@@ -103,4 +103,3 @@ export type TModeToggleProps = {
   mode: TChartMode;
   onChange: (mode: TChartMode) => void;
 };
-

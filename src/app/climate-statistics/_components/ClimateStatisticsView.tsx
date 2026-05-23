@@ -1,7 +1,13 @@
 "use client";
 
 import { LocationSearch, TempPrecipChart, ThreeDotsScaleLoader } from "@/components";
-import { ChartSkeleton, ExportMenu, MapSkeleton, PageWrapper, StatCardsSkeleton } from "@/components/UI";
+import {
+  ChartSkeleton,
+  ExportMenu,
+  MapSkeleton,
+  PageWrapper,
+  StatCardsSkeleton,
+} from "@/components/UI";
 import { buildFilename, exportToCSV, exportToPNG, exportToSVG } from "@/utils";
 import dynamic from "next/dynamic";
 import { useRef } from "react";

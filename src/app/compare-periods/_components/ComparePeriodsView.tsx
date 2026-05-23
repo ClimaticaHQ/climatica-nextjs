@@ -8,7 +8,14 @@ import {
   MultiPeriodStatsTable,
   TempPrecipChart,
 } from "@/components";
-import { ChartSkeleton, ComparisonTableSkeleton, Dropdown, ExportMenu, MapSkeleton, PageWrapper } from "@/components/UI";
+import {
+  ChartSkeleton,
+  ComparisonTableSkeleton,
+  Dropdown,
+  ExportMenu,
+  MapSkeleton,
+  PageWrapper,
+} from "@/components/UI";
 import {
   CELL_SIZE_OPTIONS,
   CLIMATE_COMPARISON_COLORS,
