@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
-import type { TWLCitiesLayoutProps } from "./TempPrecipChart.type";
 import { WalterLiethChart } from "./WalterLiethChart";
-import { WL_COLORS_A, WL_COLORS_B } from "./TempPrecipChart.constant";
+import { WL_COLORS_A, WL_COLORS_B } from "./WalterLiethChart.constant";
+import type { TWLCitiesLayoutProps } from "./WalterLiethChart.type";
 
-export function WLCitiesLayout({
+export function WalterLiethCitiesLayout({
   chartDataA,
   chartDataB,
   labelA,

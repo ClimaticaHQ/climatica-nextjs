@@ -11,9 +11,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { AridityLegend, SummaryStats, WLCustomized, WLPeriodsTooltip } from "./components";
-import type { TWLPeriodsLayoutProps, TWLScaledPoint } from "./TempPrecipChart.type";
-import { WL_COLORS_A, WL_COLORS_B } from "./TempPrecipChart.constant";
+import {
+  AridityLegend,
+  SummaryStats,
+  WalterLiethCustomized,
+  WalterLiethPeriodsTooltip,
+} from "./components";
+import { WL_COLORS_A, WL_COLORS_B } from "./WalterLiethChart.constant";
+import type { TWLPeriodsLayoutProps, TWLScaledPoint } from "./WalterLiethChart.type";
 
 function toScaledPoint(d: { monthName: string; tavg: number; prec: number }): TWLScaledPoint {
   return {
@@ -24,7 +29,7 @@ function toScaledPoint(d: { monthName: string; tavg: number; prec: number }): TW
   };
 }
 
-export function WLPeriodsLayout({
+export function WalterLiethPeriodsLayout({
   chartDataA,
   chartDataB,
   scales,
@@ -117,7 +122,7 @@ export function WLPeriodsLayout({
 
               <Tooltip
                 content={
-                  <WLPeriodsTooltip
+                  <WalterLiethPeriodsTooltip
                     wlDataA={scaledA}
                     wlDataB={scaledB}
                     labelA={labelA}
@@ -133,7 +138,7 @@ export function WLPeriodsLayout({
               <Line yAxisId="right" dataKey="precB" strokeWidth={0} dot={false} legendType="none" />
 
               <Customized
-                component={WLCustomized}
+                component={WalterLiethCustomized}
                 wlData={scaledA}
                 wlScales={scales}
                 colors={WL_COLORS_A}
@@ -141,7 +146,7 @@ export function WLPeriodsLayout({
               />
 
               <Customized
-                component={WLCustomized}
+                component={WalterLiethCustomized}
                 wlData={scaledB}
                 wlScales={scales}
                 colors={WL_COLORS_B}

@@ -1,9 +1,8 @@
 import { MONTH_NAMES } from "@/constants";
 import { useTranslation } from "react-i18next";
-import type { TWLTooltipProps } from "../TempPrecipChart.type";
-import { CHART_COLORS } from "../TempPrecipChart.constant";
+import type { TWLTooltipProps } from "../WalterLiethChart.type";
 
-export function WLTooltip({ active, label, wlData }: TWLTooltipProps) {
+export function WalterLiethTooltip({ active, label, wlData }: TWLTooltipProps) {
   const { t } = useTranslation();
   if (!active || !label) return null;
 
@@ -20,15 +19,15 @@ export function WLTooltip({ active, label, wlData }: TWLTooltipProps) {
       style={{ fontSize: 13 }}
     >
       <p className="mb-1 font-semibold text-[var(--color-text)]">{displayLabel}</p>
-      <p style={{ color: CHART_COLORS.wl.tempStroke }}>
+      <p style={{ color: "var(--color-wl-temp-line-a)" }}>
         {t("chart.avgTemperature")}: {point.tavg.toFixed(1)}°C
       </p>
-      <p style={{ color: CHART_COLORS.wl.precStroke }}>
+      <p style={{ color: "var(--color-wl-prec-line-a)" }}>
         {t("chart.precipitation")}: {Math.round(point.prec)} mm
       </p>
       <p
         className="mt-1"
-        style={{ color: isArid ? CHART_COLORS.wl.aridTooltip : CHART_COLORS.wl.humidTooltip }}
+        style={{ color: isArid ? "var(--color-wl-arid-tooltip)" : "var(--color-wl-prec-line-b)" }}
       >
         {isArid ? t("chart.aridPeriod") : t("chart.humidPeriod")}
       </p>

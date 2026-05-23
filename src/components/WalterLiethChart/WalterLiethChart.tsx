@@ -1,3 +1,4 @@
+import { ClimateStatsBar } from "@/components/ClimateStatsBar";
 import { MONTH_NAMES } from "@/constants";
 import { computeWLAxisTicks } from "@/utils";
 import { useTranslation } from "react-i18next";
@@ -11,12 +12,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { AridityLegend } from "./components/AridityLegend";
-import { ClimateStatsBar } from "@/components/ClimateStatsBar";
-import { WLCustomized } from "./components/WLCustomized";
-import { WLTooltip } from "./components/WLTooltip";
-import type { TWLScaledPoint, TWalterLiethChartProps } from "./TempPrecipChart.type";
-import { WL_COLORS_A } from "./TempPrecipChart.constant";
+import { AridityLegend, WalterLiethCustomized, WalterLiethTooltip } from "./components";
+import { WL_COLORS_A } from "./WalterLiethChart.constant";
+import type { TWLScaledPoint, TWalterLiethChartProps } from "./WalterLiethChart.type";
 
 export function WalterLiethChart({
   chartData,
@@ -111,7 +109,7 @@ export function WalterLiethChart({
                   fontWeight: 600,
                 }}
               />
-              <Tooltip content={<WLTooltip wlData={scaledData} />} />
+              <Tooltip content={<WalterLiethTooltip wlData={scaledData} />} />
               {/* Invisible lines — needed for recharts to initialise axis scales */}
               <Line
                 yAxisId="left"
@@ -131,7 +129,7 @@ export function WalterLiethChart({
               />
               <Line yAxisId="right" dataKey="prec" strokeWidth={0} dot={false} legendType="none" />
               <Customized
-                component={WLCustomized}
+                component={WalterLiethCustomized}
                 wlData={scaledData}
                 wlScales={scales}
                 colors={colors}

@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { CHART_COLORS } from "../TempPrecipChart.constant";
 
 export function AridityLegend() {
   const { t } = useTranslation();
@@ -8,14 +7,14 @@ export function AridityLegend() {
       <span className="flex items-center gap-1.5">
         <span
           className="inline-block h-3 w-3 rounded-sm"
-          style={{ backgroundColor: CHART_COLORS.arid }}
+          style={{ backgroundColor: "var(--chart-arid)" }}
         />
         {t("chart.aridPeriod")}
       </span>
       <span className="flex items-center gap-1.5">
         <span
           className="inline-block h-3 w-3 rounded-sm"
-          style={{ backgroundColor: CHART_COLORS.humid }}
+          style={{ backgroundColor: "var(--chart-humid)" }}
         />
         {t("chart.humidPeriod")}
       </span>
