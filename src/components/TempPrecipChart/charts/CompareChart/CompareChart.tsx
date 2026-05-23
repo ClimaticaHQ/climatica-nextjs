@@ -1,4 +1,4 @@
-import { ClimateStatsBar } from "@/components";
+import { AridityLegend } from "@/components/WalterLiethChart";
 import { MONTH_NAMES } from "@/constants";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -13,13 +13,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { AridityLegend, PrecipBarShape } from "./components";
-import { CHART_COLORS } from "./TempPrecipChart.constant";
-import type { TDotRendererProps, TStandardClimateChartProps } from "./TempPrecipChart.type";
-
-function periodColor(i: number, colors: readonly string[] | undefined): string {
-  return colors?.[i] ?? `var(--color-period-${i})`;
-}
+import { PrecipBarShape } from "../../components";
+import { CHART_COLORS } from "../../TempPrecipChart.constant";
+import type { TDotRendererProps } from "../../TempPrecipChart.type";
+import type { TCompareChartProps } from "./CompareChart.type";
 
 function CompareModeLegend({
   labelA,
@@ -54,64 +51,18 @@ function CompareModeLegend({
   );
 }
 
-function MultiPeriodLegend({
-  periods,
-  periodColors: colors,
-  hiddenPeriods,
-}: {
-  periods: { year: number }[];
-  periodColors: readonly string[] | undefined;
-  hiddenPeriods: number[];
-}) {
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-3 pt-3" style={{ fontSize: 11 }}>
-      {periods.map(({ year }, i) => {
-        const color = periodColor(i, colors);
-        const isHidden = hiddenPeriods.includes(year);
-        return (
-          <span
-            key={year}
-            className="flex items-center gap-1.5 transition-opacity"
-            style={{ opacity: isHidden ? 0.35 : 1 }}
-          >
-            <span
-              className="inline-block h-2.5 w-2.5 rounded-sm"
-              style={{ backgroundColor: color }}
-            />
-            <span style={{ color }}>{year}</span>
-          </span>
-        );
-      })}
-    </div>
-  );
-}
-
-export function StandardClimateChart({
+export function CompareChart({
   chartData,
-  aridity,
-  aridityA,
-  scales,
-  rightMax,
-  summary,
   visible,
-  selectedMonths,
-  isCompare,
   labelA,
   labelB,
-  altitude,
+  scales,
+  rightMax,
+  selectedMonths,
   showAridity = true,
-  multiPeriodData,
-  hiddenPeriods = [],
-  periodColors,
-}: TStandardClimateChartProps) {
+  aridityA,
+}: TCompareChartProps) {
   const { t } = useTranslation();
-
-  const isMultiPeriod = multiPeriodData !== undefined && multiPeriodData.length > 0;
-
-  const aridityByMonth = useMemo<Record<number, boolean> | undefined>(() => {
-    if (!aridity) return undefined;
-    return Object.fromEntries(aridity.map((m) => [m.month, m.isArid]));
-  }, [aridity]);
 
   const aridityByMonthA = useMemo<Record<number, boolean> | undefined>(() => {
     if (!aridityA) return undefined;
@@ -124,9 +75,8 @@ export function StandardClimateChart({
   }
 
   function makeDot(color: string) {
-    function DotRenderer(dotProps: TDotRendererProps) {
-      const { cx = 0, cy = 0, fill = color, index = -1 } = dotProps;
-      const month = aridity?.[index]?.month ?? (index >= 0 ? index + 1 : -1);
+    function DotRenderer({ cx = 0, cy = 0, fill = color, index = -1 }: TDotRendererProps) {
+      const month = index >= 0 ? index + 1 : -1;
       const isSelected =
         !selectedMonths || selectedMonths.length === 0 || selectedMonths.includes(month);
       const isHighlighted = selectedMonths?.length === 1 && isSelected;
@@ -146,15 +96,6 @@ export function StandardClimateChart({
 
   return (
     <>
-      {summary && !isMultiPeriod && (
-        <ClimateStatsBar
-          meanTemp={summary.annualAvgTemp}
-          annualPrecip={summary.totalPrec}
-          aridMonths={summary.aridCount}
-          martonneIndex={summary.martonne}
-          {...(altitude !== undefined ? { altitude } : {})}
-        />
-      )}
       <div className="overflow-x-auto">
         <div className="h-[300px] sm:h-[360px] md:h-[420px] lg:h-[460px] min-w-[520px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -227,88 +168,13 @@ export function StandardClimateChart({
                 }}
               />
 
-              {isMultiPeriod ? (
-                <Legend
-                  verticalAlign="bottom"
-                  height={36}
-                  content={() => (
-                    <MultiPeriodLegend
-                      periods={multiPeriodData}
-                      periodColors={periodColors}
-                      hiddenPeriods={hiddenPeriods}
-                    />
-                  )}
-                />
-              ) : isCompare ? (
-                <Legend
-                  verticalAlign="bottom"
-                  height={52}
-                  content={() => <CompareModeLegend labelA={labelA} labelB={labelB} />}
-                />
-              ) : (
-                <Legend verticalAlign="bottom" height={48} wrapperStyle={{ paddingTop: 24 }} />
-              )}
+              <Legend
+                verticalAlign="bottom"
+                height={52}
+                content={() => <CompareModeLegend labelA={labelA} labelB={labelB} />}
+              />
 
-              {/* ── Single mode ── */}
-              {!isCompare && !isMultiPeriod && visible.prec && (
-                <Bar
-                  yAxisId="prec"
-                  dataKey="prec"
-                  name={t("chart.precipitation")}
-                  fill={CHART_COLORS.humid}
-                  minPointSize={0}
-                  background={false}
-                  shape={
-                    <PrecipBarShape
-                      selectedMonths={selectedMonths}
-                      aridityByMonth={showAridity ? aridityByMonth : undefined}
-                    />
-                  }
-                />
-              )}
-
-              {!isCompare && !isMultiPeriod && visible.tmax && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tmax"
-                  name={t("chart.maxTemperature")}
-                  stroke={CHART_COLORS.single.tmax}
-                  strokeWidth={2}
-                  dot={makeDot(CHART_COLORS.single.tmax)}
-                  activeDot={{ r: 5 }}
-                />
-              )}
-
-              {!isCompare && !isMultiPeriod && visible.tavg && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tavg"
-                  name={t("chart.avgTemperature")}
-                  stroke={CHART_COLORS.single.tavg}
-                  strokeWidth={2}
-                  strokeDasharray="5 3"
-                  dot={makeDot(CHART_COLORS.single.tavg)}
-                  activeDot={{ r: 5 }}
-                />
-              )}
-
-              {!isCompare && !isMultiPeriod && visible.tmin && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tmin"
-                  name={t("chart.minTemperature")}
-                  stroke={CHART_COLORS.single.tmin}
-                  strokeWidth={2}
-                  dot={makeDot(CHART_COLORS.single.tmin)}
-                  activeDot={{ r: 5 }}
-                />
-              )}
-
-              {/* ── Compare mode ── */}
-              {isCompare && visible.prec && (
+              {visible.prec && (
                 <Bar
                   yAxisId="prec"
                   dataKey="precA"
@@ -325,7 +191,7 @@ export function StandardClimateChart({
                 />
               )}
 
-              {isCompare && visible.tmax && (
+              {visible.tmax && (
                 <Line
                   yAxisId="temp"
                   type="monotone"
@@ -338,7 +204,7 @@ export function StandardClimateChart({
                 />
               )}
 
-              {isCompare && visible.tavg && (
+              {visible.tavg && (
                 <Line
                   yAxisId="temp"
                   type="monotone"
@@ -352,7 +218,7 @@ export function StandardClimateChart({
                 />
               )}
 
-              {isCompare && visible.tmin && (
+              {visible.tmin && (
                 <Line
                   yAxisId="temp"
                   type="monotone"
@@ -366,7 +232,7 @@ export function StandardClimateChart({
                 />
               )}
 
-              {isCompare && visible.prec && (
+              {visible.prec && (
                 <Bar
                   yAxisId="prec"
                   dataKey="precB"
@@ -378,7 +244,7 @@ export function StandardClimateChart({
                 />
               )}
 
-              {isCompare && visible.tmax && (
+              {visible.tmax && (
                 <Line
                   yAxisId="temp"
                   type="monotone"
@@ -391,7 +257,7 @@ export function StandardClimateChart({
                 />
               )}
 
-              {isCompare && visible.tavg && (
+              {visible.tavg && (
                 <Line
                   yAxisId="temp"
                   type="monotone"
@@ -405,7 +271,7 @@ export function StandardClimateChart({
                 />
               )}
 
-              {isCompare && visible.tmin && (
+              {visible.tmin && (
                 <Line
                   yAxisId="temp"
                   type="monotone"
@@ -418,67 +284,11 @@ export function StandardClimateChart({
                   strokeDasharray="4 2"
                 />
               )}
-
-              {/* ── Multi-period mode ── */}
-              {isMultiPeriod &&
-                multiPeriodData.flatMap(({ year }, i) => {
-                  const color = periodColor(i, periodColors);
-                  const hidden = hiddenPeriods.includes(year);
-                  const series = [];
-                  if (visible.prec) {
-                    series.push(
-                      <Bar
-                        key={`bar-${year}`}
-                        yAxisId="prec"
-                        dataKey={`${year}_prec`}
-                        name={`${year} — ${t("chart.precipitation")}`}
-                        fill={color}
-                        minPointSize={0}
-                        hide={hidden}
-                        shape={<PrecipBarShape selectedMonths={selectedMonths} />}
-                      />,
-                    );
-                  }
-                  if (visible.tmax) {
-                    series.push(
-                      <Line
-                        key={`line-tmax-${year}`}
-                        yAxisId="temp"
-                        type="monotone"
-                        dataKey={`${year}_tmax`}
-                        name={`${year} — ${t("chart.maxTemperature")}`}
-                        stroke={color}
-                        strokeWidth={2}
-                        dot={makeDot(color)}
-                        activeDot={{ r: 4 }}
-                        hide={hidden}
-                      />,
-                    );
-                  }
-                  if (visible.tmin) {
-                    series.push(
-                      <Line
-                        key={`line-tmin-${year}`}
-                        yAxisId="temp"
-                        type="monotone"
-                        dataKey={`${year}_tmin`}
-                        name={`${year} — ${t("chart.minTemperature")}`}
-                        stroke={color}
-                        strokeWidth={2}
-                        strokeDasharray="4 2"
-                        dot={makeDot(color)}
-                        activeDot={{ r: 3 }}
-                        hide={hidden}
-                      />,
-                    );
-                  }
-                  return series;
-                })}
             </ComposedChart>
           </ResponsiveContainer>
         </div>
       </div>
-      {visible.prec && showAridity && !isMultiPeriod && <AridityLegend />}
+      {visible.prec && showAridity && <AridityLegend />}
     </>
   );
 }

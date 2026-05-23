@@ -1,15 +1,17 @@
-import { FilterChip } from "@/components/FilterChip";
+import {
+  FilterChip,
+  WalterLiethChart,
+  WalterLiethCitiesLayout,
+  WalterLiethPeriodsLayout,
+} from "@/components";
 import { CLIMATE_PERIOD_LABELS, DATASETS } from "@/constants";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ModeToggle } from "./components/ModeToggle";
+import { CompareChart, MultiPeriodChart, StandardClimateChart } from "./charts";
+import { ModeToggle } from "./components";
 import { useTempPrecipChart } from "./hooks";
 import { CalendarIcon, DatabaseIcon } from "./icons";
-import { StandardClimateChart } from "./StandardClimateChart";
 import type { TChartMode, TTempPrecipChartProps, TVisibleSeries } from "./TempPrecipChart.type";
-import { WalterLiethChart } from "./WalterLiethChart";
-import { WLCitiesLayout } from "./WLCitiesLayout";
-import { WLPeriodsLayout } from "./WLPeriodsLayout";
 
 const DEFAULT_VISIBLE: TVisibleSeries = { tmax: true, tmin: true, tavg: false, prec: true };
 
@@ -143,7 +145,7 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
           {...(props.altitude !== undefined ? { altitude: props.altitude } : {})}
         />
       ) : isWalterLieth && props.compareMode === "periods" ? (
-        <WLPeriodsLayout
+        <WalterLiethPeriodsLayout
           chartDataA={chart.chartDataA}
           chartDataB={chart.chartDataB}
           scales={chart.scales}
@@ -153,7 +155,7 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
           summaryB={chart.summaryB}
         />
       ) : isWalterLieth ? (
-        <WLCitiesLayout
+        <WalterLiethCitiesLayout
           chartDataA={chart.chartDataA}
           chartDataB={chart.chartDataB}
           labelA={props.labelA ?? ""}
@@ -162,26 +164,40 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
           summaryA={chart.summaryA}
           summaryB={chart.summaryB}
         />
+      ) : chart.isMultiPeriod ? (
+        <MultiPeriodChart
+          chartData={chart.chartData}
+          multiPeriodData={props.multiPeriodData ?? []}
+          visible={visible}
+          scales={chart.scales}
+          rightMax={chart.rightMax}
+          {...(props.selectedMonths !== undefined ? { selectedMonths: props.selectedMonths } : {})}
+          {...(props.periodColors !== undefined ? { periodColors: props.periodColors } : {})}
+          {...(props.hiddenPeriods !== undefined ? { hiddenPeriods: props.hiddenPeriods } : {})}
+        />
+      ) : chart.isCompare ? (
+        <CompareChart
+          chartData={chart.chartData}
+          visible={visible}
+          scales={chart.scales}
+          rightMax={chart.rightMax}
+          showAridity={showAridity}
+          aridityA={chart.aridityA}
+          {...(props.labelA !== undefined ? { labelA: props.labelA } : {})}
+          {...(props.labelB !== undefined ? { labelB: props.labelB } : {})}
+          {...(props.selectedMonths !== undefined ? { selectedMonths: props.selectedMonths } : {})}
+        />
       ) : (
         <StandardClimateChart
           chartData={chart.chartData}
           aridity={chart.aridity}
-          aridityA={chart.aridityA}
           scales={chart.scales}
           rightMax={chart.rightMax}
           summary={chart.summary}
           visible={visible}
-          isCompare={chart.isCompare}
           showAridity={showAridity}
           {...(props.selectedMonths !== undefined ? { selectedMonths: props.selectedMonths } : {})}
-          {...(props.labelA !== undefined ? { labelA: props.labelA } : {})}
-          {...(props.labelB !== undefined ? { labelB: props.labelB } : {})}
           {...(props.altitude !== undefined ? { altitude: props.altitude } : {})}
-          {...(props.multiPeriodData !== undefined
-            ? { multiPeriodData: props.multiPeriodData }
-            : {})}
-          {...(props.hiddenPeriods !== undefined ? { hiddenPeriods: props.hiddenPeriods } : {})}
-          {...(props.periodColors !== undefined ? { periodColors: props.periodColors } : {})}
         />
       )}
     </div>

@@ -19,4 +19,9 @@ export { TempPrecipChart } from "./TempPrecipChart";
 export { Topbar } from "./Topbar";
 export { SectionLabel } from "./UI";
 export type { TMiniMapLocation } from "./UI";
+export {
+  WalterLiethChart,
+  WalterLiethCitiesLayout,
+  WalterLiethPeriodsLayout,
+} from "./WalterLiethChart";
 export { YearInput } from "./YearInput";
