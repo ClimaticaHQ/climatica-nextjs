@@ -1,0 +1,1 @@
+export { MultiPeriodStatsTable } from "./MultiPeriodStatsTable";

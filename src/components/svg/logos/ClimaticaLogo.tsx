@@ -1,0 +1,38 @@
+export default function ClimaticaLogo({ className }: { className?: string }) {
+  return (
+    <svg
+      width="1452"
+      height="1222"
+      viewBox="0 0 1452 1222"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <rect y="691" width="295" height="531" rx="40" fill="var(--color-light)" />
+      <path
+        d="M386 466C386 443.909 403.909 426 426 426H641C663.091 426 681 443.909 681 466V1182C681 1204.09 663.091 1222 641 1222H426C403.909 1222 386 1204.09 386 1182V466Z"
+        fill="var(--color-secondary)"
+      />
+      <path
+        d="M1157 334C1157 311.909 1174.91 294 1197 294H1412C1434.09 294 1452 311.909 1452 334V1182C1452 1204.09 1434.09 1222 1412 1222H1197C1174.91 1222 1157 1204.09 1157 1182V334Z"
+        fill="var(--color-secondary)"
+      />
+      <rect x="771" y="28" width="295" height="1194" rx="40" fill="var(--color-primary)" />
+      <ellipse cx="148" cy="529.5" rx="105" ry="105.5" fill="var(--color-dark)" />
+      <path
+        d="M1409 104.5C1409 162.214 1362.21 209 1304.5 209C1246.79 209 1200 162.214 1200 104.5C1200 46.7862 1246.79 0 1304.5 0C1362.21 0 1409 46.7862 1409 104.5Z"
+        fill="var(--color-dark)"
+      />
+      <path
+        d="M1025 365.5C1025 423.214 978.214 470 920.5 470C862.786 470 816 423.214 816 365.5C816 307.786 862.786 261 920.5 261C978.214 261 1025 307.786 1025 365.5Z"
+        fill="var(--color-dark)"
+      />
+      <ellipse cx="533" cy="230.5" rx="105" ry="104.5" fill="var(--color-dark)" />
+      <path
+        d="M156 523C175.176 315.407 395.336 223.695 515.187 223.695C681.536 223.695 696.255 523 908.672 367.057C1039.13 271.284 1108.92 -17.0068 1304 100.861"
+        stroke="var(--color-dark)"
+        strokeWidth="70"
+      />
+    </svg>
+  );
+}

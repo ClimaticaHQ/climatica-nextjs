@@ -1,0 +1,43 @@
+{
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "search.exclude": {
+    "package-lock.json": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always",
+    "source.addMissingImports": "explicit"
+  },
+  "i18n-ally.localesPaths": ["src/i18n/locales"],
+  "i18n-ally.keystyle": "nested",
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "cSpell.words": [
+    "Andrii",
+    "axios",
+    "Climatica",
+    "climograph",
+    "hyperarid",
+    "Kononenko",
+    "Lieth",
+    "martonne",
+    "navlink",
+    "perhumid",
+    "PREC",
+    "Precip",
+    "Sparql",
+    "tavg",
+    "tmax",
+    "tmin",
+    "Topbar",
+    "WORLDCLIM",
+    "Клімограф"
+  ]
+}

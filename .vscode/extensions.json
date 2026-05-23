@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "mikestead.dotenv",
+    "bradlc.vscode-tailwindcss",
+    "github.vscode-github-actions",
+    "lokalise.i18n-ally",
+    "esbenp.prettier-vscode",
+    "ms-playwright.playwright"
+  ]
+}

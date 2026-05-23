@@ -1,0 +1,18 @@
+export const EXCLUDE_DESCRIPTION_KEYWORDS = [
+  "district",
+  "neighborhood",
+  "neighbourhood",
+  "quarter",
+  "barrio",
+  "historic",
+  "precinct",
+  "ranch",
+  "comarca",
+  "province",
+  "region",
+  "state",
+  "department",
+  "street",
+  "road",
+  "avenue",
+] as const;

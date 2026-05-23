@@ -1,0 +1,1 @@
+export { CompareCities } from "./CompareCities";
