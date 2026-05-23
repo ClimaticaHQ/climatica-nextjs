@@ -18,8 +18,11 @@ import { useTranslation } from "react-i18next";
 import type { TCitySearchRowProps, TCompareCitiesViewProps } from "./CompareCities.type";
 
 const MiniMap = dynamic(
-  () => import("@/components/shared/MiniMap").then((m) => ({ default: m.MiniMap })),
-  { ssr: false, loading: () => <div style={{ height: 200 }} /> },
+  () => import("@/components/UI/MiniMap/MiniMap").then((m) => ({ default: m.MiniMap })),
+  {
+    ssr: false,
+    loading: () => <div style={{ height: 200 }} />,
+  },
 );
 
 function CitySearchRow({ label, dotColor, defaultValue, onCitySelect }: TCitySearchRowProps) {

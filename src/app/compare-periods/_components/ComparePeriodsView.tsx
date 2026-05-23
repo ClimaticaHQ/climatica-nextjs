@@ -27,8 +27,11 @@ import { useTranslation } from "react-i18next";
 import type { TClimatePeriodRowProps, TComparePeriodsViewProps } from "./ComparePeriods.type";
 
 const MiniMap = dynamic(
-  () => import("@/components/shared/MiniMap").then((m) => ({ default: m.MiniMap })),
-  { ssr: false, loading: () => <div style={{ height: 200 }} /> },
+  () => import("@/components/UI/MiniMap/MiniMap").then((m) => ({ default: m.MiniMap })),
+  {
+    ssr: false,
+    loading: () => <div style={{ height: 200 }} />,
+  },
 );
 
 const CLIMATE_PERIOD_OPTIONS = Object.values(CLIMATE_PERIODS).map((period) => ({
