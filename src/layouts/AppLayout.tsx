@@ -3,7 +3,7 @@
 import { Sidebar, Topbar } from "@/components";
 import { Suspense, useEffect, useState } from "react";
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function AppLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   function closeSidebar() {

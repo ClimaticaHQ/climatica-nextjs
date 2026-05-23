@@ -1,4 +1,4 @@
-import { Layout } from "@/components/Layout";
+import { AppLayout } from "@/layouts";
 import "@/styles/global.css";
 import type { Metadata } from "next";
 import { Providers } from "./providers";
@@ -13,7 +13,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body>
         <Providers>
-          <Layout>{props.children}</Layout>
+          <AppLayout>{props.children}</AppLayout>
         </Providers>
       </body>
     </html>
