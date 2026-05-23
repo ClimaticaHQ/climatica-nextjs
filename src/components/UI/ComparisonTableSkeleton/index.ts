@@ -1,0 +1,1 @@
+export { ComparisonTableSkeleton } from "./ComparisonTableSkeleton";
