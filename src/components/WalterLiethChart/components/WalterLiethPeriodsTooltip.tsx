@@ -1,9 +1,9 @@
 import { MONTH_NAMES } from "@/constants";
 import { useTranslation } from "react-i18next";
-import type { TWLPeriodsTooltipProps, TWLScaledPoint } from "../TempPrecipChart.type";
-import { WL_COLORS_A, WL_COLORS_B } from "../TempPrecipChart.constant";
+import { WL_COLORS_A, WL_COLORS_B } from "../WalterLiethChart.constant";
+import type { TWLPeriodsTooltipProps, TWLScaledPoint } from "../WalterLiethChart.type";
 
-export function WLPeriodsTooltip({
+export function WalterLiethPeriodsTooltip({
   active,
   label,
   wlDataA,

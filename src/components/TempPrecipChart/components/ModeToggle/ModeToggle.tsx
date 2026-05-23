@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { IconAreaChart } from "../icons/IconAreaChart";
-import { IconBarChart } from "../icons/IconBarChart";
-import type { TModeButtonProps, TModeToggleProps } from "../TempPrecipChart.type";
+import { IconAreaChart } from "../../icons/IconAreaChart";
+import { IconBarChart } from "../../icons/IconBarChart";
+import type { TModeButtonProps, TModeToggleProps } from "../../TempPrecipChart.type";
 
 function ModeButton({ isActive, onClick, title, children }: TModeButtonProps) {
   return (

@@ -1,5 +1,5 @@
-import { WikidataService } from "@/api";
 import { TIME_CONSTANTS } from "@/constants";
+import { WikidataService } from "@/libs";
 import type { TCoordinates, TWikidataCity } from "@/types";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";

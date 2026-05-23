@@ -1,4 +1,4 @@
-import { WorldClimService } from "@/api";
+import { WorldClimService } from "@/libs";
 import type {
   TBbox,
   TCellSize,

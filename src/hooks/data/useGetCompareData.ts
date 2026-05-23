@@ -1,5 +1,5 @@
-import { WorldClimService } from "@/api";
 import { DATASETS, WEATHER_VARIABLES } from "@/constants";
+import { WorldClimService } from "@/libs";
 import { useFiltersStore } from "@/stores";
 import type {
   TCellSize,

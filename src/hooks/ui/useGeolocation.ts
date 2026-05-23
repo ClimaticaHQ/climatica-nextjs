@@ -1,5 +1,5 @@
-import { WikidataService } from "@/api/services/wikidataService";
 import { GEOLOCATION_ERRORS } from "@/constants";
+import { WikidataService } from "@/libs";
 import type { TGeolocationError, TUseGeolocationReturn, TWikidataCity } from "@/types";
 import { useState } from "react";
 

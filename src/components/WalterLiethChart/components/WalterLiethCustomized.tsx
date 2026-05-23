@@ -1,11 +1,11 @@
+import { linearPath } from "@/components/TempPrecipChart/utils/catmullRomPath";
 import { useXAxisScale, useYAxisScale } from "recharts";
-import type { TWLCustomizedProps } from "../TempPrecipChart.type";
-import { linearPath } from "../utils/catmullRomPath";
-import { WL_COLORS_A } from "../TempPrecipChart.constant";
+import { WL_COLORS_A } from "../WalterLiethChart.constant";
+import type { TWLCustomizedProps } from "../WalterLiethChart.type";
 
 // Renders Walter-Lieth fills and curves via SVG clipPath (even-odd winding rule).
 // Uses recharts v3 hooks to access the chart's coordinate systems.
-export function WLCustomized({
+export function WalterLiethCustomized({
   wlData,
   wlScales,
   colors = WL_COLORS_A,

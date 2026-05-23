@@ -1,5 +1,5 @@
-import type { TBarShape } from "../TempPrecipChart.type";
-import { CHART_COLORS } from "../TempPrecipChart.constant";
+import { CHART_COLORS } from "../../TempPrecipChart.constant";
+import type { TBarShape } from "../../TempPrecipChart.type";
 
 /**
  * Draws the bar from y=0 to y=value regardless of axis minimum.

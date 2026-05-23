@@ -1,6 +1,6 @@
-import { useTranslation } from "react-i18next";
 import { getMartonneBadge } from "@/utils/martonne.util";
-import type { TSummaryStatsProps } from "../TempPrecipChart.type";
+import { useTranslation } from "react-i18next";
+import type { TSummaryStatsProps } from "../WalterLiethChart.type";
 
 const BORDER_RIGHT = "0.5px solid var(--color-border)";
 
