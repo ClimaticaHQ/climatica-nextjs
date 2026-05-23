@@ -1,5 +1,4 @@
-import { WikidataService } from "@/api/services";
-import { env } from "@/libs";
+import { env, WikidataService } from "@/libs";
 import { Redis } from "@upstash/redis";
 import { type NextRequest, NextResponse } from "next/server";
 

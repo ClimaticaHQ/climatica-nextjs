@@ -1,4 +1,4 @@
-import { WikidataService } from "@/api";
+import { WikidataService } from "@/libs";
 import type { TCoordinates, TWikidataCity } from "@/types";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 

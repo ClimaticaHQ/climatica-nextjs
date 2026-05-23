@@ -1,4 +1,4 @@
-import { WikidataService } from "@/api";
+import { WikidataService } from "@/libs";
 import type { TWikidataCity } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";

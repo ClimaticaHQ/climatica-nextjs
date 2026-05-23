@@ -1,7 +1,6 @@
-import { WorldClimService } from "@/api";
-import type { TCellSize } from "@/types";
-import type { TCellBounds } from "@/types";
 import { GRID_DELTA } from "@/constants";
+import { WorldClimService } from "@/libs";
+import type { TCellBounds, TCellSize } from "@/types";
 import { iriToCellBounds } from "@/utils";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
