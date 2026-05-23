@@ -1,7 +1,7 @@
 "use client";
 
 import { LocationSearch, TempPrecipChart, ThreeDotsScaleLoader } from "@/components";
-import { ExportMenu, PageWrapper } from "@/components/UI";
+import { ChartSkeleton, ExportMenu, MapSkeleton, PageWrapper, StatCardsSkeleton } from "@/components/UI";
 import { buildFilename, exportToCSV, exportToPNG, exportToSVG } from "@/utils";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
@@ -11,7 +11,7 @@ import { computeClimateStats } from "./ClimateStatistics.util";
 
 const LeafletMap = dynamic(
   () => import("@/components/LeafletMap").then((m) => ({ default: m.LeafletMap })),
-  { ssr: false, loading: () => <div style={{ height: 400 }} /> },
+  { ssr: false, loading: () => <MapSkeleton variant="full" /> },
 );
 
 function StatCard({ label, value, unit, tooltip }: TStatCardProps) {
@@ -133,7 +133,9 @@ export function ClimateStatisticsView({
 
         {selectedCity && (temperatureData.length > 0 || isLoading || isFetching) && (
           <div id="climate-stats-container" className="flex flex-col gap-8">
-            {stats && (
+            {isLoading ? (
+              <StatCardsSkeleton />
+            ) : stats ? (
               <div className="flex flex-col gap-3">
                 <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                   <StatCard
@@ -174,7 +176,7 @@ export function ClimateStatisticsView({
                     : " "}
                 </p>
               </div>
-            )}
+            ) : null}
 
             <div id="climate-chart-container" className="flex flex-col gap-2">
               <div className="flex justify-end">
@@ -185,29 +187,30 @@ export function ClimateStatisticsView({
                   isDisabled={temperatureData.length === 0}
                 />
               </div>
-              <section
-                ref={(el) => {
-                  chartRef.current = el;
-                }}
-                className="relative"
-              >
-                {(isLoading || isFetching) && (
-                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] bg-[var(--color-bg)]/80 backdrop-blur-sm">
-                    <ThreeDotsScaleLoader className="text-[var(--color-primary)]" size={80} />
-                    <p className="text-sm text-[var(--color-text-secondary)]">
-                      {isLoading ? t("loading.fetchingClimateData") : t("loading.updating")}
-                    </p>
-                  </div>
-                )}
-                <TempPrecipChart
-                  cityName={cityName}
-                  subtitle={subtitle}
-                  variables={variables}
-                  data={temperatureData}
-                  {...(altitude !== null ? { altitude } : {})}
-                  {...(isFiltered ? { selectedMonths } : {})}
-                />
-              </section>
+              {isLoading ? (
+                <ChartSkeleton />
+              ) : (
+                <section
+                  ref={(el) => {
+                    chartRef.current = el;
+                  }}
+                  className="relative"
+                >
+                  {isFetching && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-bg)]/80 backdrop-blur-sm">
+                      <ThreeDotsScaleLoader className="text-[var(--color-primary)]" size={80} />
+                    </div>
+                  )}
+                  <TempPrecipChart
+                    cityName={cityName}
+                    subtitle={subtitle}
+                    variables={variables}
+                    data={temperatureData}
+                    {...(altitude !== null ? { altitude } : {})}
+                    {...(isFiltered ? { selectedMonths } : {})}
+                  />
+                </section>
+              )}
             </div>
           </div>
         )}

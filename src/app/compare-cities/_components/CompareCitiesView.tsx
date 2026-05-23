@@ -1,14 +1,8 @@
 "use client";
 
 import type { TMiniMapLocation } from "@/components";
-import {
-  CompareStatsGrid,
-  DiffCard,
-  SearchBar,
-  TempPrecipChart,
-  ThreeDotsScaleLoader,
-} from "@/components";
-import { ExportMenu, PageWrapper } from "@/components/UI";
+import { CompareStatsGrid, DiffCard, SearchBar, TempPrecipChart } from "@/components";
+import { ChartSkeleton, ComparisonTableSkeleton, ExportMenu, PageWrapper } from "@/components/UI";
 import { CELL_SIZE_OPTIONS, CLIMATE_COMPARISON_COLORS } from "@/constants";
 import { buildFilename, exportElementToPng, exportTableToCsv, getMartonneBadge } from "@/utils";
 import { computeCompareStats, computeDiffStats } from "@/utils/climateComparison.util";
@@ -176,8 +170,9 @@ export function CompareCitiesView({
         </div>
 
         {isLoading && (
-          <div className="flex flex-col items-center gap-3 py-12">
-            <ThreeDotsScaleLoader className="text-[var(--color-primary)]" size={80} />
+          <div className="flex flex-col gap-6">
+            <ComparisonTableSkeleton />
+            <ChartSkeleton />
           </div>
         )}
 

@@ -7,9 +7,8 @@ import {
   LocationSearch,
   MultiPeriodStatsTable,
   TempPrecipChart,
-  ThreeDotsScaleLoader,
 } from "@/components";
-import { Dropdown, ExportMenu, PageWrapper } from "@/components/UI";
+import { ChartSkeleton, ComparisonTableSkeleton, Dropdown, ExportMenu, MapSkeleton, PageWrapper } from "@/components/UI";
 import {
   CELL_SIZE_OPTIONS,
   CLIMATE_COMPARISON_COLORS,
@@ -30,7 +29,7 @@ const MiniMap = dynamic(
   () => import("@/components/UI/MiniMap/MiniMap").then((m) => ({ default: m.MiniMap })),
   {
     ssr: false,
-    loading: () => <div style={{ height: 200 }} />,
+    loading: () => <MapSkeleton variant="mini" />,
   },
 );
 
@@ -269,8 +268,9 @@ export function ComparePeriodsView({
         </div>
 
         {isLoading && isClimate && (
-          <div className="flex flex-col items-center gap-3 py-12">
-            <ThreeDotsScaleLoader className="text-[var(--color-primary)]" size={80} />
+          <div className="flex flex-col gap-6">
+            <ComparisonTableSkeleton />
+            <ChartSkeleton />
           </div>
         )}
 
@@ -378,7 +378,7 @@ export function ComparePeriodsView({
                 altitude={altitude}
                 periodColors={PERIOD_COLORS}
               />
-              {periodsData.length > 0 && (
+              {periodsData.length > 0 ? (
                 <TempPrecipChart
                   cityName={city.label}
                   multiPeriodData={periodsData}
@@ -389,7 +389,9 @@ export function ComparePeriodsView({
                     ? { selectedMonths }
                     : {})}
                 />
-              )}
+              ) : loadingPeriods.length > 0 ? (
+                <ChartSkeleton />
+              ) : null}
             </div>
           </div>
         )}

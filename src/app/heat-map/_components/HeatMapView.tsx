@@ -1,7 +1,7 @@
 "use client";
 
 import { LocationSearch } from "@/components";
-import { PageWrapper } from "@/components/UI";
+import { MapSkeleton, PageWrapper } from "@/components/UI";
 import { buildFilename, exportElementToPng, exportTableToCsv } from "@/utils";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
@@ -14,7 +14,10 @@ import { Toolbar } from "./components/Toolbar";
 
 const MapCanvas = dynamic(
   () => import("./components/MapCanvas").then((m) => ({ default: m.MapCanvas })),
-  { ssr: false, loading: () => <div style={{ height: 520 }} /> },
+  {
+    ssr: false,
+    loading: () => <MapSkeleton variant="full" heightClassName="h-[70vh] sm:h-[520px]" />,
+  },
 );
 
 export function HeatMapView({
