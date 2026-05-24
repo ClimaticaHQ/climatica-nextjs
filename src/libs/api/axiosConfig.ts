@@ -1,4 +1,4 @@
-import { ERROR_CONSTANTS, TIME_CONSTANTS } from "@/constants";
+import { ERROR_CONSTANTS, TIME } from "@/constants";
 import { GLOBAL_CONFIG } from "@/libs/GlobalConfig";
 import { userStore } from "@/stores";
 import type { TApiResponse } from "@/types/api/common";
@@ -6,7 +6,7 @@ import axios, { type AxiosError, type AxiosResponse } from "axios";
 
 export const axiosInstance = axios.create({
   baseURL: GLOBAL_CONFIG.apiBaseUrl,
-  timeout: TIME_CONSTANTS.FIFTY_SECONDS,
+  timeout: TIME.IN_MILLISECONDS.FIFTY_SECONDS,
   headers: { "Content-Type": "application/json;charset=utf-8" },
 });
 

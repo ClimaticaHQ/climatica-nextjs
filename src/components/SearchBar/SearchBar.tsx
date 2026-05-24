@@ -1,4 +1,4 @@
-import { TIME_CONSTANTS } from "@/constants";
+import { TIME } from "@/constants";
 import { WikidataService } from "@/libs";
 import type { TCoordinates, TWikidataCity } from "@/types";
 import { useEffect, useRef, useState } from "react";
@@ -58,7 +58,7 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
         })
         .catch(() => setResults([]))
         .finally(() => setIsLoading(false));
-    }, TIME_CONSTANTS.FOUR_HUNDRED_MILLISECONDS);
+    }, TIME.IN_MILLISECONDS.ONE_HUNDRED_MS * 4);
   }
 
   function handleSelectCity(city: TWikidataCity) {
