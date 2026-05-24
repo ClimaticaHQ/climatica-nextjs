@@ -34,7 +34,6 @@
     <useColdSearcher>false</useColdSearcher>
   </query>
 
-  <!-- Search handler -->
   <requestHandler name="/select" class="solr.SearchHandler">
     <lst name="defaults">
       <str name="echoParams">explicit</str>
@@ -43,7 +42,6 @@
     </lst>
   </requestHandler>
 
-  <!-- Cities search handler -->
   <requestHandler name="/cities" class="solr.SearchHandler">
     <lst name="defaults">
       <str name="echoParams">explicit</str>
@@ -65,29 +63,6 @@
     <lst name="defaults">
       <str name="echoParams">all</str>
     </lst>
-  </requestHandler>
-
-  <searchComponent name="suggest" class="solr.SuggestComponent">
-    <lst name="suggester">
-      <str name="name">citySuggester</str>
-      <str name="lookupImpl">AnalyzingInfixLookupFactory</str>
-      <str name="indexPath">suggester</str>
-      <str name="field">label_en</str>
-      <str name="suggestAnalyzerFieldType">suggestType</str>
-      <str name="buildOnStartup">false</str>
-      <str name="buildOnCommit">true</str>
-    </lst>
-  </searchComponent>
-
-  <requestHandler name="/suggest" class="solr.SearchHandler" startup="lazy">
-    <lst name="defaults">
-      <str name="suggest">true</str>
-      <str name="suggest.count">10</str>
-      <str name="suggest.component">citySuggester</str>
-    </lst>
-    <arr name="components">
-      <str>suggest</str>
-    </arr>
   </requestHandler>
 
   <requestDispatcher>
