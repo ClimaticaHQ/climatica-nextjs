@@ -3,6 +3,11 @@ export type TCoordinates = {
   lng: number;
 };
 
+export type TCitySearchParams = {
+  lang: string;
+  query: string;
+};
+
 export type TWikidataCity = {
   id: string;
   label: string;

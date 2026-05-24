@@ -38,6 +38,8 @@ export type {
 } from "./api";
 export type {
   TCellSize,
+  TCitySearchParams,
+  TClimateSearch,
   TCoordinates,
   TDataset,
   TMonthFilter,
