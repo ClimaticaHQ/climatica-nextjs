@@ -7,6 +7,8 @@ export type {
   TRawPixelValueBinding,
   TRawPixelValueResponse,
   TResultStatus,
+  TSolrCityDoc,
+  TSolrResponse,
   TSparqlUriValue,
   TSparqlValue,
   TWikidataCoords,
