@@ -64,6 +64,22 @@ export class RedisClient {
     }
   }
 
+  public static async incrementCounter(key: string, ttl: number): Promise<number> {
+    try {
+      const redis = RedisClient.getInstance();
+      const count = await redis.incr(key);
+
+      if (count === 1) {
+        await redis.expire(key, ttl);
+      }
+
+      return count;
+    } catch (error: any) {
+      logger.error(`[Redis] INCR error for key "${key}": ${error.message}`);
+      return 0;
+    }
+  }
+
   public static async del(key: string): Promise<void> {
     try {
       await RedisClient.getInstance().del(key);
