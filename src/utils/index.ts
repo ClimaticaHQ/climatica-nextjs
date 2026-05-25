@@ -1,3 +1,4 @@
+export { buildQueryParams } from "./buildQueryParams.util";
 export { estimateCellCount, getCellCountStatus } from "./cellCount.util";
 export { getColorStops, interpolateColor } from "./colorScale.util";
 export { cssVar, hexToRgb } from "./cssVar.util";
@@ -9,6 +10,7 @@ export {
   exportToPNG,
   exportToSVG,
 } from "./export.util";
+export { getCityDescription } from "./geonames.util";
 export { getMartonneBadge } from "./martonne.util";
 export {
   encodeMonths,
