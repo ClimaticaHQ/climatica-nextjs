@@ -1,33 +1,66 @@
-import { env, WikidataService } from "@/libs";
-import { Redis } from "@upstash/redis";
+import { CACHE_TTL } from "@/constants";
+import { logger } from "@/libs/Logger";
+import { REDIS_STRATEGIES } from "@/libs/redis";
+import { RedisClient } from "@/libs/redis/client";
+import { SolrService, WikidataService } from "@/libs/services";
 import { type NextRequest, NextResponse } from "next/server";
-
-const CACHE_TTL = 60 * 60 * 24;
-
-function getRedis() {
-  if (!env.UPSTASH_REDIS_REST_URL || !env.UPSTASH_REDIS_REST_TOKEN) return null;
-  return new Redis({
-    url: env.UPSTASH_REDIS_REST_URL,
-    token: env.UPSTASH_REDIS_REST_TOKEN,
-  });
-}
+import { parseCoordinates } from "../@utils";
 
 export async function GET(request: NextRequest) {
-  const q = request.nextUrl.searchParams.get("q");
+  const q = request.nextUrl.searchParams.get("q")?.trim();
+  const lang = request.nextUrl.searchParams.get("lang") ?? "en";
+
+  logger.info(`[Cities] GET called: q="${q}", lang="${lang}"`);
+
   if (!q || q.length < 2) return NextResponse.json([]);
 
-  const redis = getRedis();
-  const cacheKey = `city-search:${q.toLowerCase()}`;
+  const coords = parseCoordinates(q);
+  if (coords) {
+    const cacheKey = REDIS_STRATEGIES.nearestCity.buildKey(coords);
+    const cached = await RedisClient.get(cacheKey);
+    if (cached) {
+      logger.info(`[Cities] Cache HIT for key: ${cacheKey}`);
+      return NextResponse.json(cached);
+    }
+    logger.info(`[Cities] Cache MISS for key: ${cacheKey}`);
 
-  if (redis) {
-    const cached = await redis.get(cacheKey);
-    if (cached) return NextResponse.json(cached);
+    const city = await WikidataService.findNearestCityByCoordinates(coords.lat, coords.lng);
+
+    const result = city ? [city] : [];
+    if (result.length > 0) {
+      await RedisClient.set(cacheKey, result, REDIS_STRATEGIES.nearestCity.ttl);
+    }
+    return NextResponse.json(result);
   }
 
-  const results = await WikidataService.searchCity(q);
+  const strategy = REDIS_STRATEGIES.citySearch;
+  const cacheKey = strategy.buildKey({ query: q, lang });
 
-  if (redis) {
-    await redis.set(cacheKey, results, { ex: CACHE_TTL });
+  const cached = await RedisClient.get(cacheKey);
+  if (cached) {
+    logger.info(`[Cities] Cache HIT for key: ${cacheKey}`);
+    return NextResponse.json(cached);
+  }
+  logger.info(`[Cities] Cache MISS for key: ${cacheKey}`);
+
+  const results = await SolrService.searchCities(q, lang);
+  logger.info(`[Cities] Solr returned ${results.length} results`);
+
+  if (results.length > 0) {
+    const isShortQuery = q.length < 4;
+
+    if (isShortQuery) {
+      await RedisClient.set(cacheKey, results, strategy.shortTtl);
+      logger.info(
+        `[Cities] Cached ${results.length} results with short TTL ${CACHE_TTL.CITY_SEARCH_SHORT}s`,
+      );
+    } else {
+      const counterKey = strategy.buildCounterKey({ query: q, lang });
+      const count = await RedisClient.incrementCounter(counterKey, strategy.ttl);
+      const ttl = count >= strategy.popularThreshold ? strategy.popularTtl : strategy.ttl;
+      await RedisClient.set(cacheKey, results, ttl);
+      logger.info(`[Cities] Cached ${results.length} results with TTL ${ttl}s`);
+    }
   }
 
   return NextResponse.json(results);
