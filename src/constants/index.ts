@@ -3,7 +3,6 @@ export {
   EXCLUDE_DESCRIPTION_KEYWORDS,
   MONTH_NAMES,
   RESULT_STATUSES,
-  SOLR_CONFIG,
   WORLDCLIM_BASE_URL,
   WORLDCLIM_GRID_BASE,
   WORLDCLIM_PROXY_BASE,
@@ -28,6 +27,7 @@ export {
   DEFAULT_HEATMAP_LOCATION,
 } from "./defaultCity.constant";
 export { ERROR_CONSTANTS } from "./error.constant";
+export { FEATURE_CODE_LABELS } from "./geonames.constant";
 export { GEOLOCATION_ERRORS } from "./hooks.constant";
 export {
   DEFAULT_LANGUAGE,

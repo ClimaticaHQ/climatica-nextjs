@@ -1,5 +1,4 @@
 export { ENDPOINTS, RESULT_STATUSES } from "./api.constant";
-export { SOLR_CONFIG } from "./solr.constant";
 export { EXCLUDE_DESCRIPTION_KEYWORDS } from "./wikidata.constant";
 export {
   MONTH_NAMES,
