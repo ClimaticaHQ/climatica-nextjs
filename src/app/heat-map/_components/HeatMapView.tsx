@@ -103,7 +103,10 @@ export function HeatMapView({
     <PageWrapper>
       <div className="flex flex-col gap-8">
         <header className="text-center">
-          <h1 className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]">
+          <h1
+            className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]"
+            suppressHydrationWarning
+          >
             {t("heatMap.title")}
           </h1>
         </header>
@@ -170,13 +173,15 @@ export function HeatMapView({
         )}
 
         {!hasSelection && !isLoading && (
-          <p className="text-center text-[var(--color-text-secondary)]">
+          <p className="text-center text-[var(--color-text-secondary)]" suppressHydrationWarning>
             {t("heatMap.noSelection")}
           </p>
         )}
 
         {hasNoData && !isLoading && (
-          <p className="text-center text-[var(--color-text-secondary)]">{t("heatMap.noData")}</p>
+          <p className="text-center text-[var(--color-text-secondary)]" suppressHydrationWarning>
+            {t("heatMap.noData")}
+          </p>
         )}
       </div>
     </PageWrapper>

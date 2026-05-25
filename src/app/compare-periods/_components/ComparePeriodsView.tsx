@@ -218,12 +218,18 @@ export function ComparePeriodsView({
     <PageWrapper>
       <div className="flex flex-col gap-10">
         <header className="text-center">
-          <h1 className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]">
+          <h1
+            className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]"
+            suppressHydrationWarning
+          >
             {t("comparePeriods.title")}
           </h1>
         </header>
 
-        <p className="text-center text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
+        <p
+          className="text-center text-[length:var(--font-xs)] text-[var(--color-text-secondary)]"
+          suppressHydrationWarning
+        >
           {t("climateComparison.autoResolution", { resolution: CELL_SIZE_OPTIONS[autoGrid] })}
         </p>
 

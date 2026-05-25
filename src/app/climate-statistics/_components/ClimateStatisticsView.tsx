@@ -105,10 +105,13 @@ export function ClimateStatisticsView({
     <PageWrapper>
       <div className="flex flex-col gap-10">
         <header className="text-center">
-          <h1 className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]">
+          <h1
+            className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]"
+            suppressHydrationWarning
+          >
             {t("climateStatistics.title")}
           </h1>
-          <p className="mt-1 text-[var(--color-text-secondary)]">
+          <p className="mt-1 text-[var(--color-text-secondary)]" suppressHydrationWarning>
             {t("climateStatistics.subtitle")}
           </p>
         </header>
