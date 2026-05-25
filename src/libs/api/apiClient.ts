@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import type { AxiosRequestConfig } from "axios";
 import { axiosInstance } from "./axiosConfig";
 
 class APIClient {
@@ -19,4 +19,5 @@ class APIClient {
   }
 }
 
-export const apiClient = new APIClient();
+export const apiClient = axiosInstance;
+export const legacyApiClient = new APIClient();
