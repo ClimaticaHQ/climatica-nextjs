@@ -1,12 +1,13 @@
-import { WorldClimService } from "@/libs";
+import { apiClient } from "@/libs/api";
 import type {
   TBbox,
   TCellSize,
   TClimatePeriod,
   TProfileResult,
+  TRawAvgValueResponse,
   TWorldClimAvgBoxBinding,
 } from "@/types";
-import { groupAvgBindings } from "@/utils";
+import { buildGridIri, buildVariableIris, groupAvgBindings } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 
 export function useGetRegionalProfile(
@@ -33,25 +34,32 @@ export function useGetRegionalProfile(
     ],
     queryFn: async (): Promise<TProfileResult> => {
       const fetchAvg = async (varName: string): Promise<TWorldClimAvgBoxBinding | null> => {
-        const raw = bbox
-          ? await WorldClimService.getAvgPixelValuesInBox(
-              bbox.north,
-              bbox.south,
-              bbox.west,
-              bbox.east,
-              gridSize,
-              [varName],
-              isClimate,
-              isClimate ? undefined : year,
-            )
-          : await WorldClimService.getAvgPixelValuesInPolygon(
-              wkt!,
-              gridSize,
-              [varName],
-              isClimate,
-              isClimate ? undefined : year,
-            );
+        const datasetParams = isClimate
+          ? { isClimate: true }
+          : { isWeather: true, year: year ?? new Date().getFullYear() };
 
+        const endpoint = bbox
+          ? "/api/worldclim/avgpixelvaluesinbox"
+          : "/api/worldclim/avgpixelvaluesinpolygonGEO";
+
+        const params = bbox
+          ? {
+              north: bbox.north,
+              south: bbox.south,
+              west: bbox.west,
+              east: bbox.east,
+              grid: buildGridIri(gridSize),
+              var: buildVariableIris([varName]),
+              ...datasetParams,
+            }
+          : {
+              polygon: wkt!,
+              grid: buildGridIri(gridSize),
+              var: buildVariableIris([varName]),
+              ...datasetParams,
+            };
+
+        const { data: raw } = await apiClient.get<TRawAvgValueResponse>(endpoint, { params });
         const allBindings = groupAvgBindings(raw.results.bindings);
         const filtered = isClimate
           ? allBindings.filter((b) => b.raster?.value?.includes(climatePeriod))
