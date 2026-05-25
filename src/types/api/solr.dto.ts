@@ -1,5 +1,5 @@
 export type TSolrCityDoc = {
-  geonameid: string;
+  geonameid: number;
   label_en: string;
   label_uk?: string;
   label_es?: string;
