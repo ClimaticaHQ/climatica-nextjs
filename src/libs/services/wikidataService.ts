@@ -1,3 +1,5 @@
+import "server-only";
+
 import { ENDPOINTS, EXCLUDE_DESCRIPTION_KEYWORDS } from "@/constants";
 import type {
   TPopulationResult,

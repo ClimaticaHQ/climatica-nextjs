@@ -1,3 +1,5 @@
+import "server-only";
+
 import { WORLDCLIM_PROXY_BASE } from "@/constants";
 import type {
   TCellSize,
