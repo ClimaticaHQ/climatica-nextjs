@@ -1,9 +1,12 @@
+import "server-only";
+
 import { CACHE_KEYS, CACHE_TTL, THRESHOLDS } from "@/constants";
 import { TCitySearchParams, TClimateSearch, TCoordinates } from "@/types";
 
 export const REDIS_STRATEGIES = {
   citySearch: {
     ttl: CACHE_TTL.CITY_SEARCH,
+    shortTtl: CACHE_TTL.CITY_SEARCH_SHORT,
     popularTtl: CACHE_TTL.POPULAR_CITY,
     popularThreshold: THRESHOLDS.POPULAR_CITY,
     buildKey: (dto: TCitySearchParams) => CACHE_KEYS.CITY_SEARCH(dto),

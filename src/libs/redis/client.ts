@@ -1,6 +1,8 @@
+import "server-only";
+
 import { TIME } from "@/constants";
 import Redis from "ioredis";
-import env from "../Env";
+import { env } from "../Env";
 import { logger } from "../Logger";
 
 export class RedisClient {
