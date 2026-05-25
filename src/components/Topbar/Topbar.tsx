@@ -3,7 +3,7 @@
 import { LanguageSwitcher } from "@/components";
 import { LANGUAGE_SWITCHER_VARIANTS, NAV_LINKS } from "@/constants";
 import { useTheme } from "@/hooks";
-import { GLOBAL_CONFIG } from "@/libs";
+import { GLOBAL_CONFIG } from "@/libs/GlobalConfig";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
