@@ -25,6 +25,9 @@
     "solr:import": "docker cp docker/solr/data/cities.csv climatica-solr:/var/solr/data/cities.csv && docker exec climatica-solr post -c cities /var/solr/data/cities.csv",
     "solr:reindex": "npm run solr:schema && npm run solr:import",
     "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -51,12 +54,14 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.7",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "prettier": "^3.8.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "typescript-eslint": "^8.48.0",
-    "vite-tsconfig-paths": "^6.1.1"
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.7"
   }
 }
