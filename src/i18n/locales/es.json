@@ -34,7 +34,7 @@
       "resolution": "Resolución",
       "autoResolutionTooltip": "La resolución se establece automáticamente según el conjunto de datos seleccionado",
       "altitude": "Altitud",
-      "filteredMonths": "Filtrado: {{months}}"
+      "filteredMonths": "Filtrado: {months}"
     }
   },
   "compareCities": {
@@ -51,11 +51,11 @@
     "weather": {
       "periods": "Años",
       "addPeriod": "Añadir período",
-      "maxPeriods": "Máximo {{max}} períodos",
-      "removePeriod": "Eliminar {{year}}",
-      "invalidYear": "Introduce un año entre {{min}} y {{max}}",
+      "maxPeriods": "Máximo {max} períodos",
+      "removePeriod": "Eliminar {year}",
+      "invalidYear": "Introduce un año entre {min} y {max}",
       "duplicateYear": "Este año ya está en la lista",
-      "periodsCount": "{{count}} / {{max}} períodos"
+      "periodsCount": "{count} / {max} períodos"
     }
   },
   "climateComparison": {
@@ -81,17 +81,17 @@
       "moreRain": "Más lluvias",
       "hottestMonth": "Mes más caluroso",
       "coldestMonth": "Mes más frío",
-      "byDegrees": "por {{value}}°C",
-      "byMm": "por {{value}} mm",
+      "byDegrees": "por {value}°C",
+      "byMm": "por {value} mm",
       "tie": "Empate"
     },
-    "autoResolution": "Resolución automática: {{resolution}}",
+    "autoResolution": "Resolución automática: {resolution}",
     "wlCompare": {
-      "warmerBy": "{{label}} más cálido por {{value}}°C",
-      "coolerBy": "{{label}} más frío por {{value}}°C",
+      "warmerBy": "{label} más cálido por {value}°C",
+      "coolerBy": "{label} más frío por {value}°C",
       "sameTemp": "Temperatura promedio igual",
-      "moreArid": "{{label}} tiene {{value}} mes(es) árido(s) más",
-      "fewerArid": "{{label}} tiene {{value}} mes(es) árido(s) menos",
+      "moreArid": "{label} tiene {value} mes(es) árido(s) más",
+      "fewerArid": "{label} tiene {value} mes(es) árido(s) menos",
       "sameArid": "Mismos meses áridos"
     }
   },
@@ -112,23 +112,23 @@
       "median": "Mediana",
       "stdDev": "Desv. típ.",
       "cellsAnalyzed": "Celdas",
-      "contextClimate": "Prom. 30 años · {{period}}",
-      "contextWeatherAnnual": "Prom. anual · {{year}}",
-      "contextWeatherMonth": "Prom. {{month}} {{year}}",
-      "avgTooltipClimate": "Promedio climatológico de 30 años ({{period}}) en todas las celdas",
+      "contextClimate": "Prom. 30 años · {period}",
+      "contextWeatherAnnual": "Prom. anual · {year}",
+      "contextWeatherMonth": "Prom. {month} {year}",
+      "avgTooltipClimate": "Promedio climatológico de 30 años ({period}) en todas las celdas",
       "avgTooltipWeatherAnnual": "Promedio anual: media de los 12 promedios mensuales en todas las celdas",
-      "avgTooltipWeatherMonth": "Promedio mensual: media de {{variable}} para {{month}} {{year}} en todas las celdas"
+      "avgTooltipWeatherMonth": "Promedio mensual: media de {variable} para {month} {year} en todas las celdas"
     },
-    "showingVariable": "Mostrando: {{variable}}",
+    "showingVariable": "Mostrando: {variable}",
     "useMyLocation": "Usar mi ubicación",
     "locating": "Localizando...",
-    "summaryLine": "{{count}} celdas analizadas · {{period}} · {{variable}} · cuadrícula {{grid}}",
-    "summaryLineClimate": "{{count}} celdas · Prom. 30 años {{variable}} · {{period}} · {{grid}}",
-    "summaryLineWeatherAnnual": "{{count}} celdas · Prom. anual {{variable}} · {{year}} · {{grid}}",
-    "summaryLineWeatherMonth": "{{count}} celdas · {{variable}} en {{period}} · {{grid}}",
+    "summaryLine": "{count} celdas analizadas · {period} · {variable} · cuadrícula {grid}",
+    "summaryLineClimate": "{count} celdas · Prom. 30 años {variable} · {period} · {grid}",
+    "summaryLineWeatherAnnual": "{count} celdas · Prom. anual {variable} · {year} · {grid}",
+    "summaryLineWeatherMonth": "{count} celdas · {variable} en {period} · {grid}",
     "profile": {
-      "subtitle": "Perfil climático regional · {{count}} celdas · {{period}}",
-      "subtitleWeather": "Perfil climático regional · {{count}} celdas · {{year}} · no es una normal climática"
+      "subtitle": "Perfil climático regional · {count} celdas · {period}",
+      "subtitleWeather": "Perfil climático regional · {count} celdas · {year} · no es una normal climática"
     }
   },
   "chart": {
@@ -157,11 +157,11 @@
     "modeStandard": "Gráfico estándar",
     "modeWalterLieth": "Diagrama Walter-Lieth",
     "walterLiethTabUnavailable": "No disponible en la vista Walter-Lieth",
-    "selectedMonth": "valores de {{month}}",
+    "selectedMonth": "valores de {month}",
     "altitude": "Altitud",
     "subtitle": {
-      "climate": "Clima {{period}}",
-      "weather": "Tiempo {{year}}"
+      "climate": "Clima {period}",
+      "weather": "Tiempo {year}"
     },
     "legend": {
       "seriesNote": "Sólida = tmax · Discontinua = tmin · Barras = precip"
@@ -186,12 +186,12 @@
   },
   "map": {
     "selectedFromMap": "Seleccionado desde el mapa",
-    "pointLabel": "Punto del mapa {{lat}}, {{lng}}"
+    "pointLabel": "Punto del mapa {lat}, {lng}"
   },
   "cellSizes": {
     "10m": "10 min (~324 km2)",
     "5m": "5 min (~81 km2)",
-    "2.5m": "2.5 min (~20.25 km2)",
+    "2_5m": "2.5 min (~20.25 km2)",
     "30s": "30 seg (~1 km2)"
   },
   "filters": {
@@ -202,8 +202,8 @@
       "required": "El año es obligatorio",
       "invalid": "Ingresa un número válido",
       "integer": "El año debe ser un número entero",
-      "tooSmall": "El año debe ser al menos {{min}}",
-      "tooBig": "El año no puede superar {{max}}"
+      "tooSmall": "El año debe ser al menos {min}",
+      "tooBig": "El año no puede superar {max}"
     },
     "period": {
       "invalid": "Selecciona un período climático válido"
