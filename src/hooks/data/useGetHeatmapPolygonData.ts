@@ -7,7 +7,7 @@ import type {
   TRawPixelValueResponse,
   TVariable,
 } from "@/types";
-import { buildGridIri, buildVariableIris, groupAvgBindings, groupPixelBindings } from "@/utils";
+import { buildGridIri, buildHeatmapResults, buildVariableIris } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 
 export function useGetHeatmapPolygonData(
@@ -39,24 +39,7 @@ export function useGetHeatmapPolygonData(
         }),
       ]);
 
-      const allPixelBindings = groupPixelBindings(rawPixels.results.bindings);
-      const allAvgBindings = groupAvgBindings(rawAvg.results.bindings);
-
-      const pixelBindings = isClimate
-        ? allPixelBindings.filter((b) => b.pixel?.value?.includes(climatePeriod))
-        : allPixelBindings;
-      const filteredPixels =
-        isClimate && pixelBindings.length === 0 ? allPixelBindings : pixelBindings;
-
-      const avgBindings = isClimate
-        ? allAvgBindings.filter((b) => b.raster?.value?.includes(climatePeriod))
-        : allAvgBindings;
-      const filteredAvg = isClimate && avgBindings.length === 0 ? allAvgBindings : avgBindings;
-
-      return {
-        pixels: { results: { bindings: filteredPixels } },
-        avg: { results: { bindings: filteredAvg } },
-      };
+      return buildHeatmapResults(rawPixels, rawAvg, isClimate, climatePeriod);
     },
     enabled,
     staleTime: Infinity,
