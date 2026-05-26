@@ -236,7 +236,8 @@
       "climatePeriod": "Кліматичний період",
       "yearRange": "Рік",
       "variables": "Змінні",
-      "months": "Місяць"
+      "months": "Місяць",
+      "filters": "Фільтри"
     },
     "datasets": {
       "climate": "Клімат",
@@ -258,6 +259,9 @@
       "from": "Від",
       "to": "До"
     },
+    "autoScroll": "Автопрокрутка до результатів",
+    "filters": "Фільтри",
+    "settings": "Налаштування",
     "applyFilters": "Застосувати",
     "cellCount": {
       "fast": "Швидко",

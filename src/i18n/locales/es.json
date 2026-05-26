@@ -236,7 +236,8 @@
       "climatePeriod": "Período climático",
       "yearRange": "Año",
       "variables": "Variables",
-      "months": "Mes"
+      "months": "Mes",
+      "filters": "Filtros"
     },
     "datasets": {
       "climate": "Clima",
@@ -258,6 +259,9 @@
       "from": "Desde",
       "to": "Hasta"
     },
+    "autoScroll": "Desplazamiento automático a resultados",
+    "filters": "Filtros",
+    "settings": "Configuración",
     "applyFilters": "Aplicar filtros",
     "cellCount": {
       "fast": "Rápido",
