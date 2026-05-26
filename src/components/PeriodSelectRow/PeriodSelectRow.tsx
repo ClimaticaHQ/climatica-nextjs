@@ -28,9 +28,7 @@ export function PeriodSelectRow({
 
   return (
     <div className="flex flex-col gap-1.5">
-      {label && (
-        <DotLabel label={label} dotColor={dotColor ?? ""} hideDot={hideDot} />
-      )}
+      {label && <DotLabel label={label} dotColor={dotColor ?? ""} hideDot={hideDot} />}
 
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">

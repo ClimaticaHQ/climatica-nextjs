@@ -2,7 +2,7 @@ import { ClimateStatsBar } from "@/components";
 import { AridityLegend } from "@/components/WalterLiethChart";
 import { MONTH_NAMES } from "@/constants";
 import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import {
   Bar,
   CartesianGrid,
@@ -30,7 +30,7 @@ export function StandardClimateChart({
   altitude,
   showAridity = true,
 }: TStandardClimateChartProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const aridityByMonth = useMemo<Record<number, boolean> | undefined>(() => {
     if (!aridity) return undefined;

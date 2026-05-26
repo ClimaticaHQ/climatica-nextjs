@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { WalterLiethChart } from "./WalterLiethChart";
 import { WL_COLORS_A, WL_COLORS_B } from "./WalterLiethChart.constant";
 import type { TWLCitiesLayoutProps } from "./WalterLiethChart.type";
@@ -12,7 +12,7 @@ export function WalterLiethCitiesLayout({
   summaryA,
   summaryB,
 }: TWLCitiesLayoutProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const tempDiff = summaryA && summaryB ? summaryA.annualAvgTemp - summaryB.annualAvgTemp : null;
   const aridDiff = summaryA && summaryB ? summaryA.aridCount - summaryB.aridCount : null;

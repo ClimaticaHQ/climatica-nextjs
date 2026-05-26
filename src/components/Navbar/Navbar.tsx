@@ -3,15 +3,15 @@
 import { LanguageSwitcher } from "@/components";
 import { LANGUAGE_SWITCHER_VARIANTS, NAV_LINKS } from "@/constants";
 import { GLOBAL_CONFIG } from "@/libs/GlobalConfig";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+
+import { Link, usePathname } from "@/libs/I18nNavigation";
 import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef<HTMLElement | null>(null);
-  const { t } = useTranslation();
+  const t = useTranslations();
   const pathname = usePathname();
 
   useEffect(() => {

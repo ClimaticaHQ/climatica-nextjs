@@ -18,8 +18,7 @@ export function buildHeatmapResults(
   const pixelBindings = isClimate
     ? allPixelBindings.filter((b) => b.pixel?.value?.includes(climatePeriod))
     : allPixelBindings;
-  const filteredPixels =
-    isClimate && pixelBindings.length === 0 ? allPixelBindings : pixelBindings;
+  const filteredPixels = isClimate && pixelBindings.length === 0 ? allPixelBindings : pixelBindings;
 
   const avgBindings = isClimate
     ? allAvgBindings.filter((b) => b.raster?.value?.includes(climatePeriod))

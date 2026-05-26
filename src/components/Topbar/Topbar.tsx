@@ -4,10 +4,10 @@ import { LanguageSwitcher } from "@/components";
 import { LANGUAGE_SWITCHER_VARIANTS, NAV_LINKS } from "@/constants";
 import { useTheme } from "@/hooks";
 import { GLOBAL_CONFIG } from "@/libs/GlobalConfig";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+
+import { Link, usePathname } from "@/libs/I18nNavigation";
 import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { ClimaticaLogo, FilterIcon, MoonIcon, SunIcon } from "../svg";
 import type { TTopbarProps } from "./Topbar.type";
 
@@ -37,7 +37,7 @@ function BurgerIcon({ isOpen }: { isOpen: boolean }) {
 }
 
 export function Topbar({ isSidebarOpen, onToggleSidebar }: TTopbarProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { isDark, toggleTheme } = useTheme();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);

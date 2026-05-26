@@ -1,5 +1,5 @@
 import { getMartonneBadge } from "@/utils/martonne.util";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TClimateStatsBarProps, TDualValueProps } from "./ClimateStatsBar.type";
 
 const CELL_BORDER = "0.5px solid var(--color-border)";
@@ -23,7 +23,7 @@ export function ClimateStatsBar({
   comparison,
   primaryColor,
 }: TClimateStatsBarProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const isCompare = comparison !== undefined;
   const showAltitude = altitude !== undefined || (isCompare && comparison.altitude !== undefined);

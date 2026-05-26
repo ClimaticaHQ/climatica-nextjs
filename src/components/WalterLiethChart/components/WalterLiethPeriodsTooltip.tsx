@@ -1,5 +1,5 @@
 import { MONTH_NAMES } from "@/constants";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { WL_COLORS_A, WL_COLORS_B } from "../WalterLiethChart.constant";
 import type { TWLPeriodsTooltipProps, TWLScaledPoint } from "../WalterLiethChart.type";
 
@@ -11,7 +11,7 @@ export function WalterLiethPeriodsTooltip({
   labelA,
   labelB,
 }: TWLPeriodsTooltipProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   if (!active || !label) return null;
 
   const ptA = wlDataA.find((d: TWLScaledPoint) => d.monthName === label);

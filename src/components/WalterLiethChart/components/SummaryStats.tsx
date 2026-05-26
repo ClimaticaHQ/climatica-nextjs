@@ -1,11 +1,11 @@
 import { getMartonneBadge } from "@/utils/martonne.util";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TSummaryStatsProps } from "../WalterLiethChart.type";
 
 const BORDER_RIGHT = "0.5px solid var(--color-border)";
 
 export function SummaryStats({ summary, altitude }: TSummaryStatsProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const badge = getMartonneBadge(summary.martonne);
   const martonneDisplay = summary.martonne !== null ? summary.martonne.toFixed(1) : "—";
 

@@ -1,9 +1,9 @@
 import { MONTH_NAMES } from "@/constants";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TWLTooltipProps } from "../WalterLiethChart.type";
 
 export function WalterLiethTooltip({ active, label, wlData }: TWLTooltipProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   if (!active || !label) return null;
 
   const point = wlData?.find((d) => d.monthName === label);

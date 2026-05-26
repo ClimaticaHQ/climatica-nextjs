@@ -2,12 +2,12 @@ import { useSearchCity } from "@/hooks/data/useSearchCity";
 import { useDebounce } from "@/hooks/ui/useDebounce";
 import type { TCoordinates, TWikidataCity } from "@/types";
 import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TSearchBarProps } from "./SearchBar.type";
 import { tryParseCoords } from "./SearchBar.util";
 
 export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [query, setQuery] = useState(defaultValue);
   const [coordResult, setCoordResult] = useState<TCoordinates | null>(null);
   const [dismissed, setDismissed] = useState(false);

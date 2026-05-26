@@ -2,7 +2,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { LocationIcon, SpinnerIcon } from "@/components/svg";
 import { Button } from "@/components/UI";
 import { EButtonVariant } from "@/enums";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TLocationSearchProps } from "./LocationSearch.type";
 
 export function LocationSearch({
@@ -14,7 +14,7 @@ export function LocationSearch({
   onLocate,
   onClearLocationError,
 }: TLocationSearchProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return (
     <div className="flex flex-col gap-2">

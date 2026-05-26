@@ -1,7 +1,7 @@
 import { ClimateStatsBar } from "@/components/ClimateStatsBar";
 import { MONTH_NAMES } from "@/constants";
 import { computeWLAxisTicks } from "@/utils";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import {
   CartesianGrid,
   ComposedChart,
@@ -24,7 +24,7 @@ export function WalterLiethChart({
   title,
   altitude,
 }: TWalterLiethChartProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   function localMonthName(v: unknown): string {
     const idx = (MONTH_NAMES as readonly string[]).indexOf(String(v));

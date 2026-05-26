@@ -1,1 +1,1 @@
-export { default as LanguageSwitcher } from "./LanguageSwitcher";
+export { LanguageSwitcher } from "./LanguageSwitcher";

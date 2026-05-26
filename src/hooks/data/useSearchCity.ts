@@ -1,7 +1,7 @@
 import { apiClient } from "@/libs/api";
 import type { TWikidataCity } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
+import { useLocale } from "next-intl";
 
 async function fetchCities(query: string, lang: string): Promise<TWikidataCity[]> {
   const { data } = await apiClient.get<TWikidataCity[]>("/api/cities", {
@@ -11,8 +11,7 @@ async function fetchCities(query: string, lang: string): Promise<TWikidataCity[]
 }
 
 export function useSearchCity(query: string) {
-  const { i18n } = useTranslation();
-  const lang = i18n.language;
+  const lang = useLocale();
   const trimmed = query.trim();
 
   return useQuery<TWikidataCity[]>({

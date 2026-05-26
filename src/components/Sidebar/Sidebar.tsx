@@ -26,9 +26,10 @@ import type { TCellSize, TCellSizeOption } from "@/types";
 import { estimateCellCount, getCellCountStatus } from "@/utils";
 import { sidebarFiltersSchema } from "@/validators";
 import { useQueryClient } from "@tanstack/react-query";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { usePathname } from "@/libs/I18nNavigation";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TDraftErrors, TDraftFilters, TSidebarProps } from "./Sidebar.type";
 
 const CLIMATE_PERIOD_OPTIONS = Object.values(CLIMATE_PERIODS).map((period) => ({
@@ -38,7 +39,7 @@ const CLIMATE_PERIOD_OPTIONS = Object.values(CLIMATE_PERIODS).map((period) => ({
 
 export function Sidebar({ isOpen, onClose }: TSidebarProps) {
   const { autoScroll, toggleAutoScroll } = useAutoScroll();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
@@ -138,7 +139,7 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
     Object.keys(CELL_SIZE_OPTIONS) as TCellSize[]
   ).map((value) => ({
     value,
-    label: t(`cellSizes.${value}`),
+    label: t(`cellSizes.${value.replace(".", "_")}`),
     ...(value === CELL_SIZES.THIRTY_SECONDS && thirtySecDisabled ? { disabled: true } : {}),
   }));
 

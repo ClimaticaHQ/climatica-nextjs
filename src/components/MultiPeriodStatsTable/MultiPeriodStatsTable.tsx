@@ -1,7 +1,7 @@
 import type { TCompareStats } from "@/types";
 import { computeCompareStats } from "@/utils/climateComparison.util";
 import { getMartonneBadge } from "@/utils/martonne.util";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TMultiPeriodStatsTableProps } from "./MultiPeriodStatsTable.type";
 
 const LABEL_COL_WIDTH = 180;
@@ -17,7 +17,7 @@ export function MultiPeriodStatsTable({
   altitude,
   periodColors,
 }: TMultiPeriodStatsTableProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const n = periods.length;
   const statsMap = new Map(periodsData.map(({ year, rows }) => [year, computeCompareStats(rows)]));

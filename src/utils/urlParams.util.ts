@@ -7,7 +7,15 @@ import {
   WEATHER_MAX_YEAR,
   WEATHER_MIN_YEAR,
 } from "@/constants";
-import type { TCellSize, TClimatePeriod, TDataset, TFiltersState, TMonthFilter, TVariable, TWikidataCity } from "@/types";
+import type {
+  TCellSize,
+  TClimatePeriod,
+  TDataset,
+  TFiltersState,
+  TMonthFilter,
+  TVariable,
+  TWikidataCity,
+} from "@/types";
 
 const VALID_VARIABLES = new Set<string>(CLIMATE_VARIABLES);
 const VALID_CELL_SIZES = new Set<string>(Object.values(CELL_SIZES));

@@ -1,7 +1,7 @@
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 export function AridityLegend() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   return (
     <div className="mt-2 flex justify-center gap-6 text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
       <span className="flex items-center gap-1.5">

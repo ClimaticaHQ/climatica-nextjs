@@ -2,10 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-export function usePersistedJson<T>(
-  key: string,
-  defaultValue: T,
-): [T, (value: T) => void] {
+export function usePersistedJson<T>(key: string, defaultValue: T): [T, (value: T) => void] {
   const [state, setState] = useState<T>(defaultValue);
 
   /* eslint-disable react-hooks/set-state-in-effect */

@@ -1,5 +1,5 @@
 import { useId, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TFiltersTabProps } from "./FiltersTab.type";
 
 function ArrowTopIcon({ className = "" }: { className?: string }) {
@@ -23,7 +23,7 @@ function ArrowTopIcon({ className = "" }: { className?: string }) {
 }
 
 export default function FiltersTab({ children, summary, className = "" }: TFiltersTabProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const panelId = useId();
 

@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { IconAreaChart } from "../../icons/IconAreaChart";
 import { IconBarChart } from "../../icons/IconBarChart";
 import type { TModeButtonProps, TModeToggleProps } from "../../TempPrecipChart.type";
@@ -22,7 +22,7 @@ function ModeButton({ isActive, onClick, title, children }: TModeButtonProps) {
 }
 
 export function ModeToggle({ mode, onChange }: TModeToggleProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   return (
     <div className="flex gap-1.5">
       <ModeButton
