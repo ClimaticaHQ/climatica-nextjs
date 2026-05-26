@@ -1,4 +1,5 @@
-export { APP_TITLE } from "./app.constant";
+export { APP_CONFIG, APP_TITLE } from "./app.constant";
+export type { TLocale } from "./app.constant";
 export {
   ENDPOINTS,
   EXCLUDE_DESCRIPTION_KEYWORDS,
