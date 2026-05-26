@@ -25,34 +25,79 @@ ALLOWED_FEATURE_CODES = {
 # * languages to extract from alternateNamesV2
 TARGET_LANGS = {"en", "uk", "es"}
 
+
 def load_alternate_names():
     print("Loading alternate names...")
-    
-    # * alternateNameId, geonameid, isolanguage, alternateName, ...
-    names = defaultdict(lambda: {"en": None, "uk": None, "es": None})
-    
+
+    # * structure: geonameid -> lang -> (name, alt_id, is_preferred)
+    # * we pick the best name per lang using priority:
+    # *   1. preferred=1 with highest alt_id (most recent preferred)
+    # *   2. any name with highest alt_id (most recent non-preferred)
+    names = defaultdict(lambda: {
+        lang: {"name": None, "alt_id": 0, "preferred": False}
+        for lang in TARGET_LANGS
+    })
+
     with open(ALTERNATE_NAMES, encoding="utf-8") as f:
         for line in f:
             parts = line.strip().split("\t")
             if len(parts) < 4:
                 continue
-            
+
+            try:
+                alt_id = int(parts[0])
+            except ValueError:
+                continue
+
             geonameid = parts[1]
             lang = parts[2]
             name = parts[3]
-            
-            if lang in TARGET_LANGS:
-                if names[geonameid][lang] is None:
-                    names[geonameid][lang] = name
-    
-    print(f"Loaded alternate names for {len(names)} places")
-    return names
+
+            # * skip non-language entries (link, wkdt, abbr, etc.)
+            if lang not in TARGET_LANGS:
+                continue
+
+            # * is_preferred is column index 4 (value "1" means preferred)
+            is_preferred = len(parts) > 4 and parts[4] == "1"
+
+            current = names[geonameid][lang]
+
+            should_update = False
+
+            if current["name"] is None:
+                # * first entry for this lang — always take it
+                should_update = True
+            elif is_preferred and not current["preferred"]:
+                # * new entry is preferred, current is not — upgrade
+                should_update = True
+            elif is_preferred and current["preferred"] and alt_id > current["alt_id"]:
+                # * both preferred — take the more recent one
+                should_update = True
+            elif not is_preferred and not current["preferred"] and alt_id > current["alt_id"]:
+                # * neither preferred — take the more recent one
+                should_update = True
+
+            if should_update:
+                names[geonameid][lang] = {
+                    "name": name,
+                    "alt_id": alt_id,
+                    "preferred": is_preferred,
+                }
+
+    # * flatten to simple geonameid -> lang -> name dict
+    result = {}
+    for geonameid, langs in names.items():
+        result[geonameid] = {lang: data["name"] for lang, data in langs.items()}
+
+    print(f"Loaded alternate names for {len(result)} places")
+    return result
+
 
 def prepare_cities():
     alt_names = load_alternate_names()
-    
+
     print("Processing allCountries.txt...")
-    
+
     count = 0
     skipped = 0
 
@@ -60,10 +105,10 @@ def prepare_cities():
          open(OUTPUT_CSV, "w", encoding="utf-8", newline="") as outfile:
 
         writer = csv.writer(outfile)
-        
+
         # * header
         writer.writerow([
-            "id",           # geonameid (Solr uses "id" as unique key)
+            "id",
             "geonameid",
             "label_en",
             "label_uk",
@@ -83,18 +128,17 @@ def prepare_cities():
 
             # * allCountries.txt columns:
             # 0  geonameid
-            # 1  name (default, usually english)
-            # 2  asciiname
-            # 3  alternatenames (comma separated)
+            # 1  name (default name, often the local transliteration)
+            # 2  asciiname (ASCII-safe version)
             # 4  latitude
             # 5  longitude
-            # 6  feature class
-            # 7  feature code
-            # 8  country code
+            # 7  feature_code
+            # 8  country_code
             # 14 population
 
             geonameid    = parts[0]
             default_name = parts[1]
+            ascii_name   = parts[2]
             latitude     = parts[4]
             longitude    = parts[5]
             feature_code = parts[7]
@@ -106,7 +150,12 @@ def prepare_cities():
                 continue
 
             alt = alt_names.get(geonameid, {})
-            label_en = alt.get("en") or default_name
+
+            # * for label_en prefer:
+            # *   1. alternate name with lang=en (preferred/recent)
+            # *   2. ascii_name (no diacritics, good for search)
+            # *   3. default_name as last resort
+            label_en = alt.get("en") or ascii_name or default_name
             label_uk = alt.get("uk") or label_en
             label_es = alt.get("es") or label_en
 
@@ -131,6 +180,7 @@ def prepare_cities():
     print(f"  Cities written: {count:,}")
     print(f"  Rows skipped:   {skipped:,}")
     print(f"  Output: {OUTPUT_CSV}")
+
 
 if __name__ == "__main__":
     prepare_cities()
