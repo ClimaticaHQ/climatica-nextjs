@@ -28,9 +28,10 @@ import {
   encodeVars,
   scrollToSection,
 } from "@/utils";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { formatCoordinate } from "./ClimateStatistics.util";
 import { ClimateStatisticsView } from "./ClimateStatisticsView";
 
@@ -39,7 +40,7 @@ function resolveCityName(city: TWikidataCity): string {
 }
 
 export function ClimateStatistics() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { city: selectedCity, selectCity } = usePersistedCity();
   const { isLoading: isResolving, mutateAsync: resolveCityByCoordinates } =
     useResolveCityByCoordinates();

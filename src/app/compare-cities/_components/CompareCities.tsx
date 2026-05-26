@@ -10,8 +10,15 @@ import {
 } from "@/hooks";
 import { useFiltersStore } from "@/stores";
 import type { TWikidataCity } from "@/types";
-import { applyUrlFiltersToStore, cityFromUrl, createUrlParamHelpers, encodeVars, scrollToSection } from "@/utils";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  applyUrlFiltersToStore,
+  cityFromUrl,
+  createUrlParamHelpers,
+  encodeVars,
+  scrollToSection,
+} from "@/utils";
+import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useEffect, useMemo, useRef } from "react";
 import { CompareCitiesView } from "./CompareCitiesView";
 

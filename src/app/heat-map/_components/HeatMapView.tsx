@@ -5,7 +5,7 @@ import { EmptyState, ErrorBanner, MapSkeleton, PageTitle, PageWrapper } from "@/
 import { buildFilename, exportElementToPng, exportTableToCsv } from "@/utils";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TRegionHeatmapViewProps } from "./HeatMap.type";
 import { computeHeatmapStats, formatSelectedMonths, pixelAnnualAvg } from "./HeatMap.util";
 import { RegionalClimateProfile } from "./components/RegionalClimateProfile";
@@ -46,7 +46,7 @@ export function HeatMapView({
   onLocate,
   onClearLocationError,
 }: TRegionHeatmapViewProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const statsBarRef = useRef<HTMLDivElement>(null);
 
   const pixelBindings = pixels?.results.bindings ?? [];

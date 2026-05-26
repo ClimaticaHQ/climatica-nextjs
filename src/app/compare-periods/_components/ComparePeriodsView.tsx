@@ -39,7 +39,7 @@ import {
 import { computeCompareStats } from "@/utils/climateComparison.util";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TClimatePeriodRowProps, TComparePeriodsViewProps } from "./ComparePeriods.type";
 
 const MiniMap = dynamic(
@@ -96,7 +96,7 @@ export function ComparePeriodsView({
   loadingPeriods,
   chartSectionRef,
 }: TComparePeriodsViewProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const climateExportRef = useRef<HTMLDivElement>(null);
   const weatherExportRef = useRef<HTMLDivElement>(null);
 
@@ -119,12 +119,15 @@ export function ComparePeriodsView({
     if (!statsA || !statsB) return;
     const badgeA = getMartonneBadge(statsA.martonneIndex);
     const badgeB = getMartonneBadge(statsB.martonneIndex);
-    const rows = buildClimateStatsRows([statsA, statsB], [
-      t("climateComparison.stats.avgTmax"),
-      t("climateComparison.stats.avgTmin"),
-      t("climateComparison.stats.totalPrec"),
-      t("climateComparison.stats.aridMonths"),
-    ]);
+    const rows = buildClimateStatsRows(
+      [statsA, statsB],
+      [
+        t("climateComparison.stats.avgTmax"),
+        t("climateComparison.stats.avgTmin"),
+        t("climateComparison.stats.totalPrec"),
+        t("climateComparison.stats.aridMonths"),
+      ],
+    );
     if (altitude != null) {
       rows.push([t("chart.altitude"), `${altitude} m`, `${altitude} m`]);
     }

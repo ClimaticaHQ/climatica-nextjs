@@ -13,7 +13,7 @@ import {
 import { buildFilename, exportToCSV, exportToPNG, exportToSVG } from "@/utils";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TClimateStatisticsViewProps, TStatCardProps } from "./ClimateStatistics.type";
 import { computeClimateStats } from "./ClimateStatistics.util";
 
@@ -75,7 +75,7 @@ export function ClimateStatisticsView({
   onClearLocationError,
   chartSectionRef,
 }: TClimateStatisticsViewProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const chartRef = useRef<HTMLElement | null>(null);
 
   const isFiltered = selectedMonths !== null && selectedMonths.length > 0;

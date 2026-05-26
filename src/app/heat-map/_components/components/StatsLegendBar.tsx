@@ -1,5 +1,5 @@
 import { interpolateColor } from "@/utils";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TStatsLegendBarProps } from "../HeatMap.type";
 import type { TSkeletonBlockProps, TStatBlockProps } from "./StatsLegendBar.type";
 
@@ -53,7 +53,7 @@ export function StatsLegendBar({
   statSubtitle,
   avgTooltip,
 }: TStatsLegendBarProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const gradientColors = Array.from({ length: 10 }, (_, i) =>
     interpolateColor(stats.min + (stats.max - stats.min) * (i / 9), stats.min, stats.max, scale),

@@ -1,6 +1,12 @@
 "use client";
 
-import { APP_TITLE, CLIMATE_PERIOD_LABELS, DATASETS, SIDEBAR_PARAMS, VARIABLE_LABELS } from "@/constants";
+import {
+  APP_TITLE,
+  CLIMATE_PERIOD_LABELS,
+  DATASETS,
+  SIDEBAR_PARAMS,
+  VARIABLE_LABELS,
+} from "@/constants";
 import {
   useGeolocation,
   useGetHeatmapData,
@@ -10,15 +16,16 @@ import {
 import { useFiltersStore } from "@/stores";
 import type { TBbox, TColorScale, TWikidataCity } from "@/types";
 import { applyUrlFiltersToStore, createUrlParamHelpers, encodeVars } from "@/utils";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TDrawMode, TMapTarget, TPolygon } from "./HeatMap.type";
 import { computeRegionalProfile, polygonToWkt, wktToPolygon } from "./HeatMap.util";
 import { HeatMapView } from "./HeatMapView";
 
 export function HeatMap() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();

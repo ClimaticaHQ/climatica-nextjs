@@ -36,9 +36,10 @@ import {
   parseYear,
   scrollToSection,
 } from "@/utils";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { ComparePeriodsView } from "./ComparePeriodsView";
 
 function resolvePeriodFromUrl(raw: string | null, fallback: TClimatePeriod): TClimatePeriod {
@@ -49,7 +50,7 @@ export function ComparePeriods() {
   const { autoScroll } = useAutoScroll();
   const userSelectedRef = useRef(false);
   const chartSectionRef = useRef<HTMLDivElement>(null);
-  const { t } = useTranslation();
+  const t = useTranslations();
   const isHydrated = useHasHydrated();
   const { cityA, selectCityA } = usePersistedComparisonCities();
   const { gridSize, dataset, months, variables } = useFiltersStore();

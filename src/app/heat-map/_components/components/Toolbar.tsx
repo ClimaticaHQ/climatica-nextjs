@@ -1,6 +1,6 @@
 import { Button, ExportMenu } from "@/components/UI";
 import { EButtonVariant } from "@/enums";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TToolbarProps } from "../HeatMap.type";
 
 function BoxIcon({ active }: { active: boolean }) {
@@ -56,7 +56,7 @@ export function Toolbar({
   onExportCSV,
   onExportPNG,
 }: TToolbarProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const activeClass =
     "border-[var(--color-primary)] bg-[var(--color-chip-active-bg)] text-[var(--color-chip-active-text)]";
   const inactiveClass =
