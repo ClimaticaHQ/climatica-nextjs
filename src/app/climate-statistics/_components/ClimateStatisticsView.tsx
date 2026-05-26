@@ -3,15 +3,17 @@
 import { LocationSearch, TempPrecipChart, ThreeDotsScaleLoader } from "@/components";
 import {
   ChartSkeleton,
+  ErrorBanner,
   ExportMenu,
   MapSkeleton,
+  PageTitle,
   PageWrapper,
   StatCardsSkeleton,
 } from "@/components/UI";
 import { buildFilename, exportToCSV, exportToPNG, exportToSVG } from "@/utils";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TClimateStatisticsViewProps, TStatCardProps } from "./ClimateStatistics.type";
 import { computeClimateStats } from "./ClimateStatistics.util";
 
@@ -71,8 +73,9 @@ export function ClimateStatisticsView({
   onMapClick,
   onLocate,
   onClearLocationError,
+  chartSectionRef,
 }: TClimateStatisticsViewProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const chartRef = useRef<HTMLElement | null>(null);
 
   const isFiltered = selectedMonths !== null && selectedMonths.length > 0;
@@ -105,10 +108,8 @@ export function ClimateStatisticsView({
     <PageWrapper>
       <div className="flex flex-col gap-10">
         <header className="text-center">
-          <h1 className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]">
-            {t("climateStatistics.title")}
-          </h1>
-          <p className="mt-1 text-[var(--color-text-secondary)]">
+          <PageTitle suppressHydrationWarning>{t("climateStatistics.title")}</PageTitle>
+          <p className="mt-1 text-[var(--color-text-secondary)]" suppressHydrationWarning>
             {t("climateStatistics.subtitle")}
           </p>
         </header>
@@ -131,14 +132,10 @@ export function ClimateStatisticsView({
           />
         </section>
 
-        {error && (
-          <div className="text-center px-4 py-3 text-[var(--color-error)] bg-[var(--color-error-bg)] rounded-[var(--radius-md)] border border-[var(--color-error-border)]">
-            <p>{error}</p>
-          </div>
-        )}
+        {error && <ErrorBanner message={error} />}
 
         {selectedCity && (temperatureData.length > 0 || isLoading || isFetching) && (
-          <div id="climate-stats-container" className="flex flex-col gap-8">
+          <div ref={chartSectionRef} id="climate-stats-container" className="flex flex-col gap-8">
             {isLoading ? (
               <StatCardsSkeleton />
             ) : stats ? (

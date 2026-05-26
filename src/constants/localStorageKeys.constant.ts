@@ -6,4 +6,5 @@ export const LOCAL_STORAGE_KEYS = {
   COMPARE_PERIODS: "comparePeriods",
   LANGUAGE: "lang",
   THEME: "theme",
+  AUTO_SCROLL: "climatica:autoScroll",
 } as const;

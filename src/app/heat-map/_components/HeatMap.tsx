@@ -1,6 +1,12 @@
 "use client";
 
-import { CLIMATE_PERIOD_LABELS, DATASETS, SIDEBAR_PARAMS, VARIABLE_LABELS } from "@/constants";
+import {
+  APP_TITLE,
+  CLIMATE_PERIOD_LABELS,
+  DATASETS,
+  SIDEBAR_PARAMS,
+  VARIABLE_LABELS,
+} from "@/constants";
 import {
   useGeolocation,
   useGetHeatmapData,
@@ -9,23 +15,17 @@ import {
 } from "@/hooks";
 import { useFiltersStore } from "@/stores";
 import type { TBbox, TColorScale, TWikidataCity } from "@/types";
-import {
-  encodeVars,
-  parseCellSize,
-  parseDataset,
-  parsePeriod,
-  parseVars,
-  parseYear,
-} from "@/utils";
+import { applyUrlFiltersToStore, createUrlParamHelpers, encodeVars } from "@/utils";
+import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { TDrawMode, TMapTarget, TPolygon } from "./HeatMap.type";
 import { computeRegionalProfile, polygonToWkt, wktToPolygon } from "./HeatMap.util";
 import { HeatMapView } from "./HeatMapView";
 
 export function HeatMap() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -72,57 +72,28 @@ export function HeatMap() {
 
   // Restore global filters from URL once on mount
   useEffect(() => {
-    const store = useFiltersStore.getState();
-
-    const ds = parseDataset(searchParams.get(SIDEBAR_PARAMS.DATASET));
-    if (ds !== null) store.actions.setDataset(ds);
-
-    const period = parsePeriod(searchParams.get(SIDEBAR_PARAMS.PERIOD));
-    if (period !== null) store.actions.setClimatePeriod(period);
-
-    const yr = parseYear(searchParams.get(SIDEBAR_PARAMS.YEAR));
-    if (yr !== null) store.actions.setWeatherYear(yr);
-
-    const vars = parseVars(searchParams.get(SIDEBAR_PARAMS.VAR));
-    if (vars !== null) store.actions.setVariables(vars);
-
-    const gridSize = parseCellSize(searchParams.get(SIDEBAR_PARAMS.GRID));
-    if (gridSize !== null) store.actions.setGridSize(gridSize);
+    applyUrlFiltersToStore(searchParams, useFiltersStore.getState().actions);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync filter params → URL (replace); separate from bbox/polygon writers
   const varsStr = useMemo(() => encodeVars(variables), [variables]);
 
   useEffect(() => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    let changed = false;
+    const helper = createUrlParamHelpers(searchParams);
 
-    function maybeSet(key: string, value: string) {
-      if (nextParams.get(key) !== value) {
-        nextParams.set(key, value);
-        changed = true;
-      }
-    }
-    function maybeDelete(key: string) {
-      if (nextParams.has(key)) {
-        nextParams.delete(key);
-        changed = true;
-      }
-    }
-
-    maybeSet(SIDEBAR_PARAMS.DATASET, dataset);
-    maybeSet(SIDEBAR_PARAMS.VAR, varsStr);
-    maybeSet(SIDEBAR_PARAMS.GRID, grid);
+    helper.set(SIDEBAR_PARAMS.DATASET, dataset);
+    helper.set(SIDEBAR_PARAMS.VAR, varsStr);
+    helper.set(SIDEBAR_PARAMS.GRID, grid);
 
     if (isClimate) {
-      maybeSet(SIDEBAR_PARAMS.PERIOD, climatePeriod);
-      maybeDelete(SIDEBAR_PARAMS.YEAR);
+      helper.set(SIDEBAR_PARAMS.PERIOD, climatePeriod);
+      helper.delete(SIDEBAR_PARAMS.YEAR);
     } else {
-      maybeSet(SIDEBAR_PARAMS.YEAR, String(weatherYear));
-      maybeDelete(SIDEBAR_PARAMS.PERIOD);
+      helper.set(SIDEBAR_PARAMS.YEAR, String(weatherYear));
+      helper.delete(SIDEBAR_PARAMS.PERIOD);
     }
 
-    if (changed) router.replace(`${pathname}?${nextParams.toString()}`);
+    if (helper.changed) router.replace(`${pathname}?${helper.params.toString()}`);
   }, [
     dataset,
     climatePeriod,
@@ -141,7 +112,7 @@ export function HeatMap() {
     const periodStr = isClimate
       ? (CLIMATE_PERIOD_LABELS[climatePeriod] ?? climatePeriod)
       : String(weatherYear);
-    document.title = `Region Heatmap · ${varLabel} ${periodStr} | Climatica`;
+    document.title = `Region Heatmap · ${varLabel} ${periodStr} | ${APP_TITLE}`;
   }, [activeVariable, isClimate, climatePeriod, weatherYear]);
 
   const wkt = polygon ? polygonToWkt(polygon) : null;

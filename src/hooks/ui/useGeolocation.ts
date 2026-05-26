@@ -1,5 +1,5 @@
 import { GEOLOCATION_ERRORS } from "@/constants";
-import { WikidataService } from "@/libs";
+import { apiClient } from "@/libs/api";
 import type { TGeolocationError, TUseGeolocationReturn, TWikidataCity } from "@/types";
 import { useState } from "react";
 
@@ -36,7 +36,10 @@ export function useGeolocation(): TUseGeolocationReturn {
         void (async () => {
           try {
             const { latitude, longitude } = position.coords;
-            const city = await WikidataService.findNearestCityByCoordinates(latitude, longitude);
+            const { data: cities } = await apiClient.get<TWikidataCity[]>("/api/cities", {
+              params: { q: `${latitude},${longitude}` },
+            });
+            const city = cities[0] ?? null;
             if (city) {
               onSuccess(city);
             } else {

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { ENDPOINTS, EXCLUDE_DESCRIPTION_KEYWORDS } from "@/constants";
 import type {
   TPopulationResult,
@@ -9,7 +11,6 @@ import type {
 } from "@/types";
 import { isValidString, parseWktPoint } from "@/utils";
 import axios from "axios";
-import i18n from "i18next";
 
 const searchCache = new Map<string, TWikidataCity[]>();
 const CACHE_MAX_SIZE = 100;
@@ -38,8 +39,7 @@ function storeCache(key: string, cities: TWikidataCity[]): void {
 
 export const WikidataService = {
   async searchCity(query: string): Promise<TWikidataCity[]> {
-    const rawLang = i18n.language ?? "en";
-    const lang = rawLang === "ua" ? "uk" : rawLang;
+    const lang = "en";
     const cacheKey = `${query}::${lang}`;
 
     const cached = searchCache.get(cacheKey);
@@ -209,7 +209,7 @@ export const WikidataService = {
   },
 
   async findNearestCityByCoordinates(lat: number, lng: number): Promise<TWikidataCity | null> {
-    const lang = i18n.language ?? "en";
+    const lang = "en";
 
     const geoSearchRes = await axios.get<TWikidataGeoSearchResult>(ENDPOINTS.WIKIDATA, {
       params: {
@@ -220,6 +220,9 @@ export const WikidataService = {
         gslimit: 5,
         format: "json",
         origin: "*",
+      },
+      headers: {
+        "User-Agent": "Climatica/1.0 (wastardy.k@gmail.com) axios/1.16.1",
       },
     });
 
@@ -244,6 +247,9 @@ export const WikidataService = {
         languages: `${lang}|en`,
         format: "json",
         origin: "*",
+      },
+      headers: {
+        "User-Agent": "Climatica/1.0 (wastardy.k@gmail.com) axios/1.16.1",
       },
     });
 

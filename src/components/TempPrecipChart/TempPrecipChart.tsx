@@ -6,7 +6,7 @@ import {
 } from "@/components";
 import { CLIMATE_PERIOD_LABELS, DATASETS } from "@/constants";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { CompareChart, MultiPeriodChart, StandardClimateChart } from "./charts";
 import { ModeToggle } from "./components";
 import { useTempPrecipChart } from "./hooks";
@@ -16,7 +16,7 @@ import type { TChartMode, TTempPrecipChartProps, TVisibleSeries } from "./TempPr
 const DEFAULT_VISIBLE: TVisibleSeries = { tmax: true, tmin: true, tavg: false, prec: true };
 
 export function TempPrecipChart(props: TTempPrecipChartProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [visible, setVisible] = useState<TVisibleSeries>(DEFAULT_VISIBLE);
   const [chartMode, setChartMode] = useState<TChartMode>("standard");
   const [prevVariables, setPrevVariables] = useState(props.variables);

@@ -34,7 +34,7 @@
       "resolution": "Роздільність",
       "autoResolutionTooltip": "Роздільність встановлюється автоматично на основі обраного датасету",
       "altitude": "Висота",
-      "filteredMonths": "Фільтр: {{months}}"
+      "filteredMonths": "Фільтр: {months}"
     }
   },
   "compareCities": {
@@ -51,11 +51,11 @@
     "weather": {
       "periods": "Роки",
       "addPeriod": "Додати період",
-      "maxPeriods": "Максимум {{max}} періодів",
-      "removePeriod": "Видалити {{year}}",
-      "invalidYear": "Введіть рік між {{min}} та {{max}}",
+      "maxPeriods": "Максимум {max} періодів",
+      "removePeriod": "Видалити {year}",
+      "invalidYear": "Введіть рік між {min} та {max}",
       "duplicateYear": "Цей рік вже є у списку",
-      "periodsCount": "{{count}} / {{max}} періодів"
+      "periodsCount": "{count} / {max} періодів"
     }
   },
   "climateComparison": {
@@ -81,17 +81,17 @@
       "moreRain": "Більше опадів",
       "hottestMonth": "Найспекотніший місяць",
       "coldestMonth": "Найхолодніший місяць",
-      "byDegrees": "на {{value}}°C",
-      "byMm": "на {{value}} мм",
+      "byDegrees": "на {value}°C",
+      "byMm": "на {value} мм",
       "tie": "Нічия"
     },
-    "autoResolution": "Авторозрядність: {{resolution}}",
+    "autoResolution": "Авторозрядність: {resolution}",
     "wlCompare": {
-      "warmerBy": "{{label}} тепліше на {{value}}°C",
-      "coolerBy": "{{label}} холодніше на {{value}}°C",
+      "warmerBy": "{label} тепліше на {value}°C",
+      "coolerBy": "{label} холодніше на {value}°C",
       "sameTemp": "Однакова середня температура",
-      "moreArid": "{{label}} має {{value}} більше посушливих місяців",
-      "fewerArid": "{{label}} має {{value}} менше посушливих місяців",
+      "moreArid": "{label} має {value} більше посушливих місяців",
+      "fewerArid": "{label} має {value} менше посушливих місяців",
       "sameArid": "Однакова кількість посушливих місяців"
     }
   },
@@ -112,23 +112,23 @@
       "median": "Медіана",
       "stdDev": "Ст. відх.",
       "cellsAnalyzed": "Клітинки",
-      "contextClimate": "Сер. 30 р. · {{period}}",
-      "contextWeatherAnnual": "Річне сер. · {{year}}",
-      "contextWeatherMonth": "Сер. {{month}} {{year}}",
-      "avgTooltipClimate": "30-річне кліматологічне середнє ({{period}}) по всіх клітинках",
+      "contextClimate": "Сер. 30 р. · {period}",
+      "contextWeatherAnnual": "Річне сер. · {year}",
+      "contextWeatherMonth": "Сер. {month} {year}",
+      "avgTooltipClimate": "30-річне кліматологічне середнє ({period}) по всіх клітинках",
       "avgTooltipWeatherAnnual": "Річне середнє: середнє з 12 місячних значень по всіх клітинках",
-      "avgTooltipWeatherMonth": "Місячне середнє: середнє {{variable}} за {{month}} {{year}} по всіх клітинках"
+      "avgTooltipWeatherMonth": "Місячне середнє: середнє {variable} за {month} {year} по всіх клітинках"
     },
-    "showingVariable": "Показується: {{variable}}",
+    "showingVariable": "Показується: {variable}",
     "useMyLocation": "Моє місцезнаходження",
     "locating": "Визначення...",
-    "summaryLine": "{{count}} комірок проаналізовано · {{period}} · {{variable}} · сітка {{grid}}",
-    "summaryLineClimate": "{{count}} клітинок · Сер. 30 р. {{variable}} · {{period}} · {{grid}}",
-    "summaryLineWeatherAnnual": "{{count}} клітинок · Річне сер. {{variable}} · {{year}} · {{grid}}",
-    "summaryLineWeatherMonth": "{{count}} клітинок · {{variable}} за {{period}} · {{grid}}",
+    "summaryLine": "{count} комірок проаналізовано · {period} · {variable} · сітка {grid}",
+    "summaryLineClimate": "{count} клітинок · Сер. 30 р. {variable} · {period} · {grid}",
+    "summaryLineWeatherAnnual": "{count} клітинок · Річне сер. {variable} · {year} · {grid}",
+    "summaryLineWeatherMonth": "{count} клітинок · {variable} за {period} · {grid}",
     "profile": {
-      "subtitle": "Кліматичний профіль регіону · {{count}} клітинок · {{period}}",
-      "subtitleWeather": "Кліматичний профіль регіону · {{count}} клітинок · {{year}} · не є кліматичною нормою"
+      "subtitle": "Кліматичний профіль регіону · {count} клітинок · {period}",
+      "subtitleWeather": "Кліматичний профіль регіону · {count} клітинок · {year} · не є кліматичною нормою"
     }
   },
   "chart": {
@@ -157,11 +157,11 @@
     "modeStandard": "Стандартний графік",
     "modeWalterLieth": "Діаграма Вальтера-Лієта",
     "walterLiethTabUnavailable": "Недоступно у вигляді Вальтера-Лієта",
-    "selectedMonth": "значення за {{month}}",
+    "selectedMonth": "значення за {month}",
     "altitude": "Висота",
     "subtitle": {
-      "climate": "Клімат {{period}}",
-      "weather": "Погода {{year}}"
+      "climate": "Клімат {period}",
+      "weather": "Погода {year}"
     },
     "legend": {
       "seriesNote": "Суцільна = tmax · Пунктир = tmin · Стовпці = precip"
@@ -186,12 +186,12 @@
   },
   "map": {
     "selectedFromMap": "Вибрано з мапи",
-    "pointLabel": "Точка на мапі {{lat}}, {{lng}}"
+    "pointLabel": "Точка на мапі {lat}, {lng}"
   },
   "cellSizes": {
     "10m": "10 хв (~324 км2)",
     "5m": "5 хв (~81 км2)",
-    "2.5m": "2.5 хв (~20.25 км2)",
+    "2_5m": "2.5 хв (~20.25 км2)",
     "30s": "30 с (~1 км2)"
   },
   "filters": {
@@ -202,8 +202,8 @@
       "required": "Рік обов'язковий",
       "invalid": "Введіть коректне число",
       "integer": "Рік має бути цілим числом",
-      "tooSmall": "Рік не може бути меншим за {{min}}",
-      "tooBig": "Рік не може перевищувати {{max}}"
+      "tooSmall": "Рік не може бути меншим за {min}",
+      "tooBig": "Рік не може перевищувати {max}"
     },
     "period": {
       "invalid": "Оберіть коректний кліматичний період"
@@ -236,7 +236,8 @@
       "climatePeriod": "Кліматичний період",
       "yearRange": "Рік",
       "variables": "Змінні",
-      "months": "Місяць"
+      "months": "Місяць",
+      "filters": "Фільтри"
     },
     "datasets": {
       "climate": "Клімат",
@@ -258,6 +259,9 @@
       "from": "Від",
       "to": "До"
     },
+    "autoScroll": "Автопрокрутка до результатів",
+    "filters": "Фільтри",
+    "settings": "Налаштування",
     "applyFilters": "Застосувати",
     "cellCount": {
       "fast": "Швидко",

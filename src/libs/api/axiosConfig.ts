@@ -1,42 +1,18 @@
-import { ERROR_CONSTANTS, TIME_CONSTANTS } from "@/constants";
-import { GLOBAL_CONFIG } from "@/libs/GlobalConfig";
-import { userStore } from "@/stores";
-import type { TApiResponse } from "@/types/api/common";
-import axios, { type AxiosError, type AxiosResponse } from "axios";
+import { TIME } from "@/constants";
+import axios from "axios";
+import { logger } from "../Logger";
 
 export const axiosInstance = axios.create({
-  baseURL: GLOBAL_CONFIG.apiBaseUrl,
-  timeout: TIME_CONSTANTS.FIFTY_SECONDS,
-  headers: { "Content-Type": "application/json;charset=utf-8" },
+  baseURL: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
+  timeout: TIME.IN_MILLISECONDS.FIFTY_SECONDS,
+  headers: { "Content-Type": "application/json" },
+  paramsSerializer: { indexes: null },
 });
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = userStore.getState().token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error instanceof Error ? error : new Error(String(error))),
-);
-
 axiosInstance.interceptors.response.use(
-  <T>(res: AxiosResponse<TApiResponse<T>>) => {
-    if (!res.data) throw new Error(ERROR_CONSTANTS.API_REQUEST_FAILED);
-    return res;
-  },
-  (error: AxiosError<TApiResponse<unknown>>) => {
-    const { response, message } = error;
-
-    const errMsg = response?.data?.message ?? message ?? ERROR_CONSTANTS.API_REQUEST_FAILED;
-
-    if (response?.status === 401) {
-      userStore.getState().actions.clearUserInfoAndToken();
-    }
-
-    return Promise.reject(
-      error instanceof Error ? Object.assign(error, { message: errMsg }) : new Error(errMsg),
-    );
+  (res) => res,
+  (error) => {
+    logger.error(`[API] Request failed: ${error.message}`);
+    return Promise.reject(error instanceof Error ? error : new Error(String(error)));
   },
 );

@@ -73,31 +73,33 @@ export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
   const showToggle = locations.length === 2;
 
   return (
-    <div className="flex h-full flex-col">
-      {showToggle && (
-        <div className="shrink-0 flex justify-center border-b border-[var(--color-border)] bg-[var(--color-bg)] px-2 py-1.5">
-          <div className="flex rounded-full border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-0.5">
-            {locations.map((loc, i) => (
-              <button
-                key={loc.label}
-                type="button"
-                onClick={() => onToggle?.(i)}
-                className={`rounded-full px-3 py-1 text-[length:var(--font-xs)] font-medium transition-colors duration-150 ${
-                  activeIndex === i
-                    ? "text-white"
-                    : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
-                }`}
-                style={activeIndex === i ? { backgroundColor: loc.color } : undefined}
-              >
-                {loc.label}
-              </button>
-            ))}
+    <div className="h-[120px] w-full shrink-0 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] shadow-sm sm:h-[160px] sm:w-[260px]">
+      <div className="flex h-full flex-col">
+        {showToggle && (
+          <div className="shrink-0 flex justify-center border-b border-[var(--color-border)] bg-[var(--color-bg)] px-2 py-1.5">
+            <div className="flex rounded-full border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-0.5">
+              {locations.map((loc, i) => (
+                <button
+                  key={loc.label}
+                  type="button"
+                  onClick={() => onToggle?.(i)}
+                  className={`rounded-full px-3 py-1 text-[length:var(--font-xs)] font-medium transition-colors duration-150 ${
+                    activeIndex === i
+                      ? "text-white"
+                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
+                  }`}
+                  style={activeIndex === i ? { backgroundColor: loc.color } : undefined}
+                >
+                  {loc.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="min-h-0 flex-1">
-        <div ref={containerRef} style={{ height: "100%" }} className="w-full" />
+        <div className="min-h-0 flex-1">
+          <div ref={containerRef} style={{ height: "100%" }} className="w-full" />
+        </div>
       </div>
     </div>
   );

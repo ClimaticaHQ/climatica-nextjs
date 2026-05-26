@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { ExportMenuProps } from "./ExportMenu.type";
 
 function ImageIcon() {
@@ -60,7 +60,7 @@ export function ExportMenu({
   onExportSVG,
   isDisabled = false,
 }: ExportMenuProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const ref = useRef<HTMLDivElement>(null);

@@ -1,11 +1,11 @@
 "use client";
 
 import { LocationSearch } from "@/components";
-import { MapSkeleton, PageWrapper } from "@/components/UI";
+import { EmptyState, ErrorBanner, MapSkeleton, PageTitle, PageWrapper } from "@/components/UI";
 import { buildFilename, exportElementToPng, exportTableToCsv } from "@/utils";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TRegionHeatmapViewProps } from "./HeatMap.type";
 import { computeHeatmapStats, formatSelectedMonths, pixelAnnualAvg } from "./HeatMap.util";
 import { RegionalClimateProfile } from "./components/RegionalClimateProfile";
@@ -46,7 +46,7 @@ export function HeatMapView({
   onLocate,
   onClearLocationError,
 }: TRegionHeatmapViewProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const statsBarRef = useRef<HTMLDivElement>(null);
 
   const pixelBindings = pixels?.results.bindings ?? [];
@@ -103,9 +103,7 @@ export function HeatMapView({
     <PageWrapper>
       <div className="flex flex-col gap-8">
         <header className="text-center">
-          <h1 className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]">
-            {t("heatMap.title")}
-          </h1>
+          <PageTitle suppressHydrationWarning>{t("heatMap.title")}</PageTitle>
         </header>
 
         <LocationSearch
@@ -163,20 +161,14 @@ export function HeatMapView({
           />
         )}
 
-        {error && !isLoading && (
-          <div className="rounded-[var(--radius-md)] border border-[var(--color-error-border)] bg-[var(--color-error-bg)] px-4 py-3 text-center text-[var(--color-error)]">
-            {error.message}
-          </div>
-        )}
+        {error && !isLoading && <ErrorBanner message={error.message} />}
 
         {!hasSelection && !isLoading && (
-          <p className="text-center text-[var(--color-text-secondary)]">
-            {t("heatMap.noSelection")}
-          </p>
+          <EmptyState message={t("heatMap.noSelection")} suppressHydrationWarning />
         )}
 
         {hasNoData && !isLoading && (
-          <p className="text-center text-[var(--color-text-secondary)]">{t("heatMap.noData")}</p>
+          <EmptyState message={t("heatMap.noData")} suppressHydrationWarning />
         )}
       </div>
     </PageWrapper>

@@ -11,9 +11,13 @@ import {
 import {
   ChartSkeleton,
   ComparisonTableSkeleton,
+  DotLabel,
   Dropdown,
+  EmptyState,
+  ErrorBanner,
   ExportMenu,
   MapSkeleton,
+  PageTitle,
   PageWrapper,
 } from "@/components/UI";
 import {
@@ -25,11 +29,17 @@ import {
   PERIOD_COLORS,
 } from "@/constants";
 import type { TClimatePeriod } from "@/types";
-import { buildFilename, exportElementToPng, exportTableToCsv, getMartonneBadge } from "@/utils";
+import {
+  buildClimateStatsRows,
+  buildFilename,
+  exportElementToPng,
+  exportTableToCsv,
+  getMartonneBadge,
+} from "@/utils";
 import { computeCompareStats } from "@/utils/climateComparison.util";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TClimatePeriodRowProps, TComparePeriodsViewProps } from "./ComparePeriods.type";
 
 const MiniMap = dynamic(
@@ -48,16 +58,7 @@ const CLIMATE_PERIOD_OPTIONS = Object.values(CLIMATE_PERIODS).map((period) => ({
 function ClimatePeriodRow({ label, dotColor, value, onChange }: TClimatePeriodRowProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex items-center gap-2">
-        <span
-          className="h-3 w-3 shrink-0 rounded-full"
-          style={{ backgroundColor: dotColor }}
-          aria-hidden="true"
-        />
-        <span className="text-[length:var(--font-sm)] font-medium text-[var(--color-text-secondary)]">
-          {label}
-        </span>
-      </div>
+      <DotLabel label={label} dotColor={dotColor} />
       <Dropdown
         options={CLIMATE_PERIOD_OPTIONS}
         value={value}
@@ -93,8 +94,9 @@ export function ComparePeriodsView({
   periods,
   periodsData,
   loadingPeriods,
+  chartSectionRef,
 }: TComparePeriodsViewProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const climateExportRef = useRef<HTMLDivElement>(null);
   const weatherExportRef = useRef<HTMLDivElement>(null);
 
@@ -117,28 +119,15 @@ export function ComparePeriodsView({
     if (!statsA || !statsB) return;
     const badgeA = getMartonneBadge(statsA.martonneIndex);
     const badgeB = getMartonneBadge(statsB.martonneIndex);
-    const rows: string[][] = [
+    const rows = buildClimateStatsRows(
+      [statsA, statsB],
       [
         t("climateComparison.stats.avgTmax"),
-        `${statsA.avgTmax.toFixed(1)} °C`,
-        `${statsB.avgTmax.toFixed(1)} °C`,
-      ],
-      [
         t("climateComparison.stats.avgTmin"),
-        `${statsA.avgTmin.toFixed(1)} °C`,
-        `${statsB.avgTmin.toFixed(1)} °C`,
-      ],
-      [
         t("climateComparison.stats.totalPrec"),
-        `${statsA.totalPrec.toFixed(0)} mm`,
-        `${statsB.totalPrec.toFixed(0)} mm`,
-      ],
-      [
         t("climateComparison.stats.aridMonths"),
-        String(statsA.aridMonths),
-        String(statsB.aridMonths),
       ],
-    ];
+    );
     if (altitude != null) {
       rows.push([t("chart.altitude"), `${altitude} m`, `${altitude} m`]);
     }
@@ -170,25 +159,15 @@ export function ComparePeriodsView({
     const statsMap = new Map(
       periodsData.map(({ year, rows }) => [year, computeCompareStats(rows)]),
     );
-    const metricLabels = [
-      t("climateComparison.stats.avgTmax"),
-      t("climateComparison.stats.avgTmin"),
-      t("climateComparison.stats.totalPrec"),
-      t("climateComparison.stats.aridMonths"),
-    ];
-    const metricFormats: ((s: ReturnType<typeof computeCompareStats>) => string)[] = [
-      (s) => `${s.avgTmax.toFixed(1)} °C`,
-      (s) => `${s.avgTmin.toFixed(1)} °C`,
-      (s) => `${s.totalPrec.toFixed(0)} mm`,
-      (s) => String(s.aridMonths),
-    ];
-    const rows: string[][] = metricLabels.map((label, i) => [
-      label,
-      ...periods.map((year) => {
-        const s = statsMap.get(year);
-        return s !== undefined ? (metricFormats[i]?.(s) ?? "—") : "—";
-      }),
-    ]);
+    const rows = buildClimateStatsRows(
+      periods.map((year) => statsMap.get(year)),
+      [
+        t("climateComparison.stats.avgTmax"),
+        t("climateComparison.stats.avgTmin"),
+        t("climateComparison.stats.totalPrec"),
+        t("climateComparison.stats.aridMonths"),
+      ],
+    );
     if (altitude !== null) {
       rows.push([t("chart.altitude"), ...periods.map(() => `${altitude} m`)]);
     }
@@ -218,28 +197,23 @@ export function ComparePeriodsView({
     <PageWrapper>
       <div className="flex flex-col gap-10">
         <header className="text-center">
-          <h1 className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]">
-            {t("comparePeriods.title")}
-          </h1>
+          <PageTitle suppressHydrationWarning>{t("comparePeriods.title")}</PageTitle>
         </header>
 
-        <p className="text-center text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
+        <p
+          className="text-center text-[length:var(--font-xs)] text-[var(--color-text-secondary)]"
+          suppressHydrationWarning
+        >
           {t("climateComparison.autoResolution", { resolution: CELL_SIZE_OPTIONS[autoGrid] })}
         </p>
 
         <div className="flex flex-col gap-4 sm:flex-row">
           <div className="flex-1 flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2">
-                <span
-                  className="h-3 w-3 shrink-0 rounded-full"
-                  style={{ backgroundColor: CLIMATE_COMPARISON_COLORS.A.tmax }}
-                  aria-hidden="true"
-                />
-                <span className="text-[length:var(--font-sm)] font-medium text-[var(--color-text-secondary)]">
-                  {t("climateComparison.searchCity")}
-                </span>
-              </div>
+              <DotLabel
+                label={t("climateComparison.searchCity")}
+                dotColor={CLIMATE_COMPARISON_COLORS.A.tmax}
+              />
               <LocationSearch
                 key={city.id}
                 defaultValue={city.label}
@@ -269,9 +243,7 @@ export function ComparePeriodsView({
             )}
           </div>
 
-          <div className="h-[120px] w-full shrink-0 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] shadow-sm sm:h-[160px] sm:w-[260px]">
-            <MiniMap locations={miniMapLocations} activeIndex={0} onToggle={() => undefined} />
-          </div>
+          <MiniMap locations={miniMapLocations} activeIndex={0} onToggle={() => undefined} />
         </div>
 
         {isLoading && isClimate && (
@@ -281,21 +253,15 @@ export function ComparePeriodsView({
           </div>
         )}
 
-        {error && !isLoading && (
-          <div className="px-4 py-3 text-center text-[var(--color-error)] bg-[var(--color-error-bg)] rounded-[var(--radius-md)] border border-[var(--color-error-border)]">
-            {error.message}
-          </div>
-        )}
+        {error && !isLoading && <ErrorBanner message={error.message} />}
 
         {/* ── Climate: 2-period comparison ── */}
         {isClimate && !hasBothClimateData && !isLoading && !error && (
-          <p className="text-center text-[var(--color-text-secondary)]">
-            {t("climateComparison.noDataPeriods")}
-          </p>
+          <EmptyState message={t("climateComparison.noDataPeriods")} />
         )}
 
         {isClimate && hasBothClimateData && statsA && statsB && (
-          <div className="flex flex-col gap-2">
+          <div ref={chartSectionRef} className="flex flex-col gap-2">
             <div className="flex justify-end">
               <ExportMenu
                 onExportCSV={handleClimateExportCSV}
@@ -368,7 +334,7 @@ export function ComparePeriodsView({
 
         {/* ── Weather: multi-period ── */}
         {!isClimate && periods.length > 0 && (
-          <div className="flex flex-col gap-2">
+          <div ref={chartSectionRef} className="flex flex-col gap-2">
             {periodsData.length > 0 && (
               <div className="flex justify-end">
                 <ExportMenu

@@ -1,7 +1,7 @@
 import { AridityLegend } from "@/components/WalterLiethChart";
 import { MONTH_NAMES } from "@/constants";
 import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import {
   Bar,
   CartesianGrid,
@@ -25,7 +25,7 @@ function CompareModeLegend({
   labelA: string | undefined;
   labelB: string | undefined;
 }) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   return (
     <div className="flex flex-col items-center gap-1 pt-3" style={{ fontSize: 11 }}>
       <div className="flex items-center gap-5">
@@ -62,7 +62,7 @@ export function CompareChart({
   showAridity = true,
   aridityA,
 }: TCompareChartProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const aridityByMonthA = useMemo<Record<number, boolean> | undefined>(() => {
     if (!aridityA) return undefined;

@@ -1,26 +1,31 @@
-import { TIME_CONSTANTS } from "@/constants";
-import { WikidataService } from "@/libs";
+import { useSearchCity } from "@/hooks/data/useSearchCity";
+import { useDebounce } from "@/hooks/ui/useDebounce";
 import type { TCoordinates, TWikidataCity } from "@/types";
 import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TSearchBarProps } from "./SearchBar.type";
 import { tryParseCoords } from "./SearchBar.util";
 
 export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [query, setQuery] = useState(defaultValue);
-  const [results, setResults] = useState<TWikidataCity[]>([]);
   const [coordResult, setCoordResult] = useState<TCoordinates | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const [dirty, setDirty] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const debouncedQuery = useDebounce(query, 400);
+  const searchQuery = !dirty || coordResult !== null ? "" : debouncedQuery;
+  const { data: results = [], isLoading } = useSearchCity(searchQuery);
+
+  const isOpen =
+    !dismissed && (coordResult !== null || (debouncedQuery.length >= 2 && results.length > 0));
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
+        setDismissed(true);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -29,41 +34,20 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
 
   function handleInputChange(value: string) {
     setQuery(value);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
+    setDirty(true);
+    setDismissed(false);
     const trimmed = value.trim();
-
     const coords = tryParseCoords(trimmed);
     if (coords) {
       setCoordResult(coords);
-      setResults([]);
-      setIsOpen(true);
-      return;
+    } else {
+      setCoordResult(null);
     }
-
-    setCoordResult(null);
-
-    if (trimmed.length < 2) {
-      setResults([]);
-      setIsOpen(false);
-      return;
-    }
-
-    debounceRef.current = setTimeout(() => {
-      setIsLoading(true);
-      WikidataService.searchCity(trimmed)
-        .then((cities) => {
-          setResults(cities);
-          setIsOpen(cities.length > 0);
-        })
-        .catch(() => setResults([]))
-        .finally(() => setIsLoading(false));
-    }, TIME_CONSTANTS.FOUR_HUNDRED_MILLISECONDS);
   }
 
   function handleSelectCity(city: TWikidataCity) {
     setQuery(city.label);
-    setIsOpen(false);
+    setDismissed(true);
     onCitySelect(city);
   }
 
@@ -71,7 +55,7 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
     if (!coordResult) return;
     const label = `${coordResult.lat}, ${coordResult.lng}`;
     setQuery(label);
-    setIsOpen(false);
+    setDismissed(true);
     onCitySelect({
       id: `coords:${coordResult.lat},${coordResult.lng}`,
       label,
@@ -107,7 +91,7 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
         `}
       />
 
-      {isLoading && (
+      {isLoading && dirty && debouncedQuery.length >= 2 && (
         <span className="absolute right-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] border-2 border-[var(--color-border)] border-t-[var(--color-primary)] rounded-[var(--radius-md)] animate-spin" />
       )}
 

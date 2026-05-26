@@ -2,13 +2,28 @@
 
 import type { TMiniMapLocation } from "@/components";
 import { CompareStatsGrid, DiffCard, SearchBar, TempPrecipChart } from "@/components";
-import { ChartSkeleton, ComparisonTableSkeleton, ExportMenu, PageWrapper } from "@/components/UI";
+import {
+  ChartSkeleton,
+  ComparisonTableSkeleton,
+  DotLabel,
+  EmptyState,
+  ErrorBanner,
+  ExportMenu,
+  PageTitle,
+  PageWrapper,
+} from "@/components/UI";
 import { CELL_SIZE_OPTIONS, CLIMATE_COMPARISON_COLORS } from "@/constants";
-import { buildFilename, exportElementToPng, exportTableToCsv, getMartonneBadge } from "@/utils";
+import {
+  buildClimateStatsRows,
+  buildFilename,
+  exportElementToPng,
+  exportTableToCsv,
+  getMartonneBadge,
+} from "@/utils";
 import { computeCompareStats, computeDiffStats } from "@/utils/climateComparison.util";
 import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TCitySearchRowProps, TCompareCitiesViewProps } from "./CompareCities.type";
 
 const MiniMap = dynamic(
@@ -22,16 +37,7 @@ const MiniMap = dynamic(
 function CitySearchRow({ label, dotColor, defaultValue, onCitySelect }: TCitySearchRowProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex items-center gap-2">
-        <span
-          className="h-3 w-3 shrink-0 rounded-full"
-          style={{ backgroundColor: dotColor }}
-          aria-hidden="true"
-        />
-        <span className="text-[length:var(--font-sm)] font-medium text-[var(--color-text-secondary)]">
-          {label}
-        </span>
-      </div>
+      <DotLabel label={label} dotColor={dotColor} />
       <SearchBar defaultValue={defaultValue} onCitySelect={onCitySelect} />
     </div>
   );
@@ -51,8 +57,9 @@ export function CompareCitiesView({
   altitudeB,
   onCityASelect,
   onCityBSelect,
+  chartSectionRef,
 }: TCompareCitiesViewProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [activeCity, setActiveCity] = useState(0);
   const exportRef = useRef<HTMLDivElement>(null);
 
@@ -74,28 +81,15 @@ export function CompareCitiesView({
     const badgeA = getMartonneBadge(statsA.martonneIndex);
     const badgeB = getMartonneBadge(statsB.martonneIndex);
     const showAltitude = altitudeA != null || altitudeB != null;
-    const rows: string[][] = [
+    const rows = buildClimateStatsRows(
+      [statsA, statsB],
       [
         t("climateComparison.stats.avgTmax"),
-        `${statsA.avgTmax.toFixed(1)} °C`,
-        `${statsB.avgTmax.toFixed(1)} °C`,
-      ],
-      [
         t("climateComparison.stats.avgTmin"),
-        `${statsA.avgTmin.toFixed(1)} °C`,
-        `${statsB.avgTmin.toFixed(1)} °C`,
-      ],
-      [
         t("climateComparison.stats.totalPrec"),
-        `${statsA.totalPrec.toFixed(0)} mm`,
-        `${statsB.totalPrec.toFixed(0)} mm`,
-      ],
-      [
         t("climateComparison.stats.aridMonths"),
-        String(statsA.aridMonths),
-        String(statsB.aridMonths),
       ],
-    ];
+    );
     if (showAltitude) {
       rows.push([
         t("chart.altitude"),
@@ -131,12 +125,13 @@ export function CompareCitiesView({
     <PageWrapper>
       <div className="flex flex-col gap-10">
         <header className="text-center">
-          <h1 className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]">
-            {t("compareCities.title")}
-          </h1>
+          <PageTitle suppressHydrationWarning>{t("compareCities.title")}</PageTitle>
         </header>
 
-        <p className="text-center text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
+        <p
+          className="text-center text-[length:var(--font-xs)] text-[var(--color-text-secondary)]"
+          suppressHydrationWarning
+        >
           {t("climateComparison.autoResolution", { resolution: CELL_SIZE_OPTIONS[autoGrid] })}
         </p>
 
@@ -160,13 +155,7 @@ export function CompareCitiesView({
             </div>
           </div>
 
-          <div className="h-[120px] w-full shrink-0 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] shadow-sm sm:h-[160px] sm:w-[260px]">
-            <MiniMap
-              locations={miniMapLocations}
-              activeIndex={activeCity}
-              onToggle={setActiveCity}
-            />
-          </div>
+          <MiniMap locations={miniMapLocations} activeIndex={activeCity} onToggle={setActiveCity} />
         </div>
 
         {isLoading && (
@@ -176,20 +165,14 @@ export function CompareCitiesView({
           </div>
         )}
 
-        {error && !isLoading && (
-          <div className="px-4 py-3 text-center text-[var(--color-error)] bg-[var(--color-error-bg)] rounded-[var(--radius-md)] border border-[var(--color-error-border)]">
-            {error.message}
-          </div>
-        )}
+        {error && !isLoading && <ErrorBanner message={error.message} />}
 
         {!hasBothData && !isLoading && !error && (
-          <p className="text-center text-[var(--color-text-secondary)]">
-            {t("climateComparison.noData")}
-          </p>
+          <EmptyState message={t("climateComparison.noData")} />
         )}
 
         {hasBothData && statsA && statsB && (
-          <div className="flex flex-col gap-2">
+          <div ref={chartSectionRef} className="flex flex-col gap-2">
             <div className="flex justify-end">
               <ExportMenu onExportCSV={handleExportCSV} onExportPNG={handleExportPNG} />
             </div>

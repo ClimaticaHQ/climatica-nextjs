@@ -1,5 +1,5 @@
 import { MONTH_NAMES } from "@/constants";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import {
   Bar,
   CartesianGrid,
@@ -61,7 +61,7 @@ export function MultiPeriodChart({
   periodColors,
   hiddenPeriods = [],
 }: TMultiPeriodChartProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   function localMonthName(v: unknown): string {
     const idx = (MONTH_NAMES as readonly string[]).indexOf(String(v));

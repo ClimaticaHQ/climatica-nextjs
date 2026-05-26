@@ -1,31 +1,20 @@
+"use client";
+
 import { Dropdown } from "@/components/UI";
-import { LANGUAGES, LOCAL_STORAGE_KEYS } from "@/constants";
-import i18next from "i18next";
-import { useEffect, useState } from "react";
-import { TLanguageSwitcherProps } from "./LanguageSwitcher.type";
-import { resolveLanguageCode } from "./LanguageSwitcher.util";
+import { LANGUAGES } from "@/constants";
+import { usePathname, useRouter } from "@/libs/I18nNavigation";
+import { parseLocale } from "@/libs/I18nRouting";
+import { useLocale } from "next-intl";
+import type { TLanguageSwitcherProps } from "./LanguageSwitcher.type";
 
-export default function LanguageSwitcher({ variant = "dropdown" }: TLanguageSwitcherProps) {
-  const [current, setCurrent] = useState(
-    resolveLanguageCode(i18next.resolvedLanguage ?? i18next.language),
-  );
+export function LanguageSwitcher({ variant = "dropdown" }: TLanguageSwitcherProps) {
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const change = async (code: string) => {
-    await i18next.changeLanguage(code);
-    localStorage.setItem(LOCAL_STORAGE_KEYS.LANGUAGE, code);
-  };
-
-  useEffect(() => {
-    const handleLanguageChanged = (language: string) => {
-      setCurrent(resolveLanguageCode(language));
-    };
-
-    i18next.on("languageChanged", handleLanguageChanged);
-
-    return () => {
-      i18next.off("languageChanged", handleLanguageChanged);
-    };
-  }, []);
+  function change(code: string) {
+    router.push(pathname, { locale: parseLocale(code), scroll: false });
+  }
 
   if (variant === "inline") {
     return (
@@ -33,14 +22,12 @@ export default function LanguageSwitcher({ variant = "dropdown" }: TLanguageSwit
         {LANGUAGES.map(({ code, label }) => (
           <button
             key={code}
-            onClick={() => {
-              void change(code);
-            }}
+            onClick={() => change(code)}
             className={`
               px-3 py-1.5 rounded-[var(--radius-sm)]
               text-[length:var(--font-sm)] transition-colors duration-150
               ${
-                current === code
+                locale === code
                   ? "bg-[var(--color-primary)] text-[var(--color-bg)] font-medium"
                   : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]"
               }
@@ -56,10 +43,8 @@ export default function LanguageSwitcher({ variant = "dropdown" }: TLanguageSwit
   return (
     <Dropdown
       options={LANGUAGES.map(({ code, label }) => ({ value: code, label }))}
-      value={current}
-      onChange={(code) => {
-        void change(code);
-      }}
+      value={locale}
+      onChange={change}
     />
   );
 }
