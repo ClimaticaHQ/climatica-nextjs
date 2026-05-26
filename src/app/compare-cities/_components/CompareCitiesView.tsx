@@ -13,7 +13,13 @@ import {
   PageWrapper,
 } from "@/components/UI";
 import { CELL_SIZE_OPTIONS, CLIMATE_COMPARISON_COLORS } from "@/constants";
-import { buildFilename, exportElementToPng, exportTableToCsv, getMartonneBadge } from "@/utils";
+import {
+  buildClimateStatsRows,
+  buildFilename,
+  exportElementToPng,
+  exportTableToCsv,
+  getMartonneBadge,
+} from "@/utils";
 import { computeCompareStats, computeDiffStats } from "@/utils/climateComparison.util";
 import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
@@ -75,28 +81,12 @@ export function CompareCitiesView({
     const badgeA = getMartonneBadge(statsA.martonneIndex);
     const badgeB = getMartonneBadge(statsB.martonneIndex);
     const showAltitude = altitudeA != null || altitudeB != null;
-    const rows: string[][] = [
-      [
-        t("climateComparison.stats.avgTmax"),
-        `${statsA.avgTmax.toFixed(1)} °C`,
-        `${statsB.avgTmax.toFixed(1)} °C`,
-      ],
-      [
-        t("climateComparison.stats.avgTmin"),
-        `${statsA.avgTmin.toFixed(1)} °C`,
-        `${statsB.avgTmin.toFixed(1)} °C`,
-      ],
-      [
-        t("climateComparison.stats.totalPrec"),
-        `${statsA.totalPrec.toFixed(0)} mm`,
-        `${statsB.totalPrec.toFixed(0)} mm`,
-      ],
-      [
-        t("climateComparison.stats.aridMonths"),
-        String(statsA.aridMonths),
-        String(statsB.aridMonths),
-      ],
-    ];
+    const rows = buildClimateStatsRows([statsA, statsB], [
+      t("climateComparison.stats.avgTmax"),
+      t("climateComparison.stats.avgTmin"),
+      t("climateComparison.stats.totalPrec"),
+      t("climateComparison.stats.aridMonths"),
+    ]);
     if (showAltitude) {
       rows.push([
         t("chart.altitude"),
