@@ -116,37 +116,11 @@ export const WorldClimService = {
     variables: string[],
     isClimate: boolean,
     year?: number,
-  ): Promise<TRawPixelValueResponse> {
-    const response = await axios.get<TRawPixelValueResponse>(
-      `${WORLDCLIM_PROXY_BASE}/pixelvaluesinbox`,
-      {
-        params: {
-          north,
-          south,
-          west,
-          east,
-          grid: buildGridIri(gridSize),
-          var: buildVariableIris(variables),
-          ...buildDatasetParams(isClimate, year),
-        },
-      },
-    );
-    validateResponseData(response);
-    return response.data;
-  },
-
-  async getAvgPixelValuesInBox(
-    north: number,
-    south: number,
-    west: number,
-    east: number,
-    gridSize: TCellSize,
-    variables: string[],
-    isClimate: boolean,
-    year?: number,
-  ): Promise<TRawAvgValueResponse> {
-    const response = await axios.get<TRawAvgValueResponse>(
-      `${WORLDCLIM_PROXY_BASE}/avgpixelvaluesinbox`,
+    avg?: boolean,
+  ): Promise<TRawPixelValueResponse | TRawAvgValueResponse> {
+    const endpoint = avg ? "avgpixelvaluesinbox" : "pixelvaluesinbox";
+    const response = await axios.get<TRawPixelValueResponse | TRawAvgValueResponse>(
+      `${WORLDCLIM_PROXY_BASE}/${endpoint}`,
       {
         params: {
           north,
@@ -169,31 +143,11 @@ export const WorldClimService = {
     variables: string[],
     isClimate: boolean,
     year?: number,
-  ): Promise<TRawPixelValueResponse> {
-    const response = await axios.get<TRawPixelValueResponse>(
-      `${WORLDCLIM_PROXY_BASE}/pixelvaluesinpolygonGEO`,
-      {
-        params: {
-          polygon: wkt,
-          grid: buildGridIri(gridSize),
-          var: buildVariableIris(variables),
-          ...buildDatasetParams(isClimate, year),
-        },
-      },
-    );
-    validateResponseData(response);
-    return response.data;
-  },
-
-  async getAvgPixelValuesInPolygon(
-    wkt: string,
-    gridSize: TCellSize,
-    variables: string[],
-    isClimate: boolean,
-    year?: number,
-  ): Promise<TRawAvgValueResponse> {
-    const response = await axios.get<TRawAvgValueResponse>(
-      `${WORLDCLIM_PROXY_BASE}/avgpixelvaluesinpolygonGEO`,
+    avg?: boolean,
+  ): Promise<TRawPixelValueResponse | TRawAvgValueResponse> {
+    const endpoint = avg ? "avgpixelvaluesinpolygonGEO" : "pixelvaluesinpolygonGEO";
+    const response = await axios.get<TRawPixelValueResponse | TRawAvgValueResponse>(
+      `${WORLDCLIM_PROXY_BASE}/${endpoint}`,
       {
         params: {
           polygon: wkt,
