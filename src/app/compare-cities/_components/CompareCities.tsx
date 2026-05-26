@@ -10,27 +10,10 @@ import {
 } from "@/hooks";
 import { useFiltersStore } from "@/stores";
 import type { TWikidataCity } from "@/types";
-import { applyUrlFiltersToStore, encodeVars, parseCoord, scrollToSection } from "@/utils";
+import { applyUrlFiltersToStore, cityFromUrl, createUrlParamHelpers, encodeVars, scrollToSection } from "@/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import { CompareCitiesView } from "./CompareCitiesView";
-
-function cityFromUrl(
-  latRaw: string | null,
-  lngRaw: string | null,
-  labelRaw: string | null,
-): TWikidataCity | null {
-  const lat = parseCoord(latRaw);
-  const lng = parseCoord(lngRaw);
-  if (lat === null || lng === null) return null;
-  return {
-    id: `url:${lat},${lng}`,
-    label: labelRaw ?? `${lat}, ${lng}`,
-    description: "",
-    lat,
-    lng,
-  };
-}
 
 export function CompareCities() {
   const { autoScroll } = useAutoScroll();
@@ -66,41 +49,27 @@ export function CompareCities() {
   const varsStr = useMemo(() => encodeVars(variables), [variables]);
 
   useEffect(() => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    let changed = false;
+    const helper = createUrlParamHelpers(searchParams);
 
-    function maybeSet(key: string, value: string) {
-      if (nextParams.get(key) !== value) {
-        nextParams.set(key, value);
-        changed = true;
-      }
-    }
-    function maybeDelete(key: string) {
-      if (nextParams.has(key)) {
-        nextParams.delete(key);
-        changed = true;
-      }
-    }
-
-    maybeSet(SIDEBAR_PARAMS.COMPARE_CITY_A, cityA.label);
-    maybeSet(SIDEBAR_PARAMS.LAT_A, cityA.lat.toFixed(4));
-    maybeSet(SIDEBAR_PARAMS.LNG_A, cityA.lng.toFixed(4));
-    maybeSet(SIDEBAR_PARAMS.COMPARE_CITY_B, cityB.label);
-    maybeSet(SIDEBAR_PARAMS.LAT_B, cityB.lat.toFixed(4));
-    maybeSet(SIDEBAR_PARAMS.LNG_B, cityB.lng.toFixed(4));
-    maybeSet(SIDEBAR_PARAMS.DATASET, dataset);
-    maybeSet(SIDEBAR_PARAMS.VAR, varsStr);
-    maybeSet(SIDEBAR_PARAMS.GRID, gridSize);
+    helper.set(SIDEBAR_PARAMS.COMPARE_CITY_A, cityA.label);
+    helper.set(SIDEBAR_PARAMS.LAT_A, cityA.lat.toFixed(4));
+    helper.set(SIDEBAR_PARAMS.LNG_A, cityA.lng.toFixed(4));
+    helper.set(SIDEBAR_PARAMS.COMPARE_CITY_B, cityB.label);
+    helper.set(SIDEBAR_PARAMS.LAT_B, cityB.lat.toFixed(4));
+    helper.set(SIDEBAR_PARAMS.LNG_B, cityB.lng.toFixed(4));
+    helper.set(SIDEBAR_PARAMS.DATASET, dataset);
+    helper.set(SIDEBAR_PARAMS.VAR, varsStr);
+    helper.set(SIDEBAR_PARAMS.GRID, gridSize);
 
     if (dataset === DATASETS.CLIMATE) {
-      maybeSet(SIDEBAR_PARAMS.PERIOD, climatePeriod);
-      maybeDelete(SIDEBAR_PARAMS.YEAR);
+      helper.set(SIDEBAR_PARAMS.PERIOD, climatePeriod);
+      helper.delete(SIDEBAR_PARAMS.YEAR);
     } else {
-      maybeSet(SIDEBAR_PARAMS.YEAR, String(weatherYear));
-      maybeDelete(SIDEBAR_PARAMS.PERIOD);
+      helper.set(SIDEBAR_PARAMS.YEAR, String(weatherYear));
+      helper.delete(SIDEBAR_PARAMS.PERIOD);
     }
 
-    if (changed) router.replace(`${pathname}?${nextParams.toString()}`);
+    if (helper.changed) router.replace(`${pathname}?${helper.params.toString()}`);
   }, [
     cityA.label,
     cityA.lat,

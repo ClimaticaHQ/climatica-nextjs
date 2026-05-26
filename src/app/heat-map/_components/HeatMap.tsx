@@ -9,7 +9,7 @@ import {
 } from "@/hooks";
 import { useFiltersStore } from "@/stores";
 import type { TBbox, TColorScale, TWikidataCity } from "@/types";
-import { applyUrlFiltersToStore, encodeVars } from "@/utils";
+import { applyUrlFiltersToStore, createUrlParamHelpers, encodeVars } from "@/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -72,35 +72,21 @@ export function HeatMap() {
   const varsStr = useMemo(() => encodeVars(variables), [variables]);
 
   useEffect(() => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    let changed = false;
+    const helper = createUrlParamHelpers(searchParams);
 
-    function maybeSet(key: string, value: string) {
-      if (nextParams.get(key) !== value) {
-        nextParams.set(key, value);
-        changed = true;
-      }
-    }
-    function maybeDelete(key: string) {
-      if (nextParams.has(key)) {
-        nextParams.delete(key);
-        changed = true;
-      }
-    }
-
-    maybeSet(SIDEBAR_PARAMS.DATASET, dataset);
-    maybeSet(SIDEBAR_PARAMS.VAR, varsStr);
-    maybeSet(SIDEBAR_PARAMS.GRID, grid);
+    helper.set(SIDEBAR_PARAMS.DATASET, dataset);
+    helper.set(SIDEBAR_PARAMS.VAR, varsStr);
+    helper.set(SIDEBAR_PARAMS.GRID, grid);
 
     if (isClimate) {
-      maybeSet(SIDEBAR_PARAMS.PERIOD, climatePeriod);
-      maybeDelete(SIDEBAR_PARAMS.YEAR);
+      helper.set(SIDEBAR_PARAMS.PERIOD, climatePeriod);
+      helper.delete(SIDEBAR_PARAMS.YEAR);
     } else {
-      maybeSet(SIDEBAR_PARAMS.YEAR, String(weatherYear));
-      maybeDelete(SIDEBAR_PARAMS.PERIOD);
+      helper.set(SIDEBAR_PARAMS.YEAR, String(weatherYear));
+      helper.delete(SIDEBAR_PARAMS.PERIOD);
     }
 
-    if (changed) router.replace(`${pathname}?${nextParams.toString()}`);
+    if (helper.changed) router.replace(`${pathname}?${helper.params.toString()}`);
   }, [
     dataset,
     climatePeriod,
