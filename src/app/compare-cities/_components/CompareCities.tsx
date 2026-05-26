@@ -1,7 +1,7 @@
 "use client";
 
 import type { TChartSubtitle } from "@/components/TempPrecipChart";
-import { DATASETS, SIDEBAR_PARAMS, TIME } from "@/constants";
+import { APP_TITLE, DATASETS, SIDEBAR_PARAMS, TIME } from "@/constants";
 import {
   useAutoScroll,
   useGetAltitude,
@@ -99,8 +99,8 @@ export function CompareCities() {
       !/^Q\d+$/.test(labelA) &&
       !/^Q\d+$/.test(labelB);
     document.title = bothValid
-      ? `${labelA} vs ${labelB} | Climatica`
-      : "Compare Cities | Climatica";
+      ? `${labelA} vs ${labelB} | ${APP_TITLE}`
+      : `Compare Cities | ${APP_TITLE}`;
   }, [cityA.label, cityB.label]);
 
   const subtitle: TChartSubtitle =

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  APP_TITLE,
   CLIMATE_PERIOD_LABELS,
   CLIMATE_PERIODS,
   DATASETS,
@@ -143,16 +144,16 @@ export function ComparePeriods() {
     const cityLabel = cityA.label;
     const validCity = cityLabel && !cityLabel.startsWith("url:") && !/^Q\d+$/.test(cityLabel);
     if (!validCity) {
-      document.title = "Compare Periods | Climatica";
+      document.title = `Compare Periods | ${APP_TITLE}`;
       return;
     }
     const varLabel = variables[0] ? (VARIABLE_LABELS[variables[0]] ?? variables[0]) : "";
     if (dataset === DATASETS.CLIMATE) {
       const labelA = CLIMATE_PERIOD_LABELS[climatePeriodA] ?? climatePeriodA;
       const labelB = CLIMATE_PERIOD_LABELS[climatePeriodB] ?? climatePeriodB;
-      document.title = `${cityLabel} · ${varLabel} ${labelA} vs ${labelB} | Climatica`;
+      document.title = `${cityLabel} · ${varLabel} ${labelA} vs ${labelB} | ${APP_TITLE}`;
     } else {
-      document.title = `${cityLabel} · ${varLabel} ${periods.join(", ")} | Climatica`;
+      document.title = `${cityLabel} · ${varLabel} ${periods.join(", ")} | ${APP_TITLE}`;
     }
   }, [cityA.label, dataset, climatePeriodA, climatePeriodB, periods, variables]);
 

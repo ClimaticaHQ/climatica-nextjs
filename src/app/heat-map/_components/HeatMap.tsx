@@ -1,6 +1,6 @@
 "use client";
 
-import { CLIMATE_PERIOD_LABELS, DATASETS, SIDEBAR_PARAMS, VARIABLE_LABELS } from "@/constants";
+import { APP_TITLE, CLIMATE_PERIOD_LABELS, DATASETS, SIDEBAR_PARAMS, VARIABLE_LABELS } from "@/constants";
 import {
   useGeolocation,
   useGetHeatmapData,
@@ -105,7 +105,7 @@ export function HeatMap() {
     const periodStr = isClimate
       ? (CLIMATE_PERIOD_LABELS[climatePeriod] ?? climatePeriod)
       : String(weatherYear);
-    document.title = `Region Heatmap · ${varLabel} ${periodStr} | Climatica`;
+    document.title = `Region Heatmap · ${varLabel} ${periodStr} | ${APP_TITLE}`;
   }, [activeVariable, isClimate, climatePeriod, weatherYear]);
 
   const wkt = polygon ? polygonToWkt(polygon) : null;

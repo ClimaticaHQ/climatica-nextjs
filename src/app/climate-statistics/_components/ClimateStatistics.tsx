@@ -2,6 +2,7 @@
 
 import type { TChartSubtitle } from "@/components/TempPrecipChart/TempPrecipChart.type";
 import {
+  APP_TITLE,
   CLIMATE_PERIOD_LABELS,
   DATASETS,
   SIDEBAR_PARAMS,
@@ -127,7 +128,7 @@ export function ClimateStatistics() {
   useEffect(() => {
     const cityStr = chartCityName || cityLabel;
     if (!cityStr) {
-      document.title = "City Climate | Climatica";
+      document.title = `City Climate | ${APP_TITLE}`;
       return;
     }
     const varLabel = variables[0] ? (VARIABLE_LABELS[variables[0]] ?? variables[0]) : "";
@@ -135,7 +136,7 @@ export function ClimateStatistics() {
       dataset === DATASETS.CLIMATE
         ? (CLIMATE_PERIOD_LABELS[climatePeriod] ?? climatePeriod)
         : String(weatherYear);
-    document.title = `${cityStr} · ${varLabel} ${periodStr} | Climatica`;
+    document.title = `${cityStr} · ${varLabel} ${periodStr} | ${APP_TITLE}`;
   }, [chartCityName, cityLabel, variables, dataset, climatePeriod, weatherYear]);
 
   function handleCitySelect(city: TWikidataCity) {
