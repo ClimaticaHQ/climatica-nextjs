@@ -15,6 +15,8 @@ export { getMartonneBadge } from "./martonne.util";
 export { scrollToSection } from "./scroll.util";
 export {
   applyUrlFiltersToStore,
+  cityFromUrl,
+  createUrlParamHelpers,
   encodeMonths,
   encodePeriods,
   encodeVars,

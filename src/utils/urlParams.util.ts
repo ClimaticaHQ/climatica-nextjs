@@ -7,7 +7,7 @@ import {
   WEATHER_MAX_YEAR,
   WEATHER_MIN_YEAR,
 } from "@/constants";
-import type { TCellSize, TClimatePeriod, TDataset, TFiltersState, TMonthFilter, TVariable } from "@/types";
+import type { TCellSize, TClimatePeriod, TDataset, TFiltersState, TMonthFilter, TVariable, TWikidataCity } from "@/types";
 
 const VALID_VARIABLES = new Set<string>(CLIMATE_VARIABLES);
 const VALID_CELL_SIZES = new Set<string>(Object.values(CELL_SIZES));
@@ -113,4 +113,50 @@ export function applyUrlFiltersToStore(
     const monthFilter = parseMonths(searchParams.get(SIDEBAR_PARAMS.MONTHS));
     if (monthFilter !== null) actions.setMonths(monthFilter);
   }
+}
+
+export function createUrlParamHelpers(base: URLSearchParams): {
+  set: (key: string, val: string) => void;
+  delete: (key: string) => void;
+  changed: boolean;
+  params: URLSearchParams;
+} {
+  const params = new URLSearchParams(base.toString());
+  let _changed = false;
+
+  return {
+    params,
+    get changed() {
+      return _changed;
+    },
+    set(key: string, val: string) {
+      if (params.get(key) !== val) {
+        params.set(key, val);
+        _changed = true;
+      }
+    },
+    delete(key: string) {
+      if (params.has(key)) {
+        params.delete(key);
+        _changed = true;
+      }
+    },
+  };
+}
+
+export function cityFromUrl(
+  latRaw: string | null,
+  lngRaw: string | null,
+  labelRaw: string | null,
+): TWikidataCity | null {
+  const lat = latRaw ? Number(latRaw) : NaN;
+  const lng = lngRaw ? Number(lngRaw) : NaN;
+  if (isNaN(lat) || isNaN(lng)) return null;
+  return {
+    id: `url:${lat},${lng}`,
+    label: labelRaw ?? `${lat}, ${lng}`,
+    description: "",
+    lat,
+    lng,
+  };
 }
