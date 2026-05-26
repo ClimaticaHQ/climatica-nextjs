@@ -1,4 +1,6 @@
 export { buildQueryParams } from "./buildQueryParams.util";
+export { buildClimateStatsRows } from "./climateExport.util";
+export { buildHeatmapResults } from "./heatmapResults.util";
 export { estimateCellCount, getCellCountStatus } from "./cellCount.util";
 export { getColorStops, interpolateColor } from "./colorScale.util";
 export { cssVar, hexToRgb } from "./cssVar.util";
