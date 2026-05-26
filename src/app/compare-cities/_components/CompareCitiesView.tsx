@@ -2,7 +2,16 @@
 
 import type { TMiniMapLocation } from "@/components";
 import { CompareStatsGrid, DiffCard, SearchBar, TempPrecipChart } from "@/components";
-import { ChartSkeleton, ComparisonTableSkeleton, ExportMenu, PageWrapper } from "@/components/UI";
+import {
+  ChartSkeleton,
+  ComparisonTableSkeleton,
+  DotLabel,
+  EmptyState,
+  ErrorBanner,
+  ExportMenu,
+  PageTitle,
+  PageWrapper,
+} from "@/components/UI";
 import { CELL_SIZE_OPTIONS, CLIMATE_COMPARISON_COLORS } from "@/constants";
 import { buildFilename, exportElementToPng, exportTableToCsv, getMartonneBadge } from "@/utils";
 import { computeCompareStats, computeDiffStats } from "@/utils/climateComparison.util";
@@ -22,16 +31,7 @@ const MiniMap = dynamic(
 function CitySearchRow({ label, dotColor, defaultValue, onCitySelect }: TCitySearchRowProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex items-center gap-2">
-        <span
-          className="h-3 w-3 shrink-0 rounded-full"
-          style={{ backgroundColor: dotColor }}
-          aria-hidden="true"
-        />
-        <span className="text-[length:var(--font-sm)] font-medium text-[var(--color-text-secondary)]">
-          {label}
-        </span>
-      </div>
+      <DotLabel label={label} dotColor={dotColor} />
       <SearchBar defaultValue={defaultValue} onCitySelect={onCitySelect} />
     </div>
   );
@@ -132,12 +132,7 @@ export function CompareCitiesView({
     <PageWrapper>
       <div className="flex flex-col gap-10">
         <header className="text-center">
-          <h1
-            className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]"
-            suppressHydrationWarning
-          >
-            {t("compareCities.title")}
-          </h1>
+          <PageTitle suppressHydrationWarning>{t("compareCities.title")}</PageTitle>
         </header>
 
         <p
@@ -167,13 +162,11 @@ export function CompareCitiesView({
             </div>
           </div>
 
-          <div className="h-[120px] w-full shrink-0 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] shadow-sm sm:h-[160px] sm:w-[260px]">
-            <MiniMap
-              locations={miniMapLocations}
-              activeIndex={activeCity}
-              onToggle={setActiveCity}
-            />
-          </div>
+          <MiniMap
+            locations={miniMapLocations}
+            activeIndex={activeCity}
+            onToggle={setActiveCity}
+          />
         </div>
 
         {isLoading && (
@@ -183,16 +176,10 @@ export function CompareCitiesView({
           </div>
         )}
 
-        {error && !isLoading && (
-          <div className="px-4 py-3 text-center text-[var(--color-error)] bg-[var(--color-error-bg)] rounded-[var(--radius-md)] border border-[var(--color-error-border)]">
-            {error.message}
-          </div>
-        )}
+        {error && !isLoading && <ErrorBanner message={error.message} />}
 
         {!hasBothData && !isLoading && !error && (
-          <p className="text-center text-[var(--color-text-secondary)]">
-            {t("climateComparison.noData")}
-          </p>
+          <EmptyState message={t("climateComparison.noData")} />
         )}
 
         {hasBothData && statsA && statsB && (

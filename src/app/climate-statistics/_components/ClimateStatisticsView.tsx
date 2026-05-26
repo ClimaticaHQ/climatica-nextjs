@@ -3,8 +3,10 @@
 import { LocationSearch, TempPrecipChart, ThreeDotsScaleLoader } from "@/components";
 import {
   ChartSkeleton,
+  ErrorBanner,
   ExportMenu,
   MapSkeleton,
+  PageTitle,
   PageWrapper,
   StatCardsSkeleton,
 } from "@/components/UI";
@@ -106,12 +108,7 @@ export function ClimateStatisticsView({
     <PageWrapper>
       <div className="flex flex-col gap-10">
         <header className="text-center">
-          <h1
-            className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]"
-            suppressHydrationWarning
-          >
-            {t("climateStatistics.title")}
-          </h1>
+          <PageTitle suppressHydrationWarning>{t("climateStatistics.title")}</PageTitle>
           <p className="mt-1 text-[var(--color-text-secondary)]" suppressHydrationWarning>
             {t("climateStatistics.subtitle")}
           </p>
@@ -135,11 +132,7 @@ export function ClimateStatisticsView({
           />
         </section>
 
-        {error && (
-          <div className="text-center px-4 py-3 text-[var(--color-error)] bg-[var(--color-error-bg)] rounded-[var(--radius-md)] border border-[var(--color-error-border)]">
-            <p>{error}</p>
-          </div>
-        )}
+        {error && <ErrorBanner message={error} />}
 
         {selectedCity && (temperatureData.length > 0 || isLoading || isFetching) && (
           <div ref={chartSectionRef} id="climate-stats-container" className="flex flex-col gap-8">
