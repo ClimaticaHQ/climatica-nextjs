@@ -12,7 +12,9 @@ export {
 } from "./export.util";
 export { getCityDescription } from "./geonames.util";
 export { getMartonneBadge } from "./martonne.util";
+export { scrollToSection } from "./scroll.util";
 export {
+  applyUrlFiltersToStore,
   encodeMonths,
   encodePeriods,
   encodeVars,
