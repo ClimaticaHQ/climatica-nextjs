@@ -1,3 +1,4 @@
+export { APP_TITLE } from "./app.constant";
 export {
   ENDPOINTS,
   EXCLUDE_DESCRIPTION_KEYWORDS,

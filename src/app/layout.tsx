@@ -1,10 +1,11 @@
+import { APP_TITLE } from "@/constants";
 import { AppLayout } from "@/layouts";
 import "@/styles/global.css";
 import type { Metadata } from "next";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Climatica",
+  title: APP_TITLE,
   description: "Climate data visualization",
 };
 
