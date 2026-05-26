@@ -223,6 +223,9 @@ export const WikidataService = {
         format: "json",
         origin: "*",
       },
+      headers: {
+        "User-Agent": "Climatica/1.0 (wastardy.k@gmail.com) axios/1.16.1",
+      },
     });
 
     const geosearch = geoSearchRes.data.query?.geosearch;
@@ -246,6 +249,9 @@ export const WikidataService = {
         languages: `${lang}|en`,
         format: "json",
         origin: "*",
+      },
+      headers: {
+        "User-Agent": "Climatica/1.0 (wastardy.k@gmail.com) axios/1.16.1",
       },
     });
 
