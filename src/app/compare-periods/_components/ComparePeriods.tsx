@@ -6,11 +6,13 @@ import {
   DATASETS,
   MIN_PERIODS,
   SIDEBAR_PARAMS,
+  TIME,
   VARIABLE_LABELS,
   WEATHER_MAX_YEAR,
   WEATHER_MIN_YEAR,
 } from "@/constants";
 import {
+  useAutoScroll,
   useGeolocation,
   useGetAltitude,
   useGetComparePeriods,
@@ -22,19 +24,18 @@ import {
 import { useFiltersStore } from "@/stores";
 import type { TClimatePeriod, TWikidataCity } from "@/types";
 import {
+  applyUrlFiltersToStore,
   encodeMonths,
   encodePeriods,
   encodeVars,
-  parseCellSize,
   parseCoord,
-  parseDataset,
   parsePeriod,
   parsePeriods,
-  parseVars,
   parseYear,
+  scrollToSection,
 } from "@/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ComparePeriodsView } from "./ComparePeriodsView";
 
@@ -43,6 +44,9 @@ function resolvePeriodFromUrl(raw: string | null, fallback: TClimatePeriod): TCl
 }
 
 export function ComparePeriods() {
+  const { autoScroll } = useAutoScroll();
+  const userSelectedRef = useRef(false);
+  const chartSectionRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
   const isHydrated = useHasHydrated();
   const { cityA, selectCityA } = usePersistedComparisonCities();
@@ -81,13 +85,7 @@ export function ComparePeriods() {
       selectCityA(urlCity);
     }
 
-    const store = useFiltersStore.getState();
-    const ds = parseDataset(searchParams.get(SIDEBAR_PARAMS.DATASET));
-    if (ds !== null) store.actions.setDataset(ds);
-    const vars = parseVars(searchParams.get(SIDEBAR_PARAMS.VAR));
-    if (vars !== null) store.actions.setVariables(vars);
-    const grid = parseCellSize(searchParams.get(SIDEBAR_PARAMS.GRID));
-    if (grid !== null) store.actions.setGridSize(grid);
+    applyUrlFiltersToStore(searchParams, useFiltersStore.getState().actions);
 
     // URL periods take priority over localStorage
     const fromUrl = parsePeriods(searchParams.get(SIDEBAR_PARAMS.PERIODS));
@@ -215,10 +213,14 @@ export function ComparePeriods() {
   const error = dataset === DATASETS.CLIMATE ? climateError : weatherError;
 
   function handleLocate() {
-    locate(selectCityA);
+    locate((city) => {
+      userSelectedRef.current = true;
+      selectCityA(city);
+    });
   }
 
   function handleCitySelect(city: TWikidataCity) {
+    userSelectedRef.current = true;
     selectCityA(city);
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set(SIDEBAR_PARAMS.CITY, city.label.trim());
@@ -226,6 +228,22 @@ export function ComparePeriods() {
     nextParams.set(SIDEBAR_PARAMS.LNG, city.lng.toFixed(4));
     router.push(`${pathname}?${nextParams.toString()}`);
   }
+
+  useEffect(() => {
+    const hasResults =
+      dataset === DATASETS.CLIMATE ? dataA.length > 0 && dataB.length > 0 : periodsData.length > 0;
+
+    if (!hasResults || !chartSectionRef.current) return;
+    if (!userSelectedRef.current || !autoScroll) return;
+
+    const timer = setTimeout(() => {
+      if (chartSectionRef.current) {
+        scrollToSection(chartSectionRef.current, { toBottom: true });
+      }
+    }, TIME.IN_MILLISECONDS.SECOND * 2);
+
+    return () => clearTimeout(timer);
+  }, [dataA, dataB, periodsData, dataset, autoScroll]);
 
   const resolvedLocationError = locationError !== null ? t(locationError) : null;
 
@@ -253,6 +271,7 @@ export function ComparePeriods() {
       periods={periods}
       periodsData={periodsData}
       loadingPeriods={loadingPeriods}
+      chartSectionRef={chartSectionRef}
     />
   );
 }

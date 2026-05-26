@@ -7,8 +7,10 @@ import type {
   TWikidataCity,
 } from "@/types";
 import type { TCellBounds } from "@/types";
+import type { RefObject } from "react";
 
 export type TClimateStatisticsViewProps = {
+  chartSectionRef?: RefObject<HTMLDivElement | null>;
   selectedCity: TWikidataCity | null;
   mapCenter: TCoordinates;
   temperatureData: TMonthlyTemperature[];

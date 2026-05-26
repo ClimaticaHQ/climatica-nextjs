@@ -1,21 +1,18 @@
 "use client";
 
 import type { TChartSubtitle } from "@/components/TempPrecipChart";
-import { DATASETS, SIDEBAR_PARAMS } from "@/constants";
-import { useGetAltitude, useGetCompareData, usePersistedComparisonCities } from "@/hooks";
+import { DATASETS, SIDEBAR_PARAMS, TIME } from "@/constants";
+import {
+  useAutoScroll,
+  useGetAltitude,
+  useGetCompareData,
+  usePersistedComparisonCities,
+} from "@/hooks";
 import { useFiltersStore } from "@/stores";
 import type { TWikidataCity } from "@/types";
-import {
-  encodeVars,
-  parseCellSize,
-  parseCoord,
-  parseDataset,
-  parsePeriod,
-  parseVars,
-  parseYear,
-} from "@/utils";
-import { useEffect, useMemo } from "react";
+import { applyUrlFiltersToStore, encodeVars, parseCoord, scrollToSection } from "@/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef } from "react";
 import { CompareCitiesView } from "./CompareCitiesView";
 
 function cityFromUrl(
@@ -36,6 +33,9 @@ function cityFromUrl(
 }
 
 export function CompareCities() {
+  const { autoScroll } = useAutoScroll();
+  const userSelectedRef = useRef(false);
+  const chartSectionRef = useRef<HTMLDivElement>(null);
   const { cityA, cityB, selectCityA, selectCityB } = usePersistedComparisonCities();
   const { gridSize, dataset, climatePeriod, weatherYear, months, variables } = useFiltersStore();
   const selectedMonths = Array.isArray(months) ? months : null;
@@ -59,22 +59,7 @@ export function CompareCities() {
     );
     if (urlCityB) selectCityB(urlCityB);
 
-    const store = useFiltersStore.getState();
-
-    const ds = parseDataset(searchParams.get(SIDEBAR_PARAMS.DATASET));
-    if (ds !== null) store.actions.setDataset(ds);
-
-    const period = parsePeriod(searchParams.get(SIDEBAR_PARAMS.PERIOD));
-    if (period !== null) store.actions.setClimatePeriod(period);
-
-    const year = parseYear(searchParams.get(SIDEBAR_PARAMS.YEAR));
-    if (year !== null) store.actions.setWeatherYear(year);
-
-    const vars = parseVars(searchParams.get(SIDEBAR_PARAMS.VAR));
-    if (vars !== null) store.actions.setVariables(vars);
-
-    const grid = parseCellSize(searchParams.get(SIDEBAR_PARAMS.GRID));
-    if (grid !== null) store.actions.setGridSize(grid);
+    applyUrlFiltersToStore(searchParams, useFiltersStore.getState().actions);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync all shareable state → URL (replace)
@@ -163,6 +148,7 @@ export function CompareCities() {
   const { data: altitudeB = null } = useGetAltitude(cityB.lat, cityB.lng, gridSize);
 
   function handleCityASelect(city: TWikidataCity) {
+    userSelectedRef.current = true;
     selectCityA(city);
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.set(SIDEBAR_PARAMS.COMPARE_CITY_A, city.label);
@@ -172,6 +158,7 @@ export function CompareCities() {
   }
 
   function handleCityBSelect(city: TWikidataCity) {
+    userSelectedRef.current = true;
     selectCityB(city);
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.set(SIDEBAR_PARAMS.COMPARE_CITY_B, city.label);
@@ -179,6 +166,19 @@ export function CompareCities() {
     nextParams.set(SIDEBAR_PARAMS.LNG_B, city.lng.toFixed(4));
     router.push(`${pathname}?${nextParams.toString()}`);
   }
+
+  useEffect(() => {
+    if (!dataA.length || !dataB.length || !chartSectionRef.current) return;
+    if (!userSelectedRef.current || !autoScroll) return;
+
+    const timer = setTimeout(() => {
+      if (chartSectionRef.current) {
+        scrollToSection(chartSectionRef.current, { toBottom: true });
+      }
+    }, TIME.IN_MILLISECONDS.SECOND * 2);
+
+    return () => clearTimeout(timer);
+  }, [dataA, dataB, autoScroll]);
 
   return (
     <CompareCitiesView
@@ -195,6 +195,7 @@ export function CompareCities() {
       altitudeB={altitudeB}
       onCityASelect={handleCityASelect}
       onCityBSelect={handleCityBSelect}
+      chartSectionRef={chartSectionRef}
     />
   );
 }

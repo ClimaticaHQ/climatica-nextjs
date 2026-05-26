@@ -9,17 +9,10 @@ import {
 } from "@/hooks";
 import { useFiltersStore } from "@/stores";
 import type { TBbox, TColorScale, TWikidataCity } from "@/types";
-import {
-  encodeVars,
-  parseCellSize,
-  parseDataset,
-  parsePeriod,
-  parseVars,
-  parseYear,
-} from "@/utils";
+import { applyUrlFiltersToStore, encodeVars } from "@/utils";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { TDrawMode, TMapTarget, TPolygon } from "./HeatMap.type";
 import { computeRegionalProfile, polygonToWkt, wktToPolygon } from "./HeatMap.util";
 import { HeatMapView } from "./HeatMapView";
@@ -72,22 +65,7 @@ export function HeatMap() {
 
   // Restore global filters from URL once on mount
   useEffect(() => {
-    const store = useFiltersStore.getState();
-
-    const ds = parseDataset(searchParams.get(SIDEBAR_PARAMS.DATASET));
-    if (ds !== null) store.actions.setDataset(ds);
-
-    const period = parsePeriod(searchParams.get(SIDEBAR_PARAMS.PERIOD));
-    if (period !== null) store.actions.setClimatePeriod(period);
-
-    const yr = parseYear(searchParams.get(SIDEBAR_PARAMS.YEAR));
-    if (yr !== null) store.actions.setWeatherYear(yr);
-
-    const vars = parseVars(searchParams.get(SIDEBAR_PARAMS.VAR));
-    if (vars !== null) store.actions.setVariables(vars);
-
-    const gridSize = parseCellSize(searchParams.get(SIDEBAR_PARAMS.GRID));
-    if (gridSize !== null) store.actions.setGridSize(gridSize);
+    applyUrlFiltersToStore(searchParams, useFiltersStore.getState().actions);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync filter params → URL (replace); separate from bbox/polygon writers

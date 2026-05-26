@@ -51,6 +51,7 @@ export function CompareCitiesView({
   altitudeB,
   onCityASelect,
   onCityBSelect,
+  chartSectionRef,
 }: TCompareCitiesViewProps) {
   const { t } = useTranslation();
   const [activeCity, setActiveCity] = useState(0);
@@ -195,7 +196,7 @@ export function CompareCitiesView({
         )}
 
         {hasBothData && statsA && statsB && (
-          <div className="flex flex-col gap-2">
+          <div ref={chartSectionRef} className="flex flex-col gap-2">
             <div className="flex justify-end">
               <ExportMenu onExportCSV={handleExportCSV} onExportPNG={handleExportPNG} />
             </div>

@@ -71,6 +71,7 @@ export function ClimateStatisticsView({
   onMapClick,
   onLocate,
   onClearLocationError,
+  chartSectionRef,
 }: TClimateStatisticsViewProps) {
   const { t } = useTranslation();
   const chartRef = useRef<HTMLElement | null>(null);
@@ -141,7 +142,7 @@ export function ClimateStatisticsView({
         )}
 
         {selectedCity && (temperatureData.length > 0 || isLoading || isFetching) && (
-          <div id="climate-stats-container" className="flex flex-col gap-8">
+          <div ref={chartSectionRef} id="climate-stats-container" className="flex flex-col gap-8">
             {isLoading ? (
               <StatCardsSkeleton />
             ) : stats ? (

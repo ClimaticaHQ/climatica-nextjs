@@ -93,6 +93,7 @@ export function ComparePeriodsView({
   periods,
   periodsData,
   loadingPeriods,
+  chartSectionRef,
 }: TComparePeriodsViewProps) {
   const { t } = useTranslation();
   const climateExportRef = useRef<HTMLDivElement>(null);
@@ -301,7 +302,7 @@ export function ComparePeriodsView({
         )}
 
         {isClimate && hasBothClimateData && statsA && statsB && (
-          <div className="flex flex-col gap-2">
+          <div ref={chartSectionRef} className="flex flex-col gap-2">
             <div className="flex justify-end">
               <ExportMenu
                 onExportCSV={handleClimateExportCSV}
@@ -374,7 +375,7 @@ export function ComparePeriodsView({
 
         {/* ── Weather: multi-period ── */}
         {!isClimate && periods.length > 0 && (
-          <div className="flex flex-col gap-2">
+          <div ref={chartSectionRef} className="flex flex-col gap-2">
             {periodsData.length > 0 && (
               <div className="flex justify-end">
                 <ExportMenu

@@ -1,8 +1,15 @@
 "use client";
 
 import type { TChartSubtitle } from "@/components/TempPrecipChart/TempPrecipChart.type";
-import { CLIMATE_PERIOD_LABELS, DATASETS, SIDEBAR_PARAMS, VARIABLE_LABELS } from "@/constants";
 import {
+  CLIMATE_PERIOD_LABELS,
+  DATASETS,
+  SIDEBAR_PARAMS,
+  TIME,
+  VARIABLE_LABELS,
+} from "@/constants";
+import {
+  useAutoScroll,
   useGeolocation,
   useGetAltitude,
   useGetCellBounds,
@@ -13,19 +20,15 @@ import {
 import { useFiltersStore } from "@/stores";
 import type { TWikidataCity } from "@/types";
 import {
+  applyUrlFiltersToStore,
   encodeMonths,
   encodeVars,
-  parseCellSize,
   parseCoord,
-  parseDataset,
-  parseMonths,
-  parsePeriod,
-  parseVars,
-  parseYear,
+  scrollToSection,
 } from "@/utils";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { formatCoordinate } from "./ClimateStatistics.util";
 import { ClimateStatisticsView } from "./ClimateStatisticsView";
 
@@ -39,7 +42,10 @@ export function ClimateStatistics() {
   const { isLoading: isResolving, mutateAsync: resolveCityByCoordinates } =
     useResolveCityByCoordinates();
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
+  const { autoScroll } = useAutoScroll();
   const latestMapClickIdRef = useRef(0);
+  const userSelectedRef = useRef(false);
+  const chartSectionRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -73,24 +79,9 @@ export function ClimateStatistics() {
       if (cityLabel) setChartCityName(cityLabel);
     }
 
-    const store = useFiltersStore.getState();
-    const ds = parseDataset(searchParams.get(SIDEBAR_PARAMS.DATASET));
-    if (ds !== null) store.actions.setDataset(ds);
-
-    const period = parsePeriod(searchParams.get(SIDEBAR_PARAMS.PERIOD));
-    if (period !== null) store.actions.setClimatePeriod(period);
-
-    const year = parseYear(searchParams.get(SIDEBAR_PARAMS.YEAR));
-    if (year !== null) store.actions.setWeatherYear(year);
-
-    const vars = parseVars(searchParams.get(SIDEBAR_PARAMS.VAR));
-    if (vars !== null) store.actions.setVariables(vars);
-
-    const grid = parseCellSize(searchParams.get(SIDEBAR_PARAMS.GRID));
-    if (grid !== null) store.actions.setGridSize(grid);
-
-    const monthFilter = parseMonths(searchParams.get(SIDEBAR_PARAMS.MONTHS));
-    if (monthFilter !== null) store.actions.setMonths(monthFilter);
+    applyUrlFiltersToStore(searchParams, useFiltersStore.getState().actions, {
+      includeMonths: true,
+    });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -166,6 +157,7 @@ export function ClimateStatistics() {
   }, [chartCityName, cityLabel, variables, dataset, climatePeriod, weatherYear]);
 
   function handleCitySelect(city: TWikidataCity) {
+    userSelectedRef.current = true;
     clearLocationError();
     const name = resolveCityName(city);
     if (name) setChartCityName(name);
@@ -180,6 +172,7 @@ export function ClimateStatistics() {
 
   function handleLocate() {
     locate((city) => {
+      userSelectedRef.current = true;
       const name = resolveCityName(city);
       if (name) setChartCityName(name);
       selectCity(city);
@@ -201,6 +194,7 @@ export function ClimateStatistics() {
       lng,
     };
 
+    userSelectedRef.current = true;
     selectCity(provisionalCity);
 
     try {
@@ -240,6 +234,19 @@ export function ClimateStatistics() {
     gridSize,
   );
 
+  useEffect(() => {
+    if (!temperatureData.length || !chartSectionRef.current) return;
+    if (!userSelectedRef.current || !autoScroll) return;
+
+    const timer = setTimeout(() => {
+      if (chartSectionRef.current) {
+        scrollToSection(chartSectionRef.current, { offset: 20 });
+      }
+    }, TIME.IN_MILLISECONDS.SECOND * 2);
+
+    return () => clearTimeout(timer);
+  }, [temperatureData, autoScroll]);
+
   const resolvedLocationError = locationError !== null ? t(locationError) : null;
 
   return (
@@ -263,6 +270,7 @@ export function ClimateStatistics() {
       onMapClick={handleMapClick}
       onLocate={handleLocate}
       onClearLocationError={clearLocationError}
+      chartSectionRef={chartSectionRef}
     />
   );
 }
