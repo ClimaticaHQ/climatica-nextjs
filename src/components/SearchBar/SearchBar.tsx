@@ -91,7 +91,7 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
         `}
       />
 
-      {isLoading && debouncedQuery.length >= 2 && (
+      {isLoading && dirty && debouncedQuery.length >= 2 && (
         <span className="absolute right-3 top-1/2 -translate-y-1/2 w-[18px] h-[18px] border-2 border-[var(--color-border)] border-t-[var(--color-primary)] rounded-[var(--radius-md)] animate-spin" />
       )}
 
