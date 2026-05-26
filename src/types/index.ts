@@ -73,5 +73,6 @@ export type {
   TDiffStats,
   TMartonneBadge,
   TMonthAridity,
+  TScrollOptions,
   TWalterLiethScales,
 } from "./utils";
