@@ -1,17 +1,25 @@
 "use client";
 
 import { LocationSearch, TempPrecipChart, ThreeDotsScaleLoader } from "@/components";
-import { ExportMenu, PageWrapper } from "@/components/UI";
+import {
+  ChartSkeleton,
+  ErrorBanner,
+  ExportMenu,
+  MapSkeleton,
+  PageTitle,
+  PageWrapper,
+  StatCardsSkeleton,
+} from "@/components/UI";
 import { buildFilename, exportToCSV, exportToPNG, exportToSVG } from "@/utils";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TClimateStatisticsViewProps, TStatCardProps } from "./ClimateStatistics.type";
 import { computeClimateStats } from "./ClimateStatistics.util";
 
 const LeafletMap = dynamic(
   () => import("@/components/LeafletMap").then((m) => ({ default: m.LeafletMap })),
-  { ssr: false, loading: () => <div style={{ height: 400 }} /> },
+  { ssr: false, loading: () => <MapSkeleton variant="full" /> },
 );
 
 function StatCard({ label, value, unit, tooltip }: TStatCardProps) {
@@ -65,8 +73,9 @@ export function ClimateStatisticsView({
   onMapClick,
   onLocate,
   onClearLocationError,
+  chartSectionRef,
 }: TClimateStatisticsViewProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const chartRef = useRef<HTMLElement | null>(null);
 
   const isFiltered = selectedMonths !== null && selectedMonths.length > 0;
@@ -99,10 +108,8 @@ export function ClimateStatisticsView({
     <PageWrapper>
       <div className="flex flex-col gap-10">
         <header className="text-center">
-          <h1 className="mb-2 text-[length:var(--font-xl)] lg:text-[length:var(--font-2xl)] font-bold text-[var(--color-primary)]">
-            {t("climateStatistics.title")}
-          </h1>
-          <p className="mt-1 text-[var(--color-text-secondary)]">
+          <PageTitle suppressHydrationWarning>{t("climateStatistics.title")}</PageTitle>
+          <p className="mt-1 text-[var(--color-text-secondary)]" suppressHydrationWarning>
             {t("climateStatistics.subtitle")}
           </p>
         </header>
@@ -125,17 +132,15 @@ export function ClimateStatisticsView({
           />
         </section>
 
-        {error && (
-          <div className="text-center px-4 py-3 text-[var(--color-error)] bg-[var(--color-error-bg)] rounded-[var(--radius-md)] border border-[var(--color-error-border)]">
-            <p>{error}</p>
-          </div>
-        )}
+        {error && <ErrorBanner message={error} />}
 
         {selectedCity && (temperatureData.length > 0 || isLoading || isFetching) && (
-          <div id="climate-stats-container" className="flex flex-col gap-8">
-            {stats && (
+          <div ref={chartSectionRef} id="climate-stats-container" className="flex flex-col gap-8">
+            {isLoading ? (
+              <StatCardsSkeleton />
+            ) : stats ? (
               <div className="flex flex-col gap-3">
-                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                <div data-testid="stat-cards" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                   <StatCard
                     label={
                       isSingleMonth
@@ -174,40 +179,49 @@ export function ClimateStatisticsView({
                     : " "}
                 </p>
               </div>
-            )}
+            ) : null}
 
-            <div id="climate-chart-container" className="flex flex-col gap-2">
-              <div className="flex justify-end">
-                <ExportMenu
-                  onExportCSV={handleExportCSV}
-                  onExportPNG={handleExportPNG}
-                  onExportSVG={handleExportSVG}
-                  isDisabled={temperatureData.length === 0}
-                />
-              </div>
-              <section
-                ref={(el) => {
-                  chartRef.current = el;
-                }}
-                className="relative"
-              >
-                {(isLoading || isFetching) && (
-                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] bg-[var(--color-bg)]/80 backdrop-blur-sm">
-                    <ThreeDotsScaleLoader className="text-[var(--color-primary)]" size={80} />
-                    <p className="text-sm text-[var(--color-text-secondary)]">
-                      {isLoading ? t("loading.fetchingClimateData") : t("loading.updating")}
-                    </p>
-                  </div>
+            <div
+              id="climate-chart-container"
+              data-testid="climate-chart"
+              className="flex flex-col gap-2"
+            >
+              <div className="flex h-10 items-center justify-end">
+                {isLoading ? (
+                  <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
+                ) : (
+                  <ExportMenu
+                    onExportCSV={handleExportCSV}
+                    onExportPNG={handleExportPNG}
+                    onExportSVG={handleExportSVG}
+                    isDisabled={temperatureData.length === 0}
+                  />
                 )}
-                <TempPrecipChart
-                  cityName={cityName}
-                  subtitle={subtitle}
-                  variables={variables}
-                  data={temperatureData}
-                  {...(altitude !== null ? { altitude } : {})}
-                  {...(isFiltered ? { selectedMonths } : {})}
-                />
-              </section>
+              </div>
+              {isLoading ? (
+                <ChartSkeleton />
+              ) : (
+                <section
+                  ref={(el) => {
+                    chartRef.current = el;
+                  }}
+                  className="relative"
+                >
+                  {isFetching && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-bg)]/80 backdrop-blur-sm">
+                      <ThreeDotsScaleLoader className="text-[var(--color-primary)]" size={80} />
+                    </div>
+                  )}
+                  <TempPrecipChart
+                    cityName={cityName}
+                    subtitle={subtitle}
+                    variables={variables}
+                    data={temperatureData}
+                    {...(altitude !== null ? { altitude } : {})}
+                    {...(isFiltered ? { selectedMonths } : {})}
+                  />
+                </section>
+              )}
             </div>
           </div>
         )}

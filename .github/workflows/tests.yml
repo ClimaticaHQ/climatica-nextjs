@@ -1,0 +1,108 @@
+name: Tests
+
+on:
+  push:
+    branches: [development, main]
+  pull_request:
+    branches: [development, main]
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          node-version: 20
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Coverage report
+        uses: davelosert/vitest-coverage-report-action@v2
+        if: always()
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          json-summary-path: tests/reports/unit/coverage-summary.json
+          json-final-path: tests/reports/unit/coverage-final.json
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      solr:
+        image: solr:8
+        ports:
+          - 8983:8983
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          node-version: 20
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Wait for Solr to start
+        run: |
+          echo "Waiting for Solr..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8983/solr/admin/info/system; then
+              echo "Solr is up"
+              break
+            fi
+            echo "Attempt $i/30..."
+            sleep 3
+          done
+
+      - name: Create Solr core
+        run: |
+          curl "http://localhost:8983/solr/admin/cores?action=CREATE&name=cities&configSet=_default" || echo "Core already exists, skipping..."
+
+      - name: Apply Solr schema
+        run: |
+          curl -X POST -H 'Content-type:application/json' \
+            --data-binary @docker/solr/schema.json \
+            http://localhost:8983/api/cores/cities/schema
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download GeoNames data
+        run: |
+          wget -q https://download.geonames.org/export/dump/allCountries.zip
+          wget -q https://download.geonames.org/export/dump/alternateNamesV2.zip
+          unzip -q allCountries.zip -d docker/solr/data/
+          unzip -q alternateNamesV2.zip -d docker/solr/data/
+
+      - name: Generate cities CSV
+        run: python3 docker/solr/scripts/prepare_data.py
+
+      - name: Import cities to Solr
+        run: |
+          curl "http://localhost:8983/solr/cities/update?commit=true" \
+            -X POST -H 'Content-type:application/csv' \
+            --data-binary @docker/solr/data/cities.csv

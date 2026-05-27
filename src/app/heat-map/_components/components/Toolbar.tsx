@@ -1,5 +1,6 @@
-import { ExportMenu } from "@/components/UI";
-import { useTranslation } from "react-i18next";
+import { Button, ExportMenu } from "@/components/UI";
+import { EButtonVariant } from "@/enums";
+import { useTranslations } from "next-intl";
 import type { TToolbarProps } from "../HeatMap.type";
 
 function BoxIcon({ active }: { active: boolean }) {
@@ -55,7 +56,7 @@ export function Toolbar({
   onExportCSV,
   onExportPNG,
 }: TToolbarProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const activeClass =
     "border-[var(--color-primary)] bg-[var(--color-chip-active-bg)] text-[var(--color-chip-active-text)]";
   const inactiveClass =
@@ -82,14 +83,14 @@ export function Toolbar({
       </button>
 
       {hasSelection && (
-        <button
-          type="button"
+        <Button
+          variant={EButtonVariant.SECONDARY}
           onClick={onClear}
-          className={`flex items-center gap-2 rounded-[var(--radius-sm)] border px-3 py-2 text-[length:var(--font-sm)] font-medium transition-colors duration-150 ${inactiveClass}`}
+          className="flex items-center gap-2 px-3 py-2 text-[length:var(--font-sm)]"
         >
           <ClearIcon />
           {t("heatMap.clearSelection")}
-        </button>
+        </Button>
       )}
 
       {drawMode !== "none" && (

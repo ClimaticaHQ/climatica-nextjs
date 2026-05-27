@@ -1,10 +1,10 @@
 import { CLIMATE_RANGE } from "@/constants";
 import { useId } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TPeriodSliderProps } from "./PeriodSlider.type";
 
 export default function PeriodSlider({ startYear, onChange }: TPeriodSliderProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const sliderId = useId();
   const endYear = Math.min(startYear + CLIMATE_RANGE.WINDOW, CLIMATE_RANGE.MAX_START);
 

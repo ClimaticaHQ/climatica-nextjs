@@ -1,6 +1,8 @@
 import { SearchBar } from "@/components/SearchBar";
 import { LocationIcon, SpinnerIcon } from "@/components/svg";
-import { useTranslation } from "react-i18next";
+import { Button } from "@/components/UI";
+import { EButtonVariant } from "@/enums";
+import { useTranslations } from "next-intl";
 import type { TLocationSearchProps } from "./LocationSearch.type";
 
 export function LocationSearch({
@@ -12,7 +14,7 @@ export function LocationSearch({
   onLocate,
   onClearLocationError,
 }: TLocationSearchProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return (
     <div className="flex flex-col gap-2">
@@ -24,18 +26,18 @@ export function LocationSearch({
           />
         </div>
         {showLocateButton && (
-          <button
-            type="button"
+          <Button
+            variant={EButtonVariant.SECONDARY}
             onClick={onLocate}
             disabled={isLocating}
-            aria-label={t("common.useMyLocation")}
-            className="flex h-10 shrink-0 items-center gap-1.5 px-3 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-bg)] text-[length:var(--font-sm)] text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors duration-150 hover:bg-[var(--color-bg-secondary)] disabled:cursor-not-allowed disabled:opacity-60"
+            ariaLabel={t("common.useMyLocation")}
+            className="flex h-10 shrink-0 items-center gap-1.5 px-3 text-[length:var(--font-sm)]"
           >
             {isLocating ? <SpinnerIcon /> : <LocationIcon />}
             <span className="hidden sm:inline">
               {isLocating ? t("common.locating") : t("common.useMyLocation")}
             </span>
-          </button>
+          </Button>
         )}
       </div>
 

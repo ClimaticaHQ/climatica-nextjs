@@ -1,5 +1,4 @@
-import { WorldClimService } from "@/api";
-import { DATASETS, WEATHER_VARIABLES } from "@/constants";
+import { DATASETS } from "@/constants";
 import type {
   TCellSize,
   TClimatePeriod,
@@ -7,7 +6,6 @@ import type {
   TDataset,
   TUseGetComparePeriodsReturn,
 } from "@/types";
-import { buildMonthlyTemperaturesFromPointValues } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCityData } from "./useGetCompareData";
 
@@ -37,31 +35,9 @@ export function useGetComparePeriods(
     queryFn: async (): Promise<TComparePeriods> => {
       if (lat === null || lng === null) throw new Error("No location selected");
 
-      if (isClimate) {
-        const [responseA, responseB] = await Promise.all([
-          WorldClimService.getClimateDataForPoint(
-            lat,
-            lng,
-            gridSize,
-            WEATHER_VARIABLES,
-            climatePeriodA,
-          ),
-          WorldClimService.getClimateDataForPoint(
-            lat,
-            lng,
-            gridSize,
-            WEATHER_VARIABLES,
-            climatePeriodB,
-          ),
-        ]);
-        const dataA = buildMonthlyTemperaturesFromPointValues(responseA.results.bindings);
-        const dataB = buildMonthlyTemperaturesFromPointValues(responseB.results.bindings);
-        return { dataA, dataB };
-      }
-
       const [dataA, dataB] = await Promise.all([
-        fetchCityData(lat, lng, gridSize, false, climatePeriodA, yearA),
-        fetchCityData(lat, lng, gridSize, false, climatePeriodB, yearB),
+        fetchCityData(lat, lng, gridSize, isClimate, climatePeriodA, isClimate ? undefined : yearA),
+        fetchCityData(lat, lng, gridSize, isClimate, climatePeriodB, isClimate ? undefined : yearB),
       ]);
       return { dataA, dataB };
     },

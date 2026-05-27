@@ -7,6 +7,8 @@ export type {
   TRawPixelValueBinding,
   TRawPixelValueResponse,
   TResultStatus,
+  TSolrCityDoc,
+  TSolrResponse,
   TSparqlUriValue,
   TSparqlValue,
   TWikidataCoords,
@@ -38,6 +40,8 @@ export type {
 } from "./api";
 export type {
   TCellSize,
+  TCitySearchParams,
+  TClimateSearch,
   TCoordinates,
   TDataset,
   TMonthFilter,
@@ -69,5 +73,6 @@ export type {
   TDiffStats,
   TMartonneBadge,
   TMonthAridity,
+  TScrollOptions,
   TWalterLiethScales,
 } from "./utils";

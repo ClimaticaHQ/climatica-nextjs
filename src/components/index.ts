@@ -13,10 +13,15 @@ export { Navbar } from "./Navbar";
 export { PeriodSelectRow } from "./PeriodSelectRow";
 export { PeriodSlider } from "./PeriodSlider";
 export { SearchBar } from "./SearchBar";
-export type { TMiniMapLocation } from "./shared/MiniMap";
-export { SectionLabel } from "./shared/SectionLabel";
 export { Sidebar } from "./Sidebar";
 export { ThreeDotsScaleLoader } from "./svg";
 export { TempPrecipChart } from "./TempPrecipChart";
 export { Topbar } from "./Topbar";
+export { SectionLabel } from "./UI";
+export type { TMiniMapLocation } from "./UI";
+export {
+  WalterLiethChart,
+  WalterLiethCitiesLayout,
+  WalterLiethPeriodsLayout,
+} from "./WalterLiethChart";
 export { YearInput } from "./YearInput";

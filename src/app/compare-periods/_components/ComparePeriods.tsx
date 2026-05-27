@@ -1,16 +1,19 @@
 "use client";
 
 import {
+  APP_TITLE,
   CLIMATE_PERIOD_LABELS,
   CLIMATE_PERIODS,
   DATASETS,
   MIN_PERIODS,
   SIDEBAR_PARAMS,
+  TIME,
   VARIABLE_LABELS,
   WEATHER_MAX_YEAR,
   WEATHER_MIN_YEAR,
 } from "@/constants";
 import {
+  useAutoScroll,
   useGeolocation,
   useGetAltitude,
   useGetComparePeriods,
@@ -22,20 +25,21 @@ import {
 import { useFiltersStore } from "@/stores";
 import type { TClimatePeriod, TWikidataCity } from "@/types";
 import {
+  applyUrlFiltersToStore,
+  cityFromUrl,
+  createUrlParamHelpers,
   encodeMonths,
   encodePeriods,
   encodeVars,
-  parseCellSize,
-  parseCoord,
-  parseDataset,
   parsePeriod,
   parsePeriods,
-  parseVars,
   parseYear,
+  scrollToSection,
 } from "@/utils";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/libs/I18nNavigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ComparePeriodsView } from "./ComparePeriodsView";
 
 function resolvePeriodFromUrl(raw: string | null, fallback: TClimatePeriod): TClimatePeriod {
@@ -43,7 +47,10 @@ function resolvePeriodFromUrl(raw: string | null, fallback: TClimatePeriod): TCl
 }
 
 export function ComparePeriods() {
-  const { t } = useTranslation();
+  const { autoScroll } = useAutoScroll();
+  const userSelectedRef = useRef(false);
+  const chartSectionRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations();
   const isHydrated = useHasHydrated();
   const { cityA, selectCityA } = usePersistedComparisonCities();
   const { gridSize, dataset, months, variables } = useFiltersStore();
@@ -66,28 +73,14 @@ export function ComparePeriods() {
 
   // Restore city, global filters, and periods from URL once on mount
   useEffect(() => {
-    const lat = parseCoord(searchParams.get(SIDEBAR_PARAMS.LAT));
-    const lng = parseCoord(searchParams.get(SIDEBAR_PARAMS.LNG));
-    const cityLabel = searchParams.get(SIDEBAR_PARAMS.CITY);
+    const urlCity = cityFromUrl(
+      searchParams.get(SIDEBAR_PARAMS.LAT),
+      searchParams.get(SIDEBAR_PARAMS.LNG),
+      searchParams.get(SIDEBAR_PARAMS.CITY),
+    );
+    if (urlCity) selectCityA(urlCity);
 
-    if (lat !== null && lng !== null) {
-      const urlCity: TWikidataCity = {
-        id: `url:${lat},${lng}`,
-        label: cityLabel ?? `${lat}, ${lng}`,
-        description: "",
-        lat,
-        lng,
-      };
-      selectCityA(urlCity);
-    }
-
-    const store = useFiltersStore.getState();
-    const ds = parseDataset(searchParams.get(SIDEBAR_PARAMS.DATASET));
-    if (ds !== null) store.actions.setDataset(ds);
-    const vars = parseVars(searchParams.get(SIDEBAR_PARAMS.VAR));
-    if (vars !== null) store.actions.setVariables(vars);
-    const grid = parseCellSize(searchParams.get(SIDEBAR_PARAMS.GRID));
-    if (grid !== null) store.actions.setGridSize(grid);
+    applyUrlFiltersToStore(searchParams, useFiltersStore.getState().actions);
 
     // URL periods take priority over localStorage
     const fromUrl = parsePeriods(searchParams.get(SIDEBAR_PARAMS.PERIODS));
@@ -106,45 +99,31 @@ export function ComparePeriods() {
 
   // Sync shareable state → URL
   useEffect(() => {
-    const nextParams = new URLSearchParams(searchParams);
-    let changed = false;
+    const helper = createUrlParamHelpers(searchParams);
 
-    function maybeSet(key: string, value: string) {
-      if (nextParams.get(key) !== value) {
-        nextParams.set(key, value);
-        changed = true;
-      }
-    }
-    function maybeDelete(key: string) {
-      if (nextParams.has(key)) {
-        nextParams.delete(key);
-        changed = true;
-      }
-    }
-
-    maybeSet(SIDEBAR_PARAMS.CITY, cityA.label.trim());
-    maybeSet(SIDEBAR_PARAMS.LAT, cityA.lat.toFixed(4));
-    maybeSet(SIDEBAR_PARAMS.LNG, cityA.lng.toFixed(4));
-    maybeSet(SIDEBAR_PARAMS.DATASET, dataset);
-    maybeSet(SIDEBAR_PARAMS.VAR, varsStr);
-    maybeSet(SIDEBAR_PARAMS.GRID, gridSize);
-    maybeSet(SIDEBAR_PARAMS.MONTHS, monthsStr);
+    helper.set(SIDEBAR_PARAMS.CITY, cityA.label.trim());
+    helper.set(SIDEBAR_PARAMS.LAT, cityA.lat.toFixed(4));
+    helper.set(SIDEBAR_PARAMS.LNG, cityA.lng.toFixed(4));
+    helper.set(SIDEBAR_PARAMS.DATASET, dataset);
+    helper.set(SIDEBAR_PARAMS.VAR, varsStr);
+    helper.set(SIDEBAR_PARAMS.GRID, gridSize);
+    helper.set(SIDEBAR_PARAMS.MONTHS, monthsStr);
 
     if (dataset === DATASETS.CLIMATE) {
-      maybeSet(SIDEBAR_PARAMS.PERIOD_A, climatePeriodA);
-      maybeSet(SIDEBAR_PARAMS.PERIOD_B, climatePeriodB);
-      maybeDelete(SIDEBAR_PARAMS.PERIODS);
-      maybeDelete(SIDEBAR_PARAMS.YEAR_A);
-      maybeDelete(SIDEBAR_PARAMS.YEAR_B);
+      helper.set(SIDEBAR_PARAMS.PERIOD_A, climatePeriodA);
+      helper.set(SIDEBAR_PARAMS.PERIOD_B, climatePeriodB);
+      helper.delete(SIDEBAR_PARAMS.PERIODS);
+      helper.delete(SIDEBAR_PARAMS.YEAR_A);
+      helper.delete(SIDEBAR_PARAMS.YEAR_B);
     } else {
-      maybeSet(SIDEBAR_PARAMS.PERIODS, periodsStr);
-      maybeDelete(SIDEBAR_PARAMS.PERIOD_A);
-      maybeDelete(SIDEBAR_PARAMS.PERIOD_B);
-      maybeDelete(SIDEBAR_PARAMS.YEAR_A);
-      maybeDelete(SIDEBAR_PARAMS.YEAR_B);
+      helper.set(SIDEBAR_PARAMS.PERIODS, periodsStr);
+      helper.delete(SIDEBAR_PARAMS.PERIOD_A);
+      helper.delete(SIDEBAR_PARAMS.PERIOD_B);
+      helper.delete(SIDEBAR_PARAMS.YEAR_A);
+      helper.delete(SIDEBAR_PARAMS.YEAR_B);
     }
 
-    if (changed) router.replace(`${pathname}?${nextParams.toString()}`);
+    if (helper.changed) router.replace(`${pathname}?${helper.params.toString()}`);
   }, [
     cityA.label,
     cityA.lat,
@@ -166,16 +145,16 @@ export function ComparePeriods() {
     const cityLabel = cityA.label;
     const validCity = cityLabel && !cityLabel.startsWith("url:") && !/^Q\d+$/.test(cityLabel);
     if (!validCity) {
-      document.title = "Compare Periods | Climatica";
+      document.title = `Compare Periods | ${APP_TITLE}`;
       return;
     }
     const varLabel = variables[0] ? (VARIABLE_LABELS[variables[0]] ?? variables[0]) : "";
     if (dataset === DATASETS.CLIMATE) {
       const labelA = CLIMATE_PERIOD_LABELS[climatePeriodA] ?? climatePeriodA;
       const labelB = CLIMATE_PERIOD_LABELS[climatePeriodB] ?? climatePeriodB;
-      document.title = `${cityLabel} · ${varLabel} ${labelA} vs ${labelB} | Climatica`;
+      document.title = `${cityLabel} · ${varLabel} ${labelA} vs ${labelB} | ${APP_TITLE}`;
     } else {
-      document.title = `${cityLabel} · ${varLabel} ${periods.join(", ")} | Climatica`;
+      document.title = `${cityLabel} · ${varLabel} ${periods.join(", ")} | ${APP_TITLE}`;
     }
   }, [cityA.label, dataset, climatePeriodA, climatePeriodB, periods, variables]);
 
@@ -215,10 +194,14 @@ export function ComparePeriods() {
   const error = dataset === DATASETS.CLIMATE ? climateError : weatherError;
 
   function handleLocate() {
-    locate(selectCityA);
+    locate((city) => {
+      userSelectedRef.current = true;
+      selectCityA(city);
+    });
   }
 
   function handleCitySelect(city: TWikidataCity) {
+    userSelectedRef.current = true;
     selectCityA(city);
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set(SIDEBAR_PARAMS.CITY, city.label.trim());
@@ -226,6 +209,22 @@ export function ComparePeriods() {
     nextParams.set(SIDEBAR_PARAMS.LNG, city.lng.toFixed(4));
     router.push(`${pathname}?${nextParams.toString()}`);
   }
+
+  useEffect(() => {
+    const hasResults =
+      dataset === DATASETS.CLIMATE ? dataA.length > 0 && dataB.length > 0 : periodsData.length > 0;
+
+    if (!hasResults || !chartSectionRef.current) return;
+    if (!userSelectedRef.current || !autoScroll) return;
+
+    const timer = setTimeout(() => {
+      if (chartSectionRef.current) {
+        scrollToSection(chartSectionRef.current, { toBottom: true });
+      }
+    }, TIME.IN_MILLISECONDS.SECOND * 2);
+
+    return () => clearTimeout(timer);
+  }, [dataA, dataB, periodsData, dataset, autoScroll]);
 
   const resolvedLocationError = locationError !== null ? t(locationError) : null;
 
@@ -253,6 +252,7 @@ export function ComparePeriods() {
       periods={periods}
       periodsData={periodsData}
       loadingPeriods={loadingPeriods}
+      chartSectionRef={chartSectionRef}
     />
   );
 }

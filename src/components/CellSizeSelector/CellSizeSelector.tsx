@@ -1,9 +1,9 @@
 import { Dropdown } from "@/components/UI";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TCellSizeSelectorProps } from "./CellSizeSelector.type";
 
 export function CellSizeSelector({ activeSize, options, onSelect }: TCellSizeSelectorProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return (
     <div className="flex flex-col gap-1.5">
