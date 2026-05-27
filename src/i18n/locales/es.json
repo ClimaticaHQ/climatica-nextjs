@@ -280,5 +280,16 @@
   "common": {
     "useMyLocation": "Usar mi ubicación",
     "locating": "Localizando..."
+  },
+  "error": {
+    "title": "Algo salió mal",
+    "subtitle": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo.",
+    "tryAgain": "Intentar de nuevo",
+    "goHome": "Ir al inicio"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "subtitle": "La página que buscas no existe o ha sido movida.",
+    "goHome": "Ir a Estadísticas Climáticas"
   }
 }
