@@ -10,7 +10,6 @@ import {
 } from "@/components";
 import {
   ChartSkeleton,
-  ComparisonTableSkeleton,
   DotLabel,
   Dropdown,
   EmptyState,
@@ -19,6 +18,7 @@ import {
   MapSkeleton,
   PageTitle,
   PageWrapper,
+  TableSkeleton,
 } from "@/components/UI";
 import {
   CELL_SIZE_OPTIONS,
@@ -246,54 +246,56 @@ export function ComparePeriodsView({
           <MiniMap locations={miniMapLocations} activeIndex={0} onToggle={() => undefined} />
         </div>
 
-        {isLoading && isClimate && (
-          <div className="flex flex-col gap-6">
-            <ComparisonTableSkeleton />
-            <ChartSkeleton />
-          </div>
-        )}
-
         {error && !isLoading && <ErrorBanner message={error.message} />}
 
         {/* ── Climate: 2-period comparison ── */}
-        {isClimate && !hasBothClimateData && !isLoading && !error && (
-          <EmptyState message={t("climateComparison.noDataPeriods")} />
-        )}
-
-        {isClimate && hasBothClimateData && statsA && statsB && (
-          <div ref={chartSectionRef} className="flex flex-col gap-2">
-            <div className="flex justify-end">
-              <ExportMenu
-                onExportCSV={handleClimateExportCSV}
-                onExportPNG={handleClimateExportPNG}
-              />
+        {isClimate &&
+          (isLoading ? (
+            <div className="flex flex-col gap-2">
+              <div className="flex h-10 items-center justify-end">
+                <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
+              </div>
+              <div className="flex flex-col gap-6">
+                <TableSkeleton rows={5} cols={2} />
+                <ChartSkeleton />
+              </div>
             </div>
-            <div ref={climateExportRef} className="flex flex-col gap-6">
-              <CompareStatsGrid
-                labelA={labelA}
-                labelB={labelB}
-                statsA={statsA}
-                statsB={statsB}
-                altitudeA={altitude}
-                altitudeB={altitude}
-              />
-              <TempPrecipChart
-                dataA={dataA}
-                dataB={dataB}
-                labelA={labelA}
-                labelB={labelB}
-                compareMode="periods"
-                cityName={city.label}
-                subtitle={{ rawLabel: `${labelA} vs ${labelB}` }}
-                showWalterLiethToggle={false}
-                showAridity={false}
-                {...(selectedMonths !== null && selectedMonths.length > 0
-                  ? { selectedMonths }
-                  : {})}
-              />
+          ) : hasBothClimateData && statsA && statsB ? (
+            <div ref={chartSectionRef} className="flex flex-col gap-2">
+              <div className="flex h-10 items-center justify-end">
+                <ExportMenu
+                  onExportCSV={handleClimateExportCSV}
+                  onExportPNG={handleClimateExportPNG}
+                />
+              </div>
+              <div ref={climateExportRef} className="flex flex-col gap-6">
+                <CompareStatsGrid
+                  labelA={labelA}
+                  labelB={labelB}
+                  statsA={statsA}
+                  statsB={statsB}
+                  altitudeA={altitude}
+                  altitudeB={altitude}
+                />
+                <TempPrecipChart
+                  dataA={dataA}
+                  dataB={dataB}
+                  labelA={labelA}
+                  labelB={labelB}
+                  compareMode="periods"
+                  cityName={city.label}
+                  subtitle={{ rawLabel: `${labelA} vs ${labelB}` }}
+                  showWalterLiethToggle={false}
+                  showAridity={false}
+                  {...(selectedMonths !== null && selectedMonths.length > 0
+                    ? { selectedMonths }
+                    : {})}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          ) : !hasBothClimateData && !error ? (
+            <EmptyState message={t("climateComparison.noDataPeriods")} />
+          ) : null)}
 
         {isClimate && hasBothClimateData && tmaxDiff !== null && precDiff !== null && (
           <div className="grid grid-cols-2 gap-3">
@@ -335,14 +337,18 @@ export function ComparePeriodsView({
         {/* ── Weather: multi-period ── */}
         {!isClimate && periods.length > 0 && (
           <div ref={chartSectionRef} className="flex flex-col gap-2">
-            {periodsData.length > 0 && (
-              <div className="flex justify-end">
+            {periodsData.length > 0 ? (
+              <div className="flex h-10 items-center justify-end">
                 <ExportMenu
                   onExportCSV={handleWeatherExportCSV}
                   onExportPNG={handleWeatherExportPNG}
                 />
               </div>
-            )}
+            ) : loadingPeriods.length > 0 ? (
+              <div className="flex h-10 items-center justify-end">
+                <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
+              </div>
+            ) : null}
             <div ref={weatherExportRef} className="flex flex-col gap-6">
               <MultiPeriodStatsTable
                 periods={periods}

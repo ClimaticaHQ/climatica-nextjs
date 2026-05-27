@@ -182,13 +182,17 @@ export function ClimateStatisticsView({
             ) : null}
 
             <div id="climate-chart-container" className="flex flex-col gap-2">
-              <div className="flex justify-end">
-                <ExportMenu
-                  onExportCSV={handleExportCSV}
-                  onExportPNG={handleExportPNG}
-                  onExportSVG={handleExportSVG}
-                  isDisabled={temperatureData.length === 0}
-                />
+              <div className="flex h-10 items-center justify-end">
+                {isLoading ? (
+                  <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
+                ) : (
+                  <ExportMenu
+                    onExportCSV={handleExportCSV}
+                    onExportPNG={handleExportPNG}
+                    onExportSVG={handleExportSVG}
+                    isDisabled={temperatureData.length === 0}
+                  />
+                )}
               </div>
               {isLoading ? (
                 <ChartSkeleton />
