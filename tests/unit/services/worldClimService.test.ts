@@ -12,9 +12,9 @@ vi.mock("axios", () => ({
   },
 }));
 
-import axios from "axios";
 import { WorldClimService } from "@/libs/services/worldClimService";
 import type { TWorldClimCellResponse, TWorldClimPointValueResponse } from "@/types";
+import axios from "axios";
 
 function makeAxiosResponse<T>(data: T) {
   return { data, status: 200, statusText: "OK", headers: {}, config: { headers: {} } };
@@ -33,13 +33,13 @@ function makeCellResponse(gridSizes: string[]): TWorldClimCellResponse {
 
 function makePointValueBinding(rasterPeriod: string) {
   return {
-    value: { type: "literal", value: "10" },
-    month: { type: "literal", value: "--01" },
-    pixel: { type: "uri", value: "http://example.com/pixel" },
-    raster: { type: "uri", value: `http://example.com/Raster_${rasterPeriod}_tmax` },
-    var: { type: "uri", value: "http://example.com/Variable_tmax" },
-    cell: { type: "uri", value: "http://example.com/Cell" },
-    grid: { type: "uri", value: "http://example.com/Grid_10m" },
+    value: { type: "literal" as const, value: "10" },
+    month: { type: "literal" as const, value: "--01" },
+    pixel: { type: "uri" as const, value: "http://example.com/pixel" },
+    raster: { type: "uri" as const, value: `http://example.com/Raster_${rasterPeriod}_tmax` },
+    var: { type: "uri" as const, value: "http://example.com/Variable_tmax" },
+    cell: { type: "uri" as const, value: "http://example.com/Cell" },
+    grid: { type: "uri" as const, value: "http://example.com/Grid_10m" },
   };
 }
 
