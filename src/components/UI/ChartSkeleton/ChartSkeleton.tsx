@@ -7,7 +7,7 @@ export function ChartSkeleton() {
         <div className="h-7 w-20 rounded-full bg-[var(--color-border)]" />
         <div className="h-7 w-24 rounded-full bg-[var(--color-border)]" />
       </div>
-      <div className="relative flex h-64 items-end justify-between px-2">
+      <div className="relative flex h-[300px] items-end justify-between px-2 sm:h-[360px] md:h-[420px] lg:h-[460px]">
         {BAR_HEIGHTS.map((h, i) => (
           <div
             key={i}

@@ -15,4 +15,5 @@ export { PageWrapper } from "./PageWrapper";
 export { RangeSlider } from "./RangeSlider";
 export { SectionLabel } from "./SectionLabel";
 export { StatCardsSkeleton } from "./StatCardsSkeleton";
+export { TableSkeleton } from "./TableSkeleton";
 export { ToggleSwitch } from "./ToggleSwitch";

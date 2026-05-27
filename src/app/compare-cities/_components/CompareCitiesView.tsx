@@ -4,13 +4,14 @@ import type { TMiniMapLocation } from "@/components";
 import { CompareStatsGrid, DiffCard, SearchBar, TempPrecipChart } from "@/components";
 import {
   ChartSkeleton,
-  ComparisonTableSkeleton,
   DotLabel,
   EmptyState,
   ErrorBanner,
   ExportMenu,
+  MapSkeleton,
   PageTitle,
   PageWrapper,
+  TableSkeleton,
 } from "@/components/UI";
 import { CELL_SIZE_OPTIONS, CLIMATE_COMPARISON_COLORS } from "@/constants";
 import {
@@ -30,7 +31,7 @@ const MiniMap = dynamic(
   () => import("@/components/UI/MiniMap/MiniMap").then((m) => ({ default: m.MiniMap })),
   {
     ssr: false,
-    loading: () => <div style={{ height: 200 }} />,
+    loading: () => <MapSkeleton variant="mini" />,
   },
 );
 
@@ -158,22 +159,19 @@ export function CompareCitiesView({
           <MiniMap locations={miniMapLocations} activeIndex={activeCity} onToggle={setActiveCity} />
         </div>
 
-        {isLoading && (
-          <div className="flex flex-col gap-6">
-            <ComparisonTableSkeleton />
-            <ChartSkeleton />
+        {isLoading ? (
+          <div className="flex flex-col gap-2">
+            <div className="flex h-10 items-center justify-end">
+              <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
+            </div>
+            <div className="flex flex-col gap-6">
+              <TableSkeleton rows={5} cols={2} />
+              <ChartSkeleton />
+            </div>
           </div>
-        )}
-
-        {error && !isLoading && <ErrorBanner message={error.message} />}
-
-        {!hasBothData && !isLoading && !error && (
-          <EmptyState message={t("climateComparison.noData")} />
-        )}
-
-        {hasBothData && statsA && statsB && (
+        ) : hasBothData && statsA && statsB ? (
           <div ref={chartSectionRef} className="flex flex-col gap-2">
-            <div className="flex justify-end">
+            <div className="flex h-10 items-center justify-end">
               <ExportMenu onExportCSV={handleExportCSV} onExportPNG={handleExportPNG} />
             </div>
             <div ref={exportRef} className="flex flex-col gap-6">
@@ -202,6 +200,12 @@ export function CompareCitiesView({
               />
             </div>
           </div>
+        ) : null}
+
+        {error && !isLoading && <ErrorBanner message={error.message} />}
+
+        {!hasBothData && !isLoading && !error && (
+          <EmptyState message={t("climateComparison.noData")} />
         )}
 
         {hasBothData && diff && (
