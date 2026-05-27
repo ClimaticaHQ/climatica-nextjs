@@ -42,6 +42,8 @@ export function LanguageSwitcher({ variant = "dropdown" }: TLanguageSwitcherProp
 
   return (
     <Dropdown
+      data-testid="language-switcher"
+      optionTestIdPrefix="language-option"
       options={LANGUAGES.map(({ code, label }) => ({ value: code, label }))}
       value={locale}
       onChange={change}

@@ -1,0 +1,31 @@
+import { expect, test } from "@playwright/test";
+
+test.describe("Navigation", () => {
+  test("nav links navigate to the correct pages", async ({ page }) => {
+    await page.goto("/climate-statistics");
+
+    await page.getByRole("link", { name: "Compare Cities" }).click();
+    await expect(page).toHaveURL(/compare-cities/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Compare Cities");
+
+    await page.getByRole("link", { name: "Compare Periods" }).click();
+    await expect(page).toHaveURL(/compare-periods/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Compare Periods");
+
+    await page.getByRole("link", { name: "Region Heatmap" }).click();
+    await expect(page).toHaveURL(/heat-map/);
+
+    await page.getByRole("link", { name: "City Climate" }).click();
+    await expect(page).toHaveURL(/climate-statistics/);
+  });
+
+  test("compare cities page renders two city search inputs", async ({ page }) => {
+    await page.goto("/compare-cities");
+    await expect(page.getByTestId("city-search-input")).toHaveCount(2);
+  });
+
+  test("compare periods page renders with the correct heading", async ({ page }) => {
+    await page.goto("/compare-periods");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Compare Periods");
+  });
+});

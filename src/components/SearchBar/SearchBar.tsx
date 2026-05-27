@@ -77,6 +77,7 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
   return (
     <div ref={containerRef} className="relative w-full max-w-[480px]">
       <input
+        data-testid="city-search-input"
         type="text"
         value={query}
         onChange={(e) => handleInputChange(e.target.value)}
@@ -96,7 +97,10 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
       )}
 
       {isOpen && (
-        <ul className="absolute top-[calc(100%+4px)] left-0 right-0 max-h-[280px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-md overflow-y-auto z-[1000] list-none">
+        <ul
+          data-testid="city-search-results"
+          className="absolute top-[calc(100%+4px)] left-0 right-0 max-h-[280px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-md overflow-y-auto z-[1000] list-none"
+        >
           {coordResult && (
             <li key="coord-result">
               <button type="button" onClick={handleSelectCoords} className={itemClass}>

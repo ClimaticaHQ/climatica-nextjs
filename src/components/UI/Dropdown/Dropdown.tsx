@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { TDropdownProps } from "./Dropdown.type";
 
-export default function Dropdown({ options, value, onChange, className }: TDropdownProps) {
+export default function Dropdown({
+  options,
+  value,
+  onChange,
+  className,
+  "data-testid": testId,
+  optionTestIdPrefix,
+}: TDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -20,6 +27,7 @@ export default function Dropdown({ options, value, onChange, className }: TDropd
   return (
     <div ref={ref} className={`relative ${className ?? ""}`}>
       <button
+        data-testid={testId}
         onClick={() => setIsOpen((o) => !o)}
         className={`
           flex items-center gap-2 px-3 py-1.5
@@ -53,6 +61,7 @@ export default function Dropdown({ options, value, onChange, className }: TDropd
         {options.map((option) => (
           <button
             key={option.value}
+            data-testid={optionTestIdPrefix ? `${optionTestIdPrefix}-${option.value}` : undefined}
             disabled={option.disabled}
             onClick={() => {
               onChange(option.value);

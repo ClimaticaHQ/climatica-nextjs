@@ -140,7 +140,7 @@ export function ClimateStatisticsView({
               <StatCardsSkeleton />
             ) : stats ? (
               <div className="flex flex-col gap-3">
-                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                <div data-testid="stat-cards" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                   <StatCard
                     label={
                       isSingleMonth
@@ -181,7 +181,11 @@ export function ClimateStatisticsView({
               </div>
             ) : null}
 
-            <div id="climate-chart-container" className="flex flex-col gap-2">
+            <div
+              id="climate-chart-container"
+              data-testid="climate-chart"
+              className="flex flex-col gap-2"
+            >
               <div className="flex h-10 items-center justify-end">
                 {isLoading ? (
                   <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />

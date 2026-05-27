@@ -9,4 +9,6 @@ export type TDropdownProps = {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  "data-testid"?: string;
+  optionTestIdPrefix?: string;
 };
