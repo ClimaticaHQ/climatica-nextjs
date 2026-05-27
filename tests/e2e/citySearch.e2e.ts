@@ -17,6 +17,7 @@ test.describe("City search", () => {
   test("displays results dropdown when typing a city name", async ({ page }) => {
     const input = page.getByTestId("city-search-input").first();
     await input.fill("Paris");
+    await page.waitForTimeout(600);
     const results = page.getByTestId("city-search-results").first();
     await expect(results).toBeVisible();
     await expect(results.getByRole("button").first()).toBeVisible();
