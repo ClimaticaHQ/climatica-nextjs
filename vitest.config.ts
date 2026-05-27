@@ -9,7 +9,8 @@ export default defineConfig({
     globals: true,
     coverage: {
       provider: "v8",
-      reporter: ["text", "html"],
+      reporter: process.env["CI"] ? ["text", "json", "json-summary"] : ["text"],
+      reportsDirectory: "./tests/reports/unit",
       include: ["src/**/*.ts", "src/**/*.tsx"],
       exclude: ["src/**/*.type.ts", "src/**/*.enum.ts", "src/app/**", "src/**/*.stories.*"],
     },
@@ -18,12 +19,12 @@ export default defineConfig({
         extends: true,
         test: {
           name: "unit",
-          include: ["src/**/*.test.ts"],
+          include: ["tests/unit/**/*.test.ts"],
           environment: "node",
         },
       },
     ],
-    reporters: ["default"],
+    reporters: process.env["CI"] ? ["github-actions", "default"] : ["default"],
     env: loadEnv("", process.cwd(), ""),
   },
 });
