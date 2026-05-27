@@ -28,4 +28,16 @@ test.describe("Navigation", () => {
     await page.goto("/compare-periods");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Compare Periods");
   });
+
+  test("shows 404 page for unknown route", async ({ page }) => {
+    await page.goto("/uk/this-page-does-not-exist");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("404");
+    await expect(page.getByTestId("not-found-home-link")).toBeVisible();
+  });
+
+  test("404 page has working link to home", async ({ page }) => {
+    await page.goto("/uk/this-page-does-not-exist");
+    await page.getByTestId("not-found-home-link").click();
+    await expect(page).toHaveURL(/climate-statistics/);
+  });
 });
