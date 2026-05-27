@@ -128,9 +128,7 @@ describe("WorldClimService.getWeatherDataForPoint", () => {
   });
 
   it("passes correct year param to axios", async () => {
-    vi.mocked(axios.get).mockResolvedValue(
-      makeAxiosResponse(makePointValueResponse(["2020"])),
-    );
+    vi.mocked(axios.get).mockResolvedValue(makeAxiosResponse(makePointValueResponse(["2020"])));
     await WorldClimService.getWeatherDataForPoint(48.0, 16.0, "10m", ["tmax"], 2020);
     const params = vi.mocked(axios.get).mock.calls[0]?.[1]?.params;
     expect(params).toMatchObject({ year: 2020, isWeather: true });
@@ -148,7 +146,17 @@ describe("WorldClimService.getPixelValuesInBox", () => {
 
   it("calls avgpixelvaluesinbox endpoint when avg=true", async () => {
     vi.mocked(axios.get).mockResolvedValue(makeAxiosResponse({ results: { bindings: [] } }));
-    await WorldClimService.getPixelValuesInBox(50, 48, 14, 16, "10m", ["tmax"], true, undefined, true);
+    await WorldClimService.getPixelValuesInBox(
+      50,
+      48,
+      14,
+      16,
+      "10m",
+      ["tmax"],
+      true,
+      undefined,
+      true,
+    );
     const url = vi.mocked(axios.get).mock.calls[0]?.[0] as string;
     expect(url).toContain("avgpixelvaluesinbox");
   });

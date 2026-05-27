@@ -40,10 +40,7 @@ describe("buildVariableIris", () => {
   });
 
   it('["tmax", "tmin"] → array with both IRIs', () => {
-    expect(buildVariableIris(["tmax", "tmin"])).toEqual([
-      `${VAR_BASE}tmax`,
-      `${VAR_BASE}tmin`,
-    ]);
+    expect(buildVariableIris(["tmax", "tmin"])).toEqual([`${VAR_BASE}tmax`, `${VAR_BASE}tmin`]);
   });
 
   it("[] → []", () => {
