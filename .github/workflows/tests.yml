@@ -103,4 +103,6 @@ jobs:
 
       - name: Import cities to Solr
         run: |
-          curl -X POST
+          curl "http://localhost:8983/solr/cities/update?commit=true" \
+            -X POST -H 'Content-type:application/csv' \
+            --data-binary @docker/solr/data/cities.csv
