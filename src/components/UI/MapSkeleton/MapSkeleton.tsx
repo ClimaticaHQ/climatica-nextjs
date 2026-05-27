@@ -4,13 +4,13 @@ const TILE_OPACITIES = [50, 30, 50, 30, 50, 30, 50, 30, 50] as const;
 
 export function MapSkeleton({ variant = "full", heightClassName }: TMapSkeletonProps) {
   const isMini = variant === "mini";
-  const height = isMini ? "h-full" : (heightClassName ?? "h-[400px]");
+  const height = heightClassName ?? "h-[400px]";
 
   return (
     <div
       className={
         isMini
-          ? `relative w-full animate-pulse overflow-hidden bg-[var(--color-bg-secondary)] ${height}`
+          ? "relative h-[120px] w-full shrink-0 animate-pulse overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] sm:h-[160px] sm:w-[260px]"
           : `relative z-0 w-full animate-pulse overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] shadow-md ${height}`
       }
     >
