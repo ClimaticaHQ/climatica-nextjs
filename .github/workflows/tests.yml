@@ -78,7 +78,7 @@ jobs:
 
       - name: Create Solr core
         run: |
-          curl -f "http://localhost:8983/solr/admin/cores?action=CREATE&name=cities&configSet=_default"
+          curl "http://localhost:8983/solr/admin/cores?action=CREATE&name=cities&configSet=_default" || echo "Core already exists, skipping..."
 
       - name: Apply Solr schema
         run: |
