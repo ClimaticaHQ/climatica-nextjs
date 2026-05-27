@@ -33,5 +33,5 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_WORLDCLIM_API_KEY: ${{ secrets.WORLDCLIM_API_KEY }}
-          VITE_NODE_ENV: production
+          WORLDCLIM_API_KEY: ${{ secrets.WORLDCLIM_API_KEY }}
+          NODE_ENV: production
