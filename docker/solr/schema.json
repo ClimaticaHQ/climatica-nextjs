@@ -1,0 +1,142 @@
+{
+  "add-field-type": [
+    {
+      "name": "suggestType",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "indexAnalyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          { "class": "solr.LowerCaseFilterFactory" },
+          { "class": "solr.ASCIIFoldingFilterFactory" }
+        ]
+      },
+      "queryAnalyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          { "class": "solr.LowerCaseFilterFactory" },
+          { "class": "solr.ASCIIFoldingFilterFactory" }
+        ]
+      }
+    },
+    {
+      "name": "trigramType",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "indexAnalyzer": {
+        "tokenizer": { "class": "solr.StandardTokenizerFactory" },
+        "filters": [
+          { "class": "solr.LowerCaseFilterFactory" },
+          { "class": "solr.ASCIIFoldingFilterFactory" },
+          {
+            "class": "solr.NGramFilterFactory",
+            "minGramSize": "3",
+            "maxGramSize": "10"
+          }
+        ]
+      },
+      "queryAnalyzer": {
+        "tokenizer": { "class": "solr.StandardTokenizerFactory" },
+        "filters": [
+          { "class": "solr.LowerCaseFilterFactory" },
+          { "class": "solr.ASCIIFoldingFilterFactory" }
+        ]
+      }
+    }
+  ],
+  "add-field": [
+    {
+      "name": "geonameid",
+      "type": "pint",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_en",
+      "type": "suggestType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_uk",
+      "type": "suggestType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_es",
+      "type": "suggestType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_en_ngram",
+      "type": "trigramType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": false
+    },
+    {
+      "name": "label_uk_ngram",
+      "type": "trigramType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": false
+    },
+    {
+      "name": "label_es_ngram",
+      "type": "trigramType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": false
+    },
+    {
+      "name": "latitude",
+      "type": "pdouble",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "longitude",
+      "type": "pdouble",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "feature_code",
+      "type": "string",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "country_code",
+      "type": "string",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "population",
+      "type": "plong",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    }
+  ],
+  "add-copy-field": [
+    { "source": "label_en", "dest": "label_en_ngram" },
+    { "source": "label_uk", "dest": "label_uk_ngram" },
+    { "source": "label_es", "dest": "label_es_ngram" }
+  ]
+}

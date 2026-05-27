@@ -1,6 +1,6 @@
 import { getMartonneBadge } from "@/utils/martonne.util";
 import { CLIMATE_COMPARISON_COLORS } from "@/constants";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TCompareStatsGridProps } from "./CompareStatsGrid.type";
 
 export function CompareStatsGrid({
@@ -12,7 +12,7 @@ export function CompareStatsGrid({
   altitudeB,
   activeColumn,
 }: TCompareStatsGridProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const badgeA = getMartonneBadge(statsA.martonneIndex);
   const badgeB = getMartonneBadge(statsB.martonneIndex);

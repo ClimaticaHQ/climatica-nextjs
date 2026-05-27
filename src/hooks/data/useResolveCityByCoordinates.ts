@@ -1,4 +1,4 @@
-import { WikidataService } from "@/api";
+import { apiClient } from "@/libs/api";
 import type { TCoordinates, TWikidataCity } from "@/types";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 
@@ -8,6 +8,11 @@ export function useResolveCityByCoordinates(): UseMutationResult<
   TCoordinates
 > {
   return useMutation<TWikidataCity | null, Error, TCoordinates>({
-    mutationFn: ({ lat, lng }) => WikidataService.findNearestCityByCoordinates(lat, lng),
+    mutationFn: async ({ lat, lng }) => {
+      const { data: cities } = await apiClient.get<TWikidataCity[]>("/api/cities", {
+        params: { q: `${lat},${lng}` },
+      });
+      return cities[0] ?? null;
+    },
   });
 }

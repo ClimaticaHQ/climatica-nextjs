@@ -1,6 +1,14 @@
-import { WorldClimService } from "@/api";
-import type { TBbox, TCellSize, TClimatePeriod, THeatmapResult, TVariable } from "@/types";
-import { groupAvgBindings, groupPixelBindings } from "@/utils";
+import { apiClient } from "@/libs/api";
+import type {
+  TBbox,
+  TCellSize,
+  TClimatePeriod,
+  THeatmapResult,
+  TRawAvgValueResponse,
+  TRawPixelValueResponse,
+  TVariable,
+} from "@/types";
+import { buildGridIri, buildHeatmapResults, buildVariableIris } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 
 export function useGetHeatmapData(
@@ -26,51 +34,24 @@ export function useGetHeatmapData(
     ],
     queryFn: async (): Promise<THeatmapResult> => {
       const { north, south, west, east } = bbox!;
-      const variables = [`${variable}`];
+      const params = {
+        north,
+        south,
+        west,
+        east,
+        grid: buildGridIri(gridSize),
+        var: buildVariableIris([`${variable}`]),
+        ...(isClimate
+          ? { isClimate: true }
+          : { isWeather: true, year: year ?? new Date().getFullYear() }),
+      };
 
-      const [rawPixels, rawAvg] = await Promise.all([
-        WorldClimService.getPixelValuesInBox(
-          north,
-          south,
-          west,
-          east,
-          gridSize,
-          variables,
-          isClimate,
-          isClimate ? undefined : year,
-        ),
-        WorldClimService.getAvgPixelValuesInBox(
-          north,
-          south,
-          west,
-          east,
-          gridSize,
-          variables,
-          isClimate,
-          isClimate ? undefined : year,
-        ),
+      const [{ data: rawPixels }, { data: rawAvg }] = await Promise.all([
+        apiClient.get<TRawPixelValueResponse>("/api/worldclim/pixelvaluesinbox", { params }),
+        apiClient.get<TRawAvgValueResponse>("/api/worldclim/avgpixelvaluesinbox", { params }),
       ]);
 
-      // Group per-month rows into per-pixel bindings
-      const allPixelBindings = groupPixelBindings(rawPixels.results.bindings);
-      const allAvgBindings = groupAvgBindings(rawAvg.results.bindings);
-
-      // Filter by climate period using pixel/raster IRI
-      const pixelBindings = isClimate
-        ? allPixelBindings.filter((b) => b.pixel?.value?.includes(climatePeriod))
-        : allPixelBindings;
-      const filteredPixels =
-        isClimate && pixelBindings.length === 0 ? allPixelBindings : pixelBindings;
-
-      const avgBindings = isClimate
-        ? allAvgBindings.filter((b) => b.raster?.value?.includes(climatePeriod))
-        : allAvgBindings;
-      const filteredAvg = isClimate && avgBindings.length === 0 ? allAvgBindings : avgBindings;
-
-      return {
-        pixels: { results: { bindings: filteredPixels } },
-        avg: { results: { bindings: filteredAvg } },
-      };
+      return buildHeatmapResults(rawPixels, rawAvg, isClimate, climatePeriod);
     },
     enabled,
     staleTime: Infinity,

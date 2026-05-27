@@ -8,3 +8,4 @@ export { useGetHeatmapPolygonData } from "./useGetHeatmapPolygonData";
 export { useGetMultiPeriodData } from "./useGetMultiPeriodData";
 export { useGetRegionalProfile } from "./useGetRegionalProfile";
 export { useResolveCityByCoordinates } from "./useResolveCityByCoordinates";
+export { useSearchCity } from "./useSearchCity";

@@ -1,3 +1,4 @@
+import { DotLabel } from "@/components/UI";
 import { useEffect, useState } from "react";
 import type { TPeriodSelectRowProps } from "./PeriodSelectRow.type";
 
@@ -27,20 +28,7 @@ export function PeriodSelectRow({
 
   return (
     <div className="flex flex-col gap-1.5">
-      {label && (
-        <div className="flex items-center gap-2">
-          {!hideDot && (
-            <span
-              className="h-3 w-3 shrink-0 rounded-full"
-              style={{ backgroundColor: dotColor }}
-              aria-hidden="true"
-            />
-          )}
-          <span className="text-[length:var(--font-sm)] font-medium text-[var(--color-text-secondary)]">
-            {label}
-          </span>
-        </div>
-      )}
+      {label && <DotLabel label={label} dotColor={dotColor ?? ""} hideDot={hideDot} />}
 
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">

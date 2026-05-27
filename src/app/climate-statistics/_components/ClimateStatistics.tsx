@@ -1,8 +1,16 @@
 "use client";
 
 import type { TChartSubtitle } from "@/components/TempPrecipChart/TempPrecipChart.type";
-import { CLIMATE_PERIOD_LABELS, DATASETS, SIDEBAR_PARAMS, VARIABLE_LABELS } from "@/constants";
 import {
+  APP_TITLE,
+  CLIMATE_PERIOD_LABELS,
+  DATASETS,
+  SIDEBAR_PARAMS,
+  TIME,
+  VARIABLE_LABELS,
+} from "@/constants";
+import {
+  useAutoScroll,
   useGeolocation,
   useGetAltitude,
   useGetCellBounds,
@@ -13,19 +21,17 @@ import {
 import { useFiltersStore } from "@/stores";
 import type { TWikidataCity } from "@/types";
 import {
+  applyUrlFiltersToStore,
+  cityFromUrl,
+  createUrlParamHelpers,
   encodeMonths,
   encodeVars,
-  parseCellSize,
-  parseCoord,
-  parseDataset,
-  parseMonths,
-  parsePeriod,
-  parseVars,
-  parseYear,
+  scrollToSection,
 } from "@/utils";
+import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { formatCoordinate } from "./ClimateStatistics.util";
 import { ClimateStatisticsView } from "./ClimateStatisticsView";
 
@@ -34,12 +40,15 @@ function resolveCityName(city: TWikidataCity): string {
 }
 
 export function ClimateStatistics() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { city: selectedCity, selectCity } = usePersistedCity();
   const { isLoading: isResolving, mutateAsync: resolveCityByCoordinates } =
     useResolveCityByCoordinates();
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
+  const { autoScroll } = useAutoScroll();
   const latestMapClickIdRef = useRef(0);
+  const userSelectedRef = useRef(false);
+  const chartSectionRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -57,40 +66,20 @@ export function ClimateStatistics() {
   // Restore city and filters from URL once on mount
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    const lat = parseCoord(searchParams.get(SIDEBAR_PARAMS.LAT));
-    const lng = parseCoord(searchParams.get(SIDEBAR_PARAMS.LNG));
     const cityLabel = searchParams.get(SIDEBAR_PARAMS.CITY);
-
-    if (lat !== null && lng !== null) {
-      const urlCity: TWikidataCity = {
-        id: `url:${lat},${lng}`,
-        label: cityLabel ?? `${lat}, ${lng}`,
-        description: "",
-        lat,
-        lng,
-      };
+    const urlCity = cityFromUrl(
+      searchParams.get(SIDEBAR_PARAMS.LAT),
+      searchParams.get(SIDEBAR_PARAMS.LNG),
+      cityLabel,
+    );
+    if (urlCity) {
       selectCity(urlCity);
       if (cityLabel) setChartCityName(cityLabel);
     }
 
-    const store = useFiltersStore.getState();
-    const ds = parseDataset(searchParams.get(SIDEBAR_PARAMS.DATASET));
-    if (ds !== null) store.actions.setDataset(ds);
-
-    const period = parsePeriod(searchParams.get(SIDEBAR_PARAMS.PERIOD));
-    if (period !== null) store.actions.setClimatePeriod(period);
-
-    const year = parseYear(searchParams.get(SIDEBAR_PARAMS.YEAR));
-    if (year !== null) store.actions.setWeatherYear(year);
-
-    const vars = parseVars(searchParams.get(SIDEBAR_PARAMS.VAR));
-    if (vars !== null) store.actions.setVariables(vars);
-
-    const grid = parseCellSize(searchParams.get(SIDEBAR_PARAMS.GRID));
-    if (grid !== null) store.actions.setGridSize(grid);
-
-    const monthFilter = parseMonths(searchParams.get(SIDEBAR_PARAMS.MONTHS));
-    if (monthFilter !== null) store.actions.setMonths(monthFilter);
+    applyUrlFiltersToStore(searchParams, useFiltersStore.getState().actions, {
+      includeMonths: true,
+    });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -102,39 +91,25 @@ export function ClimateStatistics() {
   const monthsStr = useMemo(() => encodeMonths(months), [months]);
 
   useEffect(() => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    let changed = false;
+    const helper = createUrlParamHelpers(searchParams);
 
-    function maybeSet(key: string, value: string) {
-      if (nextParams.get(key) !== value) {
-        nextParams.set(key, value);
-        changed = true;
-      }
-    }
-    function maybeDelete(key: string) {
-      if (nextParams.has(key)) {
-        nextParams.delete(key);
-        changed = true;
-      }
-    }
-
-    maybeSet(SIDEBAR_PARAMS.CITY, cityLabel);
-    maybeSet(SIDEBAR_PARAMS.LAT, latStr);
-    maybeSet(SIDEBAR_PARAMS.LNG, lngStr);
-    maybeSet(SIDEBAR_PARAMS.DATASET, dataset);
-    maybeSet(SIDEBAR_PARAMS.VAR, varsStr);
-    maybeSet(SIDEBAR_PARAMS.GRID, gridSize);
-    maybeSet(SIDEBAR_PARAMS.MONTHS, monthsStr);
+    helper.set(SIDEBAR_PARAMS.CITY, cityLabel);
+    helper.set(SIDEBAR_PARAMS.LAT, latStr);
+    helper.set(SIDEBAR_PARAMS.LNG, lngStr);
+    helper.set(SIDEBAR_PARAMS.DATASET, dataset);
+    helper.set(SIDEBAR_PARAMS.VAR, varsStr);
+    helper.set(SIDEBAR_PARAMS.GRID, gridSize);
+    helper.set(SIDEBAR_PARAMS.MONTHS, monthsStr);
 
     if (dataset === DATASETS.CLIMATE) {
-      maybeSet(SIDEBAR_PARAMS.PERIOD, climatePeriod);
-      maybeDelete(SIDEBAR_PARAMS.YEAR);
+      helper.set(SIDEBAR_PARAMS.PERIOD, climatePeriod);
+      helper.delete(SIDEBAR_PARAMS.YEAR);
     } else {
-      maybeSet(SIDEBAR_PARAMS.YEAR, String(weatherYear));
-      maybeDelete(SIDEBAR_PARAMS.PERIOD);
+      helper.set(SIDEBAR_PARAMS.YEAR, String(weatherYear));
+      helper.delete(SIDEBAR_PARAMS.PERIOD);
     }
 
-    if (changed) router.replace(`${pathname}?${nextParams.toString()}`);
+    if (helper.changed) router.replace(`${pathname}?${helper.params.toString()}`);
   }, [
     cityLabel,
     latStr,
@@ -154,7 +129,7 @@ export function ClimateStatistics() {
   useEffect(() => {
     const cityStr = chartCityName || cityLabel;
     if (!cityStr) {
-      document.title = "City Climate | Climatica";
+      document.title = `City Climate | ${APP_TITLE}`;
       return;
     }
     const varLabel = variables[0] ? (VARIABLE_LABELS[variables[0]] ?? variables[0]) : "";
@@ -162,10 +137,11 @@ export function ClimateStatistics() {
       dataset === DATASETS.CLIMATE
         ? (CLIMATE_PERIOD_LABELS[climatePeriod] ?? climatePeriod)
         : String(weatherYear);
-    document.title = `${cityStr} · ${varLabel} ${periodStr} | Climatica`;
+    document.title = `${cityStr} · ${varLabel} ${periodStr} | ${APP_TITLE}`;
   }, [chartCityName, cityLabel, variables, dataset, climatePeriod, weatherYear]);
 
   function handleCitySelect(city: TWikidataCity) {
+    userSelectedRef.current = true;
     clearLocationError();
     const name = resolveCityName(city);
     if (name) setChartCityName(name);
@@ -180,6 +156,7 @@ export function ClimateStatistics() {
 
   function handleLocate() {
     locate((city) => {
+      userSelectedRef.current = true;
       const name = resolveCityName(city);
       if (name) setChartCityName(name);
       selectCity(city);
@@ -201,6 +178,7 @@ export function ClimateStatistics() {
       lng,
     };
 
+    userSelectedRef.current = true;
     selectCity(provisionalCity);
 
     try {
@@ -240,6 +218,19 @@ export function ClimateStatistics() {
     gridSize,
   );
 
+  useEffect(() => {
+    if (!temperatureData.length || !chartSectionRef.current) return;
+    if (!userSelectedRef.current || !autoScroll) return;
+
+    const timer = setTimeout(() => {
+      if (chartSectionRef.current) {
+        scrollToSection(chartSectionRef.current, { offset: 20 });
+      }
+    }, TIME.IN_MILLISECONDS.SECOND * 2);
+
+    return () => clearTimeout(timer);
+  }, [temperatureData, autoScroll]);
+
   const resolvedLocationError = locationError !== null ? t(locationError) : null;
 
   return (
@@ -263,6 +254,7 @@ export function ClimateStatistics() {
       onMapClick={handleMapClick}
       onLocate={handleLocate}
       onClearLocationError={clearLocationError}
+      chartSectionRef={chartSectionRef}
     />
   );
 }

@@ -1,11 +1,5 @@
 import type { TClimatePeriod } from "@/constants";
-import type {
-  TDataset,
-  TMonthAridity,
-  TMonthlyTemperature,
-  TVariable,
-  TWalterLiethScales,
-} from "@/types";
+import type { TDataset, TMonthlyTemperature, TVariable } from "@/types";
 import type { ReactNode } from "react";
 
 export type TMonthlyTemperatureWithAvg = TMonthlyTemperature & { tavg: number };
@@ -98,11 +92,6 @@ export type TChartSummary = {
   martonne: number | null;
 };
 
-export type TSummaryStatsProps = {
-  summary: TChartSummary;
-  altitude?: number;
-};
-
 export type TModeButtonProps = {
   isActive: boolean;
   onClick: () => void;
@@ -113,92 +102,4 @@ export type TModeButtonProps = {
 export type TModeToggleProps = {
   mode: TChartMode;
   onChange: (mode: TChartMode) => void;
-};
-
-export type TWLScaledPoint = {
-  monthName: string;
-  tavg: number;
-  prec: number;
-  precScaled: number;
-};
-
-export type TWalterLiethColors = {
-  humidFill: string;
-  aridFill: string;
-  humidFillOpacity?: number;
-  aridFillOpacity?: number;
-  tempLineColor: string;
-  precLineColor: string;
-};
-
-export type TWLCustomizedProps = {
-  wlData: TWLScaledPoint[];
-  wlScales: TWalterLiethScales | null;
-  colors?: TWalterLiethColors;
-  clipId?: string;
-  opacity?: number;
-  dashArray?: string;
-};
-
-export type TWLTooltipProps = {
-  active?: boolean;
-  label?: string;
-  wlData?: TWLScaledPoint[];
-};
-
-export type TWalterLiethChartProps = {
-  chartData: TMonthlyTemperatureWithAvg[];
-  scales: TWalterLiethScales | null;
-  summary: TChartSummary | null;
-  colors?: TWalterLiethColors;
-  title?: string;
-  altitude?: number;
-};
-
-export type TWLCitiesLayoutProps = {
-  chartDataA: TMonthlyTemperatureWithAvg[];
-  chartDataB: TMonthlyTemperatureWithAvg[];
-  labelA: string;
-  labelB: string;
-  scales: TWalterLiethScales | null;
-  summaryA: TChartSummary | null;
-  summaryB: TChartSummary | null;
-};
-
-export type TWLPeriodsLayoutProps = {
-  chartDataA: TMonthlyTemperatureWithAvg[];
-  chartDataB: TMonthlyTemperatureWithAvg[];
-  scales: TWalterLiethScales | null;
-  labelA: string;
-  labelB: string;
-  summaryA: TChartSummary | null;
-  summaryB: TChartSummary | null;
-};
-
-export type TWLPeriodsTooltipProps = {
-  active?: boolean;
-  label?: string;
-  wlDataA: TWLScaledPoint[];
-  wlDataB: TWLScaledPoint[];
-  labelA: string;
-  labelB: string;
-};
-
-export type TStandardClimateChartProps = {
-  chartData: Record<string, unknown>[];
-  aridity: TMonthAridity[] | null;
-  aridityA: TMonthAridity[] | null;
-  scales: TWalterLiethScales | null;
-  rightMax: number;
-  summary: TChartSummary | null;
-  visible: TVisibleSeries;
-  selectedMonths?: number[];
-  isCompare: boolean;
-  labelA?: string;
-  labelB?: string;
-  altitude?: number;
-  showAridity?: boolean;
-  multiPeriodData?: TMultiPeriodEntry[] | undefined;
-  hiddenPeriods?: number[] | undefined;
-  periodColors?: readonly string[] | undefined;
 };

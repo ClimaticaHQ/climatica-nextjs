@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+    "types": ["vitest/globals"],
     "incremental": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -27,7 +28,6 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@/api/*": ["./src/api/*"],
       "@/components/*": ["./src/components/*"],
       "@/constants/*": ["./src/constants/*"],
       "@/hooks/*": ["./src/hooks/*"],

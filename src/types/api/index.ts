@@ -1,4 +1,5 @@
 export type { TApiResponse, TResultStatus } from "./common";
+export type { TSolrCityDoc, TSolrResponse } from "./solr.dto";
 export type {
   TPopulationResult,
   TWikidataCoords,

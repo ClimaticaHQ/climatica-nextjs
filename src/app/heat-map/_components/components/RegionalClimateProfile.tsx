@@ -1,5 +1,5 @@
 import { ClimateStatsBar } from "@/components";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import type { TRegionalClimateProfileProps } from "../HeatMap.type";
 
 export function RegionalClimateProfile({
@@ -9,7 +9,7 @@ export function RegionalClimateProfile({
   periodLabel,
   cellCount,
 }: TRegionalClimateProfileProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   if (isLoading) {
     return (

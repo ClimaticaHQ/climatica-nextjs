@@ -1,5 +1,5 @@
 import { MONTH_NAMES, WORLDCLIM_GRID_BASE, WORLDCLIM_VARIABLE_BASE } from "@/constants";
-import { env } from "@/libs";
+import { env } from "@/libs/Env";
 import type {
   TCellBounds,
   TCellSize,

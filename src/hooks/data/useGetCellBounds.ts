@@ -1,8 +1,7 @@
-import { WorldClimService } from "@/api";
-import type { TCellSize } from "@/types";
-import type { TCellBounds } from "@/types";
 import { GRID_DELTA } from "@/constants";
-import { iriToCellBounds } from "@/utils";
+import { apiClient } from "@/libs/api";
+import type { TCellBounds, TCellSize, TWorldClimCellResponse } from "@/types";
+import { extractCellBySize, iriToCellBounds } from "@/utils";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
 export function useGetCellBounds(
@@ -13,7 +12,12 @@ export function useGetCellBounds(
   return useQuery<TCellBounds | null, Error>({
     queryKey: ["cellBounds", lat, lng, gridSize],
     queryFn: async () => {
-      const cellIri = await WorldClimService.getCellForPoint(lat, lng, gridSize);
+      const { data: cellData } = await apiClient.get<TWorldClimCellResponse>(
+        "/api/worldclim/cellofpoint",
+        { params: { lat, lng } },
+      );
+
+      const cellIri = extractCellBySize(cellData, gridSize);
       if (!cellIri) return null;
       const delta = GRID_DELTA[gridSize];
       if (delta === undefined) return null;
