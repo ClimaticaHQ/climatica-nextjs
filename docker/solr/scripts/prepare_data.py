@@ -19,7 +19,6 @@ ALLOWED_FEATURE_CODES = {
     "PPLA4",  # seat of fourth-order admin division
     "PPLA5",  # seat of fifth-order admin division
     "PPLC",   # capital city
-    "PPLX",   # section of populated place
 }
 
 # * languages to extract from alternateNamesV2
@@ -58,7 +57,7 @@ def load_alternate_names():
                 continue
 
             # * is_preferred is column index 4 (value "1" means preferred)
-            is_preferred = len(parts) > 4 and parts[4] == "1"
+            is_preferred = len(parts) > 4 and parts[-1] == "1"
 
             current = names[geonameid][lang]
 
