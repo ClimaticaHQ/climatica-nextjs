@@ -58,7 +58,7 @@ def load_alternate_names():
                 continue
 
             # * is_preferred is column index 4 (value "1" means preferred)
-            is_preferred = len(parts) > 4 and parts[4] == "1"
+            is_preferred = len(parts) > 4 and parts[-1] == "1"
 
             current = names[geonameid][lang]
 
