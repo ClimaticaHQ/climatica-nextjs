@@ -1,4 +1,9 @@
-import { MONTH_NAMES, WORLDCLIM_GRID_BASE, WORLDCLIM_VARIABLE_BASE } from "@/constants";
+import {
+  CELL_IRI_ROW_COL_REGEX,
+  MONTH_NAMES,
+  WORLDCLIM_GRID_BASE,
+  WORLDCLIM_VARIABLE_BASE,
+} from "@/constants";
 import { env } from "@/libs/Env";
 import type {
   TCellBounds,
@@ -13,8 +18,6 @@ import type {
   TWorldClimPixelResource,
   TWorldClimPointValueBinding,
 } from "@/types";
-
-const CELL_IRI_ROW_COL_REGEX = /Pixel_[^_]+_r(\d+)c(\d+)/;
 
 export function iriToCellBounds(iri: string, cellSize: number): TCellBounds | null {
   const match = CELL_IRI_ROW_COL_REGEX.exec(iri);
