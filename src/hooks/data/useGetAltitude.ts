@@ -1,6 +1,5 @@
-import { apiClient } from "@/libs/api";
-import type { TCellSize, TWorldClimCellResource, TWorldClimCellResponse } from "@/types";
-import { extractCellBySize } from "@/utils";
+import { WorldClimService } from "@/libs/services/worldClimService";
+import type { TCellSize } from "@/types";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
 export function useGetAltitude(
@@ -11,18 +10,10 @@ export function useGetAltitude(
   return useQuery<number | null, Error>({
     queryKey: ["altitude", lat, lng, gridSize],
     queryFn: async () => {
-      const { data: cellData } = await apiClient.get<TWorldClimCellResponse>(
-        "/api/worldclim/cellofpoint",
-        { params: { lat, lng } },
-      );
-
-      const cellIri = extractCellBySize(cellData, gridSize);
+      const cellIri = await WorldClimService.getCellForPoint(lat, lng, gridSize);
       if (!cellIri) return null;
 
-      const { data: resource } = await apiClient.get<TWorldClimCellResource>(
-        "/api/worldclim/resource",
-        { params: { id: "Cell", iri: cellIri } },
-      );
+      const resource = await WorldClimService.getCellResource(cellIri);
 
       return resource.elevation ?? null;
     },
