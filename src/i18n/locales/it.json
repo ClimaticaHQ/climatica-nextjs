@@ -1,0 +1,298 @@
+{
+  "topbar": {
+    "toggleFilters": "Attiva/disattiva filtri",
+    "toggleTheme": "Cambia tema"
+  },
+  "navbar": {
+    "toggleMenu": "Apri o chiudi il menu",
+    "links": {
+      "climateStatistics": "Clima della Città",
+      "climateComparison": "Confronta Città",
+      "compareCities": "Confronta Città",
+      "comparePeriods": "Confronta Periodi",
+      "heatMap": "Mappa di Calore Regionale"
+    }
+  },
+  "search": {
+    "placeholder": "Cerca una città o inserisci le coordinate (lat, lng)...",
+    "coordsResult": "Vai alle coordinate"
+  },
+  "climateStatistics": {
+    "title": "Statistiche Climatiche",
+    "subtitle": "Cerca una città per esplorare i suoi dati climatici",
+    "cellResolution": "Risoluzione della cella:",
+    "filtersTab": "Filtri",
+    "useMyLocation": "Usa la mia posizione",
+    "locating": "Localizzazione in corso...",
+    "stats": {
+      "avgTmax": "Temp. max media",
+      "avgTmin": "Temp. min media",
+      "tmax": "Temp. max",
+      "tmin": "Temp. min",
+      "totalPrec": "Precipitazione totale",
+      "mmThisMonth": "mm questo mese",
+      "resolution": "Risoluzione",
+      "autoResolutionTooltip": "La risoluzione viene impostata automaticamente in base al set di dati selezionato",
+      "altitude": "Altitudine",
+      "filteredMonths": "Filtrato: {months}"
+    }
+  },
+  "compareCities": {
+    "title": "Confronta Città",
+    "selectSecondCity": "Seleziona una seconda città da confrontare"
+  },
+  "comparePeriods": {
+    "title": "Confronta Periodi",
+    "trend": {
+      "tempTitle": "Tendenza della temperatura",
+      "precipTitle": "Tendenza delle precipitazioni",
+      "noChange": "Nessun cambiamento"
+    },
+    "weather": {
+      "periods": "Anni",
+      "addPeriod": "Aggiungi periodo",
+      "maxPeriods": "Massimo {max} periodi",
+      "removePeriod": "Rimuovi {year}",
+      "invalidYear": "Inserisci un anno tra {min} e {max}",
+      "duplicateYear": "Questo anno è già nell'elenco",
+      "periodsCount": "{count} / {max} periodi"
+    }
+  },
+  "climateComparison": {
+    "title": "Confronto Climatico",
+    "modeCities": "Confronta città",
+    "modePeriods": "Confronta periodi",
+    "searchA": "Città A",
+    "searchB": "Città B",
+    "searchCity": "Città",
+    "periodA": "Periodo A",
+    "periodB": "Periodo B",
+    "noData": "Seleziona due città per confrontare i loro dati climatici",
+    "noDataPeriods": "Seleziona una città e due periodi di tempo per confrontare i dati climatici",
+    "stats": {
+      "avgTmax": "Temp. max media",
+      "avgTmin": "Temp. min media",
+      "totalPrec": "Precipitazione totale",
+      "aridMonths": "Mesi aridi",
+      "martonne": "Martonne (M)"
+    },
+    "diff": {
+      "warmerCity": "Città più calda",
+      "moreRain": "Più piogge",
+      "hottestMonth": "Mese più caldo",
+      "coldestMonth": "Mese più freddo",
+      "byDegrees": "di {value}°C",
+      "byMm": "di {value} mm",
+      "tie": "Pareggio"
+    },
+    "autoResolution": "Risoluzione automatica: {resolution}",
+    "wlCompare": {
+      "warmerBy": "{label} più caldo di {value}°C",
+      "coolerBy": "{label} più freddo di {value}°C",
+      "sameTemp": "Temperatura media uguale",
+      "moreArid": "{label} ha {value} mese/i arido/i in più",
+      "fewerArid": "{label} ha {value} mese/i arido/i in meno",
+      "sameArid": "Stessi mesi aridi"
+    }
+  },
+  "heatMap": {
+    "title": "Mappa di Calore Regionale",
+    "placeholder": "Segnaposto della mappa di calore. Più avanti potremo mostrare qui l'intensità climatica su una mappa mondiale.",
+    "drawBbox": "Disegna riquadro di selezione",
+    "drawPolygon": "Disegna poligono",
+    "clearSelection": "Cancella selezione",
+    "drawing": "Fai clic e trascina sulla mappa per selezionare una regione",
+    "drawingPolygon": "Fai clic per aggiungere vertici — fai clic sul primo punto per chiudere il poligono",
+    "noSelection": "Disegna un riquadro o un poligono sulla mappa per analizzare i dati climatici di quella regione",
+    "noData": "Nessun dato disponibile per questa regione",
+    "stats": {
+      "minValue": "Min",
+      "maxValue": "Max",
+      "avgValue": "Media",
+      "median": "Mediana",
+      "stdDev": "Dev. std.",
+      "cellsAnalyzed": "Celle",
+      "contextClimate": "Media 30 anni · {period}",
+      "contextWeatherAnnual": "Media annuale · {year}",
+      "contextWeatherMonth": "Media {month} {year}",
+      "avgTooltipClimate": "Media climatologica di 30 anni ({period}) su tutte le celle",
+      "avgTooltipWeatherAnnual": "Media annuale: media dei 12 valori medi mensili su tutte le celle",
+      "avgTooltipWeatherMonth": "Media mensile: media di {variable} per {month} {year} su tutte le celle"
+    },
+    "showingVariable": "Visualizzazione: {variable}",
+    "useMyLocation": "Usa la mia posizione",
+    "locating": "Localizzazione in corso...",
+    "summaryLine": "{count} celle analizzate · {period} · {variable} · griglia {grid}",
+    "summaryLineClimate": "{count} celle · Media 30 anni {variable} · {period} · {grid}",
+    "summaryLineWeatherAnnual": "{count} celle · Media annuale {variable} · {year} · {grid}",
+    "summaryLineWeatherMonth": "{count} celle · {variable} in {period} · {grid}",
+    "profile": {
+      "subtitle": "Profilo climatico regionale · {count} celle · {period}",
+      "subtitleWeather": "Profilo climatico regionale · {count} celle · {year} · non è una normale climatica"
+    }
+  },
+  "chart": {
+    "title": "Temperatura",
+    "monthAxis": "Mese",
+    "temperatureAxis": "Temperatura (gradi C)",
+    "precipitation": "Precipitazione",
+    "maxTemperature": "Temperatura Massima",
+    "minTemperature": "Temperatura Minima",
+    "avgTemperature": "Temperatura Media",
+    "meanTemp": "Temp. media",
+    "annualPrec": "Precip. annuale",
+    "aridMonths": "Mesi aridi",
+    "martonne": "Aridità (M)",
+    "martonneTooltip": "Indice di aridità di De Martonne: M = P/(T+10). <5 Iperarido | 5–10 Arido | 10–20 Semiarido | 20–30 Subumido | >30 Umido",
+    "aridPeriod": "Periodo arido",
+    "humidPeriod": "Periodo umido",
+    "modeStandard": "Grafico standard",
+    "modeWalterLieth": "Diagramma Walter-Lieth",
+    "walterLiethTabUnavailable": "Non disponibile nella vista Walter-Lieth",
+    "selectedMonth": "valori di {month}",
+    "altitude": "Altitudine",
+    "subtitle": {
+      "climate": "Clima {period}",
+      "weather": "Meteo {year}"
+    },
+    "legend": {
+      "seriesNote": "Continua = tmax · Tratteggiata = tmin · Barre = precip"
+    }
+  },
+  "loading": {
+    "fetchingClimateData": "Recupero dati climatici...",
+    "updating": "Aggiornamento in corso..."
+  },
+  "errors": {
+    "fetchClimateData": "Impossibile recuperare i dati climatici",
+    "geolocationDenied": "Accesso alla posizione negato. Consenti la posizione nel tuo browser.",
+    "geolocationUnavailable": "Impossibile determinare la tua posizione."
+  },
+  "geolocation": {
+    "notSupported": "Il tuo browser non supporta la geolocalizzazione",
+    "httpsRequired": "La posizione richiede una connessione sicura",
+    "permissionDenied": "Accesso alla posizione negato. Consenti la posizione nelle impostazioni del browser",
+    "unavailable": "Impossibile determinare la tua posizione",
+    "timeout": "La richiesta di posizione è scaduta. Riprova",
+    "unknown": "Si è verificato un errore sconosciuto"
+  },
+  "map": {
+    "selectedFromMap": "Selezionato dalla mappa",
+    "pointLabel": "Punto della mappa {lat}, {lng}"
+  },
+  "cellSizes": {
+    "10m": "10 min (~324 km2)",
+    "5m": "5 min (~81 km2)",
+    "2_5m": "2.5 min (~20.25 km2)",
+    "30s": "30 sec (~1 km2)"
+  },
+  "filters": {
+    "period": "Periodo"
+  },
+  "validation": {
+    "year": {
+      "required": "L'anno è obbligatorio",
+      "invalid": "Inserisci un numero valido",
+      "integer": "L'anno deve essere un numero intero",
+      "tooSmall": "L'anno deve essere almeno {min}",
+      "tooBig": "L'anno non può superare {max}"
+    },
+    "period": {
+      "invalid": "Seleziona un periodo climatico valido"
+    }
+  },
+  "exportMenu": {
+    "button": "Esporta",
+    "png": "Immagine PNG",
+    "svg": "Vettoriale SVG",
+    "csv": "Dati CSV",
+    "metricColumn": "Metrica"
+  },
+  "months": {
+    "1": "Gen",
+    "2": "Feb",
+    "3": "Mar",
+    "4": "Apr",
+    "5": "Mag",
+    "6": "Giu",
+    "7": "Lug",
+    "8": "Ago",
+    "9": "Set",
+    "10": "Ott",
+    "11": "Nov",
+    "12": "Dic"
+  },
+  "sidebar": {
+    "sections": {
+      "dataset": "Dataset",
+      "climatePeriod": "Periodo climatico",
+      "yearRange": "Anno",
+      "variables": "Variabili",
+      "months": "Mese",
+      "filters": "Filtri"
+    },
+    "datasets": {
+      "climate": "Clima",
+      "weather": "Meteo"
+    },
+    "variables": {
+      "tmax": "Temp. max",
+      "tmin": "Temp. min",
+      "prec": "Precip",
+      "tavg": "Temp. media",
+      "srad": "Rad. solare",
+      "wind": "Vento",
+      "vapr": "Vapore"
+    },
+    "months": {
+      "all": "Tutti"
+    },
+    "yearRange": {
+      "from": "Da",
+      "to": "A"
+    },
+    "autoScroll": "Scorrimento automatico ai risultati",
+    "syncCity": "Sincronizza la città selezionata su tutte le pagine",
+    "autoApplyFilters": "Applica i filtri automaticamente",
+    "filters": "Filtri",
+    "settings": "Impostazioni",
+    "applyFilters": "Applica filtri",
+    "cellCount": {
+      "fast": "Veloce",
+      "moderate": "Moderato",
+      "slow": "Lento",
+      "tooMany": "Troppe celle",
+      "tooManyError": "Riduci l'area o la risoluzione per applicare"
+    },
+    "notes": {
+      "climateNormals": "Normali climatiche di 30 anni",
+      "weatherData": "Dati meteorologici annuali (CRU-TS-4.09)",
+      "weatherVariables": "I dati meteorologici includono solo temperatura e precipitazioni",
+      "notAvailableHeatmap": "Non disponibile per la mappa di calore regionale"
+    }
+  },
+  "common": {
+    "useMyLocation": "Usa la mia posizione",
+    "locating": "Localizzazione in corso..."
+  },
+  "error": {
+    "title": "Qualcosa è andato storto",
+    "subtitle": "Si è verificato un errore imprevisto. Riprova.",
+    "tryAgain": "Riprova",
+    "goHome": "Torna alla home"
+  },
+  "notFound": {
+    "title": "Pagina non trovata",
+    "subtitle": "La pagina che cerchi non esiste o è stata spostata.",
+    "goHome": "Vai a Statistiche Climatiche"
+  },
+  "martonne": {
+    "arid": "Arido",
+    "semiArid": "Semiarido",
+    "mediterranean": "Mediterraneo",
+    "semiHumid": "Semiumido",
+    "humid": "Umido",
+    "veryHumid": "Molto umido",
+    "extremelyHumid": "Estremamente umido"
+  }
+}

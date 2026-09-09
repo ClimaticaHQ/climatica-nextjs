@@ -2,7 +2,7 @@ export const APP_TITLE = "Climatica";
 
 export const APP_CONFIG = {
   i18n: {
-    locales: ["en", "uk", "es"] as const,
+    locales: ["de", "el", "en", "es", "fr", "it", "pt", "uk"] as const,
     defaultLocale: "en",
     localePrefix: "as-needed",
   },

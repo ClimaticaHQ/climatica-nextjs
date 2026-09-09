@@ -4,7 +4,7 @@
     "toggleTheme": "Cambiar tema"
   },
   "navbar": {
-    "toggleMenu": "Abrir o cerrar menu",
+    "toggleMenu": "Abrir o cerrar menú",
     "links": {
       "climateStatistics": "Clima de Ciudad",
       "climateComparison": "Comparar Ciudades",
@@ -18,9 +18,9 @@
     "coordsResult": "Ir a las coordenadas"
   },
   "climateStatistics": {
-    "title": "Estadisticas Climaticas",
-    "subtitle": "Busca una ciudad para explorar sus datos climaticos",
-    "cellResolution": "Resolucion de celda:",
+    "title": "Estadísticas Climáticas",
+    "subtitle": "Busca una ciudad para explorar sus datos climáticos",
+    "cellResolution": "Resolución de celda:",
     "filtersTab": "Filtros",
     "useMyLocation": "Usar mi ubicación",
     "locating": "Localizando...",
@@ -59,7 +59,7 @@
     }
   },
   "climateComparison": {
-    "title": "Comparacion Climatica",
+    "title": "Comparación Climática",
     "modeCities": "Comparar ciudades",
     "modePeriods": "Comparar períodos",
     "searchA": "Ciudad A",
@@ -67,7 +67,7 @@
     "searchCity": "Ciudad",
     "periodA": "Período A",
     "periodB": "Período B",
-    "noData": "Selecciona dos ciudades para comparar sus datos climaticos",
+    "noData": "Selecciona dos ciudades para comparar sus datos climáticos",
     "noDataPeriods": "Selecciona una ciudad y dos períodos de tiempo para comparar datos climáticos",
     "stats": {
       "avgTmax": "Temp. máx promedio",
@@ -97,7 +97,7 @@
   },
   "heatMap": {
     "title": "Mapa de Calor Regional",
-    "placeholder": "Marcador de posicion de mapa de calor. Mas adelante podremos mostrar la intensidad climatica en un mapa mundial aqui.",
+    "placeholder": "Marcador de posición de mapa de calor. Más adelante podremos mostrar la intensidad climática en un mapa mundial aquí.",
     "drawBbox": "Dibujar caja delimitadora",
     "drawPolygon": "Dibujar polígono",
     "clearSelection": "Limpiar selección",
@@ -135,9 +135,9 @@
     "title": "Temperatura",
     "monthAxis": "Mes",
     "temperatureAxis": "Temperatura (grados C)",
-    "precipitation": "Precipitacion",
-    "maxTemperature": "Temperatura Maxima",
-    "minTemperature": "Temperatura Minima",
+    "precipitation": "Precipitación",
+    "maxTemperature": "Temperatura Máxima",
+    "minTemperature": "Temperatura Mínima",
     "avgTemperature": "Temperatura Media",
     "meanTemp": "Temp. media",
     "annualPrec": "Precip. anual",
@@ -160,11 +160,11 @@
     }
   },
   "loading": {
-    "fetchingClimateData": "Obteniendo datos climaticos...",
+    "fetchingClimateData": "Obteniendo datos climáticos...",
     "updating": "Actualizando..."
   },
   "errors": {
-    "fetchClimateData": "No se pudieron obtener los datos climaticos",
+    "fetchClimateData": "No se pudieron obtener los datos climáticos",
     "geolocationDenied": "Acceso a ubicación denegado. Permite la ubicación en tu navegador.",
     "geolocationUnavailable": "No se pudo determinar tu ubicación."
   },
@@ -253,6 +253,7 @@
     },
     "autoScroll": "Desplazamiento automático a resultados",
     "syncCity": "Sincronizar ciudad seleccionada en todas las páginas",
+    "autoApplyFilters": "Aplicar filtros automáticamente",
     "filters": "Filtros",
     "settings": "Configuración",
     "applyFilters": "Aplicar filtros",
