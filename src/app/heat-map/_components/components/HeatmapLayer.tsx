@@ -57,9 +57,6 @@ export function HeatmapLayer({
     const min = Math.min(...values);
     const max = Math.max(...values);
 
-    let boundsOkCount = 0;
-    let boundsNullCount = 0;
-
     for (const b of bindings) {
       const value = getValue(b);
       if (isNaN(value)) continue;
@@ -80,11 +77,7 @@ export function HeatmapLayer({
         if (iri) bounds = iriToCellBounds(iri, cellSize);
       }
 
-      if (!bounds) {
-        boundsNullCount++;
-        continue;
-      }
-      boundsOkCount++;
+      if (!bounds) continue;
 
       const color = interpolateColor(value, min, max, scale);
       const leafletBounds = L.latLngBounds(
