@@ -16,7 +16,7 @@ import {
   usePersistedComparisonCities,
 } from "@/hooks";
 import { usePathname, useRouter } from "@/libs/I18nNavigation";
-import { useFiltersStore } from "@/stores";
+import { useFiltersStore, useSettingsStore } from "@/stores";
 import type { TBbox, TColorScale, TWikidataCity } from "@/types";
 import { applyUrlFiltersToStore, createUrlParamHelpers, encodeVars } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -53,9 +53,8 @@ export function HeatMap() {
     gridSize: grid,
     variables,
     months,
-    syncCity,
-    hasHydrated,
   } = useFiltersStore();
+  const { syncCity, hasHydrated } = useSettingsStore();
   const isClimate = dataset === DATASETS.CLIMATE;
   const year = isClimate ? undefined : weatherYear;
   const selectedMonths: number[] = months === "all" ? [] : months;

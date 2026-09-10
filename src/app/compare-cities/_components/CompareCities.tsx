@@ -3,14 +3,13 @@
 import type { TChartSubtitle } from "@/components/TempPrecipChart";
 import { APP_TITLE, DATASETS, SIDEBAR_PARAMS, TIME } from "@/constants";
 import {
-  useAutoScroll,
   useGetAltitude,
   useGetCompareData,
   usePersistedCity,
   usePersistedComparisonCities,
 } from "@/hooks";
 import { usePathname, useRouter } from "@/libs/I18nNavigation";
-import { useFiltersStore } from "@/stores";
+import { useFiltersStore, useSettingsStore } from "@/stores";
 import type { TWikidataCity } from "@/types";
 import {
   applyUrlFiltersToStore,
@@ -25,22 +24,13 @@ import { useEffect, useMemo, useRef } from "react";
 import { CompareCitiesView } from "./CompareCitiesView";
 
 export function CompareCities() {
-  const { autoScroll } = useAutoScroll();
+  const { autoScroll, syncCity, hasHydrated } = useSettingsStore();
   const queryClient = useQueryClient();
   const userSelectedRef = useRef(false);
   const chartSectionRef = useRef<HTMLDivElement>(null);
   const { cityA, cityB, selectCityA, selectCityB } = usePersistedComparisonCities();
   const { selectCity: selectCityClimate } = usePersistedCity();
-  const {
-    gridSize,
-    dataset,
-    climatePeriod,
-    weatherYear,
-    months,
-    variables,
-    syncCity,
-    hasHydrated,
-  } = useFiltersStore();
+  const { gridSize, dataset, climatePeriod, weatherYear, months, variables } = useFiltersStore();
   const selectedMonths = Array.isArray(months) ? months : null;
   const searchParams = useSearchParams();
   const router = useRouter();
