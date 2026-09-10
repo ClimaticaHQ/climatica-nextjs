@@ -1,4 +1,4 @@
-import { apiClient } from "@/libs/api";
+import { WorldClimService } from "@/libs/services/worldClimService";
 import type {
   TBbox,
   TCellSize,
@@ -8,7 +8,7 @@ import type {
   TRawPixelValueResponse,
   TVariable,
 } from "@/types";
-import { buildGridIri, buildHeatmapResults, buildVariableIris } from "@/utils";
+import { buildHeatmapResults } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 
 export function useGetHeatmapData(
@@ -34,24 +34,38 @@ export function useGetHeatmapData(
     ],
     queryFn: async (): Promise<THeatmapResult> => {
       const { north, south, west, east } = bbox!;
-      const params = {
-        north,
-        south,
-        west,
-        east,
-        grid: buildGridIri(gridSize),
-        var: buildVariableIris([`${variable}`]),
-        ...(isClimate
-          ? { isClimate: true }
-          : { isWeather: true, year: year ?? new Date().getFullYear() }),
-      };
 
-      const [{ data: rawPixels }, { data: rawAvg }] = await Promise.all([
-        apiClient.get<TRawPixelValueResponse>("/api/worldclim/pixelvaluesinbox", { params }),
-        apiClient.get<TRawAvgValueResponse>("/api/worldclim/avgpixelvaluesinbox", { params }),
+      const [rawPixels, rawAvg] = await Promise.all([
+        WorldClimService.getPixelValuesInBox(
+          north,
+          south,
+          west,
+          east,
+          gridSize,
+          [variable],
+          isClimate,
+          year,
+          false,
+        ),
+        WorldClimService.getPixelValuesInBox(
+          north,
+          south,
+          west,
+          east,
+          gridSize,
+          [variable],
+          isClimate,
+          year,
+          true,
+        ),
       ]);
 
-      return buildHeatmapResults(rawPixels, rawAvg, isClimate, climatePeriod);
+      return buildHeatmapResults(
+        rawPixels as TRawPixelValueResponse,
+        rawAvg as TRawAvgValueResponse,
+        isClimate,
+        climatePeriod,
+      );
     },
     enabled,
     staleTime: Infinity,

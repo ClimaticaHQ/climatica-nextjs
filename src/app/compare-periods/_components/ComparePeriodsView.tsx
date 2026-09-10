@@ -32,11 +32,11 @@ import type { TClimatePeriod } from "@/types";
 import {
   buildClimateStatsRows,
   buildFilename,
+  computeCompareStats,
   exportElementToPng,
   exportTableToCsv,
   getMartonneLabelKey,
 } from "@/utils";
-import { computeCompareStats } from "@/utils/climateComparison.util";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useRef } from "react";

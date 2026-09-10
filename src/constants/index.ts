@@ -1,7 +1,3 @@
-export { APP_CONFIG, APP_TITLE } from "./app.constant";
-export { MARTONNE_CLASSES } from "./martonne.constant";
-export type { TMartonnClass } from "./martonne.constant";
-export type { TLocale } from "./app.constant";
 export {
   ENDPOINTS,
   EXCLUDE_DESCRIPTION_KEYWORDS,
@@ -13,6 +9,8 @@ export {
   WORLDCLIM_VARIABLE_BASE,
   WORLDCLIM_VARIABLES,
 } from "./api";
+export { APP_CONFIG, APP_TITLE } from "./app.constant";
+export type { TLocale } from "./app.constant";
 export {
   CLIMATE_COMPARISON_COLORS,
   CLIMATE_RANGE,
@@ -40,13 +38,22 @@ export {
   SUPPORTED_LANGUAGE_CODES,
 } from "./language.constant";
 export { LOCAL_STORAGE_KEYS } from "./localStorageKeys.constant";
+export { RASTER_SELECTION_PATH_OPTIONS } from "./map.constant";
+export { MARTONNE_CLASSES } from "./martonne.constant";
+export type { TMartonnClass } from "./martonne.constant";
 export { NAV_LINKS } from "./navlink.constant";
-export { CACHE_KEYS, CACHE_TTL, THRESHOLDS } from "./redis.constant";
+export { CACHE_KEYS, CACHE_TTL, RECOVERABLE_REDIS_ERRORS, THRESHOLDS } from "./redis.constant";
 export { ROUTES } from "./route.constant";
-export { DATASETS, DEFAULT_VARIABLES, SIDEBAR_PARAMS } from "./sidebar.constant";
+export {
+  AUTO_APPLY_DEBOUNCE_MS,
+  DATASETS,
+  DEFAULT_VARIABLES,
+  SIDEBAR_PARAMS,
+} from "./sidebar.constant";
 export { TIME } from "./time.constant";
 export {
   AUTO_RESOLUTION,
+  CELL_IRI_ROW_COL_REGEX,
   CELL_SIZE_OPTIONS,
   CELL_SIZES,
   CLIMATE_PERIOD_LABELS,

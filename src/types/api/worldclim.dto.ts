@@ -115,6 +115,7 @@ export type TRawAvgValueResponse = {
  */
 export type TWorldClimBoxBinding = {
   pixel: TSparqlUriValue;
+  cell?: TSparqlUriValue;
   lat?: TSparqlValue;
   lng?: TSparqlValue;
   variable?: TSparqlUriValue;

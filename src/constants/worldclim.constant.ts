@@ -69,3 +69,5 @@ export const GRID_DELTA: Record<string, number> = {
   "2.5m": 2.5 / 60,
   "30s": 30 / 3600,
 };
+
+export const CELL_IRI_ROW_COL_REGEX = /Cell_[^_]+_r(\d+)c(\d+)/;

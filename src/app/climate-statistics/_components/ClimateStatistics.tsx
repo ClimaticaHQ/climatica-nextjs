@@ -10,7 +10,6 @@ import {
   VARIABLE_LABELS,
 } from "@/constants";
 import {
-  useAutoScroll,
   useGeolocation,
   useGetAltitude,
   useGetCellBounds,
@@ -19,7 +18,7 @@ import {
   usePersistedComparisonCities,
   useResolveCityByCoordinates,
 } from "@/hooks";
-import { useFiltersStore } from "@/stores";
+import { useFiltersStore, useSettingsStore } from "@/stores";
 import type { TWikidataCity } from "@/types";
 import {
   applyUrlFiltersToStore,
@@ -48,7 +47,7 @@ export function ClimateStatistics() {
   const { isLoading: isResolving, mutateAsync: resolveCityByCoordinates } =
     useResolveCityByCoordinates();
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
-  const { autoScroll } = useAutoScroll();
+  const { autoScroll, syncCity, hasHydrated } = useSettingsStore();
   const queryClient = useQueryClient();
   const latestMapClickIdRef = useRef(0);
   const userSelectedRef = useRef(false);
@@ -57,16 +56,7 @@ export function ClimateStatistics() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const {
-    dataset,
-    climatePeriod,
-    weatherYear,
-    gridSize,
-    months,
-    variables,
-    syncCity,
-    hasHydrated,
-  } = useFiltersStore();
+  const { dataset, climatePeriod, weatherYear, gridSize, months, variables } = useFiltersStore();
   const selectedMonths: number[] | null = Array.isArray(months) ? months : null;
 
   useEffect(() => {

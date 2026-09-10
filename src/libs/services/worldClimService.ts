@@ -1,12 +1,12 @@
-import "server-only";
-
 import { WORLDCLIM_PROXY_BASE } from "@/constants";
+import { apiClient } from "@/libs/api";
 import type {
   TCellSize,
   TClimatePeriod,
   TRawAvgValueResponse,
   TRawPixelValueResponse,
   TVariable,
+  TWorldClimAvgBoxBinding,
   TWorldClimCellResource,
   TWorldClimCellResponse,
   TWorldClimPixelResource,
@@ -17,13 +17,13 @@ import {
   buildGridIri,
   buildVariableIris,
   extractCellBySize,
+  groupAvgBindings,
   validateResponseData,
 } from "@/utils";
-import axios from "axios";
 
 export const WorldClimService = {
   async getCellsForPoint(lat: number, lng: number) {
-    const response = await axios.get<TWorldClimCellResponse>(
+    const response = await apiClient.get<TWorldClimCellResponse>(
       `${WORLDCLIM_PROXY_BASE}/cellofpoint`,
       { params: { lat, lng } },
     );
@@ -32,7 +32,7 @@ export const WorldClimService = {
   },
 
   async getCellForPoint(lat: number, lng: number, gridSize: TCellSize): Promise<string | null> {
-    const response = await axios.get<TWorldClimCellResponse>(
+    const response = await apiClient.get<TWorldClimCellResponse>(
       `${WORLDCLIM_PROXY_BASE}/cellofpoint`,
       { params: { lat, lng } },
     );
@@ -41,9 +41,12 @@ export const WorldClimService = {
   },
 
   async getCellResource(cellIri: string): Promise<TWorldClimCellResource> {
-    const response = await axios.get<TWorldClimCellResource>(`${WORLDCLIM_PROXY_BASE}/resource`, {
-      params: { id: "Cell", iri: cellIri },
-    });
+    const response = await apiClient.get<TWorldClimCellResource>(
+      `${WORLDCLIM_PROXY_BASE}/resource`,
+      {
+        params: { id: "Cell", iri: cellIri },
+      },
+    );
     validateResponseData(response);
     return response.data;
   },
@@ -55,7 +58,7 @@ export const WorldClimService = {
     variables: readonly TVariable[],
     period: TClimatePeriod,
   ): Promise<TWorldClimPointValueResponse> {
-    const response = await axios.get<TWorldClimPointValueResponse>(
+    const response = await apiClient.get<TWorldClimPointValueResponse>(
       `${WORLDCLIM_PROXY_BASE}/pixelvaluesofapoint`,
       {
         params: {
@@ -82,7 +85,7 @@ export const WorldClimService = {
     variables: readonly TVariable[],
     year: number,
   ): Promise<TWorldClimPointValueResponse> {
-    const response = await axios.get<TWorldClimPointValueResponse>(
+    const response = await apiClient.get<TWorldClimPointValueResponse>(
       `${WORLDCLIM_PROXY_BASE}/pixelvaluesofapoint`,
       {
         params: {
@@ -100,9 +103,12 @@ export const WorldClimService = {
   },
 
   async getPixelResource(pixelIri: string) {
-    const response = await axios.get<TWorldClimPixelResource>(`${WORLDCLIM_PROXY_BASE}/resource`, {
-      params: { id: "Pixel", iri: pixelIri },
-    });
+    const response = await apiClient.get<TWorldClimPixelResource>(
+      `${WORLDCLIM_PROXY_BASE}/resource`,
+      {
+        params: { id: "Pixel", iri: pixelIri },
+      },
+    );
     validateResponseData(response);
     return response.data;
   },
@@ -119,7 +125,7 @@ export const WorldClimService = {
     avg?: boolean,
   ): Promise<TRawPixelValueResponse | TRawAvgValueResponse> {
     const endpoint = avg ? "avgpixelvaluesinbox" : "pixelvaluesinbox";
-    const response = await axios.get<TRawPixelValueResponse | TRawAvgValueResponse>(
+    const response = await apiClient.get<TRawPixelValueResponse | TRawAvgValueResponse>(
       `${WORLDCLIM_PROXY_BASE}/${endpoint}`,
       {
         params: {
@@ -146,7 +152,7 @@ export const WorldClimService = {
     avg?: boolean,
   ): Promise<TRawPixelValueResponse | TRawAvgValueResponse> {
     const endpoint = avg ? "avgpixelvaluesinpolygonGEO" : "pixelvaluesinpolygonGEO";
-    const response = await axios.get<TRawPixelValueResponse | TRawAvgValueResponse>(
+    const response = await apiClient.get<TRawPixelValueResponse | TRawAvgValueResponse>(
       `${WORLDCLIM_PROXY_BASE}/${endpoint}`,
       {
         params: {
@@ -159,5 +165,42 @@ export const WorldClimService = {
     );
     validateResponseData(response);
     return response.data;
+  },
+
+  async getRegionalAverage(
+    variables: readonly TVariable[],
+    gridSize: TCellSize,
+    area: { bbox: { north: number; south: number; west: number; east: number } } | { wkt: string },
+    isClimate: boolean,
+    period?: TClimatePeriod,
+    year?: number,
+  ): Promise<TWorldClimAvgBoxBinding | null> {
+    const response =
+      "bbox" in area
+        ? await this.getPixelValuesInBox(
+            area.bbox.north,
+            area.bbox.south,
+            area.bbox.west,
+            area.bbox.east,
+            gridSize,
+            variables as string[],
+            isClimate,
+            year,
+            true,
+          )
+        : await this.getPixelValuesInPolygon(
+            area.wkt,
+            gridSize,
+            variables as string[],
+            isClimate,
+            year,
+            true,
+          );
+
+    const grouped = groupAvgBindings((response as TRawAvgValueResponse).results.bindings);
+    const filtered =
+      isClimate && period ? grouped.filter((b) => b.raster?.value?.includes(period)) : grouped;
+
+    return filtered[0] ?? null;
   },
 };

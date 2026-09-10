@@ -1,0 +1,298 @@
+{
+  "topbar": {
+    "toggleFilters": "Εναλλαγή φίλτρων",
+    "toggleTheme": "Αλλαγή θέματος"
+  },
+  "navbar": {
+    "toggleMenu": "Άνοιγμα ή κλείσιμο μενού",
+    "links": {
+      "climateStatistics": "Κλίμα Πόλης",
+      "climateComparison": "Σύγκριση Πόλεων",
+      "compareCities": "Σύγκριση Πόλεων",
+      "comparePeriods": "Σύγκριση Περιόδων",
+      "heatMap": "Περιφερειακός Χάρτης Θερμότητας"
+    }
+  },
+  "search": {
+    "placeholder": "Αναζήτηση πόλης ή εισαγωγή συντεταγμένων (lat, lng)...",
+    "coordsResult": "Μετάβαση στις συντεταγμένες"
+  },
+  "climateStatistics": {
+    "title": "Κλιματικά Στατιστικά",
+    "subtitle": "Αναζητήστε μια πόλη για να εξερευνήσετε τα κλιματικά της δεδομένα",
+    "cellResolution": "Ανάλυση κελιού:",
+    "filtersTab": "Φίλτρα",
+    "useMyLocation": "Χρήση της τοποθεσίας μου",
+    "locating": "Εντοπισμός θέσης...",
+    "stats": {
+      "avgTmax": "Μέση μέγ. θερμ.",
+      "avgTmin": "Μέση ελάχ. θερμ.",
+      "tmax": "Μέγ. θερμ.",
+      "tmin": "Ελάχ. θερμ.",
+      "totalPrec": "Συνολική βροχόπτωση",
+      "mmThisMonth": "mm αυτόν τον μήνα",
+      "resolution": "Ανάλυση",
+      "autoResolutionTooltip": "Η ανάλυση ορίζεται αυτόματα ανάλογα με το επιλεγμένο σύνολο δεδομένων",
+      "altitude": "Υψόμετρο",
+      "filteredMonths": "Φιλτραρισμένο: {months}"
+    }
+  },
+  "compareCities": {
+    "title": "Σύγκριση Πόλεων",
+    "selectSecondCity": "Επιλέξτε μια δεύτερη πόλη για σύγκριση"
+  },
+  "comparePeriods": {
+    "title": "Σύγκριση Περιόδων",
+    "trend": {
+      "tempTitle": "Τάση θερμοκρασίας",
+      "precipTitle": "Τάση βροχόπτωσης",
+      "noChange": "Καμία αλλαγή"
+    },
+    "weather": {
+      "periods": "Έτη",
+      "addPeriod": "Προσθήκη περιόδου",
+      "maxPeriods": "Μέγιστο {max} περίοδοι",
+      "removePeriod": "Αφαίρεση {year}",
+      "invalidYear": "Εισαγάγετε ένα έτος μεταξύ {min} και {max}",
+      "duplicateYear": "Αυτό το έτος υπάρχει ήδη στη λίστα",
+      "periodsCount": "{count} / {max} περίοδοι"
+    }
+  },
+  "climateComparison": {
+    "title": "Κλιματική Σύγκριση",
+    "modeCities": "Σύγκριση πόλεων",
+    "modePeriods": "Σύγκριση περιόδων",
+    "searchA": "Πόλη Α",
+    "searchB": "Πόλη Β",
+    "searchCity": "Πόλη",
+    "periodA": "Περίοδος Α",
+    "periodB": "Περίοδος Β",
+    "noData": "Επιλέξτε δύο πόλεις για να συγκρίνετε τα κλιματικά τους δεδομένα",
+    "noDataPeriods": "Επιλέξτε μια πόλη και δύο χρονικές περιόδους για να συγκρίνετε κλιματικά δεδομένα",
+    "stats": {
+      "avgTmax": "Μέση μέγ. θερμ.",
+      "avgTmin": "Μέση ελάχ. θερμ.",
+      "totalPrec": "Συνολική βροχόπτωση",
+      "aridMonths": "Ξηροί μήνες",
+      "martonne": "Martonne (M)"
+    },
+    "diff": {
+      "warmerCity": "Θερμότερη πόλη",
+      "moreRain": "Περισσότερη βροχή",
+      "hottestMonth": "Θερμότερος μήνας",
+      "coldestMonth": "Ψυχρότερος μήνας",
+      "byDegrees": "κατά {value}°C",
+      "byMm": "κατά {value} mm",
+      "tie": "Ισοπαλία"
+    },
+    "autoResolution": "Αυτόματη ανάλυση: {resolution}",
+    "wlCompare": {
+      "warmerBy": "{label} θερμότερη κατά {value}°C",
+      "coolerBy": "{label} ψυχρότερη κατά {value}°C",
+      "sameTemp": "Ίδια μέση θερμοκρασία",
+      "moreArid": "{label} έχει {value} περισσότερο(-ους) ξηρό(-ούς) μήνα(-ες)",
+      "fewerArid": "{label} έχει {value} λιγότερο(-ους) ξηρό(-ούς) μήνα(-ες)",
+      "sameArid": "Ίδιοι ξηροί μήνες"
+    }
+  },
+  "heatMap": {
+    "title": "Περιφερειακός Χάρτης Θερμότητας",
+    "placeholder": "Δεσμευτική θέση χάρτη θερμότητας. Σύντομα θα μπορούμε να εμφανίσουμε εδώ την κλιματική ένταση σε έναν παγκόσμιο χάρτη.",
+    "drawBbox": "Σχεδίαση πλαισίου επιλογής",
+    "drawPolygon": "Σχεδίαση πολυγώνου",
+    "clearSelection": "Εκκαθάριση επιλογής",
+    "drawing": "Κάντε κλικ και σύρετε στον χάρτη για να επιλέξετε μια περιοχή",
+    "drawingPolygon": "Κάντε κλικ για προσθήκη κορυφών — κάντε κλικ στο πρώτο σημείο για να κλείσετε το πολύγωνο",
+    "noSelection": "Σχεδιάστε ένα πλαίσιο ή πολύγωνο στον χάρτη για να αναλύσετε τα κλιματικά δεδομένα αυτής της περιοχής",
+    "noData": "Δεν υπάρχουν διαθέσιμα δεδομένα για αυτήν την περιοχή",
+    "stats": {
+      "minValue": "Ελάχ.",
+      "maxValue": "Μέγ.",
+      "avgValue": "Μέσος όρος",
+      "median": "Διάμεσος",
+      "stdDev": "Τυπ. απόκλ.",
+      "cellsAnalyzed": "Κελιά",
+      "contextClimate": "Μ.Ο. 30 ετών · {period}",
+      "contextWeatherAnnual": "Ετήσιος Μ.Ο. · {year}",
+      "contextWeatherMonth": "Μ.Ο. {month} {year}",
+      "avgTooltipClimate": "Κλιματολογικός μέσος όρος 30 ετών ({period}) σε όλα τα κελιά",
+      "avgTooltipWeatherAnnual": "Ετήσιος μέσος όρος: μέσος όρος των 12 μηνιαίων μέσων όρων σε όλα τα κελιά",
+      "avgTooltipWeatherMonth": "Μηνιαίος μέσος όρος: μέσος όρος του {variable} για {month} {year} σε όλα τα κελιά"
+    },
+    "showingVariable": "Εμφάνιση: {variable}",
+    "useMyLocation": "Χρήση της τοποθεσίας μου",
+    "locating": "Εντοπισμός θέσης...",
+    "summaryLine": "{count} αναλυμένα κελιά · {period} · {variable} · πλέγμα {grid}",
+    "summaryLineClimate": "{count} κελιά · Μ.Ο. 30 ετών {variable} · {period} · {grid}",
+    "summaryLineWeatherAnnual": "{count} κελιά · Ετήσιος Μ.Ο. {variable} · {year} · {grid}",
+    "summaryLineWeatherMonth": "{count} κελιά · {variable} σε {period} · {grid}",
+    "profile": {
+      "subtitle": "Περιφερειακό κλιματικό προφίλ · {count} κελιά · {period}",
+      "subtitleWeather": "Περιφερειακό κλιματικό προφίλ · {count} κελιά · {year} · δεν αποτελεί κλιματική κανονική περίοδο"
+    }
+  },
+  "chart": {
+    "title": "Θερμοκρασία",
+    "monthAxis": "Μήνας",
+    "temperatureAxis": "Θερμοκρασία (βαθμοί C)",
+    "precipitation": "Βροχόπτωση",
+    "maxTemperature": "Μέγιστη Θερμοκρασία",
+    "minTemperature": "Ελάχιστη Θερμοκρασία",
+    "avgTemperature": "Μέση Θερμοκρασία",
+    "meanTemp": "Μέση θερμ.",
+    "annualPrec": "Ετήσια βροχόπτ.",
+    "aridMonths": "Ξηροί μήνες",
+    "martonne": "Ξηρότητα (M)",
+    "martonneTooltip": "Δείκτης ξηρότητας De Martonne: M = P/(T+10). <5 Υπερξηρό | 5–10 Ξηρό | 10–20 Ημίξηρο | 20–30 Υφύγρο | >30 Υγρό",
+    "aridPeriod": "Ξηρή περίοδος",
+    "humidPeriod": "Υγρή περίοδος",
+    "modeStandard": "Τυπικό γράφημα",
+    "modeWalterLieth": "Διάγραμμα Walter-Lieth",
+    "walterLiethTabUnavailable": "Μη διαθέσιμο στην προβολή Walter-Lieth",
+    "selectedMonth": "τιμές για {month}",
+    "altitude": "Υψόμετρο",
+    "subtitle": {
+      "climate": "Κλίμα {period}",
+      "weather": "Καιρός {year}"
+    },
+    "legend": {
+      "seriesNote": "Συνεχής = tmax · Διακεκομμένη = tmin · Ράβδοι = βροχόπτωση"
+    }
+  },
+  "loading": {
+    "fetchingClimateData": "Λήψη κλιματικών δεδομένων...",
+    "updating": "Ενημέρωση..."
+  },
+  "errors": {
+    "fetchClimateData": "Δεν ήταν δυνατή η λήψη των κλιματικών δεδομένων",
+    "geolocationDenied": "Η πρόσβαση στην τοποθεσία απορρίφθηκε. Επιτρέψτε την τοποθεσία στο πρόγραμμα περιήγησής σας.",
+    "geolocationUnavailable": "Δεν ήταν δυνατός ο προσδιορισμός της τοποθεσίας σας."
+  },
+  "geolocation": {
+    "notSupported": "Το πρόγραμμα περιήγησής σας δεν υποστηρίζει γεωεντοπισμό",
+    "httpsRequired": "Ο εντοπισμός θέσης απαιτεί ασφαλή σύνδεση",
+    "permissionDenied": "Η πρόσβαση στην τοποθεσία απορρίφθηκε. Επιτρέψτε την τοποθεσία στις ρυθμίσεις του προγράμματος περιήγησης",
+    "unavailable": "Δεν ήταν δυνατός ο προσδιορισμός της τοποθεσίας σας",
+    "timeout": "Το αίτημα εντοπισμού θέσης έληξε. Δοκιμάστε ξανά",
+    "unknown": "Παρουσιάστηκε άγνωστο σφάλμα"
+  },
+  "map": {
+    "selectedFromMap": "Επιλέχθηκε από τον χάρτη",
+    "pointLabel": "Σημείο χάρτη {lat}, {lng}"
+  },
+  "cellSizes": {
+    "10m": "10 λεπ (~324 km2)",
+    "5m": "5 λεπ (~81 km2)",
+    "2_5m": "2.5 λεπ (~20.25 km2)",
+    "30s": "30 δευτ (~1 km2)"
+  },
+  "filters": {
+    "period": "Περίοδος"
+  },
+  "validation": {
+    "year": {
+      "required": "Το έτος είναι υποχρεωτικό",
+      "invalid": "Εισαγάγετε έναν έγκυρο αριθμό",
+      "integer": "Το έτος πρέπει να είναι ακέραιος αριθμός",
+      "tooSmall": "Το έτος πρέπει να είναι τουλάχιστον {min}",
+      "tooBig": "Το έτος δεν μπορεί να υπερβαίνει το {max}"
+    },
+    "period": {
+      "invalid": "Επιλέξτε μια έγκυρη κλιματική περίοδο"
+    }
+  },
+  "exportMenu": {
+    "button": "Εξαγωγή",
+    "png": "Εικόνα PNG",
+    "svg": "Διάνυσμα SVG",
+    "csv": "Δεδομένα CSV",
+    "metricColumn": "Μετρική"
+  },
+  "months": {
+    "1": "Ιαν",
+    "2": "Φεβ",
+    "3": "Μάρ",
+    "4": "Απρ",
+    "5": "Μάι",
+    "6": "Ιούν",
+    "7": "Ιούλ",
+    "8": "Αύγ",
+    "9": "Σεπ",
+    "10": "Οκτ",
+    "11": "Νοέ",
+    "12": "Δεκ"
+  },
+  "sidebar": {
+    "sections": {
+      "dataset": "Σύνολο δεδομένων",
+      "climatePeriod": "Κλιματική περίοδος",
+      "yearRange": "Έτος",
+      "variables": "Μεταβλητές",
+      "months": "Μήνας",
+      "filters": "Φίλτρα"
+    },
+    "datasets": {
+      "climate": "Κλίμα",
+      "weather": "Καιρός"
+    },
+    "variables": {
+      "tmax": "Μέγ. θερμ.",
+      "tmin": "Ελάχ. θερμ.",
+      "prec": "Βροχόπτ.",
+      "tavg": "Μέση θερμ.",
+      "srad": "Ηλιακή ακτιν.",
+      "wind": "Άνεμος",
+      "vapr": "Ατμός"
+    },
+    "months": {
+      "all": "Όλοι"
+    },
+    "yearRange": {
+      "from": "Από",
+      "to": "Έως"
+    },
+    "autoScroll": "Αυτόματη κύλιση στα αποτελέσματα",
+    "syncCity": "Συγχρονισμός επιλεγμένης πόλης σε όλες τις σελίδες",
+    "autoApplyFilters": "Αυτόματη εφαρμογή φίλτρων",
+    "filters": "Φίλτρα",
+    "settings": "Ρυθμίσεις",
+    "applyFilters": "Εφαρμογή φίλτρων",
+    "cellCount": {
+      "fast": "Γρήγορο",
+      "moderate": "Μέτριο",
+      "slow": "Αργό",
+      "tooMany": "Πολλά κελιά",
+      "tooManyError": "Μειώστε την περιοχή ή την ανάλυση για εφαρμογή"
+    },
+    "notes": {
+      "climateNormals": "Κλιματικές κανονικές τιμές 30 ετών",
+      "weatherData": "Ετήσια μετεωρολογικά δεδομένα (CRU-TS-4.09)",
+      "weatherVariables": "Τα μετεωρολογικά δεδομένα περιλαμβάνουν μόνο θερμοκρασία και βροχόπτωση",
+      "notAvailableHeatmap": "Μη διαθέσιμο για τον περιφερειακό χάρτη θερμότητας"
+    }
+  },
+  "common": {
+    "useMyLocation": "Χρήση της τοποθεσίας μου",
+    "locating": "Εντοπισμός θέσης..."
+  },
+  "error": {
+    "title": "Κάτι πήγε στραβά",
+    "subtitle": "Παρουσιάστηκε ένα απροσδόκητο σφάλμα. Παρακαλώ δοκιμάστε ξανά.",
+    "tryAgain": "Δοκιμάστε ξανά",
+    "goHome": "Μετάβαση στην αρχική"
+  },
+  "notFound": {
+    "title": "Η σελίδα δεν βρέθηκε",
+    "subtitle": "Η σελίδα που αναζητάτε δεν υπάρχει ή έχει μετακινηθεί.",
+    "goHome": "Μετάβαση στα Κλιματικά Στατιστικά"
+  },
+  "martonne": {
+    "arid": "Ξηρό",
+    "semiArid": "Ημίξηρο",
+    "mediterranean": "Μεσογειακό",
+    "semiHumid": "Υφύγρο",
+    "humid": "Υγρό",
+    "veryHumid": "Πολύ υγρό",
+    "extremelyHumid": "Εξαιρετικά υγρό"
+  }
+}

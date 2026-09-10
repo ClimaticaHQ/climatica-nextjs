@@ -1,5 +1,5 @@
 import { DATASETS, WEATHER_VARIABLES } from "@/constants";
-import { apiClient } from "@/libs/api";
+import { WorldClimService } from "@/libs/services/worldClimService";
 import { useFiltersStore } from "@/stores";
 import type {
   TCellSize,
@@ -7,9 +7,8 @@ import type {
   TCompareData,
   TMonthlyTemperature,
   TUseGetCompareDataReturn,
-  TWorldClimPointValueResponse,
 } from "@/types";
-import { buildGridIri, buildMonthlyTemperaturesFromPointValues, buildVariableIris } from "@/utils";
+import { buildMonthlyTemperaturesFromPointValues } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 
 export async function fetchCityData(
@@ -20,26 +19,23 @@ export async function fetchCityData(
   climatePeriod: TClimatePeriod,
   year?: number,
 ): Promise<TMonthlyTemperature[]> {
-  const { data: response } = await apiClient.get<TWorldClimPointValueResponse>(
-    "/api/worldclim/pixelvaluesofapoint",
-    {
-      params: {
+  const response = isClimate
+    ? await WorldClimService.getClimateDataForPoint(
         lat,
         lng,
-        grid: buildGridIri(gridSize),
-        var: buildVariableIris(WEATHER_VARIABLES),
-        ...(isClimate
-          ? { isClimate: true }
-          : { isWeather: true, year: year ?? new Date().getFullYear() }),
-      },
-    },
-  );
+        gridSize,
+        WEATHER_VARIABLES,
+        climatePeriod,
+      )
+    : await WorldClimService.getWeatherDataForPoint(
+        lat,
+        lng,
+        gridSize,
+        WEATHER_VARIABLES,
+        year ?? new Date().getFullYear(),
+      );
 
-  const bindings = isClimate
-    ? response.results.bindings.filter((b) => b.raster.value.includes(climatePeriod))
-    : response.results.bindings;
-
-  return buildMonthlyTemperaturesFromPointValues(bindings);
+  return buildMonthlyTemperaturesFromPointValues(response.results.bindings);
 }
 
 export function useGetCompareData(

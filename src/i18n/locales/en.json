@@ -253,6 +253,7 @@
     },
     "autoScroll": "Auto-scroll to results",
     "syncCity": "Sync selected city across pages",
+    "autoApplyFilters": "Auto-apply filters",
     "filters": "Filters",
     "settings": "Settings",
     "applyFilters": "Apply filters",

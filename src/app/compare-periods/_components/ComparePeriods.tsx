@@ -13,7 +13,6 @@ import {
   WEATHER_MIN_YEAR,
 } from "@/constants";
 import {
-  useAutoScroll,
   useGeolocation,
   useGetAltitude,
   useGetComparePeriods,
@@ -23,7 +22,7 @@ import {
   usePersistedPeriods,
 } from "@/hooks";
 import { usePathname, useRouter } from "@/libs/I18nNavigation";
-import { useFiltersStore } from "@/stores";
+import { useFiltersStore, useSettingsStore } from "@/stores";
 import type { TClimatePeriod, TWikidataCity } from "@/types";
 import {
   applyUrlFiltersToStore,
@@ -48,14 +47,14 @@ function resolvePeriodFromUrl(raw: string | null, fallback: TClimatePeriod): TCl
 }
 
 export function ComparePeriods() {
-  const { autoScroll } = useAutoScroll();
+  const { autoScroll, syncCity, hasHydrated: settingsHydrated } = useSettingsStore();
   const queryClient = useQueryClient();
   const userSelectedRef = useRef(false);
   const chartSectionRef = useRef<HTMLDivElement>(null);
   const t = useTranslations();
   const { city, selectCity: selectCityA } = usePersistedCity();
   const { selectCityA: selectCompareCityA } = usePersistedComparisonCities();
-  const { gridSize, dataset, months, variables, syncCity, hasHydrated } = useFiltersStore();
+  const { gridSize, dataset, months, variables, hasHydrated } = useFiltersStore();
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
   const selectedMonths = Array.isArray(months) ? months : null;
   const searchParams = useSearchParams();
@@ -203,7 +202,7 @@ export function ComparePeriods() {
 
     void queryClient.invalidateQueries({ queryKey: ["compare-periods"] });
 
-    if (syncCity && hasHydrated) {
+    if (syncCity && settingsHydrated) {
       selectCompareCityA(city);
       void queryClient.invalidateQueries({ queryKey: ["climate"] });
       void queryClient.invalidateQueries({ queryKey: ["compare"] });
