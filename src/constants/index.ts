@@ -41,9 +41,14 @@ export { LOCAL_STORAGE_KEYS } from "./localStorageKeys.constant";
 export { MARTONNE_CLASSES } from "./martonne.constant";
 export type { TMartonnClass } from "./martonne.constant";
 export { NAV_LINKS } from "./navlink.constant";
-export { CACHE_KEYS, CACHE_TTL, THRESHOLDS } from "./redis.constant";
+export { CACHE_KEYS, CACHE_TTL, RECOVERABLE_REDIS_ERRORS, THRESHOLDS } from "./redis.constant";
 export { ROUTES } from "./route.constant";
-export { DATASETS, DEFAULT_VARIABLES, SIDEBAR_PARAMS } from "./sidebar.constant";
+export {
+  AUTO_APPLY_DEBOUNCE_MS,
+  DATASETS,
+  DEFAULT_VARIABLES,
+  SIDEBAR_PARAMS,
+} from "./sidebar.constant";
 export { TIME } from "./time.constant";
 export {
   AUTO_RESOLUTION,
