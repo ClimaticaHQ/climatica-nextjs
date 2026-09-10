@@ -1,6 +1,6 @@
 "use client";
 
-import { CELL_SIZE_OPTIONS } from "@/constants";
+import { CELL_SIZE_OPTIONS, RASTER_SELECTION_PATH_OPTIONS } from "@/constants";
 import type { Map as LMap, Marker as LMarker, Rectangle as LRectangle } from "leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -92,13 +92,7 @@ export function LeafletMap({
     const areaMatch = gridSize ? /\(~[^)]+\)/.exec(CELL_SIZE_OPTIONS[gridSize]) : null;
     const area = areaMatch ? ` ${areaMatch[0]}` : "";
 
-    const rect = L.rectangle(bounds, {
-      color: "var(--color-primary)",
-      weight: 1.5,
-      fillColor: "var(--color-primary)",
-      fillOpacity: 0.08,
-      dashArray: "4 4",
-    });
+    const rect = L.rectangle(bounds, RASTER_SELECTION_PATH_OPTIONS);
     rect.bindTooltip(`Grid cell: ${gridSize ?? ""}${area}`, { sticky: true });
     rect.addTo(mapRef.current);
     rectRef.current = rect;

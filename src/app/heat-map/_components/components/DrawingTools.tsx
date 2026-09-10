@@ -1,5 +1,6 @@
 "use client";
 
+import { RASTER_SELECTION_PATH_OPTIONS } from "@/constants";
 import { useEffect, useRef, useState } from "react";
 import { CircleMarker, Polygon, Polyline, Rectangle, useMap, useMapEvents } from "react-leaflet";
 import type {
@@ -80,7 +81,7 @@ export function BboxOutline({ bbox }: TBboxOutlineProps) {
         [bbox.south, bbox.west],
         [bbox.north, bbox.east],
       ]}
-      pathOptions={{ color: "var(--color-primary)", fillOpacity: 0, weight: 2 }}
+      pathOptions={RASTER_SELECTION_PATH_OPTIONS}
     />
   );
 }
@@ -160,10 +161,5 @@ export function PolygonDrawer({ onPolygonComplete }: TPolygonDrawerProps) {
 }
 
 export function PolygonOutline({ vertices }: TPolygonOutlineProps) {
-  return (
-    <Polygon
-      positions={vertices}
-      pathOptions={{ color: "var(--color-primary)", fillOpacity: 0, weight: 2 }}
-    />
-  );
+  return <Polygon positions={vertices} pathOptions={RASTER_SELECTION_PATH_OPTIONS} />;
 }
