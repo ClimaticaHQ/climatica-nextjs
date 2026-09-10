@@ -3,6 +3,7 @@
 import { CellSizeSelector, FilterChip, SectionLabel, YearInput } from "@/components";
 import { Button, CollapsibleSection, Dropdown, ToggleSwitch } from "@/components/UI";
 import {
+  AUTO_APPLY_DEBOUNCE_MS,
   CELL_SIZE_OPTIONS,
   CELL_SIZES,
   CLIMATE_PERIOD_LABELS,
@@ -20,16 +21,16 @@ import {
   WEATHER_VARIABLES,
 } from "@/constants";
 import { EButtonVariant } from "@/enums";
-import { useAutoScroll, usePersistedPeriods } from "@/hooks";
+import { useDebounce, usePersistedPeriods } from "@/hooks";
 import { usePathname } from "@/libs/I18nNavigation";
-import { useFiltersStore } from "@/stores";
+import { useFiltersStore, useSettingsStore } from "@/stores";
 import type { TCellSize, TCellSizeOption } from "@/types";
 import { estimateCellCount, getCellCountStatus } from "@/utils";
 import { sidebarFiltersSchema } from "@/validators";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { TDraftErrors, TDraftFilters, TSidebarProps } from "./Sidebar.type";
 
 const CLIMATE_PERIOD_OPTIONS = Object.values(CLIMATE_PERIODS).map((period) => ({
@@ -38,7 +39,15 @@ const CLIMATE_PERIOD_OPTIONS = Object.values(CLIMATE_PERIODS).map((period) => ({
 }));
 
 export function Sidebar({ isOpen, onClose }: TSidebarProps) {
-  const { autoScroll, toggleAutoScroll } = useAutoScroll();
+  const {
+    autoScroll,
+    toggleAutoScroll,
+    autoApplyFilters,
+    toggleAutoApplyFilters,
+    syncCity,
+    toggleSyncCity,
+    hasHydrated: settingsHydrated,
+  } = useSettingsStore();
   const t = useTranslations();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -51,8 +60,6 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
     variables,
     gridSize,
     months,
-    syncCity,
-    setSyncCity,
     actions: {
       setDataset,
       setClimatePeriod,
@@ -79,6 +86,7 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
   const [addPeriodError, setAddPeriodError] = useState<string | null>(null);
   const [errors, setErrors] = useState<TDraftErrors>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const skipNextAutoApplyRef = useRef(true);
 
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
@@ -92,6 +100,7 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
       gridSize: state.gridSize,
       months: state.months,
     });
+    skipNextAutoApplyRef.current = true;
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -108,6 +117,7 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
       });
       setErrors({});
       setSubmitAttempted(false);
+      skipNextAutoApplyRef.current = true;
     }
   }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
   /* eslint-enable react-hooks/set-state-in-effect */
@@ -238,7 +248,7 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
     setPeriods(periods.filter((y) => y !== year));
   }
 
-  function handleApplyAndClose() {
+  function commitDraft(): boolean {
     setSubmitAttempted(true);
 
     const result = sidebarFiltersSchema.safeParse({
@@ -259,7 +269,7 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
         }
       });
       setErrors(fieldErrors);
-      return;
+      return false;
     }
 
     setDataset(draft.dataset);
@@ -282,8 +292,30 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
 
     setSubmitAttempted(false);
     setErrors({});
-    onClose();
+    return true;
   }
+
+  function handleApplyAndClose() {
+    if (commitDraft()) {
+      onClose();
+    }
+  }
+
+  const draftSnapshot = JSON.stringify(draft);
+  const debouncedDraftSnapshot = useDebounce(draftSnapshot, AUTO_APPLY_DEBOUNCE_MS);
+
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    if (!autoApplyFilters || !settingsHydrated) return;
+    if (skipNextAutoApplyRef.current) {
+      skipNextAutoApplyRef.current = false;
+      return;
+    }
+    if (isTooMany) return;
+    commitDraft();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedDraftSnapshot]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const isAllActive = draft.months === "all";
 
@@ -525,7 +557,12 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
           <ToggleSwitch
             label={t("sidebar.syncCity")}
             checked={syncCity}
-            onChange={() => setSyncCity(!syncCity)}
+            onChange={toggleSyncCity}
+          />
+          <ToggleSwitch
+            label={t("sidebar.autoApplyFilters")}
+            checked={autoApplyFilters}
+            onChange={toggleAutoApplyFilters}
           />
         </CollapsibleSection>
       </div>
