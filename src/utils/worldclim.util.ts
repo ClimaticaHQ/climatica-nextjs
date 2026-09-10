@@ -11,6 +11,7 @@ import type {
   TMonthlyTemperature,
   TRawAvgValueBinding,
   TRawPixelValueBinding,
+  TSparqlUriValue,
   TSparqlValue,
   TWorldClimAvgBoxBinding,
   TWorldClimBoxBinding,
@@ -130,21 +131,24 @@ function parseGMonth(gMonth: string | undefined): number | null {
  * TWorldClimBoxBinding per unique pixel IRI (with valueMonth01..12 populated).
  */
 export function groupPixelBindings(raw: TRawPixelValueBinding[]): TWorldClimBoxBinding[] {
-  const map = new Map<string, Map<number, TSparqlValue>>();
+  const map = new Map<
+    string,
+    { cell: TSparqlUriValue | undefined; months: Map<number, TSparqlValue> }
+  >();
 
   for (const b of raw) {
     const iri = b.pixel?.value;
     if (!iri) continue;
     const monthNum = parseGMonth(b.month?.value);
     if (monthNum === null) continue;
-    if (!map.has(iri)) map.set(iri, new Map());
-    map.get(iri)!.set(monthNum, b.value);
+    if (!map.has(iri)) map.set(iri, { cell: b.cell, months: new Map() });
+    map.get(iri)!.months.set(monthNum, b.value);
   }
 
   const result: TWorldClimBoxBinding[] = [];
-  for (const [iri, monthValues] of map) {
-    const binding: Record<string, unknown> = { pixel: { type: "uri", value: iri } };
-    for (const [m, v] of monthValues) {
+  for (const [iri, { cell, months }] of map) {
+    const binding: Record<string, unknown> = { pixel: { type: "uri", value: iri }, cell };
+    for (const [m, v] of months) {
       binding[`valueMonth${String(m).padStart(2, "0")}`] = v;
     }
     result.push(binding as TWorldClimBoxBinding);
