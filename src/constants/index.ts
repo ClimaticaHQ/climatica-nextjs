@@ -42,6 +42,7 @@ export { RASTER_SELECTION_PATH_OPTIONS } from "./map.constant";
 export { MARTONNE_CLASSES } from "./martonne.constant";
 export type { TMartonnClass } from "./martonne.constant";
 export { NAV_LINKS } from "./navlink.constant";
+export { OG_IMAGE_COLORS, OG_IMAGE_SIZE } from "./og.constant";
 export { CACHE_KEYS, CACHE_TTL, RECOVERABLE_REDIS_ERRORS, THRESHOLDS } from "./redis.constant";
 export { ROUTES } from "./route.constant";
 export {
