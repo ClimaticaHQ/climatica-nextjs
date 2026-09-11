@@ -1,8 +1,9 @@
-export type { TCellCountStatus } from "./cellCount.type";
-export type { TCompareStats, TDiffStats } from "./climateComparison.type";
-export type { TColorScale, TColorStop } from "./colorScale.type";
-export type { TCsvVariable } from "./export.type";
-export type { TMartonneBadge } from "./martonne.type";
-export type { TScrollOptions } from "./scroll.type";
-export type { TMonthAridity, TWalterLiethScales } from "./walterLeith.type";
-export type { TCellBounds } from "./worldclim.type";
+export type * from "./cellCount.type";
+export type * from "./climateComparison.type";
+export type * from "./colorScale.type";
+export type * from "./export.type";
+export type * from "./martonne.type";
+export type * from "./metadata.type";
+export type * from "./scroll.type";
+export type * from "./walterLeith.type";
+export type * from "./worldclim.type";

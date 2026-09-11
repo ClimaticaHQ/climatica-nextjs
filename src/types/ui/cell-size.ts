@@ -1,4 +1,4 @@
-import type { TCellSize } from "@/types/domain/climate";
+import type { TCellSize } from "@/types";
 
 export type TCellSizeOption = {
   value: TCellSize;

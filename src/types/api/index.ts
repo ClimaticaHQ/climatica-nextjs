@@ -1,40 +1,4 @@
-export type { TApiResponse, TResultStatus } from "./common";
-export type { TSolrCityDoc, TSolrResponse } from "./solr.dto";
-export type {
-  TPopulationResult,
-  TWikidataCoords,
-  TWikidataEntitiesResult,
-  TWikidataEntity,
-  TWikidataEntityValue,
-  TWikidataGeoSearchItem,
-  TWikidataGeoSearchResult,
-  TWikidataLabelMap,
-  TWikidataSearchItem,
-  TWikidataSearchResult,
-  TWikidataSparqlBinding,
-  TWikidataSparqlResult,
-} from "./wikidata.dto";
-export type {
-  TClimatePeriod,
-  TRawAvgValueBinding,
-  TRawAvgValueResponse,
-  TRawPixelValueBinding,
-  TRawPixelValueResponse,
-  TSparqlUriValue,
-  TSparqlValue,
-  TWorldClimAvgBoxBinding,
-  TWorldClimAvgBoxResponse,
-  TWorldClimBoxBinding,
-  TWorldClimBoxResponse,
-  TWorldClimCellBinding,
-  TWorldClimCellResource,
-  TWorldClimCellResponse,
-  TWorldClimCellResponseResults,
-  TWorldClimPixelResource,
-  TWorldClimPixelsResponse,
-  TWorldClimPointValueBinding,
-  TWorldClimPointValueResponse,
-  TWorldClimTemperatureBinding,
-  TWorldClimTemperatureResponse,
-  TWorldClimTemperatureResponseResults,
-} from "./worldclim.dto";
+export type * from "./common";
+export type * from "./solr.dto";
+export type * from "./wikidata.dto";
+export type * from "./worldclim.dto";
