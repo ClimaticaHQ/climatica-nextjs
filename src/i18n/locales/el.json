@@ -294,5 +294,24 @@
     "humid": "Υγρό",
     "veryHumid": "Πολύ υγρό",
     "extremelyHumid": "Εξαιρετικά υγρό"
+  },
+  "meta": {
+    "climateStatistics": {
+      "title": "Κλιματικά στατιστικά για {city}",
+      "description": "{variables} για {city} ({period})"
+    },
+    "compareCities": {
+      "title": "Σύγκριση {cityA} και {cityB}",
+      "description": "{variables} για {cityA} έναντι {cityB} ({period})"
+    },
+    "comparePeriods": {
+      "title": "{city} — σύγκριση κλιματικών περιόδων",
+      "description": "{variables} για {city} — {periods}",
+      "descriptionGeneric": "Σύγκριση κλιματικών δεδομένων μιας πόλης σε διαφορετικές χρονικές περιόδους"
+    },
+    "heatMap": {
+      "title": "Θερμικός χάρτης περιοχής — {variables} ({period})",
+      "description": "Ένταση κλίματος {variables} στην επιλεγμένη περιοχή ({period})"
+    }
   }
 }

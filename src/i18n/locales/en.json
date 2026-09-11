@@ -294,5 +294,24 @@
     "humid": "Humid",
     "veryHumid": "Very-humid",
     "extremelyHumid": "Extremely humid"
+  },
+  "meta": {
+    "climateStatistics": {
+      "title": "Climate statistics for {city}",
+      "description": "{variables} for {city} ({period})"
+    },
+    "compareCities": {
+      "title": "Comparing {cityA} and {cityB}",
+      "description": "{variables} for {cityA} vs {cityB} ({period})"
+    },
+    "comparePeriods": {
+      "title": "{city} — climate periods compared",
+      "description": "{variables} for {city} — {periods}",
+      "descriptionGeneric": "Compare climate data for a city across different time periods"
+    },
+    "heatMap": {
+      "title": "Region heatmap — {variables} ({period})",
+      "description": "{variables} climate intensity across the selected region ({period})"
+    }
   }
 }
