@@ -1,0 +1,17 @@
+export const EXPORT_SVG_LAYOUT = {
+  width: 1000,
+  height: 700,
+  paddingX: 40,
+  headerTitleY: 36,
+  headerSubtitleY: 58,
+  headerRuleY: 78,
+  statsY: 92,
+  statsHeight: 54,
+  chartMarginLeft: 70,
+  chartMarginRight: 70,
+  chartTop: 170,
+  chartHeight: 380,
+  legendY: 616,
+  aridityLegendY: 642,
+  footerY: 680,
+} as const;
