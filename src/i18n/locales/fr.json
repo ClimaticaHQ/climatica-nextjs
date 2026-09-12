@@ -206,6 +206,10 @@
     "png": "Image PNG",
     "svg": "Vecteur SVG",
     "csv": "Données CSV",
+    "rawCsv": "Données complètes (CSV)",
+    "rawJson": "Données complètes (JSON)",
+    "rawDataUnavailable": "Disponible uniquement pour Climat 1970–2000",
+    "failed": "Échec de l'exportation — réessayez",
     "metricColumn": "Métrique"
   },
   "months": {
