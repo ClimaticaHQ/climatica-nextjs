@@ -5,7 +5,7 @@ import {
   WalterLiethPeriodsLayout,
 } from "@/components";
 import { CLIMATE_PERIOD_LABELS, DATASETS } from "@/constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CompareChart, MultiPeriodChart, StandardClimateChart } from "./charts";
 import { ModeToggle } from "./components";
@@ -34,6 +34,11 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
       }));
     }
   }
+
+  useEffect(() => {
+    props.onVisibleSeriesChange?.(visible);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   const chart = useTempPrecipChart(props);
 

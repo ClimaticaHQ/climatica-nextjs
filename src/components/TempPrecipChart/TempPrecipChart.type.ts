@@ -41,6 +41,7 @@ export type TTempPrecipChartProps = {
   multiPeriodData?: TMultiPeriodEntry[] | undefined;
   hiddenPeriods?: number[] | undefined;
   periodColors?: readonly string[] | undefined;
+  onVisibleSeriesChange?: (visible: TVisibleSeries) => void;
 };
 
 export type TBarShape = {
