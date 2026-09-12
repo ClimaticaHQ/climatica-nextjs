@@ -16,7 +16,9 @@ import {
   cityFromUrl,
   createUrlParamHelpers,
   encodeVars,
+  pushUrlParams,
   scrollToSection,
+  syncUrlParams,
 } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
@@ -77,7 +79,7 @@ export function CompareCities() {
       helper.delete(SIDEBAR_PARAMS.PERIOD);
     }
 
-    if (helper.changed) router.replace(`${pathname}?${helper.params.toString()}`);
+    syncUrlParams(router, pathname, helper);
   }, [
     cityA.label,
     cityA.lat,
@@ -140,7 +142,7 @@ export function CompareCities() {
     nextParams.set(SIDEBAR_PARAMS.COMPARE_CITY_A, city.label);
     nextParams.set(SIDEBAR_PARAMS.LAT_A, city.lat.toFixed(4));
     nextParams.set(SIDEBAR_PARAMS.LNG_A, city.lng.toFixed(4));
-    router.push(`${pathname}?${nextParams.toString()}`);
+    pushUrlParams(router, pathname, nextParams);
   }
 
   function handleCityBSelect(city: TWikidataCity) {
@@ -154,7 +156,7 @@ export function CompareCities() {
     nextParams.set(SIDEBAR_PARAMS.COMPARE_CITY_B, city.label);
     nextParams.set(SIDEBAR_PARAMS.LAT_B, city.lat.toFixed(4));
     nextParams.set(SIDEBAR_PARAMS.LNG_B, city.lng.toFixed(4));
-    router.push(`${pathname}?${nextParams.toString()}`);
+    pushUrlParams(router, pathname, nextParams);
   }
 
   useEffect(() => {

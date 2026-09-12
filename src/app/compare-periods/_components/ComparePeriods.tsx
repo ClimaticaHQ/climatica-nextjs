@@ -34,7 +34,9 @@ import {
   parsePeriod,
   parsePeriods,
   parseYear,
+  pushUrlParams,
   scrollToSection,
+  syncUrlParams,
 } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -122,7 +124,7 @@ export function ComparePeriods() {
       helper.delete(SIDEBAR_PARAMS.YEAR_B);
     }
 
-    if (helper.changed) router.replace(`${pathname}?${helper.params.toString()}`);
+    syncUrlParams(router, pathname, helper);
   }, [
     cityA.label,
     cityA.lat,
@@ -213,7 +215,7 @@ export function ComparePeriods() {
     nextParams.set(SIDEBAR_PARAMS.CITY, city.label.trim());
     nextParams.set(SIDEBAR_PARAMS.LAT, city.lat.toFixed(4));
     nextParams.set(SIDEBAR_PARAMS.LNG, city.lng.toFixed(4));
-    router.push(`${pathname}?${nextParams.toString()}`);
+    pushUrlParams(router, pathname, nextParams);
   }
 
   useEffect(() => {

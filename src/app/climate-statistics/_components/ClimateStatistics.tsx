@@ -26,7 +26,9 @@ import {
   createUrlParamHelpers,
   encodeMonths,
   encodeVars,
+  pushUrlParams,
   scrollToSection,
+  syncUrlParams,
 } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
@@ -118,7 +120,7 @@ export function ClimateStatistics() {
       helper.delete(SIDEBAR_PARAMS.PERIOD);
     }
 
-    if (helper.changed) router.replace(`${pathname}?${helper.params.toString()}`);
+    syncUrlParams(router, pathname, helper);
   }, [
     cityLabel,
     latStr,
@@ -165,7 +167,7 @@ export function ClimateStatistics() {
     nextParams.set(SIDEBAR_PARAMS.CITY, city.label.trim());
     nextParams.set(SIDEBAR_PARAMS.LAT, city.lat.toFixed(4));
     nextParams.set(SIDEBAR_PARAMS.LNG, city.lng.toFixed(4));
-    router.push(`${pathname}?${nextParams.toString()}`);
+    pushUrlParams(router, pathname, nextParams);
   }
 
   function handleLocate() {
