@@ -38,7 +38,12 @@ export {
   SUPPORTED_LANGUAGE_CODES,
 } from "./language.constant";
 export { LOCAL_STORAGE_KEYS } from "./localStorageKeys.constant";
-export { RASTER_SELECTION_PATH_OPTIONS } from "./map.constant";
+export {
+  CLIMATE_MAP_CONFIG,
+  HEATMAP_MAP_CONFIG,
+  MAP_TILE_CONFIG,
+  RASTER_SELECTION_PATH_OPTIONS,
+} from "./map.constant";
 export { MARTONNE_CLASSES } from "./martonne.constant";
 export type { TMartonnClass } from "./martonne.constant";
 export { NAV_LINKS } from "./navlink.constant";
