@@ -209,7 +209,11 @@ export function StandardClimateChart({
           </ResponsiveContainer>
         </div>
       </div>
-      {visible.prec && showAridity && <AridityLegend />}
+      {showAridity && (
+        <div className={visible.prec ? undefined : "invisible"}>
+          <AridityLegend />
+        </div>
+      )}
     </>
   );
 }
