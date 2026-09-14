@@ -1,6 +1,6 @@
 "use client";
 
-import { CELL_SIZE_OPTIONS, RASTER_SELECTION_PATH_OPTIONS } from "@/constants";
+import { CELL_SIZE_OPTIONS, CLIMATE_MAP_CONFIG, RASTER_SELECTION_PATH_OPTIONS } from "@/constants";
 import type { Map as LMap, Marker as LMarker, Rectangle as LRectangle } from "leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -38,10 +38,10 @@ export function LeafletMap({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    const map = L.map(containerRef.current, { center: [lat, lng], zoom: 10 });
+    const map = L.map(containerRef.current, { center: [lat, lng], zoom: CLIMATE_MAP_CONFIG.zoom });
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    L.tileLayer(CLIMATE_MAP_CONFIG.url, {
+      attribution: CLIMATE_MAP_CONFIG.attribution,
     }).addTo(map);
 
     const marker = L.marker([lat, lng], { icon: MARKER_ICON });
@@ -66,7 +66,7 @@ export function LeafletMap({
 
   useEffect(() => {
     if (!mapRef.current) return;
-    mapRef.current.flyTo([lat, lng], 10, { duration: 1.5 });
+    mapRef.current.flyTo([lat, lng], CLIMATE_MAP_CONFIG.zoom, { duration: 1.5 });
     markerRef.current?.setLatLng([lat, lng]);
   }, [lat, lng]);
 
