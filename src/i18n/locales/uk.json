@@ -206,6 +206,10 @@
     "png": "Зображення PNG",
     "svg": "Вектор SVG",
     "csv": "Дані CSV",
+    "rawCsv": "Повні дані (CSV)",
+    "rawJson": "Повні дані (JSON)",
+    "rawDataUnavailable": "Доступно лише для клімату 1970–2000",
+    "failed": "Не вдалося експортувати — спробуйте ще раз",
     "metricColumn": "Метрика"
   },
   "months": {
@@ -294,5 +298,24 @@
     "humid": "Вологий",
     "veryHumid": "Дуже вологий",
     "extremelyHumid": "Надзвичайно вологий"
+  },
+  "meta": {
+    "climateStatistics": {
+      "title": "Кліматична статистика для {city}",
+      "description": "{variables} для {city} ({period})"
+    },
+    "compareCities": {
+      "title": "Порівняння {cityA} і {cityB}",
+      "description": "{variables} для {cityA} проти {cityB} ({period})"
+    },
+    "comparePeriods": {
+      "title": "{city} — порівняння кліматичних періодів",
+      "description": "{variables} для {city} — {periods}",
+      "descriptionGeneric": "Порівняйте кліматичні дані міста за різні періоди часу"
+    },
+    "heatMap": {
+      "title": "Теплова карта регіону — {variables} ({period})",
+      "description": "Інтенсивність клімату {variables} для обраної області ({period})"
+    }
   }
 }

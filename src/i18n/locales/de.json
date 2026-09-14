@@ -206,6 +206,10 @@
     "png": "PNG-Bild",
     "svg": "SVG-Vektor",
     "csv": "CSV-Daten",
+    "rawCsv": "Alle Daten (CSV)",
+    "rawJson": "Alle Daten (JSON)",
+    "rawDataUnavailable": "Nur verfügbar für Klima 1970–2000",
+    "failed": "Export fehlgeschlagen — bitte erneut versuchen",
     "metricColumn": "Metrik"
   },
   "months": {
@@ -294,5 +298,24 @@
     "humid": "Humid",
     "veryHumid": "Sehr humid",
     "extremelyHumid": "Extrem humid"
+  },
+  "meta": {
+    "climateStatistics": {
+      "title": "Klimastatistik für {city}",
+      "description": "{variables} für {city} ({period})"
+    },
+    "compareCities": {
+      "title": "Vergleich von {cityA} und {cityB}",
+      "description": "{variables} für {cityA} vs. {cityB} ({period})"
+    },
+    "comparePeriods": {
+      "title": "{city} — Klimazeiträume im Vergleich",
+      "description": "{variables} für {city} — {periods}",
+      "descriptionGeneric": "Klimadaten einer Stadt über verschiedene Zeiträume vergleichen"
+    },
+    "heatMap": {
+      "title": "Regionale Heatmap — {variables} ({period})",
+      "description": "{variables} Klimaintensität für die ausgewählte Region ({period})"
+    }
   }
 }

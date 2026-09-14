@@ -206,6 +206,10 @@
     "png": "Imagen PNG",
     "svg": "Vector SVG",
     "csv": "Datos CSV",
+    "rawCsv": "Datos completos (CSV)",
+    "rawJson": "Datos completos (JSON)",
+    "rawDataUnavailable": "Disponible solo para Clima 1970–2000",
+    "failed": "Error al exportar — inténtalo de nuevo",
     "metricColumn": "Métrica"
   },
   "months": {
@@ -294,5 +298,24 @@
     "humid": "Húmedo",
     "veryHumid": "Muy húmedo",
     "extremelyHumid": "Extremadamente húmedo"
+  },
+  "meta": {
+    "climateStatistics": {
+      "title": "Estadísticas climáticas de {city}",
+      "description": "{variables} de {city} ({period})"
+    },
+    "compareCities": {
+      "title": "Comparando {cityA} y {cityB}",
+      "description": "{variables} para {cityA} frente a {cityB} ({period})"
+    },
+    "comparePeriods": {
+      "title": "{city} — comparación de periodos climáticos",
+      "description": "{variables} de {city} — {periods}",
+      "descriptionGeneric": "Compara los datos climáticos de una ciudad entre distintos periodos"
+    },
+    "heatMap": {
+      "title": "Mapa de calor regional — {variables} ({period})",
+      "description": "Intensidad climática de {variables} en la región seleccionada ({period})"
+    }
   }
 }

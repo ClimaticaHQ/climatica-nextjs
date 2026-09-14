@@ -38,10 +38,16 @@ export {
   SUPPORTED_LANGUAGE_CODES,
 } from "./language.constant";
 export { LOCAL_STORAGE_KEYS } from "./localStorageKeys.constant";
-export { RASTER_SELECTION_PATH_OPTIONS } from "./map.constant";
+export {
+  CLIMATE_MAP_CONFIG,
+  HEATMAP_MAP_CONFIG,
+  MAP_TILE_CONFIG,
+  RASTER_SELECTION_PATH_OPTIONS,
+} from "./map.constant";
 export { MARTONNE_CLASSES } from "./martonne.constant";
 export type { TMartonnClass } from "./martonne.constant";
 export { NAV_LINKS } from "./navlink.constant";
+export { OG_IMAGE_COLORS, OG_IMAGE_SIZE } from "./og.constant";
 export { CACHE_KEYS, CACHE_TTL, RECOVERABLE_REDIS_ERRORS, THRESHOLDS } from "./redis.constant";
 export { ROUTES } from "./route.constant";
 export {
@@ -62,6 +68,7 @@ export {
   GRID_DELTA,
   PERIOD_RESTRICTED_VARIABLES,
   VARIABLE_LABELS,
+  VARIABLE_UNITS,
   WEATHER_MAX_YEAR,
   WEATHER_MIN_YEAR,
   WEATHER_VARIABLES,

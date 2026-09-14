@@ -70,7 +70,11 @@ function resolveCssVars(cloneEl: SVGElement, sourceEl: SVGElement): void {
 }
 
 /** Returns a full filename including extension: "compare-cities-rome-oslo-2024-01-15.png" */
-export function buildFilename(page: string, parts: string[], ext: "png" | "csv" | "svg"): string {
+export function buildFilename(
+  page: string,
+  parts: string[],
+  ext: "png" | "csv" | "svg" | "json",
+): string {
   const date = new Date().toISOString().split("T")[0];
   const slug = [page, ...parts, date]
     .join("-")

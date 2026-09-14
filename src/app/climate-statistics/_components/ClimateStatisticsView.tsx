@@ -1,6 +1,11 @@
 "use client";
 
-import { LocationSearch, TempPrecipChart, ThreeDotsScaleLoader } from "@/components";
+import {
+  LocationSearch,
+  TempPrecipChart,
+  ThreeDotsScaleLoader,
+  useTempPrecipChart,
+} from "@/components";
 import {
   ChartSkeleton,
   ErrorBanner,
@@ -10,9 +15,26 @@ import {
   PageWrapper,
   StatCardsSkeleton,
 } from "@/components/UI";
-import { buildFilename, exportToCSV, exportToPNG, exportToSVG } from "@/utils";
+import type { TVisibleSeries } from "@/components/TempPrecipChart/TempPrecipChart.type";
+import { CLIMATE_PERIOD_LABELS, DATASETS } from "@/constants";
+import { useFetchFullClimateData } from "@/hooks";
+import type { TExportLabels } from "@/types";
+import {
+  buildExportPayload,
+  buildExportSvg,
+  buildFilename,
+  downloadSvgString,
+  exportRawCsv,
+  exportRawJson,
+  exportToCSV,
+  getMartonneBadge,
+  isFullVariableDataAvailable,
+  resolveExportColors,
+  svgToPng,
+} from "@/utils";
+import { EXPORT_SVG_LAYOUT } from "@/utils/export/svg/exportSvg.constant";
 import dynamic from "next/dynamic";
-import { useRef } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { TClimateStatisticsViewProps, TStatCardProps } from "./ClimateStatistics.type";
 import { computeClimateStats } from "./ClimateStatistics.util";
@@ -76,7 +98,11 @@ export function ClimateStatisticsView({
   chartSectionRef,
 }: TClimateStatisticsViewProps) {
   const t = useTranslations();
-  const chartRef = useRef<HTMLElement | null>(null);
+  const [visibleSeries, setVisibleSeries] = useState<TVisibleSeries | null>(null);
+  const chart = useTempPrecipChart({ data: temperatureData });
+  const { mutateAsync: fetchFullClimateData } = useFetchFullClimateData();
+
+  const canExportFullData = isFullVariableDataAvailable(subtitle.dataset, subtitle.climatePeriod);
 
   const isFiltered = selectedMonths !== null && selectedMonths.length > 0;
   const isSingleMonth = isFiltered && selectedMonths.length === 1;
@@ -92,16 +118,111 @@ export function ClimateStatisticsView({
         .join(", ")
     : null;
 
+  const periodLabel =
+    subtitle.rawLabel ??
+    (subtitle.dataset === DATASETS.CLIMATE && subtitle.climatePeriod
+      ? t("chart.subtitle.climate", { period: CLIMATE_PERIOD_LABELS[subtitle.climatePeriod] })
+      : subtitle.weatherYear !== undefined
+        ? t("chart.subtitle.weather", { year: subtitle.weatherYear })
+        : "");
+
+  const martonneClassLabel =
+    chart.summary && chart.summary.martonne !== null
+      ? t(getMartonneBadge(chart.summary.martonne).labelKey)
+      : undefined;
+
+  const exportLabels: TExportLabels = {
+    periodLabel,
+    monthNames: Array.from({ length: 12 }, (_, i) => t(`months.${i + 1}`)),
+    seriesLabels: {
+      tmax: t("chart.maxTemperature"),
+      tmin: t("chart.minTemperature"),
+      tavg: t("chart.avgTemperature"),
+      prec: t("chart.precipitation"),
+    },
+    statsLabels: {
+      meanTemp: t("chart.meanTemp"),
+      annualPrec: t("chart.annualPrec"),
+      aridMonths: t("chart.aridMonths"),
+      altitude: t("chart.altitude"),
+      martonne: t("chart.martonne"),
+    },
+    monthAxisLabel: t("chart.monthAxis"),
+    ...(martonneClassLabel !== undefined ? { martonneClassLabel } : {}),
+    aridityLegend: {
+      arid: t("chart.aridPeriod"),
+      humid: t("chart.humidPeriod"),
+    },
+  };
+
+  const exportPayload = buildExportPayload({
+    cityName,
+    lat: mapCenter.lat,
+    lng: mapCenter.lng,
+    altitude,
+    gridSize,
+    subtitle,
+    variables,
+    selectedMonths,
+    visibleSeries,
+    chartDataSingle: chart.chartDataSingle,
+    aridity: chart.aridity,
+    scales: chart.scales,
+    summary: chart.summary,
+    rightMax: chart.rightMax,
+    labels: exportLabels,
+  });
+
   function handleExportCSV() {
     exportToCSV(temperatureData, cityName, variables);
   }
 
-  function handleExportPNG(): Promise<void> {
-    return exportToPNG("climate-stats-container", buildFilename("city-climate", [cityName], "png"));
+  async function handleExportPNG(): Promise<void> {
+    if (!exportPayload) return;
+    const colors = resolveExportColors();
+    const svg = buildExportSvg(exportPayload, colors);
+    await svgToPng({
+      svg,
+      width: EXPORT_SVG_LAYOUT.width,
+      height: EXPORT_SVG_LAYOUT.height,
+      filename: buildFilename("city-climate", [cityName], "png"),
+    });
   }
 
   function handleExportSVG() {
-    exportToSVG(chartRef, buildFilename("city-climate", [cityName], "svg"));
+    if (!exportPayload) return;
+    const colors = resolveExportColors();
+    const svg = buildExportSvg(exportPayload, colors);
+    downloadSvgString(svg, buildFilename("city-climate", [cityName], "svg"));
+  }
+
+  async function fetchRawData() {
+    if (!canExportFullData) return null;
+    // Type-narrowing safety net only — canExportFullData already guarantees
+    // climatePeriod === "c1970-2000", so this branch never actually runs.
+    const climatePeriod = subtitle.climatePeriod;
+    if (!climatePeriod) return null;
+
+    return fetchFullClimateData({
+      lat: mapCenter.lat,
+      lng: mapCenter.lng,
+      gridSize,
+      climatePeriod,
+    });
+  }
+
+  async function handleExportRawCsv(): Promise<void> {
+    if (!exportPayload) return;
+    const rawData = await fetchRawData();
+    if (!rawData) return;
+    exportRawCsv({ ...exportPayload, rawData });
+  }
+
+  async function handleExportRawJson(): Promise<void> {
+    if (!exportPayload) return;
+    const rawData = await fetchRawData();
+    if (!rawData) return;
+    exportRawJson({ ...exportPayload, rawData });
   }
 
   return (
@@ -194,6 +315,9 @@ export function ClimateStatisticsView({
                     onExportCSV={handleExportCSV}
                     onExportPNG={handleExportPNG}
                     onExportSVG={handleExportSVG}
+                    onExportRawCsv={handleExportRawCsv}
+                    onExportRawJson={handleExportRawJson}
+                    isRawDataAvailable={canExportFullData}
                     isDisabled={temperatureData.length === 0}
                   />
                 )}
@@ -201,12 +325,7 @@ export function ClimateStatisticsView({
               {isLoading ? (
                 <ChartSkeleton />
               ) : (
-                <section
-                  ref={(el) => {
-                    chartRef.current = el;
-                  }}
-                  className="relative"
-                >
+                <section className="relative">
                   {isFetching && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-bg)]/80 backdrop-blur-sm">
                       <ThreeDotsScaleLoader className="text-[var(--color-primary)]" size={80} />
@@ -217,6 +336,7 @@ export function ClimateStatisticsView({
                     subtitle={subtitle}
                     variables={variables}
                     data={temperatureData}
+                    onVisibleSeriesChange={setVisibleSeries}
                     {...(altitude !== null ? { altitude } : {})}
                     {...(isFiltered ? { selectedMonths } : {})}
                   />

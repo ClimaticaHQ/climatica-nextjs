@@ -1,3 +1,3 @@
-export type { TFiltersData, TFiltersState } from "./filtersStore.type";
-export type { TPeriodsState } from "./periodsStore.type";
-export type { TSettingsState } from "./settingsStore.type";
+export type * from "./filtersStore.type";
+export type * from "./periodsStore.type";
+export type * from "./settingsStore.type";

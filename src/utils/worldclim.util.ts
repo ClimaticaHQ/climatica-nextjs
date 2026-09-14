@@ -1,5 +1,6 @@
 import {
   CELL_IRI_ROW_COL_REGEX,
+  CLIMATE_VARIABLES,
   MONTH_NAMES,
   WORLDCLIM_GRID_BASE,
   WORLDCLIM_VARIABLE_BASE,
@@ -8,6 +9,7 @@ import { env } from "@/libs/Env";
 import type {
   TCellBounds,
   TCellSize,
+  TFullVariableMonthRow,
   TMonthlyTemperature,
   TRawAvgValueBinding,
   TRawPixelValueBinding,
@@ -117,6 +119,34 @@ export function buildMonthlyTemperaturesFromPointValues(
     tmax: vals.get(`tmax_${i + 1}`) ?? 0,
     prec: vals.get(`prec_${i + 1}`) ?? 0,
   }));
+}
+
+/**
+ * Same Map-walk as buildMonthlyTemperaturesFromPointValues, but keeps every
+ * variable present in the bindings instead of narrowing to tmin/tmax/prec —
+ * for the "raw" export, which requests all of CLIMATE_VARIABLES from SCRAPI.
+ */
+export function extractAllVariablesFromPointValues(
+  bindings: TWorldClimPointValueBinding[],
+): TFullVariableMonthRow[] {
+  const vals = new Map<string, number>();
+
+  for (const b of bindings) {
+    const varParts = b.var.value.split("Variable_");
+    const varName = varParts[varParts.length - 1] ?? "";
+    const monthNum = parseInt(b.month.value.replace("--", ""), 10);
+    vals.set(`${varName}_${monthNum}`, Number(b.value.value));
+  }
+
+  return Array.from({ length: 12 }, (_, i) => {
+    const month = i + 1;
+    const row: TFullVariableMonthRow = { month, monthName: MONTH_NAMES[i] };
+    for (const variable of CLIMATE_VARIABLES) {
+      const value = vals.get(`${variable}_${month}`);
+      if (value !== undefined) row[variable] = value;
+    }
+    return row;
+  });
 }
 
 /** Parses XSD gMonth "--01" → 1, "--12" → 12. Returns null if invalid. */

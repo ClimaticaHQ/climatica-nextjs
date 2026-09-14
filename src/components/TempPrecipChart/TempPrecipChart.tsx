@@ -5,35 +5,35 @@ import {
   WalterLiethPeriodsLayout,
 } from "@/components";
 import { CLIMATE_PERIOD_LABELS, DATASETS } from "@/constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CompareChart, MultiPeriodChart, StandardClimateChart } from "./charts";
 import { ModeToggle } from "./components";
 import { useTempPrecipChart } from "./hooks";
 import { CalendarIcon, DatabaseIcon } from "./icons";
 import type { TChartMode, TTempPrecipChartProps, TVisibleSeries } from "./TempPrecipChart.type";
+import { resolveVisibleSeries } from "./utils";
 
 const DEFAULT_VISIBLE: TVisibleSeries = { tmax: true, tmin: true, tavg: false, prec: true };
 
 export function TempPrecipChart(props: TTempPrecipChartProps) {
   const t = useTranslations();
-  const [visible, setVisible] = useState<TVisibleSeries>(DEFAULT_VISIBLE);
+  const [visible, setVisible] = useState<TVisibleSeries>(() =>
+    resolveVisibleSeries(props.variables, DEFAULT_VISIBLE),
+  );
   const [chartMode, setChartMode] = useState<TChartMode>("standard");
   const [prevVariables, setPrevVariables] = useState(props.variables);
 
   /** Render-phase state update — intentional; avoids a stale-render flash from useEffect */
   if (props.variables !== prevVariables) {
     setPrevVariables(props.variables);
-    if (props.variables) {
-      const vars = props.variables;
-      setVisible((prev) => ({
-        tmax: vars.includes("tmax"),
-        tmin: vars.includes("tmin"),
-        tavg: prev.tavg,
-        prec: vars.includes("prec"),
-      }));
-    }
+    setVisible((prev) => resolveVisibleSeries(props.variables, prev));
   }
+
+  useEffect(() => {
+    props.onVisibleSeriesChange?.(visible);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   const chart = useTempPrecipChart(props);
 

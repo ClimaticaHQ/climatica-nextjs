@@ -1,6 +1,10 @@
+export { ChevronDownIcon } from "./ChevronDownIcon";
+export { CodeIcon } from "./CodeIcon";
 export { FilterIcon } from "./filters";
+export { ImageIcon } from "./ImageIcon";
 export { ThreeDotsScaleLoader } from "./loaders";
 export { LocationIcon } from "./LocationIcon";
 export { ClimaticaLogo } from "./logos";
 export { SpinnerIcon } from "./SpinnerIcon";
+export { TableIcon } from "./TableIcon";
 export { MoonIcon, SunIcon } from "./themes";

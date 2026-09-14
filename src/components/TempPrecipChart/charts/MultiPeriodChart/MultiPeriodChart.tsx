@@ -1,4 +1,5 @@
 import { MONTH_NAMES } from "@/constants";
+import { useDelayedHide } from "@/hooks";
 import { useTranslations } from "next-intl";
 import {
   Bar,
@@ -12,6 +13,7 @@ import {
   YAxis,
 } from "recharts";
 import { PrecipBarShape } from "../../components";
+import { PRECIP_BAR_ANIMATION_DURATION_MS } from "../../TempPrecipChart.constant";
 import type { TDotRendererProps } from "../../TempPrecipChart.type";
 import type { TMultiPeriodChartProps } from "./MultiPeriodChart.type";
 
@@ -62,6 +64,7 @@ export function MultiPeriodChart({
   hiddenPeriods = [],
 }: TMultiPeriodChartProps) {
   const t = useTranslations();
+  const hidePrecBar = useDelayedHide(!visible.prec, PRECIP_BAR_ANIMATION_DURATION_MS);
 
   function localMonthName(v: unknown): string {
     const idx = (MONTH_NAMES as readonly string[]).indexOf(String(v));
@@ -178,20 +181,21 @@ export function MultiPeriodChart({
               const color = periodColor(i, periodColors);
               const hidden = hiddenPeriods.includes(year);
               const series = [];
-              if (visible.prec) {
-                series.push(
-                  <Bar
-                    key={`bar-${year}`}
-                    yAxisId="prec"
-                    dataKey={`${year}_prec`}
-                    name={`${year} — ${t("chart.precipitation")}`}
-                    fill={color}
-                    minPointSize={0}
-                    hide={hidden}
-                    shape={<PrecipBarShape selectedMonths={selectedMonths} />}
-                  />,
-                );
-              }
+              series.push(
+                <Bar
+                  key={`bar-${year}`}
+                  yAxisId="prec"
+                  dataKey={(entry: Record<string, unknown>) =>
+                    visible.prec ? Number(entry[`${year}_prec`]) : 0
+                  }
+                  name={`${year} — ${t("chart.precipitation")}`}
+                  fill={color}
+                  minPointSize={0}
+                  hide={hidden || hidePrecBar}
+                  animationDuration={PRECIP_BAR_ANIMATION_DURATION_MS}
+                  shape={<PrecipBarShape selectedMonths={selectedMonths} />}
+                />,
+              );
               if (visible.tmax) {
                 series.push(
                   <Line

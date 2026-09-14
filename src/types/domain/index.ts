@@ -1,9 +1,2 @@
-export type {
-  TCellSize,
-  TClimateSearch,
-  TDataset,
-  TMonthFilter,
-  TMonthlyTemperature,
-  TVariable,
-} from "./climate";
-export type { TCitySearchParams, TCoordinates, TWikidataCity } from "./location";
+export type * from "./climate";
+export type * from "./location";

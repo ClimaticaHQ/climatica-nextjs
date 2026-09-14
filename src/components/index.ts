@@ -15,7 +15,7 @@ export { PeriodSlider } from "./PeriodSlider";
 export { SearchBar } from "./SearchBar";
 export { Sidebar } from "./Sidebar";
 export { ThreeDotsScaleLoader } from "./svg";
-export { TempPrecipChart } from "./TempPrecipChart";
+export { TempPrecipChart, useTempPrecipChart } from "./TempPrecipChart";
 export { Topbar } from "./Topbar";
 export { SectionLabel } from "./UI";
 export type { TMiniMapLocation } from "./UI";
