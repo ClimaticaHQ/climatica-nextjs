@@ -27,7 +27,6 @@ import { useFiltersStore, useSettingsStore } from "@/stores";
 import type { TCellSize, TCellSizeOption } from "@/types";
 import { estimateCellCount, getCellCountStatus } from "@/utils";
 import { sidebarFiltersSchema } from "@/validators";
-import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -51,7 +50,6 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
   const t = useTranslations();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const queryClient = useQueryClient();
 
   const {
     dataset,
@@ -283,12 +281,6 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
     });
     setGridSize(draft.gridSize);
     setMonths(draft.months);
-
-    void queryClient.invalidateQueries({ queryKey: ["climate"] });
-    void queryClient.invalidateQueries({ queryKey: ["compare"] });
-    void queryClient.invalidateQueries({ queryKey: ["compare-periods"] });
-    void queryClient.invalidateQueries({ queryKey: ["heatmap"] });
-    void queryClient.invalidateQueries({ queryKey: ["heatmap-polygon"] });
 
     setSubmitAttempted(false);
     setErrors({});
