@@ -1,5 +1,6 @@
 import { AridityLegend } from "@/components/WalterLiethChart";
 import { MONTH_NAMES } from "@/constants";
+import { useDelayedHide } from "@/hooks";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import {
@@ -14,7 +15,7 @@ import {
   YAxis,
 } from "recharts";
 import { PrecipBarShape } from "../../components";
-import { CHART_COLORS } from "../../TempPrecipChart.constant";
+import { CHART_COLORS, PRECIP_BAR_ANIMATION_DURATION_MS } from "../../TempPrecipChart.constant";
 import type { TDotRendererProps } from "../../TempPrecipChart.type";
 import type { TCompareChartProps } from "./CompareChart.type";
 
@@ -63,6 +64,7 @@ export function CompareChart({
   aridityA,
 }: TCompareChartProps) {
   const t = useTranslations();
+  const hidePrecBar = useDelayedHide(!visible.prec, PRECIP_BAR_ANIMATION_DURATION_MS);
 
   const aridityByMonthA = useMemo<Record<number, boolean> | undefined>(() => {
     if (!aridityA) return undefined;
@@ -175,22 +177,24 @@ export function CompareChart({
                 content={() => <CompareModeLegend labelA={labelA} labelB={labelB} />}
               />
 
-              {visible.prec && (
-                <Bar
-                  yAxisId="prec"
-                  dataKey="precA"
-                  name={`${labelA ?? ""} — ${t("chart.precipitation")}`}
-                  fill={CHART_COLORS.compareA.prec}
-                  minPointSize={0}
-                  background={false}
-                  shape={
-                    <PrecipBarShape
-                      selectedMonths={selectedMonths}
-                      aridityByMonth={showAridity ? aridityByMonthA : undefined}
-                    />
-                  }
-                />
-              )}
+              <Bar
+                yAxisId="prec"
+                dataKey={(entry: Record<string, unknown>) =>
+                  visible.prec ? Number(entry["precA"]) : 0
+                }
+                name={`${labelA ?? ""} — ${t("chart.precipitation")}`}
+                fill={CHART_COLORS.compareA.prec}
+                minPointSize={0}
+                background={false}
+                hide={hidePrecBar}
+                animationDuration={PRECIP_BAR_ANIMATION_DURATION_MS}
+                shape={
+                  <PrecipBarShape
+                    selectedMonths={selectedMonths}
+                    aridityByMonth={showAridity ? aridityByMonthA : undefined}
+                  />
+                }
+              />
 
               {visible.tmax && (
                 <Line
@@ -233,17 +237,19 @@ export function CompareChart({
                 />
               )}
 
-              {visible.prec && (
-                <Bar
-                  yAxisId="prec"
-                  dataKey="precB"
-                  name={`${labelB ?? ""} — ${t("chart.precipitation")}`}
-                  fill={CHART_COLORS.compareB.prec}
-                  minPointSize={0}
-                  background={false}
-                  shape={<PrecipBarShape selectedMonths={selectedMonths} />}
-                />
-              )}
+              <Bar
+                yAxisId="prec"
+                dataKey={(entry: Record<string, unknown>) =>
+                  visible.prec ? Number(entry["precB"]) : 0
+                }
+                name={`${labelB ?? ""} — ${t("chart.precipitation")}`}
+                fill={CHART_COLORS.compareB.prec}
+                minPointSize={0}
+                background={false}
+                hide={hidePrecBar}
+                animationDuration={PRECIP_BAR_ANIMATION_DURATION_MS}
+                shape={<PrecipBarShape selectedMonths={selectedMonths} />}
+              />
 
               {visible.tmax && (
                 <Line

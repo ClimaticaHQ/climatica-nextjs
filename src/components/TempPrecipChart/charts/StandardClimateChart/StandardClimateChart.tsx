@@ -1,6 +1,7 @@
 import { ClimateStatsBar } from "@/components";
 import { AridityLegend } from "@/components/WalterLiethChart";
 import { MONTH_NAMES } from "@/constants";
+import { useDelayedHide } from "@/hooks";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import {
@@ -15,7 +16,7 @@ import {
   YAxis,
 } from "recharts";
 import { PrecipBarShape } from "../../components";
-import { CHART_COLORS } from "../../TempPrecipChart.constant";
+import { CHART_COLORS, PRECIP_BAR_ANIMATION_DURATION_MS } from "../../TempPrecipChart.constant";
 import type { TDotRendererProps } from "../../TempPrecipChart.type";
 import type { TStandardClimateChartProps } from "./StandardClimateChart.type";
 
@@ -31,6 +32,7 @@ export function StandardClimateChart({
   showAridity = true,
 }: TStandardClimateChartProps) {
   const t = useTranslations();
+  const hidePrecBar = useDelayedHide(!visible.prec, PRECIP_BAR_ANIMATION_DURATION_MS);
 
   const aridityByMonth = useMemo<Record<number, boolean> | undefined>(() => {
     if (!aridity) return undefined;
@@ -149,22 +151,24 @@ export function StandardClimateChart({
 
               <Legend verticalAlign="bottom" height={48} wrapperStyle={{ paddingTop: 24 }} />
 
-              {visible.prec && (
-                <Bar
-                  yAxisId="prec"
-                  dataKey="prec"
-                  name={t("chart.precipitation")}
-                  fill={CHART_COLORS.humid}
-                  minPointSize={0}
-                  background={false}
-                  shape={
-                    <PrecipBarShape
-                      selectedMonths={selectedMonths}
-                      aridityByMonth={showAridity ? aridityByMonth : undefined}
-                    />
-                  }
-                />
-              )}
+              <Bar
+                yAxisId="prec"
+                dataKey={(entry: Record<string, unknown>) =>
+                  visible.prec ? Number(entry["prec"]) : 0
+                }
+                name={t("chart.precipitation")}
+                fill={CHART_COLORS.humid}
+                minPointSize={0}
+                background={false}
+                hide={hidePrecBar}
+                animationDuration={PRECIP_BAR_ANIMATION_DURATION_MS}
+                shape={
+                  <PrecipBarShape
+                    selectedMonths={selectedMonths}
+                    aridityByMonth={showAridity ? aridityByMonth : undefined}
+                  />
+                }
+              />
 
               {visible.tmax && (
                 <Line
