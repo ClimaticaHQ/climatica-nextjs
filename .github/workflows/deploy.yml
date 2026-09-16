@@ -23,6 +23,42 @@ jobs:
           git fetch --all --tags
           git checkout ${GITHUB_REF_NAME}
 
+      - name: Build application
+        run: |
+          cd /home/guiveg/climatica-nextjs
+          npm run build
+
+      - name: Restart application
+        run: |
+          sudo systemctl restart climatica
+
+      - name: Verify service
+        run: |
+          sudo systemctl is-active climaticaname: Deploy Climatica
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    env:
+      PATH: /home/guiveg/.nvm/versions/node/v25.1.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+    steps:
+      - name: Deploy version
+        run: |
+          echo "Deploying ${GITHUB_REF_NAME}"
+
+      - name: Update repository
+        run: |
+          cd /home/guiveg/climatica-nextjs
+          git fetch --all --tags
+          git checkout ${GITHUB_REF_NAME}
+
       - name: Install dependencies
         run: |
           cd /home/guiveg/climatica-nextjs
