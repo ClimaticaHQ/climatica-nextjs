@@ -10,30 +10,29 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Show trigger information
+      - name: Update repository
         run: |
-          echo "Deploying tag ${GITHUB_REF_NAME}"
-
-      - name: Update source code
-        run: |
+          export PATH=/home/guiveg/.nvm/versions/node/v25.1.0/bin:$PATH
           cd /home/guiveg/climatica-nextjs
           git fetch --all --tags
           git checkout ${GITHUB_REF_NAME}
 
       - name: Install dependencies
         run: |
+          export PATH=/home/guiveg/.nvm/versions/node/v25.1.0/bin:$PATH
           cd /home/guiveg/climatica-nextjs
           npm ci
 
       - name: Build application
         run: |
+          export PATH=/home/guiveg/.nvm/versions/node/v25.1.0/bin:$PATH
           cd /home/guiveg/climatica-nextjs
           npm run build
 
-      - name: Restart application
+      - name: Restart service
         run: |
           sudo systemctl restart climatica
 
-      - name: Verify service status
+      - name: Verify service
         run: |
-          sudo systemctl status climatica --no-pager
+          sudo systemctl is-active climatica
