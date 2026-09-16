@@ -1,11 +1,13 @@
+import { TMonthlyTemperatureWithAvg } from "@/types";
 import { computeAridityPeriods, getWalterLiethScales } from "@/utils";
-import { useMemo } from "react";
-import type { TMonthlyTemperatureWithAvg, TTempPrecipChartProps } from "../TempPrecipChart.type";
+import { useMemo, useState } from "react";
+import type { TTempPrecipChartProps } from "../TempPrecipChart.type";
 import { buildCompareData, buildMultiPeriodChartData, computeChartSummary } from "../utils";
 
 export function useTempPrecipChart({ data, dataA, dataB, multiPeriodData }: TTempPrecipChartProps) {
   const isCompare = dataA !== undefined;
   const isMultiPeriod = multiPeriodData !== undefined && multiPeriodData.length > 0;
+  const [activeMonthIndex, setActiveMonthIndex] = useState<number | null>(null);
 
   const hasData = useMemo(
     () =>
@@ -107,5 +109,7 @@ export function useTempPrecipChart({ data, dataA, dataB, multiPeriodData }: TTem
     summaryA,
     summaryB,
     rightMax,
+    activeMonthIndex,
+    setActiveMonthIndex,
   };
 }
