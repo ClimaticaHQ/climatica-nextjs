@@ -1,5 +1,4 @@
-import type { TChartSubtitle } from "@/components/TempPrecipChart";
-import type { TCellSize, TMonthlyTemperature, TWikidataCity } from "@/types";
+import type { TCellSize, TChartSubtitle, TMonthlyTemperature, TWikidataCity } from "@/types";
 import type { RefObject } from "react";
 
 export type TCompareCitiesViewProps = {

@@ -1,5 +1,4 @@
-import type { TMonthlyTemperature } from "@/types";
-import type { TComparePoint } from "../TempPrecipChart.type";
+import type { TComparePoint, TMonthlyTemperature } from "@/types";
 
 export function buildCompareData(
   dataA: TMonthlyTemperature[],

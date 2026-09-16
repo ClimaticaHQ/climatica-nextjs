@@ -1,12 +1,12 @@
-import type { TChartSubtitle } from "@/components/TempPrecipChart/TempPrecipChart.type";
 import type {
+  TCellBounds,
   TCellSize,
+  TChartSubtitle,
   TCoordinates,
   TMonthlyTemperature,
   TVariable,
   TWikidataCity,
 } from "@/types";
-import type { TCellBounds } from "@/types";
 import type { RefObject } from "react";
 
 export type TClimateStatisticsViewProps = {

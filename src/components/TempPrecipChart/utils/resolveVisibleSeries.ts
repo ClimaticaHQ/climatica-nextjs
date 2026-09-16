@@ -1,5 +1,4 @@
-import type { TVariable } from "@/types";
-import type { TVisibleSeries } from "../TempPrecipChart.type";
+import type { TVariable, TVisibleSeries } from "@/types";
 
 /**
  * Derives which series should be visible from the store's selected variables.

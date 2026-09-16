@@ -1,6 +1,11 @@
-import type { TMultiPeriodEntry } from "@/components/TempPrecipChart/TempPrecipChart.type";
 import type { TClimatePeriod } from "@/constants/worldclim.constant";
-import type { TCellSize, TDataset, TMonthlyTemperature, TWikidataCity } from "@/types";
+import type {
+  TCellSize,
+  TDataset,
+  TMonthlyTemperature,
+  TMultiPeriodEntry,
+  TWikidataCity,
+} from "@/types";
 import type { RefObject } from "react";
 
 export type TComparePeriodsViewProps = {
