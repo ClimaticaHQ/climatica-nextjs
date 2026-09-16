@@ -1,4 +1,5 @@
 import { ClimateStatsBar } from "@/components/ClimateStatsBar";
+import { resolveActiveTooltipIndex } from "@/components/TempPrecipChart/utils";
 import { MONTH_NAMES } from "@/constants";
 import { computeWLAxisTicks } from "@/utils";
 import { useTranslations } from "next-intl";
@@ -23,6 +24,7 @@ export function WalterLiethChart({
   colors = WL_COLORS_A,
   title,
   altitude,
+  onActiveMonthIndexChange,
 }: TWalterLiethChartProps) {
   const t = useTranslations();
 
@@ -60,7 +62,14 @@ export function WalterLiethChart({
       <div className="overflow-x-auto">
         <div className="h-[300px] sm:h-[360px] md:h-[420px] lg:h-[460px] min-w-[520px]">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={scaledData} margin={{ top: 20, right: 70, bottom: 50, left: 20 }}>
+            <ComposedChart
+              data={scaledData}
+              margin={{ top: 20, right: 70, bottom: 50, left: 20 }}
+              onMouseMove={(state) =>
+                onActiveMonthIndexChange?.(resolveActiveTooltipIndex(state.activeTooltipIndex))
+              }
+              onMouseLeave={() => onActiveMonthIndexChange?.(null)}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
               <XAxis
                 dataKey="monthName"
