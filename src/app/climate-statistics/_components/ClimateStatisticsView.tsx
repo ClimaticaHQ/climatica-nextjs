@@ -15,10 +15,9 @@ import {
   PageWrapper,
   StatCardsSkeleton,
 } from "@/components/UI";
-import type { TVisibleSeries } from "@/components/TempPrecipChart/TempPrecipChart.type";
 import { CLIMATE_PERIOD_LABELS, DATASETS } from "@/constants";
 import { useFetchFullClimateData } from "@/hooks";
-import type { TExportLabels } from "@/types";
+import type { TChartMode, TExportLabels, TVisibleSeries } from "@/types";
 import {
   buildExportPayload,
   buildExportSvg,
@@ -32,10 +31,10 @@ import {
   resolveExportColors,
   svgToPng,
 } from "@/utils";
-import { EXPORT_SVG_LAYOUT } from "@/utils/export/svg/exportSvg.constant";
+import { EXPORT_SVG_LAYOUT } from "@/utils/export";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 import type { TClimateStatisticsViewProps, TStatCardProps } from "./ClimateStatistics.type";
 import { computeClimateStats } from "./ClimateStatistics.util";
 
@@ -99,6 +98,7 @@ export function ClimateStatisticsView({
 }: TClimateStatisticsViewProps) {
   const t = useTranslations();
   const [visibleSeries, setVisibleSeries] = useState<TVisibleSeries | null>(null);
+  const [chartMode, setChartMode] = useState<TChartMode>("standard");
   const chart = useTempPrecipChart({ data: temperatureData });
   const { mutateAsync: fetchFullClimateData } = useFetchFullClimateData();
 
@@ -147,6 +147,10 @@ export function ClimateStatisticsView({
       altitude: t("chart.altitude"),
       martonne: t("chart.martonne"),
     },
+    tableLabels: {
+      avgTemp: t("chart.avgTempShort"),
+      precip: t("chart.precipShort"),
+    },
     monthAxisLabel: t("chart.monthAxis"),
     ...(martonneClassLabel !== undefined ? { martonneClassLabel } : {}),
     aridityLegend: {
@@ -170,6 +174,7 @@ export function ClimateStatisticsView({
     scales: chart.scales,
     summary: chart.summary,
     rightMax: chart.rightMax,
+    chartMode,
     labels: exportLabels,
   });
 
@@ -337,6 +342,7 @@ export function ClimateStatisticsView({
                     variables={variables}
                     data={temperatureData}
                     onVisibleSeriesChange={setVisibleSeries}
+                    onChartModeChange={setChartMode}
                     {...(altitude !== null ? { altitude } : {})}
                     {...(isFiltered ? { selectedMonths } : {})}
                   />

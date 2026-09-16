@@ -1,6 +1,5 @@
 "use client";
 
-import type { TChartSubtitle } from "@/components/TempPrecipChart/TempPrecipChart.type";
 import {
   APP_TITLE,
   CLIMATE_PERIOD_LABELS,
@@ -18,8 +17,9 @@ import {
   usePersistedComparisonCities,
   useResolveCityByCoordinates,
 } from "@/hooks";
+import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useFiltersStore, useSettingsStore } from "@/stores";
-import type { TWikidataCity } from "@/types";
+import type { TChartSubtitle, TWikidataCity } from "@/types";
 import {
   applyUrlFiltersToStore,
   cityFromUrl,
@@ -31,10 +31,9 @@ import {
   syncUrlParams,
 } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
-import { usePathname, useRouter } from "@/libs/I18nNavigation";
-import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatCoordinate } from "./ClimateStatistics.util";
 import { ClimateStatisticsView } from "./ClimateStatisticsView";
 
