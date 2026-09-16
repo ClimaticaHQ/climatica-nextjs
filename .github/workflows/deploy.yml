@@ -2,18 +2,23 @@ name: Deploy Climatica
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
   deploy:
     runs-on: self-hosted
 
     steps:
-      - name: Update source
+      - name: Show trigger information
+        run: |
+          echo "Deploying tag ${GITHUB_REF_NAME}"
+
+      - name: Update source code
         run: |
           cd /home/guiveg/climatica-nextjs
-          git pull origin main
+          git fetch --all --tags
+          git checkout ${GITHUB_REF_NAME}
 
       - name: Install dependencies
         run: |
@@ -25,10 +30,10 @@ jobs:
           cd /home/guiveg/climatica-nextjs
           npm run build
 
-      - name: Restart service
+      - name: Restart application
         run: |
           sudo systemctl restart climatica
 
-      - name: Check service
+      - name: Verify service status
         run: |
           sudo systemctl status climatica --no-pager
