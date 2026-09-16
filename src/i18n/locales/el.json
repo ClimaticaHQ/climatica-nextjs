@@ -139,6 +139,8 @@
     "maxTemperature": "Μέγιστη Θερμοκρασία",
     "minTemperature": "Ελάχιστη Θερμοκρασία",
     "avgTemperature": "Μέση Θερμοκρασία",
+    "avgTempShort": "Μέση Θερμ.",
+    "precipShort": "Βροχόπτ.",
     "meanTemp": "Μέση θερμ.",
     "annualPrec": "Ετήσια βροχόπτ.",
     "aridMonths": "Ξηροί μήνες",

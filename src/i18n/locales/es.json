@@ -139,6 +139,8 @@
     "maxTemperature": "Temperatura Máxima",
     "minTemperature": "Temperatura Mínima",
     "avgTemperature": "Temperatura Media",
+    "avgTempShort": "Temp. Media",
+    "precipShort": "Precip.",
     "meanTemp": "Temp. media",
     "annualPrec": "Precip. anual",
     "aridMonths": "Meses áridos",

@@ -139,6 +139,8 @@
     "maxTemperature": "Höchsttemperatur",
     "minTemperature": "Tiefsttemperatur",
     "avgTemperature": "Durchschnittstemperatur",
+    "avgTempShort": "Ø-Temp.",
+    "precipShort": "Niederschl.",
     "meanTemp": "Ø Temp.",
     "annualPrec": "Jahresniederschlag",
     "aridMonths": "Aride Monate",

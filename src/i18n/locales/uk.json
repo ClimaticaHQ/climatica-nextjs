@@ -139,6 +139,8 @@
     "maxTemperature": "Макс. температура",
     "minTemperature": "Мін. температура",
     "avgTemperature": "Сер. температура",
+    "avgTempShort": "Сер. темп.",
+    "precipShort": "Опади",
     "meanTemp": "Сер. темп",
     "annualPrec": "Річні опади",
     "aridMonths": "Посушливих місяців",
