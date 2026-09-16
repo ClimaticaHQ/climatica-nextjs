@@ -32,6 +32,7 @@ export function buildExportPayload(params: TBuildExportPayloadParams): TExportPa
     aridity,
     scales,
     rightMax: params.rightMax,
+    chartMode: params.chartMode,
     labels: params.labels,
   };
 }

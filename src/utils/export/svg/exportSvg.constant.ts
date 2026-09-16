@@ -1,6 +1,6 @@
 export const EXPORT_SVG_LAYOUT = {
   width: 1000,
-  height: 700,
+  height: 800,
   paddingX: 40,
   headerTitleY: 36,
   headerSubtitleY: 58,
@@ -13,5 +13,8 @@ export const EXPORT_SVG_LAYOUT = {
   chartHeight: 380,
   legendY: 616,
   aridityLegendY: 642,
-  footerY: 680,
+  dataTableY: 670,
+  dataTableRowHeight: 26,
+  dataTableLabelWidth: 110,
+  footerY: 780,
 } as const;
