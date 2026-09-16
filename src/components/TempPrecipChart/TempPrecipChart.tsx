@@ -1,17 +1,19 @@
 import {
+  ClimateDataTable,
   FilterChip,
   WalterLiethChart,
   WalterLiethCitiesLayout,
   WalterLiethPeriodsLayout,
 } from "@/components";
 import { CLIMATE_PERIOD_LABELS, DATASETS } from "@/constants";
-import { useEffect, useState } from "react";
+import { TChartMode, TVisibleSeries } from "@/types";
 import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 import { CompareChart, MultiPeriodChart, StandardClimateChart } from "./charts";
 import { ModeToggle } from "./components";
 import { useTempPrecipChart } from "./hooks";
 import { CalendarIcon, DatabaseIcon } from "./icons";
-import type { TChartMode, TTempPrecipChartProps, TVisibleSeries } from "./TempPrecipChart.type";
+import type { TTempPrecipChartProps } from "./TempPrecipChart.type";
 import { resolveVisibleSeries } from "./utils";
 
 const DEFAULT_VISIBLE: TVisibleSeries = { tmax: true, tmin: true, tavg: false, prec: true };
@@ -34,6 +36,11 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
     props.onVisibleSeriesChange?.(visible);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
+
+  useEffect(() => {
+    props.onChartModeChange?.(chartMode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chartMode]);
 
   const chart = useTempPrecipChart(props);
 
@@ -142,6 +149,7 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
           chartData={chart.chartDataSingle}
           scales={chart.scales}
           summary={chart.summary}
+          onActiveMonthIndexChange={chart.setActiveMonthIndex}
           {...(props.altitude !== undefined ? { altitude: props.altitude } : {})}
         />
       ) : isWalterLieth && props.compareMode === "periods" ? (
@@ -196,8 +204,16 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
           summary={chart.summary}
           visible={visible}
           showAridity={showAridity}
+          onActiveMonthIndexChange={chart.setActiveMonthIndex}
           {...(props.selectedMonths !== undefined ? { selectedMonths: props.selectedMonths } : {})}
           {...(props.altitude !== undefined ? { altitude: props.altitude } : {})}
+        />
+      )}
+
+      {!chart.isCompare && !chart.isMultiPeriod && (
+        <ClimateDataTable
+          monthlyData={chart.chartDataSingle}
+          activeMonthIndex={chart.activeMonthIndex}
         />
       )}
     </div>

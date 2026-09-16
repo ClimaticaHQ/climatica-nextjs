@@ -18,6 +18,7 @@ import {
 import { PrecipBarShape } from "../../components";
 import { CHART_COLORS, PRECIP_BAR_ANIMATION_DURATION_MS } from "../../TempPrecipChart.constant";
 import type { TDotRendererProps } from "../../TempPrecipChart.type";
+import { resolveActiveTooltipIndex } from "../../utils";
 import type { TStandardClimateChartProps } from "./StandardClimateChart.type";
 
 export function StandardClimateChart({
@@ -30,6 +31,7 @@ export function StandardClimateChart({
   selectedMonths,
   altitude,
   showAridity = true,
+  onActiveMonthIndexChange,
 }: TStandardClimateChartProps) {
   const t = useTranslations();
   const hidePrecBar = useDelayedHide(!visible.prec, PRECIP_BAR_ANIMATION_DURATION_MS);
@@ -84,6 +86,10 @@ export function StandardClimateChart({
               margin={{ top: 20, right: 60, bottom: 50, left: 20 }}
               barGap={2}
               barCategoryGap="30%"
+              onMouseMove={(state) =>
+                onActiveMonthIndexChange?.(resolveActiveTooltipIndex(state.activeTooltipIndex))
+              }
+              onMouseLeave={() => onActiveMonthIndexChange?.(null)}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
 
