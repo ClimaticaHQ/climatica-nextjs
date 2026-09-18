@@ -12,4 +12,5 @@ export type TWalterLiethScales = {
   tempMax: number;
   precMin: number;
   precMax: number;
+  plotMax: number;
 };
