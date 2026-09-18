@@ -139,6 +139,8 @@
     "maxTemperature": "Temperatura Máxima",
     "minTemperature": "Temperatura Mínima",
     "avgTemperature": "Temperatura Media",
+    "avgTempShort": "Temp. Media",
+    "precipShort": "Precip.",
     "meanTemp": "Temp. media",
     "annualPrec": "Precip. anual",
     "aridMonths": "Meses áridos",
@@ -150,6 +152,7 @@
     "modeWalterLieth": "Diagrama Walter-Lieth",
     "walterLiethTabUnavailable": "No disponible en la vista Walter-Lieth",
     "selectedMonth": "valores de {month}",
+    "selectedMonthsCount": "{count, plural, one {# mes} other {# meses}}",
     "altitude": "Altitud",
     "subtitle": {
       "climate": "Clima {period}",

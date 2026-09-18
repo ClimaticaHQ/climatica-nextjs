@@ -12,6 +12,7 @@ export function WalterLiethCustomized({
   clipId = "wl-clip-diff",
   opacity = 1,
   dashArray,
+  activeMonthIndex,
 }: TWLCustomizedProps) {
   const xScale = useXAxisScale();
   const yScale = useYAxisScale("left");
@@ -92,17 +93,23 @@ export function WalterLiethCustomized({
         strokeDasharray={dashArray}
       />
       {!dashArray &&
-        tempPts.map((p, i) => (
-          <circle
-            key={i}
-            cx={p.x}
-            cy={p.y}
-            r={4}
-            fill={colors.tempLineColor}
-            stroke="white"
-            strokeWidth={1}
-          />
-        ))}
+        tempPts.map((p, i) => {
+          const isHovering = activeMonthIndex !== null && activeMonthIndex !== undefined;
+          const isActive = i === activeMonthIndex;
+          const dotOpacity = isHovering ? (isActive ? 1 : 0.15) : 1;
+          return (
+            <circle
+              key={i}
+              cx={p.x}
+              cy={p.y}
+              r={isActive ? 6 : 4}
+              fill={colors.tempLineColor}
+              stroke="white"
+              strokeWidth={isActive ? 2 : 1}
+              opacity={dotOpacity}
+            />
+          );
+        })}
     </g>
   );
 }

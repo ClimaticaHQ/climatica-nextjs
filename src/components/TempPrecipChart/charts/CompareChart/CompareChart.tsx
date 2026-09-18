@@ -17,6 +17,7 @@ import {
 import { PrecipBarShape } from "../../components";
 import { CHART_COLORS, PRECIP_BAR_ANIMATION_DURATION_MS } from "../../TempPrecipChart.constant";
 import type { TDotRendererProps } from "../../TempPrecipChart.type";
+import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle } from "../../utils";
 import type { TCompareChartProps } from "./CompareChart.type";
 
 function CompareModeLegend({
@@ -65,6 +66,9 @@ export function CompareChart({
 }: TCompareChartProps) {
   const t = useTranslations();
   const hidePrecBar = useDelayedHide(!visible.prec, PRECIP_BAR_ANIMATION_DURATION_MS);
+  const hideTmaxLine = useDelayedHide(!visible.tmax, PRECIP_BAR_ANIMATION_DURATION_MS);
+  const hideTminLine = useDelayedHide(!visible.tmin, PRECIP_BAR_ANIMATION_DURATION_MS);
+  const hideTavgLine = useDelayedHide(!visible.tavg, PRECIP_BAR_ANIMATION_DURATION_MS);
 
   const aridityByMonthA = useMemo<Record<number, boolean> | undefined>(() => {
     if (!aridityA) return undefined;
@@ -76,20 +80,21 @@ export function CompareChart({
     return idx >= 0 ? t(`months.${idx + 1}`) : String(v);
   }
 
-  function makeDot(color: string) {
+  function makeDot(color: string, isSeriesVisible: boolean) {
     function DotRenderer({ cx = 0, cy = 0, fill = color, index = -1 }: TDotRendererProps) {
       const month = index >= 0 ? index + 1 : -1;
       const isSelected =
         !selectedMonths || selectedMonths.length === 0 || selectedMonths.includes(month);
       const isHighlighted = selectedMonths?.length === 1 && isSelected;
+      const opacity = isSelected ? 1 : 0.15;
       return (
         <circle
           cx={cx}
           cy={cy}
           r={isHighlighted ? 5 : 3}
           fill={fill}
-          opacity={isSelected ? 1 : 0.15}
           stroke="none"
+          style={buildOpacityFadeStyle(isSeriesVisible ? opacity : 0)}
         />
       );
     }
@@ -196,46 +201,46 @@ export function CompareChart({
                 }
               />
 
-              {visible.tmax && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tmaxA"
-                  name={`${labelA ?? ""} — ${t("chart.maxTemperature")}`}
-                  stroke={CHART_COLORS.compareA.tmax}
-                  strokeWidth={2}
-                  dot={makeDot(CHART_COLORS.compareA.tmax)}
-                  activeDot={{ r: 4 }}
-                />
-              )}
+              <Line
+                yAxisId="temp"
+                type="monotone"
+                dataKey="tmaxA"
+                name={`${labelA ?? ""} — ${t("chart.maxTemperature")}`}
+                stroke={CHART_COLORS.compareA.tmax}
+                strokeWidth={2}
+                dot={makeDot(CHART_COLORS.compareA.tmax, visible.tmax)}
+                activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tmax ? 1 : 0) }}
+                hide={hideTmaxLine}
+                style={buildStrokeOpacityFadeStyle(visible.tmax ? 1 : 0)}
+              />
 
-              {visible.tavg && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tavgA"
-                  name={`${labelA ?? ""} — ${t("chart.avgTemperature")}`}
-                  stroke={CHART_COLORS.compareA.tavg}
-                  strokeWidth={2}
-                  dot={makeDot(CHART_COLORS.compareA.tavg)}
-                  activeDot={{ r: 4 }}
-                  strokeDasharray="5 3"
-                />
-              )}
+              <Line
+                yAxisId="temp"
+                type="monotone"
+                dataKey="tavgA"
+                name={`${labelA ?? ""} — ${t("chart.avgTemperature")}`}
+                stroke={CHART_COLORS.compareA.tavg}
+                strokeWidth={2}
+                dot={makeDot(CHART_COLORS.compareA.tavg, visible.tavg)}
+                activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tavg ? 1 : 0) }}
+                strokeDasharray="5 3"
+                hide={hideTavgLine}
+                style={buildStrokeOpacityFadeStyle(visible.tavg ? 1 : 0)}
+              />
 
-              {visible.tmin && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tminA"
-                  name={`${labelA ?? ""} — ${t("chart.minTemperature")}`}
-                  stroke={CHART_COLORS.compareA.tmin}
-                  strokeWidth={2}
-                  dot={makeDot(CHART_COLORS.compareA.tmin)}
-                  activeDot={{ r: 4 }}
-                  strokeDasharray="4 2"
-                />
-              )}
+              <Line
+                yAxisId="temp"
+                type="monotone"
+                dataKey="tminA"
+                name={`${labelA ?? ""} — ${t("chart.minTemperature")}`}
+                stroke={CHART_COLORS.compareA.tmin}
+                strokeWidth={2}
+                dot={makeDot(CHART_COLORS.compareA.tmin, visible.tmin)}
+                activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
+                strokeDasharray="4 2"
+                hide={hideTminLine}
+                style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
+              />
 
               <Bar
                 yAxisId="prec"
@@ -251,46 +256,46 @@ export function CompareChart({
                 shape={<PrecipBarShape selectedMonths={selectedMonths} />}
               />
 
-              {visible.tmax && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tmaxB"
-                  name={`${labelB ?? ""} — ${t("chart.maxTemperature")}`}
-                  stroke={CHART_COLORS.compareB.tmax}
-                  strokeWidth={2}
-                  dot={makeDot(CHART_COLORS.compareB.tmax)}
-                  activeDot={{ r: 4 }}
-                />
-              )}
+              <Line
+                yAxisId="temp"
+                type="monotone"
+                dataKey="tmaxB"
+                name={`${labelB ?? ""} — ${t("chart.maxTemperature")}`}
+                stroke={CHART_COLORS.compareB.tmax}
+                strokeWidth={2}
+                dot={makeDot(CHART_COLORS.compareB.tmax, visible.tmax)}
+                activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tmax ? 1 : 0) }}
+                hide={hideTmaxLine}
+                style={buildStrokeOpacityFadeStyle(visible.tmax ? 1 : 0)}
+              />
 
-              {visible.tavg && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tavgB"
-                  name={`${labelB ?? ""} — ${t("chart.avgTemperature")}`}
-                  stroke={CHART_COLORS.compareB.tavg}
-                  strokeWidth={2}
-                  dot={makeDot(CHART_COLORS.compareB.tavg)}
-                  activeDot={{ r: 4 }}
-                  strokeDasharray="5 3"
-                />
-              )}
+              <Line
+                yAxisId="temp"
+                type="monotone"
+                dataKey="tavgB"
+                name={`${labelB ?? ""} — ${t("chart.avgTemperature")}`}
+                stroke={CHART_COLORS.compareB.tavg}
+                strokeWidth={2}
+                dot={makeDot(CHART_COLORS.compareB.tavg, visible.tavg)}
+                activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tavg ? 1 : 0) }}
+                strokeDasharray="5 3"
+                hide={hideTavgLine}
+                style={buildStrokeOpacityFadeStyle(visible.tavg ? 1 : 0)}
+              />
 
-              {visible.tmin && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tminB"
-                  name={`${labelB ?? ""} — ${t("chart.minTemperature")}`}
-                  stroke={CHART_COLORS.compareB.tmin}
-                  strokeWidth={2}
-                  dot={makeDot(CHART_COLORS.compareB.tmin)}
-                  activeDot={{ r: 4 }}
-                  strokeDasharray="4 2"
-                />
-              )}
+              <Line
+                yAxisId="temp"
+                type="monotone"
+                dataKey="tminB"
+                name={`${labelB ?? ""} — ${t("chart.minTemperature")}`}
+                stroke={CHART_COLORS.compareB.tmin}
+                strokeWidth={2}
+                dot={makeDot(CHART_COLORS.compareB.tmin, visible.tmin)}
+                activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
+                strokeDasharray="4 2"
+                hide={hideTminLine}
+                style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
+              />
             </ComposedChart>
           </ResponsiveContainer>
         </div>

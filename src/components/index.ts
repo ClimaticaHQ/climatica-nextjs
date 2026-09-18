@@ -1,4 +1,5 @@
 export { CellSizeSelector } from "./CellSizeSelector";
+export { ClimateDataTable } from "./ClimateDataTable";
 export { ClimateStatsBar } from "./ClimateStatsBar";
 export type { TClimateStatsBarProps } from "./ClimateStatsBar";
 export { CompareStatsGrid } from "./CompareStatsGrid";

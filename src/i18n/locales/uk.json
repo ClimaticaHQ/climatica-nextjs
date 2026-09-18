@@ -139,6 +139,8 @@
     "maxTemperature": "Макс. температура",
     "minTemperature": "Мін. температура",
     "avgTemperature": "Сер. температура",
+    "avgTempShort": "Сер. темп.",
+    "precipShort": "Опади",
     "meanTemp": "Сер. темп",
     "annualPrec": "Річні опади",
     "aridMonths": "Посушливих місяців",
@@ -150,6 +152,7 @@
     "modeWalterLieth": "Діаграма Вальтера-Лієта",
     "walterLiethTabUnavailable": "Недоступно у вигляді Вальтера-Лієта",
     "selectedMonth": "значення за {month}",
+    "selectedMonthsCount": "{count, plural, one {# місяць} few {# місяці} many {# місяців} other {# місяців}}",
     "altitude": "Висота",
     "subtitle": {
       "climate": "Клімат {period}",

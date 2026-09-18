@@ -1,17 +1,19 @@
 import {
+  ClimateDataTable,
   FilterChip,
   WalterLiethChart,
   WalterLiethCitiesLayout,
   WalterLiethPeriodsLayout,
 } from "@/components";
 import { CLIMATE_PERIOD_LABELS, DATASETS } from "@/constants";
-import { useEffect, useState } from "react";
+import { TChartMode, TVisibleSeries } from "@/types";
 import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 import { CompareChart, MultiPeriodChart, StandardClimateChart } from "./charts";
 import { ModeToggle } from "./components";
 import { useTempPrecipChart } from "./hooks";
 import { CalendarIcon, DatabaseIcon } from "./icons";
-import type { TChartMode, TTempPrecipChartProps, TVisibleSeries } from "./TempPrecipChart.type";
+import type { TTempPrecipChartProps } from "./TempPrecipChart.type";
 import { resolveVisibleSeries } from "./utils";
 
 const DEFAULT_VISIBLE: TVisibleSeries = { tmax: true, tmin: true, tavg: false, prec: true };
@@ -35,6 +37,11 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
+  useEffect(() => {
+    props.onChartModeChange?.(chartMode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chartMode]);
+
   const chart = useTempPrecipChart(props);
 
   if (!chart.hasData) return null;
@@ -49,8 +56,11 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
     setVisible((prev) => ({ ...prev, [key]: !prev[key] }));
   }
 
+  const selectedMonthsCount = !chart.isCompare ? (props.selectedMonths?.length ?? 0) : 0;
+  const isPartialMonthFilter = selectedMonthsCount > 0 && selectedMonthsCount < 12;
   const selectedMonth =
-    !chart.isCompare && props.selectedMonths?.length === 1 ? props.selectedMonths[0] : null;
+    isPartialMonthFilter && props.selectedMonths?.length === 1 ? props.selectedMonths[0] : null;
+  const showMonthsCountBadge = isPartialMonthFilter && selectedMonthsCount >= 2;
 
   const subtitleText = props.subtitle
     ? (props.subtitle.rawLabel ??
@@ -81,7 +91,8 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
             <h3 className="font-semibold text-[length:var(--font-md)] md:text-[length:var(--font-lg)] text-[var(--color-text)]">
               {t("chart.title")}: {props.cityName}
             </h3>
-            {(!!subtitleText || (!isWalterLieth && selectedMonth !== null)) && (
+            {(!!subtitleText ||
+              (!isWalterLieth && (selectedMonth !== null || showMonthsCountBadge))) && (
               <div className="flex flex-wrap items-center gap-2">
                 {!!subtitleText && (
                   <span className="flex items-center gap-1 text-[12px] text-[var(--color-text-secondary)]">
@@ -89,7 +100,7 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
                     {subtitleText}
                   </span>
                 )}
-                {!isWalterLieth && selectedMonth !== null && (
+                {!isWalterLieth && (selectedMonth !== null || showMonthsCountBadge) && (
                   <span className="flex items-center gap-1" style={{ color: "#1a6fa0" }}>
                     <CalendarIcon />
                     <span
@@ -102,7 +113,9 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
                         color: "#1a6fa0",
                       }}
                     >
-                      {t(`months.${selectedMonth}`)}
+                      {selectedMonth !== null
+                        ? t(`months.${selectedMonth}`)
+                        : t("chart.selectedMonthsCount", { count: selectedMonthsCount })}
                     </span>
                   </span>
                 )}
@@ -142,6 +155,8 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
           chartData={chart.chartDataSingle}
           scales={chart.scales}
           summary={chart.summary}
+          activeMonthIndex={chart.activeMonthIndex}
+          onActiveMonthIndexChange={chart.setActiveMonthIndex}
           {...(props.altitude !== undefined ? { altitude: props.altitude } : {})}
         />
       ) : isWalterLieth && props.compareMode === "periods" ? (
@@ -196,8 +211,18 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
           summary={chart.summary}
           visible={visible}
           showAridity={showAridity}
+          activeMonthIndex={chart.activeMonthIndex}
+          onActiveMonthIndexChange={chart.setActiveMonthIndex}
           {...(props.selectedMonths !== undefined ? { selectedMonths: props.selectedMonths } : {})}
           {...(props.altitude !== undefined ? { altitude: props.altitude } : {})}
+        />
+      )}
+
+      {!chart.isCompare && !chart.isMultiPeriod && (
+        <ClimateDataTable
+          monthlyData={chart.chartDataSingle}
+          activeMonthIndex={chart.activeMonthIndex}
+          onMonthHover={chart.setActiveMonthIndex}
         />
       )}
     </div>

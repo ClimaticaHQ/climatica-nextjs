@@ -19,3 +19,5 @@ export type TMonthlyTemperature = {
   tmax: number;
   prec: number;
 };
+
+export type TMonthlyTemperatureWithAvg = TMonthlyTemperature & { tavg: number };

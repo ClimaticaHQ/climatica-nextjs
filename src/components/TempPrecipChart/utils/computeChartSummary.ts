@@ -1,6 +1,4 @@
-import type { TMonthlyTemperature } from "@/types";
-import type { TMonthAridity } from "@/types";
-import type { TChartSummary } from "../TempPrecipChart.type";
+import type { TChartSummary, TMonthAridity, TMonthlyTemperature } from "@/types";
 
 export function computeChartSummary(
   data: TMonthlyTemperature[],

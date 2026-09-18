@@ -1,6 +1,7 @@
 import { WEATHER_VARIABLES } from "@/constants";
 import type {
   TCellSize,
+  TChartMode,
   TClimatePeriod,
   TDataset,
   TMonthAridity,
@@ -79,6 +80,12 @@ export type TExportLabels = {
     altitude: string;
     martonne: string;
   };
+  /** chart.avgTempShort / chart.precipShort — short row labels for buildDataTable(),
+   *  matching ClimateDataTable.tsx's on-screen labels exactly. */
+  tableLabels: {
+    avgTemp: string;
+    precip: string;
+  };
   /** chart.monthAxis ("Month") — °C/mm axis units are unit symbols, not translated
    *  even in the live chart (StandardClimateChart.tsx hardcodes them literally). */
   monthAxisLabel: string;
@@ -115,6 +122,7 @@ export type TExportPayload = {
   aridity: TMonthAridity[];
   scales: TWalterLiethScales;
   rightMax: number;
+  chartMode: TChartMode;
   labels: TExportLabels;
   rawData?: TExportRawData;
 };
@@ -134,6 +142,7 @@ export type TBuildExportPayloadParams = {
   scales: TWalterLiethScales | null;
   summary: TExportSummary | null;
   rightMax: number;
+  chartMode: TChartMode;
   labels: TExportLabels;
 };
 

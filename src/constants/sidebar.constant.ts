@@ -7,7 +7,7 @@ export const DATASETS = {
 
 export const DEFAULT_VARIABLES = ["tmax", "tmin", "prec"] as const;
 
-export const AUTO_APPLY_DEBOUNCE_MS = TIME.IN_MILLISECONDS.SECOND * 2;
+export const AUTO_APPLY_DEBOUNCE_MS = TIME.IN_MILLISECONDS.SECOND / 5;
 
 export const SIDEBAR_PARAMS = {
   DATASET: "dataset",

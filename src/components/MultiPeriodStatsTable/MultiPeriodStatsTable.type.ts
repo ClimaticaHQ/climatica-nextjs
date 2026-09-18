@@ -1,4 +1,4 @@
-import type { TMultiPeriodEntry } from "@/components/TempPrecipChart/TempPrecipChart.type";
+import type { TMultiPeriodEntry } from "@/types";
 
 export type TMultiPeriodStatsTableProps = {
   periods: number[];

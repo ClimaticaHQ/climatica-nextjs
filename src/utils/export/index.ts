@@ -5,5 +5,7 @@ export * from "./raw/exportRawJson.util";
 export * from "./raw/rawDataAvailability.util";
 export * from "./shared/download.util";
 export * from "./svg/buildExportSvg.util";
+export * from "./svg/exportSvg.constant";
+export * from "./svg/linearPath.util";
 export * from "./svg/resolveExportColors.util";
 export * from "./svg/scales.util";

@@ -139,6 +139,8 @@
     "maxTemperature": "Höchsttemperatur",
     "minTemperature": "Tiefsttemperatur",
     "avgTemperature": "Durchschnittstemperatur",
+    "avgTempShort": "Ø-Temp.",
+    "precipShort": "Niederschl.",
     "meanTemp": "Ø Temp.",
     "annualPrec": "Jahresniederschlag",
     "aridMonths": "Aride Monate",
@@ -150,6 +152,7 @@
     "modeWalterLieth": "Walter-Lieth-Diagramm",
     "walterLiethTabUnavailable": "In der Walter-Lieth-Ansicht nicht verfügbar",
     "selectedMonth": "Werte für {month}",
+    "selectedMonthsCount": "{count, plural, one {# Monat} other {# Monate}}",
     "altitude": "Höhe",
     "subtitle": {
       "climate": "Klima {period}",

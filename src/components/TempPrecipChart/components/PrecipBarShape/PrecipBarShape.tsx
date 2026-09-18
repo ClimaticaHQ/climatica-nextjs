@@ -1,4 +1,4 @@
-import { CHART_COLORS } from "../../TempPrecipChart.constant";
+import { CHART_COLORS, PRECIP_BAR_ANIMATION_DURATION_MS } from "../../TempPrecipChart.constant";
 import type { TBarShape } from "../../TempPrecipChart.type";
 
 /**
@@ -21,6 +21,7 @@ export function PrecipBarShape(props: TBarShape) {
     month,
     selectedMonths,
     aridityByMonth,
+    activeMonthIndex,
   } = props;
 
   const fill =
@@ -30,8 +31,14 @@ export function PrecipBarShape(props: TBarShape) {
         : CHART_COLORS.humid
       : propFill;
 
-  const fillOpacity =
-    !selectedMonths || selectedMonths.length === 0
+  const isHovering = activeMonthIndex !== undefined && activeMonthIndex !== null;
+  const isActive = isHovering && month !== undefined && month === activeMonthIndex + 1;
+
+  const fillOpacity = isHovering
+    ? isActive
+      ? 1
+      : 0.15
+    : !selectedMonths || selectedMonths.length === 0
       ? 1
       : month !== undefined && selectedMonths.includes(month)
         ? 0.8
@@ -44,8 +51,13 @@ export function PrecipBarShape(props: TBarShape) {
       width={width}
       height={Math.max(0, height)}
       fill={fill}
-      fillOpacity={fillOpacity}
       rx={2}
+      style={{
+        fillOpacity,
+        transitionProperty: "fill-opacity",
+        transitionDuration: `${PRECIP_BAR_ANIMATION_DURATION_MS}ms`,
+        transitionTimingFunction: "ease",
+      }}
     />
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import type { TChartSubtitle } from "@/components/TempPrecipChart";
 import { APP_TITLE, DATASETS, SIDEBAR_PARAMS, TIME } from "@/constants";
 import {
   useGetAltitude,
@@ -10,7 +9,7 @@ import {
 } from "@/hooks";
 import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useFiltersStore, useSettingsStore } from "@/stores";
-import type { TWikidataCity } from "@/types";
+import type { TChartSubtitle, TWikidataCity } from "@/types";
 import {
   applyUrlFiltersToStore,
   cityFromUrl,
@@ -185,6 +184,7 @@ export function CompareCities() {
       error={error}
       altitudeA={altitudeA}
       altitudeB={altitudeB}
+      variables={variables}
       onCityASelect={handleCityASelect}
       onCityBSelect={handleCityBSelect}
       chartSectionRef={chartSectionRef}
