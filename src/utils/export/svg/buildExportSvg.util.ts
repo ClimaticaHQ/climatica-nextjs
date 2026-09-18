@@ -1,6 +1,6 @@
 import { catmullRomPath } from "@/components/TempPrecipChart/utils/catmullRomPath";
 import type { TExportChartColors, TExportPayload, TLinearScale, TMonthBand } from "@/types";
-import { computeWLAxisTicks } from "@/utils";
+import { computeWLAxisTicks, computeWLPrecAxisTicks, precToScaled, scaledToPrec } from "@/utils";
 import { EXPORT_SVG_LAYOUT as L } from "./exportSvg.constant";
 import { linearPath } from "./linearPath.util";
 import { createLinearScale, monthBandX } from "./scales.util";
@@ -26,6 +26,28 @@ function monthOpacity(month: number, selectedMonths: number[] | null): number {
 
 function dotRadius(month: number, selectedMonths: number[] | null): number {
   return selectedMonths?.length === 1 && selectedMonths.includes(month) ? 5 : 3;
+}
+
+/**
+ * Nice round ticks from 0 to max, sized for a target count regardless of range —
+ * unlike computeWLAxisTicks (fixed step 5/10, built for the temp axis's small range),
+ * this scales its step with the magnitude of max so a monsoon-scale rightMax
+ * (~1000+) doesn't produce hundreds of overlapping labels. The actual max is
+ * appended as a final tick so the axis's real top boundary is always labeled.
+ */
+function computeNiceAxisTicks(max: number, targetCount = 6): number[] {
+  if (max <= 0) return [0];
+
+  const roughStep = max / targetCount;
+  const magnitude = 10 ** Math.floor(Math.log10(roughStep));
+  const normalized = roughStep / magnitude;
+  const niceNormalized = [1, 2, 5, 10].find((n) => n >= normalized) ?? 10;
+  const step = niceNormalized * magnitude;
+
+  const ticks: number[] = [];
+  for (let v = 0; v < max; v += step) ticks.push(v);
+  if (ticks[ticks.length - 1] !== max) ticks.push(max);
+  return ticks;
 }
 
 function buildHeader(payload: TExportPayload, colors: TExportChartColors): string {
@@ -82,9 +104,10 @@ function buildStatsTable(payload: TExportPayload, colors: TExportChartColors): s
 }
 
 /**
- * precTickMin/precTickMax are passed in rather than derived from payload.rightMax so this
- * stays reusable for Walter-Lieth mode, whose right-axis tick bounds are payload.scales'
- * precMin/precMax (tempMin/tempMax × 2), not the standard chart's raw-precip rightMax.
+ * precTicks are raw-mm label values; toScalePos maps a raw-mm tick to whatever value
+ * precScale's own domain expects, since that differs by mode — standard mode's precScale
+ * domain is already raw mm (identity), while Walter-Lieth mode's precScale shares the
+ * temp-equivalent scaled domain (tempMin..plotMax), so its ticks go through precToScaled.
  */
 function buildGridAndAxes(
   payload: TExportPayload,
@@ -94,11 +117,10 @@ function buildGridAndAxes(
   plotLeft: number,
   plotRight: number,
   chartBottom: number,
-  precTickMin: number,
-  precTickMax: number,
+  precTicks: number[],
+  toScalePos: (tick: number) => number,
 ): string {
   const tempTicks = computeWLAxisTicks(payload.scales.tempMin, payload.scales.tempMax);
-  const precTicks = computeWLAxisTicks(precTickMin, precTickMax);
 
   const gridLines = tempTicks
     .map((tick) => {
@@ -116,7 +138,7 @@ function buildGridAndAxes(
 
   const precLabels = precTicks
     .map((tick) => {
-      const y = precScale(tick);
+      const y = precScale(toScalePos(tick));
       return `<text x="${plotRight + 10}" y="${y + 4}" text-anchor="start" font-size="11" fill="${colors.textSecondary}">${Math.round(tick)}</text>`;
     })
     .join("");
@@ -207,8 +229,8 @@ function buildStandardBody(
       plotLeft,
       plotRight,
       chartBottom,
-      0,
-      payload.rightMax,
+      computeNiceAxisTicks(payload.rightMax),
+      (tick) => tick,
     ),
     buildBars(payload, colors, precScale, monthBands, chartBottom),
     buildLine(payload, colors.tmax, "tmax", tempScale, monthBands),
@@ -219,8 +241,8 @@ function buildStandardBody(
 
 /**
  * Walter-Lieth plot area — ports WalterLiethCustomized.tsx's technique directly: both curves
- * are mapped through the SAME temp-domain scale (precip pre-divided by 2, matching the live
- * component's precScaled = prec / 2), so the two closed areas share one coordinate space and
+ * are mapped through the SAME temp-domain scale (precip run through precToScaled(), matching
+ * the live component's precScaled), so the two closed areas share one coordinate space and
  * an evenodd clip can isolate humid-above/arid-above regions without intersection math.
  */
 function buildWalterLiethBody(
@@ -232,11 +254,19 @@ function buildWalterLiethBody(
   chartBottom: number,
   monthBands: TMonthBand[],
 ): string {
+  // precScale shares the temp axis's own domain (tempMin..plotMax) so its tick positions —
+  // fed through precToScaled — land exactly where the curves (also drawn via tempScale) do.
   const precScale = createLinearScale(
-    payload.scales.precMin,
-    payload.scales.precMax,
+    payload.scales.tempMin,
+    payload.scales.plotMax,
     chartBottom,
     L.chartTop,
+  );
+  const precRawMax = scaledToPrec(payload.scales.precMax);
+  // Ticks below tempMin fall outside the shared domain (e.g. a raw-mm tick at 0 sits below
+  // the plot floor once tempMin is above 0°C, as in tropical climates that never freeze).
+  const precTicks = computeWLPrecAxisTicks(precRawMax).filter(
+    (tick) => precToScaled(tick) >= payload.scales.tempMin,
   );
   const gridAndAxes = buildGridAndAxes(
     payload,
@@ -246,9 +276,17 @@ function buildWalterLiethBody(
     plotLeft,
     plotRight,
     chartBottom,
-    payload.scales.precMin,
-    payload.scales.precMax,
+    precTicks,
+    precToScaled,
   );
+
+  // Marks where the temperature axis's real range ends, once the shared domain has been
+  // widened to fit tall precipitation (Task 6) — otherwise this would just redraw the
+  // plot's own top edge, so it's skipped for the common non-widened case.
+  const tempCeilingLine =
+    payload.scales.plotMax > payload.scales.tempMax
+      ? `<line x1="${plotLeft}" y1="${tempScale(payload.scales.tempMax)}" x2="${plotRight}" y2="${tempScale(payload.scales.tempMax)}" stroke="${colors.textSecondary}" stroke-opacity="0.5" stroke-dasharray="4 4" />`
+      : "";
 
   const baselineY = tempScale(payload.scales.tempMin);
   const tempPts = payload.monthlyData.map((row, i) => ({
@@ -257,7 +295,7 @@ function buildWalterLiethBody(
   }));
   const precPts = payload.monthlyData.map((row, i) => ({
     x: monthBands[i].center,
-    y: tempScale(row.prec / 2),
+    y: tempScale(precToScaled(row.prec)),
   }));
 
   const firstX = tempPts[0].x;
@@ -270,11 +308,9 @@ function buildWalterLiethBody(
   const precArea = `${precLine} L ${f(lastX)},${f(baselineY)} L ${f(firstX)},${f(baselineY)} Z`;
   const diffPath = `${precArea} ${tempArea}`;
   const clipId = "wl-export-clip";
-  // Mitigates, not fixes: precMax = tempMax * 2 has no >100mm compression, so a heavy
-  // monsoon month's prec/2 can fall far outside the temp domain and produce a wildly
-  // out-of-range pixel value. Recharts' allowDataOverflow={false} clips the live chart
-  // at the plot boundary instead of letting it draw over the header/stats area — this
-  // clip reproduces that same boundary-clip failure mode for the export.
+  // tempScale's domain now extends to plotMax (max(tempMax, precMax)), so precip curves
+  // stay within the temp domain by construction — this clip is now a defensive boundary
+  // rather than a mitigation for a known-overflowing domain.
   const plotClipId = "wl-export-plot-clip";
 
   const dots = tempPts
@@ -286,6 +322,7 @@ function buildWalterLiethBody(
 
   return `
     ${gridAndAxes}
+    ${tempCeilingLine}
     <defs>
       <clipPath id="${plotClipId}" clipPathUnits="userSpaceOnUse">
         <rect x="${plotLeft}" y="${L.chartTop}" width="${plotRight - plotLeft}" height="${chartBottom - L.chartTop}" />
@@ -444,9 +481,11 @@ export function buildExportSvg(payload: TExportPayload, colors: TExportChartColo
   const chartBottom = L.chartTop + L.chartHeight;
   const isWalterLieth = payload.chartMode === "walter-lieth";
 
+  // Walter-Lieth mode draws precip through this same scale (see buildWalterLiethBody), so
+  // its ceiling must reach plotMax; standard mode's temp lines only ever need tempMax.
   const tempScale = createLinearScale(
     payload.scales.tempMin,
-    payload.scales.tempMax,
+    isWalterLieth ? payload.scales.plotMax : payload.scales.tempMax,
     chartBottom,
     L.chartTop,
   );
