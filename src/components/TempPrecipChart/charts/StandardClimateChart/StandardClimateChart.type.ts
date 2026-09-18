@@ -10,5 +10,6 @@ export type TStandardClimateChartProps = {
   selectedMonths?: number[];
   altitude?: number;
   showAridity?: boolean;
+  activeMonthIndex?: number | null;
   onActiveMonthIndexChange?: (index: number | null) => void;
 };

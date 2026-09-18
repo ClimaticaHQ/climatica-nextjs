@@ -18,7 +18,11 @@ import {
 import { PrecipBarShape } from "../../components";
 import { CHART_COLORS, PRECIP_BAR_ANIMATION_DURATION_MS } from "../../TempPrecipChart.constant";
 import type { TDotRendererProps } from "../../TempPrecipChart.type";
-import { resolveActiveTooltipIndex } from "../../utils";
+import {
+  buildOpacityFadeStyle,
+  buildStrokeOpacityFadeStyle,
+  resolveActiveTooltipIndex,
+} from "../../utils";
 import type { TStandardClimateChartProps } from "./StandardClimateChart.type";
 
 export function StandardClimateChart({
@@ -31,10 +35,14 @@ export function StandardClimateChart({
   selectedMonths,
   altitude,
   showAridity = true,
+  activeMonthIndex,
   onActiveMonthIndexChange,
 }: TStandardClimateChartProps) {
   const t = useTranslations();
   const hidePrecBar = useDelayedHide(!visible.prec, PRECIP_BAR_ANIMATION_DURATION_MS);
+  const hideTmaxLine = useDelayedHide(!visible.tmax, PRECIP_BAR_ANIMATION_DURATION_MS);
+  const hideTminLine = useDelayedHide(!visible.tmin, PRECIP_BAR_ANIMATION_DURATION_MS);
+  const hideTavgLine = useDelayedHide(!visible.tavg, PRECIP_BAR_ANIMATION_DURATION_MS);
 
   const aridityByMonth = useMemo<Record<number, boolean> | undefined>(() => {
     if (!aridity) return undefined;
@@ -46,21 +54,24 @@ export function StandardClimateChart({
     return idx >= 0 ? t(`months.${idx + 1}`) : String(v);
   }
 
-  function makeDot(color: string) {
+  function makeDot(color: string, isSeriesVisible: boolean) {
     function DotRenderer(dotProps: TDotRendererProps) {
       const { cx = 0, cy = 0, fill = color, index = -1 } = dotProps;
       const month = aridity?.[index]?.month ?? (index >= 0 ? index + 1 : -1);
       const isSelected =
         !selectedMonths || selectedMonths.length === 0 || selectedMonths.includes(month);
-      const isHighlighted = selectedMonths?.length === 1 && isSelected;
+      const isHovering = activeMonthIndex !== null && activeMonthIndex !== undefined;
+      const isActive = index === activeMonthIndex;
+      const isHighlighted = (selectedMonths?.length === 1 && isSelected) || isActive;
+      const opacity = isHovering ? (isActive ? 1 : 0.15) : isSelected ? 1 : 0.15;
       return (
         <circle
           cx={cx}
           cy={cy}
           r={isHighlighted ? 5 : 3}
           fill={fill}
-          opacity={isSelected ? 1 : 0.15}
           stroke="none"
+          style={buildOpacityFadeStyle(isSeriesVisible ? opacity : 0)}
         />
       );
     }
@@ -172,49 +183,50 @@ export function StandardClimateChart({
                   <PrecipBarShape
                     selectedMonths={selectedMonths}
                     aridityByMonth={showAridity ? aridityByMonth : undefined}
+                    {...(activeMonthIndex !== undefined ? { activeMonthIndex } : {})}
                   />
                 }
               />
 
-              {visible.tmax && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tmax"
-                  name={t("chart.maxTemperature")}
-                  stroke={CHART_COLORS.single.tmax}
-                  strokeWidth={2}
-                  dot={makeDot(CHART_COLORS.single.tmax)}
-                  activeDot={{ r: 5 }}
-                />
-              )}
+              <Line
+                yAxisId="temp"
+                type="monotone"
+                dataKey="tmax"
+                name={t("chart.maxTemperature")}
+                stroke={CHART_COLORS.single.tmax}
+                strokeWidth={2}
+                dot={makeDot(CHART_COLORS.single.tmax, visible.tmax)}
+                activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tmax ? 1 : 0) }}
+                hide={hideTmaxLine}
+                style={buildStrokeOpacityFadeStyle(visible.tmax ? 1 : 0)}
+              />
 
-              {visible.tavg && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tavg"
-                  name={t("chart.avgTemperature")}
-                  stroke={CHART_COLORS.single.tavg}
-                  strokeWidth={2}
-                  strokeDasharray="5 3"
-                  dot={makeDot(CHART_COLORS.single.tavg)}
-                  activeDot={{ r: 5 }}
-                />
-              )}
+              <Line
+                yAxisId="temp"
+                type="monotone"
+                dataKey="tavg"
+                name={t("chart.avgTemperature")}
+                stroke={CHART_COLORS.single.tavg}
+                strokeWidth={2}
+                strokeDasharray="5 3"
+                dot={makeDot(CHART_COLORS.single.tavg, visible.tavg)}
+                activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tavg ? 1 : 0) }}
+                hide={hideTavgLine}
+                style={buildStrokeOpacityFadeStyle(visible.tavg ? 1 : 0)}
+              />
 
-              {visible.tmin && (
-                <Line
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey="tmin"
-                  name={t("chart.minTemperature")}
-                  stroke={CHART_COLORS.single.tmin}
-                  strokeWidth={2}
-                  dot={makeDot(CHART_COLORS.single.tmin)}
-                  activeDot={{ r: 5 }}
-                />
-              )}
+              <Line
+                yAxisId="temp"
+                type="monotone"
+                dataKey="tmin"
+                name={t("chart.minTemperature")}
+                stroke={CHART_COLORS.single.tmin}
+                strokeWidth={2}
+                dot={makeDot(CHART_COLORS.single.tmin, visible.tmin)}
+                activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
+                hide={hideTminLine}
+                style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
+              />
             </ComposedChart>
           </ResponsiveContainer>
         </div>

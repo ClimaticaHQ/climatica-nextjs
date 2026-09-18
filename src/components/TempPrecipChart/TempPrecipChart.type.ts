@@ -43,6 +43,8 @@ export type TBarShape = {
   selectedMonths?: readonly number[] | undefined;
   /** month → isArid lookup, passed via shape prop to avoid Cell children */
   aridityByMonth?: Record<number, boolean> | undefined;
+  /** 0-based chart index, matching recharts' activeTooltipIndex — passed via shape prop */
+  activeMonthIndex?: number | null;
   yAxis?: { scale?: (v: number) => number };
 };
 
