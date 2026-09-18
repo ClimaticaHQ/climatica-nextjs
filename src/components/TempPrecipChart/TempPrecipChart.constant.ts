@@ -1,3 +1,8 @@
+/** Precip Bar's animationDuration and its useDelayedHide() delay must stay
+ * equal — the hide transition (which excludes the bar from tooltip/legend)
+ * should only kick in once the shrink animation has visibly finished. */
+export const PRECIP_BAR_ANIMATION_DURATION_MS = 400;
+
 export const CHART_COLORS = {
   arid: "var(--chart-arid)",
   humid: "var(--chart-humid)",

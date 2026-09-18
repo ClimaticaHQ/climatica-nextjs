@@ -1,3 +1,4 @@
+export { useFetchFullClimateData } from "./useFetchFullClimateData";
 export { useGetAltitude } from "./useGetAltitude";
 export { useGetCellBounds } from "./useGetCellBounds";
 export { useGetClimateData } from "./useGetClimateData";

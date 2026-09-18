@@ -11,6 +11,7 @@ export default function Dropdown({
 }: TDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const selected = options.find((o) => o.value === value);
 
@@ -23,6 +24,14 @@ export default function Dropdown({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen || !listRef.current) return;
+    const activeOption = listRef.current.querySelector<HTMLButtonElement>(
+      `[data-value="${value}"]`,
+    );
+    activeOption?.scrollIntoView({ block: "nearest" });
+  }, [isOpen, value]);
 
   return (
     <div ref={ref} className={`relative ${className ?? ""}`}>
@@ -50,10 +59,12 @@ export default function Dropdown({
       </button>
 
       <div
+        ref={listRef}
         className={`
           absolute right-0 top-full mt-1 min-w-full z-50
+          max-h-[7rem] overflow-y-auto overscroll-contain
           bg-[var(--color-bg)] border border-[var(--color-border)]
-          rounded-[var(--radius-sm)] shadow-md overflow-hidden
+          rounded-[var(--radius-sm)] shadow-md
           transition-all duration-200 origin-top
           ${isOpen ? "opacity-100 scale-y-100 pointer-events-auto" : "opacity-0 scale-y-95 pointer-events-none"}
         `}
@@ -61,6 +72,7 @@ export default function Dropdown({
         {options.map((option) => (
           <button
             key={option.value}
+            data-value={option.value}
             data-testid={optionTestIdPrefix ? `${optionTestIdPrefix}-${option.value}` : undefined}
             disabled={option.disabled}
             onClick={() => {

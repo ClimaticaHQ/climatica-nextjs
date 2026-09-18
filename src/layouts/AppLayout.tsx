@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar, Topbar } from "@/components";
+import { SidebarSkeleton, TopbarSkeleton } from "@/components/UI";
 import { Suspense, useEffect, useState } from "react";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
@@ -20,10 +21,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
-      <Topbar
-        isSidebarOpen={isSidebarOpen}
-        onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-      />
+      <Suspense fallback={<TopbarSkeleton />}>
+        <Topbar
+          isSidebarOpen={isSidebarOpen}
+          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+        />
+      </Suspense>
       <div className="relative flex flex-1 overflow-hidden">
         {isSidebarOpen && (
           <div
@@ -32,7 +35,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             aria-hidden="true"
           />
         )}
-        <Suspense>
+        <Suspense fallback={<SidebarSkeleton isOpen={isSidebarOpen} />}>
           <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
         </Suspense>
         <main className="flex-1 overflow-y-auto">{children}</main>

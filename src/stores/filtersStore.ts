@@ -5,6 +5,7 @@ import {
   CLIMATE_PERIODS,
   DATASETS,
   DEFAULT_VARIABLES,
+  LOCAL_STORAGE_KEYS,
   PERIOD_RESTRICTED_VARIABLES,
   WEATHER_VARIABLES,
 } from "@/constants";
@@ -27,8 +28,6 @@ export const useFiltersStore = create<TFiltersState>()(
       ...DEFAULT_FILTERS,
       hasHydrated: false,
       setHasHydrated: (hydrated) => set({ hasHydrated: hydrated }),
-      syncCity: true,
-      setSyncCity: (value) => set({ syncCity: value }),
       actions: {
         setDataset: (dataset) =>
           set((state) => {
@@ -87,7 +86,7 @@ export const useFiltersStore = create<TFiltersState>()(
       },
     }),
     {
-      name: "climatica-filters",
+      name: LOCAL_STORAGE_KEYS.FILTERS,
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
@@ -98,7 +97,6 @@ export const useFiltersStore = create<TFiltersState>()(
         variables: state.variables,
         gridSize: state.gridSize,
         months: state.months,
-        syncCity: state.syncCity,
       }),
     },
   ),

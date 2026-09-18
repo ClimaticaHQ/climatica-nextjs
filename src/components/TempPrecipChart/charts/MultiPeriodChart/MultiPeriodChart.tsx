@@ -1,4 +1,5 @@
 import { MONTH_NAMES } from "@/constants";
+import { useDelayedHide } from "@/hooks";
 import { useTranslations } from "next-intl";
 import {
   Bar,
@@ -12,7 +13,9 @@ import {
   YAxis,
 } from "recharts";
 import { PrecipBarShape } from "../../components";
+import { PRECIP_BAR_ANIMATION_DURATION_MS } from "../../TempPrecipChart.constant";
 import type { TDotRendererProps } from "../../TempPrecipChart.type";
+import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle } from "../../utils";
 import type { TMultiPeriodChartProps } from "./MultiPeriodChart.type";
 
 function periodColor(i: number, colors: readonly string[] | undefined): string {
@@ -62,26 +65,30 @@ export function MultiPeriodChart({
   hiddenPeriods = [],
 }: TMultiPeriodChartProps) {
   const t = useTranslations();
+  const hidePrecBar = useDelayedHide(!visible.prec, PRECIP_BAR_ANIMATION_DURATION_MS);
+  const hideTmaxLine = useDelayedHide(!visible.tmax, PRECIP_BAR_ANIMATION_DURATION_MS);
+  const hideTminLine = useDelayedHide(!visible.tmin, PRECIP_BAR_ANIMATION_DURATION_MS);
 
   function localMonthName(v: unknown): string {
     const idx = (MONTH_NAMES as readonly string[]).indexOf(String(v));
     return idx >= 0 ? t(`months.${idx + 1}`) : String(v);
   }
 
-  function makeDot(color: string) {
+  function makeDot(color: string, isSeriesVisible: boolean) {
     function DotRenderer({ cx = 0, cy = 0, fill = color, index = -1 }: TDotRendererProps) {
       const month = index >= 0 ? index + 1 : -1;
       const isSelected =
         !selectedMonths || selectedMonths.length === 0 || selectedMonths.includes(month);
       const isHighlighted = selectedMonths?.length === 1 && isSelected;
+      const opacity = isSelected ? 1 : 0.15;
       return (
         <circle
           cx={cx}
           cy={cy}
           r={isHighlighted ? 5 : 3}
           fill={fill}
-          opacity={isSelected ? 1 : 0.15}
           stroke="none"
+          style={buildOpacityFadeStyle(isSeriesVisible ? opacity : 0)}
         />
       );
     }
@@ -178,53 +185,52 @@ export function MultiPeriodChart({
               const color = periodColor(i, periodColors);
               const hidden = hiddenPeriods.includes(year);
               const series = [];
-              if (visible.prec) {
-                series.push(
-                  <Bar
-                    key={`bar-${year}`}
-                    yAxisId="prec"
-                    dataKey={`${year}_prec`}
-                    name={`${year} — ${t("chart.precipitation")}`}
-                    fill={color}
-                    minPointSize={0}
-                    hide={hidden}
-                    shape={<PrecipBarShape selectedMonths={selectedMonths} />}
-                  />,
-                );
-              }
-              if (visible.tmax) {
-                series.push(
-                  <Line
-                    key={`line-tmax-${year}`}
-                    yAxisId="temp"
-                    type="monotone"
-                    dataKey={`${year}_tmax`}
-                    name={`${year} — ${t("chart.maxTemperature")}`}
-                    stroke={color}
-                    strokeWidth={2}
-                    dot={makeDot(color)}
-                    activeDot={{ r: 4 }}
-                    hide={hidden}
-                  />,
-                );
-              }
-              if (visible.tmin) {
-                series.push(
-                  <Line
-                    key={`line-tmin-${year}`}
-                    yAxisId="temp"
-                    type="monotone"
-                    dataKey={`${year}_tmin`}
-                    name={`${year} — ${t("chart.minTemperature")}`}
-                    stroke={color}
-                    strokeWidth={2}
-                    strokeDasharray="4 2"
-                    dot={makeDot(color)}
-                    activeDot={{ r: 3 }}
-                    hide={hidden}
-                  />,
-                );
-              }
+              series.push(
+                <Bar
+                  key={`bar-${year}`}
+                  yAxisId="prec"
+                  dataKey={(entry: Record<string, unknown>) =>
+                    visible.prec ? Number(entry[`${year}_prec`]) : 0
+                  }
+                  name={`${year} — ${t("chart.precipitation")}`}
+                  fill={color}
+                  minPointSize={0}
+                  hide={hidden || hidePrecBar}
+                  animationDuration={PRECIP_BAR_ANIMATION_DURATION_MS}
+                  shape={<PrecipBarShape selectedMonths={selectedMonths} />}
+                />,
+              );
+              series.push(
+                <Line
+                  key={`line-tmax-${year}`}
+                  yAxisId="temp"
+                  type="monotone"
+                  dataKey={`${year}_tmax`}
+                  name={`${year} — ${t("chart.maxTemperature")}`}
+                  stroke={color}
+                  strokeWidth={2}
+                  dot={makeDot(color, visible.tmax)}
+                  activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tmax ? 1 : 0) }}
+                  hide={hidden || hideTmaxLine}
+                  style={buildStrokeOpacityFadeStyle(visible.tmax ? 1 : 0)}
+                />,
+              );
+              series.push(
+                <Line
+                  key={`line-tmin-${year}`}
+                  yAxisId="temp"
+                  type="monotone"
+                  dataKey={`${year}_tmin`}
+                  name={`${year} — ${t("chart.minTemperature")}`}
+                  stroke={color}
+                  strokeWidth={2}
+                  strokeDasharray="4 2"
+                  dot={makeDot(color, visible.tmin)}
+                  activeDot={{ r: 3, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
+                  hide={hidden || hideTminLine}
+                  style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
+                />,
+              );
               return series;
             })}
           </ComposedChart>

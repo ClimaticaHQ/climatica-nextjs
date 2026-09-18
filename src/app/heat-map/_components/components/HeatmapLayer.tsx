@@ -73,7 +73,7 @@ export function HeatmapLayer({
           east: bLng + cellSize / 2,
         };
       } else {
-        const iri = b.pixel?.value;
+        const iri = b.cell?.value;
         if (iri) bounds = iriToCellBounds(iri, cellSize);
       }
 

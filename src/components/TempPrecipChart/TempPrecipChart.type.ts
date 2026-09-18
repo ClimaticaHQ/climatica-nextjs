@@ -1,28 +1,13 @@
-import type { TClimatePeriod } from "@/constants";
-import type { TDataset, TMonthlyTemperature, TVariable } from "@/types";
+import type {
+  TChartMode,
+  TChartSubtitle,
+  TCompareMode,
+  TMonthlyTemperature,
+  TMultiPeriodEntry,
+  TVariable,
+  TVisibleSeries,
+} from "@/types";
 import type { ReactNode } from "react";
-
-export type TMonthlyTemperatureWithAvg = TMonthlyTemperature & { tavg: number };
-
-export type TMultiPeriodEntry = { year: number; rows: TMonthlyTemperature[] };
-
-export type TVisibleSeries = {
-  tmax: boolean;
-  tmin: boolean;
-  tavg: boolean;
-  prec: boolean;
-};
-
-export type TChartSubtitle = {
-  dataset?: TDataset;
-  climatePeriod?: TClimatePeriod;
-  weatherYear?: number;
-  rawLabel?: string;
-};
-
-export type TChartMode = "standard" | "walter-lieth";
-
-export type TCompareMode = "cities" | "periods";
 
 export type TTempPrecipChartProps = {
   data?: TMonthlyTemperature[];
@@ -41,6 +26,8 @@ export type TTempPrecipChartProps = {
   multiPeriodData?: TMultiPeriodEntry[] | undefined;
   hiddenPeriods?: number[] | undefined;
   periodColors?: readonly string[] | undefined;
+  onVisibleSeriesChange?: (visible: TVisibleSeries) => void;
+  onChartModeChange?: (mode: TChartMode) => void;
 };
 
 export type TBarShape = {
@@ -56,6 +43,8 @@ export type TBarShape = {
   selectedMonths?: readonly number[] | undefined;
   /** month → isArid lookup, passed via shape prop to avoid Cell children */
   aridityByMonth?: Record<number, boolean> | undefined;
+  /** 0-based chart index, matching recharts' activeTooltipIndex — passed via shape prop */
+  activeMonthIndex?: number | null;
   yAxis?: { scale?: (v: number) => number };
 };
 
@@ -70,26 +59,6 @@ export type TDotRendererProps = {
   fill?: string | undefined;
   stroke?: string | undefined;
   index?: number | undefined;
-};
-
-export type TComparePoint = {
-  month: number;
-  monthName: string;
-  tmaxA: number;
-  tminA: number;
-  tavgA: number;
-  precA: number;
-  tmaxB: number;
-  tminB: number;
-  tavgB: number;
-  precB: number;
-};
-
-export type TChartSummary = {
-  annualAvgTemp: number;
-  totalPrec: number;
-  aridCount: number;
-  martonne: number | null;
 };
 
 export type TModeButtonProps = {

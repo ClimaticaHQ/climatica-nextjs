@@ -1,4 +1,4 @@
-import { CLIMATE_RANGE } from "@/constants/climate.constant";
+import { CLIMATE_RANGE } from "@/constants";
 
 export function buildPeriodWindowOptions(): { value: string; label: string }[] {
   const options: { value: string; label: string }[] = [];

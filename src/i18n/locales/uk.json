@@ -139,6 +139,8 @@
     "maxTemperature": "Макс. температура",
     "minTemperature": "Мін. температура",
     "avgTemperature": "Сер. температура",
+    "avgTempShort": "Сер. темп.",
+    "precipShort": "Опади",
     "meanTemp": "Сер. темп",
     "annualPrec": "Річні опади",
     "aridMonths": "Посушливих місяців",
@@ -150,6 +152,7 @@
     "modeWalterLieth": "Діаграма Вальтера-Лієта",
     "walterLiethTabUnavailable": "Недоступно у вигляді Вальтера-Лієта",
     "selectedMonth": "значення за {month}",
+    "selectedMonthsCount": "{count, plural, one {# місяць} few {# місяці} many {# місяців} other {# місяців}}",
     "altitude": "Висота",
     "subtitle": {
       "climate": "Клімат {period}",
@@ -206,6 +209,10 @@
     "png": "Зображення PNG",
     "svg": "Вектор SVG",
     "csv": "Дані CSV",
+    "rawCsv": "Повні дані (CSV)",
+    "rawJson": "Повні дані (JSON)",
+    "rawDataUnavailable": "Доступно лише для клімату 1970–2000",
+    "failed": "Не вдалося експортувати — спробуйте ще раз",
     "metricColumn": "Метрика"
   },
   "months": {
@@ -253,6 +260,7 @@
     },
     "autoScroll": "Автопрокрутка до результатів",
     "syncCity": "Синхронізувати вибране місто на всіх сторінках",
+    "autoApplyFilters": "Автоматично застосовувати фільтри",
     "filters": "Фільтри",
     "settings": "Налаштування",
     "applyFilters": "Застосувати",
@@ -293,5 +301,24 @@
     "humid": "Вологий",
     "veryHumid": "Дуже вологий",
     "extremelyHumid": "Надзвичайно вологий"
+  },
+  "meta": {
+    "climateStatistics": {
+      "title": "Кліматична статистика для {city}",
+      "description": "{variables} для {city} ({period})"
+    },
+    "compareCities": {
+      "title": "Порівняння {cityA} і {cityB}",
+      "description": "{variables} для {cityA} проти {cityB} ({period})"
+    },
+    "comparePeriods": {
+      "title": "{city} — порівняння кліматичних періодів",
+      "description": "{variables} для {city} — {periods}",
+      "descriptionGeneric": "Порівняйте кліматичні дані міста за різні періоди часу"
+    },
+    "heatMap": {
+      "title": "Теплова карта регіону — {variables} ({period})",
+      "description": "Інтенсивність клімату {variables} для обраної області ({period})"
+    }
   }
 }

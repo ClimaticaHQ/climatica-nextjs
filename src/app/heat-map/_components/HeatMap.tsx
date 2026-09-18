@@ -16,9 +16,15 @@ import {
   usePersistedComparisonCities,
 } from "@/hooks";
 import { usePathname, useRouter } from "@/libs/I18nNavigation";
-import { useFiltersStore } from "@/stores";
+import { useFiltersStore, useSettingsStore } from "@/stores";
 import type { TBbox, TColorScale, TWikidataCity } from "@/types";
-import { applyUrlFiltersToStore, createUrlParamHelpers, encodeVars } from "@/utils";
+import {
+  applyUrlFiltersToStore,
+  createUrlParamHelpers,
+  encodeVars,
+  replaceUrlParams,
+  syncUrlParams,
+} from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -53,9 +59,8 @@ export function HeatMap() {
     gridSize: grid,
     variables,
     months,
-    syncCity,
-    hasHydrated,
   } = useFiltersStore();
+  const { syncCity, hasHydrated } = useSettingsStore();
   const isClimate = dataset === DATASETS.CLIMATE;
   const year = isClimate ? undefined : weatherYear;
   const selectedMonths: number[] = months === "all" ? [] : months;
@@ -109,7 +114,7 @@ export function HeatMap() {
       helper.delete(SIDEBAR_PARAMS.PERIOD);
     }
 
-    if (helper.changed) router.replace(`${pathname}?${helper.params.toString()}`);
+    syncUrlParams(router, pathname, helper);
   }, [
     dataset,
     climatePeriod,
@@ -197,7 +202,7 @@ export function HeatMap() {
     } else {
       nextParams.delete(SIDEBAR_PARAMS.POLYGON);
     }
-    router.replace(`${pathname}?${nextParams.toString()}`);
+    replaceUrlParams(router, pathname, nextParams);
   }
 
   function handleBboxChange(next: TBbox | null) {

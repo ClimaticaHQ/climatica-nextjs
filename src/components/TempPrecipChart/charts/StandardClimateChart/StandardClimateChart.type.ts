@@ -1,5 +1,4 @@
-import type { TMonthAridity, TWalterLiethScales } from "@/types";
-import type { TChartSummary, TVisibleSeries } from "../../TempPrecipChart.type";
+import type { TChartSummary, TMonthAridity, TVisibleSeries, TWalterLiethScales } from "@/types";
 
 export type TStandardClimateChartProps = {
   chartData: Record<string, unknown>[];
@@ -11,4 +10,6 @@ export type TStandardClimateChartProps = {
   selectedMonths?: number[];
   altitude?: number;
   showAridity?: boolean;
+  activeMonthIndex?: number | null;
+  onActiveMonthIndexChange?: (index: number | null) => void;
 };

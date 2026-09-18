@@ -1,6 +1,5 @@
 "use client";
 
-import type { TChartSubtitle } from "@/components/TempPrecipChart/TempPrecipChart.type";
 import {
   APP_TITLE,
   CLIMATE_PERIOD_LABELS,
@@ -10,7 +9,6 @@ import {
   VARIABLE_LABELS,
 } from "@/constants";
 import {
-  useAutoScroll,
   useGeolocation,
   useGetAltitude,
   useGetCellBounds,
@@ -19,21 +17,23 @@ import {
   usePersistedComparisonCities,
   useResolveCityByCoordinates,
 } from "@/hooks";
-import { useFiltersStore } from "@/stores";
-import type { TWikidataCity } from "@/types";
+import { usePathname, useRouter } from "@/libs/I18nNavigation";
+import { useFiltersStore, useSettingsStore } from "@/stores";
+import type { TChartSubtitle, TWikidataCity } from "@/types";
 import {
   applyUrlFiltersToStore,
   cityFromUrl,
   createUrlParamHelpers,
   encodeMonths,
   encodeVars,
+  pushUrlParams,
   scrollToSection,
+  syncUrlParams,
 } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
-import { usePathname, useRouter } from "@/libs/I18nNavigation";
-import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatCoordinate } from "./ClimateStatistics.util";
 import { ClimateStatisticsView } from "./ClimateStatisticsView";
 
@@ -48,7 +48,7 @@ export function ClimateStatistics() {
   const { isLoading: isResolving, mutateAsync: resolveCityByCoordinates } =
     useResolveCityByCoordinates();
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
-  const { autoScroll } = useAutoScroll();
+  const { autoScroll, syncCity, hasHydrated } = useSettingsStore();
   const queryClient = useQueryClient();
   const latestMapClickIdRef = useRef(0);
   const userSelectedRef = useRef(false);
@@ -57,16 +57,7 @@ export function ClimateStatistics() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const {
-    dataset,
-    climatePeriod,
-    weatherYear,
-    gridSize,
-    months,
-    variables,
-    syncCity,
-    hasHydrated,
-  } = useFiltersStore();
+  const { dataset, climatePeriod, weatherYear, gridSize, months, variables } = useFiltersStore();
   const selectedMonths: number[] | null = Array.isArray(months) ? months : null;
 
   useEffect(() => {
@@ -128,7 +119,7 @@ export function ClimateStatistics() {
       helper.delete(SIDEBAR_PARAMS.PERIOD);
     }
 
-    if (helper.changed) router.replace(`${pathname}?${helper.params.toString()}`);
+    syncUrlParams(router, pathname, helper);
   }, [
     cityLabel,
     latStr,
@@ -175,7 +166,7 @@ export function ClimateStatistics() {
     nextParams.set(SIDEBAR_PARAMS.CITY, city.label.trim());
     nextParams.set(SIDEBAR_PARAMS.LAT, city.lat.toFixed(4));
     nextParams.set(SIDEBAR_PARAMS.LNG, city.lng.toFixed(4));
-    router.push(`${pathname}?${nextParams.toString()}`);
+    pushUrlParams(router, pathname, nextParams);
   }
 
   function handleLocate() {

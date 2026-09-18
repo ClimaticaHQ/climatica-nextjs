@@ -19,6 +19,7 @@ ALLOWED_FEATURE_CODES = {
     "PPLA4",  # seat of fourth-order admin division
     "PPLA5",  # seat of fifth-order admin division
     "PPLC",   # capital city
+    #"PPLX",   # section of populated place
 }
 
 # * languages to extract from alternateNamesV2
@@ -29,6 +30,10 @@ def load_alternate_names():
     print("Loading alternate names...")
 
     # * structure: geonameid -> lang -> (name, alt_id, is_preferred)
+    # * we pick the best name per lang using priority:
+    # *   1. preferred=1 with highest alt_id (most recent preferred)
+    # *   2. any name with highest alt_id (most recent non-preferred)
+    # ! (CHANGE)
     # * we pick the best name per lang using priority:
     # *   1. earliest entry with preferred=1
     # *   2. earliest entry if no one has preferred=1
@@ -69,13 +74,7 @@ def load_alternate_names():
             elif is_preferred and not current["preferred"]:
                 # * new entry is preferred, current is not — upgrade
                 should_update = True
-            # ! NO FURTHER PROCESSING
-            # elif is_preferred and current["preferred"] and alt_id > current["alt_id"]:
-                # * both preferred — take the more recent one
-            #   should_update = True
-            # elif not is_preferred and not current["preferred"] and alt_id > current["alt_id"]:
-                # * neither preferred — take the more recent one
-            #   should_update = True
+            # NO FURTHER PROCESSING
 
             if should_update:
                 names[geonameid][lang] = {
@@ -153,11 +152,11 @@ def prepare_cities():
 
             # * for label_en prefer:
             # *   1. alternate name with lang=en (preferred/recent)
-            # *   2. ascii_name (no diacritics, good for search)
-            # *   3. default_name as last resort
-            label_en = alt.get("en") or ascii_name or default_name
-            label_uk = alt.get("uk") or label_en
-            label_es = alt.get("es") or label_en
+            # *   2. default_name
+            # *   3. ascii_name (no diacritics, good for search)
+            label_en = alt.get("en") or default_name or ascii_name
+            label_uk = alt.get("uk") or default_name or label_en
+            label_es = alt.get("es") or default_name or ascii_name
 
             writer.writerow([
                 geonameid,

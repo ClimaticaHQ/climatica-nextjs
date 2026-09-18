@@ -139,6 +139,8 @@
     "maxTemperature": "Max Temperature",
     "minTemperature": "Min Temperature",
     "avgTemperature": "Avg Temperature",
+    "avgTempShort": "Avg Temp",
+    "precipShort": "Precip",
     "meanTemp": "Mean temp",
     "annualPrec": "Annual precip",
     "aridMonths": "Arid months",
@@ -150,6 +152,7 @@
     "modeWalterLieth": "Walter-Lieth diagram",
     "walterLiethTabUnavailable": "Not available in Walter-Lieth view",
     "selectedMonth": "{month} values",
+    "selectedMonthsCount": "{count, plural, one {# month} other {# months}}",
     "altitude": "Altitude",
     "subtitle": {
       "climate": "Climate {period}",
@@ -206,6 +209,10 @@
     "png": "PNG image",
     "svg": "SVG vector",
     "csv": "CSV data",
+    "rawCsv": "Full data (CSV)",
+    "rawJson": "Full data (JSON)",
+    "rawDataUnavailable": "Available only for Climate 1970–2000",
+    "failed": "Export failed — try again",
     "metricColumn": "Metric"
   },
   "months": {
@@ -253,6 +260,7 @@
     },
     "autoScroll": "Auto-scroll to results",
     "syncCity": "Sync selected city across pages",
+    "autoApplyFilters": "Auto-apply filters",
     "filters": "Filters",
     "settings": "Settings",
     "applyFilters": "Apply filters",
@@ -293,5 +301,24 @@
     "humid": "Humid",
     "veryHumid": "Very-humid",
     "extremelyHumid": "Extremely humid"
+  },
+  "meta": {
+    "climateStatistics": {
+      "title": "Climate statistics for {city}",
+      "description": "{variables} for {city} ({period})"
+    },
+    "compareCities": {
+      "title": "Comparing {cityA} and {cityB}",
+      "description": "{variables} for {cityA} vs {cityB} ({period})"
+    },
+    "comparePeriods": {
+      "title": "{city} — climate periods compared",
+      "description": "{variables} for {city} — {periods}",
+      "descriptionGeneric": "Compare climate data for a city across different time periods"
+    },
+    "heatMap": {
+      "title": "Region heatmap — {variables} ({period})",
+      "description": "{variables} climate intensity across the selected region ({period})"
+    }
   }
 }

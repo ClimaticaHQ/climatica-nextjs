@@ -1,1 +1,1 @@
-export type { TCellSizeOption } from "./cell-size";
+export type * from "./cell-size";

@@ -1,5 +1,4 @@
-import type { TMonthAridity, TWalterLiethScales } from "@/types";
-import type { TVisibleSeries } from "../../TempPrecipChart.type";
+import type { TMonthAridity, TVisibleSeries, TWalterLiethScales } from "@/types";
 
 export type TCompareChartProps = {
   chartData: Record<string, unknown>[];

@@ -1,8 +1,4 @@
-import type {
-  TChartSummary,
-  TMonthlyTemperatureWithAvg,
-} from "@/components/TempPrecipChart/TempPrecipChart.type";
-import type { TWalterLiethScales } from "@/types";
+import type { TChartSummary, TMonthlyTemperatureWithAvg, TWalterLiethScales } from "@/types";
 
 export type TWLScaledPoint = {
   monthName: string;
@@ -27,6 +23,7 @@ export type TWLCustomizedProps = {
   clipId?: string;
   opacity?: number;
   dashArray?: string;
+  activeMonthIndex?: number | null;
 };
 
 export type TWLTooltipProps = {
@@ -42,6 +39,8 @@ export type TWalterLiethChartProps = {
   colors?: TWalterLiethColors;
   title?: string;
   altitude?: number;
+  activeMonthIndex?: number | null;
+  onActiveMonthIndexChange?: (index: number | null) => void;
 };
 
 export type TWLCitiesLayoutProps = {

@@ -1,5 +1,4 @@
 import type { TClimatePeriod } from "@/constants";
-import { DATASETS } from "@/constants";
 import type { TCellSize, TDataset, TMonthFilter, TVariable } from "@/types";
 import type { TCellSizeOption } from "@/types/ui/cell-size";
 
@@ -39,8 +38,8 @@ export type TSidebarHandlers = {
 };
 
 export type TSidebarFiltersState = {
-  dataset: (typeof DATASETS)[keyof typeof DATASETS];
-  setDataset: (dataset: (typeof DATASETS)[keyof typeof DATASETS]) => void;
+  dataset: TDataset;
+  setDataset: (dataset: TDataset) => void;
   periodWindowStart: string;
   setPeriodWindowStart: (value: string) => void;
   variables: TVariable[];

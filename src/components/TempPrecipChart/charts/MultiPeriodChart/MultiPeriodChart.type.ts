@@ -1,5 +1,4 @@
-import type { TWalterLiethScales } from "@/types";
-import type { TMultiPeriodEntry, TVisibleSeries } from "../../TempPrecipChart.type";
+import type { TMultiPeriodEntry, TVisibleSeries, TWalterLiethScales } from "@/types";
 
 export type TMultiPeriodChartProps = {
   chartData: Record<string, unknown>[];

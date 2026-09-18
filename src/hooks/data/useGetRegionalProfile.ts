@@ -1,13 +1,12 @@
-import { apiClient } from "@/libs/api";
+import { WorldClimService } from "@/libs/services/worldClimService";
 import type {
   TBbox,
   TCellSize,
   TClimatePeriod,
   TProfileResult,
-  TRawAvgValueResponse,
+  TVariable,
   TWorldClimAvgBoxBinding,
 } from "@/types";
-import { buildGridIri, buildVariableIris, groupAvgBindings } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 
 export function useGetRegionalProfile(
@@ -33,38 +32,17 @@ export function useGetRegionalProfile(
       isClimate ? climatePeriod : year,
     ],
     queryFn: async (): Promise<TProfileResult> => {
-      const fetchAvg = async (varName: string): Promise<TWorldClimAvgBoxBinding | null> => {
-        const datasetParams = isClimate
-          ? { isClimate: true }
-          : { isWeather: true, year: year ?? new Date().getFullYear() };
+      const fetchAvg = (varName: TVariable): Promise<TWorldClimAvgBoxBinding | null> => {
+        const area = bbox ? { bbox } : { wkt: wkt! };
 
-        const endpoint = bbox
-          ? "/api/worldclim/avgpixelvaluesinbox"
-          : "/api/worldclim/avgpixelvaluesinpolygonGEO";
-
-        const params = bbox
-          ? {
-              north: bbox.north,
-              south: bbox.south,
-              west: bbox.west,
-              east: bbox.east,
-              grid: buildGridIri(gridSize),
-              var: buildVariableIris([varName]),
-              ...datasetParams,
-            }
-          : {
-              polygon: wkt!,
-              grid: buildGridIri(gridSize),
-              var: buildVariableIris([varName]),
-              ...datasetParams,
-            };
-
-        const { data: raw } = await apiClient.get<TRawAvgValueResponse>(endpoint, { params });
-        const allBindings = groupAvgBindings(raw.results.bindings);
-        const filtered = isClimate
-          ? allBindings.filter((b) => b.raster?.value?.includes(climatePeriod))
-          : allBindings;
-        return filtered[0] ?? null;
+        return WorldClimService.getRegionalAverage(
+          [varName],
+          gridSize,
+          area,
+          isClimate,
+          climatePeriod,
+          year,
+        );
       };
 
       const [tmax, tmin, prec] = await Promise.all([

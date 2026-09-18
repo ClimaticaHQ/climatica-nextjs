@@ -13,7 +13,6 @@ import {
   WEATHER_MIN_YEAR,
 } from "@/constants";
 import {
-  useAutoScroll,
   useGeolocation,
   useGetAltitude,
   useGetComparePeriods,
@@ -23,7 +22,7 @@ import {
   usePersistedPeriods,
 } from "@/hooks";
 import { usePathname, useRouter } from "@/libs/I18nNavigation";
-import { useFiltersStore } from "@/stores";
+import { useFiltersStore, useSettingsStore } from "@/stores";
 import type { TClimatePeriod, TWikidataCity } from "@/types";
 import {
   applyUrlFiltersToStore,
@@ -35,7 +34,9 @@ import {
   parsePeriod,
   parsePeriods,
   parseYear,
+  pushUrlParams,
   scrollToSection,
+  syncUrlParams,
 } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -48,14 +49,14 @@ function resolvePeriodFromUrl(raw: string | null, fallback: TClimatePeriod): TCl
 }
 
 export function ComparePeriods() {
-  const { autoScroll } = useAutoScroll();
+  const { autoScroll, syncCity, hasHydrated: settingsHydrated } = useSettingsStore();
   const queryClient = useQueryClient();
   const userSelectedRef = useRef(false);
   const chartSectionRef = useRef<HTMLDivElement>(null);
   const t = useTranslations();
   const { city, selectCity: selectCityA } = usePersistedCity();
   const { selectCityA: selectCompareCityA } = usePersistedComparisonCities();
-  const { gridSize, dataset, months, variables, syncCity, hasHydrated } = useFiltersStore();
+  const { gridSize, dataset, months, variables, hasHydrated } = useFiltersStore();
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
   const selectedMonths = Array.isArray(months) ? months : null;
   const searchParams = useSearchParams();
@@ -123,7 +124,7 @@ export function ComparePeriods() {
       helper.delete(SIDEBAR_PARAMS.YEAR_B);
     }
 
-    if (helper.changed) router.replace(`${pathname}?${helper.params.toString()}`);
+    syncUrlParams(router, pathname, helper);
   }, [
     cityA.label,
     cityA.lat,
@@ -203,7 +204,7 @@ export function ComparePeriods() {
 
     void queryClient.invalidateQueries({ queryKey: ["compare-periods"] });
 
-    if (syncCity && hasHydrated) {
+    if (syncCity && settingsHydrated) {
       selectCompareCityA(city);
       void queryClient.invalidateQueries({ queryKey: ["climate"] });
       void queryClient.invalidateQueries({ queryKey: ["compare"] });
@@ -214,7 +215,7 @@ export function ComparePeriods() {
     nextParams.set(SIDEBAR_PARAMS.CITY, city.label.trim());
     nextParams.set(SIDEBAR_PARAMS.LAT, city.lat.toFixed(4));
     nextParams.set(SIDEBAR_PARAMS.LNG, city.lng.toFixed(4));
-    router.push(`${pathname}?${nextParams.toString()}`);
+    pushUrlParams(router, pathname, nextParams);
   }
 
   useEffect(() => {
@@ -243,6 +244,7 @@ export function ComparePeriods() {
       isHydrated={hasHydrated}
       autoGrid={gridSize}
       selectedMonths={selectedMonths}
+      variables={variables}
       isLoading={isLoading}
       isLocating={isLocating}
       error={error}

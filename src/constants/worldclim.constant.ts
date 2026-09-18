@@ -60,6 +60,15 @@ export const VARIABLE_LABELS: Record<TVariable, string> = {
   vapr: "Vapor",
 };
 
+export const VARIABLE_UNITS: Record<TVariable, string> = {
+  tmax: "°C",
+  tmin: "°C",
+  prec: "mm",
+  srad: "kJ m⁻² day⁻¹",
+  wind: "m/s",
+  vapr: "kPa",
+};
+
 export const WEATHER_MIN_YEAR = 1951;
 export const WEATHER_MAX_YEAR = 2024;
 
@@ -69,3 +78,5 @@ export const GRID_DELTA: Record<string, number> = {
   "2.5m": 2.5 / 60,
   "30s": 30 / 3600,
 };
+
+export const CELL_IRI_ROW_COL_REGEX = /Cell_[^_]+_r(\d+)c(\d+)/;

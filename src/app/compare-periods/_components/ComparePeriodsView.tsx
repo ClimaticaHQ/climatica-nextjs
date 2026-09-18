@@ -32,11 +32,11 @@ import type { TClimatePeriod } from "@/types";
 import {
   buildClimateStatsRows,
   buildFilename,
+  computeCompareStats,
   exportElementToPng,
   exportTableToCsv,
   getMartonneLabelKey,
 } from "@/utils";
-import { computeCompareStats } from "@/utils/climateComparison.util";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
@@ -81,6 +81,7 @@ export function ComparePeriodsView({
   dataB,
   autoGrid,
   selectedMonths,
+  variables,
   altitude,
   isLoading,
   isLocating,
@@ -283,6 +284,7 @@ export function ComparePeriodsView({
                   compareMode="periods"
                   cityName={city.label}
                   subtitle={{ rawLabel: `${labelA} vs ${labelB}` }}
+                  variables={variables}
                   showWalterLiethToggle={false}
                   showAridity={false}
                   {...(selectedMonths !== null && selectedMonths.length > 0
@@ -360,6 +362,7 @@ export function ComparePeriodsView({
                   cityName={city.label}
                   multiPeriodData={periodsData}
                   periodColors={PERIOD_COLORS}
+                  variables={variables}
                   showWalterLiethToggle={false}
                   showAridity={false}
                   {...(selectedMonths !== null && selectedMonths.length > 0

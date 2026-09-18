@@ -9,12 +9,15 @@ export const env = createEnv({
     REDIS_URL: zod.string().default("redis://localhost:6379"),
     SOLR_URL: zod.string().default("http://localhost:8983"),
   },
-  client: {},
+  client: {
+    NEXT_PUBLIC_SITE_URL: zod.url().default("https://climatica.gsic.uva.es"),
+  },
   runtimeEnv: {
     PORT: process.env["PORT"],
     NODE_ENV: process.env["NODE_ENV"],
     WORLDCLIM_API_KEY: process.env["WORLDCLIM_API_KEY"],
     REDIS_URL: process.env["REDIS_URL"],
     SOLR_URL: process.env["SOLR_URL"],
+    NEXT_PUBLIC_SITE_URL: process.env["NEXT_PUBLIC_SITE_URL"],
   },
 });

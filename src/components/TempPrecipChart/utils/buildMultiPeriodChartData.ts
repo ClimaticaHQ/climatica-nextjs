@@ -1,4 +1,4 @@
-import type { TMultiPeriodEntry } from "../TempPrecipChart.type";
+import type { TMultiPeriodEntry } from "@/types";
 
 export function buildMultiPeriodChartData(periods: TMultiPeriodEntry[]): Record<string, unknown>[] {
   const base = periods[0]?.rows ?? [];

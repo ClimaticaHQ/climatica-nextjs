@@ -5,31 +5,37 @@ import { LANGUAGES } from "@/constants";
 import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { parseLocale } from "@/libs/I18nRouting";
 import { useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import type { TLanguageSwitcherProps } from "./LanguageSwitcher.type";
 
 export function LanguageSwitcher({ variant = "dropdown" }: TLanguageSwitcherProps) {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   function change(code: string) {
-    router.push(pathname, { locale: parseLocale(code), scroll: false });
+    router.push(
+      { pathname, query: Object.fromEntries(searchParams.entries()) },
+      { locale: parseLocale(code), scroll: false },
+    );
   }
 
   if (variant === "inline") {
     return (
-      <div className="flex flex-wrap gap-2 px-4 py-2">
+      <div className="grid grid-cols-4 gap-2 px-4 py-2">
         {LANGUAGES.map(({ code, label }) => (
           <button
             key={code}
             onClick={() => change(code)}
             className={`
-              px-3 py-1.5 rounded-[var(--radius-sm)]
+              flex items-center justify-center
+              px-3 py-1.5 rounded-[var(--radius-sm)] border
               text-[length:var(--font-sm)] transition-colors duration-150
               ${
                 locale === code
-                  ? "bg-[var(--color-primary)] text-[var(--color-bg)] font-medium"
-                  : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]"
+                  ? "border-transparent bg-[var(--color-primary)] text-[var(--color-bg)] font-medium"
+                  : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)]"
               }
             `}
           >

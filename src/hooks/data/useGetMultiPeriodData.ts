@@ -1,6 +1,5 @@
-import type { TMultiPeriodEntry } from "@/components/TempPrecipChart/TempPrecipChart.type";
 import { CLIMATE_PERIODS } from "@/constants";
-import type { TCellSize } from "@/types";
+import type { TCellSize, TMultiPeriodEntry } from "@/types";
 import { useQueries } from "@tanstack/react-query";
 import { fetchCityData } from "./useGetCompareData";
 

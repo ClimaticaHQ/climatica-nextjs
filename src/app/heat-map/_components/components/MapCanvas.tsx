@@ -1,7 +1,7 @@
 "use client";
 
 import { ThreeDotsScaleLoader } from "@/components";
-import { DEFAULT_HEATMAP_LOCATION } from "@/constants";
+import { DEFAULT_HEATMAP_LOCATION, HEATMAP_MAP_CONFIG } from "@/constants";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer } from "react-leaflet";
 import type { TMapCanvasProps } from "../HeatMap.type";
@@ -32,14 +32,11 @@ export function MapCanvas({
       )}
       <MapContainer
         center={DEFAULT_HEATMAP_LOCATION}
-        zoom={8}
+        zoom={HEATMAP_MAP_CONFIG.zoom}
         className="w-full h-full"
         scrollWheelZoom
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <TileLayer attribution={HEATMAP_MAP_CONFIG.attribution} url={HEATMAP_MAP_CONFIG.url} />
 
         <MapFitter bbox={bbox} />
         <MapNavigator target={mapTarget} />
