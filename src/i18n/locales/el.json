@@ -152,6 +152,7 @@
     "modeWalterLieth": "Διάγραμμα Walter-Lieth",
     "walterLiethTabUnavailable": "Μη διαθέσιμο στην προβολή Walter-Lieth",
     "selectedMonth": "τιμές για {month}",
+    "selectedMonthsCount": "{count, plural, one {# μήνας} other {# μήνες}}",
     "altitude": "Υψόμετρο",
     "subtitle": {
       "climate": "Κλίμα {period}",

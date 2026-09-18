@@ -152,6 +152,7 @@
     "modeWalterLieth": "Diagrama de Walter-Lieth",
     "walterLiethTabUnavailable": "Não disponível na vista Walter-Lieth",
     "selectedMonth": "valores de {month}",
+    "selectedMonthsCount": "{count, plural, one {# mês} other {# meses}}",
     "altitude": "Altitude",
     "subtitle": {
       "climate": "Clima {period}",

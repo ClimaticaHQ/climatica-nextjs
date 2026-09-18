@@ -152,6 +152,7 @@
     "modeWalterLieth": "Діаграма Вальтера-Лієта",
     "walterLiethTabUnavailable": "Недоступно у вигляді Вальтера-Лієта",
     "selectedMonth": "значення за {month}",
+    "selectedMonthsCount": "{count, plural, one {# місяць} few {# місяці} many {# місяців} other {# місяців}}",
     "altitude": "Висота",
     "subtitle": {
       "climate": "Клімат {period}",
