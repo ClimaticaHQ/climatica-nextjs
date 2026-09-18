@@ -1,29 +1,78 @@
 name: Deploy Climatica
 
 on:
+  workflow_run:
+    workflows: ["Tests", "Validation"]
+    branches: [main]
+    types: [completed]
   workflow_dispatch:
+
+# workflow_run fires once PER upstream workflow, so a single main push can
+# trigger this job twice (once when Tests completes, once when Validation
+# completes). The "Ensure Tests and Validation passed" step re-checks both
+# for idempotency, but this still stops a second, overlapping run from
+# actually redeploying in parallel.
+concurrency:
+  group: deploy-climatica
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: self-hosted
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
 
     env:
       PATH: /home/guiveg/.nvm/versions/node/v25.1.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      REPO_DIR: /home/guiveg/climatica-nextjs
 
     steps:
+      # Manual (workflow_dispatch) runs are a deliberate human override — e.g. a
+      # hotfix or rollback — and skip this gate. Automatic runs must confirm BOTH
+      # workflows succeeded for the exact commit, since workflow_run only tells us
+      # one of them finished, not which, or whether the other one even ran yet.
+      - name: Ensure Tests and Validation passed for this commit
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          for wf in "Tests" "Validation"; do
+            conclusion=$(gh run list --workflow "$wf" --branch main --commit "$SHA" \
+              --json conclusion --jq '.[0].conclusion' --repo "${{ github.repository }}")
+            if [ "$conclusion" != "success" ]; then
+              echo "$wf did not succeed for $SHA (conclusion: $conclusion) — aborting deploy."
+              exit 1
+            fi
+          done
+
       - name: Mark repository as safe
-        run: |
-          git config --global --add safe.directory /home/guiveg/climatica-nextjs
+        run: git config --global --add safe.directory "$REPO_DIR"
+
       - name: Update repository
-        run: |
-          git -C /home/guiveg/climatica-nextjs pull origin main
+        run: git -C "$REPO_DIR" pull origin main
+
+      - name: Install dependencies
+        run: cd "$REPO_DIR" && npm ci
+
       - name: Build application
-        run: |
-          cd /home/guiveg/climatica-nextjs
-          npm run build
+        run: cd "$REPO_DIR" && npm run build
+
       - name: Restart application
+        run: sudo systemctl restart climatica
+
+      - name: Verify service is active
         run: |
-          sudo systemctl restart climatica
-      - name: Verify service
-        run: |
-          sudo systemctl is-active climatica
+          for i in $(seq 1 10); do
+            if sudo systemctl is-active --quiet climatica; then
+              echo "climatica is active"
+              exit 0
+            fi
+            echo "Waiting for climatica to become active ($i/10)..."
+            sleep 2
+          done
+          echo "climatica did not become active in time"
+          sudo systemctl status climatica --no-pager || true
+          exit 1
