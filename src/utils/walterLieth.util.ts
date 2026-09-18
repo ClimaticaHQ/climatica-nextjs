@@ -1,7 +1,8 @@
 import { WALTER_LIETH_DIAGRAM } from "@/constants";
 import type { TMonthAridity, TMonthlyTemperature, TWalterLiethScales } from "@/types";
 
-const { PREC_BREAKPOINT, LINEAR_RATIO, COMPRESSED_RATIO } = WALTER_LIETH_DIAGRAM;
+const { PREC_BREAKPOINT, LINEAR_RATIO, COMPRESSED_RATIO, WIDEN_THRESHOLD_RATIO } =
+  WALTER_LIETH_DIAGRAM;
 
 export function precToScaled(prec: number): number {
   if (prec <= PREC_BREAKPOINT) {
@@ -61,8 +62,13 @@ export function getWalterLiethScales(data: TMonthlyTemperature[]): TWalterLiethS
 
   // * precMax now tracks actual precipitation (piecewise-scaled, then rounded
   // * outward to 5 in scaled space) instead of assuming precip = temp × 2.
+  // * Rounds strictly outward — floor-then-add-5 rather than ceil — so a value that
+  // * already lands exactly on a multiple of 5 (e.g. rawPrecMax hitting the compression
+  // * breakpoint exactly, 100mm → scaled 50) still gets headroom instead of landing
+  // * flush against the axis ceiling with the tallest data point touching the top edge.
   const rawPrecMax = Math.max(...data.map((d) => d.prec));
-  const precMax = Math.ceil(precToScaled(rawPrecMax) / 5) * 5;
+  const scaledPrecMax = precToScaled(rawPrecMax);
+  const precMax = Math.floor(scaledPrecMax / 5) * 5 + 5;
 
   // * precMin never crosses the compression breakpoint (precip is never
   // * negative), so it stays linear — same zero as the temp axis, ratio 2.
@@ -72,7 +78,10 @@ export function getWalterLiethScales(data: TMonthlyTemperature[]): TWalterLiethS
   // * and precip curves, since precip is plotted through the temp scale).
   // * tempMax itself stays untouched so temperature tick labels never show
   // * a meaningless high value just because precipitation was tall.
-  const plotMax = Math.max(tempMax, precMax);
+  // * precMax ≈ 2×tempMax is the classical convention's own baseline ratio, not
+  // * overflow — only widen once precMax clears that baseline by a real margin,
+  // * so normal climates keep the temp curve at its full, unsquashed range.
+  const plotMax = precMax > tempMax * WIDEN_THRESHOLD_RATIO ? precMax : tempMax;
 
   return { tempMin, tempMax, precMin, precMax, plotMax };
 }
