@@ -1,0 +1,29 @@
+name: Deploy Climatica
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    env:
+      PATH: /home/guiveg/.nvm/versions/node/v25.1.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+    steps:
+      - name: Mark repository as safe
+        run: |
+          git config --global --add safe.directory /home/guiveg/climatica-nextjs
+      - name: Update repository
+        run: |
+          git -C /home/guiveg/climatica-nextjs pull origin main
+      - name: Build application
+        run: |
+          cd /home/guiveg/climatica-nextjs
+          npm run build
+      - name: Restart application
+        run: |
+          sudo systemctl restart climatica
+      - name: Verify service
+        run: |
+          sudo systemctl is-active climatica
