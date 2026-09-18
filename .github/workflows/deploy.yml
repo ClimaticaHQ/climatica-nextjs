@@ -29,6 +29,18 @@ jobs:
       REPO_DIR: /home/guiveg/climatica-nextjs
 
     steps:
+      - name: Install GitHub CLI
+        run: |
+          if ! command -v gh >/dev/null 2>&1; then
+            type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt update && sudo apt install gh -y
+          else
+            echo "gh already installed: $(gh --version | head -1)"
+          fi
+
       # Manual (workflow_dispatch) runs are a deliberate human override — e.g. a
       # hotfix or rollback — and skip this gate. Automatic runs must confirm BOTH
       # workflows succeeded for the exact commit, since workflow_run only tells us
