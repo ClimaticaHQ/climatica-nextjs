@@ -244,6 +244,7 @@ export function ComparePeriods() {
       isHydrated={hasHydrated}
       autoGrid={gridSize}
       selectedMonths={selectedMonths}
+      variables={variables}
       isLoading={isLoading}
       isLocating={isLocating}
       error={error}

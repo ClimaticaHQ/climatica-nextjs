@@ -184,6 +184,7 @@ export function CompareCities() {
       error={error}
       altitudeA={altitudeA}
       altitudeB={altitudeB}
+      variables={variables}
       onCityASelect={handleCityASelect}
       onCityBSelect={handleCityBSelect}
       chartSectionRef={chartSectionRef}

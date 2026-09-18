@@ -52,6 +52,7 @@ export function CompareCitiesView({
   autoGrid,
   subtitle,
   selectedMonths,
+  variables,
   isLoading,
   error,
   altitudeA,
@@ -208,6 +209,7 @@ export function CompareCitiesView({
                 compareMode="cities"
                 cityName={`${labelA} vs ${labelB}`}
                 subtitle={subtitle}
+                variables={variables}
                 showWalterLiethToggle={false}
                 showAridity={false}
                 {...(selectedMonths !== null && selectedMonths.length > 0

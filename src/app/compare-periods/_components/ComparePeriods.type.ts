@@ -4,6 +4,7 @@ import type {
   TDataset,
   TMonthlyTemperature,
   TMultiPeriodEntry,
+  TVariable,
   TWikidataCity,
 } from "@/types";
 import type { RefObject } from "react";
@@ -14,6 +15,7 @@ export type TComparePeriodsViewProps = {
   dataset: TDataset;
   isHydrated: boolean;
   selectedMonths: number[] | null;
+  variables: readonly TVariable[];
   altitude: number | null;
   autoGrid: TCellSize;
   isLoading: boolean;

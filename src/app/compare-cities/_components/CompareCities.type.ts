@@ -1,4 +1,10 @@
-import type { TCellSize, TChartSubtitle, TMonthlyTemperature, TWikidataCity } from "@/types";
+import type {
+  TCellSize,
+  TChartSubtitle,
+  TMonthlyTemperature,
+  TVariable,
+  TWikidataCity,
+} from "@/types";
 import type { RefObject } from "react";
 
 export type TCompareCitiesViewProps = {
@@ -10,6 +16,7 @@ export type TCompareCitiesViewProps = {
   autoGrid: TCellSize;
   subtitle: TChartSubtitle;
   selectedMonths: number[] | null;
+  variables: readonly TVariable[];
   isLoading: boolean;
   error: Error | null;
   altitudeA: number | null;
