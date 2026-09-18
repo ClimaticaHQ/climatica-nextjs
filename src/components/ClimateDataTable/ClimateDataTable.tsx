@@ -8,8 +8,19 @@ const ACTIVE_CELL_STYLE = {
   color: "var(--color-chip-active-text)",
 };
 
-export function ClimateDataTable({ monthlyData, activeMonthIndex }: TClimateDataTableProps) {
+export function ClimateDataTable({
+  monthlyData,
+  activeMonthIndex,
+  onMonthHover,
+}: TClimateDataTableProps) {
   const t = useTranslations();
+
+  function monthHoverHandlers(i: number) {
+    return {
+      onMouseEnter: () => onMonthHover?.(i),
+      onMouseLeave: () => onMonthHover?.(null),
+    };
+  }
 
   const rows: {
     label: string;
@@ -45,6 +56,7 @@ export function ClimateDataTable({ monthlyData, activeMonthIndex }: TClimateData
                   borderLeft: CELL_BORDER,
                   ...(i === activeMonthIndex ? ACTIVE_CELL_STYLE : {}),
                 }}
+                {...monthHoverHandlers(i)}
               >
                 {t(`months.${d.month}`)}
               </th>
@@ -65,6 +77,7 @@ export function ClimateDataTable({ monthlyData, activeMonthIndex }: TClimateData
                     borderLeft: CELL_BORDER,
                     ...(i === activeMonthIndex ? ACTIVE_CELL_STYLE : {}),
                   }}
+                  {...monthHoverHandlers(i)}
                 >
                   {row.format(d)}
                 </td>
