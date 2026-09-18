@@ -1,13 +1,14 @@
 import { ClimateStatsBar } from "@/components/ClimateStatsBar";
 import { resolveActiveTooltipIndex } from "@/components/TempPrecipChart/utils";
 import { MONTH_NAMES } from "@/constants";
-import { computeWLAxisTicks } from "@/utils";
+import { computeWLAxisTicks, computeWLPrecAxisTicks, precToScaled, scaledToPrec } from "@/utils";
 import { useTranslations } from "next-intl";
 import {
   CartesianGrid,
   ComposedChart,
   Customized,
   Line,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -38,11 +39,17 @@ export function WalterLiethChart({
     monthName: d.monthName,
     tavg: d.tavg,
     prec: d.prec,
-    precScaled: d.prec / 2,
+    precScaled: precToScaled(d.prec),
   }));
 
   const leftTicks = scales ? computeWLAxisTicks(scales.tempMin, scales.tempMax) : undefined;
-  const rightTicks = leftTicks ? leftTicks.map((t) => t * 2) : undefined;
+  // Ticks below tempMin fall outside the shared domain (e.g. a raw-mm tick at 0 sits below
+  // the plot floor once tempMin is above 0°C, as in tropical climates that never freeze).
+  const rightTicks = scales
+    ? computeWLPrecAxisTicks(scaledToPrec(scales.precMax))
+        .map(precToScaled)
+        .filter((pos) => pos >= scales.tempMin)
+    : undefined;
 
   return (
     <div>
@@ -87,7 +94,7 @@ export function WalterLiethChart({
               />
               <YAxis
                 yAxisId="left"
-                domain={scales ? [scales.tempMin, scales.tempMax] : ["auto", "auto"]}
+                domain={scales ? [scales.tempMin, scales.plotMax] : ["auto", "auto"]}
                 {...(leftTicks ? { ticks: leftTicks } : {})}
                 tickFormatter={(v: unknown) => String(Math.round(Number(v)))}
                 tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
@@ -103,10 +110,10 @@ export function WalterLiethChart({
               <YAxis
                 yAxisId="right"
                 orientation="right"
-                domain={scales ? [scales.precMin, scales.precMax] : [0, "auto"]}
+                domain={scales ? [scales.tempMin, scales.plotMax] : [0, "auto"]}
                 allowDataOverflow={false}
                 {...(rightTicks ? { ticks: rightTicks } : {})}
-                tickFormatter={(v: unknown) => String(Math.round(Number(v)))}
+                tickFormatter={(v: unknown) => String(Math.round(scaledToPrec(Number(v))))}
                 tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
                 axisLine={{ stroke: "var(--color-border)" }}
                 tickLine={{ stroke: "var(--color-border)" }}
@@ -119,6 +126,15 @@ export function WalterLiethChart({
                   fontWeight: 600,
                 }}
               />
+              {scales && scales.plotMax > scales.tempMax && (
+                <ReferenceLine
+                  yAxisId="left"
+                  y={scales.tempMax}
+                  stroke="var(--color-text-secondary)"
+                  strokeOpacity={0.5}
+                  strokeDasharray="4 4"
+                />
+              )}
               <Tooltip content={<WalterLiethTooltip wlData={scaledData} />} />
               {/* Invisible lines — needed for recharts to initialise axis scales */}
               <Line
@@ -137,7 +153,13 @@ export function WalterLiethChart({
                 dot={false}
                 legendType="none"
               />
-              <Line yAxisId="right" dataKey="prec" strokeWidth={0} dot={false} legendType="none" />
+              <Line
+                yAxisId="right"
+                dataKey="precScaled"
+                strokeWidth={0}
+                dot={false}
+                legendType="none"
+              />
               <Customized
                 component={WalterLiethCustomized}
                 wlData={scaledData}
