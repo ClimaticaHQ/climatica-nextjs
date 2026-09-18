@@ -1,4 +1,23 @@
+import { WALTER_LIETH_DIAGRAM } from "@/constants";
 import type { TMonthAridity, TMonthlyTemperature, TWalterLiethScales } from "@/types";
+
+const { PREC_BREAKPOINT, LINEAR_RATIO, COMPRESSED_RATIO } = WALTER_LIETH_DIAGRAM;
+
+function precToScaled(prec: number): number {
+  if (prec <= PREC_BREAKPOINT) {
+    return prec / LINEAR_RATIO;
+  }
+  return PREC_BREAKPOINT / LINEAR_RATIO + (prec - PREC_BREAKPOINT) / COMPRESSED_RATIO;
+}
+
+function scaledToPrec(scaled: number): number {
+  const breakScaled = PREC_BREAKPOINT / LINEAR_RATIO; // 50
+
+  if (scaled <= breakScaled) {
+    return scaled * LINEAR_RATIO;
+  }
+  return PREC_BREAKPOINT + (scaled - breakScaled) * COMPRESSED_RATIO;
+}
 
 export function computeAridityPeriods(data: TMonthlyTemperature[]): TMonthAridity[] {
   return data.map((d) => {
