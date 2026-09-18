@@ -24,6 +24,7 @@ export function WalterLiethChart({
   colors = WL_COLORS_A,
   title,
   altitude,
+  activeMonthIndex,
   onActiveMonthIndexChange,
 }: TWalterLiethChartProps) {
   const t = useTranslations();
@@ -142,6 +143,7 @@ export function WalterLiethChart({
                 wlData={scaledData}
                 wlScales={scales}
                 colors={colors}
+                {...(activeMonthIndex !== undefined ? { activeMonthIndex } : {})}
               />
             </ComposedChart>
           </ResponsiveContainer>

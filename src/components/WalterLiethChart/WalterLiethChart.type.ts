@@ -23,6 +23,7 @@ export type TWLCustomizedProps = {
   clipId?: string;
   opacity?: number;
   dashArray?: string;
+  activeMonthIndex?: number | null;
 };
 
 export type TWLTooltipProps = {
@@ -38,6 +39,7 @@ export type TWalterLiethChartProps = {
   colors?: TWalterLiethColors;
   title?: string;
   altitude?: number;
+  activeMonthIndex?: number | null;
   onActiveMonthIndexChange?: (index: number | null) => void;
 };
 
