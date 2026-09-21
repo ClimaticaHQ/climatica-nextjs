@@ -11,9 +11,14 @@ concurrency:
   group: deploy-climatica
   cancel-in-progress: false
 
+permissions:
+  actions: read
+  contents: read
+
 jobs:
   deploy:
     runs-on: self-hosted
+    timeout-minutes: 20
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
@@ -22,6 +27,7 @@ jobs:
     env:
       PATH: /home/guiveg/.nvm/versions/node/v25.1.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       REPO_DIR: /home/guiveg/climatica-nextjs
+      DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
 
     steps:
       - name: Ensure Tests and Validation passed for this commit
@@ -39,22 +45,82 @@ jobs:
             fi
           done
 
+      - name: Skip if this commit is already deployed
+        id: guard
+        run: |
+          MARKER="$REPO_DIR/.deployed_sha"
+          if [ -f "$MARKER" ] && [ "$(cat "$MARKER")" == "$DEPLOY_SHA" ]; then
+            echo "Commit $DEPLOY_SHA already deployed — skipping remaining steps."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Mark repository as safe
+        if: steps.guard.outputs.skip != 'true'
         run: git config --global --add safe.directory "$REPO_DIR"
 
       - name: Update repository
-        run: git -C "$REPO_DIR" pull origin main
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          git -C "$REPO_DIR" fetch origin main
+          git -C "$REPO_DIR" reset --hard origin/main
+
+      - name: Ensure Docker services are running
+        if: steps.guard.outputs.skip != 'true'
+        run: cd "$REPO_DIR/docker" && docker compose up -d
+
+      - name: Wait for Solr to be healthy
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          for i in $(seq 1 15); do
+            status=$(docker inspect --format='{{.State.Health.Status}}' climatica-solr 2>/dev/null)
+            if [ "$status" == "healthy" ]; then
+              echo "Solr is healthy"
+              exit 0
+            fi
+            echo "Waiting for Solr to become healthy ($i/15)..."
+            sleep 5
+          done
+          echo "Solr did not become healthy in time"
+          exit 1
+
+      - name: Check Solr index is not empty
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          get_count() {
+            curl -s "http://172.17.0.1:8983/solr/cities/select?q=*:*&rows=0" | jq -r '.response.numFound'
+          }
+
+          count=$(get_count)
+          echo "Solr 'cities' core has $count documents"
+
+          if [ "$count" -eq 0 ]; then
+            echo "::warning::Solr 'cities' core is empty — running solr:reindex."
+            (cd "$REPO_DIR" && npm run solr:reindex)
+
+            count=$(get_count)
+            echo "After reindex: $count documents"
+            if [ "$count" -eq 0 ]; then
+              echo "::error::Solr 'cities' core is still empty after reindex — aborting deploy."
+              exit 1
+            fi
+          fi
 
       - name: Install dependencies
+        if: steps.guard.outputs.skip != 'true'
         run: cd "$REPO_DIR" && npm ci
 
       - name: Build application
+        if: steps.guard.outputs.skip != 'true'
         run: cd "$REPO_DIR" && npm run build
 
       - name: Restart application
+        if: steps.guard.outputs.skip != 'true'
         run: script -qc "sudo systemctl restart climatica" /dev/null
 
       - name: Verify service is active
+        if: steps.guard.outputs.skip != 'true'
         run: |
           for i in $(seq 1 10); do
             if script -qc "sudo systemctl is-active --quiet climatica" /dev/null; then
@@ -67,3 +133,7 @@ jobs:
           echo "climatica did not become active in time"
           script -qc "sudo systemctl status climatica --no-pager" /dev/null || true
           exit 1
+
+      - name: Record deployed commit
+        if: steps.guard.outputs.skip != 'true'
+        run: echo "$DEPLOY_SHA" > "$REPO_DIR/.deployed_sha"
