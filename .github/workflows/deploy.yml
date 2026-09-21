@@ -7,11 +7,6 @@ on:
     types: [completed]
   workflow_dispatch:
 
-# workflow_run fires once PER upstream workflow, so a single main push can
-# trigger this job twice (once when Tests completes, once when Validation
-# completes). The "Ensure Tests and Validation passed" step re-checks both
-# for idempotency, but this still stops a second, overlapping run from
-# actually redeploying in parallel.
 concurrency:
   group: deploy-climatica
   cancel-in-progress: false
@@ -29,10 +24,6 @@ jobs:
       REPO_DIR: /home/guiveg/climatica-nextjs
 
     steps:
-      # Manual (workflow_dispatch) runs are a deliberate human override — e.g. a
-      # hotfix or rollback — and skip this gate. Automatic runs must confirm BOTH
-      # workflows succeeded for the exact commit, since workflow_run only tells us
-      # one of them finished, not which, or whether the other one even ran yet.
       - name: Ensure Tests and Validation passed for this commit
         if: github.event_name == 'workflow_run'
         env:
@@ -61,12 +52,12 @@ jobs:
         run: cd "$REPO_DIR" && npm run build
 
       - name: Restart application
-        run: sudo systemctl restart climatica
+        run: script -qc "sudo systemctl restart climatica" /dev/null
 
       - name: Verify service is active
         run: |
           for i in $(seq 1 10); do
-            if sudo systemctl is-active --quiet climatica; then
+            if script -qc "sudo systemctl is-active --quiet climatica" /dev/null; then
               echo "climatica is active"
               exit 0
             fi
@@ -74,5 +65,5 @@ jobs:
             sleep 2
           done
           echo "climatica did not become active in time"
-          sudo systemctl status climatica --no-pager || true
+          script -qc "sudo systemctl status climatica --no-pager" /dev/null || true
           exit 1
