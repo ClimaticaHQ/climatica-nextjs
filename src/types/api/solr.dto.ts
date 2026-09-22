@@ -1,14 +1,14 @@
+import type { TLocale } from "@/types";
+
 export type TSolrCityDoc = {
   geonameid: number;
   label_en: string;
-  label_uk?: string;
-  label_es?: string;
   latitude: number;
   longitude: number;
   population: number;
   feature_code: string;
   country_code: string;
-};
+} & Partial<Record<`label_${TLocale}`, string>>;
 
 export type TSolrResponse = {
   responseHeader: { status: number; QTime: number };

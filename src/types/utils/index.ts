@@ -6,5 +6,6 @@ export type * from "./martonne.type";
 export type * from "./metadata.type";
 export type * from "./navigation.type";
 export type * from "./scroll.type";
+export type * from "./solr.type";
 export type * from "./walterLeith.type";
 export type * from "./worldclim.type";
