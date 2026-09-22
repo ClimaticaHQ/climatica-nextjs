@@ -162,7 +162,7 @@ climatica-next-app/
 ├── docker/
 │   ├── solr/
 │   │   ├── data/           # GeoNames data files (gitignored)
-│   │   ├── scripts/        # prepare_data.py
+│   │   ├── scripts/        # prepare_data.py, generate_schema.py, test_prepare_data.py
 │   │   ├── schema.json     # Solr schema
 │   │   └── solrconfig.xml  # Solr configuration
 │   └── docker-compose.yml
@@ -176,6 +176,7 @@ climatica-next-app/
 │   │   ├── compare-periods/
 │   │   └── heat-map/
 │   ├── components/         # Shared UI components
+│   ├── configs/            # locales.json — json for supported locales
 │   ├── hooks/              # Custom React hooks
 │   ├── libs/
 │   │   ├── api/            # Axios client
@@ -196,6 +197,32 @@ Component → Hook → fetch /api/* → Route Handler → Redis → Solr/WorldCl
 - Redis caches city search results (7 days) and climate data (30 days)
 - Popular queries get extended TTL automatically
 - WorldClim API key stays server-side only
+
+### Adding a new locale
+
+`src/configs/locales.json` is the single source of truth for supported
+locales — the frontend (`src/constants/locales.constant.ts`), the CSV
+generator (`prepare_data.py`), and the Solr schema generator
+(`generate_schema.py`) all read from it. Adding a language means touching
+this one file plus regenerating two derived artifacts:
+
+```bash
+# 1. Add the locale code to src/configs/locales.json
+
+# 2. Regenerate the Solr schema (adds label_<lang> + label_<lang>_ngram fields)
+python3 docker/solr/scripts/generate_schema.py
+
+# 3. Regenerate the cities CSV (adds the label_<lang> column)
+python3 docker/solr/scripts/prepare_data.py
+
+# 4. Push the new schema to Solr and reimport the data
+npm run solr:reindex
+```
+
+`schema.json` is committed to the repo but treated as a build artifact of
+`generate_schema.py` — don't hand-edit the per-locale fields directly, since
+the next regeneration will overwrite them. Run `git diff docker/solr/schema.json`
+after step 2 to confirm the change is only additive before reindexing.
 
 ### Code Standards
 
