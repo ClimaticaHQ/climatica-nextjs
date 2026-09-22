@@ -1,77 +1,22 @@
-export {
-  ENDPOINTS,
-  EXCLUDE_DESCRIPTION_KEYWORDS,
-  MONTH_NAMES,
-  RESULT_STATUSES,
-  WORLDCLIM_BASE_URL,
-  WORLDCLIM_GRID_BASE,
-  WORLDCLIM_PROXY_BASE,
-  WORLDCLIM_VARIABLE_BASE,
-  WORLDCLIM_VARIABLES,
-} from "./api";
-export { APP_CONFIG, APP_TITLE } from "./app.constant";
-export type { TLocale } from "./app.constant";
-export {
-  CLIMATE_COMPARISON_COLORS,
-  CLIMATE_RANGE,
-  CLIMATE_START,
-  DEFAULT_MAP_CENTER,
-  MONTHS,
-  MONTHS_ARRAY,
-} from "./climate.constant";
-export { MAX_PERIODS, MIN_PERIODS, PERIOD_COLORS } from "./comparePeriods.constant";
-export { COORDINATE_REGEX, LAT_BOUNDS, LNG_BOUNDS } from "./coordinates.constant";
-export {
-  DEFAULT_CITY,
-  DEFAULT_COMPARE_CITY_A,
-  DEFAULT_COMPARE_CITY_B,
-  DEFAULT_HEATMAP_BBOX,
-  DEFAULT_HEATMAP_LOCATION,
-} from "./defaultCity.constant";
-export { ERROR_CONSTANTS } from "./error.constant";
-export { FEATURE_CODE_LABELS } from "./geonames.constant";
-export { GEOLOCATION_ERRORS } from "./hooks.constant";
-export {
-  DEFAULT_LANGUAGE,
-  LANGUAGE_SWITCHER_VARIANTS,
-  LANGUAGES,
-  SUPPORTED_LANGUAGE_CODES,
-} from "./language.constant";
-export { LOCAL_STORAGE_KEYS } from "./localStorageKeys.constant";
-export {
-  CLIMATE_MAP_CONFIG,
-  HEATMAP_MAP_CONFIG,
-  MAP_TILE_CONFIG,
-  RASTER_SELECTION_PATH_OPTIONS,
-} from "./map.constant";
-export { MARTONNE_CLASSES } from "./martonne.constant";
-export type { TMartonnClass } from "./martonne.constant";
-export { NAV_LINKS } from "./navlink.constant";
-export { OG_IMAGE_COLORS, OG_IMAGE_SIZE } from "./og.constant";
-export { CACHE_KEYS, CACHE_TTL, RECOVERABLE_REDIS_ERRORS, THRESHOLDS } from "./redis.constant";
-export { ROUTES } from "./route.constant";
-export {
-  AUTO_APPLY_DEBOUNCE_MS,
-  DATASETS,
-  DEFAULT_VARIABLES,
-  SIDEBAR_PARAMS,
-} from "./sidebar.constant";
-export { TIME } from "./time.constant";
+export * from "./api";
+export * from "./app.constant";
+export * from "./climate.constant";
+export * from "./comparePeriods.constant";
+export * from "./coordinates.constant";
+export * from "./defaultCity.constant";
+export * from "./error.constant";
+export * from "./geonames.constant";
+export * from "./hooks.constant";
+export * from "./language.constant";
+export * from "./locales.constant";
+export * from "./localStorageKeys.constant";
+export * from "./map.constant";
+export * from "./martonne.constant";
+export * from "./navlink.constant";
+export * from "./og.constant";
+export * from "./redis.constant";
+export * from "./route.constant";
+export * from "./sidebar.constant";
+export * from "./time.constant";
 export * from "./walterLieth.constant";
-export {
-  AUTO_RESOLUTION,
-  CELL_IRI_ROW_COL_REGEX,
-  CELL_SIZE_OPTIONS,
-  CELL_SIZES,
-  CLIMATE_PERIOD_LABELS,
-  CLIMATE_PERIODS,
-  CLIMATE_VARIABLES,
-  GRID_DELTA,
-  PERIOD_RESTRICTED_VARIABLES,
-  VARIABLE_LABELS,
-  VARIABLE_UNITS,
-  WEATHER_MAX_YEAR,
-  WEATHER_MIN_YEAR,
-  WEATHER_VARIABLES,
-} from "./worldclim.constant";
-export type { TClimatePeriod } from "./worldclim.constant";
+export * from "./worldclim.constant";
