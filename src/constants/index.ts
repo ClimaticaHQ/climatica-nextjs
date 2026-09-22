@@ -17,6 +17,7 @@ export * from "./og.constant";
 export * from "./redis.constant";
 export * from "./route.constant";
 export * from "./sidebar.constant";
+export * from "./solr.constant";
 export * from "./time.constant";
 export * from "./walterLieth.constant";
 export * from "./worldclim.constant";
