@@ -52,7 +52,10 @@
         label_en_ngram^1 label_uk_ngram^1 label_es_ngram^1
       </str>
       <str name="pf">label_en^20 label_uk^15 label_es^15</str>
-      <str name="fl">geonameid,label_en,label_uk,label_es,latitude,longitude,population,feature_code,country_code</str>
+      <!-- fl intentionally omitted: the client never sends it either, so Solr's
+           true default (all stored fields) applies -- returns every label_<lang>
+           field automatically as locales are added, instead of a hardcoded list
+           that silently strips new languages' fields from the response. -->
       <str name="sort">score desc, population desc</str>
       <str name="bf">log(sum(population,1))^20</str> <!-- ! Boost factor for population -->
       <str name="q.op">OR</str>
