@@ -28,6 +28,8 @@ jobs:
       PATH: /home/guiveg/.nvm/versions/node/v25.1.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       REPO_DIR: /home/guiveg/climatica-nextjs
       DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      DATA_SCRIPT: docker/solr/scripts/prepare_data.py
+      LOCALES_JSON: locales.json
 
     steps:
       - name: Ensure Tests and Validation passed for this commit
@@ -49,7 +51,14 @@ jobs:
         id: guard
         run: |
           MARKER="$REPO_DIR/.deployed_sha"
-          if [ -f "$MARKER" ] && [ "$(cat "$MARKER")" == "$DEPLOY_SHA" ]; then
+          if [ -f "$MARKER" ]; then
+            OLD_SHA="$(cat "$MARKER")"
+          else
+            OLD_SHA=""
+          fi
+          echo "old_sha=$OLD_SHA" >> "$GITHUB_OUTPUT"
+
+          if [ "$OLD_SHA" == "$DEPLOY_SHA" ]; then
             echo "Commit $DEPLOY_SHA already deployed — skipping remaining steps."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
@@ -65,6 +74,34 @@ jobs:
         run: |
           git -C "$REPO_DIR" fetch origin main
           git -C "$REPO_DIR" reset --hard origin/main
+
+      - name: Check if data-generation inputs changed
+        id: data_script
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          OLD_SHA="${{ steps.guard.outputs.old_sha }}"
+
+          if [ -z "$OLD_SHA" ]; then
+            echo "No previous deploy recorded — will (re)generate cities.csv."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif ! git -C "$REPO_DIR" cat-file -e "$OLD_SHA" 2>/dev/null; then
+            echo "Previous commit $OLD_SHA not found in local history — will (re)generate cities.csv."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            changed_files=$(git -C "$REPO_DIR" diff --name-only "$OLD_SHA" "$DEPLOY_SHA" -- "$DATA_SCRIPT" "$LOCALES_JSON")
+            if [ -z "$changed_files" ]; then
+              echo "Neither $DATA_SCRIPT nor $LOCALES_JSON changed since last deploy — skipping regeneration."
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "Changed since last deploy:"
+              echo "$changed_files"
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Generate cities CSV
+        if: steps.guard.outputs.skip != 'true' && steps.data_script.outputs.changed == 'true'
+        run: cd "$REPO_DIR" && python3 "$DATA_SCRIPT"
 
       - name: Ensure Docker services are running
         if: steps.guard.outputs.skip != 'true'
@@ -85,7 +122,7 @@ jobs:
           echo "Solr did not become healthy in time"
           exit 1
 
-      - name: Check Solr index is not empty
+      - name: Reindex Solr if empty or data inputs changed
         if: steps.guard.outputs.skip != 'true'
         run: |
           get_count() {
@@ -95,8 +132,13 @@ jobs:
           count=$(get_count)
           echo "Solr 'cities' core has $count documents"
 
-          if [ "$count" -eq 0 ]; then
-            echo "::warning::Solr 'cities' core is empty — running solr:reindex."
+          if [ "$count" -eq 0 ] || [ "${{ steps.data_script.outputs.changed }}" == "true" ]; then
+            if [ "$count" -eq 0 ]; then
+              echo "::warning::Solr 'cities' core is empty — running solr:reindex."
+            else
+              echo "::notice::$DATA_SCRIPT or $LOCALES_JSON changed — forcing solr:reindex with fresh data."
+            fi
+
             (cd "$REPO_DIR" && npm run solr:reindex)
 
             count=$(get_count)
