@@ -21,7 +21,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "solr:schema": "curl -X POST -H 'Content-type:application/json' --data-binary @docker/solr/schema.json http://localhost:8983/api/cores/cities/schema",
+    "solr:schema": "node docker/solr/scripts/apply-schema.mjs",
     "solr:import": "docker cp docker/solr/data/cities.csv climatica-solr:/var/solr/data/cities.csv && docker exec climatica-solr post -c cities /var/solr/data/cities.csv",
     "solr:reindex": "npm run solr:schema && npm run solr:import",
     "start": "next start",
