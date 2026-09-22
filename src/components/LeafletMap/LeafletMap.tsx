@@ -1,9 +1,10 @@
 "use client";
 
-import { CELL_SIZE_OPTIONS, CLIMATE_MAP_CONFIG, RASTER_SELECTION_PATH_OPTIONS } from "@/constants";
+import { CLIMATE_MAP_CONFIG, RASTER_SELECTION_PATH_OPTIONS } from "@/constants";
 import type { Map as LMap, Marker as LMarker, Rectangle as LRectangle } from "leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import type { TLeafletMapProps } from "./LeafletMap.type";
 
@@ -24,6 +25,7 @@ export function LeafletMap({
   cellBounds,
   gridSize,
 }: TLeafletMapProps) {
+  const t = useTranslations();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LMap | null>(null);
   const markerRef = useRef<LMarker | null>(null);
@@ -89,14 +91,14 @@ export function LeafletMap({
       [cellBounds.south, cellBounds.west],
       [cellBounds.north, cellBounds.east],
     ];
-    const areaMatch = gridSize ? /\(~[^)]+\)/.exec(CELL_SIZE_OPTIONS[gridSize]) : null;
-    const area = areaMatch ? ` ${areaMatch[0]}` : "";
+    const cellSizeKey = gridSize === "2.5m" ? "2_5m" : gridSize;
+    const cellSizeLabel = cellSizeKey ? t(`cellSizes.${cellSizeKey}`) : "";
 
     const rect = L.rectangle(bounds, RASTER_SELECTION_PATH_OPTIONS);
-    rect.bindTooltip(`Grid cell: ${gridSize ?? ""}${area}`, { sticky: true });
+    rect.bindTooltip(t("map.gridCell", { size: cellSizeLabel }), { sticky: true });
     rect.addTo(mapRef.current);
     rectRef.current = rect;
-  }, [cellBounds, gridSize]);
+  }, [cellBounds, gridSize, t]);
 
   return (
     <div

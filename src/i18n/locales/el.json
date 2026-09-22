@@ -181,7 +181,8 @@
   },
   "map": {
     "selectedFromMap": "Επιλέχθηκε από τον χάρτη",
-    "pointLabel": "Σημείο χάρτη {lat}, {lng}"
+    "pointLabel": "Σημείο χάρτη {lat}, {lng}",
+    "gridCell": "Κελί πλέγματος: {size}"
   },
   "cellSizes": {
     "10m": "10 λεπ (~324 km2)",

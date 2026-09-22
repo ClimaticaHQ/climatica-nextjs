@@ -181,7 +181,8 @@
   },
   "map": {
     "selectedFromMap": "Sélectionné depuis la carte",
-    "pointLabel": "Point de la carte {lat}, {lng}"
+    "pointLabel": "Point de la carte {lat}, {lng}",
+    "gridCell": "Cellule de grille : {size}"
   },
   "cellSizes": {
     "10m": "10 min (~324 km2)",
