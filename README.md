@@ -32,7 +32,8 @@
 
 - [Node.js LTS](https://nodejs.org/) (v18+)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Python 3](https://www.python.org/downloads/) (for one-time data preparation)
+- [Python 3](https://www.python.org/downloads/) (for one-time data preparation and running Python unit tests)
+  - On macOS/Homebrew Python, installing packages requires a virtual environment — `pip install` directly into the system Python will fail with `externally-managed-environment`. See the [Tests](#tests) section for the exact setup.
 
 ### Steps
 
@@ -116,6 +117,22 @@ WorldClim route, SolrService, WorldClimService, URL utils, city descriptions.
 
 E2E tests cover: city search, climate data loading, i18n switching,
 navigation, 404 page.
+
+**Python unit tests** (`docker/solr/scripts/prepare_data.py`):
+
+```bash
+python3 -m venv .venv          # first time only
+source .venv/bin/activate
+pip install -r docker/solr/scripts/requirements-dev.txt
+pytest docker/solr/scripts/
+deactivate                     # when done
+```
+
+Cover: per-language label fallback order in `build_labels()` (including the
+`uk`-specific fallback to `label_en`), alternate-name preference resolution
+in `should_update_name()`, and locale-list loading/validation in
+`load_lang_order()`. Runs against small in-memory/tmp_path fixtures, not the
+real GeoNames dump — no download required.
 
 ---
 
