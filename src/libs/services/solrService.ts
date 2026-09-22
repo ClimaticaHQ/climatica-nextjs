@@ -1,5 +1,6 @@
 import "server-only";
 
+import { LOCALES } from "@/constants";
 import { env } from "@/libs/Env";
 import { logger } from "@/libs/Logger";
 import type { TSolrCityDoc, TSolrResponse, TWikidataCity } from "@/types";
@@ -49,12 +50,7 @@ export const SolrService = {
   },
 
   getLabelField(lang: string): string {
-    const map: Record<string, string> = {
-      uk: "label_uk",
-      es: "label_es",
-      en: "label_en",
-    };
-    return map[lang] ?? "label_en";
+    return LOCALES.includes(lang) ? `label_${lang}` : "label_en";
   },
 
   mapToCity(doc: TSolrCityDoc, lang: string): TWikidataCity {
