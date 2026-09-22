@@ -20,8 +20,14 @@ describe("buildSolrQueryParams", () => {
     expect(params.get("pf")).toContain("label_es^40");
   });
 
-  it("falls back to en boost for unknown lang", () => {
+  it("boosts label_fr for lang fr (a locale added after es/uk/en)", () => {
     const params = buildSolrQueryParams("paris", "fr");
+    expect(params.get("qf")).toContain("label_fr^25");
+    expect(params.get("pf")).toContain("label_fr^40");
+  });
+
+  it("falls back to en boost for a lang outside the supported locale list", () => {
+    const params = buildSolrQueryParams("paris", "xx");
     expect(params.get("qf")).toContain("label_en^25");
   });
 
