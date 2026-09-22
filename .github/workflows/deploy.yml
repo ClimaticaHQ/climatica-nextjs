@@ -29,7 +29,8 @@ jobs:
       REPO_DIR: /home/guiveg/climatica-nextjs
       DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
       DATA_SCRIPT: docker/solr/scripts/prepare_data.py
-      LOCALES_JSON: locales.json
+      LOCALES_JSON: src/configs/locales.json
+      SOLR_CONFIG: docker/solr/solrconfig.xml
 
     steps:
       - name: Ensure Tests and Validation passed for this commit
@@ -99,6 +100,29 @@ jobs:
             fi
           fi
 
+      - name: Check if Solr core config changed
+        id: solr_config
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          OLD_SHA="${{ steps.guard.outputs.old_sha }}"
+
+          if [ -z "$OLD_SHA" ]; then
+            echo "No previous deploy recorded — will reload Solr core to be safe."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif ! git -C "$REPO_DIR" cat-file -e "$OLD_SHA" 2>/dev/null; then
+            echo "Previous commit $OLD_SHA not found in local history — will reload Solr core to be safe."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            changed_files=$(git -C "$REPO_DIR" diff --name-only "$OLD_SHA" "$DEPLOY_SHA" -- "$SOLR_CONFIG")
+            if [ -z "$changed_files" ]; then
+              echo "$SOLR_CONFIG unchanged since last deploy — no reload needed."
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "$SOLR_CONFIG changed since last deploy — will reload Solr core."
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
       - name: Generate cities CSV
         if: steps.guard.outputs.skip != 'true' && steps.data_script.outputs.changed == 'true'
         run: cd "$REPO_DIR" && python3 "$DATA_SCRIPT"
@@ -121,6 +145,21 @@ jobs:
           done
           echo "Solr did not become healthy in time"
           exit 1
+
+      - name: Reload Solr core if config changed
+        if: steps.guard.outputs.skip != 'true' && steps.solr_config.outputs.changed == 'true'
+        run: |
+          # docker compose up -d is a no-op for an already-running container, so a
+          # solrconfig.xml change (request handlers, fl defaults, etc.) is never
+          # picked up without an explicit core RELOAD — Solr only reads this file
+          # at core load time, not per-request.
+          response=$(curl -s "http://172.17.0.1:8983/solr/admin/cores?action=RELOAD&core=cities")
+          echo "$response"
+          if echo "$response" | jq -e '.error' > /dev/null 2>&1; then
+            echo "::error::Solr core reload failed: $response"
+            exit 1
+          fi
+          echo "Solr core 'cities' reloaded."
 
       - name: Reindex Solr if empty or data inputs changed
         if: steps.guard.outputs.skip != 'true'
@@ -148,6 +187,17 @@ jobs:
               exit 1
             fi
           fi
+
+      - name: Flush Redis cache if data or Solr config changed
+        if: >
+          steps.guard.outputs.skip != 'true' &&
+          (steps.data_script.outputs.changed == 'true' || steps.solr_config.outputs.changed == 'true')
+        run: |
+          # City search results are cached for 7 days (see README). Without an
+          # explicit flush here, a data/schema/config fix that just shipped would
+          # keep serving stale cached results for up to a week.
+          docker exec climatica-redis redis-cli FLUSHALL
+          echo "Redis cache flushed."
 
       - name: Install dependencies
         if: steps.guard.outputs.skip != 'true'
