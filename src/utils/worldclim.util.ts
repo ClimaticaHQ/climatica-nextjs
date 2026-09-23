@@ -3,18 +3,21 @@ import {
   CLIMATE_VARIABLES,
   MONTH_NAMES,
   WORLDCLIM_GRID_BASE,
+  WORLDCLIM_RASTER_BASE,
   WORLDCLIM_VARIABLE_BASE,
 } from "@/constants";
 import { env } from "@/libs/Env";
 import type {
   TCellBounds,
   TCellSize,
+  TClimatePeriod,
   TFullVariableMonthRow,
   TMonthlyTemperature,
   TRawAvgValueBinding,
   TRawPixelValueBinding,
   TSparqlUriValue,
   TSparqlValue,
+  TVariable,
   TWorldClimAvgBoxBinding,
   TWorldClimBoxBinding,
   TWorldClimCellResponse,
@@ -81,6 +84,17 @@ export function buildGridIri(gridSize: TCellSize): string {
 
 export function buildVariableIris(variables: readonly string[]): string[] {
   return variables.map((v) => `${WORLDCLIM_VARIABLE_BASE}${v}`);
+}
+
+/** Mirrors the raster IRI shape SCRAPI names rasters with: "Raster_{grid}_{variable}_{period}",
+ * where period is a climate period (already "c1970-2000"-shaped) or "w{year}" for weather. */
+export function buildRasterIri(
+  gridSize: TCellSize,
+  variable: TVariable,
+  period: TClimatePeriod | number,
+): string {
+  const periodSuffix = typeof period === "number" ? `w${period}` : period;
+  return `${WORLDCLIM_RASTER_BASE}${gridSize}_${variable}_${periodSuffix}`;
 }
 
 export function buildDatasetParams(

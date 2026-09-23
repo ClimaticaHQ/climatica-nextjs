@@ -4,6 +4,7 @@ export * from "./raw/exportRawCsv.util";
 export * from "./raw/exportRawJson.util";
 export * from "./raw/rawDataAvailability.util";
 export * from "./shared/download.util";
+export * from "./shared/shareUrl.util";
 export * from "./svg/buildExportSvg.util";
 export * from "./svg/exportSvg.constant";
 export * from "./svg/linearPath.util";
