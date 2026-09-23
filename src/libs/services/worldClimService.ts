@@ -11,6 +11,7 @@ import type {
   TWorldClimCellResponse,
   TWorldClimPixelResource,
   TWorldClimPointValueResponse,
+  TWorldClimRasterResource,
 } from "@/types";
 import {
   buildDatasetParams,
@@ -96,6 +97,17 @@ export const WorldClimService = {
           isWeather: true,
           year,
         },
+      },
+    );
+    validateResponseData(response);
+    return response.data;
+  },
+
+  async getRasterResource(rasterIri: string): Promise<TWorldClimRasterResource> {
+    const response = await apiClient.get<TWorldClimRasterResource>(
+      `${WORLDCLIM_PROXY_BASE}/resource`,
+      {
+        params: { id: "Raster", iri: rasterIri },
       },
     );
     validateResponseData(response);
