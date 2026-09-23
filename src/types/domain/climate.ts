@@ -21,3 +21,18 @@ export type TMonthlyTemperature = {
 };
 
 export type TMonthlyTemperatureWithAvg = TMonthlyTemperature & { tavg: number };
+
+/** Provenance (creator + version) for a single raster's source dataset,
+ * fetched live from WorldClim's Raster resource — see useGetDatasetVersion. */
+export type TDatasetProvenance = {
+  creator: string;
+  version: number;
+};
+
+/** Both provenances the export footer always cites — WorldClim's own v2.1 climate
+ * baseline and the CRU-TS input data its weather rasters are downscaled from —
+ * regardless of which dataset (climate/weather) the current export uses. */
+export type TDatasetAttribution = {
+  worldclim: TDatasetProvenance;
+  cruTs: TDatasetProvenance;
+};

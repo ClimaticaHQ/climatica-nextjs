@@ -4,6 +4,8 @@ import type {
   TChartMode,
   TClimatePeriod,
   TDataset,
+  TDatasetAttribution,
+  TLocale,
   TMonthAridity,
   TMonthlyTemperature,
   TVariable,
@@ -124,10 +126,16 @@ export type TExportPayload = {
   rightMax: number;
   chartMode: TChartMode;
   labels: TExportLabels;
+  /** Canonical, shareable link to the current view — see buildShareableUrl(). */
+  shareUrl: string;
+  /** Live WorldClim + CRU-TS attribution, always both regardless of dataset —
+   * null while useGetDatasetVersion() is still loading. */
+  datasetAttribution: TDatasetAttribution | null;
   rawData?: TExportRawData;
 };
 
 export type TBuildExportPayloadParams = {
+  locale: TLocale;
   cityName: string;
   lat: number;
   lng: number;
@@ -144,6 +152,21 @@ export type TBuildExportPayloadParams = {
   rightMax: number;
   chartMode: TChartMode;
   labels: TExportLabels;
+  datasetAttribution: TDatasetAttribution | null;
+};
+
+/** Everything buildShareableUrl() needs to reconstruct the current view's URL
+ * from state directly, instead of reading window.location (which can briefly lag
+ * behind the latest city/filter change via the app's async URL-sync effect). */
+export type TBuildShareableUrlParams = {
+  locale: TLocale;
+  cityName: string;
+  lat: number;
+  lng: number;
+  gridSize: TCellSize;
+  variables: readonly TVariable[];
+  selectedMonths: number[] | null;
+  subtitle: TExportSubtitle;
 };
 
 export type TLinearScale = (value: number) => number;

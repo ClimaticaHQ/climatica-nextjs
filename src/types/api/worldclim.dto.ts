@@ -184,4 +184,20 @@ export type TWorldClimCellResource = {
   elevation?: number;
 };
 
+/** Returned by GET /resource?id=Raster&iri=... — carries the raster's real
+ * source-dataset provenance (creator/version), which is what backs the export
+ * footer's attribution line instead of a hardcoded app-config value. */
+export type TWorldClimRasterResource = {
+  iri: string;
+  isClimate?: boolean;
+  isWeather?: boolean;
+  creator: { nolang: string };
+  version: number;
+  start: string | number;
+  end: string | number;
+  temporalResolution: string;
+  grid: string;
+  variable: string;
+};
+
 export type { TClimatePeriod };
