@@ -3,6 +3,7 @@ import type {
   TCellSize,
   TChartSubtitle,
   TCoordinates,
+  TDatasetAttribution,
   TMonthlyTemperature,
   TVariable,
   TWikidataCity,
@@ -17,6 +18,7 @@ export type TClimateStatisticsViewProps = {
   cityName: string;
   subtitle: TChartSubtitle;
   altitude: number | null;
+  datasetAttribution: TDatasetAttribution | null;
   selectedMonths: number[] | null;
   variables: readonly TVariable[];
   cellBounds: TCellBounds | null;

@@ -13,6 +13,7 @@ import {
   useGetAltitude,
   useGetCellBounds,
   useGetClimateData,
+  useGetDatasetVersion,
   usePersistedCity,
   usePersistedComparisonCities,
   useResolveCityByCoordinates,
@@ -226,6 +227,8 @@ export function ClimateStatistics() {
     isError,
   } = useGetClimateData(selectedCity.lat, selectedCity.lng, gridSize);
 
+  const { data: datasetAttribution = null } = useGetDatasetVersion();
+
   const { data: altitude = null } = useGetAltitude(selectedCity.lat, selectedCity.lng, gridSize);
   const { data: cellBounds = null } = useGetCellBounds(
     selectedCity.lat,
@@ -256,6 +259,7 @@ export function ClimateStatistics() {
       cityName={chartCityName}
       subtitle={subtitle}
       altitude={altitude}
+      datasetAttribution={datasetAttribution}
       cellBounds={cellBounds}
       gridSize={gridSize}
       selectedMonths={selectedMonths}
