@@ -39,7 +39,6 @@
     "@t3-oss/env-nextjs": "^0.13.11",
     "@tanstack/react-query": "^4.43.0",
     "axios": "^1.13.6",
-    "dom-to-image-more": "^3.10.0",
     "ioredis": "^5.10.1",
     "leaflet": "^1.9.4",
     "next": "16.2.6",
