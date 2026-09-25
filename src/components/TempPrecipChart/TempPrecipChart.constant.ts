@@ -1,7 +1,17 @@
+import type { TVisibleSeries } from "@/types";
+
 /** Precip Bar's animationDuration and its useDelayedHide() delay must stay
  * equal — the hide transition (which excludes the bar from tooltip/legend)
  * should only kick in once the shrink animation has visibly finished. */
 export const PRECIP_BAR_ANIMATION_DURATION_MS = 400;
+
+/** The chart's pre-toggle-interaction default — also the export payload's fallback. */
+export const DEFAULT_VISIBLE_SERIES: TVisibleSeries = {
+  tmax: true,
+  tmin: true,
+  tavg: false,
+  prec: true,
+};
 
 export const CHART_COLORS = {
   arid: "var(--chart-arid)",

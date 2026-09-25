@@ -13,15 +13,14 @@ import { CompareChart, MultiPeriodChart, StandardClimateChart } from "./charts";
 import { ModeToggle } from "./components";
 import { useTempPrecipChart } from "./hooks";
 import { CalendarIcon, DatabaseIcon } from "./icons";
+import { DEFAULT_VISIBLE_SERIES } from "./TempPrecipChart.constant";
 import type { TTempPrecipChartProps } from "./TempPrecipChart.type";
 import { resolveVisibleSeries } from "./utils";
-
-const DEFAULT_VISIBLE: TVisibleSeries = { tmax: true, tmin: true, tavg: false, prec: true };
 
 export function TempPrecipChart(props: TTempPrecipChartProps) {
   const t = useTranslations();
   const [visible, setVisible] = useState<TVisibleSeries>(() =>
-    resolveVisibleSeries(props.variables, DEFAULT_VISIBLE),
+    resolveVisibleSeries(props.variables, DEFAULT_VISIBLE_SERIES),
   );
   const [chartMode, setChartMode] = useState<TChartMode>("standard");
   const [prevVariables, setPrevVariables] = useState(props.variables);
