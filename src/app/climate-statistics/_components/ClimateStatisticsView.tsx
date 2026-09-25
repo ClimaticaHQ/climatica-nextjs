@@ -15,7 +15,7 @@ import {
   PageWrapper,
   StatCardsSkeleton,
 } from "@/components/UI";
-import { CLIMATE_PERIOD_LABELS, DATASETS } from "@/constants";
+import { CLIMATE_PERIOD_LABELS, DATASETS, EXPORT_PNG_SCALE, EXPORT_SVG_LAYOUT } from "@/constants";
 import { useFetchFullClimateData } from "@/hooks";
 import type { TChartMode, TExportLabels, TVisibleSeries } from "@/types";
 import {
@@ -31,7 +31,6 @@ import {
   resolveExportColors,
   svgToPng,
 } from "@/utils";
-import { EXPORT_SVG_LAYOUT } from "@/utils/export";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
@@ -189,11 +188,12 @@ export function ClimateStatisticsView({
   async function handleExportPNG(): Promise<void> {
     if (!exportPayload) return;
     const colors = resolveExportColors();
-    const svg = buildExportSvg(exportPayload, colors);
+    const { svg, height } = buildExportSvg(exportPayload, colors);
     await svgToPng({
       svg,
       width: EXPORT_SVG_LAYOUT.width,
-      height: EXPORT_SVG_LAYOUT.height,
+      height,
+      scale: EXPORT_PNG_SCALE,
       filename: buildFilename("city-climate", [cityName], "png"),
     });
   }
@@ -201,7 +201,7 @@ export function ClimateStatisticsView({
   function handleExportSVG() {
     if (!exportPayload) return;
     const colors = resolveExportColors();
-    const svg = buildExportSvg(exportPayload, colors);
+    const { svg } = buildExportSvg(exportPayload, colors);
     downloadSvgString(svg, buildFilename("city-climate", [cityName], "svg"));
   }
 
