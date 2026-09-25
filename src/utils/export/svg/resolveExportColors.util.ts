@@ -10,6 +10,7 @@ const CSS_VAR_MAP: Record<keyof TExportChartColors, string> = {
   tavg: "--chart-temp-avg",
   arid: "--chart-arid",
   humid: "--chart-humid",
+  primary: "--color-primary",
 };
 
 /** Resolves the live CSS custom properties to literal colors for the SVG/PNG export. */

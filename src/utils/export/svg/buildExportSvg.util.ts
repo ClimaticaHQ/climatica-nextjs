@@ -1,11 +1,19 @@
 import { catmullRomPath } from "@/components/TempPrecipChart/utils/catmullRomPath";
-import type { TExportChartColors, TExportPayload, TLinearScale, TMonthBand } from "@/types";
+import { EXPORT_SVG_LAYOUT as L } from "@/constants";
+import type {
+  TExportChartColors,
+  TExportPayload,
+  TFooterTextLine,
+  TLinearScale,
+  TMonthBand,
+  TSvgExportResult,
+} from "@/types";
 import { computeWLAxisTicks, computeWLPrecAxisTicks, precToScaled, scaledToPrec } from "@/utils";
-import { EXPORT_SVG_LAYOUT as L } from "./exportSvg.constant";
+import { buildFooterTextLines } from "../shared/footerLines.util";
 import { linearPath } from "./linearPath.util";
 import { createLinearScale, monthBandX } from "./scales.util";
 
-function escapeXml(text: string): string {
+export function escapeXml(text: string): string {
   return text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -19,12 +27,12 @@ function formatCoordinate(lat: number, lng: number): string {
   return `${Math.abs(lat).toFixed(4)}°${latDir}, ${Math.abs(lng).toFixed(4)}°${lngDir}`;
 }
 
-function monthOpacity(month: number, selectedMonths: number[] | null): number {
+export function monthOpacity(month: number, selectedMonths: number[] | null): number {
   if (!selectedMonths || selectedMonths.length === 0) return 1;
   return selectedMonths.includes(month) ? 0.8 : 0.15;
 }
 
-function dotRadius(month: number, selectedMonths: number[] | null): number {
+export function dotRadius(month: number, selectedMonths: number[] | null): number {
   return selectedMonths?.length === 1 && selectedMonths.includes(month) ? 5 : 3;
 }
 
@@ -35,7 +43,7 @@ function dotRadius(month: number, selectedMonths: number[] | null): number {
  * (~1000+) doesn't produce hundreds of overlapping labels. The actual max is
  * appended as a final tick so the axis's real top boundary is always labeled.
  */
-function computeNiceAxisTicks(max: number, targetCount = 6): number[] {
+export function computeNiceAxisTicks(max: number, targetCount = 6): number[] {
   if (max <= 0) return [0];
 
   const roughStep = max / targetCount;
@@ -109,18 +117,19 @@ function buildStatsTable(payload: TExportPayload, colors: TExportChartColors): s
  * domain is already raw mm (identity), while Walter-Lieth mode's precScale shares the
  * temp-equivalent scaled domain (tempMin..plotMax), so its ticks go through precToScaled.
  */
-function buildGridAndAxes(
-  payload: TExportPayload,
+export function buildGridAndAxes(
+  scales: { tempMin: number; tempMax: number },
   colors: TExportChartColors,
   tempScale: TLinearScale,
   precScale: TLinearScale,
   plotLeft: number,
   plotRight: number,
+  chartTop: number,
   chartBottom: number,
   precTicks: number[],
   toScalePos: (tick: number) => number,
 ): string {
-  const tempTicks = computeWLAxisTicks(payload.scales.tempMin, payload.scales.tempMax);
+  const tempTicks = computeWLAxisTicks(scales.tempMin, scales.tempMax);
 
   const gridLines = tempTicks
     .map((tick) => {
@@ -143,7 +152,7 @@ function buildGridAndAxes(
     })
     .join("");
 
-  const midY = (L.chartTop + chartBottom) / 2;
+  const midY = (chartTop + chartBottom) / 2;
   const tempTitleX = plotLeft - 45;
   const precTitleX = plotRight + 45;
 
@@ -222,12 +231,13 @@ function buildStandardBody(
 
   return [
     buildGridAndAxes(
-      payload,
+      payload.scales,
       colors,
       tempScale,
       precScale,
       plotLeft,
       plotRight,
+      L.chartTop,
       chartBottom,
       computeNiceAxisTicks(payload.rightMax),
       (tick) => tick,
@@ -269,12 +279,13 @@ function buildWalterLiethBody(
     (tick) => precToScaled(tick) >= payload.scales.tempMin,
   );
   const gridAndAxes = buildGridAndAxes(
-    payload,
+    payload.scales,
     colors,
     tempScale,
     precScale,
     plotLeft,
     plotRight,
+    L.chartTop,
     chartBottom,
     precTicks,
     precToScaled,
@@ -470,34 +481,7 @@ function buildDataTable(payload: TExportPayload, colors: TExportChartColors): st
   return border + vDividers + hDividers + headerRow + dataRows;
 }
 
-/** Shrinks (bounded) to keep long share URLs from overflowing the canvas width — their
- * length varies with the city name and selected variables, unlike the other footer lines. */
-function footerUrlFontSize(url: string): number {
-  const availableWidth = L.width - L.paddingX * 2;
-  const fitted = Math.floor(availableWidth / (url.length * L.footerUrlAvgCharWidthRatio));
-  return Math.max(L.footerUrlMinFontSize, Math.min(L.footerFontSize, fitted));
-}
-
-/** "WorldClim v2.1 (CRU-TS 4.09)" — both numbers fetched live from WorldClim's
- * Raster resource, not hardcoded. Cited together regardless of dataset: even
- * climate-mode exports are grounded in WorldClim's v2.1 baseline, and weather
- * rasters are that baseline downscaled with CRU-TS anomalies. */
-function formatDatasetAttribution(attribution: TExportPayload["datasetAttribution"]): string {
-  if (!attribution) return "WorldClim data";
-  const { worldclim, cruTs } = attribution;
-  return `${worldclim.creator} v${worldclim.version} (${cruTs.creator} ${cruTs.version}) data`;
-}
-
-function buildFooter(payload: TExportPayload, colors: TExportChartColors): string {
-  const lines = [
-    { text: `Climatica · WorldClim · ${payload.labels.periodLabel}`, fontSize: L.footerFontSize },
-    {
-      text: `Generated by climatica.gsic.uva.es using ${formatDatasetAttribution(payload.datasetAttribution)}`,
-      fontSize: L.footerFontSize,
-    },
-    { text: payload.shareUrl, fontSize: footerUrlFontSize(payload.shareUrl) },
-  ];
-
+function renderFooterLines(lines: TFooterTextLine[], colors: TExportChartColors): string {
   return lines
     .map(({ text, fontSize }, i) => {
       const y = L.footerY + i * L.footerLineHeight;
@@ -506,7 +490,10 @@ function buildFooter(payload: TExportPayload, colors: TExportChartColors): strin
     .join("\n");
 }
 
-export function buildExportSvg(payload: TExportPayload, colors: TExportChartColors): string {
+export function buildExportSvg(
+  payload: TExportPayload,
+  colors: TExportChartColors,
+): TSvgExportResult {
   const plotLeft = L.chartMarginLeft;
   const plotRight = L.width - L.chartMarginRight;
   const chartBottom = L.chartTop + L.chartHeight;
@@ -541,6 +528,14 @@ export function buildExportSvg(payload: TExportPayload, colors: TExportChartColo
       )
     : buildStandardBody(payload, colors, tempScale, plotLeft, plotRight, chartBottom, shiftedBands);
 
+  const footerLines = buildFooterTextLines({
+    contextLabel: payload.labels.periodLabel,
+    datasetAttribution: payload.datasetAttribution,
+    shareUrl: payload.shareUrl,
+    layout: L,
+  });
+  const height = L.footerY + footerLines.length * L.footerLineHeight + L.footerBottomMargin;
+
   const body = [
     buildHeader(payload, colors),
     buildStatsTable(payload, colors),
@@ -550,7 +545,7 @@ export function buildExportSvg(payload: TExportPayload, colors: TExportChartColo
     isWalterLieth ? "" : buildLegend(payload, colors),
     buildAridityLegend(payload, colors),
     buildDataTable(payload, colors),
-    buildFooter(payload, colors),
+    renderFooterLines(footerLines, colors),
   ].join("\n");
 
   // Built as a joined array, not a single multi-line template literal — a raw
@@ -558,11 +553,13 @@ export function buildExportSvg(payload: TExportPayload, colors: TExportChartColo
   // literal's surrounding return statement, which inserts whitespace BEFORE
   // <?xml ...?>. The XML spec requires the declaration to be the document's
   // very first character, so that whitespace breaks every consumer's parser.
-  return [
+  const svg = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${L.width}" height="${L.height}" viewBox="0 0 ${L.width} ${L.height}" font-family="Inter, Roboto, Helvetica Neue, Arial, sans-serif">`,
-    `<rect width="${L.width}" height="${L.height}" fill="${colors.bg}" />`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${L.width}" height="${height}" viewBox="0 0 ${L.width} ${height}" font-family="Inter, Roboto, Helvetica Neue, Arial, sans-serif">`,
+    `<rect width="${L.width}" height="${height}" fill="${colors.bg}" />`,
     body,
     `</svg>`,
   ].join("\n");
+
+  return { svg, height };
 }

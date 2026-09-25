@@ -10,6 +10,7 @@ export * from "./export.util";
 export * from "./geonames.util";
 export * from "./getClientIp.util";
 export * from "./heatmapResults.util";
+export * from "./mapProjection.util";
 export * from "./martonne.util";
 export * from "./metadata.util";
 export * from "./navigation.util";
