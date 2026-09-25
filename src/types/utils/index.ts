@@ -1,7 +1,7 @@
 export type * from "./cellCount.type";
 export type * from "./climateComparison.type";
 export type * from "./colorScale.type";
-export type * from "./export.type";
+export type * from "./export";
 export type * from "./mapProjection.type";
 export type * from "./martonne.type";
 export type * from "./metadata.type";

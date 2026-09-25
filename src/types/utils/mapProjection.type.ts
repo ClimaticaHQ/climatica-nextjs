@@ -24,7 +24,7 @@ export type TTileZoomResolution = {
    * their world-pixel size is divided by 2^zoomDelta so they still align with
    * cells/selection, which stay projected at fittedZoom. */
   zoomDelta: number;
-  
+
   /** Each tile's drawn size on the fittedZoom canvas: tileSizePx / 2^zoomDelta. */
   tileDrawSizePx: number;
 };

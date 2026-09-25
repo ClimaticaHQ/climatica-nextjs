@@ -7,6 +7,8 @@ export type TBbox = {
   east: number;
 };
 
+export type TPolygon = [number, number][];
+
 export type THeatmapResult = {
   pixels: TWorldClimBoxResponse;
   avg: TWorldClimAvgBoxResponse;

@@ -3,12 +3,9 @@ import { TDataset, TMonthlyTemperature } from "../domain";
 
 export type TMultiPeriodEntry = { year: number; rows: TMonthlyTemperature[] };
 
-export type TVisibleSeries = {
-  tmax: boolean;
-  tmin: boolean;
-  tavg: boolean;
-  prec: boolean;
-};
+export type TSeriesKey = "tmax" | "tmin" | "tavg" | "prec";
+
+export type TVisibleSeries = Record<TSeriesKey, boolean>;
 
 export type TChartSubtitle = {
   dataset?: TDataset;
