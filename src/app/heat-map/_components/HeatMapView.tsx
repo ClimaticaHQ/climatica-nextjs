@@ -2,12 +2,28 @@
 
 import { LocationSearch } from "@/components";
 import { EmptyState, ErrorBanner, MapSkeleton, PageTitle, PageWrapper } from "@/components/UI";
-import { buildFilename, exportElementToPng, exportTableToCsv } from "@/utils";
+import { EXPORT_PNG_SCALE, HEATMAP_EXPORT_SVG_LAYOUT, VARIABLE_LABELS } from "@/constants";
+import type { THeatmapExportCell, THeatmapExportPayload, THeatmapExportSelection } from "@/types";
+import {
+  buildFilename,
+  buildHeatmapExportSvg,
+  downloadSvgString,
+  exportTableToCsv,
+  interpolateColor,
+  resolveExportColors,
+  svgToPng,
+} from "@/utils";
 import dynamic from "next/dynamic";
-import { useRef } from "react";
 import { useTranslations } from "next-intl";
 import type { TRegionHeatmapViewProps } from "./HeatMap.type";
-import { computeHeatmapStats, formatSelectedMonths, pixelAnnualAvg } from "./HeatMap.util";
+import {
+  computeHeatmapStats,
+  formatSelectedMonths,
+  gridDelta,
+  pixelAnnualAvg,
+  pixelSelectedAvg,
+  resolveCellBounds,
+} from "./HeatMap.util";
 import { RegionalClimateProfile } from "./components/RegionalClimateProfile";
 import { StatsLegendBar } from "./components/StatsLegendBar";
 import { Toolbar } from "./components/Toolbar";
@@ -38,6 +54,8 @@ export function HeatMapView({
   periodLabel,
   profile,
   isProfileLoading,
+  datasetAttribution,
+  shareUrl,
   onDrawModeChange,
   onBboxChange,
   onPolygonChange,
@@ -47,7 +65,6 @@ export function HeatMapView({
   onClearLocationError,
 }: TRegionHeatmapViewProps) {
   const t = useTranslations();
-  const statsBarRef = useRef<HTMLDivElement>(null);
 
   const pixelBindings = pixels?.results.bindings ?? [];
   const stats = computeHeatmapStats(pixelBindings);
@@ -91,12 +108,104 @@ export function HeatMapView({
     );
   }
 
-  async function handleExportPNG() {
-    if (!statsBarRef.current) return;
-    await exportElementToPng(
-      statsBarRef.current,
-      buildFilename("heatmap", [activeVariable, periodLabel], "png"),
+  /** Colors are resolved from the live DOM, so this must only ever run inside a
+   * click handler (browser-only) — never at render time, which also runs on the
+   * server for a "use client" page like this one. */
+  function buildHeatmapExportPayload(): THeatmapExportPayload | null {
+    if (!hasData) return null;
+
+    const selectionBounds =
+      bbox ??
+      (polygon
+        ? {
+            north: Math.max(...polygon.map(([lat]) => lat)),
+            south: Math.min(...polygon.map(([lat]) => lat)),
+            west: Math.min(...polygon.map(([, lng]) => lng)),
+            east: Math.max(...polygon.map(([, lng]) => lng)),
+          }
+        : null);
+    const selection: THeatmapExportSelection | null = bbox
+      ? { kind: "bbox", bounds: bbox }
+      : polygon
+        ? { kind: "polygon", vertices: polygon }
+        : null;
+    if (!selectionBounds || !selection) return null;
+
+    // Mirrors HeatmapLayer.tsx's own getValue/min/max exactly, so the export's
+    // cell colors match the live map pixel-for-pixel — including the case where
+    // a month filter makes this differ from computeHeatmapStats()'s always-
+    // annual stats (the stats row and gradient legend below intentionally keep
+    // using those annual stats, same as StatsLegendBar.tsx does live).
+    const cellSize = gridDelta(gridSize);
+    const getCellValue = (b: (typeof pixelBindings)[number]) =>
+      selectedMonths.length > 0 ? pixelSelectedAvg(b, selectedMonths) : pixelAnnualAvg(b);
+    const cellValues = pixelBindings.map(getCellValue).filter((v) => !isNaN(v));
+    const cellMin = cellValues.length > 0 ? Math.min(...cellValues) : 0;
+    const cellMax = cellValues.length > 0 ? Math.max(...cellValues) : 0;
+
+    const cells: THeatmapExportCell[] = [];
+    for (const binding of pixelBindings) {
+      const value = getCellValue(binding);
+      if (isNaN(value)) continue;
+      const bounds = resolveCellBounds(binding, cellSize);
+      if (!bounds) continue;
+      cells.push({ bounds, color: interpolateColor(value, cellMin, cellMax, colorScale) });
+    }
+
+    const gradientColors = Array.from({ length: 10 }, (_, i) =>
+      interpolateColor(
+        stats.min + (stats.max - stats.min) * (i / 9),
+        stats.min,
+        stats.max,
+        colorScale,
+      ),
     );
+    const fmt = (v: number) => `${v.toFixed(1)} ${unit}`;
+
+    return {
+      headerTitle: t("heatMap.title"),
+      headerSubtitle: `${VARIABLE_LABELS[activeVariable]} · ${statSubtitle}`,
+      stats: [
+        { label: t("heatMap.stats.minValue"), value: fmt(stats.min), subtitle: statSubtitle },
+        { label: t("heatMap.stats.maxValue"), value: fmt(stats.max), subtitle: statSubtitle },
+        { label: t("heatMap.stats.avgValue"), value: fmt(stats.avg), subtitle: statSubtitle },
+        { label: t("heatMap.stats.median"), value: fmt(stats.median), subtitle: statSubtitle },
+        {
+          label: t("heatMap.stats.stdDev"),
+          value: `±${stats.stdDev.toFixed(1)} ${unit}`,
+          subtitle: statSubtitle,
+        },
+        { label: t("heatMap.stats.cellsAnalyzed"), value: String(stats.count) },
+      ],
+      gradientColors,
+      minLabel: fmt(stats.min),
+      maxLabel: fmt(stats.max),
+      mapSection: { selectionBounds, cells, selection },
+      datasetAttribution,
+      shareUrl,
+    };
+  }
+
+  async function handleExportPNG() {
+    const payload = buildHeatmapExportPayload();
+    if (!payload) return;
+    const colors = resolveExportColors();
+    const { svg, height } = await buildHeatmapExportSvg(payload, colors);
+    await svgToPng({
+      svg,
+      width: HEATMAP_EXPORT_SVG_LAYOUT.width,
+      height,
+      scale: EXPORT_PNG_SCALE,
+      filename: buildFilename("heatmap", [activeVariable, periodLabel], "png"),
+    });
+  }
+
+  async function handleExportSVG() {
+    const payload = buildHeatmapExportPayload();
+    if (!payload) return;
+    const colors = resolveExportColors();
+    const { svg } = await buildHeatmapExportSvg(payload, colors);
+    downloadSvgString(svg, buildFilename("heatmap", [activeVariable, periodLabel], "svg"));
   }
 
   return (
@@ -120,20 +229,24 @@ export function HeatMapView({
           onBboxModeToggle={() => onDrawModeChange(drawMode === "bbox" ? "none" : "bbox")}
           onPolygonModeToggle={() => onDrawModeChange(drawMode === "polygon" ? "none" : "polygon")}
           onClear={onClear}
-          {...(hasData ? { onExportCSV: handleExportCSV, onExportPNG: handleExportPNG } : {})}
+          {...(hasData
+            ? {
+                onExportCSV: handleExportCSV,
+                onExportPNG: handleExportPNG,
+                onExportSVG: handleExportSVG,
+              }
+            : {})}
         />
 
         {hasSelection && (
-          <div ref={statsBarRef}>
-            <StatsLegendBar
-              hasData={hasData}
-              stats={stats}
-              unit={unit}
-              scale={colorScale}
-              statSubtitle={statSubtitle}
-              avgTooltip={avgTooltip}
-            />
-          </div>
+          <StatsLegendBar
+            hasData={hasData}
+            stats={stats}
+            unit={unit}
+            scale={colorScale}
+            statSubtitle={statSubtitle}
+            avgTooltip={avgTooltip}
+          />
         )}
 
         <MapCanvas

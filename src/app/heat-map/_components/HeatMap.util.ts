@@ -1,17 +1,35 @@
-import type { TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
+import type { TPolygon, TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
 import { CELL_SIZE_OPTIONS, GRID_DELTA, MONTH_NAMES } from "@/constants";
 import { iriToCellBounds } from "@/utils";
 import type { TCellBounds, TCellSize } from "@/types";
-import type {
-  THeatmapStats,
-  TLooseBinding,
-  TPolygon,
-  TRegionalProfile,
-  TSumAndCount,
-} from "./HeatMap.type";
+import type { THeatmapStats, TLooseBinding, TRegionalProfile, TSumAndCount } from "./HeatMap.type";
 
 export { GRID_DELTA, iriToCellBounds };
 export type { TCellBounds, TCellSize };
+
+/** A cell's bounds either come straight off the binding's own lat/lng (± half a
+ * cell), or — when those aren't present — get derived from its cell IRI. Shared
+ * by the live HeatmapLayer and the SVG export, so both draw the exact same
+ * rectangles from the exact same bindings. */
+export function resolveCellBounds(
+  binding: TWorldClimBoxBinding,
+  cellSize: number,
+): TCellBounds | null {
+  const lat = parseFloat(binding.lat?.value ?? "");
+  const lng = parseFloat(binding.lng?.value ?? "");
+
+  if (!isNaN(lat) && !isNaN(lng)) {
+    return {
+      north: lat + cellSize / 2,
+      south: lat - cellSize / 2,
+      west: lng - cellSize / 2,
+      east: lng + cellSize / 2,
+    };
+  }
+
+  const iri = binding.cell?.value;
+  return iri ? iriToCellBounds(iri, cellSize) : null;
+}
 
 /** Candidate key sets — SPARQL variable names are API-defined; fallbacks cover naming variants */
 const KEY_SETS = [
@@ -143,10 +161,19 @@ export function gridDelta(gridSize: string): number {
   return GRID_DELTA[gridSize] ?? GRID_DELTA["10m"];
 }
 
+// 5 decimal places is ~1m of precision at the equator -- far finer than any
+// WorldClim grid cell -- and keeps the polygon short in query/share URLs.
+const WKT_COORDINATE_PRECISION = 5;
+
 /** lng lat order in WKT spec — note the inversion from the [lat, lng] input */
 export function polygonToWkt(vertices: [number, number][]): string {
   const ring = [...vertices, vertices[0]];
-  const coords = ring.map(([lat, lng]) => `${lng} ${lat}`).join(", ");
+  const coords = ring
+    .map(
+      ([lat, lng]) =>
+        `${lng.toFixed(WKT_COORDINATE_PRECISION)} ${lat.toFixed(WKT_COORDINATE_PRECISION)}`,
+    )
+    .join(", ");
   return `POLYGON((${coords}))`;
 }
 

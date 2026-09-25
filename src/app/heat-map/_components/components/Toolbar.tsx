@@ -55,6 +55,7 @@ export function Toolbar({
   onClear,
   onExportCSV,
   onExportPNG,
+  onExportSVG,
 }: TToolbarProps) {
   const t = useTranslations();
   const activeClass =
@@ -101,7 +102,11 @@ export function Toolbar({
 
       {onExportCSV !== undefined && onExportPNG !== undefined && (
         <div className="ml-auto">
-          <ExportMenu onExportCSV={onExportCSV} onExportPNG={onExportPNG} />
+          <ExportMenu
+            onExportCSV={onExportCSV}
+            onExportPNG={onExportPNG}
+            {...(onExportSVG !== undefined ? { onExportSVG } : {})}
+          />
         </div>
       )}
     </div>

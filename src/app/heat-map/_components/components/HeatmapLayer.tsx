@@ -5,7 +5,7 @@ import L from "leaflet";
 import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
 import type { THeatmapLayerProps } from "../HeatMap.type";
-import { GRID_DELTA, iriToCellBounds, pixelAnnualAvg, pixelSelectedAvg } from "../HeatMap.util";
+import { GRID_DELTA, pixelAnnualAvg, pixelSelectedAvg, resolveCellBounds } from "../HeatMap.util";
 
 const isTouchDevice = "ontouchstart" in window;
 
@@ -61,22 +61,7 @@ export function HeatmapLayer({
       const value = getValue(b);
       if (isNaN(value)) continue;
 
-      const bLat = parseFloat(b.lat?.value ?? "");
-      const bLng = parseFloat(b.lng?.value ?? "");
-      let bounds: { north: number; south: number; west: number; east: number } | null = null;
-
-      if (!isNaN(bLat) && !isNaN(bLng)) {
-        bounds = {
-          north: bLat + cellSize / 2,
-          south: bLat - cellSize / 2,
-          west: bLng - cellSize / 2,
-          east: bLng + cellSize / 2,
-        };
-      } else {
-        const iri = b.cell?.value;
-        if (iri) bounds = iriToCellBounds(iri, cellSize);
-      }
-
+      const bounds = resolveCellBounds(b, cellSize);
       if (!bounds) continue;
 
       const color = interpolateColor(value, min, max, scale);

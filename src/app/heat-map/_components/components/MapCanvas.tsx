@@ -36,7 +36,11 @@ export function MapCanvas({
         className="w-full h-full"
         scrollWheelZoom
       >
-        <TileLayer attribution={HEATMAP_MAP_CONFIG.attribution} url={HEATMAP_MAP_CONFIG.url} />
+        <TileLayer
+          attribution={HEATMAP_MAP_CONFIG.attribution}
+          url={HEATMAP_MAP_CONFIG.url}
+          crossOrigin={true}
+        />
 
         <MapFitter bbox={bbox} />
         <MapNavigator target={mapTarget} />

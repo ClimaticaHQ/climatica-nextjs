@@ -2,6 +2,8 @@ import type {
   TBbox,
   TCellSize,
   TColorScale,
+  TDatasetAttribution,
+  TPolygon,
   TVariable,
   TWikidataCity,
   TWorldClimBoxBinding,
@@ -23,8 +25,6 @@ export type TRegionalProfile = {
 };
 
 export type TDrawMode = "none" | "bbox" | "polygon";
-
-export type TPolygon = [number, number][];
 
 export type TMapTarget = { lat: number; lng: number };
 
@@ -55,6 +55,8 @@ export type TRegionHeatmapViewProps = {
   periodLabel: string;
   profile: TRegionalProfile | null;
   isProfileLoading: boolean;
+  datasetAttribution: TDatasetAttribution | null;
+  shareUrl: string;
   onDrawModeChange: (mode: TDrawMode) => void;
   onBboxChange: (bbox: TBbox | null) => void;
   onPolygonChange: (polygon: TPolygon | null) => void;
@@ -99,6 +101,7 @@ export type TToolbarProps = {
   onClear: () => void;
   onExportCSV?: (() => void) | undefined;
   onExportPNG?: (() => Promise<void>) | undefined;
+  onExportSVG?: (() => void | Promise<void>) | undefined;
 };
 
 export type TStatsLegendBarProps = {

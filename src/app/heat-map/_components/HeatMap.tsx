@@ -9,6 +9,7 @@ import {
 } from "@/constants";
 import {
   useGeolocation,
+  useGetDatasetVersion,
   useGetHeatmapData,
   useGetHeatmapPolygonData,
   useGetRegionalProfile,
@@ -17,24 +18,26 @@ import {
 } from "@/hooks";
 import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useFiltersStore, useSettingsStore } from "@/stores";
-import type { TBbox, TColorScale, TWikidataCity } from "@/types";
+import type { TBbox, TChartSubtitle, TColorScale, TPolygon, TWikidataCity } from "@/types";
 import {
   applyUrlFiltersToStore,
+  buildHeatMapShareUrl,
   createUrlParamHelpers,
   encodeVars,
   replaceUrlParams,
   syncUrlParams,
 } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { TDrawMode, TMapTarget, TPolygon } from "./HeatMap.type";
+import type { TDrawMode, TMapTarget } from "./HeatMap.type";
 import { computeRegionalProfile, polygonToWkt, wktToPolygon } from "./HeatMap.util";
 import { HeatMapView } from "./HeatMapView";
 
 export function HeatMap() {
   const t = useTranslations();
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -176,6 +179,20 @@ export function HeatMap() {
     ? computeRegionalProfile(profileData.tmax, profileData.tmin, profileData.prec)
     : null;
 
+  const { data: datasetAttribution = null } = useGetDatasetVersion();
+
+  const subtitle: TChartSubtitle = isClimate
+    ? { dataset, climatePeriod }
+    : { dataset, weatherYear };
+  const shareUrl = buildHeatMapShareUrl({
+    locale,
+    gridSize: grid,
+    variables,
+    subtitle,
+    bbox: polygon ? null : bbox,
+    polygonWkt: wkt,
+  });
+
   function handleDrawModeChange(mode: TDrawMode) {
     setDrawMode(mode);
     if (mode !== "none") {
@@ -254,6 +271,8 @@ export function HeatMap() {
       error={error}
       locationError={resolvedLocationError}
       mapTarget={mapTarget}
+      datasetAttribution={datasetAttribution}
+      shareUrl={shareUrl}
       onDrawModeChange={handleDrawModeChange}
       onBboxChange={handleBboxChange}
       onPolygonChange={handlePolygonChange}
