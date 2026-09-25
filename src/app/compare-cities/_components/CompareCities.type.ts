@@ -1,6 +1,7 @@
 import type {
   TCellSize,
   TChartSubtitle,
+  TDatasetAttribution,
   TMonthlyTemperature,
   TVariable,
   TWikidataCity,
@@ -21,6 +22,7 @@ export type TCompareCitiesViewProps = {
   error: Error | null;
   altitudeA: number | null;
   altitudeB: number | null;
+  datasetAttribution: TDatasetAttribution | null;
   onCityASelect: (city: TWikidataCity) => void;
   onCityBSelect: (city: TWikidataCity) => void;
 };

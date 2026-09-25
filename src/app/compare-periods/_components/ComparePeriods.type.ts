@@ -2,6 +2,7 @@ import type { TClimatePeriod } from "@/constants/worldclim.constant";
 import type {
   TCellSize,
   TDataset,
+  TDatasetAttribution,
   TMonthlyTemperature,
   TMultiPeriodEntry,
   TVariable,
@@ -17,6 +18,7 @@ export type TComparePeriodsViewProps = {
   selectedMonths: number[] | null;
   variables: readonly TVariable[];
   altitude: number | null;
+  datasetAttribution: TDatasetAttribution | null;
   autoGrid: TCellSize;
   isLoading: boolean;
   isLocating: boolean;

@@ -7,6 +7,7 @@ import {
   LocationSearch,
   MultiPeriodStatsTable,
   TempPrecipChart,
+  useTempPrecipChart,
 } from "@/components";
 import {
   ChartSkeleton,
@@ -25,21 +26,27 @@ import {
   CLIMATE_COMPARISON_COLORS,
   CLIMATE_PERIOD_LABELS,
   CLIMATE_PERIODS,
+  COMPARE_EXPORT_SVG_LAYOUT,
   DATASETS,
+  EXPORT_PNG_SCALE,
   PERIOD_COLORS,
 } from "@/constants";
-import type { TClimatePeriod } from "@/types";
+import type { TClimatePeriod, TCompareExportLabels, TCompareExportPayload } from "@/types";
 import {
   buildClimateStatsRows,
+  buildComparePeriodsShareUrl,
+  buildCompareExportSvg,
   buildFilename,
   computeCompareStats,
-  exportElementToPng,
+  downloadSvgString,
   exportTableToCsv,
   getMartonneLabelKey,
+  resolveCompareSeriesColors,
+  resolveExportColors,
+  svgToPng,
 } from "@/utils";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import { useRef } from "react";
 import type { TClimatePeriodRowProps, TComparePeriodsViewProps } from "./ComparePeriods.type";
 
 const MiniMap = dynamic(
@@ -83,6 +90,7 @@ export function ComparePeriodsView({
   selectedMonths,
   variables,
   altitude,
+  datasetAttribution,
   isLoading,
   isLocating,
   error,
@@ -98,13 +106,30 @@ export function ComparePeriodsView({
   chartSectionRef,
 }: TComparePeriodsViewProps) {
   const t = useTranslations();
-  const climateExportRef = useRef<HTMLDivElement>(null);
-  const weatherExportRef = useRef<HTMLDivElement>(null);
+  const locale = useLocale();
 
   const isClimate = dataset === DATASETS.CLIMATE;
 
+  const chart = useTempPrecipChart({
+    ...(isClimate ? { dataA, dataB } : { multiPeriodData: periodsData }),
+  });
+
   const labelA = isClimate ? CLIMATE_PERIOD_LABELS[climatePeriodA] : String(periods[0] ?? "");
   const labelB = isClimate ? CLIMATE_PERIOD_LABELS[climatePeriodB] : String(periods[1] ?? "");
+
+  const shareUrl = buildComparePeriodsShareUrl({
+    locale,
+    cityName: city.label,
+    lat: city.lat,
+    lng: city.lng,
+    gridSize: autoGrid,
+    variables,
+    selectedMonths,
+    dataset,
+    climatePeriodA,
+    climatePeriodB,
+    weatherPeriods: periods,
+  });
 
   const hasBothClimateData = dataA.length > 0 && dataB.length > 0;
   const statsA = hasBothClimateData ? computeCompareStats(dataA) : null;
@@ -146,12 +171,118 @@ export function ComparePeriodsView({
     );
   }
 
+  function buildExportLabels(): TCompareExportLabels {
+    return {
+      monthNames: Array.from({ length: 12 }, (_, i) => t(`months.${i + 1}`)),
+      monthAxisLabel: t("chart.monthAxis"),
+      seriesLabels: {
+        tmax: t("chart.maxTemperature"),
+        tmin: t("chart.minTemperature"),
+        tavg: t("chart.avgTemperature"),
+        prec: t("chart.precipitation"),
+      },
+      statsLabels: {
+        avgTmax: t("climateComparison.stats.avgTmax"),
+        avgTmin: t("climateComparison.stats.avgTmin"),
+        totalPrec: t("climateComparison.stats.totalPrec"),
+        aridMonths: t("climateComparison.stats.aridMonths"),
+        altitude: t("chart.altitude"),
+        martonne: t("climateComparison.stats.martonne"),
+      },
+    };
+  }
+
+  /** Colors are resolved from the live DOM, so these must only ever run inside a
+   * click handler (browser-only) — never at render time, which also runs on the
+   * server for a "use client" page like this one. */
+  function buildClimateExportPayload(): TCompareExportPayload | null {
+    if (!statsA || !statsB || !chart.scales) return null;
+    const seriesColors = resolveCompareSeriesColors();
+
+    return {
+      headerTitle: city.label,
+      headerSubtitle: `${labelA} vs ${labelB}`,
+      series: [
+        {
+          label: labelA,
+          data: chart.chartDataA,
+          stats: statsA,
+          altitude,
+          martonneClassLabel:
+            statsA.martonneIndex !== null ? t(getMartonneLabelKey(statsA.martonneIndex)) : null,
+          colors: seriesColors.A,
+        },
+        {
+          label: labelB,
+          data: chart.chartDataB,
+          stats: statsB,
+          altitude,
+          martonneClassLabel:
+            statsB.martonneIndex !== null ? t(getMartonneLabelKey(statsB.martonneIndex)) : null,
+          colors: seriesColors.B,
+        },
+      ],
+      visibleSeries: { tmax: true, tmin: true, tavg: false, prec: true },
+      selectedMonths,
+      scales: chart.scales,
+      rightMax: chart.rightMax,
+      labels: buildExportLabels(),
+      showTavgLine: true,
+      datasetAttribution,
+      shareUrl,
+    };
+  }
+
+  function buildWeatherExportPayload(): TCompareExportPayload | null {
+    if (periodsData.length === 0 || !chart.scales) return null;
+
+    return {
+      headerTitle: city.label,
+      headerSubtitle: periods.join(", "),
+      series: periodsData.map(({ year, rows }, i) => {
+        const stats = computeCompareStats(rows);
+        const color = PERIOD_COLORS[i % PERIOD_COLORS.length] ?? PERIOD_COLORS[0];
+        return {
+          label: String(year),
+          data: rows.map((row) => ({ ...row, tavg: (row.tmax + row.tmin) / 2 })),
+          stats,
+          altitude,
+          martonneClassLabel:
+            stats.martonneIndex !== null ? t(getMartonneLabelKey(stats.martonneIndex)) : null,
+          colors: { tmax: color, tmin: color, tavg: color, prec: color },
+        };
+      }),
+      visibleSeries: { tmax: true, tmin: true, tavg: false, prec: true },
+      selectedMonths,
+      scales: chart.scales,
+      rightMax: chart.rightMax,
+      labels: buildExportLabels(),
+      showTavgLine: false,
+      datasetAttribution,
+      shareUrl,
+    };
+  }
+
   async function handleClimateExportPNG() {
-    if (!climateExportRef.current) return;
-    await exportElementToPng(
-      climateExportRef.current,
-      buildFilename("compare-periods", [city.label, labelA, labelB], "png"),
-    );
+    const payload = buildClimateExportPayload();
+    if (!payload) return;
+    const colors = resolveExportColors();
+    const { svg, height } = buildCompareExportSvg(payload, colors);
+    await svgToPng({
+      svg,
+      width: COMPARE_EXPORT_SVG_LAYOUT.width,
+      height,
+      scale: EXPORT_PNG_SCALE,
+      filename: buildFilename("compare-periods", [city.label, labelA, labelB], "png"),
+    });
+  }
+
+  function handleClimateExportSVG() {
+    const payload = buildClimateExportPayload();
+    if (!payload) return;
+    const colors = resolveExportColors();
+    const { svg } = buildCompareExportSvg(payload, colors);
+    downloadSvgString(svg, buildFilename("compare-periods", [city.label, labelA, labelB], "svg"));
   }
 
   function handleWeatherExportCSV() {
@@ -185,10 +316,27 @@ export function ComparePeriodsView({
   }
 
   async function handleWeatherExportPNG() {
-    if (!weatherExportRef.current) return;
-    await exportElementToPng(
-      weatherExportRef.current,
-      buildFilename("compare-periods", [city.label, ...periods.map(String)], "png"),
+    const payload = buildWeatherExportPayload();
+    if (!payload) return;
+    const colors = resolveExportColors();
+    const { svg, height } = buildCompareExportSvg(payload, colors);
+    await svgToPng({
+      svg,
+      width: COMPARE_EXPORT_SVG_LAYOUT.width,
+      height,
+      scale: EXPORT_PNG_SCALE,
+      filename: buildFilename("compare-periods", [city.label, ...periods.map(String)], "png"),
+    });
+  }
+
+  function handleWeatherExportSVG() {
+    const payload = buildWeatherExportPayload();
+    if (!payload) return;
+    const colors = resolveExportColors();
+    const { svg } = buildCompareExportSvg(payload, colors);
+    downloadSvgString(
+      svg,
+      buildFilename("compare-periods", [city.label, ...periods.map(String)], "svg"),
     );
   }
 
@@ -265,9 +413,10 @@ export function ComparePeriodsView({
                 <ExportMenu
                   onExportCSV={handleClimateExportCSV}
                   onExportPNG={handleClimateExportPNG}
+                  onExportSVG={handleClimateExportSVG}
                 />
               </div>
-              <div ref={climateExportRef} className="flex flex-col gap-6">
+              <div className="flex flex-col gap-6">
                 <CompareStatsGrid
                   labelA={labelA}
                   labelB={labelB}
@@ -342,6 +491,7 @@ export function ComparePeriodsView({
                 <ExportMenu
                   onExportCSV={handleWeatherExportCSV}
                   onExportPNG={handleWeatherExportPNG}
+                  onExportSVG={handleWeatherExportSVG}
                 />
               </div>
             ) : loadingPeriods.length > 0 ? (
@@ -349,7 +499,7 @@ export function ComparePeriodsView({
                 <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
               </div>
             ) : null}
-            <div ref={weatherExportRef} className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6">
               <MultiPeriodStatsTable
                 periods={periods}
                 periodsData={periodsData}

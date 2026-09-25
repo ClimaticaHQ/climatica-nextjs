@@ -16,6 +16,7 @@ import {
   useGeolocation,
   useGetAltitude,
   useGetComparePeriods,
+  useGetDatasetVersion,
   useGetMultiPeriodData,
   usePersistedCity,
   usePersistedComparisonCities,
@@ -187,6 +188,7 @@ export function ComparePeriods() {
   );
 
   const { data: altitude = null } = useGetAltitude(cityA.lat, cityA.lng, gridSize);
+  const { data: datasetAttribution = null } = useGetDatasetVersion();
 
   const isLoading = dataset === DATASETS.CLIMATE ? isClimateLoading : isWeatherLoading;
   const error = dataset === DATASETS.CLIMATE ? climateError : weatherError;
@@ -240,6 +242,7 @@ export function ComparePeriods() {
     <ComparePeriodsView
       city={cityA}
       altitude={altitude}
+      datasetAttribution={datasetAttribution}
       dataset={dataset}
       isHydrated={hasHydrated}
       autoGrid={gridSize}

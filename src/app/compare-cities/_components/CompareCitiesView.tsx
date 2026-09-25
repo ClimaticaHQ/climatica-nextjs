@@ -1,7 +1,13 @@
 "use client";
 
 import type { TMiniMapLocation } from "@/components";
-import { CompareStatsGrid, DiffCard, SearchBar, TempPrecipChart } from "@/components";
+import {
+  CompareStatsGrid,
+  DiffCard,
+  SearchBar,
+  TempPrecipChart,
+  useTempPrecipChart,
+} from "@/components";
 import {
   ChartSkeleton,
   DotLabel,
@@ -13,18 +19,31 @@ import {
   PageWrapper,
   TableSkeleton,
 } from "@/components/UI";
-import { CELL_SIZE_OPTIONS, CLIMATE_COMPARISON_COLORS } from "@/constants";
+import {
+  CELL_SIZE_OPTIONS,
+  CLIMATE_COMPARISON_COLORS,
+  CLIMATE_PERIOD_LABELS,
+  COMPARE_EXPORT_SVG_LAYOUT,
+  DATASETS,
+  EXPORT_PNG_SCALE,
+} from "@/constants";
+import type { TCompareExportPayload } from "@/types";
 import {
   buildClimateStatsRows,
+  buildCompareCitiesShareUrl,
+  buildCompareExportSvg,
   buildFilename,
-  exportElementToPng,
+  downloadSvgString,
   exportTableToCsv,
   getMartonneLabelKey,
+  resolveCompareSeriesColors,
+  resolveExportColors,
+  svgToPng,
 } from "@/utils";
 import { computeCompareStats, computeDiffStats } from "@/utils/climateComparison.util";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import type { TCitySearchRowProps, TCompareCitiesViewProps } from "./CompareCities.type";
 
 const MiniMap = dynamic(
@@ -57,13 +76,15 @@ export function CompareCitiesView({
   error,
   altitudeA,
   altitudeB,
+  datasetAttribution,
   onCityASelect,
   onCityBSelect,
   chartSectionRef,
 }: TCompareCitiesViewProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const [activeCity, setActiveCity] = useState(0);
-  const exportRef = useRef<HTMLDivElement>(null);
+  const chart = useTempPrecipChart({ dataA, dataB });
 
   const hasBothData = dataA.length > 0 && dataB.length > 0;
   const statsA = hasBothData ? computeCompareStats(dataA) : null;
@@ -72,6 +93,26 @@ export function CompareCitiesView({
 
   const labelA = cityA.label;
   const labelB = cityB.label;
+
+  const periodLabel =
+    subtitle.dataset === DATASETS.CLIMATE && subtitle.climatePeriod
+      ? t("chart.subtitle.climate", { period: CLIMATE_PERIOD_LABELS[subtitle.climatePeriod] })
+      : subtitle.weatherYear !== undefined
+        ? t("chart.subtitle.weather", { year: subtitle.weatherYear })
+        : "";
+
+  const shareUrl = buildCompareCitiesShareUrl({
+    locale,
+    cityAName: cityA.label,
+    latA: cityA.lat,
+    lngA: cityA.lng,
+    cityBName: cityB.label,
+    latB: cityB.lat,
+    lngB: cityB.lng,
+    gridSize: autoGrid,
+    variables,
+    subtitle,
+  });
 
   const miniMapLocations: TMiniMapLocation[] = [
     ...(cityA?.lat && cityA?.lng
@@ -131,12 +172,84 @@ export function CompareCitiesView({
     );
   }
 
+  /** Colors are resolved from the live DOM, so this must only ever run inside a
+   * click handler (browser-only) — never at render time, which also runs on the
+   * server for a "use client" page like this one. */
+  function buildCompareExportPayload(): TCompareExportPayload | null {
+    if (!statsA || !statsB || !chart.scales) return null;
+    const seriesColors = resolveCompareSeriesColors();
+
+    return {
+      headerTitle: `${labelA} vs ${labelB}`,
+      headerSubtitle: periodLabel,
+      series: [
+        {
+          label: labelA,
+          data: chart.chartDataA,
+          stats: statsA,
+          altitude: altitudeA,
+          martonneClassLabel:
+            statsA.martonneIndex !== null ? t(getMartonneLabelKey(statsA.martonneIndex)) : null,
+          colors: seriesColors.A,
+        },
+        {
+          label: labelB,
+          data: chart.chartDataB,
+          stats: statsB,
+          altitude: altitudeB,
+          martonneClassLabel:
+            statsB.martonneIndex !== null ? t(getMartonneLabelKey(statsB.martonneIndex)) : null,
+          colors: seriesColors.B,
+        },
+      ],
+      visibleSeries: { tmax: true, tmin: true, tavg: false, prec: true },
+      selectedMonths,
+      scales: chart.scales,
+      rightMax: chart.rightMax,
+      labels: {
+        monthNames: Array.from({ length: 12 }, (_, i) => t(`months.${i + 1}`)),
+        monthAxisLabel: t("chart.monthAxis"),
+        seriesLabels: {
+          tmax: t("chart.maxTemperature"),
+          tmin: t("chart.minTemperature"),
+          tavg: t("chart.avgTemperature"),
+          prec: t("chart.precipitation"),
+        },
+        statsLabels: {
+          avgTmax: t("climateComparison.stats.avgTmax"),
+          avgTmin: t("climateComparison.stats.avgTmin"),
+          totalPrec: t("climateComparison.stats.totalPrec"),
+          aridMonths: t("climateComparison.stats.aridMonths"),
+          altitude: t("chart.altitude"),
+          martonne: t("climateComparison.stats.martonne"),
+        },
+      },
+      showTavgLine: true,
+      datasetAttribution,
+      shareUrl,
+    };
+  }
+
   async function handleExportPNG() {
-    if (!exportRef.current) return;
-    await exportElementToPng(
-      exportRef.current,
-      buildFilename("compare-cities", [labelA, labelB], "png"),
-    );
+    const payload = buildCompareExportPayload();
+    if (!payload) return;
+    const colors = resolveExportColors();
+    const { svg, height } = buildCompareExportSvg(payload, colors);
+    await svgToPng({
+      svg,
+      width: COMPARE_EXPORT_SVG_LAYOUT.width,
+      height,
+      scale: EXPORT_PNG_SCALE,
+      filename: buildFilename("compare-cities", [labelA, labelB], "png"),
+    });
+  }
+
+  function handleExportSVG() {
+    const payload = buildCompareExportPayload();
+    if (!payload) return;
+    const colors = resolveExportColors();
+    const { svg } = buildCompareExportSvg(payload, colors);
+    downloadSvgString(svg, buildFilename("compare-cities", [labelA, labelB], "svg"));
   }
 
   return (
@@ -189,9 +302,13 @@ export function CompareCitiesView({
         ) : hasBothData && statsA && statsB ? (
           <div ref={chartSectionRef} className="flex flex-col gap-2">
             <div className="flex h-10 items-center justify-end">
-              <ExportMenu onExportCSV={handleExportCSV} onExportPNG={handleExportPNG} />
+              <ExportMenu
+                onExportCSV={handleExportCSV}
+                onExportPNG={handleExportPNG}
+                onExportSVG={handleExportSVG}
+              />
             </div>
-            <div ref={exportRef} className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6">
               <CompareStatsGrid
                 labelA={labelA}
                 labelB={labelB}

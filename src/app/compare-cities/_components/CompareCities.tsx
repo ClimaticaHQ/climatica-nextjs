@@ -4,6 +4,7 @@ import { APP_TITLE, DATASETS, SIDEBAR_PARAMS, TIME } from "@/constants";
 import {
   useGetAltitude,
   useGetCompareData,
+  useGetDatasetVersion,
   usePersistedCity,
   usePersistedComparisonCities,
 } from "@/hooks";
@@ -123,6 +124,7 @@ export function CompareCities() {
 
   const { data: altitudeA = null } = useGetAltitude(cityA.lat, cityA.lng, gridSize);
   const { data: altitudeB = null } = useGetAltitude(cityB.lat, cityB.lng, gridSize);
+  const { data: datasetAttribution = null } = useGetDatasetVersion();
 
   function handleCityASelect(city: TWikidataCity) {
     userSelectedRef.current = true;
@@ -184,6 +186,7 @@ export function CompareCities() {
       error={error}
       altitudeA={altitudeA}
       altitudeB={altitudeB}
+      datasetAttribution={datasetAttribution}
       variables={variables}
       onCityASelect={handleCityASelect}
       onCityBSelect={handleCityBSelect}
