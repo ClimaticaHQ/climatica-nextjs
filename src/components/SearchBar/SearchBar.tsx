@@ -1,18 +1,28 @@
 import { useDebounce, useSearchCity } from "@/hooks";
-import type { TCoordinates, TWikidataCity } from "@/types";
+import type { TCity, TCoordinates } from "@/types";
 import { useTranslations } from "next-intl";
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { FocusEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { TSearchBarProps } from "./SearchBar.type";
 import { tryParseCoords } from "./SearchBar.util";
 
-export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) {
+export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
   const t = useTranslations();
-  const [query, setQuery] = useState(defaultValue);
+  const [query, setQuery] = useState(cityLabel);
+  const [isEditing, setIsEditing] = useState(false);
+  const [prevCityLabel, setPrevCityLabel] = useState(cityLabel);
   const [coordResult, setCoordResult] = useState<TCoordinates | null>(null);
   const [dismissed, setDismissed] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [lastConfig, setLastConfig] = useState({ len: 0, open: false });
+
+  /** Render-phase sync, not an effect — only applies while the user isn't
+   * mid-edit, so external city changes (back/forward, map click, geolocation,
+   * cross-page sync) don't clobber typing. */
+  if (cityLabel !== prevCityLabel) {
+    setPrevCityLabel(cityLabel);
+    if (!isEditing) setQuery(cityLabel);
+  }
 
   const debouncedQuery = useDebounce(query, 400);
   const searchQuery = !dirty || coordResult !== null ? "" : debouncedQuery;
@@ -56,6 +66,7 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
 
   function handleInputChange(value: string) {
     setQuery(value);
+    setIsEditing(true);
     setDirty(true);
     setDismissed(false);
     const trimmed = value.trim();
@@ -63,8 +74,9 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
     setCoordResult(coords || null);
   }
 
-  function handleSelectCity(city: TWikidataCity) {
+  function handleSelectCity(city: TCity) {
     setQuery(city.label);
+    setIsEditing(false);
     setDismissed(true);
     onCitySelect(city);
   }
@@ -73,6 +85,7 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
     if (!coordResult) return;
     const label = `${coordResult.lat}, ${coordResult.lng}`;
     setQuery(label);
+    setIsEditing(false);
     setDismissed(true);
     onCitySelect({
       id: `coords:${coordResult.lat},${coordResult.lng}`,
@@ -81,6 +94,16 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
       lat: coordResult.lat,
       lng: coordResult.lng,
     });
+  }
+
+  /** relatedTarget sits inside our own dropdown when the user is clicking (or
+   * tabbing to) a result — skip the revert so that selection can go through. */
+  function handleBlur(e: FocusEvent<HTMLInputElement>) {
+    if (containerRef.current?.contains(e.relatedTarget)) return;
+    if (!isEditing) return;
+    setIsEditing(false);
+    setDismissed(true);
+    setQuery(cityLabel);
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -104,7 +127,7 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
         if (selectedItem === "COORDS") {
           handleSelectCoords();
         } else {
-          handleSelectCity(selectedItem as TWikidataCity);
+          handleSelectCity(selectedItem as TCity);
         }
       },
       Escape: () => {
@@ -133,6 +156,7 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
         value={query}
         onChange={(e) => handleInputChange(e.target.value)}
         onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
         placeholder={t("search.placeholder")}
         className={`
           w-full px-3 md:px-4 py-2
@@ -189,7 +213,7 @@ export function SearchBar({ onCitySelect, defaultValue = "" }: TSearchBarProps) 
               );
             }
 
-            const city = item as TWikidataCity;
+            const city = item as TCity;
             return (
               <li key={city.id}>
                 <button
