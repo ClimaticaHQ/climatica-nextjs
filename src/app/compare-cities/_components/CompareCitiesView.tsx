@@ -30,7 +30,6 @@ import {
 import type { TCompareExportPayload } from "@/types";
 import {
   buildClimateStatsRows,
-  buildCompareCitiesShareUrl,
   buildCompareExportSvg,
   buildFilename,
   downloadSvgString,
@@ -41,7 +40,7 @@ import {
   svgToPng,
 } from "@/utils";
 import { computeCompareStats, computeDiffStats } from "@/utils/climateComparison.util";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import type { TCitySearchRowProps, TCompareCitiesViewProps } from "./CompareCities.type";
@@ -54,11 +53,11 @@ const MiniMap = dynamic(
   },
 );
 
-function CitySearchRow({ label, dotColor, defaultValue, onCitySelect }: TCitySearchRowProps) {
+function CitySearchRow({ label, dotColor, cityLabel, onCitySelect }: TCitySearchRowProps) {
   return (
     <div className="flex flex-col gap-1.5">
       <DotLabel label={label} dotColor={dotColor} />
-      <SearchBar defaultValue={defaultValue} onCitySelect={onCitySelect} />
+      <SearchBar cityLabel={cityLabel} onCitySelect={onCitySelect} />
     </div>
   );
 }
@@ -72,6 +71,7 @@ export function CompareCitiesView({
   subtitle,
   selectedMonths,
   variables,
+  shareUrl,
   isLoading,
   error,
   altitudeA,
@@ -82,7 +82,6 @@ export function CompareCitiesView({
   chartSectionRef,
 }: TCompareCitiesViewProps) {
   const t = useTranslations();
-  const locale = useLocale();
   const [activeCity, setActiveCity] = useState(0);
   const chart = useTempPrecipChart({ dataA, dataB });
 
@@ -100,19 +99,6 @@ export function CompareCitiesView({
       : subtitle.weatherYear !== undefined
         ? t("chart.subtitle.weather", { year: subtitle.weatherYear })
         : "";
-
-  const shareUrl = buildCompareCitiesShareUrl({
-    locale,
-    cityAName: cityA.label,
-    latA: cityA.lat,
-    lngA: cityA.lng,
-    cityBName: cityB.label,
-    latB: cityB.lat,
-    lngB: cityB.lng,
-    gridSize: autoGrid,
-    variables,
-    subtitle,
-  });
 
   const miniMapLocations: TMiniMapLocation[] = [
     ...(cityA?.lat && cityA?.lng
@@ -270,17 +256,15 @@ export function CompareCitiesView({
           <div className="flex-1">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <CitySearchRow
-                key={cityA.id}
                 label={t("climateComparison.searchA")}
                 dotColor={CLIMATE_COMPARISON_COLORS.A.tmax}
-                defaultValue={cityA.label}
+                cityLabel={cityA.label}
                 onCitySelect={onCityASelect}
               />
               <CitySearchRow
-                key={cityB.id}
                 label={t("climateComparison.searchB")}
                 dotColor={CLIMATE_COMPARISON_COLORS.B.tmax}
-                defaultValue={cityB.label}
+                cityLabel={cityB.label}
                 onCitySelect={onCityBSelect}
               />
             </div>
