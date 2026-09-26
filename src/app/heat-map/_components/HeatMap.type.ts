@@ -1,14 +1,25 @@
 import type {
   TBbox,
   TCellSize,
+  TCity,
   TColorScale,
   TDatasetAttribution,
+  TDatasetPeriodUrlValue,
   TPolygon,
   TVariable,
-  TWikidataCity,
   TWorldClimBoxBinding,
   TWorldClimBoxResponse,
 } from "@/types";
+
+export type THeatMapSelectionValue =
+  { kind: "bbox"; bbox: TBbox } | { kind: "polygon"; polygon: TPolygon } | { kind: "none" };
+
+export type THeatMapUrlState = {
+  datasetPeriod: TDatasetPeriodUrlValue;
+  variables: TVariable[];
+  gridSize: TCellSize;
+  selection: THeatMapSelectionValue;
+};
 
 export type TLooseBinding = Record<string, unknown>;
 
@@ -61,7 +72,7 @@ export type TRegionHeatmapViewProps = {
   onBboxChange: (bbox: TBbox | null) => void;
   onPolygonChange: (polygon: TPolygon | null) => void;
   onClear: () => void;
-  onCitySelect: (city: TWikidataCity) => void;
+  onCitySelect: (city: TCity) => void;
   onLocate: () => void;
   onClearLocationError: () => void;
 };

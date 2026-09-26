@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  APP_TITLE,
-  CLIMATE_PERIOD_LABELS,
-  DATASETS,
-  SIDEBAR_PARAMS,
-  VARIABLE_LABELS,
-} from "@/constants";
+import { APP_TITLE, CLIMATE_PERIOD_LABELS, DATASETS, VARIABLE_LABELS } from "@/constants";
 import {
   useGeolocation,
   useGetDatasetVersion,
@@ -15,42 +9,27 @@ import {
   useGetRegionalProfile,
   usePersistedCity,
   usePersistedComparisonCities,
+  useUrlStateSync,
 } from "@/hooks";
-import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useFiltersStore, useSettingsStore } from "@/stores";
-import type { TBbox, TChartSubtitle, TColorScale, TPolygon, TWikidataCity } from "@/types";
-import {
-  applyUrlFiltersToStore,
-  buildHeatMapShareUrl,
-  createUrlParamHelpers,
-  encodeVars,
-  replaceUrlParams,
-  syncUrlParams,
-} from "@/utils";
+import type { TBbox, TColorScale, TCity, TPolygon } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { useLocale, useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from "react";
+import { HEAT_MAP_URL_SCHEMA } from "./HeatMap.constant";
 import type { TDrawMode, TMapTarget } from "./HeatMap.type";
-import { computeRegionalProfile, polygonToWkt, wktToPolygon } from "./HeatMap.util";
+import { computeRegionalProfile, polygonToWkt } from "./HeatMap.util";
 import { HeatMapView } from "./HeatMapView";
 
 export function HeatMap() {
   const t = useTranslations();
-  const locale = useLocale();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
   const queryClient = useQueryClient();
   const { city: persistedCity, selectCity } = usePersistedCity();
   const isFirstRenderRef = useRef(true);
   const { selectCityA } = usePersistedComparisonCities();
   const [drawMode, setDrawMode] = useState<TDrawMode>("none");
-
-  const [polygon, setPolygon] = useState<TPolygon | null>(() => {
-    const raw = searchParams.get(SIDEBAR_PARAMS.POLYGON);
-    return raw !== null ? wktToPolygon(raw) : null;
-  });
+  const [bbox, setBbox] = useState<TBbox | null>(null);
+  const [polygon, setPolygon] = useState<TPolygon | null>(null);
 
   const [mapTarget, setMapTarget] = useState<TMapTarget | null>(null);
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
@@ -71,23 +50,30 @@ export function HeatMap() {
   const activeVariable = variables[0] ?? "tmax";
   const colorScale: TColorScale = activeVariable === "prec" ? "precipitation" : "temperature";
 
-  const northRaw = searchParams.get(SIDEBAR_PARAMS.BBOX_NORTH);
-  const southRaw = searchParams.get(SIDEBAR_PARAMS.BBOX_SOUTH);
-  const westRaw = searchParams.get(SIDEBAR_PARAMS.BBOX_WEST);
-  const eastRaw = searchParams.get(SIDEBAR_PARAMS.BBOX_EAST);
-  const bbox: TBbox | null =
-    northRaw !== null && southRaw !== null && westRaw !== null && eastRaw !== null
-      ? {
-          north: Number(northRaw),
-          south: Number(southRaw),
-          west: Number(westRaw),
-          east: Number(eastRaw),
+  const { pushUrlState, shareUrl } = useUrlStateSync({
+    schema: HEAT_MAP_URL_SCHEMA,
+    state: {
+      selection: polygon
+        ? { kind: "polygon", polygon }
+        : bbox
+          ? { kind: "bbox", bbox }
+          : { kind: "none" },
+    },
+    onRestore(parsed) {
+      if (parsed.selection) {
+        if (parsed.selection.kind === "bbox") {
+          setBbox(parsed.selection.bbox);
+          setPolygon(null);
+        } else if (parsed.selection.kind === "polygon") {
+          setPolygon(parsed.selection.polygon);
+          setBbox(null);
+        } else {
+          setBbox(null);
+          setPolygon(null);
         }
-      : null;
-
-  useEffect(() => {
-    applyUrlFiltersToStore(searchParams, useFiltersStore.getState().actions);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+      }
+    },
+  });
 
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
@@ -99,36 +85,6 @@ export function HeatMap() {
     setMapTarget({ lat: persistedCity.lat, lng: persistedCity.lng });
   }, [persistedCity.lat, persistedCity.lng]); // eslint-disable-line react-hooks/exhaustive-deps
   /* eslint-enable react-hooks/set-state-in-effect */
-
-  const varsStr = useMemo(() => encodeVars(variables), [variables]);
-
-  useEffect(() => {
-    const helper = createUrlParamHelpers(searchParams);
-
-    helper.set(SIDEBAR_PARAMS.DATASET, dataset);
-    helper.set(SIDEBAR_PARAMS.VAR, varsStr);
-    helper.set(SIDEBAR_PARAMS.GRID, grid);
-
-    if (isClimate) {
-      helper.set(SIDEBAR_PARAMS.PERIOD, climatePeriod);
-      helper.delete(SIDEBAR_PARAMS.YEAR);
-    } else {
-      helper.set(SIDEBAR_PARAMS.YEAR, String(weatherYear));
-      helper.delete(SIDEBAR_PARAMS.PERIOD);
-    }
-
-    syncUrlParams(router, pathname, helper);
-  }, [
-    dataset,
-    climatePeriod,
-    weatherYear,
-    isClimate,
-    varsStr,
-    grid,
-    searchParams,
-    router,
-    pathname,
-  ]);
 
   useEffect(() => {
     const varLabel = VARIABLE_LABELS[activeVariable] ?? activeVariable;
@@ -181,66 +137,36 @@ export function HeatMap() {
 
   const { data: datasetAttribution = null } = useGetDatasetVersion();
 
-  const subtitle: TChartSubtitle = isClimate
-    ? { dataset, climatePeriod }
-    : { dataset, weatherYear };
-  const shareUrl = buildHeatMapShareUrl({
-    locale,
-    gridSize: grid,
-    variables,
-    subtitle,
-    bbox: polygon ? null : bbox,
-    polygonWkt: wkt,
-  });
-
   function handleDrawModeChange(mode: TDrawMode) {
     setDrawMode(mode);
     if (mode !== "none") {
+      setBbox(null);
       setPolygon(null);
-      applySelection(null, null);
     }
-  }
-
-  function applySelection(nextBbox: TBbox | null, nextPolygon: TPolygon | null) {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    if (nextBbox) {
-      nextParams.set(SIDEBAR_PARAMS.BBOX_NORTH, String(nextBbox.north));
-      nextParams.set(SIDEBAR_PARAMS.BBOX_SOUTH, String(nextBbox.south));
-      nextParams.set(SIDEBAR_PARAMS.BBOX_WEST, String(nextBbox.west));
-      nextParams.set(SIDEBAR_PARAMS.BBOX_EAST, String(nextBbox.east));
-    } else {
-      nextParams.delete(SIDEBAR_PARAMS.BBOX_NORTH);
-      nextParams.delete(SIDEBAR_PARAMS.BBOX_SOUTH);
-      nextParams.delete(SIDEBAR_PARAMS.BBOX_WEST);
-      nextParams.delete(SIDEBAR_PARAMS.BBOX_EAST);
-    }
-    if (nextPolygon) {
-      nextParams.set(SIDEBAR_PARAMS.POLYGON, polygonToWkt(nextPolygon));
-    } else {
-      nextParams.delete(SIDEBAR_PARAMS.POLYGON);
-    }
-    replaceUrlParams(router, pathname, nextParams);
   }
 
   function handleBboxChange(next: TBbox | null) {
     setDrawMode("none");
     setPolygon(null);
-    applySelection(next, null);
+    setBbox(next);
+    pushUrlState({ selection: next ? { kind: "bbox", bbox: next } : { kind: "none" } });
   }
 
   function handlePolygonChange(next: TPolygon | null) {
     setDrawMode("none");
+    setBbox(null);
     setPolygon(next);
-    applySelection(null, next);
+    pushUrlState({ selection: next ? { kind: "polygon", polygon: next } : { kind: "none" } });
   }
 
   function handleClear() {
+    setBbox(null);
     setPolygon(null);
     setDrawMode("none");
-    applySelection(null, null);
+    pushUrlState({ selection: { kind: "none" } });
   }
 
-  function handleCitySelect(city: TWikidataCity) {
+  function handleCitySelect(city: TCity) {
     setMapTarget({ lat: city.lat, lng: city.lng });
     if (syncCity) {
       selectCity(city);

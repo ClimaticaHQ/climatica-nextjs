@@ -1,8 +1,15 @@
-import type { TPolygon, TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
-import { CELL_SIZE_OPTIONS, GRID_DELTA, MONTH_NAMES } from "@/constants";
+import type { TPolygon, TUrlField, TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
+import { CELL_SIZE_OPTIONS, GRID_DELTA, MONTH_NAMES, SIDEBAR_PARAMS } from "@/constants";
 import { iriToCellBounds } from "@/utils";
+import { parseCoord } from "@/utils/urlParams.util";
 import type { TCellBounds, TCellSize } from "@/types";
-import type { THeatmapStats, TLooseBinding, TRegionalProfile, TSumAndCount } from "./HeatMap.type";
+import type {
+  THeatmapStats,
+  THeatMapSelectionValue,
+  TLooseBinding,
+  TRegionalProfile,
+  TSumAndCount,
+} from "./HeatMap.type";
 
 export { GRID_DELTA, iriToCellBounds };
 export type { TCellBounds, TCellSize };
@@ -190,6 +197,37 @@ export function wktToPolygon(wkt: string): TPolygon | null {
   if (vertices.some(([lat, lng]) => isNaN(lat) || isNaN(lng))) return null;
   return vertices;
 }
+
+/** Polygon and bbox are mutually exclusive — polygon (if present) always wins on parse. */
+export const selectionUrlField: TUrlField<THeatMapSelectionValue> = {
+  serialize(value, params) {
+    if (value.kind === "polygon") {
+      params.set(SIDEBAR_PARAMS.POLYGON, polygonToWkt(value.polygon));
+    } else if (value.kind === "bbox") {
+      params.set(SIDEBAR_PARAMS.BBOX_NORTH, String(value.bbox.north));
+      params.set(SIDEBAR_PARAMS.BBOX_SOUTH, String(value.bbox.south));
+      params.set(SIDEBAR_PARAMS.BBOX_WEST, String(value.bbox.west));
+      params.set(SIDEBAR_PARAMS.BBOX_EAST, String(value.bbox.east));
+    }
+  },
+  parse(params) {
+    const polygonRaw = params.get(SIDEBAR_PARAMS.POLYGON);
+    if (polygonRaw !== null) {
+      const polygon = wktToPolygon(polygonRaw);
+      return polygon ? { kind: "polygon", polygon } : { kind: "none" };
+    }
+
+    const north = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_NORTH));
+    const south = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_SOUTH));
+    const west = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_WEST));
+    const east = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_EAST));
+    if (north !== null && south !== null && west !== null && east !== null) {
+      return { kind: "bbox", bbox: { north, south, west, east } };
+    }
+
+    return { kind: "none" };
+  },
+};
 
 /** "2.5 min" from "2.5 min (~20.25 km²)" */
 export function shortGridLabel(gridSize: TCellSize): string {
