@@ -31,7 +31,7 @@ import {
   resolveExportColors,
   svgToPng,
 } from "@/utils";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import type { TClimateStatisticsViewProps, TStatCardProps } from "./ClimateStatistics.type";
@@ -85,6 +85,7 @@ export function ClimateStatisticsView({
   gridSize,
   selectedMonths,
   variables,
+  shareUrl,
   isLoading,
   isFetching,
   isLocating,
@@ -97,7 +98,6 @@ export function ClimateStatisticsView({
   chartSectionRef,
 }: TClimateStatisticsViewProps) {
   const t = useTranslations();
-  const locale = useLocale();
   const [visibleSeries, setVisibleSeries] = useState<TVisibleSeries | null>(null);
   const [chartMode, setChartMode] = useState<TChartMode>("standard");
   const chart = useTempPrecipChart({ data: temperatureData });
@@ -161,7 +161,6 @@ export function ClimateStatisticsView({
   };
 
   const exportPayload = buildExportPayload({
-    locale,
     cityName,
     lat: mapCenter.lat,
     lng: mapCenter.lng,
@@ -179,6 +178,7 @@ export function ClimateStatisticsView({
     chartMode,
     labels: exportLabels,
     datasetAttribution,
+    shareUrl,
   });
 
   function handleExportCSV() {
@@ -247,6 +247,7 @@ export function ClimateStatisticsView({
         <LocationSearch
           isLocating={isLocating}
           locationError={locationError}
+          cityLabel={cityName}
           onCitySelect={onCitySelect}
           onLocate={onLocate}
           onClearLocationError={onClearLocationError}
