@@ -4,7 +4,6 @@ import type {
   TChartSubtitle,
   TChartSummary,
   TDatasetAttribution,
-  TLocale,
   TMonthAridity,
   TMonthlyTemperature,
   TSeriesKey,
@@ -69,7 +68,6 @@ export type TExportPayload = {
 };
 
 export type TBuildExportPayloadParams = {
-  locale: TLocale;
   cityName: string;
   lat: number;
   lng: number;
@@ -87,6 +85,7 @@ export type TBuildExportPayloadParams = {
   chartMode: TChartMode;
   labels: TExportLabels;
   datasetAttribution: TDatasetAttribution | null;
+  shareUrl: string;
 };
 
 /** Narrows rawData from optional to required — guarantees the lazy fetch ran
