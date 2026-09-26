@@ -1,18 +1,36 @@
+import { DATASETS } from "@/constants";
 import type { TClimatePeriod } from "@/constants/worldclim.constant";
 import type {
   TCellSize,
+  TCity,
   TDataset,
   TDatasetAttribution,
+  TMonthFilter,
   TMonthlyTemperature,
   TMultiPeriodEntry,
   TVariable,
-  TWikidataCity,
 } from "@/types";
 import type { RefObject } from "react";
 
+export type TComparePeriodsValue =
+  | {
+      dataset: typeof DATASETS.CLIMATE;
+      climatePeriodA: TClimatePeriod;
+      climatePeriodB: TClimatePeriod;
+    }
+  | { dataset: typeof DATASETS.WEATHER; weatherPeriods: number[] };
+
+export type TComparePeriodsUrlState = {
+  city: TCity;
+  comparePeriods: TComparePeriodsValue;
+  variables: TVariable[];
+  gridSize: TCellSize;
+  months: TMonthFilter;
+};
+
 export type TComparePeriodsViewProps = {
   chartSectionRef?: RefObject<HTMLDivElement | null>;
-  city: TWikidataCity;
+  city: TCity;
   dataset: TDataset;
   isHydrated: boolean;
   selectedMonths: number[] | null;
@@ -20,11 +38,12 @@ export type TComparePeriodsViewProps = {
   altitude: number | null;
   datasetAttribution: TDatasetAttribution | null;
   autoGrid: TCellSize;
+  shareUrl: string;
   isLoading: boolean;
   isLocating: boolean;
   error: Error | null;
   locationError: string | null;
-  onCitySelect: (city: TWikidataCity) => void;
+  onCitySelect: (city: TCity) => void;
   onLocate: () => void;
   onClearLocationError: () => void;
 

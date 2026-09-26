@@ -5,8 +5,6 @@ import {
   CLIMATE_PERIOD_LABELS,
   CLIMATE_PERIODS,
   DATASETS,
-  MIN_PERIODS,
-  SIDEBAR_PARAMS,
   TIME,
   VARIABLE_LABELS,
   WEATHER_MAX_YEAR,
@@ -21,33 +19,16 @@ import {
   usePersistedCity,
   usePersistedComparisonCities,
   usePersistedPeriods,
+  useUrlStateSync,
 } from "@/hooks";
-import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useFiltersStore, useSettingsStore } from "@/stores";
-import type { TClimatePeriod, TWikidataCity } from "@/types";
-import {
-  applyUrlFiltersToStore,
-  cityFromUrl,
-  createUrlParamHelpers,
-  encodeMonths,
-  encodePeriods,
-  encodeVars,
-  parsePeriod,
-  parsePeriods,
-  parseYear,
-  pushUrlParams,
-  scrollToSection,
-  syncUrlParams,
-} from "@/utils";
+import type { TCity, TClimatePeriod } from "@/types";
+import { scrollToSection } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { COMPARE_PERIODS_URL_SCHEMA } from "./ComparePeriods.constant";
 import { ComparePeriodsView } from "./ComparePeriodsView";
-
-function resolvePeriodFromUrl(raw: string | null, fallback: TClimatePeriod): TClimatePeriod {
-  return parsePeriod(raw) ?? fallback;
-}
 
 export function ComparePeriods() {
   const { autoScroll, syncCity, hasHydrated: settingsHydrated } = useSettingsStore();
@@ -60,87 +41,35 @@ export function ComparePeriods() {
   const { gridSize, dataset, months, variables, hasHydrated } = useFiltersStore();
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
   const selectedMonths = Array.isArray(months) ? months : null;
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
 
   const cityA = city;
 
-  // * 2 climate periods
-  const [climatePeriodA, setClimatePeriodA] = useState<TClimatePeriod>(() =>
-    resolvePeriodFromUrl(searchParams.get(SIDEBAR_PARAMS.PERIOD_A), CLIMATE_PERIODS.C1970_2000),
-  );
-  const [climatePeriodB, setClimatePeriodB] = useState<TClimatePeriod>(() =>
-    resolvePeriodFromUrl(searchParams.get(SIDEBAR_PARAMS.PERIOD_B), CLIMATE_PERIODS.C1991_2020),
-  );
-
+  const [climatePeriodA, setClimatePeriodA] = useState<TClimatePeriod>(CLIMATE_PERIODS.C1970_2000);
+  const [climatePeriodB, setClimatePeriodB] = useState<TClimatePeriod>(CLIMATE_PERIODS.C1991_2020);
   const [periods, setPeriods] = usePersistedPeriods();
 
-  useEffect(() => {
-    const urlCity = cityFromUrl(
-      searchParams.get(SIDEBAR_PARAMS.LAT),
-      searchParams.get(SIDEBAR_PARAMS.LNG),
-      searchParams.get(SIDEBAR_PARAMS.CITY),
-    );
-    if (urlCity) selectCityA(urlCity);
-
-    applyUrlFiltersToStore(searchParams, useFiltersStore.getState().actions);
-
-    const fromUrl = parsePeriods(searchParams.get(SIDEBAR_PARAMS.PERIODS));
-    if (fromUrl !== null && fromUrl.length >= MIN_PERIODS) {
-      setPeriods(fromUrl);
-    } else {
-      const y1 = parseYear(searchParams.get(SIDEBAR_PARAMS.YEAR_A));
-      const y2 = parseYear(searchParams.get(SIDEBAR_PARAMS.YEAR_B));
-      if (y1 !== null && y2 !== null) setPeriods([y1, y2]);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const varsStr = useMemo(() => encodeVars(variables), [variables]);
-  const monthsStr = useMemo(() => encodeMonths(months), [months]);
-  const periodsStr = useMemo(() => encodePeriods(periods), [periods]);
-
-  useEffect(() => {
-    const helper = createUrlParamHelpers(searchParams);
-
-    helper.set(SIDEBAR_PARAMS.CITY, cityA.label.trim());
-    helper.set(SIDEBAR_PARAMS.LAT, cityA.lat.toFixed(4));
-    helper.set(SIDEBAR_PARAMS.LNG, cityA.lng.toFixed(4));
-    helper.set(SIDEBAR_PARAMS.DATASET, dataset);
-    helper.set(SIDEBAR_PARAMS.VAR, varsStr);
-    helper.set(SIDEBAR_PARAMS.GRID, gridSize);
-    helper.set(SIDEBAR_PARAMS.MONTHS, monthsStr);
-
-    if (dataset === DATASETS.CLIMATE) {
-      helper.set(SIDEBAR_PARAMS.PERIOD_A, climatePeriodA);
-      helper.set(SIDEBAR_PARAMS.PERIOD_B, climatePeriodB);
-      helper.delete(SIDEBAR_PARAMS.PERIODS);
-      helper.delete(SIDEBAR_PARAMS.YEAR_A);
-      helper.delete(SIDEBAR_PARAMS.YEAR_B);
-    } else {
-      helper.set(SIDEBAR_PARAMS.PERIODS, periodsStr);
-      helper.delete(SIDEBAR_PARAMS.PERIOD_A);
-      helper.delete(SIDEBAR_PARAMS.PERIOD_B);
-      helper.delete(SIDEBAR_PARAMS.YEAR_A);
-      helper.delete(SIDEBAR_PARAMS.YEAR_B);
-    }
-
-    syncUrlParams(router, pathname, helper);
-  }, [
-    cityA.label,
-    cityA.lat,
-    cityA.lng,
-    dataset,
-    climatePeriodA,
-    climatePeriodB,
-    periodsStr,
-    varsStr,
-    gridSize,
-    monthsStr,
-    searchParams,
-    router,
-    pathname,
-  ]);
+  const { pushUrlState, shareUrl } = useUrlStateSync({
+    schema: COMPARE_PERIODS_URL_SCHEMA,
+    state: {
+      city: cityA,
+      comparePeriods:
+        dataset === DATASETS.CLIMATE
+          ? { dataset, climatePeriodA, climatePeriodB }
+          : { dataset, weatherPeriods: periods },
+    },
+    onRestore(parsed) {
+      if (parsed.city) selectCityA(parsed.city);
+      if (parsed.comparePeriods) {
+        useFiltersStore.getState().actions.setDataset(parsed.comparePeriods.dataset);
+        if (parsed.comparePeriods.dataset === DATASETS.CLIMATE) {
+          setClimatePeriodA(parsed.comparePeriods.climatePeriodA);
+          setClimatePeriodB(parsed.comparePeriods.climatePeriodB);
+        } else {
+          setPeriods(parsed.comparePeriods.weatherPeriods);
+        }
+      }
+    },
+  });
 
   useEffect(() => {
     const cityLabel = cityA.label;
@@ -200,7 +129,7 @@ export function ComparePeriods() {
     });
   }
 
-  function handleCitySelect(city: TWikidataCity) {
+  function handleCitySelect(city: TCity) {
     userSelectedRef.current = true;
     selectCityA(city);
 
@@ -212,12 +141,7 @@ export function ComparePeriods() {
       void queryClient.invalidateQueries({ queryKey: ["compare"] });
     }
 
-    const nextParams = new URLSearchParams(searchParams);
-
-    nextParams.set(SIDEBAR_PARAMS.CITY, city.label.trim());
-    nextParams.set(SIDEBAR_PARAMS.LAT, city.lat.toFixed(4));
-    nextParams.set(SIDEBAR_PARAMS.LNG, city.lng.toFixed(4));
-    pushUrlParams(router, pathname, nextParams);
+    pushUrlState({ city });
   }
 
   useEffect(() => {
@@ -248,6 +172,7 @@ export function ComparePeriods() {
       autoGrid={gridSize}
       selectedMonths={selectedMonths}
       variables={variables}
+      shareUrl={shareUrl}
       isLoading={isLoading}
       isLocating={isLocating}
       error={error}

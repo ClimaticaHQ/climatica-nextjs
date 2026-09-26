@@ -34,7 +34,6 @@ import {
 import type { TClimatePeriod, TCompareExportLabels, TCompareExportPayload } from "@/types";
 import {
   buildClimateStatsRows,
-  buildComparePeriodsShareUrl,
   buildCompareExportSvg,
   buildFilename,
   computeCompareStats,
@@ -45,7 +44,7 @@ import {
   resolveExportColors,
   svgToPng,
 } from "@/utils";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import type { TClimatePeriodRowProps, TComparePeriodsViewProps } from "./ComparePeriods.type";
 
@@ -89,6 +88,7 @@ export function ComparePeriodsView({
   autoGrid,
   selectedMonths,
   variables,
+  shareUrl,
   altitude,
   datasetAttribution,
   isLoading,
@@ -106,7 +106,6 @@ export function ComparePeriodsView({
   chartSectionRef,
 }: TComparePeriodsViewProps) {
   const t = useTranslations();
-  const locale = useLocale();
 
   const isClimate = dataset === DATASETS.CLIMATE;
 
@@ -116,20 +115,6 @@ export function ComparePeriodsView({
 
   const labelA = isClimate ? CLIMATE_PERIOD_LABELS[climatePeriodA] : String(periods[0] ?? "");
   const labelB = isClimate ? CLIMATE_PERIOD_LABELS[climatePeriodB] : String(periods[1] ?? "");
-
-  const shareUrl = buildComparePeriodsShareUrl({
-    locale,
-    cityName: city.label,
-    lat: city.lat,
-    lng: city.lng,
-    gridSize: autoGrid,
-    variables,
-    selectedMonths,
-    dataset,
-    climatePeriodA,
-    climatePeriodB,
-    weatherPeriods: periods,
-  });
 
   const hasBothClimateData = dataA.length > 0 && dataB.length > 0;
   const statsA = hasBothClimateData ? computeCompareStats(dataA) : null;
@@ -363,7 +348,7 @@ export function ComparePeriodsView({
               />
               <LocationSearch
                 key={city.id}
-                defaultValue={city.label}
+                cityLabel={city.label}
                 isLocating={isLocating}
                 locationError={locationError}
                 onCitySelect={onCitySelect}
