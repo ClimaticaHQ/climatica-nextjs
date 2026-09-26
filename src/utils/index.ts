@@ -18,6 +18,7 @@ export * from "./rateLimitResponse.util";
 export * from "./redis.util";
 export * from "./scroll.util";
 export * from "./solr.util";
+export * from "./urlFields.util";
 export * from "./urlParams.util";
 export * from "./walterLieth.util";
 export * from "./wikidata.util";

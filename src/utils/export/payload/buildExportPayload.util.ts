@@ -1,6 +1,5 @@
 import { DEFAULT_VISIBLE_SERIES } from "@/components/TempPrecipChart/TempPrecipChart.constant";
 import type { TBuildExportPayloadParams, TExportPayload } from "@/types";
-import { buildShareableUrl } from "../shared/shareUrl.util";
 
 export function buildExportPayload(params: TBuildExportPayloadParams): TExportPayload | null {
   const { chartDataSingle, aridity, scales, summary, visibleSeries } = params;
@@ -28,16 +27,7 @@ export function buildExportPayload(params: TBuildExportPayloadParams): TExportPa
     rightMax: params.rightMax,
     chartMode: params.chartMode,
     labels: params.labels,
-    shareUrl: buildShareableUrl({
-      locale: params.locale,
-      cityName: params.cityName,
-      lat: params.lat,
-      lng: params.lng,
-      gridSize: params.gridSize,
-      variables: params.variables,
-      selectedMonths: params.selectedMonths,
-      subtitle: params.subtitle,
-    }),
+    shareUrl: params.shareUrl,
     datasetAttribution: params.datasetAttribution,
   };
 }
