@@ -24,7 +24,7 @@ import { GET } from "@/app/api/cities/route";
 import { REDIS_STRATEGIES } from "@/libs/redis";
 import { RedisClient } from "@/libs/redis/client";
 import { SolrService, WikidataService } from "@/libs/services";
-import type { TWikidataCity } from "@/types";
+import type { TCity } from "@/types";
 import { NextRequest } from "next/server";
 
 function makeRequest(q: string, lang = "en"): NextRequest {
@@ -33,7 +33,7 @@ function makeRequest(q: string, lang = "en"): NextRequest {
   );
 }
 
-const mockCity: TWikidataCity = {
+const mockCity: TCity = {
   id: "3169070",
   label: "Rome",
   description: "Capital city · Italy",

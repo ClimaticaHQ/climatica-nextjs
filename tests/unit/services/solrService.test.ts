@@ -45,7 +45,7 @@ beforeEach(() => {
 });
 
 describe("SolrService.searchCities", () => {
-  it("returns mapped TWikidataCity[] on successful response", async () => {
+  it("returns mapped TCity[] on successful response", async () => {
     stubFetch(makeSolrResponse([makeSolrDoc()]));
     const results = await SolrService.searchCities("rome", "en");
     expect(results).toHaveLength(1);
