@@ -2,8 +2,8 @@ import "server-only";
 
 import { ENDPOINTS, EXCLUDE_DESCRIPTION_KEYWORDS } from "@/constants";
 import type {
+  TCity,
   TPopulationResult,
-  TWikidataCity,
   TWikidataEntitiesResult,
   TWikidataGeoSearchResult,
   TWikidataSearchResult,
@@ -12,7 +12,7 @@ import type {
 import { isValidString, parseWktPoint } from "@/utils";
 import axios from "axios";
 
-const searchCache = new Map<string, TWikidataCity[]>();
+const searchCache = new Map<string, TCity[]>();
 const CACHE_MAX_SIZE = 100;
 
 const POP_TIERS = [
@@ -29,7 +29,7 @@ function popTier(pop: number): number {
   return POP_TIERS.find(({ threshold }) => pop >= threshold)?.score ?? 0;
 }
 
-function storeCache(key: string, cities: TWikidataCity[]): void {
+function storeCache(key: string, cities: TCity[]): void {
   if (searchCache.size >= CACHE_MAX_SIZE) {
     const firstKey = searchCache.keys().next().value;
     if (firstKey !== undefined) searchCache.delete(firstKey);
@@ -38,7 +38,7 @@ function storeCache(key: string, cities: TWikidataCity[]): void {
 }
 
 export const WikidataService = {
-  async searchCity(query: string): Promise<TWikidataCity[]> {
+  async searchCity(query: string): Promise<TCity[]> {
     const lang = "en";
     const cacheKey = `${query}::${lang}`;
 
@@ -137,7 +137,7 @@ export const WikidataService = {
     });
 
     const seen = new Set<string>();
-    const candidates: TWikidataCity[] = [];
+    const candidates: TCity[] = [];
 
     for (const binding of sortedBindings) {
       if (!isValidString(binding.settlement.value)) continue;
@@ -208,7 +208,7 @@ export const WikidataService = {
     return stage2;
   },
 
-  async findNearestCityByCoordinates(lat: number, lng: number): Promise<TWikidataCity | null> {
+  async findNearestCityByCoordinates(lat: number, lng: number): Promise<TCity | null> {
     const lang = "en";
 
     const geoSearchRes = await axios.get<TWikidataGeoSearchResult>(ENDPOINTS.WIKIDATA, {

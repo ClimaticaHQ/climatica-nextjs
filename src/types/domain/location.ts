@@ -8,7 +8,7 @@ export type TCitySearchParams = {
   query: string;
 };
 
-export type TWikidataCity = {
+export type TCity = {
   id: string;
   label: string;
   description: string;
