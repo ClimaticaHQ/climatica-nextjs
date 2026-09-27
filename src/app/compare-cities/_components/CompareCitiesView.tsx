@@ -37,6 +37,7 @@ import {
   getMartonneLabelKey,
   resolveCompareSeriesColors,
   resolveExportColors,
+  shortGridLabel,
   svgToPng,
 } from "@/utils";
 import { computeCompareStats, computeDiffStats } from "@/utils/climateComparison.util";
@@ -83,12 +84,15 @@ export function CompareCitiesView({
 }: TCompareCitiesViewProps) {
   const t = useTranslations();
   const [activeCity, setActiveCity] = useState(0);
-  const chart = useTempPrecipChart({ dataA, dataB });
+  const chart = useTempPrecipChart({
+    ...(dataA ? { dataA } : {}),
+    ...(dataB ? { dataB } : {}),
+  });
 
-  const hasBothData = dataA.length > 0 && dataB.length > 0;
-  const statsA = hasBothData ? computeCompareStats(dataA) : null;
-  const statsB = hasBothData ? computeCompareStats(dataB) : null;
-  const diff = hasBothData ? computeDiffStats(dataA, dataB) : null;
+  const hasBothData = dataA !== null && dataB !== null;
+  const statsA = dataA ? computeCompareStats(dataA) : null;
+  const statsB = dataB ? computeCompareStats(dataB) : null;
+  const diff = dataA && dataB ? computeDiffStats(dataA, dataB) : null;
 
   const labelA = cityA.label;
   const labelB = cityB.label;
@@ -99,6 +103,14 @@ export function CompareCitiesView({
       : subtitle.weatherYear !== undefined
         ? t("chart.subtitle.weather", { year: subtitle.weatherYear })
         : "";
+
+  const noPeriodDataMessage =
+    subtitle.dataset === DATASETS.CLIMATE && subtitle.climatePeriod
+      ? t("climateComparison.noPeriodData", {
+          period: CLIMATE_PERIOD_LABELS[subtitle.climatePeriod],
+          grid: shortGridLabel(autoGrid),
+        })
+      : null;
 
   const miniMapLocations: TMiniMapLocation[] = [
     ...(cityA?.lat && cityA?.lng
@@ -283,7 +295,7 @@ export function CompareCitiesView({
               <ChartSkeleton />
             </div>
           </div>
-        ) : hasBothData && statsA && statsB ? (
+        ) : dataA && dataB && statsA && statsB ? (
           <div ref={chartSectionRef} className="flex flex-col gap-2">
             <div className="flex h-10 items-center justify-end">
               <ExportMenu
@@ -324,7 +336,13 @@ export function CompareCitiesView({
         {error && !isLoading && <ErrorBanner message={error.message} />}
 
         {!hasBothData && !isLoading && !error && (
-          <EmptyState message={t("climateComparison.noData")} />
+          <EmptyState
+            message={
+              (dataA === null || dataB === null) && noPeriodDataMessage
+                ? noPeriodDataMessage
+                : t("climateComparison.noData")
+            }
+          />
         )}
 
         {hasBothData && diff && (

@@ -90,7 +90,7 @@ export function CompareCities() {
   }
 
   useEffect(() => {
-    if (!dataA.length || !dataB.length || !chartSectionRef.current) return;
+    if (!dataA?.length || !dataB?.length || !chartSectionRef.current) return;
     if (!userSelectedRef.current || !autoScroll) return;
 
     const timer = setTimeout(() => {

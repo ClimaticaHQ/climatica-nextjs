@@ -21,8 +21,8 @@ export type TCompareCitiesViewProps = {
   chartSectionRef?: RefObject<HTMLDivElement | null>;
   cityA: TCity;
   cityB: TCity;
-  dataA: TMonthlyTemperature[];
-  dataB: TMonthlyTemperature[];
+  dataA: TMonthlyTemperature[] | null;
+  dataB: TMonthlyTemperature[] | null;
   autoGrid: TCellSize;
   subtitle: TChartSubtitle;
   selectedMonths: number[] | null;
