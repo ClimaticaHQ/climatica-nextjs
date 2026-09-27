@@ -1,11 +1,12 @@
 "use client";
 
 import { CellSizeSelector, FilterChip, SectionLabel, YearInput } from "@/components";
-import { Button, CollapsibleSection, Dropdown, ToggleSwitch } from "@/components/UI";
+import { Button, CollapsibleSection, DotLabel, Dropdown, ToggleSwitch } from "@/components/UI";
 import {
   AUTO_APPLY_DEBOUNCE_MS,
   CELL_SIZE_OPTIONS,
   CELL_SIZES,
+  CLIMATE_COMPARISON_COLORS,
   CLIMATE_PERIOD_LABELS,
   CLIMATE_PERIODS,
   CLIMATE_VARIABLES,
@@ -21,9 +22,15 @@ import {
   WEATHER_VARIABLES,
 } from "@/constants";
 import { EButtonVariant } from "@/enums";
-import { useDebounce, usePersistedPeriods } from "@/hooks";
+import {
+  useAvailableClimatePeriods,
+  useDebounce,
+  usePersistedCity,
+  usePersistedClimatePeriods,
+  usePersistedPeriods,
+} from "@/hooks";
 import { usePathname } from "@/libs/I18nNavigation";
-import { useFiltersStore, useSettingsStore } from "@/stores";
+import { useClimatePeriodsStore, useFiltersStore, useSettingsStore } from "@/stores";
 import type { TCellSize, TCellSizeOption } from "@/types";
 import { estimateCellCount, getCellCountStatus } from "@/utils";
 import { sidebarFiltersSchema } from "@/validators";
@@ -31,11 +38,6 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { TDraftErrors, TDraftFilters, TSidebarProps } from "./Sidebar.type";
-
-const CLIMATE_PERIOD_OPTIONS = Object.values(CLIMATE_PERIODS).map((period) => ({
-  value: period,
-  label: CLIMATE_PERIOD_LABELS[period],
-}));
 
 export function Sidebar({ isOpen, onClose }: TSidebarProps) {
   const {
@@ -67,10 +69,28 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
       setMonths,
     },
   } = useFiltersStore();
+  const { city } = usePersistedCity();
+  const availablePeriods = useAvailableClimatePeriods(
+    city.lat,
+    city.lng,
+    gridSize,
+    dataset === DATASETS.CLIMATE,
+  );
+  const climatePeriodOptions = Object.values(CLIMATE_PERIODS).map((period) => ({
+    value: period,
+    label: CLIMATE_PERIOD_LABELS[period],
+    disabled: availablePeriods !== null && !availablePeriods.includes(period),
+  }));
+
+  const isComparePeriods = pathname.startsWith(ROUTES.COMPARE_PERIODS);
+  const { climatePeriodA, climatePeriodB, setClimatePeriodA, setClimatePeriodB } =
+    usePersistedClimatePeriods();
 
   const [draft, setDraft] = useState<TDraftFilters>(() => ({
     dataset,
     climatePeriod,
+    climatePeriodA,
+    climatePeriodB,
     weatherYear,
     variables,
     gridSize,
@@ -78,7 +98,6 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
   }));
 
   const [mounted, setMounted] = useState(false);
-  const isComparePeriods = pathname.startsWith(ROUTES.COMPARE_PERIODS);
   const [periods, setPeriods] = usePersistedPeriods();
   const [addPeriodYear, setAddPeriodYear] = useState<number | undefined>(undefined);
   const [addPeriodError, setAddPeriodError] = useState<string | null>(null);
@@ -89,10 +108,13 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const state = useFiltersStore.getState();
+    const climatePeriods = useClimatePeriodsStore.getState();
     setMounted(true);
     setDraft({
       dataset: state.dataset,
       climatePeriod: state.climatePeriod,
+      climatePeriodA: climatePeriods.climatePeriodA,
+      climatePeriodB: climatePeriods.climatePeriodB,
       weatherYear: state.weatherYear,
       variables: [...state.variables],
       gridSize: state.gridSize,
@@ -108,6 +130,8 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
       setDraft({
         dataset,
         climatePeriod,
+        climatePeriodA,
+        climatePeriodB,
         weatherYear,
         variables: [...variables],
         gridSize,
@@ -183,6 +207,16 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
           : prev.gridSize;
       return { ...prev, climatePeriod: period, variables, gridSize };
     });
+  }
+
+  function handleDraftClimatePeriodAChange(value: string) {
+    const period = Object.values(CLIMATE_PERIODS).find((p) => p === value);
+    if (period !== undefined) setDraft((prev) => ({ ...prev, climatePeriodA: period }));
+  }
+
+  function handleDraftClimatePeriodBChange(value: string) {
+    const period = Object.values(CLIMATE_PERIODS).find((p) => p === value);
+    if (period !== undefined) setDraft((prev) => ({ ...prev, climatePeriodB: period }));
   }
 
   function handleDraftYearChange(year: number) {
@@ -271,7 +305,12 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
     }
 
     setDataset(draft.dataset);
-    setClimatePeriod(draft.climatePeriod);
+    if (isComparePeriods) {
+      setClimatePeriodA(draft.climatePeriodA);
+      setClimatePeriodB(draft.climatePeriodB);
+    } else {
+      setClimatePeriod(draft.climatePeriod);
+    }
     setWeatherYear(result.data.weatherYear);
     draft.variables.forEach((v) => {
       if (!variables.includes(v)) toggleVariable(v);
@@ -340,11 +379,43 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
           </div>
 
           {/* Climate Period */}
-          {mounted && draft.dataset === DATASETS.CLIMATE && (
+          {mounted && draft.dataset === DATASETS.CLIMATE && isComparePeriods && (
+            <div className="flex flex-col gap-3">
+              <SectionLabel text={t("sidebar.sections.climatePeriod")} />
+              <div className="flex flex-col gap-1.5">
+                <DotLabel
+                  label={t("climateComparison.periodA")}
+                  dotColor={CLIMATE_COMPARISON_COLORS.A.tmax}
+                />
+                <Dropdown
+                  options={climatePeriodOptions}
+                  value={draft.climatePeriodA}
+                  onChange={handleDraftClimatePeriodAChange}
+                  className="w-full"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <DotLabel
+                  label={t("climateComparison.periodB")}
+                  dotColor={CLIMATE_COMPARISON_COLORS.B.tmax}
+                />
+                <Dropdown
+                  options={climatePeriodOptions}
+                  value={draft.climatePeriodB}
+                  onChange={handleDraftClimatePeriodBChange}
+                  className="w-full"
+                />
+              </div>
+              <p className="text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
+                {t("sidebar.notes.climateNormals")}
+              </p>
+            </div>
+          )}
+          {mounted && draft.dataset === DATASETS.CLIMATE && !isComparePeriods && (
             <div>
               <SectionLabel text={t("sidebar.sections.climatePeriod")} />
               <Dropdown
-                options={CLIMATE_PERIOD_OPTIONS}
+                options={climatePeriodOptions}
                 value={draft.climatePeriod}
                 onChange={handleDraftClimatePeriodChange}
                 className="w-full"

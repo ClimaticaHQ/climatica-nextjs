@@ -10,6 +10,8 @@ export type TSidebarProps = {
 export type TDraftFilters = {
   dataset: TDataset;
   climatePeriod: TClimatePeriod;
+  climatePeriodA: TClimatePeriod;
+  climatePeriodB: TClimatePeriod;
   weatherYear: number;
   variables: TVariable[];
   gridSize: TCellSize;
