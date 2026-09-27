@@ -1,5 +1,5 @@
 import type { TPolygon, TUrlField, TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
-import { CELL_SIZE_OPTIONS, GRID_DELTA, MONTH_NAMES, SIDEBAR_PARAMS } from "@/constants";
+import { GRID_DELTA, MONTH_NAMES, SIDEBAR_PARAMS } from "@/constants";
 import { iriToCellBounds } from "@/utils";
 import { parseCoord } from "@/utils/urlParams.util";
 import type { TCellBounds, TCellSize } from "@/types";
@@ -228,11 +228,6 @@ export const selectionUrlField: TUrlField<THeatMapSelectionValue> = {
     return { kind: "none" };
   },
 };
-
-/** "2.5 min" from "2.5 min (~20.25 km²)" */
-export function shortGridLabel(gridSize: TCellSize): string {
-  return CELL_SIZE_OPTIONS[gridSize]?.split(" (~")[0] ?? gridSize;
-}
 
 /**
  * Returns a short month string for the summary bar.

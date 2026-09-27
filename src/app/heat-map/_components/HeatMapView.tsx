@@ -11,6 +11,7 @@ import {
   exportTableToCsv,
   interpolateColor,
   resolveExportColors,
+  shortGridLabel,
   svgToPng,
 } from "@/utils";
 import dynamic from "next/dynamic";
@@ -69,8 +70,12 @@ export function HeatMapView({
   const pixelBindings = pixels?.results.bindings ?? [];
   const stats = computeHeatmapStats(pixelBindings);
   const hasData = stats.count > 0;
-  const hasNoData = pixelBindings.length > 0 && stats.count === 0;
   const hasSelection = bbox !== null || polygon !== null;
+  const noPeriodDataMessage =
+    isClimate && hasSelection && pixelBindings.length === 0
+      ? t("heatMap.noPeriodData", { period: periodLabel, grid: shortGridLabel(gridSize) })
+      : null;
+  const hasNoData = hasSelection && (pixelBindings.length === 0 || stats.count === 0);
   const unit = colorScale === "precipitation" ? "mm" : "°C";
 
   const monthStr = formatSelectedMonths(selectedMonths);
@@ -281,7 +286,10 @@ export function HeatMapView({
         )}
 
         {hasNoData && !isLoading && (
-          <EmptyState message={t("heatMap.noData")} suppressHydrationWarning />
+          <EmptyState
+            message={noPeriodDataMessage ?? t("heatMap.noData")}
+            suppressHydrationWarning
+          />
         )}
       </div>
     </PageWrapper>
