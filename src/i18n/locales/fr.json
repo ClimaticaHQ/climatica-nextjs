@@ -35,7 +35,8 @@
       "autoResolutionTooltip": "La résolution est définie automatiquement selon le jeu de données sélectionné",
       "altitude": "Altitude",
       "filteredMonths": "Filtré : {months}"
-    }
+    },
+    "noPeriodData": "Aucune donnée pour {period} à la résolution {grid}"
   },
   "compareCities": {
     "title": "Comparer les Villes",
@@ -93,7 +94,8 @@
       "moreArid": "{label} a {value} mois aride(s) de plus",
       "fewerArid": "{label} a {value} mois aride(s) de moins",
       "sameArid": "Mêmes mois arides"
-    }
+    },
+    "noPeriodData": "Aucune donnée pour {period} à la résolution {grid}"
   },
   "heatMap": {
     "title": "Carte de Chaleur Régionale",
@@ -105,6 +107,7 @@
     "drawingPolygon": "Cliquez pour ajouter des sommets — cliquez sur le premier point pour fermer le polygone",
     "noSelection": "Dessinez une zone ou un polygone sur la carte pour analyser les données climatiques de cette région",
     "noData": "Aucune donnée disponible pour cette région",
+    "noPeriodData": "Aucune donnée pour {period} à la résolution {grid}",
     "stats": {
       "minValue": "Min",
       "maxValue": "Max",

@@ -35,7 +35,8 @@
       "autoResolutionTooltip": "Resolution is automatically set based on selected dataset",
       "altitude": "Altitude",
       "filteredMonths": "Filtered: {months}"
-    }
+    },
+    "noPeriodData": "No {period} data at {grid} resolution"
   },
   "compareCities": {
     "title": "Compare Cities",
@@ -93,7 +94,8 @@
       "moreArid": "{label} has {value} more arid month(s)",
       "fewerArid": "{label} has {value} fewer arid month(s)",
       "sameArid": "Same arid months"
-    }
+    },
+    "noPeriodData": "No {period} data at {grid} resolution"
   },
   "heatMap": {
     "title": "Region Heatmap",
@@ -105,6 +107,7 @@
     "drawingPolygon": "Click to add vertices — click the first point to close the polygon",
     "noSelection": "Draw a bounding box or polygon on the map to analyze climate data for that region",
     "noData": "No data available for this region",
+    "noPeriodData": "No {period} data at {grid} resolution",
     "stats": {
       "minValue": "Min",
       "maxValue": "Max",
