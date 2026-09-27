@@ -1,5 +1,7 @@
 import {
   CELL_IRI_ROW_COL_REGEX,
+  CELL_SIZE_OPTIONS,
+  CLIMATE_PERIODS,
   CLIMATE_VARIABLES,
   MONTH_NAMES,
   WORLDCLIM_GRID_BASE,
@@ -82,6 +84,11 @@ export function buildGridIri(gridSize: TCellSize): string {
   return `${WORLDCLIM_GRID_BASE}${gridSize}`;
 }
 
+/** "2.5 min" from "2.5 min (~20.25 km²)" */
+export function shortGridLabel(gridSize: TCellSize): string {
+  return CELL_SIZE_OPTIONS[gridSize]?.split(" (~")[0] ?? gridSize;
+}
+
 export function buildVariableIris(variables: readonly string[]): string[] {
   return variables.map((v) => `${WORLDCLIM_VARIABLE_BASE}${v}`);
 }
@@ -114,9 +121,13 @@ export function validateResponseData(response: { data: unknown }): void {
   }
 }
 
+/** null means no bindings matched (e.g. this grid has no raster for the
+ * requested period) — callers must treat that as "unavailable", not zero. */
 export function buildMonthlyTemperaturesFromPointValues(
   bindings: TWorldClimPointValueBinding[],
-): TMonthlyTemperature[] {
+): TMonthlyTemperature[] | null {
+  if (bindings.length === 0) return null;
+
   const vals = new Map<string, number>();
 
   for (const b of bindings) {
@@ -133,6 +144,28 @@ export function buildMonthlyTemperaturesFromPointValues(
     tmax: vals.get(`tmax_${i + 1}`) ?? 0,
     prec: vals.get(`prec_${i + 1}`) ?? 0,
   }));
+}
+
+/** SCRAPI's climate point-value endpoint returns every period's rasters
+ * together — this narrows to the one the caller actually wants. */
+export function filterPointBindingsByPeriod(
+  bindings: TWorldClimPointValueBinding[],
+  period: TClimatePeriod,
+): TWorldClimPointValueBinding[] {
+  return bindings.filter((b) => b.raster.value.includes(period));
+}
+
+/** Which climate periods this specific grid/point combination actually has
+ * rasters for — e.g. Grid_30s only ever has c1970-2000. */
+export function extractAvailableClimatePeriods(
+  bindings: TWorldClimPointValueBinding[],
+): TClimatePeriod[] {
+  const present = new Set(
+    bindings
+      .map((b) => Object.values(CLIMATE_PERIODS).find((period) => b.raster.value.includes(period)))
+      .filter((period): period is TClimatePeriod => period !== undefined),
+  );
+  return Object.values(CLIMATE_PERIODS).filter((period) => present.has(period));
 }
 
 /**
