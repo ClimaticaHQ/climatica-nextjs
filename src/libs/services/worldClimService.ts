@@ -52,12 +52,19 @@ export const WorldClimService = {
     return response.data;
   },
 
+  /**
+   * SCRAPI returns every climate period's rasters in one response for a
+   * point — no period param to send, and nothing to filter here. Callers
+   * narrow to one period (filterPointBindingsByPeriod) or read them all
+   * (extractAvailableClimatePeriods) from the same cached fetch.
+   *
+   * ! its necessary to predict climate period without data for specific city
+   **/
   async getClimateDataForPoint(
     lat: number,
     lng: number,
     gridSize: TCellSize,
     variables: readonly TVariable[],
-    period: TClimatePeriod,
   ): Promise<TWorldClimPointValueResponse> {
     const response = await apiClient.get<TWorldClimPointValueResponse>(
       `${WORLDCLIM_PROXY_BASE}/pixelvaluesofapoint`,
@@ -72,11 +79,7 @@ export const WorldClimService = {
       },
     );
     validateResponseData(response);
-    return {
-      results: {
-        bindings: response.data.results.bindings.filter((b) => b.raster.value.includes(period)),
-      },
-    };
+    return response.data;
   },
 
   async getWeatherDataForPoint(
