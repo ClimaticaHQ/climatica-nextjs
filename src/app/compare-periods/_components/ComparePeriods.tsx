@@ -3,7 +3,6 @@
 import {
   APP_TITLE,
   CLIMATE_PERIOD_LABELS,
-  CLIMATE_PERIODS,
   DATASETS,
   TIME,
   VARIABLE_LABELS,
@@ -17,16 +16,17 @@ import {
   useGetDatasetVersion,
   useGetMultiPeriodData,
   usePersistedCity,
+  usePersistedClimatePeriods,
   usePersistedComparisonCities,
   usePersistedPeriods,
   useUrlStateSync,
 } from "@/hooks";
 import { useFiltersStore, useSettingsStore } from "@/stores";
-import type { TCity, TClimatePeriod } from "@/types";
+import type { TCity } from "@/types";
 import { scrollToSection } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { COMPARE_PERIODS_URL_SCHEMA } from "./ComparePeriods.constant";
 import { ComparePeriodsView } from "./ComparePeriodsView";
 
@@ -38,14 +38,14 @@ export function ComparePeriods() {
   const t = useTranslations();
   const { city, selectCity: selectCityA } = usePersistedCity();
   const { selectCityA: selectCompareCityA } = usePersistedComparisonCities();
-  const { gridSize, dataset, months, variables, hasHydrated } = useFiltersStore();
+  const { gridSize, dataset, months, variables } = useFiltersStore();
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
   const selectedMonths = Array.isArray(months) ? months : null;
 
   const cityA = city;
 
-  const [climatePeriodA, setClimatePeriodA] = useState<TClimatePeriod>(CLIMATE_PERIODS.C1970_2000);
-  const [climatePeriodB, setClimatePeriodB] = useState<TClimatePeriod>(CLIMATE_PERIODS.C1991_2020);
+  const { climatePeriodA, climatePeriodB, setClimatePeriodA, setClimatePeriodB } =
+    usePersistedClimatePeriods();
   const [periods, setPeriods] = usePersistedPeriods();
 
   const { pushUrlState, shareUrl } = useUrlStateSync({
@@ -146,7 +146,7 @@ export function ComparePeriods() {
 
   useEffect(() => {
     const hasResults =
-      dataset === DATASETS.CLIMATE ? dataA.length > 0 && dataB.length > 0 : periodsData.length > 0;
+      dataset === DATASETS.CLIMATE ? !!dataA?.length && !!dataB?.length : periodsData.length > 0;
 
     if (!hasResults || !chartSectionRef.current) return;
     if (!userSelectedRef.current || !autoScroll) return;
@@ -168,7 +168,6 @@ export function ComparePeriods() {
       altitude={altitude}
       datasetAttribution={datasetAttribution}
       dataset={dataset}
-      isHydrated={hasHydrated}
       autoGrid={gridSize}
       selectedMonths={selectedMonths}
       variables={variables}
@@ -184,8 +183,6 @@ export function ComparePeriods() {
       climatePeriodB={climatePeriodB}
       dataA={dataA}
       dataB={dataB}
-      onClimatePeriodAChange={setClimatePeriodA}
-      onClimatePeriodBChange={setClimatePeriodB}
       periods={periods}
       periodsData={periodsData}
       loadingPeriods={loadingPeriods}

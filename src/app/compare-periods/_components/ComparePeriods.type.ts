@@ -32,7 +32,6 @@ export type TComparePeriodsViewProps = {
   chartSectionRef?: RefObject<HTMLDivElement | null>;
   city: TCity;
   dataset: TDataset;
-  isHydrated: boolean;
   selectedMonths: number[] | null;
   variables: readonly TVariable[];
   altitude: number | null;
@@ -50,20 +49,11 @@ export type TComparePeriodsViewProps = {
   // * climate-only
   climatePeriodA: TClimatePeriod;
   climatePeriodB: TClimatePeriod;
-  dataA: TMonthlyTemperature[];
-  dataB: TMonthlyTemperature[];
-  onClimatePeriodAChange: (period: TClimatePeriod) => void;
-  onClimatePeriodBChange: (period: TClimatePeriod) => void;
+  dataA: TMonthlyTemperature[] | null;
+  dataB: TMonthlyTemperature[] | null;
 
   // * weather multi-period
   periods: number[];
   periodsData: TMultiPeriodEntry[];
   loadingPeriods: number[];
-};
-
-export type TClimatePeriodRowProps = {
-  label: string;
-  dotColor: string;
-  value: TClimatePeriod;
-  onChange: (period: TClimatePeriod) => void;
 };

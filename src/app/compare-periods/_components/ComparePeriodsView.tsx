@@ -12,7 +12,6 @@ import {
 import {
   ChartSkeleton,
   DotLabel,
-  Dropdown,
   EmptyState,
   ErrorBanner,
   ExportMenu,
@@ -25,13 +24,12 @@ import {
   CELL_SIZE_OPTIONS,
   CLIMATE_COMPARISON_COLORS,
   CLIMATE_PERIOD_LABELS,
-  CLIMATE_PERIODS,
   COMPARE_EXPORT_SVG_LAYOUT,
   DATASETS,
   EXPORT_PNG_SCALE,
   PERIOD_COLORS,
 } from "@/constants";
-import type { TClimatePeriod, TCompareExportLabels, TCompareExportPayload } from "@/types";
+import type { TCompareExportLabels, TCompareExportPayload } from "@/types";
 import {
   buildClimateStatsRows,
   buildCompareExportSvg,
@@ -42,11 +40,12 @@ import {
   getMartonneLabelKey,
   resolveCompareSeriesColors,
   resolveExportColors,
+  shortGridLabel,
   svgToPng,
 } from "@/utils";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import type { TClimatePeriodRowProps, TComparePeriodsViewProps } from "./ComparePeriods.type";
+import type { TComparePeriodsViewProps } from "./ComparePeriods.type";
 
 const MiniMap = dynamic(
   () => import("@/components/UI/MiniMap/MiniMap").then((m) => ({ default: m.MiniMap })),
@@ -56,31 +55,9 @@ const MiniMap = dynamic(
   },
 );
 
-const CLIMATE_PERIOD_OPTIONS = Object.values(CLIMATE_PERIODS).map((period) => ({
-  value: period,
-  label: CLIMATE_PERIOD_LABELS[period],
-}));
-
-function ClimatePeriodRow({ label, dotColor, value, onChange }: TClimatePeriodRowProps) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <DotLabel label={label} dotColor={dotColor} />
-      <Dropdown
-        options={CLIMATE_PERIOD_OPTIONS}
-        value={value}
-        onChange={(v) => {
-          const period = Object.values(CLIMATE_PERIODS).find((p) => p === v);
-          if (period) onChange(period as TClimatePeriod);
-        }}
-      />
-    </div>
-  );
-}
-
 export function ComparePeriodsView({
   city,
   dataset,
-  isHydrated,
   climatePeriodA,
   climatePeriodB,
   dataA,
@@ -98,8 +75,6 @@ export function ComparePeriodsView({
   onCitySelect,
   onLocate,
   onClearLocationError,
-  onClimatePeriodAChange,
-  onClimatePeriodBChange,
   periods,
   periodsData,
   loadingPeriods,
@@ -110,17 +85,33 @@ export function ComparePeriodsView({
   const isClimate = dataset === DATASETS.CLIMATE;
 
   const chart = useTempPrecipChart({
-    ...(isClimate ? { dataA, dataB } : { multiPeriodData: periodsData }),
+    ...(isClimate && dataA && dataB ? { dataA, dataB } : {}),
+    ...(!isClimate ? { multiPeriodData: periodsData } : {}),
   });
 
   const labelA = isClimate ? CLIMATE_PERIOD_LABELS[climatePeriodA] : String(periods[0] ?? "");
   const labelB = isClimate ? CLIMATE_PERIOD_LABELS[climatePeriodB] : String(periods[1] ?? "");
 
-  const hasBothClimateData = dataA.length > 0 && dataB.length > 0;
-  const statsA = hasBothClimateData ? computeCompareStats(dataA) : null;
-  const statsB = hasBothClimateData ? computeCompareStats(dataB) : null;
+  const hasBothClimateData = dataA !== null && dataB !== null;
+  const statsA = dataA ? computeCompareStats(dataA) : null;
+  const statsB = dataB ? computeCompareStats(dataB) : null;
   const tmaxDiff = statsA && statsB ? statsB.avgTmax - statsA.avgTmax : null;
   const precDiff = statsA && statsB ? statsB.totalPrec - statsA.totalPrec : null;
+
+  const noDataMessageA =
+    isClimate && dataA === null
+      ? t("climateComparison.noPeriodData", {
+          period: CLIMATE_PERIOD_LABELS[climatePeriodA],
+          grid: shortGridLabel(autoGrid),
+        })
+      : null;
+  const noDataMessageB =
+    isClimate && dataB === null
+      ? t("climateComparison.noPeriodData", {
+          period: CLIMATE_PERIOD_LABELS[climatePeriodB],
+          grid: shortGridLabel(autoGrid),
+        })
+      : null;
 
   const miniMapLocations: TMiniMapLocation[] = [
     { lat: city.lat, lng: city.lng, label: city.label, color: CLIMATE_COMPARISON_COLORS.A.tmax },
@@ -356,23 +347,6 @@ export function ComparePeriodsView({
                 onClearLocationError={onClearLocationError}
               />
             </div>
-
-            {isHydrated && isClimate && (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <ClimatePeriodRow
-                  label={t("climateComparison.periodA")}
-                  dotColor={CLIMATE_COMPARISON_COLORS.A.tmax}
-                  value={climatePeriodA}
-                  onChange={onClimatePeriodAChange}
-                />
-                <ClimatePeriodRow
-                  label={t("climateComparison.periodB")}
-                  dotColor={CLIMATE_COMPARISON_COLORS.B.tmax}
-                  value={climatePeriodB}
-                  onChange={onClimatePeriodBChange}
-                />
-              </div>
-            )}
           </div>
           {city?.lat && city?.lng && (
             <MiniMap locations={miniMapLocations} activeIndex={0} onToggle={() => undefined} />
@@ -392,7 +366,7 @@ export function ComparePeriodsView({
                 <ChartSkeleton />
               </div>
             </div>
-          ) : hasBothClimateData && statsA && statsB ? (
+          ) : dataA && dataB && statsA && statsB ? (
             <div ref={chartSectionRef} className="flex flex-col gap-2">
               <div className="flex h-10 items-center justify-end">
                 <ExportMenu
@@ -428,7 +402,13 @@ export function ComparePeriodsView({
               </div>
             </div>
           ) : !hasBothClimateData && !error ? (
-            <EmptyState message={t("climateComparison.noDataPeriods")} />
+            <div className="flex flex-col gap-2">
+              {noDataMessageA && <EmptyState message={noDataMessageA} />}
+              {noDataMessageB && <EmptyState message={noDataMessageB} />}
+              {!noDataMessageA && !noDataMessageB && (
+                <EmptyState message={t("climateComparison.noDataPeriods")} />
+              )}
+            </div>
           ) : null)}
 
         {isClimate && hasBothClimateData && tmaxDiff !== null && precDiff !== null && (
