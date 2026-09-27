@@ -1,3 +1,4 @@
+export { useAvailableClimatePeriods } from "./useAvailableClimatePeriods";
 export { useFetchFullClimateData } from "./useFetchFullClimateData";
 export { useGetAltitude } from "./useGetAltitude";
 export { useGetCellBounds } from "./useGetCellBounds";

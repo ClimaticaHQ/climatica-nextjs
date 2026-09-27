@@ -1,7 +1,7 @@
 import { CLIMATE_VARIABLES } from "@/constants";
 import { WorldClimService } from "@/libs/services/worldClimService";
 import type { TExportRawData, TFetchFullClimateDataParams } from "@/types";
-import { extractAllVariablesFromPointValues } from "@/utils";
+import { extractAllVariablesFromPointValues, filterPointBindingsByPeriod } from "@/utils";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 
 /** Lazy, on-demand fetch of every SCRAPI variable for the raw CSV/JSON export —
@@ -18,10 +18,10 @@ export function useFetchFullClimateData(): UseMutationResult<
         lng,
         gridSize,
         CLIMATE_VARIABLES,
-        climatePeriod,
       );
+      const bindings = filterPointBindingsByPeriod(response.results.bindings, climatePeriod);
       return {
-        rows: extractAllVariablesFromPointValues(response.results.bindings),
+        rows: extractAllVariablesFromPointValues(bindings),
         variables: CLIMATE_VARIABLES,
       };
     },

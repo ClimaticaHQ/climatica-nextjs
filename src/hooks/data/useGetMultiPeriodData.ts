@@ -1,7 +1,7 @@
-import { CLIMATE_PERIODS } from "@/constants";
 import type { TCellSize, TMultiPeriodEntry } from "@/types";
+import { buildMonthlyTemperaturesFromPointValues } from "@/utils";
 import { useQueries } from "@tanstack/react-query";
-import { fetchCityData } from "./useGetCompareData";
+import { fetchCityBindings } from "./useGetCompareData";
 
 export function useGetMultiPeriodData(
   lat: number | null,
@@ -16,15 +16,8 @@ export function useGetMultiPeriodData(
       queryKey: ["compare-period", lat, lng, gridSize, year],
       queryFn: async (): Promise<TMultiPeriodEntry> => {
         if (lat === null || lng === null) throw new Error("No location selected");
-        const rows = await fetchCityData(
-          lat,
-          lng,
-          gridSize,
-          false,
-          CLIMATE_PERIODS.C1970_2000,
-          year,
-        );
-        return { year, rows };
+        const bindings = await fetchCityBindings(lat, lng, gridSize, false, year);
+        return { year, rows: buildMonthlyTemperaturesFromPointValues(bindings) ?? [] };
       },
       enabled,
       staleTime: Infinity,
