@@ -2,6 +2,7 @@ export const LOCAL_STORAGE_KEYS = {
   COMPARE_CITY_A: "climatica:compareCityA",
   COMPARE_CITY_B: "climatica:compareCityB",
   COMPARE_PERIODS: "climatica:comparePeriods",
+  COMPARE_CLIMATE_PERIODS: "climatica:compareClimatePeriods",
 
   FILTERS: "climatica:filters",
   SETTINGS: "climatica:settings",
