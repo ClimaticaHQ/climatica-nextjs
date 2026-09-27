@@ -8,6 +8,7 @@ import {
 } from "@/components";
 import {
   ChartSkeleton,
+  EmptyState,
   ErrorBanner,
   ExportMenu,
   MapSkeleton,
@@ -29,6 +30,7 @@ import {
   getMartonneBadge,
   isFullVariableDataAvailable,
   resolveExportColors,
+  shortGridLabel,
   svgToPng,
 } from "@/utils";
 import { useTranslations } from "next-intl";
@@ -100,7 +102,7 @@ export function ClimateStatisticsView({
   const t = useTranslations();
   const [visibleSeries, setVisibleSeries] = useState<TVisibleSeries | null>(null);
   const [chartMode, setChartMode] = useState<TChartMode>("standard");
-  const chart = useTempPrecipChart({ data: temperatureData });
+  const chart = useTempPrecipChart(temperatureData ? { data: temperatureData } : {});
   const { mutateAsync: fetchFullClimateData } = useFetchFullClimateData();
 
   const canExportFullData = isFullVariableDataAvailable(subtitle.dataset, subtitle.climatePeriod);
@@ -108,8 +110,21 @@ export function ClimateStatisticsView({
   const isFiltered = selectedMonths !== null && selectedMonths.length > 0;
   const isSingleMonth = isFiltered && selectedMonths.length === 1;
 
-  const showStats = temperatureData.length > 0 && !isLoading && !error;
-  const stats = showStats ? computeClimateStats(temperatureData, selectedMonths) : null;
+  const noPeriodDataMessage =
+    temperatureData === null &&
+    !isLoading &&
+    !isFetching &&
+    subtitle.dataset === DATASETS.CLIMATE &&
+    subtitle.climatePeriod !== undefined
+      ? t("climateStatistics.noPeriodData", {
+          period: CLIMATE_PERIOD_LABELS[subtitle.climatePeriod],
+          grid: shortGridLabel(gridSize),
+        })
+      : null;
+
+  const showStats = temperatureData !== null && !isLoading && !error;
+  const stats =
+    showStats && temperatureData ? computeClimateStats(temperatureData, selectedMonths) : null;
 
   const filteredMonthNames = isFiltered
     ? selectedMonths
@@ -182,6 +197,7 @@ export function ClimateStatisticsView({
   });
 
   function handleExportCSV() {
+    if (!temperatureData) return;
     exportToCSV(temperatureData, cityName, variables);
   }
 
@@ -265,7 +281,9 @@ export function ClimateStatisticsView({
 
         {error && <ErrorBanner message={error} />}
 
-        {selectedCity && (temperatureData.length > 0 || isLoading || isFetching) && (
+        {selectedCity && noPeriodDataMessage && <EmptyState message={noPeriodDataMessage} />}
+
+        {selectedCity && (temperatureData !== null || isLoading || isFetching) && (
           <div ref={chartSectionRef} id="climate-stats-container" className="flex flex-col gap-8">
             {isLoading ? (
               <StatCardsSkeleton />
@@ -328,7 +346,7 @@ export function ClimateStatisticsView({
                     onExportRawCsv={handleExportRawCsv}
                     onExportRawJson={handleExportRawJson}
                     isRawDataAvailable={canExportFullData}
-                    isDisabled={temperatureData.length === 0}
+                    isDisabled={!temperatureData || temperatureData.length === 0}
                   />
                 )}
               </div>
@@ -345,9 +363,9 @@ export function ClimateStatisticsView({
                     cityName={cityName}
                     subtitle={subtitle}
                     variables={variables}
-                    data={temperatureData}
                     onVisibleSeriesChange={setVisibleSeries}
                     onChartModeChange={setChartMode}
+                    {...(temperatureData ? { data: temperatureData } : {})}
                     {...(altitude !== null ? { altitude } : {})}
                     {...(isFiltered ? { selectedMonths } : {})}
                   />

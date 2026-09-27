@@ -24,7 +24,7 @@ export type TClimateStatisticsViewProps = {
   chartSectionRef?: RefObject<HTMLDivElement | null>;
   selectedCity: TCity | null;
   mapCenter: TCoordinates;
-  temperatureData: TMonthlyTemperature[];
+  temperatureData: TMonthlyTemperature[] | null;
   cityName: string;
   subtitle: TChartSubtitle;
   altitude: number | null;

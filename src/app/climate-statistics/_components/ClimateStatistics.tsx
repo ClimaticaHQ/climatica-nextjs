@@ -149,7 +149,7 @@ export function ClimateStatistics() {
   }
 
   const {
-    data: temperatureData = [],
+    data: temperatureData,
     isLoading,
     isFetching,
     isError,
@@ -165,7 +165,7 @@ export function ClimateStatistics() {
   );
 
   useEffect(() => {
-    if (!temperatureData.length || !chartSectionRef.current) return;
+    if (!temperatureData?.length || !chartSectionRef.current) return;
     if (!userSelectedRef.current || !autoScroll) return;
 
     const timer = setTimeout(() => {
