@@ -74,8 +74,7 @@
       "avgTmax": "Temp. máx. média",
       "avgTmin": "Temp. mín. média",
       "totalPrec": "Precipitação total",
-      "aridMonths": "Meses áridos",
-      "martonne": "Martonne (M)"
+      "aridMonths": "Meses áridos"
     },
     "diff": {
       "warmerCity": "Cidade mais quente",
@@ -87,14 +86,6 @@
       "tie": "Empate"
     },
     "autoResolution": "Resolução automática: {resolution}",
-    "wlCompare": {
-      "warmerBy": "{label} mais quente em {value}°C",
-      "coolerBy": "{label} mais frio em {value}°C",
-      "sameTemp": "Temperatura média igual",
-      "moreArid": "{label} tem mais {value} mês(es) árido(s)",
-      "fewerArid": "{label} tem menos {value} mês(es) árido(s)",
-      "sameArid": "Mesmos meses áridos"
-    },
     "noPeriodData": "Não há dados de {period} na resolução {grid}"
   },
   "heatMap": {
@@ -135,8 +126,7 @@
     }
   },
   "chart": {
-    "title": "Temperatura",
-    "monthAxis": "Mês",
+    "versus": "vs",
     "temperatureAxis": "Temperatura (graus C)",
     "precipitation": "Precipitação",
     "maxTemperature": "Temperatura Máxima",
@@ -147,10 +137,22 @@
     "meanTemp": "Temp. média",
     "annualPrec": "Precip. anual",
     "aridMonths": "Meses áridos",
-    "martonne": "Aridez (M)",
+    "deltaAridMonths": "{sign}{count, plural, one {# mês árido} other {# meses áridos}}",
+    "martonne": "Índice de Martonne (M)",
+    "martonneShort": "Martonne (M)",
     "martonneTooltip": "Índice de aridez de De Martonne: M = P/(T+10). <5 Hiperárido | 5–10 Árido | 10–20 Semiárido | 20–30 Subúmido | >30 Húmido",
     "aridPeriod": "Período árido",
     "humidPeriod": "Período húmido",
+    "perhumidPeriod": "Muito úmido (> 100 mm)",
+    "wlAriaSummary": "Diagrama de Walter-Lieth, {location}, {period}: temperatura média {temp} °C, precipitação anual {prec} mm, meses áridos: {arid}",
+    "wlIncomplete": "Dados incompletos para {label}: o diagrama de Walter-Lieth precisa de temperatura e precipitação dos 12 meses.",
+    "layout": "Layout",
+    "layoutSplit": "Lado a lado",
+    "layoutOverlay": "Sobreposto",
+    "wlVariablesNote": "Walter-Lieth usa a temperatura média e a precipitação",
+    "wlShading": "Sombreado",
+    "wlShadingNone": "Nenhum",
+    "mode": "Tipo de gráfico",
     "modeStandard": "Gráfico padrão",
     "modeWalterLieth": "Diagrama de Walter-Lieth",
     "walterLiethTabUnavailable": "Não disponível na vista Walter-Lieth",
@@ -160,9 +162,6 @@
     "subtitle": {
       "climate": "Clima {period}",
       "weather": "Tempo {year}"
-    },
-    "legend": {
-      "seriesNote": "Contínua = tmax · Tracejada = tmin · Barras = precip"
     }
   },
   "loading": {
@@ -216,6 +215,7 @@
     "rawCsv": "Dados completos (CSV)",
     "rawJson": "Dados completos (JSON)",
     "rawDataUnavailable": "Disponível apenas para Clima 1970–2000",
+    "incompleteData": "Exportação indisponível: faltam dados de temperatura ou precipitação em alguns meses",
     "failed": "Falha na exportação — tente novamente",
     "metricColumn": "Métrica"
   },

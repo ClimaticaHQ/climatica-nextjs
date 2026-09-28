@@ -74,8 +74,7 @@
       "avgTmax": "Серед. макс. темп",
       "avgTmin": "Серед. мін. темп",
       "totalPrec": "Заг. опади",
-      "aridMonths": "Посушливі місяці",
-      "martonne": "Мартон (M)"
+      "aridMonths": "Посушливі місяці"
     },
     "diff": {
       "warmerCity": "Тепліше місто",
@@ -87,14 +86,6 @@
       "tie": "Нічия"
     },
     "autoResolution": "Авторозрядність: {resolution}",
-    "wlCompare": {
-      "warmerBy": "{label} тепліше на {value}°C",
-      "coolerBy": "{label} холодніше на {value}°C",
-      "sameTemp": "Однакова середня температура",
-      "moreArid": "{label} має {value} більше посушливих місяців",
-      "fewerArid": "{label} має {value} менше посушливих місяців",
-      "sameArid": "Однакова кількість посушливих місяців"
-    },
     "noPeriodData": "Немає даних за {period} для роздільної здатності {grid}"
   },
   "heatMap": {
@@ -135,8 +126,7 @@
     }
   },
   "chart": {
-    "title": "Температура",
-    "monthAxis": "Місяць",
+    "versus": "проти",
     "temperatureAxis": "Температура (град C)",
     "precipitation": "Опади",
     "maxTemperature": "Макс. температура",
@@ -147,10 +137,22 @@
     "meanTemp": "Сер. темп",
     "annualPrec": "Річні опади",
     "aridMonths": "Посушливих місяців",
-    "martonne": "Аридність (M)",
+    "deltaAridMonths": "{sign}{count, plural, one {# посушливий місяць} few {# посушливі місяці} many {# посушливих місяців} other {# посушливого місяця}}",
+    "martonne": "Індекс Мартонна (M)",
+    "martonneShort": "Мартонн (M)",
     "martonneTooltip": "Індекс аридності де Мартонна: M = P/(T+10). <5 Гіпераридний | 5–10 Аридний | 10–20 Напіваридний | 20–30 Напівгумідний | >30 Гумідний",
     "aridPeriod": "Посушливий період",
     "humidPeriod": "Вологий період",
+    "perhumidPeriod": "Дуже вологий (> 100 мм)",
+    "wlAriaSummary": "Діаграма Вальтера-Лієта, {location}, {period}: середня температура {temp} °C, річні опади {prec} мм, посушливі місяці: {arid}",
+    "wlIncomplete": "Неповні дані для {label}: діаграмі Вальтера-Лієта потрібні температура й опади за всі 12 місяців.",
+    "layout": "Макет",
+    "layoutSplit": "Поруч",
+    "layoutOverlay": "Накладання",
+    "wlVariablesNote": "Вальтер-Літ використовує середню температуру та опади",
+    "wlShading": "Штрихування",
+    "wlShadingNone": "Немає",
+    "mode": "Тип діаграми",
     "modeStandard": "Стандартний графік",
     "modeWalterLieth": "Діаграма Вальтера-Лієта",
     "walterLiethTabUnavailable": "Недоступно у вигляді Вальтера-Лієта",
@@ -160,9 +162,6 @@
     "subtitle": {
       "climate": "Клімат {period}",
       "weather": "Погода {year}"
-    },
-    "legend": {
-      "seriesNote": "Суцільна = tmax · Пунктир = tmin · Стовпці = precip"
     }
   },
   "loading": {
@@ -216,6 +215,7 @@
     "rawCsv": "Повні дані (CSV)",
     "rawJson": "Повні дані (JSON)",
     "rawDataUnavailable": "Доступно лише для клімату 1970–2000",
+    "incompleteData": "Експорт недоступний: для деяких місяців бракує даних про температуру чи опади",
     "failed": "Не вдалося експортувати — спробуйте ще раз",
     "metricColumn": "Метрика"
   },

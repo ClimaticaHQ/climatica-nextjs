@@ -74,8 +74,7 @@
       "avgTmax": "Avg max temp",
       "avgTmin": "Avg min temp",
       "totalPrec": "Total precip",
-      "aridMonths": "Arid months",
-      "martonne": "Martonne (M)"
+      "aridMonths": "Arid months"
     },
     "diff": {
       "warmerCity": "Warmer city",
@@ -87,14 +86,6 @@
       "tie": "Tie"
     },
     "autoResolution": "Auto resolution: {resolution}",
-    "wlCompare": {
-      "warmerBy": "{label} warmer by {value}°C",
-      "coolerBy": "{label} cooler by {value}°C",
-      "sameTemp": "Same avg temperature",
-      "moreArid": "{label} has {value} more arid month(s)",
-      "fewerArid": "{label} has {value} fewer arid month(s)",
-      "sameArid": "Same arid months"
-    },
     "noPeriodData": "No {period} data at {grid} resolution"
   },
   "heatMap": {
@@ -135,8 +126,7 @@
     }
   },
   "chart": {
-    "title": "Temperature",
-    "monthAxis": "Month",
+    "versus": "vs",
     "temperatureAxis": "Temperature (deg C)",
     "precipitation": "Precipitation",
     "maxTemperature": "Max Temperature",
@@ -147,10 +137,22 @@
     "meanTemp": "Mean temp",
     "annualPrec": "Annual precip",
     "aridMonths": "Arid months",
-    "martonne": "Aridity (M)",
+    "deltaAridMonths": "{sign}{count, plural, one {# arid month} other {# arid months}}",
+    "martonne": "Martonne index (M)",
+    "martonneShort": "Martonne (M)",
     "martonneTooltip": "De Martonne aridity index: M = P/(T+10). <5 Hyperarid | 5–10 Arid | 10–20 Semi-arid | 20–30 Sub-humid | >30 Humid",
     "aridPeriod": "Arid period",
     "humidPeriod": "Humid period",
+    "perhumidPeriod": "Very humid (> 100 mm)",
+    "wlAriaSummary": "Walter-Lieth diagram, {location}, {period}: mean temperature {temp} °C, annual precipitation {prec} mm, arid months: {arid}",
+    "wlIncomplete": "Incomplete data for {label}: the Walter-Lieth diagram needs temperature and precipitation for all 12 months.",
+    "layout": "Layout",
+    "layoutSplit": "Side by side",
+    "layoutOverlay": "Overlay",
+    "wlVariablesNote": "Walter-Lieth uses mean temperature and precipitation",
+    "wlShading": "Shading",
+    "wlShadingNone": "None",
+    "mode": "Chart type",
     "modeStandard": "Standard chart",
     "modeWalterLieth": "Walter-Lieth diagram",
     "walterLiethTabUnavailable": "Not available in Walter-Lieth view",
@@ -160,9 +162,6 @@
     "subtitle": {
       "climate": "Climate {period}",
       "weather": "Weather {year}"
-    },
-    "legend": {
-      "seriesNote": "Solid = tmax · Dashed = tmin · Bars = precip"
     }
   },
   "loading": {
@@ -216,6 +215,7 @@
     "rawCsv": "Full data (CSV)",
     "rawJson": "Full data (JSON)",
     "rawDataUnavailable": "Available only for Climate 1970–2000",
+    "incompleteData": "Export unavailable: some months are missing temperature or precipitation data",
     "failed": "Export failed — try again",
     "metricColumn": "Metric"
   },

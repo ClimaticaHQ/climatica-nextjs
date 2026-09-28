@@ -74,8 +74,7 @@
       "avgTmax": "Μέση μέγ. θερμ.",
       "avgTmin": "Μέση ελάχ. θερμ.",
       "totalPrec": "Συνολική βροχόπτωση",
-      "aridMonths": "Ξηροί μήνες",
-      "martonne": "Martonne (M)"
+      "aridMonths": "Ξηροί μήνες"
     },
     "diff": {
       "warmerCity": "Θερμότερη πόλη",
@@ -87,14 +86,6 @@
       "tie": "Ισοπαλία"
     },
     "autoResolution": "Αυτόματη ανάλυση: {resolution}",
-    "wlCompare": {
-      "warmerBy": "{label} θερμότερη κατά {value}°C",
-      "coolerBy": "{label} ψυχρότερη κατά {value}°C",
-      "sameTemp": "Ίδια μέση θερμοκρασία",
-      "moreArid": "{label} έχει {value} περισσότερο(-ους) ξηρό(-ούς) μήνα(-ες)",
-      "fewerArid": "{label} έχει {value} λιγότερο(-ους) ξηρό(-ούς) μήνα(-ες)",
-      "sameArid": "Ίδιοι ξηροί μήνες"
-    },
     "noPeriodData": "Δεν υπάρχουν δεδομένα για {period} στην ανάλυση {grid}"
   },
   "heatMap": {
@@ -135,8 +126,7 @@
     }
   },
   "chart": {
-    "title": "Θερμοκρασία",
-    "monthAxis": "Μήνας",
+    "versus": "έναντι",
     "temperatureAxis": "Θερμοκρασία (βαθμοί C)",
     "precipitation": "Βροχόπτωση",
     "maxTemperature": "Μέγιστη Θερμοκρασία",
@@ -147,10 +137,22 @@
     "meanTemp": "Μέση θερμ.",
     "annualPrec": "Ετήσια βροχόπτ.",
     "aridMonths": "Ξηροί μήνες",
-    "martonne": "Ξηρότητα (M)",
+    "deltaAridMonths": "{sign}{count, plural, one {# ξηρός μήνας} other {# ξηροί μήνες}}",
+    "martonne": "Δείκτης Martonne (M)",
+    "martonneShort": "Martonne (M)",
     "martonneTooltip": "Δείκτης ξηρότητας De Martonne: M = P/(T+10). <5 Υπερξηρό | 5–10 Ξηρό | 10–20 Ημίξηρο | 20–30 Υφύγρο | >30 Υγρό",
     "aridPeriod": "Ξηρή περίοδος",
     "humidPeriod": "Υγρή περίοδος",
+    "perhumidPeriod": "Πολύ υγρό (> 100 mm)",
+    "wlAriaSummary": "Διάγραμμα Walter-Lieth, {location}, {period}: μέση θερμοκρασία {temp} °C, ετήσια βροχόπτωση {prec} mm, ξηροί μήνες: {arid}",
+    "wlIncomplete": "Ελλιπή δεδομένα για {label}: το διάγραμμα Walter-Lieth χρειάζεται θερμοκρασία και βροχόπτωση και για τους 12 μήνες.",
+    "layout": "Διάταξη",
+    "layoutSplit": "Δίπλα-δίπλα",
+    "layoutOverlay": "Επικάλυψη",
+    "wlVariablesNote": "Το Walter-Lieth χρησιμοποιεί μέση θερμοκρασία και βροχόπτωση",
+    "wlShading": "Διαγράμμιση",
+    "wlShadingNone": "Καμία",
+    "mode": "Τύπος γραφήματος",
     "modeStandard": "Τυπικό γράφημα",
     "modeWalterLieth": "Διάγραμμα Walter-Lieth",
     "walterLiethTabUnavailable": "Μη διαθέσιμο στην προβολή Walter-Lieth",
@@ -160,9 +162,6 @@
     "subtitle": {
       "climate": "Κλίμα {period}",
       "weather": "Καιρός {year}"
-    },
-    "legend": {
-      "seriesNote": "Συνεχής = tmax · Διακεκομμένη = tmin · Ράβδοι = βροχόπτωση"
     }
   },
   "loading": {
@@ -216,6 +215,7 @@
     "rawCsv": "Πλήρη δεδομένα (CSV)",
     "rawJson": "Πλήρη δεδομένα (JSON)",
     "rawDataUnavailable": "Διαθέσιμο μόνο για Κλίμα 1970–2000",
+    "incompleteData": "Η εξαγωγή δεν είναι διαθέσιμη: λείπουν δεδομένα θερμοκρασίας ή βροχόπτωσης για ορισμένους μήνες",
     "failed": "Η εξαγωγή απέτυχε — δοκιμάστε ξανά",
     "metricColumn": "Μετρική"
   },
