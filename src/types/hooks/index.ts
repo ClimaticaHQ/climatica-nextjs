@@ -4,3 +4,4 @@ export type * from "./fullClimateData.type";
 export type * from "./geo.type";
 export type * from "./heatmap.type";
 export type * from "./urlStateSync.type";
+export type * from "./walterLiethExport.type";

@@ -16,19 +16,31 @@ export type TChartSubtitle = {
 
 export type TChartMode = "standard" | "walter-lieth";
 
+export type TShownChartModeArgs = {
+  chartMode: TChartMode;
+  dataset: TDataset;
+};
+
+export type TWalterLiethShownArgs = {
+  pathname: string;
+  searchParams: URLSearchParams;
+  dataset: TDataset;
+};
+
 export type TCompareMode = "cities" | "periods";
 
+/** Missing values are null — the chart draws a gap there, never a 0. */
 export type TComparePoint = {
   month: number;
   monthName: string;
-  tmaxA: number;
-  tminA: number;
-  tavgA: number;
-  precA: number;
-  tmaxB: number;
-  tminB: number;
-  tavgB: number;
-  precB: number;
+  tmaxA: number | null;
+  tminA: number | null;
+  tavgA: number | null;
+  precA: number | null;
+  tmaxB: number | null;
+  tminB: number | null;
+  tavgB: number | null;
+  precB: number | null;
 };
 
 export type TChartSummary = {
@@ -37,3 +49,14 @@ export type TChartSummary = {
   aridCount: number;
   martonne: number | null;
 };
+
+/** Formatted differences shown under series B's values — a missing key shows no delta. */
+export type TStatDeltas = {
+  meanTemp?: string;
+  annualPrecip?: string;
+  aridMonths?: string;
+  martonne?: string;
+};
+
+/** Intl month format for chart axis labels: "short" (Jan) or "narrow" (J). */
+export type TMonthLabelFormat = "short" | "narrow";

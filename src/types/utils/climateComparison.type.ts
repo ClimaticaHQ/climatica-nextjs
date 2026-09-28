@@ -1,8 +1,9 @@
+/** Each statistic is null when any month it depends on is missing (shown as "—"). */
 export type TCompareStats = {
-  avgTmax: number;
-  avgTmin: number;
-  totalPrec: number;
-  aridMonths: number;
+  avgTmax: number | null;
+  avgTmin: number | null;
+  totalPrec: number | null;
+  aridMonths: number | null;
   martonneIndex: number | null;
 };
 

@@ -12,15 +12,20 @@ export type TClimateSearch = TCoordinates & {
 export type { TClimateVariable, TVariable, TWeatherVariable };
 export type TMonthFilter = number[] | "all";
 
+/**
+ * One month of climate data. A value the API didn't return is null — never 0, which is a
+ * real temperature/precipitation and would silently skew means, sums and aridity.
+ */
 export type TMonthlyTemperature = {
   month: number;
   monthName: string;
-  tmin: number;
-  tmax: number;
-  prec: number;
+  tmin: number | null;
+  tmax: number | null;
+  prec: number | null;
 };
 
-export type TMonthlyTemperatureWithAvg = TMonthlyTemperature & { tavg: number };
+/** tavg is null whenever tmin or tmax is missing. */
+export type TMonthlyTemperatureWithAvg = TMonthlyTemperature & { tavg: number | null };
 
 /** Provenance (creator + version) for a single raster's source dataset,
  * fetched live from WorldClim's Raster resource — see useGetDatasetVersion. */

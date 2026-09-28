@@ -9,5 +9,6 @@ export type * from "./navigation.type";
 export type * from "./scroll.type";
 export type * from "./solr.type";
 export type * from "./urlParams.type";
-export type * from "./walterLeith.type";
+export type * from "./walterLieth.type";
 export type * from "./worldclim.type";
+export type * from "./persistedStore.type";

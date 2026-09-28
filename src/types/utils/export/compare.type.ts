@@ -1,3 +1,4 @@
+import type { TComparisonExport } from "./walterLiethExport.type";
 import type {
   TCompareStats,
   TDatasetAttribution,
@@ -27,7 +28,6 @@ export type TCompareExportStatsRow = {
 
 export type TCompareExportLabels = {
   monthNames: string[];
-  monthAxisLabel: string;
   seriesLabels: Record<TSeriesKey, string>;
   statsLabels: {
     avgTmax: string;
@@ -54,4 +54,8 @@ export type TCompareExportPayload = {
   showTavgLine: boolean;
   datasetAttribution: TDatasetAttribution | null;
   shareUrl: string;
+  /** two-series comparisons: WL panels or standard split panels replace the standard body */
+  comparison?: TComparisonExport;
 };
+
+/** Pixel geometry of the standard compare chart body. */

@@ -20,7 +20,8 @@ export type TExportLocation = {
   altitude: number | null;
 };
 
-export type TExportMonthlyRow = TMonthlyTemperature & { tavg: number };
+/** tavg is null whenever tmin or tmax is missing. */
+export type TExportMonthlyRow = TMonthlyTemperature & { tavg: number | null };
 
 /** All labels reuse existing i18n keys — none were added for export. */
 export type TExportLabels = {
@@ -38,13 +39,16 @@ export type TExportLabels = {
     avgTemp: string;
     precip: string;
   };
-  monthAxisLabel: string;
   /** Omitted when summary.martonne is null. */
   martonneClassLabel?: string;
   aridityLegend: {
     arid: string;
     humid: string;
+    /** Walter-Lieth only: the solid region above 100 mm */
+    perhumid: string;
   };
+  /** Walter-Lieth only: shown instead of the diagram when a month's data is missing */
+  walterLiethIncomplete: string;
 };
 
 export type TExportPayload = {
