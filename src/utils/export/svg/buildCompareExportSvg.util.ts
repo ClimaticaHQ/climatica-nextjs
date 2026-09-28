@@ -1,23 +1,29 @@
-import { catmullRomPath } from "@/components/TempPrecipChart/utils/catmullRomPath";
-import { COMPARE_EXPORT_SVG_LAYOUT as L } from "@/constants";
+import {
+  COMPARE_EXPORT_SVG_LAYOUT as L,
+  COMPARE_WL_EXPORT_LAYOUT as W,
+  EXPORT_FONT_FAMILY,
+  EXPORT_LEGEND,
+  WALTER_LIETH_DIAGRAM,
+  EXPORT_AXES_STYLE,
+  WALTER_LIETH_EXPORT_TEXT as T,
+} from "@/constants";
+import { ECompareLayout } from "@/enums";
 import type {
   TCompareExportPayload,
-  TCompareExportSeries,
+  TCompareWalterLiethBody,
   TCompareExportStatsRow,
   TExportChartColors,
   TFooterTextLine,
-  TLinearScale,
-  TMonthBand,
   TSvgExportResult,
 } from "@/types";
+import { getSeriesLegendItems } from "@/utils";
+import { formatCount, formatPrec, formatTemp } from "../../monthlyClimate.util";
 import { buildFooterTextLines } from "../shared/footerLines.util";
-import {
-  buildGridAndAxes,
-  computeNiceAxisTicks,
-  dotRadius,
-  escapeXml,
-  monthOpacity,
-} from "./buildExportSvg.util";
+import { buildGridAndAxes, computeNiceAxisTicks, escapeXml } from "./buildExportSvg.util";
+import { buildCompareWalterLiethBody } from "./buildCompareWalterLiethSvg.util";
+import { buildStandardSplitBody } from "./buildStandardSplitSvg.util";
+import { buildExportLegend } from "./legendExport.util";
+import { buildGroupedBars, buildMonthLabels, buildSeriesLines } from "./compareChartParts.util";
 import { createLinearScale, monthBandX } from "./scales.util";
 
 function buildHeader(payload: TCompareExportPayload, colors: TExportChartColors): string {
@@ -36,10 +42,10 @@ function buildStatsTable(payload: TCompareExportPayload, colors: TExportChartCol
   const hasAltitude = series.some((s) => s.altitude !== null);
 
   const rows: TCompareExportStatsRow[] = [
-    { label: labels.statsLabels.avgTmax, format: (s) => `${s.stats.avgTmax.toFixed(1)} °C` },
-    { label: labels.statsLabels.avgTmin, format: (s) => `${s.stats.avgTmin.toFixed(1)} °C` },
-    { label: labels.statsLabels.totalPrec, format: (s) => `${s.stats.totalPrec.toFixed(0)} mm` },
-    { label: labels.statsLabels.aridMonths, format: (s) => String(s.stats.aridMonths) },
+    { label: labels.statsLabels.avgTmax, format: (s) => formatTemp(s.stats.avgTmax) },
+    { label: labels.statsLabels.avgTmin, format: (s) => formatTemp(s.stats.avgTmin) },
+    { label: labels.statsLabels.totalPrec, format: (s) => formatPrec(s.stats.totalPrec) },
+    { label: labels.statsLabels.aridMonths, format: (s) => formatCount(s.stats.aridMonths) },
   ];
   if (hasAltitude) {
     rows.push({
@@ -106,147 +112,74 @@ function buildStatsTable(payload: TCompareExportPayload, colors: TExportChartCol
   return border + vDividers + hDividers + headerRow + dataRows;
 }
 
-/** One series' precip bar for a given month, offset within the shared month band
- * so 2..N series' bars sit side by side instead of overlapping. */
-function buildGroupedBars(
-  payload: TCompareExportPayload,
-  precScale: TLinearScale,
-  monthBands: TMonthBand[],
-  chartBottom: number,
-): string {
-  if (!payload.visibleSeries.prec) return "";
-
-  const n = payload.series.length;
-  const groupWidthRatio = 0.7;
-
-  return payload.series
-    .flatMap((series, si) =>
-      series.data.map((row, i) => {
-        const band = monthBands[i];
-        const groupWidth = band.width * groupWidthRatio;
-        const barWidth = groupWidth / n;
-        const barX = band.center - groupWidth / 2 + barWidth * si;
-        const barY = precScale(row.prec);
-        const barHeight = Math.max(0, chartBottom - barY);
-        const opacity = monthOpacity(row.month, payload.selectedMonths);
-        return `<rect x="${barX.toFixed(2)}" y="${barY.toFixed(2)}" width="${(barWidth * 0.85).toFixed(2)}" height="${barHeight.toFixed(2)}" fill="${series.colors.prec}" fill-opacity="${opacity}" rx="1.5" />`;
-      }),
-    )
-    .join("");
+/** The overlay / multi-period legend — the same items ChartLegend shows for these charts. */
+function buildLegend(payload: TCompareExportPayload, colors: TExportChartColors, y: number) {
+  return buildExportLegend({
+    items: getSeriesLegendItems({
+      labels: payload.labels.seriesLabels,
+      series: payload.series.map((series) => ({
+        key: series.label,
+        label: series.label,
+        color: series.colors.tmax,
+      })),
+      visible: payload.visibleSeries,
+      neutral: colors.textSecondary,
+      hasTavg: payload.showTavgLine,
+      // * compare pages never recolor bars by aridity
+      aridity: null,
+    }),
+    y,
+    left: L.paddingX,
+    width: L.width - L.paddingX * 2,
+    textColor: colors.textSecondary,
+    idPrefix: "cmp-legend",
+  });
 }
 
-/** One series' tmax/tavg/tmin lines — dash pattern matches CompareChart/
- * MultiPeriodChart exactly (solid tmax, dashed tavg, dash-dot tmin). */
-function buildSeriesLines(
-  payload: TCompareExportPayload,
-  series: TCompareExportSeries,
-  tempScale: TLinearScale,
-  monthBands: TMonthBand[],
-): string {
-  const lineSpecs: { key: "tmax" | "tavg" | "tmin"; color: string; dashArray?: string }[] = [
-    { key: "tmax", color: series.colors.tmax },
-    ...(payload.showTavgLine
-      ? [{ key: "tavg" as const, color: series.colors.tavg, dashArray: "5 3" }]
-      : []),
-    { key: "tmin", color: series.colors.tmin, dashArray: "4 2" },
-  ];
-
-  return lineSpecs
-    .map(({ key, color, dashArray }) => {
-      if (!payload.visibleSeries[key]) return "";
-
-      const points = series.data.map((row, i) => ({
-        x: monthBands[i].center,
-        y: tempScale(row[key]),
-      }));
-      const path = catmullRomPath(points);
-      const dash = dashArray ? ` stroke-dasharray="${dashArray}"` : "";
-
-      const dots = series.data
-        .map((row, i) => {
-          const opacity = monthOpacity(row.month, payload.selectedMonths);
-          const radius = dotRadius(row.month, payload.selectedMonths);
-          return `<circle cx="${points[i].x.toFixed(2)}" cy="${points[i].y.toFixed(2)}" r="${radius}" fill="${color}" fill-opacity="${opacity}" />`;
-        })
-        .join("");
-
-      return `<path d="${path}" fill="none" stroke="${color}" stroke-width="2"${dash} /> ${dots}`;
-    })
-    .join("\n");
-}
-
-function buildMonthLabels(
-  payload: TCompareExportPayload,
+function renderFooterLines(
+  lines: TFooterTextLine[],
   colors: TExportChartColors,
-  monthBands: TMonthBand[],
-  chartBottom: number,
+  footerY: number,
 ): string {
-  return payload.labels.monthNames
-    .map(
-      (name, i) =>
-        `<text x="${monthBands[i].center.toFixed(2)}" y="${chartBottom + 20}" text-anchor="middle" font-size="11" fill="${colors.textSecondary}">${escapeXml(name)}</text>`,
-    )
-    .join("");
-}
-
-/** One color dot + label per series — matches CompareModeLegend/MultiPeriodLegend
- * (a single identity color per series, not one entry per metric). */
-function buildLegend(payload: TCompareExportPayload): string {
-  const itemWidth = L.width / (payload.series.length + 1);
-  let x = itemWidth;
-
-  return payload.series
-    .map((series) => {
-      const swatch = `<rect x="${x - 7}" y="${L.legendY - 10}" width="10" height="10" fill="${series.colors.tmax}" rx="2" />`;
-      const text = `<text x="${x + 8}" y="${L.legendY}" font-size="12" fill="${series.colors.tmax}">${escapeXml(series.label)}</text>`;
-      x += itemWidth;
-      return swatch + text;
-    })
-    .join("");
-}
-
-function renderFooterLines(lines: TFooterTextLine[], colors: TExportChartColors): string {
   return lines
     .map(({ text, fontSize }, i) => {
-      const y = L.footerY + i * L.footerLineHeight;
+      const y = footerY + i * L.footerLineHeight;
       return `<text x="${L.paddingX}" y="${y}" font-size="${fontSize}" fill="${colors.textSecondary}">${escapeXml(text)}</text>`;
     })
     .join("\n");
 }
 
-export function buildCompareExportSvg(
+/**
+ * The standard overlay / multi-period chart in the WL overlay's geometry: the same plot box,
+ * °C / mm above the axes, no month axis title, the legend the same gap below the months.
+ */
+function buildStandardChartBody(
   payload: TCompareExportPayload,
   colors: TExportChartColors,
-): TSvgExportResult {
-  const plotLeft = L.chartMarginLeft;
-  const plotRight = L.width - L.chartMarginRight;
-  const chartBottom = L.chartTop + L.chartHeight;
-
+  top: number,
+): TCompareWalterLiethBody {
+  const plotLeft = W.overlayPlotMarginX;
+  const plotRight = L.width - W.overlayPlotMarginX;
+  const chartBottom = top + W.overlayPlotHeight;
   const tempScale = createLinearScale(
     payload.scales.tempMin,
     payload.scales.tempMax,
     chartBottom,
-    L.chartTop,
+    top,
   );
-  const precScale = createLinearScale(0, payload.rightMax, chartBottom, L.chartTop);
-
-  const monthCount = payload.series[0]?.data.length ?? 12;
+  const precScale = createLinearScale(0, payload.rightMax, chartBottom, top);
+  const monthCount = payload.series[0]?.data.length ?? WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR;
   const monthBands = Array.from({ length: monthCount }, (_, i) => {
     const band = monthBandX(i, plotRight - plotLeft, monthCount);
     return { ...band, x: band.x + plotLeft, center: band.center + plotLeft };
   });
-
-  const footerLines = buildFooterTextLines({
-    contextLabel: payload.headerSubtitle,
-    datasetAttribution: payload.datasetAttribution,
-    shareUrl: payload.shareUrl,
-    layout: L,
-  });
-  const height = L.footerY + footerLines.length * L.footerLineHeight + L.footerBottomMargin;
+  const legend = buildLegend(
+    payload,
+    colors,
+    chartBottom + T.MONTH_LABEL_OFFSET + EXPORT_LEGEND.GAP,
+  );
 
   const body = [
-    buildHeader(payload, colors),
-    buildStatsTable(payload, colors),
     buildGridAndAxes(
       payload.scales,
       colors,
@@ -254,22 +187,57 @@ export function buildCompareExportSvg(
       precScale,
       plotLeft,
       plotRight,
-      L.chartTop,
+      top,
       chartBottom,
       computeNiceAxisTicks(payload.rightMax),
       (tick) => tick,
+      undefined,
+      EXPORT_AXES_STYLE,
     ),
     buildGroupedBars(payload, precScale, monthBands, chartBottom),
     ...payload.series.map((series) => buildSeriesLines(payload, series, tempScale, monthBands)),
     buildMonthLabels(payload, colors, monthBands, chartBottom),
-    `<text x="${(plotLeft + plotRight) / 2}" y="${chartBottom + 40}" text-anchor="middle" font-size="11" font-weight="600" fill="${colors.textSecondary}">${escapeXml(payload.labels.monthAxisLabel)}</text>`,
-    buildLegend(payload),
-    renderFooterLines(footerLines, colors),
+    legend.svg,
+  ].join("\n");
+  return { body, bottom: legend.bottom };
+}
+
+/** The chart body the page shows: WL (split or overlay), standard split, or standard overlay. */
+function buildChartBody(payload: TCompareExportPayload, colors: TExportChartColors) {
+  const { comparison } = payload;
+  if (comparison?.chartMode === "walter-lieth") {
+    return buildCompareWalterLiethBody(comparison, colors, L.chartTop);
+  }
+  return comparison?.layout === ECompareLayout.SPLIT
+    ? buildStandardSplitBody(payload, comparison, colors, L.chartTop)
+    : buildStandardChartBody(payload, colors, L.chartTop);
+}
+
+export function buildCompareExportSvg(
+  payload: TCompareExportPayload,
+  colors: TExportChartColors,
+): TSvgExportResult {
+  const footerLines = buildFooterTextLines({
+    contextLabel: payload.headerSubtitle,
+    datasetAttribution: payload.datasetAttribution,
+    shareUrl: payload.shareUrl,
+    layout: L,
+  });
+  // * every body sets its own height (panels, legend rows); the footer follows it
+  const chartBody = buildChartBody(payload, colors);
+  const footerY = chartBody.bottom + W.footerGap;
+  const height = footerY + footerLines.length * L.footerLineHeight + L.footerBottomMargin;
+
+  const body = [
+    buildHeader(payload, colors),
+    buildStatsTable(payload, colors),
+    chartBody.body,
+    renderFooterLines(footerLines, colors, footerY),
   ].join("\n");
 
   const svg = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${L.width}" height="${height}" viewBox="0 0 ${L.width} ${height}" font-family="Inter, Roboto, Helvetica Neue, Arial, sans-serif">`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${L.width}" height="${height}" viewBox="0 0 ${L.width} ${height}" font-family="${EXPORT_FONT_FAMILY}">`,
     `<rect width="${L.width}" height="${height}" fill="${colors.bg}" />`,
     body,
     `</svg>`,

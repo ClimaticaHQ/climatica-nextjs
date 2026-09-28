@@ -1,4 +1,5 @@
 import type { TCompareExportSeriesColors } from "@/types";
+import { readExportPalette } from "../shared/exportPalette.util";
 
 /** Raw CSS var names behind CLIMATE_COMPARISON_COLORS.A/.B (climate.constant.ts) —
  * that constant holds "var(--...)" strings meant for inline React styles, which
@@ -23,8 +24,12 @@ const COMPARE_SERIES_CSS_VARS: Record<
   },
 };
 
+/** Series hues from the light palette — identical in light and dark mode. */
 export function resolveCompareSeriesColors(): Record<"A" | "B", TCompareExportSeriesColors> {
-  const computed = getComputedStyle(document.documentElement);
+  return readExportPalette(resolveFrom);
+}
+
+function resolveFrom(computed: CSSStyleDeclaration): Record<"A" | "B", TCompareExportSeriesColors> {
   const resolve = (
     vars: Record<keyof TCompareExportSeriesColors, string>,
   ): TCompareExportSeriesColors => ({

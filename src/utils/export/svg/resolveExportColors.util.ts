@@ -1,4 +1,6 @@
+import { WALTER_LIETH_COLOR_VARS } from "@/constants";
 import type { TExportChartColors } from "@/types";
+import { readExportPalette } from "../shared/exportPalette.util";
 
 const CSS_VAR_MAP: Record<keyof TExportChartColors, string> = {
   text: "--color-text",
@@ -11,11 +13,21 @@ const CSS_VAR_MAP: Record<keyof TExportChartColors, string> = {
   arid: "--chart-arid",
   humid: "--chart-humid",
   primary: "--color-primary",
+  wlTemp: WALTER_LIETH_COLOR_VARS.TEMP,
+  wlPrec: WALTER_LIETH_COLOR_VARS.PREC,
+  wlHumidHatch: WALTER_LIETH_COLOR_VARS.HUMID_HATCH,
+  wlAridHatch: WALTER_LIETH_COLOR_VARS.ARID_HATCH,
+  wlCompressedFill: WALTER_LIETH_COLOR_VARS.COMPRESSED_FILL,
+  wlSeriesA: WALTER_LIETH_COLOR_VARS.SERIES_A,
+  wlSeriesB: WALTER_LIETH_COLOR_VARS.SERIES_B,
 };
 
-/** Resolves the live CSS custom properties to literal colors for the SVG/PNG export. */
+/** Resolves the export colors from the light palette — identical in light and dark mode. */
 export function resolveExportColors(): TExportChartColors {
-  const computed = getComputedStyle(document.documentElement);
+  return readExportPalette(resolveFrom);
+}
+
+function resolveFrom(computed: CSSStyleDeclaration): TExportChartColors {
   const keys = Object.keys(CSS_VAR_MAP) as (keyof TExportChartColors)[];
   // Same generic-Record-construction cast as extractParams — TS can't otherwise
   // prove every key of TExportChartColors was populated by this loop.

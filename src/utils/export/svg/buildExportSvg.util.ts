@@ -1,6 +1,12 @@
-import { catmullRomPath } from "@/components/TempPrecipChart/utils/catmullRomPath";
-import { EXPORT_SVG_LAYOUT as L } from "@/constants";
+import {
+  EXPORT_SVG_LAYOUT as L,
+  MISSING_VALUE_LABEL,
+  EXPORT_AXES_STYLE,
+  EXPORT_FONT_FAMILY,
+} from "@/constants";
 import type {
+  TGridAxesStyle,
+  TUnitTitlesArgs,
   TExportChartColors,
   TExportPayload,
   TFooterTextLine,
@@ -8,10 +14,22 @@ import type {
   TMonthBand,
   TSvgExportResult,
 } from "@/types";
-import { computeWLAxisTicks, computeWLPrecAxisTicks, precToScaled, scaledToPrec } from "@/utils";
+import {
+  computeWLAxisTicks,
+  getSharedDomain,
+  getStandardLegendItems,
+  getWalterLiethLegendItems,
+  toWalterLiethMonths,
+} from "@/utils";
+import { buildExportLegend, getWalterLiethExportPalette } from "./legendExport.util";
 import { buildFooterTextLines } from "../shared/footerLines.util";
-import { linearPath } from "./linearPath.util";
+import { buildGapAwarePath } from "./gapPath.util";
 import { createLinearScale, monthBandX } from "./scales.util";
+import {
+  buildNotice,
+  buildWalterLiethPanel,
+  getConventionExportPaint,
+} from "./walterLiethExport.util";
 
 export function escapeXml(text: string): string {
   return text
@@ -115,7 +133,7 @@ function buildStatsTable(payload: TExportPayload, colors: TExportChartColors): s
  * precTicks are raw-mm label values; toScalePos maps a raw-mm tick to whatever value
  * precScale's own domain expects, since that differs by mode — standard mode's precScale
  * domain is already raw mm (identity), while Walter-Lieth mode's precScale shares the
- * temp-equivalent scaled domain (tempMin..plotMax), so its ticks go through precToScaled.
+ * temp-equivalent scaled domain (tempMin..plotMax), so its ticks go through toPrecipAxisValue.
  */
 export function buildGridAndAxes(
   scales: { tempMin: number; tempMax: number },
@@ -128,9 +146,11 @@ export function buildGridAndAxes(
   chartBottom: number,
   precTicks: number[],
   toScalePos: (tick: number) => number,
+  // * WL passes its own (adds the tempMax tick); other charts keep the default steps
+  tempTicks: number[] = computeWLAxisTicks(scales.tempMin, scales.tempMax),
+  axesStyle: TGridAxesStyle = EXPORT_AXES_STYLE,
 ): string {
-  const tempTicks = computeWLAxisTicks(scales.tempMin, scales.tempMax);
-
+  const { tickGap } = axesStyle;
   const gridLines = tempTicks
     .map((tick) => {
       const y = tempScale(tick);
@@ -141,29 +161,33 @@ export function buildGridAndAxes(
   const tempLabels = tempTicks
     .map((tick) => {
       const y = tempScale(tick);
-      return `<text x="${plotLeft - 10}" y="${y + 4}" text-anchor="end" font-size="11" fill="${colors.textSecondary}">${Math.round(tick)}</text>`;
+      return `<text x="${plotLeft - tickGap}" y="${y + 4}" text-anchor="end" font-size="11" fill="${colors.textSecondary}">${Math.round(tick)}</text>`;
     })
     .join("");
 
   const precLabels = precTicks
     .map((tick) => {
       const y = precScale(toScalePos(tick));
-      return `<text x="${plotRight + 10}" y="${y + 4}" text-anchor="start" font-size="11" fill="${colors.textSecondary}">${Math.round(tick)}</text>`;
+      return `<text x="${plotRight + tickGap}" y="${y + 4}" text-anchor="start" font-size="11" fill="${colors.textSecondary}">${Math.round(tick)}</text>`;
     })
     .join("");
-
-  const midY = (chartTop + chartBottom) / 2;
-  const tempTitleX = plotLeft - 45;
-  const precTitleX = plotRight + 45;
 
   return `
     ${gridLines}
     <line x1="${plotLeft}" y1="${chartBottom}" x2="${plotRight}" y2="${chartBottom}" stroke="${colors.border}" stroke-width="1" />
     ${tempLabels}
     ${precLabels}
-    <text x="${tempTitleX}" y="${midY}" text-anchor="middle" font-size="11" font-weight="600" fill="${colors.textSecondary}" transform="rotate(-90 ${tempTitleX} ${midY})">°C</text>
-    <text x="${precTitleX}" y="${midY}" text-anchor="middle" font-size="11" font-weight="600" fill="${colors.textSecondary}" transform="rotate(90 ${precTitleX} ${midY})">mm</text>
+    ${buildUnitTitles({ plotLeft, plotRight, chartTop, colors, axesStyle })}
   `;
+}
+
+/** °C / mm upright above the axes, aligned with the tick labels — as on screen. */
+function buildUnitTitles({ plotLeft, plotRight, chartTop, colors, axesStyle }: TUnitTitlesArgs) {
+  const font = `font-size="11" font-weight="600" fill="${colors.textSecondary}"`;
+  const y = chartTop - axesStyle.unitTitlesAbove;
+  return `
+    <text x="${plotLeft - axesStyle.tickGap}" y="${y}" text-anchor="end" ${font}>°C</text>
+    <text x="${plotRight + axesStyle.tickGap}" y="${y}" text-anchor="start" ${font}>mm</text>`;
 }
 
 function buildBars(
@@ -177,8 +201,9 @@ function buildBars(
 
   return payload.monthlyData
     .map((row, i) => {
+      if (row.prec === null) return "";
       const band = monthBands[i];
-      const isArid = payload.aridity[i]?.isArid ?? false;
+      const isArid = payload.aridity[i]?.isArid === true;
       const barWidth = band.width * 0.6;
       const barX = band.center - barWidth / 2;
       const barY = precScale(row.prec);
@@ -199,18 +224,21 @@ function buildLine(
 ): string {
   if (!payload.visibleSeries[key]) return "";
 
-  const points = payload.monthlyData.map((row, i) => ({
-    x: monthBands[i].center,
-    y: tempScale(row[key]),
-  }));
-  const path = catmullRomPath(points);
+  // * a missing month is a gap in the line and has no dot — never a 0
+  const points = payload.monthlyData.map((row, i) => {
+    const value = row[key];
+    return value !== null ? { x: monthBands[i].center, y: tempScale(value) } : null;
+  });
+  const path = buildGapAwarePath(points);
   const dashArray = key === "tavg" ? ' stroke-dasharray="5 3"' : "";
 
   const dots = payload.monthlyData
     .map((row, i) => {
+      const point = points[i];
+      if (!point) return "";
       const opacity = monthOpacity(row.month, payload.selectedMonths);
       const radius = dotRadius(row.month, payload.selectedMonths);
-      return `<circle cx="${points[i].x.toFixed(2)}" cy="${points[i].y.toFixed(2)}" r="${radius}" fill="${color}" fill-opacity="${opacity}" />`;
+      return `<circle cx="${point.x.toFixed(2)}" cy="${point.y.toFixed(2)}" r="${radius}" fill="${color}" fill-opacity="${opacity}" />`;
     })
     .join("");
 
@@ -241,6 +269,9 @@ function buildStandardBody(
       chartBottom,
       computeNiceAxisTicks(payload.rightMax),
       (tick) => tick,
+      undefined,
+      // * the WL plot's axes: °C / mm above them, like the screen
+      EXPORT_AXES_STYLE,
     ),
     buildBars(payload, colors, precScale, monthBands, chartBottom),
     buildLine(payload, colors.tmax, "tmax", tempScale, monthBands),
@@ -249,107 +280,43 @@ function buildStandardBody(
   ].join("\n");
 }
 
+// * ids are fixed: the single-city export holds exactly one WL plot
+const WL_EXPORT_IDS = {
+  patternIds: { humid: "wl-export-humid", arid: "wl-export-arid" },
+  clipId: "wl-export-plot-clip",
+};
+
 /**
- * Walter-Lieth plot area — ports WalterLiethCustomized.tsx's technique directly: both curves
- * are mapped through the SAME temp-domain scale (precip run through precToScaled(), matching
- * the live component's precScaled), so the two closed areas share one coordinate space and
- * an evenodd clip can isolate humid-above/arid-above regions without intersection math.
+ * Walter-Lieth plot area — one convention-colored layer in a buildWalterLiethPanel, the same
+ * panel the compare export uses. Domain = getSharedDomain for this one series, exactly what
+ * the live diagram uses.
  */
 function buildWalterLiethBody(
   payload: TExportPayload,
   colors: TExportChartColors,
-  tempScale: TLinearScale,
   plotLeft: number,
   plotRight: number,
   chartBottom: number,
-  monthBands: TMonthBand[],
 ): string {
-  // precScale shares the temp axis's own domain (tempMin..plotMax) so its tick positions —
-  // fed through precToScaled — land exactly where the curves (also drawn via tempScale) do.
-  const precScale = createLinearScale(
-    payload.scales.tempMin,
-    payload.scales.plotMax,
-    chartBottom,
-    L.chartTop,
-  );
-  const precRawMax = scaledToPrec(payload.scales.precMax);
-  // Ticks below tempMin fall outside the shared domain (e.g. a raw-mm tick at 0 sits below
-  // the plot floor once tempMin is above 0°C, as in tropical climates that never freeze).
-  const precTicks = computeWLPrecAxisTicks(precRawMax).filter(
-    (tick) => precToScaled(tick) >= payload.scales.tempMin,
-  );
-  const gridAndAxes = buildGridAndAxes(
-    payload.scales,
+  const box = { left: plotLeft, right: plotRight, top: L.chartTop, bottom: chartBottom };
+  const months = toWalterLiethMonths(payload.monthlyData);
+  if (!months) return buildNotice({ text: payload.labels.walterLiethIncomplete, box, colors });
+
+  return buildWalterLiethPanel({
+    layers: [
+      {
+        months,
+        patternIds: WL_EXPORT_IDS.patternIds,
+        paint: getConventionExportPaint(colors),
+        isShaded: true,
+        dotShape: "circle",
+      },
+    ],
+    domain: getSharedDomain([{ months }]),
     colors,
-    tempScale,
-    precScale,
-    plotLeft,
-    plotRight,
-    L.chartTop,
-    chartBottom,
-    precTicks,
-    precToScaled,
-  );
-
-  // Marks where the temperature axis's real range ends, once the shared domain has been
-  // widened to fit tall precipitation (Task 6) — otherwise this would just redraw the
-  // plot's own top edge, so it's skipped for the common non-widened case.
-  const tempCeilingLine =
-    payload.scales.plotMax > payload.scales.tempMax
-      ? `<line x1="${plotLeft}" y1="${tempScale(payload.scales.tempMax)}" x2="${plotRight}" y2="${tempScale(payload.scales.tempMax)}" stroke="${colors.textSecondary}" stroke-opacity="0.5" stroke-dasharray="4 4" />`
-      : "";
-
-  const baselineY = tempScale(payload.scales.tempMin);
-  const tempPts = payload.monthlyData.map((row, i) => ({
-    x: monthBands[i].center,
-    y: tempScale(row.tavg),
-  }));
-  const precPts = payload.monthlyData.map((row, i) => ({
-    x: monthBands[i].center,
-    y: tempScale(precToScaled(row.prec)),
-  }));
-
-  const firstX = tempPts[0].x;
-  const lastX = tempPts[tempPts.length - 1].x;
-  const f = (n: number) => n.toFixed(2);
-
-  const tempLine = linearPath(tempPts);
-  const precLine = linearPath(precPts);
-  const tempArea = `${tempLine} L ${f(lastX)},${f(baselineY)} L ${f(firstX)},${f(baselineY)} Z`;
-  const precArea = `${precLine} L ${f(lastX)},${f(baselineY)} L ${f(firstX)},${f(baselineY)} Z`;
-  const diffPath = `${precArea} ${tempArea}`;
-  const clipId = "wl-export-clip";
-  // tempScale's domain now extends to plotMax (max(tempMax, precMax)), so precip curves
-  // stay within the temp domain by construction — this clip is now a defensive boundary
-  // rather than a mitigation for a known-overflowing domain.
-  const plotClipId = "wl-export-plot-clip";
-
-  const dots = tempPts
-    .map(
-      (p) =>
-        `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="4" fill="${colors.tavg}" stroke="${colors.bg}" stroke-width="1" />`,
-    )
-    .join("");
-
-  return `
-    ${gridAndAxes}
-    ${tempCeilingLine}
-    <defs>
-      <clipPath id="${plotClipId}" clipPathUnits="userSpaceOnUse">
-        <rect x="${plotLeft}" y="${L.chartTop}" width="${plotRight - plotLeft}" height="${chartBottom - L.chartTop}" />
-      </clipPath>
-      <clipPath id="${clipId}" clipPathUnits="userSpaceOnUse">
-        <path d="${diffPath}" clip-rule="evenodd" />
-      </clipPath>
-    </defs>
-    <g clip-path="url(#${plotClipId})">
-      <path d="${precArea}" fill="${colors.humid}" fill-opacity="0.85" clip-path="url(#${clipId})" stroke="none" />
-      <path d="${tempArea}" fill="${colors.arid}" fill-opacity="0.9" clip-path="url(#${clipId})" stroke="none" />
-      <path d="${precLine}" fill="none" stroke="${colors.humid}" stroke-width="1.5" />
-      <path d="${tempLine}" fill="none" stroke="${colors.tavg}" stroke-width="2" />
-      ${dots}
-    </g>
-  `;
+    box,
+    clipId: WL_EXPORT_IDS.clipId,
+  });
 }
 
 function buildMonthLabels(
@@ -365,53 +332,28 @@ function buildMonthLabels(
     .join("");
 }
 
-function buildLegend(payload: TExportPayload, colors: TExportChartColors): string {
-  const allEntries: { key: "tmax" | "tmin" | "tavg" | "prec"; color: string; label: string }[] = [
-    { key: "tmax", color: colors.tmax, label: payload.labels.seriesLabels.tmax },
-    { key: "tavg", color: colors.tavg, label: payload.labels.seriesLabels.tavg },
-    { key: "tmin", color: colors.tmin, label: payload.labels.seriesLabels.tmin },
-    { key: "prec", color: colors.humid, label: payload.labels.seriesLabels.prec },
-  ];
-  const entries = allEntries.filter((entry) => payload.visibleSeries[entry.key]);
-
-  const itemWidth = 150;
-  const totalWidth = entries.length * itemWidth;
-  let x = (L.width - totalWidth) / 2;
-
-  return entries
-    .map((entry) => {
-      const swatch =
-        entry.key === "prec"
-          ? `<rect x="${x}" y="${L.legendY - 9}" width="14" height="10" fill="${entry.color}" rx="2" />`
-          : `<line x1="${x}" y1="${L.legendY - 4}" x2="${x + 14}" y2="${L.legendY - 4}" stroke="${entry.color}" stroke-width="2" />`;
-      const text = `<text x="${x + 20}" y="${L.legendY}" font-size="12" fill="${colors.text}">${escapeXml(entry.label)}</text>`;
-      x += itemWidth;
-      return swatch + text;
-    })
-    .join("");
-}
-
-/** Matches AridityLegend.tsx — only shown when precip bars are visible, since the
- * arid/humid coloring only applies to those bars (StandardClimateChart.tsx). */
-function buildAridityLegend(payload: TExportPayload, colors: TExportChartColors): string {
-  if (!payload.visibleSeries.prec) return "";
-
-  const entries: { color: string; label: string }[] = [
-    { color: colors.arid, label: payload.labels.aridityLegend.arid },
-    { color: colors.humid, label: payload.labels.aridityLegend.humid },
-  ];
-  const itemWidth = 130;
-  const totalWidth = entries.length * itemWidth;
-  let x = (L.width - totalWidth) / 2;
-
-  return entries
-    .map(({ color, label }) => {
-      const swatch = `<rect x="${x}" y="${L.aridityLegendY - 9}" width="12" height="12" fill="${color}" rx="2" />`;
-      const text = `<text x="${x + 18}" y="${L.aridityLegendY}" font-size="11" fill="${colors.textSecondary}">${escapeXml(label)}</text>`;
-      x += itemWidth;
-      return swatch + text;
-    })
-    .join("");
+/** The single-city legend — the same items ChartLegend shows for this chart type. */
+function buildLegend(payload: TExportPayload, colors: TExportChartColors, isWalterLieth: boolean) {
+  const { seriesLabels, aridityLegend } = payload.labels;
+  const items = isWalterLieth
+    ? getWalterLiethLegendItems({
+        labels: { ...aridityLegend, temp: seriesLabels.tavg, prec: seriesLabels.prec },
+        palette: getWalterLiethExportPalette(colors),
+      })
+    : getStandardLegendItems({
+        labels: { ...seriesLabels, ...aridityLegend },
+        colors: { tmax: colors.tmax, tmin: colors.tmin, tavg: colors.tavg, prec: colors.humid },
+        visible: payload.visibleSeries,
+        aridity: { arid: colors.arid, humid: colors.humid },
+      });
+  return buildExportLegend({
+    items,
+    y: L.legendY,
+    left: L.paddingX,
+    width: L.width - L.paddingX * 2,
+    textColor: colors.textSecondary,
+    idPrefix: "export-legend",
+  }).svg;
 }
 
 /**
@@ -432,8 +374,14 @@ function buildDataTable(payload: TExportPayload, colors: TExportChartColors): st
   const y0 = L.dataTableY;
 
   const rows: { label: string; format: (d: TExportPayload["monthlyData"][number]) => string }[] = [
-    { label: `${labels.tableLabels.avgTemp} (°C)`, format: (d) => d.tavg.toFixed(1) },
-    { label: `${labels.tableLabels.precip} (mm)`, format: (d) => Math.round(d.prec).toString() },
+    {
+      label: `${labels.tableLabels.avgTemp} (°C)`,
+      format: (d) => (d.tavg !== null ? d.tavg.toFixed(1) : MISSING_VALUE_LABEL),
+    },
+    {
+      label: `${labels.tableLabels.precip} (mm)`,
+      format: (d) => (d.prec !== null ? Math.round(d.prec).toString() : MISSING_VALUE_LABEL),
+    },
   ];
 
   const colX = (i: number) => L.paddingX + labelColWidth + monthColWidth * i;
@@ -499,11 +447,10 @@ export function buildExportSvg(
   const chartBottom = L.chartTop + L.chartHeight;
   const isWalterLieth = payload.chartMode === "walter-lieth";
 
-  // Walter-Lieth mode draws precip through this same scale (see buildWalterLiethBody), so
-  // its ceiling must reach plotMax; standard mode's temp lines only ever need tempMax.
+  // Standard mode only — Walter-Lieth builds its own scale from getSharedDomain.
   const tempScale = createLinearScale(
     payload.scales.tempMin,
-    isWalterLieth ? payload.scales.plotMax : payload.scales.tempMax,
+    payload.scales.tempMax,
     chartBottom,
     L.chartTop,
   );
@@ -517,15 +464,7 @@ export function buildExportSvg(
   }));
 
   const plotBody = isWalterLieth
-    ? buildWalterLiethBody(
-        payload,
-        colors,
-        tempScale,
-        plotLeft,
-        plotRight,
-        chartBottom,
-        shiftedBands,
-      )
+    ? buildWalterLiethBody(payload, colors, plotLeft, plotRight, chartBottom)
     : buildStandardBody(payload, colors, tempScale, plotLeft, plotRight, chartBottom, shiftedBands);
 
   const footerLines = buildFooterTextLines({
@@ -541,9 +480,7 @@ export function buildExportSvg(
     buildStatsTable(payload, colors),
     plotBody,
     buildMonthLabels(payload, colors, shiftedBands, chartBottom),
-    `<text x="${(plotLeft + plotRight) / 2}" y="${chartBottom + 40}" text-anchor="middle" font-size="11" font-weight="600" fill="${colors.textSecondary}">${escapeXml(payload.labels.monthAxisLabel)}</text>`,
-    isWalterLieth ? "" : buildLegend(payload, colors),
-    buildAridityLegend(payload, colors),
+    buildLegend(payload, colors, isWalterLieth),
     buildDataTable(payload, colors),
     renderFooterLines(footerLines, colors),
   ].join("\n");
@@ -555,7 +492,7 @@ export function buildExportSvg(
   // very first character, so that whitespace breaks every consumer's parser.
   const svg = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${L.width}" height="${height}" viewBox="0 0 ${L.width} ${height}" font-family="Inter, Roboto, Helvetica Neue, Arial, sans-serif">`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${L.width}" height="${height}" viewBox="0 0 ${L.width} ${height}" font-family="${EXPORT_FONT_FAMILY}">`,
     `<rect width="${L.width}" height="${height}" fill="${colors.bg}" />`,
     body,
     `</svg>`,

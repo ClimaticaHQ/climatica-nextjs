@@ -1,4 +1,4 @@
-import { HEATMAP_EXPORT_SVG_LAYOUT as L } from "@/constants";
+import { HEATMAP_EXPORT_SVG_LAYOUT as L, EXPORT_FONT_FAMILY } from "@/constants";
 import type {
   TExportChartColors,
   TFooterTextLine,
@@ -103,7 +103,7 @@ export async function buildHeatmapExportSvg(
 
   const svg = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${L.width}" height="${height}" viewBox="0 0 ${L.width} ${height}" font-family="Inter, Roboto, Helvetica Neue, Arial, sans-serif">`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${L.width}" height="${height}" viewBox="0 0 ${L.width} ${height}" font-family="${EXPORT_FONT_FAMILY}">`,
     `<rect width="${L.width}" height="${height}" fill="${colors.bg}" />`,
     body,
     `</svg>`,
