@@ -140,9 +140,10 @@ export function buildMonthlyTemperaturesFromPointValues(
   return Array.from({ length: 12 }, (_, i) => ({
     month: i + 1,
     monthName: MONTH_NAMES[i],
-    tmin: vals.get(`tmin_${i + 1}`) ?? 0,
-    tmax: vals.get(`tmax_${i + 1}`) ?? 0,
-    prec: vals.get(`prec_${i + 1}`) ?? 0,
+    // * a value the response lacks stays null — 0 would be read as real data
+    tmin: vals.get(`tmin_${i + 1}`) ?? null,
+    tmax: vals.get(`tmax_${i + 1}`) ?? null,
+    prec: vals.get(`prec_${i + 1}`) ?? null,
   }));
 }
 

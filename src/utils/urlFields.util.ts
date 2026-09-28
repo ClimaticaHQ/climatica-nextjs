@@ -1,6 +1,14 @@
-import { DATASETS, SIDEBAR_PARAMS } from "@/constants";
+import {
+  CHART_MODE_BY_PARAM,
+  DATASETS,
+  DEFAULT_COMPARE_LAYOUT,
+  SIDEBAR_PARAMS,
+  WALTER_LIETH_COMPARISON,
+} from "@/constants";
+import { ECompareLayout, EWalterLiethShading } from "@/enums";
 import type {
   TCellSize,
+  TChartMode,
   TCity,
   TDatasetPeriodUrlValue,
   TMonthFilter,
@@ -92,6 +100,47 @@ export const monthsUrlField: TUrlField<TMonthFilter> = {
   },
   parse(params) {
     return parseMonths(params.get(SIDEBAR_PARAMS.MONTHS)) ?? undefined;
+  },
+};
+
+/**
+ * Comparison layout, shared by both chart types. Written only when it differs from the
+ * default (split); old links carried it as wlLayout, still read. Unknown values parse to
+ * undefined.
+ */
+export const compareLayoutUrlField: TUrlField<ECompareLayout> = {
+  serialize(value, params) {
+    if (value !== DEFAULT_COMPARE_LAYOUT) params.set(SIDEBAR_PARAMS.LAYOUT, value);
+  },
+  parse(params) {
+    const raw = params.get(SIDEBAR_PARAMS.LAYOUT) ?? params.get(SIDEBAR_PARAMS.WL_LAYOUT);
+    return Object.values(ECompareLayout).find((layout) => layout === raw);
+  },
+};
+
+/**
+ * Chart mode — `chart=standard` for the standard chart; Walter-Lieth (the default) writes
+ * nothing. Old links' `chart=wl` still parses to Walter-Lieth.
+ */
+export const chartModeUrlField: TUrlField<TChartMode> = {
+  serialize(value, params) {
+    if (value === "standard") params.set(SIDEBAR_PARAMS.CHART, SIDEBAR_PARAMS.CHART_MODE_STANDARD);
+  },
+  parse(params) {
+    return CHART_MODE_BY_PARAM[params.get(SIDEBAR_PARAMS.CHART) ?? ""];
+  },
+};
+
+/** Overlay shading — written only when it differs from the default (series A). */
+export const walterLiethShadingUrlField: TUrlField<EWalterLiethShading> = {
+  serialize(value, params) {
+    if (value !== WALTER_LIETH_COMPARISON.DEFAULT_SHADING) {
+      params.set(SIDEBAR_PARAMS.WL_SHADING, value);
+    }
+  },
+  parse(params) {
+    const raw = params.get(SIDEBAR_PARAMS.WL_SHADING);
+    return Object.values(EWalterLiethShading).find((shading) => shading === raw);
   },
 };
 
