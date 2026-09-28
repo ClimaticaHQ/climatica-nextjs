@@ -46,7 +46,17 @@ export function exportToCSV(
     "Month",
     ...activeCols.map((v) => `${VARIABLE_LABELS[v]} (${v === "prec" ? "mm" : "°C"})`),
   ];
-  const rows = [headers, ...data.map((d) => [d.monthName, ...activeCols.map((v) => String(d[v]))])];
+  // * a missing value is an empty cell — never the text "null", never 0
+  const rows = [
+    headers,
+    ...data.map((d) => [
+      d.monthName,
+      ...activeCols.map((v) => {
+        const value = d[v];
+        return value === null ? "" : String(value);
+      }),
+    ]),
+  ];
   const csv = rows.map((r) => r.join(",")).join("\n");
   const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
