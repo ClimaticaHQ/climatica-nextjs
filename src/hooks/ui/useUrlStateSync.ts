@@ -1,7 +1,7 @@
 import { DATASETS } from "@/constants";
 import { env } from "@/libs/Env";
 import { usePathname, useRouter } from "@/libs/I18nNavigation";
-import { useFiltersStore } from "@/stores";
+import { useFiltersStore, useNavigationIntentStore } from "@/stores";
 import type {
   TDatasetPeriodUrlValue,
   TParsedSharedFilterUrlState,
@@ -10,6 +10,7 @@ import type {
   TUseUrlStateSyncReturn,
 } from "@/types";
 import {
+  canWriteUrlState,
   decideUrlSyncAction,
   parseUrlState,
   pushUrlParams,
@@ -20,6 +21,7 @@ import { buildLocalePathname } from "@/utils/export/shared/shareUrl.util";
 import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
+import { useIsClient } from "./useIsClient";
 
 /** TState's own generic bound can't prove this merge is exhaustive — the param types do. */
 function mergePageAndSharedState<TState extends TSharedFilterUrlState & Record<string, unknown>>(
@@ -52,6 +54,16 @@ function applySharedFilterUrlState(shared: TParsedSharedFilterUrlState): void {
  * page state back to the URL when it drifts from the last-written string
  * (a "stateChange" — replace, never push). pushUrlState() is the only path
  * that creates history entries, for explicit user actions.
+ *
+ * Initial state is settled here, in one place: nothing is read or written until the persisted
+ * stores are in (client render + filters store rehydrated); then every field the URL carries
+ * wins, the rest keep their persisted value, else the default.
+ *
+ * A write is scheduled, not immediate, and re-checked when it runs: it's dropped if this page
+ * is no longer the browser's route, a navigation is on its way elsewhere (its replace() would
+ * cancel that navigation), or the URL changed since it was scheduled (back/forward restored an
+ * entry — that entry wins and is read as "external" next render); cancelled on unmount or a
+ * pathname change.
  */
 export function useUrlStateSync<TState extends TSharedFilterUrlState & Record<string, unknown>>({
   schema,
@@ -62,7 +74,10 @@ export function useUrlStateSync<TState extends TSharedFilterUrlState & Record<st
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
-  const { dataset, climatePeriod, weatherYear, variables, gridSize, months } = useFiltersStore();
+  const { dataset, climatePeriod, weatherYear, variables, gridSize, months, hasHydrated } =
+    useFiltersStore();
+  const isClient = useIsClient();
+  const isReady = isClient && hasHydrated;
 
   const state = useMemo(() => {
     const datasetPeriod: TDatasetPeriodUrlValue =
@@ -74,6 +89,7 @@ export function useUrlStateSync<TState extends TSharedFilterUrlState & Record<st
   const lastSeenSearchParamsRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (!isReady) return;
     const searchParamsString = searchParams.toString();
     const next = serializeUrlState(schema, state);
     const nextString = next.toString();
@@ -94,11 +110,22 @@ export function useUrlStateSync<TState extends TSharedFilterUrlState & Record<st
       return;
     }
 
-    if (action === "stateChange") {
-      replaceUrlParams(router, pathname, next);
+    if (action !== "stateChange") return;
+    const pagePathname = buildLocalePathname(locale, pathname);
+    const timer = window.setTimeout(() => {
+      const canWrite = canWriteUrlState({
+        currentPathname: window.location.pathname,
+        pagePathname,
+        pendingPathname: useNavigationIntentStore.getState().pendingPathname,
+        currentSearch: new URLSearchParams(window.location.search).toString(),
+        scheduledSearch: searchParamsString,
+      });
+      if (!canWrite) return;
       lastWrittenRef.current = nextString;
-    }
-  }, [schema, state, searchParams, router, pathname, onRestore]);
+      replaceUrlParams(router, pathname, next);
+    });
+    return () => window.clearTimeout(timer);
+  }, [isReady, schema, state, searchParams, router, pathname, locale, onRestore]);
 
   function pushUrlState(partial: Partial<Omit<TState, keyof TSharedFilterUrlState>>): void {
     const next = serializeUrlState(schema, { ...state, ...partial });
