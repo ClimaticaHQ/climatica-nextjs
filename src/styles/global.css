@@ -22,6 +22,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* * focus rings show for keyboard focus only — a mouse click never leaves an outline */
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
 .leaflet-container {
   z-index: 0;
 }
@@ -74,7 +79,10 @@ body {
   background: var(--color-primary);
 }
 
-:root {
+/* * [data-export-palette]: the light tokens again, for exports — an element carrying it
+   resolves to the light palette even while html.dark is active (see exportPalette.util) */
+:root,
+[data-export-palette] {
   /* * Fonts */
   --font-sans: "Inter", "Roboto", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "Fira Code", "Courier New", monospace;
@@ -99,12 +107,23 @@ body {
   --color-chip-active-text: #0f6e56;
   --color-chip-active-border: #5dcaa5;
 
+  /* * Chart title's month badge (a filtered month or month count) */
+  --color-month-badge-bg: #e8f4fd;
+  --color-month-badge-border: #b3d9f5;
+  --color-month-badge-text: #1a6fa0;
+
+  /* * Segmented control: grey track, raised active pill */
+  --color-control-track: #eef0f3;
+  --color-control-active: #ffffff;
+
   --color-bg: #ffffff;
   --color-bg-secondary: #f9fafb;
   --color-text: #111827;
   --color-text-secondary: #6b7280;
   --color-text-strong: #374151;
   --color-border: #e5e7eb;
+  /* * behind a plot — halos around curves and dots; the card surface every chart sits on */
+  --color-plot-bg: var(--color-bg);
   --color-error: #ef4444;
   --color-error-bg: #fef2f2;
   --color-error-border: #fecaca;
@@ -120,6 +139,7 @@ body {
   --space-xl: 4rem;
 
   /* * Border radius */
+  --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 16px;
@@ -148,14 +168,15 @@ body {
   --chart-compare-b-prec: #fcd34d;
   --chart-compare-b-tavg: #92400e;
 
-  /* * Walter-Lieth diagram colors */
-  --color-wl-humid-fill: #bfdbfe;
-  --color-wl-arid-fill: #fde68a;
-  --color-wl-temp-line-a: #f97316;
-  --color-wl-prec-line-a: #3b82f6;
-  --color-wl-temp-line-b: #6366f1;
-  --color-wl-prec-line-b: #2563eb;
-  --color-wl-arid-tooltip: #d97706;
+  /* * Walter-Lieth convention: red temperature, blue precipitation */
+  --color-wl-temp: #dc2626;
+  --color-wl-prec: #2563eb;
+  --color-wl-humid-hatch: #2563eb;
+  --color-wl-arid-hatch: #dc2626;
+  --color-wl-compressed-fill: #1d4ed8;
+  /* * Walter-Lieth overlay series identity (matches compare A green / B orange) */
+  --color-wl-series-a: #1d9e75;
+  --color-wl-series-b: #d97706;
 
   /* * Compare cities */
   --color-city-b-tint: #fef3c7;
@@ -190,6 +211,13 @@ html.dark {
   --color-chip-active-text: #6ee7b7;
   --color-chip-active-border: #059669;
 
+  --color-control-track: #1f2937;
+  --color-control-active: #374151;
+
+  --color-month-badge-bg: #0c2a3d;
+  --color-month-badge-border: #1e4f70;
+  --color-month-badge-text: #7cc4f0;
+
   --color-primary-muted: rgba(29, 158, 117, 0.25);
   --color-primary-subtle: rgba(29, 158, 117, 0.18);
 
@@ -199,4 +227,46 @@ html.dark {
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
+
+  /* * Walter-Lieth: lighter red/blue for contrast on dark backgrounds */
+  --color-wl-temp: #f87171;
+  --color-wl-prec: #60a5fa;
+  --color-wl-humid-hatch: #60a5fa;
+  --color-wl-arid-hatch: #f87171;
+  --color-wl-compressed-fill: #3b82f6;
+  --color-wl-series-a: #34d399;
+  --color-wl-series-b: #fbbf24;
+}
+
+/* * ChartTransition: a chart card's old content fades out while the new one fades in */
+@keyframes chart-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes chart-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.chart-fade-in {
+  animation-name: chart-fade-in;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.chart-fade-out {
+  animation-name: chart-fade-out;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-fade-in,
+  .chart-fade-out {
+    animation: none;
+  }
 }
