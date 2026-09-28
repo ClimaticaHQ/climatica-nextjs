@@ -40,4 +40,16 @@ export const SIDEBAR_PARAMS = {
   VAR: "var",
   POLYGON: "polygon",
   PERIODS: "periods",
+
+  // * comparison layout (split | overlay), for both chart types; omitted when split, the default
+  LAYOUT: "layout",
+  // * legacy name of LAYOUT, from when only Walter-Lieth had layouts — still read from old links
+  WL_LAYOUT: "wlLayout",
+  // * chart mode: "standard"; omitted for Walter-Lieth, the default
+  CHART: "chart",
+  // * overlay hatching (b | none); omitted when it's series A, the default
+  WL_SHADING: "wlShading",
+  CHART_MODE_STANDARD: "standard",
+  // * old links wrote chart=wl when standard was the default — still accepted
+  CHART_MODE_WALTER_LIETH: "wl",
 } as const;

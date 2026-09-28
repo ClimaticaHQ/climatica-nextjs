@@ -1,3 +1,6 @@
+// * De Martonne aridity index: I = P / (T + 10)
+export const MARTONNE_TEMP_OFFSET = 10;
+
 export const MARTONNE_CLASSES = {
   arid: { max: 10, labelKey: "martonne.arid", bg: "#fde8d0", color: "#7d3c00" },
   semiArid: { min: 10, max: 20, labelKey: "martonne.semiArid", bg: "#fff3cd", color: "#664d03" },
