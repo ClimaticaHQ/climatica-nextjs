@@ -1,3 +1,4 @@
+import { formatCount, formatPrec, formatTemp } from "@/utils/monthlyClimate.util";
 import type { TCompareStats } from "@/types";
 import { computeCompareStats } from "@/utils/climateComparison.util";
 import { getMartonneLabelKey } from "@/utils/martonne.util";
@@ -23,13 +24,13 @@ export function MultiPeriodStatsTable({
   const statsMap = new Map(periodsData.map(({ year, rows }) => [year, computeCompareStats(rows)]));
 
   const metrics: { label: string; format: (s: TCompareStats) => string }[] = [
-    { label: t("climateComparison.stats.avgTmax"), format: (s) => `${s.avgTmax.toFixed(1)} °C` },
-    { label: t("climateComparison.stats.avgTmin"), format: (s) => `${s.avgTmin.toFixed(1)} °C` },
+    { label: t("climateComparison.stats.avgTmax"), format: (s) => formatTemp(s.avgTmax) },
+    { label: t("climateComparison.stats.avgTmin"), format: (s) => formatTemp(s.avgTmin) },
     {
       label: t("climateComparison.stats.totalPrec"),
-      format: (s) => `${s.totalPrec.toFixed(0)} mm`,
+      format: (s) => formatPrec(s.totalPrec),
     },
-    { label: t("climateComparison.stats.aridMonths"), format: (s) => String(s.aridMonths) },
+    { label: t("climateComparison.stats.aridMonths"), format: (s) => formatCount(s.aridMonths) },
   ];
 
   function color(i: number): string {
@@ -131,7 +132,7 @@ export function MultiPeriodStatsTable({
             className={`${totalRows % 2 === 0 ? "bg-[var(--color-bg)]" : "bg-[var(--color-bg-secondary)]"}`}
           >
             <td className="h-11 px-4 py-2.5 text-[var(--color-text-secondary)]">
-              {t("climateComparison.stats.martonne")}
+              {t("chart.martonne")}
             </td>
             {periods.map((year, j) => {
               if (loadingPeriods.includes(year)) {
