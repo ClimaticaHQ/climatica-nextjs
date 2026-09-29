@@ -6,6 +6,7 @@ import {
   formatMonthLabel,
   formatSummaryDeltas,
   getAnnualSummary,
+  getExportedPanel,
   getMartonneLabelKey,
   isCompleteSeries,
 } from "@/utils";
@@ -21,6 +22,7 @@ export function useComparisonExport({
   chartMode,
   layout,
   shading,
+  expanded,
   ...seriesArgs
 }: TUseComparisonExportArgs): TComparisonExport | undefined {
   const t = useTranslations();
@@ -48,6 +50,7 @@ export function useComparisonExport({
     shading,
     seriesA,
     seriesB,
+    expanded: getExportedPanel({ chartMode, layout, expanded, seriesA, seriesB }),
     deltas,
     monthLabels: WALTER_LIETH_DIAGRAM.CALENDAR_MONTH_ORDER.map((monthIndex) =>
       formatMonthLabel({ locale, monthIndex, format: WALTER_LIETH_MONTH_FORMAT.WIDE }),
@@ -66,10 +69,12 @@ export function useComparisonExport({
       humid: t("chart.humidPeriod"),
       arid: t("chart.aridPeriod"),
       perhumid: t("chart.perhumidPeriod"),
+      frost: t("chart.frostLegend"),
       incomplete: {
         [EWalterLiethSeriesId.A]: t("chart.wlIncomplete", { label: seriesA.label }),
         [EWalterLiethSeriesId.B]: t("chart.wlIncomplete", { label: seriesB.label }),
       },
+      differencesVs: t("chart.differencesVs", { name: seriesA.label }),
     },
   };
 }

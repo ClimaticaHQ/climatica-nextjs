@@ -8,6 +8,7 @@ export { useTheme } from "./useTheme";
 export { useUrlStateSync } from "./useUrlStateSync";
 export { useComparisonExport } from "./useComparisonExport";
 export { useLegendLabels } from "./useLegendLabels";
+export { useMonthlyTableLabels } from "./useMonthlyTableLabels";
 export { useWalterLiethLegendItems } from "./useWalterLiethLegendItems";
 export { useHasMounted } from "./useHasMounted";
 export { useElementWidth } from "./useElementWidth";

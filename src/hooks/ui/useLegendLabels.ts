@@ -13,5 +13,6 @@ export function useLegendLabels(): TLegendLabels {
     humid: t("chart.humidPeriod"),
     arid: t("chart.aridPeriod"),
     perhumid: t("chart.perhumidPeriod"),
+    frost: t("chart.frostLegend"),
   };
 }
