@@ -1,85 +1,71 @@
+import { useMonthlyTableLabels } from "@/hooks";
+import { buildMonthlyTableRows, getMonthlyTableRowLabel } from "@/utils";
 import { useTranslations } from "next-intl";
+import {
+  TABLE_ACTIVE_CELL_STYLE,
+  TABLE_CELL_BORDER,
+  TABLE_CLASSES as C,
+  TABLE_GEOMETRY as G,
+} from "./ClimateDataTable.constant";
 import type { TClimateDataTableProps } from "./ClimateDataTable.type";
+import { TableRowHeader } from "./components";
 
-const CELL_BORDER = "0.5px solid var(--color-border)";
-const LABEL_COL_WIDTH = 110;
-const ACTIVE_CELL_STYLE = {
-  backgroundColor: "var(--color-chip-active-bg)",
-  color: "var(--color-chip-active-text)",
-};
-
+/**
+ * Monthly values under a chart — the chart's text alternative. One series (city page) or
+ * several (compare pages): rows grouped by variable, each labelled with its series.
+ */
 export function ClimateDataTable({
-  monthlyData,
+  series,
+  variables,
+  caption,
   activeMonthIndex,
   onMonthHover,
 }: TClimateDataTableProps) {
   const t = useTranslations();
+  const labels = useMonthlyTableLabels();
+  const rows = buildMonthlyTableRows({ series, variables, labels });
+  const months = series[0]?.data ?? [];
+  const labelWidth = series.length > 1 ? G.LABEL_COL_WIDTH.MULTI : G.LABEL_COL_WIDTH.SINGLE;
 
-  function monthHoverHandlers(i: number) {
-    return {
-      onMouseEnter: () => onMonthHover?.(i),
-      onMouseLeave: () => onMonthHover?.(null),
-    };
-  }
-
-  const rows: {
-    label: string;
-    format: (d: TClimateDataTableProps["monthlyData"][number]) => string;
-  }[] = [
-    { label: `${t("chart.avgTempShort")} (°C)`, format: (d) => d.tavg.toFixed(1) },
-    { label: `${t("chart.precipShort")} (mm)`, format: (d) => Math.round(d.prec).toString() },
-  ];
-
-  const dataColWidth =
-    monthlyData.length > 0 ? `calc((100% - ${LABEL_COL_WIDTH}px) / ${monthlyData.length})` : "auto";
+  const cellProps = (i: number) => ({
+    style: {
+      borderLeft: TABLE_CELL_BORDER,
+      ...(i === activeMonthIndex ? TABLE_ACTIVE_CELL_STYLE : {}),
+    },
+    onMouseEnter: () => onMonthHover?.(i),
+    onMouseLeave: () => onMonthHover?.(null),
+  });
 
   return (
-    <div
-      className="mt-6 overflow-x-auto overflow-hidden rounded-[var(--radius-md)]"
-      style={{ border: CELL_BORDER }}
-    >
-      <table className="w-full min-w-[520px] table-fixed">
+    <div className={C.FRAME} style={{ border: TABLE_CELL_BORDER }}>
+      <table
+        className={C.TABLE}
+        style={{ minWidth: labelWidth + months.length * G.MIN_MONTH_COL_WIDTH }}
+      >
+        <caption className={C.CAPTION}>{caption}</caption>
         <colgroup>
-          <col style={{ width: `${LABEL_COL_WIDTH}px` }} />
-          {monthlyData.map((d) => (
-            <col key={d.month} style={{ width: dataColWidth }} />
+          <col style={{ width: labelWidth }} />
+          {months.map((month) => (
+            <col key={month.month} />
           ))}
         </colgroup>
         <thead>
-          <tr style={{ borderBottom: CELL_BORDER }}>
-            <th className="px-4 py-[10px] text-left text-[11px] text-[var(--color-text-secondary)]" />
-            {monthlyData.map((d, i) => (
-              <th
-                key={d.month}
-                className="px-1 py-[10px] text-center text-[11px] text-[var(--color-text-secondary)]"
-                style={{
-                  borderLeft: CELL_BORDER,
-                  ...(i === activeMonthIndex ? ACTIVE_CELL_STYLE : {}),
-                }}
-                {...monthHoverHandlers(i)}
-              >
-                {t(`months.${d.month}`)}
+          <tr style={{ borderBottom: TABLE_CELL_BORDER }}>
+            <td className={`${C.CORNER} ${C.STICKY}`} />
+            {months.map((month, i) => (
+              <th key={month.month} scope="col" className={C.MONTH} {...cellProps(i)}>
+                {t(`months.${month.month}`)}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((row, ri) => (
-            <tr key={row.label} style={ri > 0 ? { borderTop: CELL_BORDER } : undefined}>
-              <td className="whitespace-nowrap px-4 py-[10px] text-[11px] text-[var(--color-text-secondary)]">
-                {row.label}
-              </td>
-              {monthlyData.map((d, i) => (
-                <td
-                  key={d.month}
-                  className="px-1 py-[10px] text-center text-[16px] font-medium tabular-nums text-[var(--color-text)]"
-                  style={{
-                    borderLeft: CELL_BORDER,
-                    ...(i === activeMonthIndex ? ACTIVE_CELL_STYLE : {}),
-                  }}
-                  {...monthHoverHandlers(i)}
-                >
-                  {row.format(d)}
+            <tr key={row.key} style={ri > 0 ? { borderTop: TABLE_CELL_BORDER } : undefined}>
+              <TableRowHeader label={getMonthlyTableRowLabel(row)} marker={row.marker} />
+              {row.values.map((value, i) => (
+                <td key={months[i]?.month ?? i} className={C.VALUE} {...cellProps(i)}>
+                  {value}
                 </td>
               ))}
             </tr>
