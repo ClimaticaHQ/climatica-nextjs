@@ -29,3 +29,5 @@ export * from "./time.constant";
 export * from "./walterLieth.constant";
 export * from "./worldclim.constant";
 export * from "./format.constant";
+export * from "./splitPanels.constant";
+export * from "./monthlyTable.constant";

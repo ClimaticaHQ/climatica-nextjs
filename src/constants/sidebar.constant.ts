@@ -49,6 +49,8 @@ export const SIDEBAR_PARAMS = {
   CHART: "chart",
   // * overlay hatching (b | none); omitted when it's series A, the default
   WL_SHADING: "wlShading",
+  // * split: the panel shown across the card (a | b); omitted when both are shown, the default
+  EXPANDED: "expanded",
   CHART_MODE_STANDARD: "standard",
   // * old links wrote chart=wl when standard was the default — still accepted
   CHART_MODE_WALTER_LIETH: "wl",

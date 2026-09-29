@@ -1,3 +1,5 @@
+import type { TVisibleSeries } from "@/types";
+import { WALTER_LIETH_FROST_BAND_SPACE } from "./walterLieth.constant";
 import type { TGridAxesStyle } from "@/types";
 /**
  * every drawn svg export (single-city, compare-cities/periods, heat-map)
@@ -50,8 +52,11 @@ export const COMPARE_EXPORT_SVG_LAYOUT = {
   statsY: 92,
   statsHeaderRowHeight: 32,
   statsRowHeight: 26,
-  // * where the chart body starts; each body (WL or standard, split or overlay) sets its height
+  // * where the chart body starts under the stats table (overlay, weather years); each body
+  // * (WL or standard, split or overlay) sets its own height
   chartTop: 310,
+  // * split panels carry their own stats, so there's no table: the body starts under the header
+  chartTopWithoutStats: 100,
 } as const;
 
 // * heat-map export with NO fixed height
@@ -88,8 +93,8 @@ export const COMPARE_WL_EXPORT_LAYOUT = {
   panelHeaderHeight: 132,
   // * same side margins as the desktop diagram; °C / mm sit above the axes, not beside them
   panelPlotMarginX: 34,
-  // * below the plot, inside the card: room for the month labels
-  panelFooterHeight: 26,
+  // * below the plot, inside the card: room for the frost band and the month labels
+  panelFooterHeight: 26 + WALTER_LIETH_FROST_BAND_SPACE,
   splitPlotHeight: 300,
   overlayPlotMarginX: 70,
   overlayPlotHeight: 360,
@@ -107,9 +112,37 @@ export const EXPORT_TEXT = {
   NOTICE_FONT_SIZE: 13,
 } as const;
 
+// * compare exports before the chart has reported its chips: max, min and precipitation
+export const COMPARE_EXPORT_DEFAULT_VISIBLE: TVisibleSeries = {
+  tmax: true,
+  tmin: true,
+  tavg: false,
+  prec: true,
+};
+
+// * the exports' monthly table: the city page's two rows, or a row per variable and series
+export const EXPORT_MONTHLY_TABLE = {
+  ROW_HEIGHT: 26,
+  // * px — the label column: variable only (one series), or variable — series (compare)
+  LABEL_WIDTH: { SINGLE: 110, MULTI: 250 },
+  LABEL_PADDING_X: 10,
+  LABEL_FONT_SIZE: 11,
+  VALUE_FONT_SIZE: 16,
+  VALUE_FONT_WEIGHT: 600,
+  // * text baselines within a row (px below the row's centre)
+  LABEL_BASELINE: 4,
+  VALUE_BASELINE: 5,
+  // * a series' marker before its row label, and the gap after it
+  MARKER_SIZE: 8,
+  MARKER_GAP: 6,
+  // * compare export: space between the chart's legend and the table
+  GAP_ABOVE: 32,
+} as const;
+
 // * WL export text: month labels under a panel, and the split-panel header lines
 export const WALTER_LIETH_EXPORT_TEXT = {
-  MONTH_LABEL_OFFSET: 18,
+  // * every export's month labels (WL and standard), below the frost band's reserved room
+  MONTH_LABEL_OFFSET: 18 + WALTER_LIETH_FROST_BAND_SPACE,
   MONTH_LABEL_FONT_SIZE: 11,
   PANEL_NAME_Y: 16,
   PANEL_NAME_X: 14,

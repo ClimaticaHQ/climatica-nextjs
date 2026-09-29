@@ -91,6 +91,7 @@ export const WALTER_LIETH_COLOR_VARS = {
   HUMID_HATCH: "--color-wl-humid-hatch",
   ARID_HATCH: "--color-wl-arid-hatch",
   COMPRESSED_FILL: "--color-wl-compressed-fill",
+  FROST: "--color-wl-frost",
   SERIES_A: "--color-wl-series-a",
   SERIES_B: "--color-wl-series-b",
 } as const;
@@ -101,6 +102,7 @@ export const WALTER_LIETH_COLORS = {
   HUMID_HATCH: `var(${WALTER_LIETH_COLOR_VARS.HUMID_HATCH})`,
   ARID_HATCH: `var(${WALTER_LIETH_COLOR_VARS.ARID_HATCH})`,
   COMPRESSED_FILL: `var(${WALTER_LIETH_COLOR_VARS.COMPRESSED_FILL})`,
+  FROST: `var(${WALTER_LIETH_COLOR_VARS.FROST})`,
   SERIES: {
     [EWalterLiethSeriesId.A]: `var(${WALTER_LIETH_COLOR_VARS.SERIES_A})`,
     [EWalterLiethSeriesId.B]: `var(${WALTER_LIETH_COLOR_VARS.SERIES_B})`,
@@ -114,7 +116,35 @@ export const WALTER_LIETH_LEGEND_PALETTE = {
   humidHatch: WALTER_LIETH_COLORS.HUMID_HATCH,
   aridHatch: WALTER_LIETH_COLORS.ARID_HATCH,
   perhumid: WALTER_LIETH_COLORS.COMPRESSED_FILL,
+  frost: WALTER_LIETH_COLORS.FROST,
 } as const;
+
+/**
+ * The frost band under a WL plot: one cell per month, filled when the month's mean minimum
+ * is below the threshold (WL's "certain frost"; without absolute minima there's no
+ * "probable frost"). Screen and export draw it in the same px.
+ */
+export const WALTER_LIETH_FROST = {
+  // * °C; a month exactly at the threshold is not frost
+  THRESHOLD: 0,
+  // * px between the x axis and the band
+  BAND_GAP: 3,
+  BAND_HEIGHT: 6,
+  // * px between neighbouring cells, so each month reads as its own cell
+  CELL_GAP: 1,
+  STROKE_WIDTH: 1,
+} as const;
+
+// * the frost band on screen: frost in its token, outlines and unknown months neutral
+export const WALTER_LIETH_FROST_PALETTE = {
+  frost: WALTER_LIETH_COLORS.FROST,
+  neutral: "var(--color-border)",
+} as const;
+
+// * the band's room under every plot — reserved even without frost (and in standard charts),
+// * so a plot's height never depends on its data and WL and standard plots stay equal
+export const WALTER_LIETH_FROST_BAND_SPACE =
+  WALTER_LIETH_FROST.BAND_GAP + WALTER_LIETH_FROST.BAND_HEIGHT;
 
 /** The single diagram's layer colors — the WL convention (red temperature, blue precipitation). */
 export const WALTER_LIETH_CONVENTION_COLORS = {
