@@ -162,7 +162,15 @@
     "subtitle": {
       "climate": "Κλίμα {period}",
       "weather": "Καιρός {year}"
-    }
+    },
+    "expandPanel": "Μεγέθυνση {name}",
+    "showBoth": "Εμφάνιση και των δύο",
+    "expandedPanel": "Μεγεθυμένο διάγραμμα",
+    "differencesVs": "διαφορές από {name}",
+    "frostLegend": "Παγετός (μέση ελάχ. < 0 °C)",
+    "maxTempShort": "Μέγ. θερμ.",
+    "minTempShort": "Ελάχ. θερμ.",
+    "monthlyTableCaption": "Μηνιαίες τιμές: {names}"
   },
   "loading": {
     "fetchingClimateData": "Λήψη κλιματικών δεδομένων...",

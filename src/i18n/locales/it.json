@@ -162,7 +162,15 @@
     "subtitle": {
       "climate": "Clima {period}",
       "weather": "Meteo {year}"
-    }
+    },
+    "expandPanel": "Espandi {name}",
+    "showBoth": "Mostra entrambi",
+    "expandedPanel": "Pannello espanso",
+    "differencesVs": "differenze rispetto a {name}",
+    "frostLegend": "Gelo (min. media < 0 °C)",
+    "maxTempShort": "Temp. max",
+    "minTempShort": "Temp. min",
+    "monthlyTableCaption": "Valori mensili: {names}"
   },
   "loading": {
     "fetchingClimateData": "Recupero dati climatici...",

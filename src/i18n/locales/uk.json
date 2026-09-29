@@ -162,7 +162,15 @@
     "subtitle": {
       "climate": "Клімат {period}",
       "weather": "Погода {year}"
-    }
+    },
+    "expandPanel": "Розгорнути {name}",
+    "showBoth": "Показати обидва",
+    "expandedPanel": "Розгорнута панель",
+    "differencesVs": "відмінності від {name}",
+    "frostLegend": "Заморозки (сер. мін. < 0 °C)",
+    "maxTempShort": "Макс. темп.",
+    "minTempShort": "Мін. темп.",
+    "monthlyTableCaption": "Місячні значення: {names}"
   },
   "loading": {
     "fetchingClimateData": "Завантаження кліматичних даних...",

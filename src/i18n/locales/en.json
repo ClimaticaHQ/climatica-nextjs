@@ -162,7 +162,15 @@
     "subtitle": {
       "climate": "Climate {period}",
       "weather": "Weather {year}"
-    }
+    },
+    "expandPanel": "Expand {name}",
+    "showBoth": "Show both",
+    "expandedPanel": "Expanded panel",
+    "differencesVs": "differences vs {name}",
+    "frostLegend": "Frost (mean min < 0 °C)",
+    "maxTempShort": "Max Temp",
+    "minTempShort": "Min Temp",
+    "monthlyTableCaption": "Monthly values: {names}"
   },
   "loading": {
     "fetchingClimateData": "Fetching climate data...",
