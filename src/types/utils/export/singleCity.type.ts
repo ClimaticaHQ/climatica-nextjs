@@ -5,6 +5,7 @@ import type {
   TChartSummary,
   TDatasetAttribution,
   TMonthAridity,
+  TMonthlyTableLabels,
   TMonthlyTemperature,
   TSeriesKey,
   TVariable,
@@ -23,7 +24,6 @@ export type TExportLocation = {
 /** tavg is null whenever tmin or tmax is missing. */
 export type TExportMonthlyRow = TMonthlyTemperature & { tavg: number | null };
 
-/** All labels reuse existing i18n keys — none were added for export. */
 export type TExportLabels = {
   periodLabel: string;
   monthNames: string[];
@@ -35,10 +35,8 @@ export type TExportLabels = {
     altitude: string;
     martonne: string;
   };
-  tableLabels: {
-    avgTemp: string;
-    precip: string;
-  };
+  /** the monthly table's variable labels with units — the screen table's */
+  tableLabels: TMonthlyTableLabels;
   /** Omitted when summary.martonne is null. */
   martonneClassLabel?: string;
   aridityLegend: {
@@ -46,6 +44,8 @@ export type TExportLabels = {
     humid: string;
     /** Walter-Lieth only: the solid region above 100 mm */
     perhumid: string;
+    /** Walter-Lieth only: the frost band's legend entry */
+    frost: string;
   };
   /** Walter-Lieth only: shown instead of the diagram when a month's data is missing */
   walterLiethIncomplete: string;

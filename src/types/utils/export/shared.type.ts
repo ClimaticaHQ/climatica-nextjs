@@ -1,3 +1,5 @@
+import type { TMonthlyTableRow } from "../../components/monthlyTable";
+
 export type TExportChartColors = {
   text: string;
   textSecondary: string;
@@ -16,6 +18,7 @@ export type TExportChartColors = {
   wlHumidHatch: string;
   wlAridHatch: string;
   wlCompressedFill: string;
+  wlFrost: string;
   /** WL overlay series identity (A green, B orange) */
   wlSeriesA: string;
   wlSeriesB: string;
@@ -61,4 +64,14 @@ export type TSvgExportResult = {
 export type TExportPoint = {
   x: number;
   y: number;
+};
+
+/** A monthly table in an export: its rows (shared with the screen table), where it goes. */
+export type TExportMonthlyTableArgs = {
+  rows: readonly TMonthlyTableRow[];
+  monthNames: readonly string[];
+  top: number;
+  left: number;
+  width: number;
+  colors: TExportChartColors;
 };

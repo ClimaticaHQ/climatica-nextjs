@@ -12,3 +12,4 @@ export type * from "./urlParams.type";
 export type * from "./walterLieth.type";
 export type * from "./worldclim.type";
 export type * from "./persistedStore.type";
+export type * from "./splitPanels.type";

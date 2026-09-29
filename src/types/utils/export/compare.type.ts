@@ -1,7 +1,9 @@
 import type { TComparisonExport } from "./walterLiethExport.type";
+import type { TExportChartColors } from "./shared.type";
 import type {
   TCompareStats,
   TDatasetAttribution,
+  TMonthlyTableLabels,
   TMonthlyTemperatureWithAvg,
   TSeriesKey,
   TVisibleSeries,
@@ -28,6 +30,8 @@ export type TCompareExportStatsRow = {
 
 export type TCompareExportLabels = {
   monthNames: string[];
+  /** the monthly table's variable labels with units — the screen table's */
+  tableLabels: TMonthlyTableLabels;
   seriesLabels: Record<TSeriesKey, string>;
   statsLabels: {
     avgTmax: string;
@@ -59,3 +63,12 @@ export type TCompareExportPayload = {
 };
 
 /** Pixel geometry of the standard compare chart body. */
+
+/** The standard split export's legend: both series' colors, or the expanded panel's. */
+export type TStandardSplitLegendArgs = {
+  payload: TCompareExportPayload;
+  comparison: TComparisonExport;
+  colors: TExportChartColors;
+  /** top of the legend block */
+  y: number;
+};

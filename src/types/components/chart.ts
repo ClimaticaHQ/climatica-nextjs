@@ -1,3 +1,5 @@
+import type { EWalterLiethSeriesId } from "@/enums";
+import type { ReactNode } from "react";
 import { TClimatePeriod } from "../api";
 import { TDataset, TMonthlyTemperature } from "../domain";
 
@@ -15,6 +17,15 @@ export type TChartSubtitle = {
 };
 
 export type TChartMode = "standard" | "walter-lieth";
+
+/** Which split panel fills the chart card; null = both side by side (the default). */
+export type TExpandedPanel = EWalterLiethSeriesId | null;
+
+/** The split's expanded panel — persisted by the page (URL state), switched from the panels. */
+export type TPanelExpansion = {
+  expanded: TExpandedPanel;
+  onExpandedChange: (expanded: TExpandedPanel) => void;
+};
 
 export type TShownChartModeArgs = {
   chartMode: TChartMode;
@@ -60,3 +71,18 @@ export type TStatDeltas = {
 
 /** Intl month format for chart axis labels: "short" (Jan) or "narrow" (J). */
 export type TMonthLabelFormat = "short" | "narrow";
+
+export type TPlotHeightArgs = {
+  /** one panel of a split pair — the compact heights */
+  isCompact: boolean;
+  /** an expanded split panel: fill the frame's remaining height, at least the compact height */
+  shouldFillHeight?: boolean | undefined;
+};
+
+/** What a split panel adds to its header: expand / collapse controls, and B's "vs A" note. */
+export type TPanelHeaderSlots = {
+  /** top-right of the header, beside the name */
+  actions?: ReactNode;
+  /** appended to the period line — e.g. "differences vs Madrid" when A isn't visible */
+  subtitleNote?: string | undefined;
+};

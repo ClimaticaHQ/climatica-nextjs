@@ -1,10 +1,11 @@
 import type {
   ECompareLayout,
+  EWalterLiethFrost,
   EWalterLiethRegime,
   EWalterLiethSeriesId,
   EWalterLiethShading,
 } from "@/enums";
-import type { TChartSummary } from "../components/chart";
+import type { TChartSummary, TPanelExpansion, TPanelHeaderSlots } from "../components/chart";
 
 export type TMonthAridity = {
   month: number;
@@ -39,6 +40,8 @@ export type TWalterLiethMonth = {
   tavg: number;
   /** monthly precipitation, mm */
   prec: number;
+  /** mean minimum temperature, °C — the frost band; null / absent = unknown */
+  tmin?: number | null | undefined;
 };
 
 export type TWalterLiethSeries = {
@@ -102,6 +105,10 @@ export type TWalterLiethChartProps = {
   isPanel?: boolean;
   /** series to compare against — its difference is shown under this series' stats (split B) */
   reference?: TWalterLiethSeries | undefined;
+  /** a split panel's header additions — expand / collapse controls, the "vs A" note */
+  headerSlots?: TPanelHeaderSlots | undefined;
+  /** an expanded split panel: the plot fills the frame's remaining height */
+  shouldFillHeight?: boolean | undefined;
   /**
    * Recharts syncId — diagrams sharing it hover in sync. Recharts syncs by data index, so
    * every diagram sharing one must use the same month order (and 12 rows each).
@@ -148,8 +155,15 @@ export type TFormatMonthLabelArgs = {
   format: "short" | "narrow" | "long";
 };
 
+/** A month as the pages hold it: WL needs tavg and prec; tmin (when known) drives frost. */
+export type TWalterLiethSourceRow = {
+  tavg: number | null;
+  prec: number | null;
+  tmin?: number | null | undefined;
+};
+
 export type TToWalterLiethSeriesArgs = Omit<TWalterLiethSeries, "months"> & {
-  data: readonly { tavg: number | null; prec: number | null }[];
+  data: readonly TWalterLiethSourceRow[];
 };
 
 /**
@@ -171,6 +185,8 @@ export type TWalterLiethComparisonProps = {
   layout: ECompareLayout;
   /** which series the overlay hatches — persisted by the page (URL state) */
   shading: EWalterLiethShading;
+  /** split: the panel shown across the card — persisted by the page (URL state) */
+  expansion: TPanelExpansion;
 };
 
 /** How one series is painted: WL convention colors, or one series color in overlay. */
@@ -199,6 +215,43 @@ export type TFormatSummaryDeltasArgs = {
 };
 
 /** Pattern geometry for one plot, in px — see getHatchGeometry. */
+/** The frost band's two colors: frost cells, and the outline / unknown fill (neutral). */
+export type TWalterLiethFrostPalette = {
+  frost: string;
+  neutral: string;
+};
+
+/** One frost cell's paint: filled frost, outlined none, neutral unknown. */
+export type TWalterLiethFrostCellPaint = {
+  fill: string;
+  stroke: string;
+};
+
+/** The frost band's cells in px — screen and export draw exactly these rects. */
+export type TWalterLiethFrostCell = TWalterLiethFrostCellPaint & {
+  key: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type TWalterLiethFrostCellsArgs = {
+  frost: readonly EWalterLiethFrost[];
+  palette: TWalterLiethFrostPalette;
+  /** month position → px (month i at the centre of its band) */
+  scaleX: (x: number) => number;
+  /** px of the x axis — the band starts WALTER_LIETH_FROST.BAND_GAP below it */
+  axisY: number;
+  monthOrder?: readonly number[];
+};
+
+/** Pixel-space projection of a WL plot: axis value → px — screen layer and export alike. */
+export type TWalterLiethProjection = {
+  scaleX: (x: number) => number;
+  scaleY: (y: number) => number;
+};
+
 export type TWalterLiethHatchGeometry = {
   /** horizontal distance between humid lines — also the arid dot columns */
   spacing: number;

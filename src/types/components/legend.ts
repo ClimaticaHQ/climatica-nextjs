@@ -1,5 +1,5 @@
 import type { ELegendSwatch } from "@/enums";
-import type { TVisibleSeries } from "./chart";
+import type { TExpandedPanel, TVisibleSeries } from "./chart";
 
 export type TLegendMarkerShape = "circle" | "square";
 
@@ -30,6 +30,8 @@ export type TLegendLabels = {
   humid: string;
   arid: string;
   perhumid: string;
+  /** WL frost band: "Frost (mean min < 0 °C)" */
+  frost: string;
 };
 
 export type TVariableLegendLabels = Pick<TLegendLabels, "tmax" | "tmin" | "tavg" | "prec">;
@@ -37,7 +39,7 @@ export type TAridityLegendLabels = Pick<TLegendLabels, "arid" | "humid">;
 export type TStandardLegendLabels = TVariableLegendLabels & TAridityLegendLabels;
 export type TWalterLiethLegendLabels = Pick<
   TLegendLabels,
-  "temp" | "prec" | "humid" | "arid" | "perhumid"
+  "temp" | "prec" | "humid" | "arid" | "perhumid" | "frost"
 >;
 
 /** Colors of one standard series: lines and bars. */
@@ -54,6 +56,7 @@ export type TWalterLiethLegendPalette = {
   humidHatch: string;
   aridHatch: string;
   perhumid: string;
+  frost: string;
 };
 
 export type TWalterLiethLegendItemsArgs = {
@@ -74,6 +77,8 @@ export type TWalterLiethOverlayLegendItemsArgs = {
   series: readonly TLegendSeries[];
   /** the shaded series' color; null = no hatching shown */
   shadeColor: string | null;
+  /** the frost band's color — shown with the shaded series' band; null without shading */
+  frostColor: string | null;
   /** line-style entries are drawn in this neutral color */
   neutral: string;
 };
@@ -96,6 +101,8 @@ export type TStandardSplitLegendItemsArgs = {
   colorsA: TLegendSeriesColors;
   colorsB: TLegendSeriesColors;
   visible: TVisibleSeries;
+  /** one panel expanded: only its colors, one swatch per variable */
+  shown?: TExpandedPanel | undefined;
 };
 
 /** Bars recolored by aridity: their colors and legend texts. */

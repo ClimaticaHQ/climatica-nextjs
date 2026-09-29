@@ -1,11 +1,16 @@
-import type { ECompareLayout, EWalterLiethSeriesId, EWalterLiethShading } from "@/enums";
+import type {
+  ECompareLayout,
+  EWalterLiethFrost,
+  EWalterLiethSeriesId,
+  EWalterLiethShading,
+} from "@/enums";
 import type {
   TWalterLiethDomain,
   TWalterLiethLayerPaint,
   TWalterLiethMonth,
   TWalterLiethSeriesInput,
 } from "../walterLieth.type";
-import type { TChartMode, TStatDeltas } from "../../components/chart";
+import type { TChartMode, TExpandedPanel, TStatDeltas } from "../../components/chart";
 import type { TExportChartColors } from "./shared.type";
 
 /** Pattern ids of one WL layer inside an exported SVG — unique per layer. */
@@ -42,6 +47,8 @@ export type TWalterLiethExportPanelArgs = {
   clipId: string;
   /** month labels under the plot; omitted when the caller draws its own */
   monthLabels?: readonly string[];
+  /** the frost band's months (calendar order); null / omitted = no band (its room stays) */
+  frost?: readonly EWalterLiethFrost[] | null | undefined;
 };
 
 /** The two-series block of a compare export — WL panels, or standard split panels. */
@@ -52,6 +59,8 @@ export type TComparisonExport = {
   /** an incomplete series gets a notice instead of a panel and stays out of the domain */
   seriesA: TWalterLiethSeriesInput;
   seriesB: TWalterLiethSeriesInput;
+  /** split: the one panel shown across the export, as on screen; null = both */
+  expanded: TExpandedPanel;
   /** B's difference from A under B's split-panel stats; only when both series are complete */
   deltas?: TStatDeltas | undefined;
   /** short, locale-aware month labels */
@@ -69,8 +78,11 @@ export type TComparisonExport = {
     humid: string;
     arid: string;
     perhumid: string;
+    frost: string;
     /** translated "incomplete data" notice per series */
     incomplete: Record<EWalterLiethSeriesId, string>;
+    /** B's note when shown without A: "differences vs {A}" */
+    differencesVs: string;
   };
 };
 
@@ -149,4 +161,40 @@ export type TExportPanelHeaderBox = TExportPosition & {
 export type TExportLegendResult = {
   svg: string;
   bottom: number;
+};
+
+/** One series' plot drawn into a box — the chart type's part of a comparison panel. */
+export type TPanelPlotRenderer = (
+  series: TWalterLiethSeriesInput,
+) => (box: TWalterLiethExportBox) => string;
+
+/** The comparison panels of an export: both side by side, or the expanded one alone. */
+export type TComparisonPanelsArgs = {
+  comparison: TComparisonExport;
+  colors: TExportChartColors;
+  top: number;
+  renderPlot: TPanelPlotRenderer;
+};
+
+export type TExpandedPanelArgs = {
+  series: TWalterLiethSeriesInput;
+  comparison: TComparisonExport;
+  colors: TExportChartColors;
+  top: number;
+  renderPlot: (box: TWalterLiethExportBox) => string;
+};
+
+/** The header height the given panels share at this inner (stats) width. */
+export type TPanelHeaderHeightArgs = {
+  panels: readonly TWalterLiethSeriesInput[];
+  comparison: TComparisonExport;
+  innerWidth: number;
+};
+
+/** Where the export's frost band goes: under the x axis, month positions through scaleX. */
+export type TExportFrostBandArgs = {
+  colors: TExportChartColors;
+  scaleX: (x: number) => number;
+  /** px of the x axis */
+  axisY: number;
 };
