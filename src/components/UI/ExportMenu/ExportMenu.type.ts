@@ -9,4 +9,6 @@ export type ExportMenuProps = {
    * entries still render (so the feature is discoverable) but are disabled. */
   isRawDataAvailable?: boolean;
   isDisabled?: boolean;
+  /** why the menu is disabled — shown as a tooltip and read out by screen readers */
+  disabledReason?: string;
 };
