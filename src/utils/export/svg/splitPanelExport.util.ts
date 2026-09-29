@@ -1,7 +1,15 @@
-import { COMPARE_WL_EXPORT_LAYOUT as W, WALTER_LIETH_EXPORT_TEXT as T } from "@/constants";
+import {
+  COMPARE_EXPORT_SVG_LAYOUT as CL,
+  COMPARE_WL_EXPORT_LAYOUT as W,
+  WALTER_LIETH_EXPORT_TEXT as T,
+} from "@/constants";
 import { EWalterLiethSeriesId } from "@/enums";
 import type {
+  TCompareWalterLiethBody,
   TComparisonExport,
+  TComparisonPanelsArgs,
+  TExpandedPanelArgs,
+  TPanelHeaderHeightArgs,
   TSplitPanelArgs,
   TExportBadge,
   TExportChartColors,
@@ -14,8 +22,17 @@ import type {
   TWalterLiethSeries,
   TWalterLiethSeriesInput,
 } from "@/types";
-import { escapeXml, getAnnualSummary, getMartonneBadge, isCompleteSeries } from "@/utils";
+import {
+  escapeXml,
+  getAnnualSummary,
+  getMartonneBadge,
+  isCompleteSeries,
+  joinSubtitle,
+} from "@/utils";
+import { getSingleExportPlotBox } from "./exportPlotBox.util";
 import { estimateTextWidth } from "./textWrap.util";
+
+const CONTENT_WIDTH = CL.width - CL.paddingX * 2;
 
 export const patternIdsOf = (prefix: string): TWalterLiethExportPatternIds => ({
   humid: `${prefix}-humid`,
@@ -24,6 +41,12 @@ export const patternIdsOf = (prefix: string): TWalterLiethExportPatternIds => ({
 
 export const seriesColor = (series: TWalterLiethSeriesInput, colors: TExportChartColors) =>
   series.id === EWalterLiethSeriesId.A ? colors.wlSeriesA : colors.wlSeriesB;
+
+/** The series the split export draws, left to right: the expanded one alone, or both. */
+export function getExportPanels({ expanded, seriesA, seriesB }: TComparisonExport) {
+  if (expanded === null) return [seriesA, seriesB];
+  return [expanded === EWalterLiethSeriesId.A ? seriesA : seriesB];
+}
 
 const badgeWidth = (badge: TExportBadge) =>
   estimateTextWidth(badge.text, T.BADGE_FONT_SIZE) + T.BADGE_PADDING_X * 2;
@@ -132,8 +155,12 @@ function buildPanelHeader(
   colors: TExportChartColors,
   { x, y, width, statsHeight }: TExportPanelHeaderBox,
 ) {
-  const altitude = series.altitude !== undefined ? ` · ${Math.round(series.altitude)} m` : "";
-  const subtitle = `${series.period ?? ""}${altitude}`;
+  const altitude = series.altitude !== undefined ? `${Math.round(series.altitude)} m` : undefined;
+  // * B shown without A: its deltas say what they're measured against, as on screen
+  const isAlone =
+    comparison.expanded === EWalterLiethSeriesId.B && series.id === comparison.expanded;
+  const note = isAlone && comparison.deltas ? comparison.labels.differencesVs : undefined;
+  const subtitle = joinSubtitle(series.period, altitude, note);
   const stats = isCompleteSeries(series)
     ? buildStatCells({
         cells: getPanelCells(series, comparison),
@@ -151,20 +178,25 @@ function buildPanelHeader(
     ${stats}`;
 }
 
-/**
- * Geometry both split panels share: width, the header height (one meta line, or two when a
- * Martonne badge and B's delta don't fit side by side in either panel) and the card height.
- */
-export function getSplitFrame(comparison: TComparisonExport, contentWidth: number) {
-  const panelWidth = (contentWidth - W.splitGap) / 2;
-  const hasSecondLine = [comparison.seriesA, comparison.seriesB]
-    .filter(isCompleteSeries)
-    .some((series) => {
-      const cells = getPanelCells(series, comparison);
-      const cellWidth = (panelWidth - W.panelPadding * 2) / cells.length;
-      return cells.some((cell) => needsSecondMetaLine(cell, cellWidth));
-    });
-  const headerHeight = W.panelHeaderHeight + (hasSecondLine ? T.STATS_META_LINE_HEIGHT : 0);
+/** The header height the panels share: one meta line, or two when a Martonne badge and B's
+ * delta don't fit side by side in any of their stats cells at this width. */
+function getPanelHeaderHeight({ panels, comparison, innerWidth }: TPanelHeaderHeightArgs) {
+  const hasSecondLine = panels.filter(isCompleteSeries).some((series) => {
+    const cells = getPanelCells(series, comparison);
+    const cellWidth = innerWidth / cells.length;
+    return cells.some((cell) => needsSecondMetaLine(cell, cellWidth));
+  });
+  return W.panelHeaderHeight + (hasSecondLine ? T.STATS_META_LINE_HEIGHT : 0);
+}
+
+/** Geometry both split panels share: half the width, one header height, the card height. */
+function getSplitFrame(comparison: TComparisonExport) {
+  const panelWidth = (CONTENT_WIDTH - W.splitGap) / 2;
+  const headerHeight = getPanelHeaderHeight({
+    panels: [comparison.seriesA, comparison.seriesB],
+    comparison,
+    innerWidth: panelWidth - W.panelPadding * 2,
+  });
   const panelHeight = W.panelPadding * 2 + headerHeight + W.splitPlotHeight + W.panelFooterHeight;
   return { panelWidth, headerHeight, panelHeight };
 }
@@ -173,7 +205,7 @@ export function getSplitFrame(comparison: TComparisonExport, contentWidth: numbe
  * One split panel as a card on the export's surface — header, then the chart type's plot in
  * the box below it. Both cards share one header height, so the plots start at the same y.
  */
-export function buildSplitPanel({ series, comparison, context, renderPlot }: TSplitPanelArgs) {
+function buildSplitPanel({ series, comparison, context, renderPlot }: TSplitPanelArgs) {
   const { colors, left, top, panelWidth, headerHeight, panelHeight } = context;
   const inner = { x: left + W.panelPadding, y: top + W.panelPadding };
   const box = {
@@ -191,4 +223,56 @@ export function buildSplitPanel({ series, comparison, context, renderPlot }: TSp
   });
 
   return card + header + renderPlot(box);
+}
+
+/**
+ * The expanded panel, laid out like the single-city export: its header (name, period with B's
+ * "differences vs A" note, stats with B's deltas) across the content width, no card, then the
+ * plot in the single export's plot box — same x span, same height.
+ */
+function buildExpandedPanel({ series, comparison, colors, top, renderPlot }: TExpandedPanelArgs) {
+  const headerHeight = getPanelHeaderHeight({
+    panels: [series],
+    comparison,
+    innerWidth: CONTENT_WIDTH,
+  });
+  const header = buildPanelHeader(series, comparison, colors, {
+    x: CL.paddingX,
+    y: top,
+    width: CONTENT_WIDTH,
+    statsHeight: T.STATS_HEIGHT + headerHeight - W.panelHeaderHeight,
+  });
+  const box = getSingleExportPlotBox(top + headerHeight);
+  return { body: header + renderPlot(box), bottom: box.bottom + W.panelFooterHeight };
+}
+
+/** The comparison's panels as the page shows them: both side by side, or the expanded one. */
+export function buildComparisonPanels({
+  comparison,
+  colors,
+  top,
+  renderPlot,
+}: TComparisonPanelsArgs): TCompareWalterLiethBody {
+  const [expanded] = comparison.expanded === null ? [] : getExportPanels(comparison);
+  if (expanded) {
+    return buildExpandedPanel({
+      series: expanded,
+      comparison,
+      colors,
+      top,
+      renderPlot: renderPlot(expanded),
+    });
+  }
+  const frame = getSplitFrame(comparison);
+  const body = [comparison.seriesA, comparison.seriesB]
+    .map((series, i) =>
+      buildSplitPanel({
+        series,
+        comparison,
+        context: { colors, left: CL.paddingX + (frame.panelWidth + W.splitGap) * i, top, ...frame },
+        renderPlot: renderPlot(series),
+      }),
+    )
+    .join("");
+  return { body, bottom: top + frame.panelHeight };
 }

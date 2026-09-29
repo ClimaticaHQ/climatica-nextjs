@@ -8,8 +8,9 @@ import {
   EXPORT_AXES_STYLE,
   WALTER_LIETH_HATCH,
   WALTER_LIETH_STROKE,
+  WALTER_LIETH_FROST,
 } from "@/constants";
-import { EWalterLiethRegime } from "@/enums";
+import { EWalterLiethRegime, type EWalterLiethFrost } from "@/enums";
 import type {
   TExportChartColors,
   TWalterLiethExportLayer,
@@ -17,16 +18,21 @@ import type {
   TWalterLiethExportPatternIds,
   TWalterLiethHatchGeometry,
   TWalterLiethLayerPaint,
+  TWalterLiethProjection,
+  TWalterLiethSegment,
+  TExportFrostBandArgs,
   TExportNoticeArgs,
 } from "@/types";
 import {
   buildWalterLiethRows,
   escapeXml,
   getAridHumidSegments,
+  getFrostCells,
   getHatchGeometry,
   getRegimeFill,
   getWalterLiethPrecTicks,
   getWalterLiethTempTicks,
+  partitionSegmentsByLayer,
   toPrecipAxisValue,
   toSvgPath,
 } from "@/utils";
@@ -98,39 +104,52 @@ function buildDot(
     : `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${r}" ${common} />`;
 }
 
-/** String twin of WalterLiethCurve.tsx: a background-colored halo under the stroke. */
-function buildHaloCurve(d: string, color: string, width: number, bg: string, dash?: string) {
-  const dashAttr = dash !== undefined ? ` stroke-dasharray="${dash}"` : "";
-  return (
-    `<path d="${d}" fill="none" stroke="${bg}" stroke-width="${width + WALTER_LIETH_STROKE.HALO_EXTRA_WIDTH}" stroke-linejoin="round" />` +
-    `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linejoin="round"${dashAttr} />`
-  );
+/** String twin of WalterLiethHalo.tsx: the background-colored band under a curve. */
+function buildHalo(d: string, width: number, bg: string) {
+  return `<path d="${d}" fill="none" stroke="${bg}" stroke-width="${width + WALTER_LIETH_STROKE.HALO_EXTRA_WIDTH}" stroke-linejoin="round" />`;
 }
 
-/** One layer: segment polygons (when shaded), then halo curves, then temperature markers. */
+/** String twin of WalterLiethCurve.tsx: a curve's stroke. */
+function buildCurve(d: string, color: string, width: number, dash?: string) {
+  const dashAttr = dash !== undefined ? ` stroke-dasharray="${dash}"` : "";
+  return `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linejoin="round"${dashAttr} />`;
+}
+
+/** Segment polygons in their regime fill — the string twin of WalterLiethSegmentPaths.tsx. */
+function buildSegmentPaths(
+  segments: readonly TWalterLiethSegment[],
+  { patternIds, paint }: Pick<TWalterLiethExportLayer, "patternIds" | "paint">,
+  projection: TWalterLiethProjection,
+) {
+  return segments
+    .map((segment) => {
+      const fill = getRegimeFill({
+        regime: segment.regime,
+        humidPatternUrl: `url(#${patternIds.humid})`,
+        aridPatternUrl: `url(#${patternIds.arid})`,
+        perhumidColor: paint.perhumid,
+      });
+      const opacity = segment.regime === EWalterLiethRegime.PERHUMID ? paint.perhumidOpacity : 1;
+      return `<path d="${toSvgPath({ points: segment.points, ...projection })}" fill="${fill}" fill-opacity="${opacity}" stroke="none" />`;
+    })
+    .join("");
+}
+
+/**
+ * One layer, painted like WalterLiethSeriesLayer.tsx: hatching → curve halos → perhumid fill
+ * → curves → temperature markers. Unshaded (overlay) layers get no segments.
+ */
 function buildLayer(
   layer: TWalterLiethExportLayer,
-  scaleX: (x: number) => number,
-  scaleY: (y: number) => number,
+  projection: TWalterLiethProjection,
   bg: string,
 ): string {
-  const { months, patternIds, paint, isShaded, dotShape, precDash } = layer;
+  const { months, paint, isShaded, dotShape, precDash } = layer;
+  const { scaleX, scaleY } = projection;
   const rows = buildWalterLiethRows(months);
-  const segments = isShaded
-    ? getAridHumidSegments({ months })
-        .map((segment) => {
-          const fill = getRegimeFill({
-            regime: segment.regime,
-            humidPatternUrl: `url(#${patternIds.humid})`,
-            aridPatternUrl: `url(#${patternIds.arid})`,
-            perhumidColor: paint.perhumid,
-          });
-          const opacity =
-            segment.regime === EWalterLiethRegime.PERHUMID ? paint.perhumidOpacity : 1;
-          return `<path d="${toSvgPath({ points: segment.points, scaleX, scaleY })}" fill="${fill}" fill-opacity="${opacity}" stroke="none" />`;
-        })
-        .join("")
-    : "";
+  const { hatched, perhumid } = partitionSegmentsByLayer(
+    isShaded ? getAridHumidSegments({ months }) : [],
+  );
   const curve = (key: "tavg" | "precAxis") =>
     toSvgPath({
       points: rows.map((row) => ({ x: row.position, y: row[key] })),
@@ -138,11 +157,39 @@ function buildLayer(
       scaleY,
       isClosed: false,
     });
+  const prec = curve("precAxis");
+  const temp = curve("tavg");
   const dots = rows
     .map((row) => buildDot(scaleX(row.position), scaleY(row.tavg), dotShape, paint.temp, bg))
     .join("");
 
-  return `${segments}${buildHaloCurve(curve("precAxis"), paint.prec, WALTER_LIETH_STROKE.PREC_WIDTH, bg, precDash)}${buildHaloCurve(curve("tavg"), paint.temp, WALTER_LIETH_STROKE.TEMP_WIDTH, bg)}${dots}`;
+  return [
+    buildSegmentPaths(hatched, layer, projection),
+    buildHalo(prec, WALTER_LIETH_STROKE.PREC_WIDTH, bg),
+    buildHalo(temp, WALTER_LIETH_STROKE.TEMP_WIDTH, bg),
+    buildSegmentPaths(perhumid, layer, projection),
+    buildCurve(prec, paint.prec, WALTER_LIETH_STROKE.PREC_WIDTH, precDash),
+    buildCurve(temp, paint.temp, WALTER_LIETH_STROKE.TEMP_WIDTH),
+    dots,
+  ].join("");
+}
+
+/** String twin of WalterLiethFrostBand.tsx: the same getFrostCells rects, below the x axis. */
+function buildFrostBand(
+  frost: readonly EWalterLiethFrost[],
+  { colors, scaleX, axisY }: TExportFrostBandArgs,
+) {
+  return getFrostCells({
+    frost,
+    palette: { frost: colors.wlFrost, neutral: colors.border },
+    scaleX,
+    axisY,
+  })
+    .map(
+      ({ x, y, width, height, fill, stroke }) =>
+        `<rect x="${x.toFixed(2)}" y="${y}" width="${width.toFixed(2)}" height="${height}" fill="${fill}" stroke="${stroke}" stroke-width="${WALTER_LIETH_FROST.STROKE_WIDTH}" />`,
+    )
+    .join("");
 }
 
 /**
@@ -157,6 +204,7 @@ export function buildWalterLiethPanel({
   box,
   clipId,
   monthLabels,
+  frost,
 }: TWalterLiethExportPanelArgs): string {
   const edge = WALTER_LIETH_DIAGRAM.MONTH_EDGE_PADDING;
   const monthCount = WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR;
@@ -202,7 +250,8 @@ export function buildWalterLiethPanel({
       <clipPath id="${clipId}"><rect x="${box.left}" y="${box.top}" width="${box.right - box.left}" height="${box.bottom - box.top}" /></clipPath>
     </defs>
     <g clip-path="url(#${clipId})">
-      ${layers.map((layer) => buildLayer(layer, scaleX, scaleY, colors.bg)).join("")}
+      ${layers.map((layer) => buildLayer(layer, { scaleX, scaleY }, colors.bg)).join("")}
     </g>
+    ${frost ? buildFrostBand(frost, { colors, scaleX, axisY: box.bottom }) : ""}
     ${labels}`;
 }

@@ -27,3 +27,5 @@ export * from "./chartLegend.util";
 export * from "./wikidata.util";
 export * from "./worldclim.util";
 export * from "./urlStateGuard.util";
+export * from "./splitPanels.util";
+export * from "./monthlyTable.util";

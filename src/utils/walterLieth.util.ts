@@ -10,10 +10,16 @@ import {
   MONTH_LABEL_TRAILING_PERIOD,
   WALTER_LIETH_COMPARISON,
   WALTER_LIETH_DIAGRAM,
+  WALTER_LIETH_FROST,
   WALTER_LIETH_HATCH,
   WALTER_LIETH_PREC_TICKS,
 } from "@/constants";
-import { EWalterLiethRegime, type EWalterLiethSeriesId, type EWalterLiethShading } from "@/enums";
+import {
+  EWalterLiethFrost,
+  EWalterLiethRegime,
+  type EWalterLiethSeriesId,
+  type EWalterLiethShading,
+} from "@/enums";
 import type {
   TChartSummary,
   TFormatMonthLabelArgs,
@@ -25,6 +31,9 @@ import type {
   TWalterLiethBandBounds,
   TWalterLiethDomain,
   TWalterLiethDomainExtents,
+  TWalterLiethFrostCell,
+  TWalterLiethFrostCellPaint,
+  TWalterLiethFrostCellsArgs,
   TWalterLiethMonth,
   TWalterLiethPoint,
   TWalterLiethScales,
@@ -49,6 +58,8 @@ const {
   DOMAIN_ROUNDING_STEP,
   DEFAULT_DOMAIN,
   CALENDAR_MONTH_ORDER,
+  // * half a month's band: month i spans [i − 0.5, i + 0.5] on the x axis
+  MONTH_EDGE_PADDING: HALF_MONTH,
 } = WALTER_LIETH_DIAGRAM;
 
 /** mm → position on the shared °C axis: linear up to 100 mm, compressed 1:10 above. */
@@ -339,6 +350,67 @@ export function toSvgPath({ points, scaleX, scaleY, isClosed = true }: TToSvgPat
     ({ x, y }, i) => `${i === 0 ? "M" : "L"} ${scaleX(x).toFixed(2)},${scaleY(y).toFixed(2)}`,
   );
   return isClosed ? `${commands.join(" ")} Z` : commands.join(" ");
+}
+
+/**
+ * The frost band, one state per calendar month: frost when the mean minimum temperature is
+ * below WALTER_LIETH_FROST.THRESHOLD (WL's "certain frost" — there are no absolute minima for
+ * "probable frost"), unknown without a minimum, none otherwise. Exactly at the threshold is
+ * not frost.
+ */
+export function getFrostMonths(months: readonly TWalterLiethMonth[]): EWalterLiethFrost[] {
+  return months.map(({ tmin }) => {
+    if (tmin === null || tmin === undefined) return EWalterLiethFrost.UNKNOWN;
+    return tmin < WALTER_LIETH_FROST.THRESHOLD ? EWalterLiethFrost.FROST : EWalterLiethFrost.NONE;
+  });
+}
+
+/**
+ * The frost band as px rects, one per month in display order, a CELL_GAP apart: frost filled,
+ * none outlined, unknown filled neutral. The screen and the export both draw these.
+ */
+export function getFrostCells({
+  frost,
+  palette,
+  scaleX,
+  axisY,
+  monthOrder = CALENDAR_MONTH_ORDER,
+}: TWalterLiethFrostCellsArgs): TWalterLiethFrostCell[] {
+  const { BAND_GAP, BAND_HEIGHT, CELL_GAP } = WALTER_LIETH_FROST;
+  const paint: Record<EWalterLiethFrost, TWalterLiethFrostCellPaint> = {
+    [EWalterLiethFrost.FROST]: { fill: palette.frost, stroke: palette.frost },
+    [EWalterLiethFrost.NONE]: { fill: "none", stroke: palette.neutral },
+    [EWalterLiethFrost.UNKNOWN]: { fill: palette.neutral, stroke: palette.neutral },
+  };
+  return monthOrder.flatMap((monthIndex, position) => {
+    const state = frost[monthIndex];
+    if (state === undefined) return [];
+    const left = scaleX(position - HALF_MONTH);
+    return [
+      {
+        key: position,
+        x: left + CELL_GAP / 2,
+        y: axisY + BAND_GAP,
+        width: scaleX(position + HALF_MONTH) - left - CELL_GAP,
+        height: BAND_HEIGHT,
+        ...paint[state],
+      },
+    ];
+  });
+}
+
+/**
+ * Segments in their paint layers: the hatching (humid lines, arid dots) goes under the curve
+ * halos, the solid perhumid fill over them — so the precipitation line sits right on the
+ * fill's edge, as in the classic diagram. Screen and export paint in this order.
+ */
+export function partitionSegmentsByLayer(segments: readonly TWalterLiethSegment[]) {
+  const isPerhumid = (segment: TWalterLiethSegment) =>
+    segment.regime === EWalterLiethRegime.PERHUMID;
+  return {
+    hatched: segments.filter((segment) => !isPerhumid(segment)),
+    perhumid: segments.filter(isPerhumid),
+  };
 }
 
 /** Fill for a segment — identical on screen and in the export: hatch, dots or solid. */

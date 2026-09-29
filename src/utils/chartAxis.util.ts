@@ -1,13 +1,20 @@
 import {
   CHART_MONTH_LABEL_MIN_WIDE_SLOT_PX,
+  CHART_PLOT,
   WALTER_LIETH_AXIS,
   WALTER_LIETH_DIAGRAM,
   WALTER_LIETH_MONTH_FORMAT,
 } from "@/constants";
-import type { TMonthLabelFormat } from "@/types";
+import type { TMonthLabelFormat, TPlotHeightArgs } from "@/types";
 
 // * axis helpers shared by the WL diagram and the standard chart's split panels, so both chart
 // * types lay out their y axes, unit labels and hover index the same way
+
+/** The plot's height classes — the same for both chart types. */
+export function getPlotHeightClass({ isCompact, shouldFillHeight }: TPlotHeightArgs) {
+  if (!isCompact) return CHART_PLOT.HEIGHT.FULL;
+  return shouldFillHeight ? CHART_PLOT.HEIGHT.COMPACT_FILL : CHART_PLOT.HEIGHT.COMPACT;
+}
 
 /** Tick text and y-axis geometry: compact diagrams get narrower margins and smaller text. */
 export function getAxisStyle(isCompact: boolean) {

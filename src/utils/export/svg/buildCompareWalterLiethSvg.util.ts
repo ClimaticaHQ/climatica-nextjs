@@ -17,6 +17,7 @@ import type {
   TWalterLiethSeriesInput,
 } from "@/types";
 import {
+  getFrostMonths,
   getOverlayPaint,
   getSharedDomain,
   getWalterLiethLegendItems,
@@ -25,7 +26,12 @@ import {
   isShadedSeries,
   orderShadedFirst,
 } from "@/utils";
-import { buildSplitPanel, getSplitFrame, patternIdsOf, seriesColor } from "./splitPanelExport.util";
+import {
+  buildComparisonPanels,
+  getExportPanels,
+  patternIdsOf,
+  seriesColor,
+} from "./splitPanelExport.util";
 import { buildExportLegend, getWalterLiethExportPalette } from "./legendExport.util";
 import {
   buildNotice,
@@ -59,6 +65,7 @@ function renderWalterLiethPlot(
           box,
           clipId: `wl-cmp-${series.id}-clip`,
           monthLabels: wl.monthLabels,
+          frost: getFrostMonths(series.months),
         })
       : buildNotice({ text: wl.labels.incomplete[series.id], box, colors });
 }
@@ -69,24 +76,16 @@ function buildSplit(
   colors: TExportChartColors,
   top: number,
 ): TCompareWalterLiethBody {
-  const frame = getSplitFrame(wl, contentWidth);
-  const panels = [wl.seriesA, wl.seriesB].map((series, i) =>
-    buildSplitPanel({
-      series,
-      comparison: wl,
-      context: {
-        colors,
-        left: contentLeft + (frame.panelWidth + W.splitGap) * i,
-        top,
-        ...frame,
-      },
-      renderPlot: renderWalterLiethPlot(series, wl, { domain, colors }),
-    }),
-  );
+  const panels = buildComparisonPanels({
+    comparison: wl,
+    colors,
+    top,
+    renderPlot: (series) => renderWalterLiethPlot(series, wl, { domain, colors }),
+  });
 
   // * no legend when neither series could be drawn; it sits below the cards, outside them
-  const drawn = [wl.seriesA, wl.seriesB].find(isCompleteSeries);
-  const legendY = top + frame.panelHeight + EXPORT_LEGEND.GAP;
+  const drawn = getExportPanels(wl).find(isCompleteSeries);
+  const legendY = panels.bottom + EXPORT_LEGEND.GAP;
   const legend = drawn
     ? buildExportLegend({
         items: getWalterLiethLegendItems({
@@ -101,7 +100,7 @@ function buildSplit(
       })
     : { svg: "", bottom: legendY };
 
-  return { body: panels.join("") + legend.svg, bottom: legend.bottom };
+  return { body: panels.body + legend.svg, bottom: legend.bottom };
 }
 
 function buildOverlay(
@@ -137,6 +136,8 @@ function buildOverlay(
     box,
     clipId: "wl-ovl-clip",
     monthLabels: wl.monthLabels,
+    // * the shaded series' frost band — none when no series is shaded
+    frost: shaded ? getFrostMonths(shaded.months) : null,
   });
   const legend = buildExportLegend({
     items: getWalterLiethOverlayLegendItems({
@@ -148,6 +149,7 @@ function buildOverlay(
         shape: WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
       })),
       shadeColor: shaded ? seriesColor(shaded, colors) : null,
+      frostColor: shaded ? colors.wlFrost : null,
       neutral: colors.textSecondary,
     }),
     y: legendY,

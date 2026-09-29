@@ -1,4 +1,4 @@
-import { CHART_LINE_DASH } from "@/constants";
+import { CHART_LINE_DASH, WALTER_LIETH_EXPORT_TEXT } from "@/constants";
 import type {
   TCompareExportPayload,
   TCompareExportSeries,
@@ -111,7 +111,7 @@ export function buildMonthLabels(
   return payload.labels.monthNames
     .map(
       (name, i) =>
-        `<text x="${monthBands[i].center.toFixed(2)}" y="${chartBottom + 20}" text-anchor="middle" font-size="11" fill="${colors.textSecondary}">${escapeXml(name)}</text>`,
+        `<text x="${monthBands[i].center.toFixed(2)}" y="${chartBottom + WALTER_LIETH_EXPORT_TEXT.MONTH_LABEL_OFFSET}" text-anchor="middle" font-size="11" fill="${colors.textSecondary}">${escapeXml(name)}</text>`,
     )
     .join("");
 }

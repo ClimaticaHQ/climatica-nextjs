@@ -1,8 +1,9 @@
 import {
   EXPORT_SVG_LAYOUT as L,
-  MISSING_VALUE_LABEL,
   EXPORT_AXES_STYLE,
   EXPORT_FONT_FAMILY,
+  WALTER_LIETH_EXPORT_TEXT,
+  MONTHLY_TABLE,
 } from "@/constants";
 import type {
   TGridAxesStyle,
@@ -20,6 +21,8 @@ import {
   getStandardLegendItems,
   getWalterLiethLegendItems,
   toWalterLiethMonths,
+  getFrostMonths,
+  buildMonthlyTableRows,
 } from "@/utils";
 import { buildExportLegend, getWalterLiethExportPalette } from "./legendExport.util";
 import { buildFooterTextLines } from "../shared/footerLines.util";
@@ -30,6 +33,8 @@ import {
   buildWalterLiethPanel,
   getConventionExportPaint,
 } from "./walterLiethExport.util";
+import { getSingleExportPlotBox } from "./exportPlotBox.util";
+import { buildMonthlyTableSvg } from "./monthlyTableExport.util";
 
 export function escapeXml(text: string): string {
   return text
@@ -316,6 +321,7 @@ function buildWalterLiethBody(
     colors,
     box,
     clipId: WL_EXPORT_IDS.clipId,
+    frost: getFrostMonths(months),
   });
 }
 
@@ -327,7 +333,7 @@ function buildMonthLabels(
 ): string {
   return payload.labels.monthNames
     .map((name, i) => {
-      return `<text x="${monthBands[i].center.toFixed(2)}" y="${chartBottom + 20}" text-anchor="middle" font-size="11" fill="${colors.textSecondary}">${escapeXml(name)}</text>`;
+      return `<text x="${monthBands[i].center.toFixed(2)}" y="${chartBottom + WALTER_LIETH_EXPORT_TEXT.MONTH_LABEL_OFFSET}" text-anchor="middle" font-size="11" fill="${colors.textSecondary}">${escapeXml(name)}</text>`;
     })
     .join("");
 }
@@ -356,77 +362,20 @@ function buildLegend(payload: TExportPayload, colors: TExportChartColors, isWalt
   }).svg;
 }
 
-/**
- * Two rows (avg temp, precip) × one column per month — the export counterpart to
- * ClimateDataTable.tsx. Mode-independent (same table regardless of chartMode), so it's
- * called once from buildExportSvg() rather than from either body-assembly function.
- * Follows buildStatsTable()'s conventions: escapeXml on every label/value, a bordered
- * rect spanning paddingX..width-paddingX, divider <line>s at cell boundaries, and the
- * same 11px label / 16px-600 value font scale.
- */
+/** The monthly table — the city page's rows (mean temperature, precipitation) as SVG. */
 function buildDataTable(payload: TExportPayload, colors: TExportChartColors): string {
-  const { monthlyData, labels } = payload;
-  const tableWidth = L.width - L.paddingX * 2;
-  const labelColWidth = L.dataTableLabelWidth;
-  const monthColWidth = (tableWidth - labelColWidth) / monthlyData.length;
-  const rowHeight = L.dataTableRowHeight;
-  const tableHeight = rowHeight * 3;
-  const y0 = L.dataTableY;
-
-  const rows: { label: string; format: (d: TExportPayload["monthlyData"][number]) => string }[] = [
-    {
-      label: `${labels.tableLabels.avgTemp} (°C)`,
-      format: (d) => (d.tavg !== null ? d.tavg.toFixed(1) : MISSING_VALUE_LABEL),
-    },
-    {
-      label: `${labels.tableLabels.precip} (mm)`,
-      format: (d) => (d.prec !== null ? Math.round(d.prec).toString() : MISSING_VALUE_LABEL),
-    },
-  ];
-
-  const colX = (i: number) => L.paddingX + labelColWidth + monthColWidth * i;
-
-  const border = `<rect x="${L.paddingX}" y="${y0}" width="${tableWidth}" height="${tableHeight}" fill="none" stroke="${colors.border}" stroke-width="1" />`;
-
-  const vDividers = [
-    `<line x1="${L.paddingX + labelColWidth}" y1="${y0}" x2="${L.paddingX + labelColWidth}" y2="${y0 + tableHeight}" stroke="${colors.border}" stroke-width="1" />`,
-    ...monthlyData.slice(1).map((_, i) => {
-      const x = colX(i + 1);
-      return `<line x1="${x}" y1="${y0}" x2="${x}" y2="${y0 + tableHeight}" stroke="${colors.border}" stroke-width="1" />`;
+  return buildMonthlyTableSvg({
+    rows: buildMonthlyTableRows({
+      series: [{ key: "single", data: payload.monthlyData }],
+      variables: MONTHLY_TABLE.CITY_VARIABLES,
+      labels: payload.labels.tableLabels,
     }),
-  ].join("");
-
-  const hDividers = [1, 2]
-    .map((r) => {
-      const y = y0 + rowHeight * r;
-      return `<line x1="${L.paddingX}" y1="${y}" x2="${L.paddingX + tableWidth}" y2="${y}" stroke="${colors.border}" stroke-width="1" />`;
-    })
-    .join("");
-
-  const headerRow = monthlyData
-    .map((_, i) => {
-      const cx = colX(i) + monthColWidth / 2;
-      const cy = y0 + rowHeight / 2 + 4;
-      return `<text x="${cx}" y="${cy}" text-anchor="middle" font-size="11" fill="${colors.textSecondary}">${escapeXml(labels.monthNames[i])}</text>`;
-    })
-    .join("");
-
-  const dataRows = rows
-    .map((row, ri) => {
-      const rowY = y0 + rowHeight * (ri + 1);
-      const labelText = `<text x="${L.paddingX + 10}" y="${rowY + rowHeight / 2 + 4}" text-anchor="start" font-size="11" fill="${colors.textSecondary}">${escapeXml(row.label)}</text>`;
-      const valueTexts = monthlyData
-        .map((d, i) => {
-          const cx = colX(i) + monthColWidth / 2;
-          const cy = rowY + rowHeight / 2 + 5;
-          return `<text x="${cx}" y="${cy}" text-anchor="middle" font-size="16" font-weight="600" fill="${colors.text}">${escapeXml(row.format(d))}</text>`;
-        })
-        .join("");
-      return labelText + valueTexts;
-    })
-    .join("");
-
-  return border + vDividers + hDividers + headerRow + dataRows;
+    monthNames: payload.labels.monthNames,
+    top: L.dataTableY,
+    left: L.paddingX,
+    width: L.width - L.paddingX * 2,
+    colors,
+  }).svg;
 }
 
 function renderFooterLines(lines: TFooterTextLine[], colors: TExportChartColors): string {
@@ -442,9 +391,11 @@ export function buildExportSvg(
   payload: TExportPayload,
   colors: TExportChartColors,
 ): TSvgExportResult {
-  const plotLeft = L.chartMarginLeft;
-  const plotRight = L.width - L.chartMarginRight;
-  const chartBottom = L.chartTop + L.chartHeight;
+  const {
+    left: plotLeft,
+    right: plotRight,
+    bottom: chartBottom,
+  } = getSingleExportPlotBox(L.chartTop);
   const isWalterLieth = payload.chartMode === "walter-lieth";
 
   // Standard mode only — Walter-Lieth builds its own scale from getSharedDomain.

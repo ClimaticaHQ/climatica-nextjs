@@ -1,5 +1,10 @@
 import { DIFFERENCE_SIGN, MISSING_VALUE_LABEL, WALTER_LIETH_DIAGRAM } from "@/constants";
-import type { TMonthlyTemperature, TMonthlyTemperatureWithAvg, TWalterLiethMonth } from "@/types";
+import type {
+  TMonthlyTemperature,
+  TMonthlyTemperatureWithAvg,
+  TWalterLiethMonth,
+  TWalterLiethSourceRow,
+} from "@/types";
 
 /** Mean monthly temperature — null when either extreme is missing. */
 export function getMonthlyMean({ tmin, tmax }: Pick<TMonthlyTemperature, "tmin" | "tmax">) {
@@ -33,11 +38,12 @@ export function meanOf(values: readonly (number | null)[]): number | null {
  * temperature and precipitation, otherwise the diagram must not be drawn.
  */
 export function toWalterLiethMonths(
-  rows: readonly Pick<TMonthlyTemperatureWithAvg, "tavg" | "prec">[],
+  rows: readonly TWalterLiethSourceRow[],
 ): TWalterLiethMonth[] | null {
   if (rows.length !== WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR) return null;
-  const months = rows.flatMap(({ tavg, prec }) =>
-    tavg !== null && prec !== null ? [{ tavg, prec }] : [],
+  // * tmin rides along for the frost band; a missing tmin doesn't make the series incomplete
+  const months = rows.flatMap(({ tavg, prec, tmin }) =>
+    tavg !== null && prec !== null ? [{ tavg, prec, tmin: tmin ?? null }] : [],
   );
   return months.length === rows.length ? months : null;
 }

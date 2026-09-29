@@ -38,3 +38,13 @@ export function wrapWords(text: string, maxWidth: number, fontSize: number): str
     return [...lines, word];
   }, []);
 }
+
+/** The text, cut with "…" to fit maxWidth — for one-line labels (table rows) that can't wrap. */
+export function truncateToWidth(text: string, maxWidth: number, fontSize: number): string {
+  if (measureExportText(text, fontSize) <= maxWidth) return text;
+  const chars = [...text];
+  while (chars.length > 0 && measureExportText(`${chars.join("")}…`, fontSize) > maxWidth) {
+    chars.pop();
+  }
+  return `${chars.join("").trimEnd()}…`;
+}

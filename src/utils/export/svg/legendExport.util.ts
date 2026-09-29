@@ -25,6 +25,7 @@ export const getWalterLiethExportPalette = (
   humidHatch: colors.wlHumidHatch,
   aridHatch: colors.wlAridHatch,
   perhumid: colors.wlCompressedFill,
+  frost: colors.wlFrost,
 });
 
 /** String twin of the ChartLegend swatches — the same descriptors, drawn as SVG markup. */

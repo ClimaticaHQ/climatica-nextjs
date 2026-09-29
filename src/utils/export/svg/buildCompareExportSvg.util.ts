@@ -3,20 +3,28 @@ import {
   COMPARE_WL_EXPORT_LAYOUT as W,
   EXPORT_FONT_FAMILY,
   EXPORT_LEGEND,
+  EXPORT_MONTHLY_TABLE,
+  WALTER_LIETH_COMPARISON,
   WALTER_LIETH_DIAGRAM,
   EXPORT_AXES_STYLE,
   WALTER_LIETH_EXPORT_TEXT as T,
 } from "@/constants";
-import { ECompareLayout } from "@/enums";
+import { ECompareLayout, EWalterLiethSeriesId } from "@/enums";
 import type {
   TCompareExportPayload,
   TCompareWalterLiethBody,
   TCompareExportStatsRow,
   TExportChartColors,
   TFooterTextLine,
+  TLegendMarkerShape,
   TSvgExportResult,
 } from "@/types";
-import { getSeriesLegendItems } from "@/utils";
+import {
+  buildMonthlyTableRows,
+  getMonthlyTableVariables,
+  getSeriesLegendItems,
+  isSplitComparison,
+} from "@/utils";
 import { formatCount, formatPrec, formatTemp } from "../../monthlyClimate.util";
 import { buildFooterTextLines } from "../shared/footerLines.util";
 import { buildGridAndAxes, computeNiceAxisTicks, escapeXml } from "./buildExportSvg.util";
@@ -24,7 +32,11 @@ import { buildCompareWalterLiethBody } from "./buildCompareWalterLiethSvg.util";
 import { buildStandardSplitBody } from "./buildStandardSplitSvg.util";
 import { buildExportLegend } from "./legendExport.util";
 import { buildGroupedBars, buildMonthLabels, buildSeriesLines } from "./compareChartParts.util";
+import { buildMonthlyTableSvg } from "./monthlyTableExport.util";
 import { createLinearScale, monthBandX } from "./scales.util";
+
+// * weather years have no A/B identity: each is a circle in its own color, as in its legend
+const WEATHER_YEAR_MARKER: TLegendMarkerShape = "circle";
 
 function buildHeader(payload: TCompareExportPayload, colors: TExportChartColors): string {
   return `
@@ -203,14 +215,54 @@ function buildStandardChartBody(
 }
 
 /** The chart body the page shows: WL (split or overlay), standard split, or standard overlay. */
-function buildChartBody(payload: TCompareExportPayload, colors: TExportChartColors) {
+function buildChartBody(payload: TCompareExportPayload, colors: TExportChartColors, top: number) {
   const { comparison } = payload;
   if (comparison?.chartMode === "walter-lieth") {
-    return buildCompareWalterLiethBody(comparison, colors, L.chartTop);
+    return buildCompareWalterLiethBody(comparison, colors, top);
   }
   return comparison?.layout === ECompareLayout.SPLIT
-    ? buildStandardSplitBody(payload, comparison, colors, L.chartTop)
-    : buildStandardChartBody(payload, colors, L.chartTop);
+    ? buildStandardSplitBody(payload, comparison, colors, top)
+    : buildStandardChartBody(payload, colors, top);
+}
+
+/**
+ * The monthly table under the chart, as on the page: every series, or only the expanded split
+ * panel's; WL's two variables, or the standard chart's chips.
+ */
+function buildTable(payload: TCompareExportPayload, colors: TExportChartColors, top: number) {
+  const { comparison } = payload;
+  const series = payload.series.flatMap((series, i) => {
+    // * two-series comparisons are always [A, B]; weather years are circles in their colors
+    const id = i === 0 ? EWalterLiethSeriesId.A : EWalterLiethSeriesId.B;
+    if (comparison?.expanded && comparison.expanded !== id) return [];
+    const marker = comparison
+      ? {
+          shape: WALTER_LIETH_COMPARISON.DOT_SHAPE[id],
+          color: id === EWalterLiethSeriesId.A ? colors.wlSeriesA : colors.wlSeriesB,
+        }
+      : { shape: WEATHER_YEAR_MARKER, color: series.colors.tmax };
+    return [{ key: `${i}`, label: series.label, marker, data: series.data }];
+  });
+  return buildMonthlyTableSvg({
+    rows: buildMonthlyTableRows({
+      series,
+      variables: getMonthlyTableVariables({
+        chartMode: comparison?.chartMode ?? "standard",
+        visible: payload.visibleSeries,
+      }),
+      labels: payload.labels.tableLabels,
+    }),
+    monthNames: payload.labels.monthNames,
+    top,
+    left: L.paddingX,
+    width: L.width - L.paddingX * 2,
+    colors,
+  });
+}
+
+/** The stats table on top: gone for split panels (their headers carry the stats), as on screen. */
+function hasStatsTable({ comparison }: TCompareExportPayload) {
+  return !comparison || !isSplitComparison(comparison);
 }
 
 export function buildCompareExportSvg(
@@ -223,15 +275,22 @@ export function buildCompareExportSvg(
     shareUrl: payload.shareUrl,
     layout: L,
   });
-  // * every body sets its own height (panels, legend rows); the footer follows it
-  const chartBody = buildChartBody(payload, colors);
-  const footerY = chartBody.bottom + W.footerGap;
+  // * every body sets its own height (panels, legend rows); the table and footer follow it
+  const showStats = hasStatsTable(payload);
+  const chartBody = buildChartBody(
+    payload,
+    colors,
+    showStats ? L.chartTop : L.chartTopWithoutStats,
+  );
+  const table = buildTable(payload, colors, chartBody.bottom + EXPORT_MONTHLY_TABLE.GAP_ABOVE);
+  const footerY = table.bottom + W.footerGap;
   const height = footerY + footerLines.length * L.footerLineHeight + L.footerBottomMargin;
 
   const body = [
     buildHeader(payload, colors),
-    buildStatsTable(payload, colors),
+    showStats ? buildStatsTable(payload, colors) : "",
     chartBody.body,
+    table.svg,
     renderFooterLines(footerLines, colors, footerY),
   ].join("\n");
 

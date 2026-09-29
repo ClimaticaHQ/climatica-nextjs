@@ -1,23 +1,24 @@
 import {
   CHART_LINE_DASH,
   COMPARE_EXPORT_SVG_LAYOUT as L,
-  COMPARE_WL_EXPORT_LAYOUT as W,
   EXPORT_AXES_STYLE,
   EXPORT_LEGEND,
 } from "@/constants";
+import { EWalterLiethSeriesId } from "@/enums";
 import type {
   TCompareExportPayload,
   TCompareExportSeries,
   TCompareWalterLiethBody,
   TComparisonExport,
   TExportChartColors,
+  TStandardSplitLegendArgs,
   TWalterLiethExportBox,
 } from "@/types";
 import { getStandardSplitLegendItems } from "@/utils";
 import { buildGridAndAxes, computeNiceAxisTicks } from "./buildExportSvg.util";
 import { buildGroupedBars, buildMonthLabels, buildSeriesLines } from "./compareChartParts.util";
 import { createLinearScale, monthBandX } from "./scales.util";
-import { buildSplitPanel, getSplitFrame } from "./splitPanelExport.util";
+import { buildComparisonPanels } from "./splitPanelExport.util";
 import { buildExportLegend } from "./legendExport.util";
 
 const contentLeft = L.paddingX;
@@ -65,7 +66,7 @@ function buildStandardPlot(
   ].join("\n");
 }
 
-function buildSplitLegend(payload: TCompareExportPayload, colors: TExportChartColors, y: number) {
+function buildSplitLegend({ payload, comparison, colors, y }: TStandardSplitLegendArgs) {
   const [seriesA, seriesB] = payload.series;
   const items =
     seriesA && seriesB
@@ -74,6 +75,7 @@ function buildSplitLegend(payload: TCompareExportPayload, colors: TExportChartCo
           colorsA: seriesA.colors,
           colorsB: seriesB.colors,
           visible: payload.visibleSeries,
+          shown: comparison.expanded,
         })
       : [];
   return buildExportLegend({
@@ -96,18 +98,22 @@ export function buildStandardSplitBody(
   colors: TExportChartColors,
   top: number,
 ): TCompareWalterLiethBody {
-  const frame = getSplitFrame(comparison, contentWidth);
-  const panels = [comparison.seriesA, comparison.seriesB].map((series, i) => {
-    const exportSeries = payload.series[i];
-    return buildSplitPanel({
-      series,
-      comparison,
-      context: { colors, left: contentLeft + (frame.panelWidth + W.splitGap) * i, top, ...frame },
-      renderPlot: (box) =>
-        exportSeries ? buildStandardPlot(payload, exportSeries, colors, box) : "",
-    });
+  const panels = buildComparisonPanels({
+    comparison,
+    colors,
+    top,
+    renderPlot: (series) => (box) => {
+      // * payload.series is always [A, B]; an expanded panel may be either
+      const exportSeries = payload.series[series.id === EWalterLiethSeriesId.A ? 0 : 1];
+      return exportSeries ? buildStandardPlot(payload, exportSeries, colors, box) : "";
+    },
   });
-  const legend = buildSplitLegend(payload, colors, top + frame.panelHeight + EXPORT_LEGEND.GAP);
+  const legend = buildSplitLegend({
+    payload,
+    comparison,
+    colors,
+    y: panels.bottom + EXPORT_LEGEND.GAP,
+  });
 
-  return { body: panels.join("") + legend.svg, bottom: legend.bottom };
+  return { body: panels.body + legend.svg, bottom: legend.bottom };
 }

@@ -1,8 +1,9 @@
-import { CHART_LEGEND, CHART_LINE_DASH } from "@/constants";
-import { ELegendSwatch } from "@/enums";
+import { CHART_LEGEND, CHART_LINE_DASH, CHART_VARIABLE_ORDER } from "@/constants";
+import { ELegendSwatch, EWalterLiethSeriesId } from "@/enums";
 import type {
   TAridityPalette,
   TLegendItem,
+  TLegendSeriesColors,
   TAridityLegendLabels,
   TVariableLegendLabels,
   TLegendSwatch,
@@ -13,13 +14,12 @@ import type {
   TSwatchSize,
   TVisibleSeries,
   TWalterLiethLegendItemsArgs,
+  TWalterLiethLegendLabels,
   TWalterLiethOverlayLegendItemsArgs,
 } from "@/types";
 
 // * the legend items of every chart type — the screen (CSS-var colors) and the export
 // * (resolved colors) build them here, so both always list the same entries
-
-const VARIABLE_ORDER: readonly TSeriesKey[] = ["tmax", "tavg", "tmin", "prec"];
 
 const line = (color: string, dash?: string): TLegendSwatch => ({
   kind: ELegendSwatch.LINE,
@@ -39,7 +39,7 @@ function variableItems(
   visible: TVisibleSeries,
   swatches: Partial<Record<TSeriesKey, TLegendSwatch>>,
 ): TLegendItem[] {
-  return VARIABLE_ORDER.flatMap((key) => {
+  return CHART_VARIABLE_ORDER.flatMap((key) => {
     const swatch = swatches[key];
     return swatch && visible[key] ? [{ key, label: labels[key], swatch }] : [];
   });
@@ -56,7 +56,14 @@ function aridityItems(
   ];
 }
 
-/** WL diagram (single and split): the two curves and the three regimes. */
+/** The WL frost band's entry: a filled cell in the frost color. */
+const frostItem = (labels: TWalterLiethLegendLabels, color: string): TLegendItem => ({
+  key: "frost",
+  label: labels.frost,
+  swatch: bar(color),
+});
+
+/** WL diagram (single and split): the two curves, the three regimes and the frost band. */
 export function getWalterLiethLegendItems({
   labels,
   palette,
@@ -79,6 +86,7 @@ export function getWalterLiethLegendItems({
       label: labels.perhumid,
       swatch: { kind: ELegendSwatch.PERHUMID, color: palette.perhumid },
     },
+    frostItem(labels, palette.frost),
   ];
 }
 
@@ -87,6 +95,7 @@ export function getWalterLiethOverlayLegendItems({
   labels,
   series,
   shadeColor,
+  frostColor,
   neutral,
 }: TWalterLiethOverlayLegendItemsArgs): TLegendItem[] {
   const regimes: TLegendItem[] = shadeColor
@@ -117,8 +126,17 @@ export function getWalterLiethOverlayLegendItems({
     { key: "temp", label: labels.temp, swatch: line(neutral) },
     { key: "prec", label: labels.prec, swatch: line(neutral, CHART_LINE_DASH.SERIES.tavg) },
     ...regimes,
+    ...(frostColor !== null ? [frostItem(labels, frostColor)] : []),
   ];
 }
+
+/** One series' variables in the standard chart's styles — its own color per variable. */
+const seriesSwatches = (colors: TLegendSeriesColors) => ({
+  tmax: line(colors.tmax),
+  tavg: line(colors.tavg, CHART_LINE_DASH.STANDARD.tavg),
+  tmin: line(colors.tmin),
+  prec: bar(colors.prec),
+});
 
 /** Standard single-city chart: its visible variables, then the arid / humid bar colors. */
 export function getStandardLegendItems({
@@ -127,22 +145,28 @@ export function getStandardLegendItems({
   visible,
   aridity,
 }: TStandardLegendItemsArgs): TLegendItem[] {
-  const shown = variableItems(labels, visible, {
-    tmax: line(colors.tmax),
-    tavg: line(colors.tavg, CHART_LINE_DASH.STANDARD.tavg),
-    tmin: line(colors.tmin),
-    prec: bar(colors.prec),
-  });
+  const shown = variableItems(labels, visible, seriesSwatches(colors));
   return [...shown, ...(visible.prec ? aridityItems(labels, aridity) : [])];
 }
 
-/** Standard split: each visible variable once, with its A and B color side by side. */
+/**
+ * Standard split: each visible variable once, with its A and B color side by side — or, with
+ * one panel expanded, in that panel's colors only.
+ */
 export function getStandardSplitLegendItems({
   labels,
   colorsA,
   colorsB,
   visible,
+  shown,
 }: TStandardSplitLegendItemsArgs): TLegendItem[] {
+  if (shown) {
+    return variableItems(
+      labels,
+      visible,
+      seriesSwatches(shown === EWalterLiethSeriesId.A ? colorsA : colorsB),
+    );
+  }
   const { tavg } = CHART_LINE_DASH.STANDARD;
   return variableItems(labels, visible, {
     tmax: pair(line(colorsA.tmax), line(colorsB.tmax)),

@@ -5,12 +5,13 @@ import {
   SIDEBAR_PARAMS,
   WALTER_LIETH_COMPARISON,
 } from "@/constants";
-import { ECompareLayout, EWalterLiethShading } from "@/enums";
+import { ECompareLayout, EWalterLiethSeriesId, EWalterLiethShading } from "@/enums";
 import type {
   TCellSize,
   TChartMode,
   TCity,
   TDatasetPeriodUrlValue,
+  TExpandedPanel,
   TMonthFilter,
   TUrlField,
   TVariable,
@@ -141,6 +142,17 @@ export const walterLiethShadingUrlField: TUrlField<EWalterLiethShading> = {
   parse(params) {
     const raw = params.get(SIDEBAR_PARAMS.WL_SHADING);
     return Object.values(EWalterLiethShading).find((shading) => shading === raw);
+  },
+};
+
+/** The split's expanded panel — `expanded=a|b`; both panels shown (the default) writes nothing. */
+export const expandedPanelUrlField: TUrlField<TExpandedPanel> = {
+  serialize(value, params) {
+    if (value !== null) params.set(SIDEBAR_PARAMS.EXPANDED, value);
+  },
+  parse(params) {
+    const raw = params.get(SIDEBAR_PARAMS.EXPANDED);
+    return Object.values(EWalterLiethSeriesId).find((id) => id === raw);
   },
 };
 
