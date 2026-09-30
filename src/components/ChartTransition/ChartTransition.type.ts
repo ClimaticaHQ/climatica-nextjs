@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 /** The side an expanding panel grows from — where it sits in the split. */
 export type TTransformOrigin = "left" | "right";
@@ -17,7 +17,9 @@ export type TTransitionLayer = {
   node: ReactNode;
 };
 
-/** Inline animation timing, plus the scale start the `chart-expand-in` keyframes read. */
-export type TTransitionStyle = CSSProperties & {
-  "--chart-expand-scale-from"?: string;
+/** The entering and leaving layers' animation classes, and how long the leaving one stays. */
+export type TTransitionMotion = {
+  durationMs: number;
+  enterClassName: string;
+  leaveClassName: string;
 };

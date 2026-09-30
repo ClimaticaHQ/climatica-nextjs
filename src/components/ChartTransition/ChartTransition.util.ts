@@ -1,16 +1,25 @@
 import { MOTION } from "@/constants";
-import type { TTransformOrigin, TTransitionStyle } from "./ChartTransition.type";
-import { CHART_TRANSITION_CLASSES as C } from "./ChartTransition.constant";
+import {
+  CHART_TRANSITION_MOTION as M,
+  CHART_TRANSITION_ORIGIN_CLASSES,
+} from "./ChartTransition.constant";
+import type { TTransformOrigin, TTransitionMotion } from "./ChartTransition.type";
 
-/** The entering layer's animation: the plain crossfade, or a panel expanding from a side. */
-export function getEnterMotion(origin: TTransformOrigin | undefined) {
+/**
+ * The transition's classes and how long the old content stays: the plain crossfade, or a
+ * panel expanding from a side.
+ */
+export function getTransitionMotion(origin: TTransformOrigin | undefined): TTransitionMotion {
   if (origin === undefined) {
-    return { durationMs: MOTION.CHART_CROSSFADE_MS, className: C.ENTERING, style: {} };
+    return {
+      durationMs: MOTION.CHART_CROSSFADE_MS,
+      enterClassName: M.CROSSFADE.ENTER,
+      leaveClassName: M.CROSSFADE.LEAVE,
+    };
   }
-  const style: TTransitionStyle = {
-    transformOrigin: origin,
-    animationTimingFunction: MOTION.PANEL_EXPAND_EASING,
-    "--chart-expand-scale-from": String(MOTION.PANEL_EXPAND_SCALE_FROM),
+  return {
+    durationMs: MOTION.PANEL_EXPAND_MS,
+    enterClassName: `${M.EXPAND.ENTER} ${CHART_TRANSITION_ORIGIN_CLASSES[origin]}`,
+    leaveClassName: M.EXPAND.LEAVE,
   };
-  return { durationMs: MOTION.PANEL_EXPAND_MS, className: C.EXPANDING, style };
 }
