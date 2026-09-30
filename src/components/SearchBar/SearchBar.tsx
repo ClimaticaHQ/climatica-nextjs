@@ -1,5 +1,6 @@
 import { useDebounce, useSearchCity } from "@/hooks";
 import type { TCity, TCoordinates } from "@/types";
+import { getScrollBehavior } from "@/utils/motion.util";
 import { useTranslations } from "next-intl";
 import { FocusEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { TSearchBarProps } from "./SearchBar.type";
@@ -58,7 +59,7 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
       if (activeElement) {
         activeElement.scrollIntoView({
           block: "nearest", // * only scrolls if the element is not fully visible
-          behavior: "smooth",
+          behavior: getScrollBehavior(),
         });
       }
     }
