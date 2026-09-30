@@ -1,57 +1,25 @@
-import { AridityLegend } from "@/components/WalterLiethChart";
-import { MONTH_NAMES } from "@/constants";
-import { useDelayedHide } from "@/hooks";
+import { ChartLegend } from "@/components/ChartLegend";
+import {
+  CHART_PLOT,
+  CHART_LEGEND,
+  CHART_LINE_DASH,
+  MONTH_NAMES,
+  MISSING_VALUE_LABEL,
+  CHART_HOVER_COLOR,
+  TOOLTIP_DIGITS,
+} from "@/constants";
+import { EWalterLiethSeriesId } from "@/enums";
+import { getMonthLabelFormat, getSeriesLegendItems, resolveActiveTooltipIndex } from "@/utils";
+import { useDelayedHide, useElementWidth, useFormatNumber, useLegendLabels } from "@/hooks";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import {
-  Bar,
-  CartesianGrid,
-  ComposedChart,
-  Legend,
-  Line,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { PrecipBarShape } from "../../components";
-import { CHART_COLORS, PRECIP_BAR_ANIMATION_DURATION_MS } from "../../TempPrecipChart.constant";
+import { Bar, ComposedChart, Line, ResponsiveContainer, Tooltip, ReferenceArea } from "recharts";
+import { useSeriesToggleMotion } from "../../hooks/useSeriesToggleMotion";
+import { PrecipBarShape, StandardChartAxes } from "../../components";
+import { ARIDITY_BAR_COLORS, CHART_COLORS } from "../../TempPrecipChart.constant";
 import type { TDotRendererProps } from "../../TempPrecipChart.type";
 import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle } from "../../utils";
 import type { TCompareChartProps } from "./CompareChart.type";
-
-function CompareModeLegend({
-  labelA,
-  labelB,
-}: {
-  labelA: string | undefined;
-  labelB: string | undefined;
-}) {
-  const t = useTranslations();
-  return (
-    <div className="flex flex-col items-center gap-1 pt-3" style={{ fontSize: 11 }}>
-      <div className="flex items-center gap-5">
-        <span className="flex items-center gap-1.5">
-          <span
-            className="inline-block h-2.5 w-2.5 rounded-sm"
-            style={{ backgroundColor: CHART_COLORS.compareA.tmax }}
-          />
-          <span style={{ color: CHART_COLORS.compareA.tmax }}>{labelA}</span>
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span
-            className="inline-block h-2.5 w-2.5 rounded-sm"
-            style={{ backgroundColor: CHART_COLORS.compareB.tmax }}
-          />
-          <span style={{ color: CHART_COLORS.compareB.tmax }}>{labelB}</span>
-        </span>
-      </div>
-      <span className="text-[var(--color-text-secondary)]" style={{ fontSize: 10 }}>
-        {t("chart.legend.seriesNote")}
-      </span>
-    </div>
-  );
-}
 
 export function CompareChart({
   chartData,
@@ -63,16 +31,24 @@ export function CompareChart({
   selectedMonths,
   showAridity = true,
   aridityA,
+  activeMonthIndex,
+  onActiveMonthIndexChange,
+  strip,
 }: TCompareChartProps) {
   const t = useTranslations();
-  const hidePrecBar = useDelayedHide(!visible.prec, PRECIP_BAR_ANIMATION_DURATION_MS);
-  const hideTmaxLine = useDelayedHide(!visible.tmax, PRECIP_BAR_ANIMATION_DURATION_MS);
-  const hideTminLine = useDelayedHide(!visible.tmin, PRECIP_BAR_ANIMATION_DURATION_MS);
-  const hideTavgLine = useDelayedHide(!visible.tavg, PRECIP_BAR_ANIMATION_DURATION_MS);
+  const legendLabels = useLegendLabels();
+  const seriesMotion = useSeriesToggleMotion();
+  const formatNumber = useFormatNumber();
+  const { ref: plotRef, width: plotWidth } = useElementWidth<HTMLDivElement>();
+  const hidePrecBar = useDelayedHide(!visible.prec, seriesMotion.toggleMs);
+  const hideTmaxLine = useDelayedHide(!visible.tmax, seriesMotion.toggleMs);
+  const hideTminLine = useDelayedHide(!visible.tmin, seriesMotion.toggleMs);
+  const hideTavgLine = useDelayedHide(!visible.tavg, seriesMotion.toggleMs);
 
   const aridityByMonthA = useMemo<Record<number, boolean> | undefined>(() => {
     if (!aridityA) return undefined;
-    return Object.fromEntries(aridityA.map((m) => [m.month, m.isArid]));
+    // * an unknown month (missing value) is not colored arid
+    return Object.fromEntries(aridityA.map((m) => [m.month, m.isArid === true]));
   }, [aridityA]);
 
   function localMonthName(v: unknown): string {
@@ -81,18 +57,22 @@ export function CompareChart({
   }
 
   function makeDot(color: string, isSeriesVisible: boolean) {
-    function DotRenderer({ cx = 0, cy = 0, fill = color, index = -1 }: TDotRendererProps) {
+    function DotRenderer({ cx = 0, cy = 0, index = -1 }: TDotRendererProps) {
       const month = index >= 0 ? index + 1 : -1;
       const isSelected =
         !selectedMonths || selectedMonths.length === 0 || selectedMonths.includes(month);
-      const isHighlighted = selectedMonths?.length === 1 && isSelected;
-      const opacity = isSelected ? 1 : 0.15;
+      // * the card's hovered month (from any chart or strip) wins over the month filter
+      const isHovering = activeMonthIndex !== null && activeMonthIndex !== undefined;
+      const isActive = index === activeMonthIndex;
+      const isHighlighted = (selectedMonths?.length === 1 && isSelected) || isActive;
+      const opacity = isHovering ? (isActive ? 1 : 0.15) : isSelected ? 1 : 0.15;
       return (
         <circle
           cx={cx}
           cy={cy}
           r={isHighlighted ? 5 : 3}
-          fill={fill}
+          // * the series color — Recharts passes a white default fill, never wanted here
+          fill={color}
           stroke="none"
           style={buildOpacityFadeStyle(isSeriesVisible ? opacity : 0)}
         />
@@ -103,64 +83,39 @@ export function CompareChart({
 
   return (
     <>
-      <div className="overflow-x-auto">
-        <div className="h-[300px] sm:h-[360px] md:h-[420px] lg:h-[460px] min-w-[520px]">
+      <div ref={plotRef} className={CHART_PLOT.HEIGHT.FULL}>
+        <div className="h-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
               data={chartData}
-              margin={{ top: 20, right: 60, bottom: 50, left: 20 }}
+              margin={CHART_PLOT.MARGIN}
               barGap={2}
               barCategoryGap="30%"
+              onMouseMove={(state) =>
+                onActiveMonthIndexChange?.(resolveActiveTooltipIndex(state.activeTooltipIndex))
+              }
+              onMouseLeave={() => onActiveMonthIndexChange?.(null)}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-
-              <XAxis
-                dataKey="monthName"
-                interval={0}
-                tickFormatter={localMonthName}
-                tick={{ fontSize: 11, fill: "var(--color-text-secondary)" }}
-                label={{
-                  value: t("chart.monthAxis"),
-                  position: "insideBottom",
-                  offset: -10,
-                  fill: "var(--color-text-secondary)",
-                  fontWeight: 600,
-                }}
+              <StandardChartAxes
+                scales={scales}
+                rightMax={rightMax}
+                isCompact={false}
+                monthFormat={getMonthLabelFormat(plotWidth)}
               />
 
-              <YAxis
-                yAxisId="temp"
-                domain={scales ? [scales.tempMin, scales.tempMax] : ["auto", "auto"]}
-                tickFormatter={(v: unknown) => String(Math.round(Number(v)))}
-                tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
-                label={{
-                  value: "°C",
-                  angle: -90,
-                  position: "insideLeft",
-                  offset: 12,
-                  fill: "var(--color-text-secondary)",
-                  fontWeight: 600,
-                }}
-              />
-
-              <YAxis
-                yAxisId="prec"
-                orientation="right"
-                domain={[0, rightMax]}
-                allowDataOverflow={false}
-                tickFormatter={(v: unknown) => String(Math.round(Number(v)))}
-                tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
-                label={{
-                  value: "mm",
-                  angle: 90,
-                  position: "insideRight",
-                  offset: 12,
-                  fill: "var(--color-text-secondary)",
-                  fontWeight: 600,
-                }}
-              />
-
+              {activeMonthIndex !== null && activeMonthIndex !== undefined && (
+                // * the hovered month's band — the same color as the monthly values table's
+                <ReferenceArea
+                  yAxisId="temp"
+                  x1={MONTH_NAMES[activeMonthIndex]}
+                  x2={MONTH_NAMES[activeMonthIndex]}
+                  fill={CHART_HOVER_COLOR}
+                  fillOpacity={1}
+                  stroke="none"
+                />
+              )}
               <Tooltip
+                cursor={false}
                 contentStyle={{
                   backgroundColor: "var(--color-bg)",
                   border: "1px solid var(--color-border)",
@@ -169,20 +124,19 @@ export function CompareChart({
                 }}
                 labelFormatter={localMonthName}
                 formatter={(value, name) => {
-                  const num = Number(value ?? "");
-                  const formatted = isNaN(num) ? String(value ?? "") : num.toFixed(2);
+                  // * a missing month is unknown — Number(null) / Number("") would print "0.00"
+                  if (value === null || value === undefined) return [MISSING_VALUE_LABEL, name];
+                  const num = Number(value);
+                  const formatted = isNaN(num)
+                    ? String(value ?? "")
+                    : formatNumber(num, { digits: TOOLTIP_DIGITS.STANDARD });
                   const isPrecip = String(name).includes(t("chart.precipitation"));
-                  return [isPrecip ? `${formatted} mm` : `${formatted} °C`, name];
+                  return [`${formatted} ${t(isPrecip ? "units.mm" : "units.celsius")}`, name];
                 }}
               />
 
-              <Legend
-                verticalAlign="bottom"
-                height={52}
-                content={() => <CompareModeLegend labelA={labelA} labelB={labelB} />}
-              />
-
               <Bar
+                isAnimationActive={seriesMotion.isAnimationActive}
                 yAxisId="prec"
                 dataKey={(entry: Record<string, unknown>) =>
                   visible.prec ? Number(entry["precA"]) : 0
@@ -192,16 +146,18 @@ export function CompareChart({
                 minPointSize={0}
                 background={false}
                 hide={hidePrecBar}
-                animationDuration={PRECIP_BAR_ANIMATION_DURATION_MS}
+                animationDuration={seriesMotion.toggleMs}
                 shape={
                   <PrecipBarShape
                     selectedMonths={selectedMonths}
                     aridityByMonth={showAridity ? aridityByMonthA : undefined}
+                    {...(activeMonthIndex !== undefined ? { activeMonthIndex } : {})}
                   />
                 }
               />
 
               <Line
+                isAnimationActive={seriesMotion.isAnimationActive}
                 yAxisId="temp"
                 type="monotone"
                 dataKey="tmaxA"
@@ -215,6 +171,7 @@ export function CompareChart({
               />
 
               <Line
+                isAnimationActive={seriesMotion.isAnimationActive}
                 yAxisId="temp"
                 type="monotone"
                 dataKey="tavgA"
@@ -223,12 +180,13 @@ export function CompareChart({
                 strokeWidth={2}
                 dot={makeDot(CHART_COLORS.compareA.tavg, visible.tavg)}
                 activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tavg ? 1 : 0) }}
-                strokeDasharray="5 3"
+                strokeDasharray={CHART_LINE_DASH.SERIES.tavg}
                 hide={hideTavgLine}
                 style={buildStrokeOpacityFadeStyle(visible.tavg ? 1 : 0)}
               />
 
               <Line
+                isAnimationActive={seriesMotion.isAnimationActive}
                 yAxisId="temp"
                 type="monotone"
                 dataKey="tminA"
@@ -237,12 +195,13 @@ export function CompareChart({
                 strokeWidth={2}
                 dot={makeDot(CHART_COLORS.compareA.tmin, visible.tmin)}
                 activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
-                strokeDasharray="4 2"
+                strokeDasharray={CHART_LINE_DASH.SERIES.tmin}
                 hide={hideTminLine}
                 style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
               />
 
               <Bar
+                isAnimationActive={seriesMotion.isAnimationActive}
                 yAxisId="prec"
                 dataKey={(entry: Record<string, unknown>) =>
                   visible.prec ? Number(entry["precB"]) : 0
@@ -252,11 +211,17 @@ export function CompareChart({
                 minPointSize={0}
                 background={false}
                 hide={hidePrecBar}
-                animationDuration={PRECIP_BAR_ANIMATION_DURATION_MS}
-                shape={<PrecipBarShape selectedMonths={selectedMonths} />}
+                animationDuration={seriesMotion.toggleMs}
+                shape={
+                  <PrecipBarShape
+                    selectedMonths={selectedMonths}
+                    {...(activeMonthIndex !== undefined ? { activeMonthIndex } : {})}
+                  />
+                }
               />
 
               <Line
+                isAnimationActive={seriesMotion.isAnimationActive}
                 yAxisId="temp"
                 type="monotone"
                 dataKey="tmaxB"
@@ -270,6 +235,7 @@ export function CompareChart({
               />
 
               <Line
+                isAnimationActive={seriesMotion.isAnimationActive}
                 yAxisId="temp"
                 type="monotone"
                 dataKey="tavgB"
@@ -278,12 +244,13 @@ export function CompareChart({
                 strokeWidth={2}
                 dot={makeDot(CHART_COLORS.compareB.tavg, visible.tavg)}
                 activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tavg ? 1 : 0) }}
-                strokeDasharray="5 3"
+                strokeDasharray={CHART_LINE_DASH.SERIES.tavg}
                 hide={hideTavgLine}
                 style={buildStrokeOpacityFadeStyle(visible.tavg ? 1 : 0)}
               />
 
               <Line
+                isAnimationActive={seriesMotion.isAnimationActive}
                 yAxisId="temp"
                 type="monotone"
                 dataKey="tminB"
@@ -292,7 +259,7 @@ export function CompareChart({
                 strokeWidth={2}
                 dot={makeDot(CHART_COLORS.compareB.tmin, visible.tmin)}
                 activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
-                strokeDasharray="4 2"
+                strokeDasharray={CHART_LINE_DASH.SERIES.tmin}
                 hide={hideTminLine}
                 style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
               />
@@ -300,7 +267,20 @@ export function CompareChart({
           </ResponsiveContainer>
         </div>
       </div>
-      {visible.prec && showAridity && <AridityLegend />}
+      {strip}
+      <ChartLegend
+        items={getSeriesLegendItems({
+          labels: legendLabels,
+          series: [
+            { key: EWalterLiethSeriesId.A, label: labelA ?? "", color: CHART_COLORS.compareA.tmax },
+            { key: EWalterLiethSeriesId.B, label: labelB ?? "", color: CHART_COLORS.compareB.tmax },
+          ],
+          visible,
+          neutral: CHART_LEGEND.NEUTRAL_COLOR,
+          hasTavg: true,
+          aridity: showAridity ? { palette: ARIDITY_BAR_COLORS, labels: legendLabels } : null,
+        })}
+      />
     </>
   );
 }

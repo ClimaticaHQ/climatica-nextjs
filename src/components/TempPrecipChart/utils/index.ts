@@ -1,7 +1,11 @@
 export { buildCompareData } from "./buildCompareData";
+export { buildComparisonSeries } from "./buildComparisonSeries";
 export { buildMultiPeriodChartData } from "./buildMultiPeriodChartData";
-export { catmullRomPath, linearPath } from "./catmullRomPath";
-export { computeChartSummary } from "./computeChartSummary";
-export { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle } from "./lineFadeStyle";
-export { resolveActiveTooltipIndex } from "./resolveActiveTooltipIndex";
+export { catmullRomPath } from "./catmullRomPath";
+export {
+  buildFillOpacityFadeStyle,
+  buildOpacityFadeStyle,
+  buildStrokeOpacityFadeStyle,
+} from "./lineFadeStyle";
 export { resolveVisibleSeries } from "./resolveVisibleSeries";
+export { periodColor } from "./periodColor";

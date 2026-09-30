@@ -1,5 +1,6 @@
-import { CHART_COLORS, PRECIP_BAR_ANIMATION_DURATION_MS } from "../../TempPrecipChart.constant";
+import { CHART_COLORS } from "../../TempPrecipChart.constant";
 import type { TBarShape } from "../../TempPrecipChart.type";
+import { buildFillOpacityFadeStyle } from "../../utils/lineFadeStyle";
 
 /**
  * Opacity is driven by month + selectedMonths (passed via shape prop), not via Cell children,
@@ -52,12 +53,7 @@ export function PrecipBarShape(props: TBarShape) {
       height={Math.max(0, height)}
       fill={fill}
       rx={2}
-      style={{
-        fillOpacity,
-        transitionProperty: "fill-opacity",
-        transitionDuration: `${PRECIP_BAR_ANIMATION_DURATION_MS}ms`,
-        transitionTimingFunction: "ease",
-      }}
+      style={buildFillOpacityFadeStyle(fillOpacity)}
     />
   );
 }

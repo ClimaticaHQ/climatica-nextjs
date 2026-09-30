@@ -1,8 +1,13 @@
 import { TMonthlyTemperatureWithAvg } from "@/types";
-import { computeAridityPeriods, getWalterLiethScales } from "@/utils";
+import {
+  computeAridityPeriods,
+  getWalterLiethScales,
+  summarizeMonths,
+  withMonthlyMean,
+} from "@/utils";
 import { useMemo, useState } from "react";
 import type { TTempPrecipChartProps } from "../TempPrecipChart.type";
-import { buildCompareData, buildMultiPeriodChartData, computeChartSummary } from "../utils";
+import { buildCompareData, buildMultiPeriodChartData } from "../utils";
 
 export function useTempPrecipChart({ data, dataA, dataB, multiPeriodData }: TTempPrecipChartProps) {
   const isCompare = dataA !== undefined;
@@ -46,7 +51,7 @@ export function useTempPrecipChart({ data, dataA, dataB, multiPeriodData }: TTem
   );
 
   const chartDataSingle = useMemo<TMonthlyTemperatureWithAvg[]>(
-    () => (data ?? []).map((d) => ({ ...d, tavg: (d.tmax + d.tmin) / 2 })),
+    () => withMonthlyMean(data ?? []),
     [data],
   );
 
@@ -56,33 +61,25 @@ export function useTempPrecipChart({ data, dataA, dataB, multiPeriodData }: TTem
     return chartDataSingle;
   }, [chartDataSingle, dataA, dataB, isCompare, isMultiPeriod, multiPeriodData]);
 
-  const summary = useMemo(
-    () => (aridity && data ? computeChartSummary(data, aridity) : null),
-    [aridity, data],
-  );
+  // * summaries need every month — with a gap they're unknown (null), never computed over 0s
+  const summary = useMemo(() => summarizeMonths(aridity), [aridity]);
 
   const chartDataA = useMemo<TMonthlyTemperatureWithAvg[]>(
-    () => (isCompare ? (dataA ?? []).map((d) => ({ ...d, tavg: (d.tmax + d.tmin) / 2 })) : []),
+    () => (isCompare ? withMonthlyMean(dataA ?? []) : []),
     [dataA, isCompare],
   );
 
   const chartDataB = useMemo<TMonthlyTemperatureWithAvg[]>(
-    () => (isCompare ? (dataB ?? []).map((d) => ({ ...d, tavg: (d.tmax + d.tmin) / 2 })) : []),
+    () => (isCompare ? withMonthlyMean(dataB ?? []) : []),
     [dataB, isCompare],
   );
 
-  const summaryA = useMemo(
-    () => (aridityA && dataA ? computeChartSummary(dataA, aridityA) : null),
-    [aridityA, dataA],
-  );
+  const summaryA = useMemo(() => summarizeMonths(aridityA), [aridityA]);
 
-  const summaryB = useMemo(
-    () => (aridityB && dataB ? computeChartSummary(dataB, aridityB) : null),
-    [aridityB, dataB],
-  );
+  const summaryB = useMemo(() => summarizeMonths(aridityB), [aridityB]);
 
   const rightMax = useMemo(() => {
-    let precValues: number[];
+    let precValues: (number | null)[];
     if (isMultiPeriod) {
       precValues = multiPeriodData.flatMap((p) => p.rows.map((r) => r.prec));
     } else if (isCompare) {
@@ -90,7 +87,8 @@ export function useTempPrecipChart({ data, dataA, dataB, multiPeriodData }: TTem
     } else {
       precValues = (data ?? []).map((d) => d.prec);
     }
-    const max = precValues.length ? Math.max(...precValues) : 0;
+    const present = precValues.filter((value): value is number => value !== null);
+    const max = present.length ? Math.max(...present) : 0;
     return Math.ceil(max / 10) * 10 || 100;
   }, [data, dataA, dataB, isCompare, isMultiPeriod, multiPeriodData]);
 
@@ -100,6 +98,7 @@ export function useTempPrecipChart({ data, dataA, dataB, multiPeriodData }: TTem
     hasData,
     aridity,
     aridityA,
+    aridityB,
     scales,
     chartData,
     chartDataSingle,
