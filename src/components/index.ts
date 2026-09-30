@@ -1,9 +1,13 @@
+export { ChartControlsRow } from "./ChartControlsRow";
+export { ChartTransition } from "./ChartTransition";
+export { MotionRoot } from "./MotionRoot";
+export { NavigationIntentTracker } from "./NavigationIntentTracker";
+export { ChartLegend } from "./ChartLegend";
+export { ChartCardHeader } from "./ChartCardHeader";
 export { CellSizeSelector } from "./CellSizeSelector";
-export { ClimateDataTable } from "./ClimateDataTable";
 export { ClimateStatsBar } from "./ClimateStatsBar";
 export type { TClimateStatsBarProps } from "./ClimateStatsBar";
-export { CompareStatsGrid } from "./CompareStatsGrid";
-export { DiffCard } from "./DiffCard";
+export { Card } from "./Card";
 export { FilterChip } from "./FilterChip";
 export { FiltersTab } from "./FiltersTab";
 export { LanguageSwitcher } from "./LanguageSwitcher";
@@ -14,15 +18,16 @@ export { Navbar } from "./Navbar";
 export { PeriodSelectRow } from "./PeriodSelectRow";
 export { PeriodSlider } from "./PeriodSlider";
 export { SearchBar } from "./SearchBar";
+export { SegmentedControl } from "./SegmentedControl";
+export { StatCard } from "./StatCard";
+export type { TSegmentedOption } from "./SegmentedControl";
 export { Sidebar } from "./Sidebar";
 export { ThreeDotsScaleLoader } from "./svg";
 export { TempPrecipChart, useTempPrecipChart } from "./TempPrecipChart";
 export { Topbar } from "./Topbar";
 export { SectionLabel } from "./UI";
 export type { TMiniMapLocation } from "./UI";
-export {
-  WalterLiethChart,
-  WalterLiethCitiesLayout,
-  WalterLiethPeriodsLayout,
-} from "./WalterLiethChart";
+export { WalterLiethChart, WalterLiethIncompleteNotice } from "./WalterLiethChart";
+export { ShadingControl, WalterLiethComparison } from "./WalterLiethComparison";
 export { YearInput } from "./YearInput";
+export { ComparisonTable } from "./ComparisonTable";
