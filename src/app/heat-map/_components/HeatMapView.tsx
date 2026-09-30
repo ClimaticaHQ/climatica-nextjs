@@ -1,8 +1,16 @@
 "use client";
 
 import { LocationSearch } from "@/components";
+import { useFormatNumber } from "@/hooks";
+import { DataUpdateProvider } from "@/components/DataUpdate";
 import { EmptyState, ErrorBanner, MapSkeleton, PageTitle, PageWrapper } from "@/components/UI";
-import { EXPORT_PNG_SCALE, HEATMAP_EXPORT_SVG_LAYOUT, VARIABLE_LABELS } from "@/constants";
+import {
+  DATA_UPDATE_REGION_SERIES,
+  DIFFERENCE_SIGN,
+  EXPORT_PNG_SCALE,
+  HEATMAP_EXPORT_SVG_LAYOUT,
+  VARIABLE_LABELS,
+} from "@/constants";
 import type { THeatmapExportCell, THeatmapExportPayload, THeatmapExportSelection } from "@/types";
 import {
   buildFilename,
@@ -16,6 +24,7 @@ import {
 } from "@/utils";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
+import { HEATMAP_VALUE_DIGITS } from "./HeatMap.constant";
 import type { TRegionHeatmapViewProps } from "./HeatMap.type";
 import {
   computeHeatmapStats,
@@ -46,6 +55,7 @@ export function HeatMapView({
   colorScale,
   drawMode,
   isLoading,
+  isFetching,
   isLocating,
   isClimate,
   error,
@@ -76,7 +86,8 @@ export function HeatMapView({
       ? t("heatMap.noPeriodData", { period: periodLabel, grid: shortGridLabel(gridSize) })
       : null;
   const hasNoData = hasSelection && (pixelBindings.length === 0 || stats.count === 0);
-  const unit = colorScale === "precipitation" ? "mm" : "°C";
+  const formatNumber = useFormatNumber();
+  const unit = t(colorScale === "precipitation" ? "units.mm" : "units.celsius");
 
   const monthStr = formatSelectedMonths(selectedMonths);
 
@@ -165,7 +176,7 @@ export function HeatMapView({
         colorScale,
       ),
     );
-    const fmt = (v: number) => `${v.toFixed(1)} ${unit}`;
+    const fmt = (v: number) => `${formatNumber(v, { digits: HEATMAP_VALUE_DIGITS })} ${unit}`;
 
     return {
       headerTitle: t("heatMap.title"),
@@ -177,10 +188,13 @@ export function HeatMapView({
         { label: t("heatMap.stats.median"), value: fmt(stats.median), subtitle: statSubtitle },
         {
           label: t("heatMap.stats.stdDev"),
-          value: `±${stats.stdDev.toFixed(1)} ${unit}`,
+          value: `${DIFFERENCE_SIGN.NONE}${fmt(stats.stdDev)}`,
           subtitle: statSubtitle,
         },
-        { label: t("heatMap.stats.cellsAnalyzed"), value: String(stats.count) },
+        {
+          label: t("heatMap.stats.cellsAnalyzed"),
+          value: formatNumber(stats.count, { hasGrouping: true }),
+        },
       ],
       gradientColors,
       minLabel: fmt(stats.min),
@@ -243,31 +257,41 @@ export function HeatMapView({
             : {})}
         />
 
-        {hasSelection && (
-          <StatsLegendBar
-            hasData={hasData}
-            stats={stats}
-            unit={unit}
-            scale={colorScale}
-            statSubtitle={statSubtitle}
-            avgTooltip={avgTooltip}
-          />
-        )}
+        {/* * the region's stats: none while empty, so only new stats replacing shown ones flash
+            the bar; the map card shows the loading state */}
+        <DataUpdateProvider
+          series={{ [DATA_UPDATE_REGION_SERIES]: hasData ? stats : null }}
+          isFetching={isFetching}
+          announcement={t("loading.dataUpdated", {
+            location: t("heatMap.title"),
+            period: periodLabel,
+          })}
+        >
+          {hasSelection && (
+            <StatsLegendBar
+              hasData={hasData}
+              stats={stats}
+              unit={unit}
+              scale={colorScale}
+              statSubtitle={statSubtitle}
+              avgTooltip={avgTooltip}
+            />
+          )}
 
-        <MapCanvas
-          bbox={bbox}
-          polygon={polygon}
-          drawMode={drawMode}
-          gridSize={gridSize}
-          colorScale={colorScale}
-          unit={unit}
-          mapTarget={mapTarget}
-          bindings={pixelBindings}
-          isLoading={isLoading}
-          selectedMonths={selectedMonths}
-          onBboxComplete={onBboxChange}
-          onPolygonComplete={onPolygonChange}
-        />
+          <MapCanvas
+            bbox={bbox}
+            polygon={polygon}
+            drawMode={drawMode}
+            gridSize={gridSize}
+            colorScale={colorScale}
+            unit={unit}
+            mapTarget={mapTarget}
+            bindings={pixelBindings}
+            selectedMonths={selectedMonths}
+            onBboxComplete={onBboxChange}
+            onPolygonComplete={onPolygonChange}
+          />
+        </DataUpdateProvider>
 
         {hasSelection && (
           <RegionalClimateProfile

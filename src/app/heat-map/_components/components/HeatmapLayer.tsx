@@ -1,18 +1,22 @@
 "use client";
 
+import { useFormatNumber } from "@/hooks";
 import { interpolateColor } from "@/utils";
 import L from "leaflet";
 import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
-import type { THeatmapLayerProps } from "../HeatMap.type";
+import { HEATMAP_COORDINATE_DIGITS, HEATMAP_VALUE_DIGITS } from "../HeatMap.constant";
+import type { THeatmapLayerProps, TPopupContentArgs } from "../HeatMap.type";
 import { GRID_DELTA, pixelAnnualAvg, pixelSelectedAvg, resolveCellBounds } from "../HeatMap.util";
 
 const isTouchDevice = "ontouchstart" in window;
 
-function popupContent(value: number, unit: string, centerLat: number, centerLng: number): string {
-  const latDir = centerLat >= 0 ? "N" : "S";
-  const lngDir = centerLng >= 0 ? "E" : "W";
-  return `<div style="font-size:13px;font-weight:500;">${value.toFixed(1)} ${unit}</div><div style="font-size:11px;opacity:.65;">${Math.abs(centerLat).toFixed(3)}°${latDir}, ${Math.abs(centerLng).toFixed(3)}°${lngDir}</div>`;
+function popupContent({ value, unit, center, formatNumber }: TPopupContentArgs): string {
+  const latDir = center.lat >= 0 ? "N" : "S";
+  const lngDir = center.lng >= 0 ? "E" : "W";
+  const coordinate = (degrees: number) =>
+    formatNumber(Math.abs(degrees), { digits: HEATMAP_COORDINATE_DIGITS });
+  return `<div style="font-size:13px;font-weight:500;">${formatNumber(value, { digits: HEATMAP_VALUE_DIGITS })} ${unit}</div><div style="font-size:11px;opacity:.65;">${coordinate(center.lat)}°${latDir}, ${coordinate(center.lng)}°${lngDir}</div>`;
 }
 
 export function HeatmapLayer({
@@ -25,6 +29,7 @@ export function HeatmapLayer({
   selectedMonths,
 }: THeatmapLayerProps) {
   const map = useMap();
+  const formatNumber = useFormatNumber();
   const groupRef = useRef<L.LayerGroup | null>(null);
   const prevSelectionRef = useRef<{ bbox: typeof bbox; polygon: typeof polygon }>({
     bbox: null,
@@ -77,7 +82,7 @@ export function HeatmapLayer({
       }).addTo(group);
 
       const center = leafletBounds.getCenter();
-      const content = popupContent(value, unit, center.lat, center.lng);
+      const content = popupContent({ value, unit, center, formatNumber });
       const popup = L.popup({ closeButton: false, offset: [0, -4] }).setContent(content);
 
       if (isTouchDevice) {
@@ -119,7 +124,7 @@ export function HeatmapLayer({
         { padding: [24, 24] },
       );
     }
-  }, [bindings, gridSize, scale, unit, bbox, polygon, selectedMonths, map]);
+  }, [bindings, gridSize, scale, unit, bbox, polygon, selectedMonths, map, formatNumber]);
 
   return null;
 }

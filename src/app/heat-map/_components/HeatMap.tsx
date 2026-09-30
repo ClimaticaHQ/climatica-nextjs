@@ -99,6 +99,7 @@ export function HeatMap() {
   const {
     pixels: bboxPixels,
     isLoading: bboxLoading,
+    isFetching: bboxFetching,
     error: bboxError,
   } = useGetHeatmapData(
     polygon ? null : bbox,
@@ -112,11 +113,13 @@ export function HeatMap() {
   const {
     pixels: polyPixels,
     isLoading: polyLoading,
+    isFetching: polyFetching,
     error: polyError,
   } = useGetHeatmapPolygonData(wkt, grid, activeVariable, isClimate, climatePeriod, year);
 
   const pixels = polygon ? polyPixels : bboxPixels;
   const isLoading = polygon ? polyLoading : bboxLoading;
+  const isFetching = polygon ? polyFetching : bboxFetching;
   const error = polygon ? polyError : bboxError;
 
   const hasData = (pixels?.results.bindings.length ?? 0) > 0;
@@ -193,6 +196,7 @@ export function HeatMap() {
       colorScale={colorScale}
       drawMode={drawMode}
       isLoading={isLoading}
+      isFetching={isFetching}
       isLocating={isLocating}
       error={error}
       locationError={resolvedLocationError}

@@ -5,6 +5,7 @@ import type {
   TColorScale,
   TDatasetAttribution,
   TDatasetPeriodUrlValue,
+  TNumberFormatter,
   TPolygon,
   TVariable,
   TWorldClimBoxBinding,
@@ -56,7 +57,10 @@ export type TRegionHeatmapViewProps = {
   activeVariable: TVariable;
   colorScale: TColorScale;
   drawMode: TDrawMode;
+  /** the first load of a selection — no cells to show yet */
   isLoading: boolean;
+  /** any load, also while the previous selection's cells are still shown */
+  isFetching: boolean;
   isLocating: boolean;
   isClimate: boolean;
   error: Error | null;
@@ -133,7 +137,6 @@ export type TMapCanvasProps = {
   unit: string;
   mapTarget: TMapTarget | null;
   bindings: TWorldClimBoxBinding[];
-  isLoading: boolean;
   selectedMonths: number[];
   onBboxComplete: (bbox: TBbox) => void;
   onPolygonComplete: (polygon: TPolygon) => void;
@@ -145,4 +148,12 @@ export type TRegionalClimateProfileProps = {
   isClimate: boolean;
   periodLabel: string;
   cellCount: number;
+};
+
+/** A heat map cell's popup: its value and where the cell is. */
+export type TPopupContentArgs = {
+  value: number;
+  unit: string;
+  center: { lat: number; lng: number };
+  formatNumber: TNumberFormatter;
 };

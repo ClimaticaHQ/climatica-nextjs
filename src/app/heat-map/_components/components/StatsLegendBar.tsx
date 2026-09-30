@@ -1,5 +1,10 @@
+import { Card } from "@/components/Card";
+import { DATA_UPDATE_ALL_SERIES, DIFFERENCE_SIGN } from "@/constants";
+import { ECardPadding, ECardSize } from "@/enums";
+import { useFormatNumber } from "@/hooks";
 import { interpolateColor } from "@/utils";
 import { useTranslations } from "next-intl";
+import { HEATMAP_VALUE_DIGITS } from "../HeatMap.constant";
 import type { TStatsLegendBarProps } from "../HeatMap.type";
 import type { TSkeletonBlockProps, TStatBlockProps } from "./StatsLegendBar.type";
 
@@ -55,15 +60,21 @@ export function StatsLegendBar({
 }: TStatsLegendBarProps) {
   const t = useTranslations();
 
+  const formatNumber = useFormatNumber();
   const gradientColors = Array.from({ length: 10 }, (_, i) =>
     interpolateColor(stats.min + (stats.max - stats.min) * (i / 9), stats.min, stats.max, scale),
   );
   const gradient = `linear-gradient(to right, ${gradientColors.join(", ")})`;
 
-  const fmt = (v: number) => `${v.toFixed(1)} ${unit}`;
+  const fmt = (v: number) => `${formatNumber(v, { digits: HEATMAP_VALUE_DIGITS })} ${unit}`;
 
   return (
-    <div className="overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg)]">
+    <Card
+      size={ECardSize.MD}
+      padding={ECardPadding.NONE}
+      flashKeys={DATA_UPDATE_ALL_SERIES}
+      shouldClip
+    >
       {/* Stats grid — 3 cols on mobile, 6 on sm+ */}
       <div className="grid grid-cols-3 sm:grid-cols-6">
         {hasData ? (
@@ -95,13 +106,13 @@ export function StatsLegendBar({
             />
             <StatBlock
               label={t("heatMap.stats.stdDev")}
-              value={`±${stats.stdDev.toFixed(1)} ${unit}`}
+              value={`${DIFFERENCE_SIGN.NONE}${fmt(stats.stdDev)}`}
               subtitle={statSubtitle}
               className={CELL_BORDERS[4]}
             />
             <StatBlock
               label={t("heatMap.stats.cellsAnalyzed")}
-              value={String(stats.count)}
+              value={formatNumber(stats.count, { hasGrouping: true })}
               className={CELL_BORDERS[5]}
             />
           </>
@@ -141,6 +152,6 @@ export function StatsLegendBar({
           </>
         )}
       </div>
-    </div>
+    </Card>
   );
 }
