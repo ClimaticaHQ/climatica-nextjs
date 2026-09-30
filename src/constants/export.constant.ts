@@ -1,5 +1,5 @@
 import type { TVisibleSeries } from "@/types";
-import { WALTER_LIETH_FROST_BAND_SPACE } from "./walterLieth.constant";
+import { WALTER_LIETH_AXIS, WALTER_LIETH_FROST } from "./walterLieth.constant";
 import type { TGridAxesStyle } from "@/types";
 /**
  * every drawn svg export (single-city, compare-cities/periods, heat-map)
@@ -35,15 +35,13 @@ export const EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,
   statsY: 92,
   statsHeight: 54,
-  chartMarginLeft: 70,
-  chartMarginRight: 70,
+  // * the screen's full plot margins inside the page padding
+  chartMarginLeft: EXPORT_SVG_SHARED_LAYOUT.paddingX + WALTER_LIETH_AXIS.WIDTH,
+  chartMarginRight: EXPORT_SVG_SHARED_LAYOUT.paddingX + WALTER_LIETH_AXIS.WIDTH,
   chartTop: 170,
   chartHeight: 380,
-  legendY: 616,
-  dataTableY: 670,
-  dataTableRowHeight: 26,
-  dataTableLabelWidth: 110,
-  footerY: 780,
+  // * below the legend (which follows the plot's monthly strip)
+  footerGap: 44,
 } as const;
 
 // * shared settings obj by compare-cities, compare-periods pages
@@ -55,8 +53,6 @@ export const COMPARE_EXPORT_SVG_LAYOUT = {
   // * where the chart body starts under the stats table (overlay, weather years); each body
   // * (WL or standard, split or overlay) sets its own height
   chartTop: 310,
-  // * split panels carry their own stats, so there's no table: the body starts under the header
-  chartTopWithoutStats: 100,
 } as const;
 
 // * heat-map export with NO fixed height
@@ -90,13 +86,14 @@ export const COMPARE_WL_EXPORT_LAYOUT = {
   // * split panel card: header (name, period, stats cells) above the plot, all inside it
   panelPadding: 16,
   panelRadius: 10,
-  panelHeaderHeight: 132,
+  // * name and subtitle, then room for °C / mm above the plot — the table on top has the stats
+  panelHeaderHeight: 64,
   // * same side margins as the desktop diagram; °C / mm sit above the axes, not beside them
-  panelPlotMarginX: 34,
+  panelPlotMarginX: WALTER_LIETH_AXIS.WIDTH,
   // * below the plot, inside the card: room for the frost band and the month labels
-  panelFooterHeight: 26 + WALTER_LIETH_FROST_BAND_SPACE,
+  panelFooterHeight: 26 + WALTER_LIETH_FROST.BAND_HEIGHT.FULL,
   splitPlotHeight: 300,
-  overlayPlotMarginX: 70,
+  overlayPlotMarginX: EXPORT_SVG_SHARED_LAYOUT.paddingX + WALTER_LIETH_AXIS.WIDTH,
   overlayPlotHeight: 360,
   footerGap: 44,
 } as const;
@@ -120,6 +117,46 @@ export const COMPARE_EXPORT_DEFAULT_VISIBLE: TVisibleSeries = {
   prec: true,
 };
 
+// * the monthly values table under each exported plot, in that plot's gutters — the screen's
+export const EXPORT_MONTHLY_VALUES = {
+  // * px below the month labels' baseline
+  GAP_ABOVE: 8,
+  RADIUS: 4,
+  // * one line per series in a cell (overlay: A above B), padded top and bottom
+  LINE_HEIGHT: 16,
+  ROW_PADDING: 5,
+  // * the values' size follows the table's width, as on screen: a split panel's is smaller
+  WIDE_MIN_WIDTH: 576,
+  VALUE_FONT_SIZE: { WIDE: 13, NARROW: 11 },
+  VALUE_FONT_WEIGHT: 500,
+  UNIT_FONT_SIZE: 11,
+  UNIT_FONT_WEIGHT: 600,
+  // * a line's baseline below its centre
+  BASELINE: 4,
+} as const;
+
+// * the compare exports' comparison table, on top — the page's ComparisonTable
+export const EXPORT_COMPARISON_TABLE = {
+  HEADER_HEIGHT: 46,
+  ROW_HEIGHT: 28,
+  // * share of the table's width for the metric column
+  METRIC_WIDTH_RATIO: 0.28,
+  PADDING_X: 12,
+  RADIUS: 8,
+  FONT_SIZE: 13,
+  HEAD_FONT_WEIGHT: 600,
+  VALUE_FONT_WEIGHT: 500,
+  SMALL_FONT_SIZE: 11,
+  // * header text baselines: names / "Difference", then the direction line under it
+  HEAD_BASELINE: 22,
+  DIRECTION_BASELINE: 37,
+  BASELINE: 5,
+  MARKER_SIZE: 8,
+  MARKER_GAP: 6,
+  // * space below the table, above the chart
+  GAP_BELOW: 24,
+} as const;
+
 // * the exports' monthly table: the city page's two rows, or a row per variable and series
 export const EXPORT_MONTHLY_TABLE = {
   ROW_HEIGHT: 26,
@@ -127,6 +164,10 @@ export const EXPORT_MONTHLY_TABLE = {
   LABEL_WIDTH: { SINGLE: 110, MULTI: 250 },
   LABEL_PADDING_X: 10,
   LABEL_FONT_SIZE: 11,
+  // * the unit in a row label, in its chart color
+  UNIT_FONT_WEIGHT: 600,
+  // * px between the plot's month labels and the table below them (city export)
+  GAP_BELOW_PLOT: 10,
   VALUE_FONT_SIZE: 16,
   VALUE_FONT_WEIGHT: 600,
   // * text baselines within a row (px below the row's centre)
@@ -139,10 +180,10 @@ export const EXPORT_MONTHLY_TABLE = {
   GAP_ABOVE: 32,
 } as const;
 
-// * WL export text: month labels under a panel, and the split-panel header lines
+// * WL export text: month labels under a panel, the panel header lines, the Martonne badge
 export const WALTER_LIETH_EXPORT_TEXT = {
   // * every export's month labels (WL and standard), below the frost band's reserved room
-  MONTH_LABEL_OFFSET: 18 + WALTER_LIETH_FROST_BAND_SPACE,
+  MONTH_LABEL_OFFSET: 18 + WALTER_LIETH_FROST.BAND_HEIGHT.FULL,
   MONTH_LABEL_FONT_SIZE: 11,
   PANEL_NAME_Y: 16,
   PANEL_NAME_X: 14,
@@ -152,28 +193,13 @@ export const WALTER_LIETH_EXPORT_TEXT = {
   PANEL_DOT_RADIUS: 4,
   PANEL_SUBTITLE_Y: 34,
   PANEL_TEXT_FONT_SIZE: 12,
-  // * stats cells: label / value / meta rows, the meta row reserved in every panel
-  STATS_Y: 46,
-  STATS_HEIGHT: 58,
-  // * the stats frame: a thin border, a smaller radius than the panel card's
-  STATS_RADIUS: 6,
-  STATS_CELL_PADDING_X: 10,
-  STATS_LABEL_Y: 12,
-  STATS_VALUE_Y: 33,
-  STATS_META_Y: 50,
-  STATS_LABEL_FONT_SIZE: 11,
-  STATS_VALUE_FONT_SIZE: 15,
-  STATS_VALUE_FONT_WEIGHT: 500,
-  STATS_META_FONT_SIZE: 11,
-  // * a Martonne badge and B's delta that don't fit one line: the delta drops a line
-  STATS_META_LINE_HEIGHT: 18,
-  STATS_META_GAP: 6,
+  // * the Martonne class badge (comparison table)
   BADGE_FONT_SIZE: 10,
   BADGE_FONT_WEIGHT: 500,
   BADGE_PADDING_X: 5,
   BADGE_HEIGHT: 15,
   BADGE_RADIUS: 3,
-  // * badge top above the meta baseline, and its text baseline below the badge top
+  // * badge top above the value's baseline, and its text baseline below the badge top
   BADGE_RISE: 11,
   BADGE_TEXT_Y: 11,
 } as const;

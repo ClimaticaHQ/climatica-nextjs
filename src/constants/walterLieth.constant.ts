@@ -64,13 +64,15 @@ export const WALTER_LIETH_PREC_TICKS = {
 export const WALTER_LIETH_AXIS = {
   TICK_FONT_SIZE: 12,
   COMPACT_TICK_FONT_SIZE: 10,
-  // * plot side margins: each y axis' width, from the chart edge to the axis line
-  WIDTH: 34,
-  COMPACT_WIDTH: 24,
+  // * plot side margins: each y axis' width, from the chart edge to the axis line — also the
+  // * monthly values table's unit column, so °C / mm get room beside the months
+  WIDTH: 44,
+  COMPACT_WIDTH: 30,
   // * tick labels sit this far from the axis line, with no tick marks
   TICK_GAP: 4,
   // * °C / mm sit above their axis, this far over the plot top
   UNIT_LABEL_OFFSET: 8,
+  UNIT_LABEL_SIZE_INCREMENT: 6,
   UNIT_LABEL_FONT_WEIGHT: 600,
   // * the dashed line marking tempMax when precipitation widens the plot above it
   REFERENCE_LINE_OPACITY: 0.5,
@@ -92,6 +94,7 @@ export const WALTER_LIETH_COLOR_VARS = {
   ARID_HATCH: "--color-wl-arid-hatch",
   COMPRESSED_FILL: "--color-wl-compressed-fill",
   FROST: "--color-wl-frost",
+  FROST_OUTLINE: "--color-wl-frost-outline",
   SERIES_A: "--color-wl-series-a",
   SERIES_B: "--color-wl-series-b",
 } as const;
@@ -103,6 +106,7 @@ export const WALTER_LIETH_COLORS = {
   ARID_HATCH: `var(${WALTER_LIETH_COLOR_VARS.ARID_HATCH})`,
   COMPRESSED_FILL: `var(${WALTER_LIETH_COLOR_VARS.COMPRESSED_FILL})`,
   FROST: `var(${WALTER_LIETH_COLOR_VARS.FROST})`,
+  FROST_OUTLINE: `var(${WALTER_LIETH_COLOR_VARS.FROST_OUTLINE})`,
   SERIES: {
     [EWalterLiethSeriesId.A]: `var(${WALTER_LIETH_COLOR_VARS.SERIES_A})`,
     [EWalterLiethSeriesId.B]: `var(${WALTER_LIETH_COLOR_VARS.SERIES_B})`,
@@ -117,6 +121,7 @@ export const WALTER_LIETH_LEGEND_PALETTE = {
   aridHatch: WALTER_LIETH_COLORS.ARID_HATCH,
   perhumid: WALTER_LIETH_COLORS.COMPRESSED_FILL,
   frost: WALTER_LIETH_COLORS.FROST,
+  frostOutline: WALTER_LIETH_COLORS.FROST_OUTLINE,
 } as const;
 
 /**
@@ -127,24 +132,21 @@ export const WALTER_LIETH_LEGEND_PALETTE = {
 export const WALTER_LIETH_FROST = {
   // * °C; a month exactly at the threshold is not frost
   THRESHOLD: 0,
-  // * px between the x axis and the band
-  BAND_GAP: 3,
-  BAND_HEIGHT: 6,
-  // * px between neighbouring cells, so each month reads as its own cell
-  CELL_GAP: 1,
+  // * px — directly under the x axis; compact = one panel of a split pair. This room is
+  // * reserved under every plot (standard charts too), frost or not, so sizes never change
+  BAND_HEIGHT: { FULL: 14, COMPACT: 10 },
+  // * px the cell-boundary ticks rise above the x axis
+  TICK_LENGTH: 4,
   STROKE_WIDTH: 1,
 } as const;
 
-// * the frost band on screen: frost in its token, outlines and unknown months neutral
+// * the frost band on screen: frost in its token, the frame / dividers / ticks in the outline
+// * token, months without a minimum neutral
 export const WALTER_LIETH_FROST_PALETTE = {
   frost: WALTER_LIETH_COLORS.FROST,
-  neutral: "var(--color-border)",
+  outline: WALTER_LIETH_COLORS.FROST_OUTLINE,
+  unknown: "var(--color-border)",
 } as const;
-
-// * the band's room under every plot — reserved even without frost (and in standard charts),
-// * so a plot's height never depends on its data and WL and standard plots stay equal
-export const WALTER_LIETH_FROST_BAND_SPACE =
-  WALTER_LIETH_FROST.BAND_GAP + WALTER_LIETH_FROST.BAND_HEIGHT;
 
 /** The single diagram's layer colors — the WL convention (red temperature, blue precipitation). */
 export const WALTER_LIETH_CONVENTION_COLORS = {

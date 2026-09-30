@@ -31,3 +31,7 @@ export * from "./worldclim.constant";
 export * from "./format.constant";
 export * from "./splitPanels.constant";
 export * from "./monthlyTable.constant";
+export * from "./comparisonTable.constant";
+export * from "./location.constant";
+export * from "./monthlyValues.constant";
+export * from "./dataUpdate.constant";
