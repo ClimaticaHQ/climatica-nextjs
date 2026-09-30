@@ -21,13 +21,22 @@ export function useGetMultiPeriodData(
       },
       enabled,
       staleTime: Infinity,
+      // * a filter change keeps each period's data on screen until its refetch lands
+      keepPreviousData: true,
     })),
   });
 
   const isLoading = enabled && queries.some((q) => q.isLoading);
+  const isFetching = enabled && queries.some((q) => q.isFetching);
   const error = queries.find((q) => q.error !== null)?.error ?? null;
   const data = queries.flatMap((q) => (q.data !== undefined ? [q.data] : []));
   const loadingPeriods = enabled ? years.filter((_, i) => queries[i]?.isLoading === true) : [];
 
-  return { data, isLoading, loadingPeriods, error: error instanceof Error ? error : null };
+  return {
+    data,
+    isLoading,
+    isFetching,
+    loadingPeriods,
+    error: error instanceof Error ? error : null,
+  };
 }

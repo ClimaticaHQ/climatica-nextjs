@@ -48,7 +48,7 @@ export function useGetCompareData(
 
   const enabled = latA !== null && lngA !== null && latB !== null && lngB !== null;
 
-  const { data, isLoading, error } = useQuery<TCompareBindings, Error>({
+  const { data, isLoading, isFetching, error } = useQuery<TCompareBindings, Error>({
     queryKey: ["compare", latA, lngA, latB, lngB, gridSize, isClimate ? "climate" : weatherYear],
     queryFn: async (): Promise<TCompareBindings> => {
       if (latA === null || lngA === null || latB === null || lngB === null) {
@@ -93,6 +93,7 @@ export function useGetCompareData(
     cityB,
     availablePeriods,
     isLoading: enabled && isLoading,
+    isFetching: enabled && isFetching,
     error: error ?? null,
   };
 }

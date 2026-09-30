@@ -28,7 +28,7 @@ export function useGetComparePeriods(
   const enabled = lat !== null && lng !== null;
   const isClimate = dataset === DATASETS.CLIMATE;
 
-  const { data, isLoading, error } = useQuery<TComparePeriodBindings, Error>({
+  const { data, isLoading, isFetching, error } = useQuery<TComparePeriodBindings, Error>({
     queryKey: ["compare-periods", lat, lng, gridSize, isClimate ? "climate" : [yearA, yearB]],
     queryFn: async (): Promise<TComparePeriodBindings> => {
       if (lat === null || lng === null) throw new Error("No location selected");
@@ -76,6 +76,7 @@ export function useGetComparePeriods(
     dataB,
     availablePeriods,
     isLoading: enabled && isLoading,
+    isFetching: enabled && isFetching,
     error: error ?? null,
   };
 }
