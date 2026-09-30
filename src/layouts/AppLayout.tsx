@@ -1,6 +1,6 @@
 "use client";
 
-import { NavigationIntentTracker, Sidebar, Topbar } from "@/components";
+import { MotionRoot, NavigationIntentTracker, Sidebar, Topbar } from "@/components";
 import { SidebarSkeleton, TopbarSkeleton } from "@/components/UI";
 import { Suspense, useEffect, useState } from "react";
 
@@ -21,6 +21,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
+      <MotionRoot />
       <NavigationIntentTracker />
       <Suspense fallback={<TopbarSkeleton />}>
         <Topbar
