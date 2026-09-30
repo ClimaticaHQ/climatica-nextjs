@@ -12,6 +12,8 @@ export enum ELegendSwatch {
   ARID = "arid",
   /** WL > 100 mm: solid fill */
   PERHUMID = "perhumid",
+  /** WL frost band: a filled, outlined cell like the band's own */
+  FROST = "frost",
   /** two swatches side by side — one entry serving series A and B (standard split) */
   PAIR = "pair",
 }
