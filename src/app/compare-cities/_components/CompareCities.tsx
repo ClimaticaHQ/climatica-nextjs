@@ -1,6 +1,13 @@
 "use client";
 
-import { APP_TITLE, DATASETS, TIME } from "@/constants";
+import {
+  APP_TITLE,
+  DATASETS,
+  DEFAULT_CHART_MODE,
+  DEFAULT_COMPARE_LAYOUT,
+  TIME,
+  WALTER_LIETH_COMPARISON,
+} from "@/constants";
 import {
   useGetAltitude,
   useGetCompareData,
@@ -10,10 +17,11 @@ import {
   useUrlStateSync,
 } from "@/hooks";
 import { useFiltersStore, useSettingsStore } from "@/stores";
-import type { TChartSubtitle, TCity } from "@/types";
+import type { ECompareLayout, EWalterLiethShading } from "@/enums";
+import type { TChartMode, TChartSubtitle, TCity, TExpandedPanel } from "@/types";
 import { scrollToSection } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { COMPARE_CITIES_URL_SCHEMA } from "./CompareCities.constant";
 import { CompareCitiesView } from "./CompareCitiesView";
 
@@ -27,12 +35,25 @@ export function CompareCities() {
   const { gridSize, dataset, climatePeriod, weatherYear, months, variables } = useFiltersStore();
   const selectedMonths = Array.isArray(months) ? months : null;
 
+  const [layout, setLayout] = useState<ECompareLayout>(DEFAULT_COMPARE_LAYOUT);
+  const [wlShading, setWlShading] = useState<EWalterLiethShading>(
+    WALTER_LIETH_COMPARISON.DEFAULT_SHADING,
+  );
+  const [chartMode, setChartMode] = useState<TChartMode>(DEFAULT_CHART_MODE);
+  // * kept while overlay is shown, so going back to split restores it
+  const [expanded, setExpanded] = useState<TExpandedPanel>(null);
+
   const { pushUrlState, shareUrl } = useUrlStateSync({
     schema: COMPARE_CITIES_URL_SCHEMA,
-    state: { cityA, cityB },
+    state: { cityA, cityB, layout, wlShading, chartMode, expanded },
     onRestore(parsed) {
       if (parsed.cityA) selectCityA(parsed.cityA);
       if (parsed.cityB) selectCityB(parsed.cityB);
+      // * absent param = default, so back/forward to a split URL restores split too
+      setLayout(parsed.layout ?? DEFAULT_COMPARE_LAYOUT);
+      setWlShading(parsed.wlShading ?? WALTER_LIETH_COMPARISON.DEFAULT_SHADING);
+      setChartMode(parsed.chartMode ?? DEFAULT_CHART_MODE);
+      setExpanded(parsed.expanded ?? null);
     },
   });
 
@@ -58,6 +79,7 @@ export function CompareCities() {
     cityA: dataA,
     cityB: dataB,
     isLoading,
+    isFetching,
     error,
   } = useGetCompareData(cityA.lat, cityA.lng, cityB.lat, cityB.lng, gridSize);
 
@@ -112,6 +134,7 @@ export function CompareCities() {
       subtitle={subtitle}
       selectedMonths={selectedMonths}
       isLoading={isLoading}
+      isFetching={isFetching}
       error={error}
       altitudeA={altitudeA}
       altitudeB={altitudeB}
@@ -120,6 +143,13 @@ export function CompareCities() {
       shareUrl={shareUrl}
       onCityASelect={handleCityASelect}
       onCityBSelect={handleCityBSelect}
+      layout={layout}
+      onLayoutChange={setLayout}
+      wlShading={wlShading}
+      onWlShadingChange={setWlShading}
+      chartMode={chartMode}
+      onChartModeChange={setChartMode}
+      panelExpansion={{ expanded, onExpandedChange: setExpanded }}
       chartSectionRef={chartSectionRef}
     />
   );

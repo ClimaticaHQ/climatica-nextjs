@@ -1,13 +1,15 @@
 "use client";
+import { EStatValueSize, EWalterLiethSeriesId } from "@/enums";
 
 import type { TMiniMapLocation } from "@/components";
 import {
-  CompareStatsGrid,
-  DiffCard,
   SearchBar,
   TempPrecipChart,
   useTempPrecipChart,
+  ComparisonTable,
+  StatCard,
 } from "@/components";
+import { DataUpdateProvider } from "@/components/DataUpdate";
 import {
   ChartSkeleton,
   DotLabel,
@@ -22,12 +24,15 @@ import {
 import {
   CELL_SIZE_OPTIONS,
   CLIMATE_COMPARISON_COLORS,
+  VALUE_DIGITS,
   CLIMATE_PERIOD_LABELS,
   COMPARE_EXPORT_SVG_LAYOUT,
+  DATA_UPDATE_NAMES_SEPARATOR,
   DATASETS,
   EXPORT_PNG_SCALE,
+  COMPARE_EXPORT_DEFAULT_VISIBLE,
 } from "@/constants";
-import type { TCompareExportPayload } from "@/types";
+import type { TCompareExportPayload, TVisibleSeries } from "@/types";
 import {
   buildClimateStatsRows,
   buildCompareExportSvg,
@@ -39,9 +44,13 @@ import {
   resolveExportColors,
   shortGridLabel,
   svgToPng,
+  getExportedSeriesLabels,
+  buildComparisonTable,
 } from "@/utils";
+import { getShownChartMode } from "@/utils/chartMode.util";
 import { computeCompareStats, computeDiffStats } from "@/utils/climateComparison.util";
-import { useTranslations } from "next-intl";
+import { useComparisonExport, useFormatNumber, useMonthName, useMonthlyTableLabels } from "@/hooks";
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import type { TCitySearchRowProps, TCompareCitiesViewProps } from "./CompareCities.type";
@@ -74,6 +83,7 @@ export function CompareCitiesView({
   variables,
   shareUrl,
   isLoading,
+  isFetching,
   error,
   altitudeA,
   altitudeB,
@@ -81,8 +91,21 @@ export function CompareCitiesView({
   onCityASelect,
   onCityBSelect,
   chartSectionRef,
+  layout,
+  onLayoutChange,
+  wlShading,
+  onWlShadingChange,
+  chartMode,
+  onChartModeChange,
+  panelExpansion,
 }: TCompareCitiesViewProps) {
   const t = useTranslations();
+  const locale = useLocale();
+  const monthName = useMonthName();
+  const formatNumber = useFormatNumber();
+  const tableLabels = useMonthlyTableLabels();
+  // * reported by the chart — the export follows its chips
+  const [visibleSeries, setVisibleSeries] = useState<TVisibleSeries | null>(null);
   const [activeCity, setActiveCity] = useState(0);
   const chart = useTempPrecipChart({
     ...(dataA ? { dataA } : {}),
@@ -90,12 +113,38 @@ export function CompareCitiesView({
   });
 
   const hasBothData = dataA !== null && dataB !== null;
+  // * the difference reads B − A: the second city against the first
+  const comparisonTable =
+    dataA && dataB
+      ? buildComparisonTable({
+          seriesA: {
+            id: EWalterLiethSeriesId.A,
+            label: cityA.label,
+            data: dataA,
+            altitude: altitudeA,
+          },
+          seriesB: {
+            id: EWalterLiethSeriesId.B,
+            label: cityB.label,
+            data: dataB,
+            altitude: altitudeB,
+          },
+          minuend: EWalterLiethSeriesId.B,
+          locale,
+        })
+      : null;
   const statsA = dataA ? computeCompareStats(dataA) : null;
   const statsB = dataB ? computeCompareStats(dataB) : null;
   const diff = dataA && dataB ? computeDiffStats(dataA, dataB) : null;
 
   const labelA = cityA.label;
   const labelB = cityB.label;
+  const isClimate = subtitle.dataset !== DATASETS.WEATHER;
+  // * WL needs climate normals — with Weather data the page shows the standard chart
+  const shownChartMode = getShownChartMode({
+    chartMode,
+    dataset: isClimate ? DATASETS.CLIMATE : DATASETS.WEATHER,
+  });
 
   const periodLabel =
     subtitle.dataset === DATASETS.CLIMATE && subtitle.climatePeriod
@@ -103,6 +152,33 @@ export function CompareCitiesView({
       : subtitle.weatherYear !== undefined
         ? t("chart.subtitle.weather", { year: subtitle.weatherYear })
         : "";
+
+  // * two-series comparisons — the export then follows chart type, layout and shading exactly
+  const comparisonExport = useComparisonExport({
+    isEnabled: true,
+    chartMode: shownChartMode,
+    layout,
+    shading: wlShading,
+    expanded: panelExpansion.expanded,
+    table: comparisonTable,
+    visible: visibleSeries ?? COMPARE_EXPORT_DEFAULT_VISIBLE,
+    chartDataA: chart.chartDataA,
+    chartDataB: chart.chartDataB,
+    labelA,
+    labelB,
+    compareMode: "cities",
+    cityName: `${labelA} vs ${labelB}`,
+    subtitleText: periodLabel,
+    altitudeA: altitudeA ?? undefined,
+    altitudeB: altitudeB ?? undefined,
+  });
+
+  // * PNG / SVG show the expanded panel alone — the file name says which series
+  const exportedLabels = getExportedSeriesLabels({
+    expanded: comparisonExport?.expanded ?? null,
+    labelA,
+    labelB,
+  });
 
   const noPeriodDataMessage =
     subtitle.dataset === DATASETS.CLIMATE && subtitle.climatePeriod
@@ -155,7 +231,7 @@ export function CompareCitiesView({
       ]);
     }
     rows.push([
-      t("climateComparison.stats.martonne"),
+      t("chart.martonne"),
       statsA.martonneIndex !== null
         ? `${statsA.martonneIndex.toFixed(1)} (${t(getMartonneLabelKey(statsA.martonneIndex))})`
         : "—",
@@ -200,13 +276,15 @@ export function CompareCitiesView({
           colors: seriesColors.B,
         },
       ],
-      visibleSeries: { tmax: true, tmin: true, tavg: false, prec: true },
+      // * the chart's chips, so the export's lines, legend and table follow the screen
+      visibleSeries: visibleSeries ?? COMPARE_EXPORT_DEFAULT_VISIBLE,
       selectedMonths,
       scales: chart.scales,
       rightMax: chart.rightMax,
       labels: {
+        locale,
         monthNames: Array.from({ length: 12 }, (_, i) => t(`months.${i + 1}`)),
-        monthAxisLabel: t("chart.monthAxis"),
+        tableLabels,
         seriesLabels: {
           tmax: t("chart.maxTemperature"),
           tmin: t("chart.minTemperature"),
@@ -219,12 +297,13 @@ export function CompareCitiesView({
           totalPrec: t("climateComparison.stats.totalPrec"),
           aridMonths: t("climateComparison.stats.aridMonths"),
           altitude: t("chart.altitude"),
-          martonne: t("climateComparison.stats.martonne"),
+          martonne: t("chart.martonne"),
         },
       },
       showTavgLine: true,
       datasetAttribution,
       shareUrl,
+      ...(comparisonExport ? { comparison: comparisonExport } : {}),
     };
   }
 
@@ -238,7 +317,7 @@ export function CompareCitiesView({
       width: COMPARE_EXPORT_SVG_LAYOUT.width,
       height,
       scale: EXPORT_PNG_SCALE,
-      filename: buildFilename("compare-cities", [labelA, labelB], "png"),
+      filename: buildFilename("compare-cities", exportedLabels, "png"),
     });
   }
 
@@ -247,7 +326,7 @@ export function CompareCitiesView({
     if (!payload) return;
     const colors = resolveExportColors();
     const { svg } = buildCompareExportSvg(payload, colors);
-    downloadSvgString(svg, buildFilename("compare-cities", [labelA, labelB], "svg"));
+    downloadSvgString(svg, buildFilename("compare-cities", exportedLabels, "svg"));
   }
 
   return (
@@ -285,124 +364,164 @@ export function CompareCitiesView({
           <MiniMap locations={miniMapLocations} activeIndex={activeCity} onToggle={setActiveCity} />
         </div>
 
-        {isLoading ? (
-          <div className="flex flex-col gap-2">
-            <div className="flex h-10 items-center justify-end">
-              <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
+        {/* * around the table, the chart card and the difference cards: each flashes when the
+            data it shows updates */}
+        <DataUpdateProvider
+          series={{ [EWalterLiethSeriesId.A]: dataA, [EWalterLiethSeriesId.B]: dataB }}
+          isFetching={isFetching}
+          announcement={t("loading.dataUpdated", {
+            location: [labelA, labelB].join(DATA_UPDATE_NAMES_SEPARATOR),
+            period: periodLabel,
+          })}
+        >
+          {isLoading ? (
+            <div className="flex flex-col gap-2">
+              <div className="flex h-10 items-center justify-end">
+                <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
+              </div>
+              <div className="flex flex-col gap-6">
+                <TableSkeleton rows={5} cols={2} />
+                <ChartSkeleton />
+              </div>
             </div>
-            <div className="flex flex-col gap-6">
-              <TableSkeleton rows={5} cols={2} />
-              <ChartSkeleton />
+          ) : dataA && dataB && statsA && statsB ? (
+            <div ref={chartSectionRef} className="flex flex-col gap-2">
+              <div className="flex h-10 items-center justify-end">
+                <ExportMenu
+                  onExportCSV={handleExportCSV}
+                  onExportPNG={handleExportPNG}
+                  onExportSVG={handleExportSVG}
+                  // * a refetch in progress: exporting now would save the data being replaced
+                  isDisabled={isFetching}
+                  {...(isFetching ? { disabledReason: t("exportMenu.updating") } : {})}
+                />
+              </div>
+              <div className="flex flex-col gap-6">
+                {comparisonTable && <ComparisonTable table={comparisonTable} />}
+                <TempPrecipChart
+                  onVisibleSeriesChange={setVisibleSeries}
+                  dataA={dataA}
+                  dataB={dataB}
+                  labelA={labelA}
+                  labelB={labelB}
+                  compareMode="cities"
+                  cityName={`${labelA} vs ${labelB}`}
+                  subtitle={subtitle}
+                  variables={variables}
+                  showAridity={false}
+                  layout={layout}
+                  onLayoutChange={onLayoutChange}
+                  wlShading={wlShading}
+                  onWlShadingChange={onWlShadingChange}
+                  chartMode={shownChartMode}
+                  showWalterLiethToggle={isClimate}
+                  onChartModeChange={onChartModeChange}
+                  panelExpansion={panelExpansion}
+                  {...(altitudeA !== null ? { altitudeA } : {})}
+                  {...(altitudeB !== null ? { altitudeB } : {})}
+                  {...(selectedMonths !== null && selectedMonths.length > 0
+                    ? { selectedMonths }
+                    : {})}
+                />
+              </div>
             </div>
-          </div>
-        ) : dataA && dataB && statsA && statsB ? (
-          <div ref={chartSectionRef} className="flex flex-col gap-2">
-            <div className="flex h-10 items-center justify-end">
-              <ExportMenu
-                onExportCSV={handleExportCSV}
-                onExportPNG={handleExportPNG}
-                onExportSVG={handleExportSVG}
+          ) : null}
+
+          {error && !isLoading && <ErrorBanner message={error.message} />}
+
+          {!hasBothData && !isLoading && !error && (
+            <EmptyState
+              message={
+                (dataA === null || dataB === null) && noPeriodDataMessage
+                  ? noPeriodDataMessage
+                  : t("climateComparison.noData")
+              }
+            />
+          )}
+
+          {hasBothData && diff && (
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              <StatCard
+                valueSize={EStatValueSize.LG}
+                label={t("climateComparison.diff.warmerCity")}
+                value={
+                  diff.warmerCity === "tie"
+                    ? t("climateComparison.diff.tie")
+                    : diff.warmerCity === "A"
+                      ? labelA
+                      : labelB
+                }
+                sub={
+                  diff.warmerCity === "tie"
+                    ? t("climateComparison.diff.tieSub")
+                    : t("climateComparison.diff.byDegrees", {
+                        value: formatNumber(diff.tmaxDiff, { digits: VALUE_DIGITS.TEMP }),
+                      })
+                }
+                valueColor={
+                  diff.warmerCity === "A"
+                    ? CLIMATE_COMPARISON_COLORS.A.tmax
+                    : diff.warmerCity === "B"
+                      ? CLIMATE_COMPARISON_COLORS.B.tmax
+                      : undefined
+                }
+              />
+              <StatCard
+                valueSize={EStatValueSize.LG}
+                label={t("climateComparison.diff.moreRain")}
+                value={
+                  diff.moreRainCity === "tie"
+                    ? t("climateComparison.diff.tie")
+                    : diff.moreRainCity === "A"
+                      ? labelA
+                      : labelB
+                }
+                sub={
+                  diff.moreRainCity === "tie"
+                    ? t("climateComparison.diff.tieSub")
+                    : t("climateComparison.diff.byMm", { value: formatNumber(diff.precDiff) })
+                }
+                valueColor={
+                  diff.moreRainCity === "A"
+                    ? CLIMATE_COMPARISON_COLORS.A.tmax
+                    : diff.moreRainCity === "B"
+                      ? CLIMATE_COMPARISON_COLORS.B.tmax
+                      : undefined
+                }
+              />
+              <StatCard
+                valueSize={EStatValueSize.LG}
+                label={t("climateComparison.diff.hottestMonth")}
+                value={monthName(diff.hottestMonthIndex)}
+                sub={t("climateComparison.diff.monthTemps", {
+                  a: labelA,
+                  tempA: t("units.celsiusValue", {
+                    value: formatNumber(diff.hottestTempA, { digits: VALUE_DIGITS.TEMP }),
+                  }),
+                  b: labelB,
+                  tempB: t("units.celsiusValue", {
+                    value: formatNumber(diff.hottestTempB, { digits: VALUE_DIGITS.TEMP }),
+                  }),
+                })}
+              />
+              <StatCard
+                valueSize={EStatValueSize.LG}
+                label={t("climateComparison.diff.coldestMonth")}
+                value={monthName(diff.coldestMonthIndex)}
+                sub={t("climateComparison.diff.monthTemps", {
+                  a: labelA,
+                  tempA: t("units.celsiusValue", {
+                    value: formatNumber(diff.coldestTempA, { digits: VALUE_DIGITS.TEMP }),
+                  }),
+                  b: labelB,
+                  tempB: t("units.celsiusValue", {
+                    value: formatNumber(diff.coldestTempB, { digits: VALUE_DIGITS.TEMP }),
+                  }),
+                })}
               />
             </div>
-            <div className="flex flex-col gap-6">
-              <CompareStatsGrid
-                labelA={labelA}
-                labelB={labelB}
-                statsA={statsA}
-                statsB={statsB}
-                altitudeA={altitudeA}
-                altitudeB={altitudeB}
-                activeColumn={activeCity}
-              />
-              <TempPrecipChart
-                dataA={dataA}
-                dataB={dataB}
-                labelA={labelA}
-                labelB={labelB}
-                compareMode="cities"
-                cityName={`${labelA} vs ${labelB}`}
-                subtitle={subtitle}
-                variables={variables}
-                showWalterLiethToggle={false}
-                showAridity={false}
-                {...(selectedMonths !== null && selectedMonths.length > 0
-                  ? { selectedMonths }
-                  : {})}
-              />
-            </div>
-          </div>
-        ) : null}
-
-        {error && !isLoading && <ErrorBanner message={error.message} />}
-
-        {!hasBothData && !isLoading && !error && (
-          <EmptyState
-            message={
-              (dataA === null || dataB === null) && noPeriodDataMessage
-                ? noPeriodDataMessage
-                : t("climateComparison.noData")
-            }
-          />
-        )}
-
-        {hasBothData && diff && (
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <DiffCard
-              title={t("climateComparison.diff.warmerCity")}
-              value={
-                diff.warmerCity === "tie"
-                  ? t("climateComparison.diff.tie")
-                  : diff.warmerCity === "A"
-                    ? labelA
-                    : labelB
-              }
-              sub={
-                diff.warmerCity === "tie"
-                  ? "="
-                  : t("climateComparison.diff.byDegrees", { value: diff.tmaxDiff.toFixed(1) })
-              }
-              valueColor={
-                diff.warmerCity === "A"
-                  ? CLIMATE_COMPARISON_COLORS.A.tmax
-                  : diff.warmerCity === "B"
-                    ? CLIMATE_COMPARISON_COLORS.B.tmax
-                    : undefined
-              }
-            />
-            <DiffCard
-              title={t("climateComparison.diff.moreRain")}
-              value={
-                diff.moreRainCity === "tie"
-                  ? t("climateComparison.diff.tie")
-                  : diff.moreRainCity === "A"
-                    ? labelA
-                    : labelB
-              }
-              sub={
-                diff.moreRainCity === "tie"
-                  ? "="
-                  : t("climateComparison.diff.byMm", { value: diff.precDiff.toFixed(0) })
-              }
-              valueColor={
-                diff.moreRainCity === "A"
-                  ? CLIMATE_COMPARISON_COLORS.A.tmax
-                  : diff.moreRainCity === "B"
-                    ? CLIMATE_COMPARISON_COLORS.B.tmax
-                    : undefined
-              }
-            />
-            <DiffCard
-              title={t("climateComparison.diff.hottestMonth")}
-              value={diff.hottestMonthName}
-              sub={`${labelA}: ${diff.hottestTempA.toFixed(1)}°C / ${labelB}: ${diff.hottestTempB.toFixed(1)}°C`}
-            />
-            <DiffCard
-              title={t("climateComparison.diff.coldestMonth")}
-              value={diff.coldestMonthName}
-              sub={`${labelA}: ${diff.coldestTempA.toFixed(1)}°C / ${labelB}: ${diff.coldestTempB.toFixed(1)}°C`}
-            />
-          </div>
-        )}
+          )}
+        </DataUpdateProvider>
       </div>
     </PageWrapper>
   );

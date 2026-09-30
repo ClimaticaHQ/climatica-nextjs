@@ -1,6 +1,13 @@
 import { SIDEBAR_PARAMS } from "@/constants";
 import type { TUrlSchema } from "@/types";
-import { cityUrlField, SHARED_FILTER_URL_FIELDS } from "@/utils/urlFields.util";
+import {
+  cityUrlField,
+  chartModeUrlField,
+  expandedPanelUrlField,
+  SHARED_FILTER_URL_FIELDS,
+  compareLayoutUrlField,
+  walterLiethShadingUrlField,
+} from "@/utils/urlFields.util";
 import type { TCompareCitiesUrlState } from "./CompareCities.type";
 
 export const COMPARE_CITIES_URL_SCHEMA: TUrlSchema<TCompareCitiesUrlState> = {
@@ -15,4 +22,8 @@ export const COMPARE_CITIES_URL_SCHEMA: TUrlSchema<TCompareCitiesUrlState> = {
     lng: SIDEBAR_PARAMS.LNG_B,
   }),
   ...SHARED_FILTER_URL_FIELDS,
+  layout: compareLayoutUrlField,
+  wlShading: walterLiethShadingUrlField,
+  chartMode: chartModeUrlField,
+  expanded: expandedPanelUrlField,
 };
