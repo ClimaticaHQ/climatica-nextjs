@@ -1,4 +1,3 @@
-import { MOTION } from "@/constants";
 import { SEGMENTED_CONTROL_CLASSES as C } from "./SegmentedControl.constant";
 import type { TSegmentedControlProps } from "./SegmentedControl.type";
 import { useIndicatorRect } from "./hooks/useIndicatorRect";
@@ -23,11 +22,7 @@ export function SegmentedControl<TValue extends string>({
         <span
           aria-hidden
           className={C.INDICATOR}
-          style={{
-            width: rect.width,
-            transform: `translateX(${rect.left}px)`,
-            transitionDuration: `${MOTION.CONTROL_SLIDE_MS}ms`,
-          }}
+          style={{ width: rect.width, transform: `translateX(${rect.left}px)` }}
         />
       )}
       {options.map((option) => {
