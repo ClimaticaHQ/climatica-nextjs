@@ -13,3 +13,4 @@ export type * from "./walterLieth.type";
 export type * from "./worldclim.type";
 export type * from "./persistedStore.type";
 export type * from "./splitPanels.type";
+export type * from "./numberFormat.type";

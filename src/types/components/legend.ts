@@ -9,6 +9,7 @@ export type TLegendSwatch =
   | { kind: ELegendSwatch.BAR | ELegendSwatch.PERHUMID; color: string }
   | { kind: ELegendSwatch.MARKER; color: string; shape: TLegendMarkerShape }
   | { kind: ELegendSwatch.HUMID | ELegendSwatch.ARID; color: string }
+  | { kind: ELegendSwatch.FROST; color: string; outline: string }
   | { kind: ELegendSwatch.PAIR; a: TLegendSwatch; b: TLegendSwatch };
 
 export type TLegendItem = {
@@ -57,6 +58,13 @@ export type TWalterLiethLegendPalette = {
   aridHatch: string;
   perhumid: string;
   frost: string;
+  frostOutline: string;
+};
+
+/** The frost cell's colors in a legend: its fill and its outline. */
+export type TLegendFrostColors = {
+  fill: string;
+  outline: string;
 };
 
 export type TWalterLiethLegendItemsArgs = {
@@ -77,8 +85,8 @@ export type TWalterLiethOverlayLegendItemsArgs = {
   series: readonly TLegendSeries[];
   /** the shaded series' color; null = no hatching shown */
   shadeColor: string | null;
-  /** the frost band's color — shown with the shaded series' band; null without shading */
-  frostColor: string | null;
+  /** the frost band's colors — shown with the shaded series' band; null without shading */
+  frost: TLegendFrostColors | null;
   /** line-style entries are drawn in this neutral color */
   neutral: string;
 };

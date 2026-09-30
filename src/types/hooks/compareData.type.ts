@@ -14,6 +14,8 @@ export type TUseGetCompareDataReturn = {
   cityB: TMonthlyTemperature[] | null;
   availablePeriods: TClimatePeriod[] | null;
   isLoading: boolean;
+  /** a refetch in progress — the previous data stays until it lands (keepPreviousData) */
+  isFetching: boolean;
   error: Error | null;
 };
 
@@ -27,5 +29,7 @@ export type TUseGetComparePeriodsReturn = {
   dataB: TMonthlyTemperature[] | null;
   availablePeriods: TClimatePeriod[] | null;
   isLoading: boolean;
+  /** a refetch in progress — the previous data stays until it lands (keepPreviousData) */
+  isFetching: boolean;
   error: Error | null;
 };

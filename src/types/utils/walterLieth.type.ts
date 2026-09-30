@@ -5,7 +5,7 @@ import type {
   EWalterLiethSeriesId,
   EWalterLiethShading,
 } from "@/enums";
-import type { TChartSummary, TPanelExpansion, TPanelHeaderSlots } from "../components/chart";
+import type { TActiveMonth, TPanelExpansion, TPanelHeaderSlots } from "../components/chart";
 
 export type TMonthAridity = {
   month: number;
@@ -97,18 +97,12 @@ export type TWalterLiethChartProps = {
   domain: TWalterLiethDomain;
   /** smaller height and header, for one diagram of a split pair */
   isCompact?: boolean;
-  /** false hides the location/period title, e.g. where the surrounding card already shows it */
-  showTitle?: boolean;
   /** false hides the legend, e.g. when a split pair shows one shared legend below both */
   showLegend?: boolean;
   /** one panel of a split pair: its own light card, a series-colored dot before the name */
   isPanel?: boolean;
-  /** series to compare against — its difference is shown under this series' stats (split B) */
-  reference?: TWalterLiethSeries | undefined;
   /** a split panel's header additions — expand / collapse controls, the "vs A" note */
   headerSlots?: TPanelHeaderSlots | undefined;
-  /** an expanded split panel: the plot fills the frame's remaining height */
-  shouldFillHeight?: boolean | undefined;
   /**
    * Recharts syncId — diagrams sharing it hover in sync. Recharts syncs by data index, so
    * every diagram sharing one must use the same month order (and 12 rows each).
@@ -117,8 +111,8 @@ export type TWalterLiethChartProps = {
   /** left-to-right month indices (0 = January); defaults to Jan–Dec */
   monthOrder?: readonly number[];
   /** position (0-based, in monthOrder) of the month highlighted from outside, e.g. a table row */
-  activeMonthIndex?: number | null;
-  onActiveMonthIndexChange?: (index: number | null) => void;
+  activeMonthIndex?: number | null | undefined;
+  onActiveMonthIndexChange?: ((index: number | null) => void) | undefined;
 };
 
 /** One chart row per month, in display order. */
@@ -187,6 +181,8 @@ export type TWalterLiethComparisonProps = {
   shading: EWalterLiethShading;
   /** split: the panel shown across the card — persisted by the page (URL state) */
   expansion: TPanelExpansion;
+  /** the card's hovered month, shared by every chart and strip */
+  activeMonth: TActiveMonth;
 };
 
 /** How one series is painted: WL convention colors, or one series color in overlay. */
@@ -207,42 +203,52 @@ export type TSummaryDeltas = {
   martonne: number | null;
 };
 
-export type TFormatSummaryDeltasArgs = {
-  reference: TChartSummary;
-  summary: TChartSummary;
-  /** the translated, pluralized arid-months difference — the sign is its own argument */
-  formatAridMonths: (sign: string, count: number) => string;
-};
-
 /** Pattern geometry for one plot, in px — see getHatchGeometry. */
-/** The frost band's two colors: frost cells, and the outline / unknown fill (neutral). */
+/** The frost band's colors: certain-frost cells, the outline (frame, dividers, ticks), unknown. */
 export type TWalterLiethFrostPalette = {
   frost: string;
-  neutral: string;
+  outline: string;
+  unknown: string;
 };
 
-/** One frost cell's paint: filled frost, outlined none, neutral unknown. */
-export type TWalterLiethFrostCellPaint = {
-  fill: string;
-  stroke: string;
-};
-
-/** The frost band's cells in px — screen and export draw exactly these rects. */
-export type TWalterLiethFrostCell = TWalterLiethFrostCellPaint & {
-  key: number;
+/** A px rect of the band — a month cell (fill) or the whole band (the frame). */
+export type TWalterLiethFrostRect = {
   x: number;
   y: number;
   width: number;
   height: number;
 };
 
-export type TWalterLiethFrostCellsArgs = {
+export type TWalterLiethFrostCell = TWalterLiethFrostRect & {
+  key: number;
+  /** "none" for a month without frost: the background shows through */
+  fill: string;
+};
+
+/** A cell boundary: the divider down through the band, rising above the axis as a tick. */
+export type TWalterLiethFrostBoundary = {
+  key: number;
+  x: number;
+  y1: number;
+  y2: number;
+};
+
+/** The whole band in px — the screen and the export draw exactly these shapes. */
+export type TWalterLiethFrostBand = {
+  cells: TWalterLiethFrostCell[];
+  boundaries: TWalterLiethFrostBoundary[];
+  frame: TWalterLiethFrostRect;
+};
+
+export type TWalterLiethFrostBandArgs = {
   frost: readonly EWalterLiethFrost[];
   palette: TWalterLiethFrostPalette;
   /** month position → px (month i at the centre of its band) */
   scaleX: (x: number) => number;
-  /** px of the x axis — the band starts WALTER_LIETH_FROST.BAND_GAP below it */
+  /** px of the x axis — the band hangs directly below it */
   axisY: number;
+  /** compact = one panel of a split pair: a lower band */
+  isCompact: boolean;
   monthOrder?: readonly number[];
 };
 
@@ -259,3 +265,5 @@ export type TWalterLiethHatchGeometry = {
   /** vertical distance between arid dot rows */
   dotRowHeight: number;
 };
+
+export type TFormatMonthNameArgs = Pick<TFormatMonthLabelArgs, "locale" | "monthIndex">;

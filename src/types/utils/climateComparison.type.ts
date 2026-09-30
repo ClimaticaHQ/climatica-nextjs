@@ -12,10 +12,11 @@ export type TDiffStats = {
   tmaxDiff: number;
   moreRainCity: "A" | "B" | "tie";
   precDiff: number;
-  hottestMonthName: string;
+  /** 0 = January — named in the UI's locale where shown */
+  hottestMonthIndex: number;
   hottestTempA: number;
   hottestTempB: number;
-  coldestMonthName: string;
+  coldestMonthIndex: number;
   coldestTempA: number;
   coldestTempB: number;
 };

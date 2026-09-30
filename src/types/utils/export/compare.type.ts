@@ -29,6 +29,8 @@ export type TCompareExportStatsRow = {
 };
 
 export type TCompareExportLabels = {
+  /** the UI's locale — the export's numbers read as on screen */
+  locale: string;
   monthNames: string[];
   /** the monthly table's variable labels with units — the screen table's */
   tableLabels: TMonthlyTableLabels;
@@ -71,4 +73,13 @@ export type TStandardSplitLegendArgs = {
   colors: TExportChartColors;
   /** top of the legend block */
   y: number;
+};
+
+/** The standard overlay's values table under its plot. */
+export type TOverlayValuesArgs = {
+  payload: TCompareExportPayload;
+  colors: TExportChartColors;
+  plotLeft: number;
+  plotRight: number;
+  chartBottom: number;
 };

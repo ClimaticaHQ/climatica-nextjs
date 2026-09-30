@@ -5,7 +5,6 @@ import type {
   TChartSummary,
   TDatasetAttribution,
   TMonthAridity,
-  TMonthlyTableLabels,
   TMonthlyTemperature,
   TSeriesKey,
   TVariable,
@@ -25,6 +24,8 @@ export type TExportLocation = {
 export type TExportMonthlyRow = TMonthlyTemperature & { tavg: number | null };
 
 export type TExportLabels = {
+  /** the UI's locale — the export's numbers read as on screen */
+  locale: string;
   periodLabel: string;
   monthNames: string[];
   seriesLabels: Record<TSeriesKey, string>;
@@ -35,8 +36,6 @@ export type TExportLabels = {
     altitude: string;
     martonne: string;
   };
-  /** the monthly table's variable labels with units — the screen table's */
-  tableLabels: TMonthlyTableLabels;
   /** Omitted when summary.martonne is null. */
   martonneClassLabel?: string;
   aridityLegend: {

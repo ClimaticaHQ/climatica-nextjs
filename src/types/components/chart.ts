@@ -18,6 +18,12 @@ export type TChartSubtitle = {
 
 export type TChartMode = "standard" | "walter-lieth";
 
+/** The month hovered or focused in any chart or strip of a card — highlighted in all of them. */
+export type TActiveMonth = {
+  activeMonthIndex: number | null;
+  onActiveMonthIndexChange?: ((index: number | null) => void) | undefined;
+};
+
 /** Which split panel fills the chart card; null = both side by side (the default). */
 export type TExpandedPanel = EWalterLiethSeriesId | null;
 
@@ -61,28 +67,26 @@ export type TChartSummary = {
   martonne: number | null;
 };
 
-/** Formatted differences shown under series B's values — a missing key shows no delta. */
-export type TStatDeltas = {
-  meanTemp?: string;
-  annualPrecip?: string;
-  aridMonths?: string;
-  martonne?: string;
-};
-
 /** Intl month format for chart axis labels: "short" (Jan) or "narrow" (J). */
 export type TMonthLabelFormat = "short" | "narrow";
 
 export type TPlotHeightArgs = {
   /** one panel of a split pair — the compact heights */
   isCompact: boolean;
-  /** an expanded split panel: fill the frame's remaining height, at least the compact height */
-  shouldFillHeight?: boolean | undefined;
 };
 
 /** What a split panel adds to its header: expand / collapse controls, and B's "vs A" note. */
 export type TPanelHeaderSlots = {
   /** top-right of the header, beside the name */
   actions?: ReactNode;
-  /** appended to the period line — e.g. "differences vs Madrid" when A isn't visible */
-  subtitleNote?: string | undefined;
+};
+
+/** Which axis a unit title (°C / mm) belongs to. */
+export type TUnitTitleSide = "left" | "right";
+
+export type TUnitTitlePlacementArgs = {
+  side: TUnitTitleSide;
+  chartWidth: number;
+  /** one panel of a split pair — the compact margins */
+  isCompact: boolean;
 };

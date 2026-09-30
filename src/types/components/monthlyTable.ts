@@ -17,13 +17,16 @@ export type TMonthlyTableSeries = {
   data: readonly TMonthlyTemperatureWithAvg[];
 };
 
-/** A variable's row label with its unit, e.g. "Avg Temp (°C)". */
+/** A variable's row label, e.g. "Avg Temp" — the unit is added (and colored) by the renderer. */
 export type TMonthlyTableLabels = Record<TSeriesKey, string>;
 
 /** One table row: a variable of one series, a formatted value ("—" if missing) per month. */
 export type TMonthlyTableRow = {
   key: string;
+  variable: TSeriesKey;
   variableLabel: string;
+  /** "°C" or "mm" */
+  unit: string;
   seriesLabel?: string | undefined;
   marker?: TMonthlyTableMarker | undefined;
   values: string[];
@@ -33,6 +36,14 @@ export type TMonthlyTableRowsArgs = {
   series: readonly TMonthlyTableSeries[];
   variables: readonly TSeriesKey[];
   labels: TMonthlyTableLabels;
+  /** the UI's locale — the values' decimal separator */
+  locale: string;
+};
+
+export type TFormatMonthlyValueArgs = {
+  variable: TSeriesKey;
+  value: number | null;
+  locale: string;
 };
 
 /** Which variables the table lists: the chart's own — WL's two, or the standard chart's chips. */
