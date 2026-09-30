@@ -16,13 +16,12 @@
 
 ## Features
 
-- **City Climate** — search any city and see temperature/precipitation charts, key stats, and an interactive map
-- **Compare Cities** — compare two cities side-by-side with overlaid charts
-- **Compare Periods** — compare climate across different 30-year baselines for the same city
+- **City Climate** — search any city and see its climate as a Walter-Lieth diagram or a standard climograph, with an interactive map and key stats
+- **Compare Cities / Compare Periods** — compare two cities, or one city across two periods, in side-by-side or overlaid charts, with a table of metrics showing the differences
 - **Regional Heatmap** — draw a region on the map and analyze its climate distribution
 - **Flexible Controls** — switch datasets (climate/weather), variables, grid resolution, and month filters
-- **Multilingual** — English, Spanish, Ukrainian
-- **Export** — save charts as PNG or download data as CSV
+- **Multilingual** — English, French, German, Greek, Italian, Norwegian Bokmål, Portuguese, Romanian, Spanish, Ukrainian
+- **Export** — save charts with stats information as SVG, PNG and download raw data as CSV or JSON
 
 ---
 
