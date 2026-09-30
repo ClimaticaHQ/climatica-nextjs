@@ -1,3 +1,6 @@
+import { Card } from "@/components/Card";
+import { ECardBackground, ECardElevation, ECardPadding } from "@/enums";
+import { MAP_SKELETON_LAYOUT } from "./MapSkeleton.constant";
 import type { TMapSkeletonProps } from "./MapSkeleton.type";
 
 const TILE_OPACITIES = [50, 30, 50, 30, 50, 30, 50, 30, 50] as const;
@@ -7,12 +10,12 @@ export function MapSkeleton({ variant = "full", heightClassName }: TMapSkeletonP
   const height = heightClassName ?? "h-[400px]";
 
   return (
-    <div
-      className={
-        isMini
-          ? "relative h-[120px] w-full shrink-0 animate-pulse overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] sm:h-[160px] sm:w-[260px]"
-          : `relative z-0 w-full animate-pulse overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] shadow-md ${height}`
-      }
+    <Card
+      padding={ECardPadding.NONE}
+      background={ECardBackground.MUTED}
+      elevation={isMini ? ECardElevation.FLAT : ECardElevation.RAISED}
+      shouldClip
+      className={`animate-pulse ${isMini ? MAP_SKELETON_LAYOUT.MINI : `${MAP_SKELETON_LAYOUT.FULL} ${height}`}`}
     >
       {/* Tile grid */}
       <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-px bg-[var(--color-bg)]">
@@ -38,6 +41,6 @@ export function MapSkeleton({ variant = "full", heightClassName }: TMapSkeletonP
       <div className="absolute bottom-1 right-1.5">
         <div className="h-3 w-28 rounded bg-[var(--color-border)] opacity-40" />
       </div>
-    </div>
+    </Card>
   );
 }

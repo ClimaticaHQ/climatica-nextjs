@@ -1,8 +1,10 @@
+import { Card } from "@/components/Card";
+import { ECardPadding } from "@/enums";
 import type { TTableSkeletonProps } from "./TableSkeleton.type";
 
 export function TableSkeleton({ rows = 5, cols = 2 }: TTableSkeletonProps) {
   return (
-    <div className="animate-pulse overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)]">
+    <Card padding={ECardPadding.NONE} shouldClip className="animate-pulse">
       <table className="w-full table-fixed text-[length:var(--font-sm)]">
         <thead>
           <tr className="border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)]">
@@ -35,6 +37,6 @@ export function TableSkeleton({ rows = 5, cols = 2 }: TTableSkeletonProps) {
           ))}
         </tbody>
       </table>
-    </div>
+    </Card>
   );
 }
