@@ -21,7 +21,7 @@ export function useGetHeatmapData(
 ) {
   const enabled = bbox !== null;
 
-  const { data, isLoading, error } = useQuery<THeatmapResult, Error>({
+  const { data, isLoading, isFetching, error } = useQuery<THeatmapResult, Error>({
     queryKey: [
       "heatmap",
       bbox?.north,
@@ -70,12 +70,16 @@ export function useGetHeatmapData(
     enabled,
     staleTime: Infinity,
     retry: 1,
+    // * the old region's cells stay on the map while the new ones load
+    keepPreviousData: true,
   });
 
   return {
-    pixels: data?.pixels ?? null,
-    avg: data?.avg ?? null,
+    // * none once the selection is cleared — the kept data belongs to the old one
+    pixels: enabled ? (data?.pixels ?? null) : null,
+    avg: enabled ? (data?.avg ?? null) : null,
     isLoading: enabled && isLoading,
+    isFetching: enabled && isFetching,
     error: error instanceof Error ? error : null,
   };
 }

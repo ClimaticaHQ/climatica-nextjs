@@ -1,11 +1,49 @@
-import { catmullRomPath } from "@/components/TempPrecipChart/utils/catmullRomPath";
-import type { TExportChartColors, TExportPayload, TLinearScale, TMonthBand } from "@/types";
-import { computeWLAxisTicks, computeWLPrecAxisTicks, precToScaled, scaledToPrec } from "@/utils";
-import { EXPORT_SVG_LAYOUT as L } from "./exportSvg.constant";
-import { linearPath } from "./linearPath.util";
+import {
+  EXPORT_SVG_LAYOUT as L,
+  EXPORT_AXES_STYLE,
+  EXPORT_FONT_FAMILY,
+  EXPORT_LEGEND,
+  EXPORT_UNITS,
+  VALUE_DIGITS,
+  WALTER_LIETH_EXPORT_TEXT,
+} from "@/constants";
+import type {
+  TGridAxesStyle,
+  TUnitTitlesArgs,
+  TExportChartColors,
+  TExportPayload,
+  TFooterTextLine,
+  TLinearScale,
+  TMonthBand,
+  TSvgExportResult,
+} from "@/types";
+import {
+  computeWLAxisTicks,
+  getSharedDomain,
+  getStandardLegendItems,
+  getWalterLiethLegendItems,
+  toWalterLiethMonths,
+  getFrostMonths,
+  formatLatLng,
+  formatNumber,
+} from "@/utils";
+import { buildExportLegend, getWalterLiethExportPalette } from "./legendExport.util";
+import { buildFooterTextLines } from "../shared/footerLines.util";
+import { buildGapAwarePath } from "./gapPath.util";
 import { createLinearScale, monthBandX } from "./scales.util";
+import {
+  buildNotice,
+  buildWalterLiethPanel,
+  getConventionExportPaint,
+} from "./walterLiethExport.util";
+import { getSingleExportPlotBox } from "./exportPlotBox.util";
+import {
+  buildExportValuesRows,
+  buildMonthlyValuesSvg,
+  getValuesTableTop,
+} from "./monthlyValuesExport.util";
 
-function escapeXml(text: string): string {
+export function escapeXml(text: string): string {
   return text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -13,18 +51,12 @@ function escapeXml(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function formatCoordinate(lat: number, lng: number): string {
-  const latDir = lat >= 0 ? "N" : "S";
-  const lngDir = lng >= 0 ? "E" : "W";
-  return `${Math.abs(lat).toFixed(4)}°${latDir}, ${Math.abs(lng).toFixed(4)}°${lngDir}`;
-}
-
-function monthOpacity(month: number, selectedMonths: number[] | null): number {
+export function monthOpacity(month: number, selectedMonths: number[] | null): number {
   if (!selectedMonths || selectedMonths.length === 0) return 1;
   return selectedMonths.includes(month) ? 0.8 : 0.15;
 }
 
-function dotRadius(month: number, selectedMonths: number[] | null): number {
+export function dotRadius(month: number, selectedMonths: number[] | null): number {
   return selectedMonths?.length === 1 && selectedMonths.includes(month) ? 5 : 3;
 }
 
@@ -35,7 +67,7 @@ function dotRadius(month: number, selectedMonths: number[] | null): number {
  * (~1000+) doesn't produce hundreds of overlapping labels. The actual max is
  * appended as a final tick so the axis's real top boundary is always labeled.
  */
-function computeNiceAxisTicks(max: number, targetCount = 6): number[] {
+export function computeNiceAxisTicks(max: number, targetCount = 6): number[] {
   if (max <= 0) return [0];
 
   const roughStep = max / targetCount;
@@ -52,28 +84,36 @@ function computeNiceAxisTicks(max: number, targetCount = 6): number[] {
 
 function buildHeader(payload: TExportPayload, colors: TExportChartColors): string {
   const { location } = payload;
-  const coords = formatCoordinate(location.lat, location.lng);
+  const coords = formatLatLng(location.lat, location.lng);
   const altitudeText = location.altitude !== null ? ` · ${Math.round(location.altitude)} m` : "";
   const subtitle = `${coords}${altitudeText} · ${payload.labels.periodLabel}`;
 
   return `
     <text x="${L.paddingX}" y="${L.headerTitleY}" font-size="24" font-weight="700" fill="${colors.text}">${escapeXml(location.cityName)}</text>
-    <text x="${L.paddingX}" y="${L.headerSubtitleY}" font-size="13" fill="${colors.textSecondary}">${escapeXml(subtitle)}</text>
+    <text x="${L.paddingX}" y="${L.headerSubtitleY}" font-size="${L.headerSubtitleFontSize}" fill="${colors.textSecondary}">${escapeXml(subtitle)}</text>
     <line x1="${L.paddingX}" y1="${L.headerRuleY}" x2="${L.width - L.paddingX}" y2="${L.headerRuleY}" stroke="${colors.border}" stroke-width="1" />
   `;
 }
 
 function buildStatsTable(payload: TExportPayload, colors: TExportChartColors): string {
   const { summary, location, labels } = payload;
+  const { locale } = labels;
+  const number = (value: number | null, digits = 0) => formatNumber(value, { locale, digits });
   const cells: [string, string][] = [
-    [labels.statsLabels.meanTemp, `${summary.annualAvgTemp.toFixed(1)}°C`],
-    [labels.statsLabels.annualPrec, `${summary.totalPrec} mm`],
-    [labels.statsLabels.aridMonths, String(summary.aridCount)],
+    [
+      labels.statsLabels.meanTemp,
+      `${number(summary.annualAvgTemp, VALUE_DIGITS.TEMP)}${EXPORT_UNITS.TEMP}`,
+    ],
+    [labels.statsLabels.annualPrec, `${number(summary.totalPrec)} ${EXPORT_UNITS.PREC}`],
+    [labels.statsLabels.aridMonths, number(summary.aridCount)],
   ];
   if (location.altitude !== null) {
-    cells.push([labels.statsLabels.altitude, `${Math.round(location.altitude)} m`]);
+    cells.push([
+      labels.statsLabels.altitude,
+      `${number(Math.round(location.altitude))} ${EXPORT_UNITS.ALTITUDE}`,
+    ]);
   }
-  const martonneValue = summary.martonne !== null ? summary.martonne.toFixed(1) : "—";
+  const martonneValue = number(summary.martonne, VALUE_DIGITS.MARTONNE);
   const martonneSuffix = labels.martonneClassLabel ? ` (${labels.martonneClassLabel})` : "";
   cells.push([labels.statsLabels.martonne, `${martonneValue}${martonneSuffix}`]);
 
@@ -107,21 +147,24 @@ function buildStatsTable(payload: TExportPayload, colors: TExportChartColors): s
  * precTicks are raw-mm label values; toScalePos maps a raw-mm tick to whatever value
  * precScale's own domain expects, since that differs by mode — standard mode's precScale
  * domain is already raw mm (identity), while Walter-Lieth mode's precScale shares the
- * temp-equivalent scaled domain (tempMin..plotMax), so its ticks go through precToScaled.
+ * temp-equivalent scaled domain (tempMin..plotMax), so its ticks go through toPrecipAxisValue.
  */
-function buildGridAndAxes(
-  payload: TExportPayload,
+export function buildGridAndAxes(
+  scales: { tempMin: number; tempMax: number },
   colors: TExportChartColors,
   tempScale: TLinearScale,
   precScale: TLinearScale,
   plotLeft: number,
   plotRight: number,
+  chartTop: number,
   chartBottom: number,
   precTicks: number[],
   toScalePos: (tick: number) => number,
+  // * WL passes its own (adds the tempMax tick); other charts keep the default steps
+  tempTicks: number[] = computeWLAxisTicks(scales.tempMin, scales.tempMax),
+  axesStyle: TGridAxesStyle = EXPORT_AXES_STYLE,
 ): string {
-  const tempTicks = computeWLAxisTicks(payload.scales.tempMin, payload.scales.tempMax);
-
+  const { tickGap } = axesStyle;
   const gridLines = tempTicks
     .map((tick) => {
       const y = tempScale(tick);
@@ -132,29 +175,36 @@ function buildGridAndAxes(
   const tempLabels = tempTicks
     .map((tick) => {
       const y = tempScale(tick);
-      return `<text x="${plotLeft - 10}" y="${y + 4}" text-anchor="end" font-size="11" fill="${colors.textSecondary}">${Math.round(tick)}</text>`;
+      return `<text x="${plotLeft - tickGap}" y="${y + 4}" text-anchor="end" font-size="11" fill="${colors.textSecondary}">${Math.round(tick)}</text>`;
     })
     .join("");
 
   const precLabels = precTicks
     .map((tick) => {
       const y = precScale(toScalePos(tick));
-      return `<text x="${plotRight + 10}" y="${y + 4}" text-anchor="start" font-size="11" fill="${colors.textSecondary}">${Math.round(tick)}</text>`;
+      return `<text x="${plotRight + tickGap}" y="${y + 4}" text-anchor="start" font-size="11" fill="${colors.textSecondary}">${Math.round(tick)}</text>`;
     })
     .join("");
-
-  const midY = (L.chartTop + chartBottom) / 2;
-  const tempTitleX = plotLeft - 45;
-  const precTitleX = plotRight + 45;
 
   return `
     ${gridLines}
     <line x1="${plotLeft}" y1="${chartBottom}" x2="${plotRight}" y2="${chartBottom}" stroke="${colors.border}" stroke-width="1" />
     ${tempLabels}
     ${precLabels}
-    <text x="${tempTitleX}" y="${midY}" text-anchor="middle" font-size="11" font-weight="600" fill="${colors.textSecondary}" transform="rotate(-90 ${tempTitleX} ${midY})">°C</text>
-    <text x="${precTitleX}" y="${midY}" text-anchor="middle" font-size="11" font-weight="600" fill="${colors.textSecondary}" transform="rotate(90 ${precTitleX} ${midY})">mm</text>
+    ${buildUnitTitles({ plotLeft, plotRight, chartTop, colors, axesStyle })}
   `;
+}
+
+/**
+ * °C / mm above the plot: °C starts at the left axis, mm ends at the right, in the WL
+ * temperature red and precipitation blue — as on screen.
+ */
+function buildUnitTitles({ plotLeft, plotRight, chartTop, colors, axesStyle }: TUnitTitlesArgs) {
+  const font = `font-size="11" font-weight="600"`;
+  const y = chartTop - axesStyle.unitTitlesAbove;
+  return `
+    <text x="${plotLeft}" y="${y}" text-anchor="start" ${font} fill="${colors.wlTemp}">°C</text>
+    <text x="${plotRight}" y="${y}" text-anchor="end" ${font} fill="${colors.wlPrec}">mm</text>`;
 }
 
 function buildBars(
@@ -168,8 +218,9 @@ function buildBars(
 
   return payload.monthlyData
     .map((row, i) => {
+      if (row.prec === null) return "";
       const band = monthBands[i];
-      const isArid = payload.aridity[i]?.isArid ?? false;
+      const isArid = payload.aridity[i]?.isArid === true;
       const barWidth = band.width * 0.6;
       const barX = band.center - barWidth / 2;
       const barY = precScale(row.prec);
@@ -190,18 +241,21 @@ function buildLine(
 ): string {
   if (!payload.visibleSeries[key]) return "";
 
-  const points = payload.monthlyData.map((row, i) => ({
-    x: monthBands[i].center,
-    y: tempScale(row[key]),
-  }));
-  const path = catmullRomPath(points);
+  // * a missing month is a gap in the line and has no dot — never a 0
+  const points = payload.monthlyData.map((row, i) => {
+    const value = row[key];
+    return value !== null ? { x: monthBands[i].center, y: tempScale(value) } : null;
+  });
+  const path = buildGapAwarePath(points);
   const dashArray = key === "tavg" ? ' stroke-dasharray="5 3"' : "";
 
   const dots = payload.monthlyData
     .map((row, i) => {
+      const point = points[i];
+      if (!point) return "";
       const opacity = monthOpacity(row.month, payload.selectedMonths);
       const radius = dotRadius(row.month, payload.selectedMonths);
-      return `<circle cx="${points[i].x.toFixed(2)}" cy="${points[i].y.toFixed(2)}" r="${radius}" fill="${color}" fill-opacity="${opacity}" />`;
+      return `<circle cx="${point.x.toFixed(2)}" cy="${point.y.toFixed(2)}" r="${radius}" fill="${color}" fill-opacity="${opacity}" />`;
     })
     .join("");
 
@@ -222,15 +276,19 @@ function buildStandardBody(
 
   return [
     buildGridAndAxes(
-      payload,
+      payload.scales,
       colors,
       tempScale,
       precScale,
       plotLeft,
       plotRight,
+      L.chartTop,
       chartBottom,
       computeNiceAxisTicks(payload.rightMax),
       (tick) => tick,
+      undefined,
+      // * the WL plot's axes: °C / mm above them, like the screen
+      EXPORT_AXES_STYLE,
     ),
     buildBars(payload, colors, precScale, monthBands, chartBottom),
     buildLine(payload, colors.tmax, "tmax", tempScale, monthBands),
@@ -239,106 +297,44 @@ function buildStandardBody(
   ].join("\n");
 }
 
+// * ids are fixed: the single-city export holds exactly one WL plot
+const WL_EXPORT_IDS = {
+  patternIds: { humid: "wl-export-humid", arid: "wl-export-arid" },
+  clipId: "wl-export-plot-clip",
+};
+
 /**
- * Walter-Lieth plot area — ports WalterLiethCustomized.tsx's technique directly: both curves
- * are mapped through the SAME temp-domain scale (precip run through precToScaled(), matching
- * the live component's precScaled), so the two closed areas share one coordinate space and
- * an evenodd clip can isolate humid-above/arid-above regions without intersection math.
+ * Walter-Lieth plot area — one convention-colored layer in a buildWalterLiethPanel, the same
+ * panel the compare export uses. Domain = getSharedDomain for this one series, exactly what
+ * the live diagram uses.
  */
 function buildWalterLiethBody(
   payload: TExportPayload,
   colors: TExportChartColors,
-  tempScale: TLinearScale,
   plotLeft: number,
   plotRight: number,
   chartBottom: number,
-  monthBands: TMonthBand[],
 ): string {
-  // precScale shares the temp axis's own domain (tempMin..plotMax) so its tick positions —
-  // fed through precToScaled — land exactly where the curves (also drawn via tempScale) do.
-  const precScale = createLinearScale(
-    payload.scales.tempMin,
-    payload.scales.plotMax,
-    chartBottom,
-    L.chartTop,
-  );
-  const precRawMax = scaledToPrec(payload.scales.precMax);
-  // Ticks below tempMin fall outside the shared domain (e.g. a raw-mm tick at 0 sits below
-  // the plot floor once tempMin is above 0°C, as in tropical climates that never freeze).
-  const precTicks = computeWLPrecAxisTicks(precRawMax).filter(
-    (tick) => precToScaled(tick) >= payload.scales.tempMin,
-  );
-  const gridAndAxes = buildGridAndAxes(
-    payload,
+  const box = { left: plotLeft, right: plotRight, top: L.chartTop, bottom: chartBottom };
+  const months = toWalterLiethMonths(payload.monthlyData);
+  if (!months) return buildNotice({ text: payload.labels.walterLiethIncomplete, box, colors });
+
+  return buildWalterLiethPanel({
+    layers: [
+      {
+        months,
+        patternIds: WL_EXPORT_IDS.patternIds,
+        paint: getConventionExportPaint(colors),
+        isShaded: true,
+        dotShape: "circle",
+      },
+    ],
+    domain: getSharedDomain([{ months }]),
     colors,
-    tempScale,
-    precScale,
-    plotLeft,
-    plotRight,
-    chartBottom,
-    precTicks,
-    precToScaled,
-  );
-
-  // Marks where the temperature axis's real range ends, once the shared domain has been
-  // widened to fit tall precipitation (Task 6) — otherwise this would just redraw the
-  // plot's own top edge, so it's skipped for the common non-widened case.
-  const tempCeilingLine =
-    payload.scales.plotMax > payload.scales.tempMax
-      ? `<line x1="${plotLeft}" y1="${tempScale(payload.scales.tempMax)}" x2="${plotRight}" y2="${tempScale(payload.scales.tempMax)}" stroke="${colors.textSecondary}" stroke-opacity="0.5" stroke-dasharray="4 4" />`
-      : "";
-
-  const baselineY = tempScale(payload.scales.tempMin);
-  const tempPts = payload.monthlyData.map((row, i) => ({
-    x: monthBands[i].center,
-    y: tempScale(row.tavg),
-  }));
-  const precPts = payload.monthlyData.map((row, i) => ({
-    x: monthBands[i].center,
-    y: tempScale(precToScaled(row.prec)),
-  }));
-
-  const firstX = tempPts[0].x;
-  const lastX = tempPts[tempPts.length - 1].x;
-  const f = (n: number) => n.toFixed(2);
-
-  const tempLine = linearPath(tempPts);
-  const precLine = linearPath(precPts);
-  const tempArea = `${tempLine} L ${f(lastX)},${f(baselineY)} L ${f(firstX)},${f(baselineY)} Z`;
-  const precArea = `${precLine} L ${f(lastX)},${f(baselineY)} L ${f(firstX)},${f(baselineY)} Z`;
-  const diffPath = `${precArea} ${tempArea}`;
-  const clipId = "wl-export-clip";
-  // tempScale's domain now extends to plotMax (max(tempMax, precMax)), so precip curves
-  // stay within the temp domain by construction — this clip is now a defensive boundary
-  // rather than a mitigation for a known-overflowing domain.
-  const plotClipId = "wl-export-plot-clip";
-
-  const dots = tempPts
-    .map(
-      (p) =>
-        `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="4" fill="${colors.tavg}" stroke="${colors.bg}" stroke-width="1" />`,
-    )
-    .join("");
-
-  return `
-    ${gridAndAxes}
-    ${tempCeilingLine}
-    <defs>
-      <clipPath id="${plotClipId}" clipPathUnits="userSpaceOnUse">
-        <rect x="${plotLeft}" y="${L.chartTop}" width="${plotRight - plotLeft}" height="${chartBottom - L.chartTop}" />
-      </clipPath>
-      <clipPath id="${clipId}" clipPathUnits="userSpaceOnUse">
-        <path d="${diffPath}" clip-rule="evenodd" />
-      </clipPath>
-    </defs>
-    <g clip-path="url(#${plotClipId})">
-      <path d="${precArea}" fill="${colors.humid}" fill-opacity="0.85" clip-path="url(#${clipId})" stroke="none" />
-      <path d="${tempArea}" fill="${colors.arid}" fill-opacity="0.9" clip-path="url(#${clipId})" stroke="none" />
-      <path d="${precLine}" fill="none" stroke="${colors.humid}" stroke-width="1.5" />
-      <path d="${tempLine}" fill="none" stroke="${colors.tavg}" stroke-width="2" />
-      ${dots}
-    </g>
-  `;
+    box,
+    clipId: WL_EXPORT_IDS.clipId,
+    frost: getFrostMonths(months),
+  });
 }
 
 function buildMonthLabels(
@@ -349,143 +345,92 @@ function buildMonthLabels(
 ): string {
   return payload.labels.monthNames
     .map((name, i) => {
-      return `<text x="${monthBands[i].center.toFixed(2)}" y="${chartBottom + 20}" text-anchor="middle" font-size="11" fill="${colors.textSecondary}">${escapeXml(name)}</text>`;
+      return `<text x="${monthBands[i].center.toFixed(2)}" y="${chartBottom + WALTER_LIETH_EXPORT_TEXT.MONTH_LABEL_OFFSET}" text-anchor="middle" font-size="11" fill="${colors.textSecondary}">${escapeXml(name)}</text>`;
     })
     .join("");
 }
 
-function buildLegend(payload: TExportPayload, colors: TExportChartColors): string {
-  const allEntries: { key: "tmax" | "tmin" | "tavg" | "prec"; color: string; label: string }[] = [
-    { key: "tmax", color: colors.tmax, label: payload.labels.seriesLabels.tmax },
-    { key: "tavg", color: colors.tavg, label: payload.labels.seriesLabels.tavg },
-    { key: "tmin", color: colors.tmin, label: payload.labels.seriesLabels.tmin },
-    { key: "prec", color: colors.humid, label: payload.labels.seriesLabels.prec },
-  ];
-  const entries = allEntries.filter((entry) => payload.visibleSeries[entry.key]);
-
-  const itemWidth = 150;
-  const totalWidth = entries.length * itemWidth;
-  let x = (L.width - totalWidth) / 2;
-
-  return entries
-    .map((entry) => {
-      const swatch =
-        entry.key === "prec"
-          ? `<rect x="${x}" y="${L.legendY - 9}" width="14" height="10" fill="${entry.color}" rx="2" />`
-          : `<line x1="${x}" y1="${L.legendY - 4}" x2="${x + 14}" y2="${L.legendY - 4}" stroke="${entry.color}" stroke-width="2" />`;
-      const text = `<text x="${x + 20}" y="${L.legendY}" font-size="12" fill="${colors.text}">${escapeXml(entry.label)}</text>`;
-      x += itemWidth;
-      return swatch + text;
-    })
-    .join("");
+/** The single-city legend — the same items ChartLegend shows for this chart type. */
+function buildLegend(payload: TExportPayload, colors: TExportChartColors, y: number) {
+  const isWalterLieth = payload.chartMode === "walter-lieth";
+  const { seriesLabels, aridityLegend } = payload.labels;
+  const items = isWalterLieth
+    ? getWalterLiethLegendItems({
+        labels: { ...aridityLegend, temp: seriesLabels.tavg, prec: seriesLabels.prec },
+        palette: getWalterLiethExportPalette(colors),
+      })
+    : getStandardLegendItems({
+        labels: { ...seriesLabels, ...aridityLegend },
+        colors: { tmax: colors.tmax, tmin: colors.tmin, tavg: colors.tavg, prec: colors.humid },
+        visible: payload.visibleSeries,
+        aridity: { arid: colors.arid, humid: colors.humid },
+      });
+  return buildExportLegend({
+    items,
+    y,
+    left: L.paddingX,
+    width: L.width - L.paddingX * 2,
+    textColor: colors.textSecondary,
+    idPrefix: "export-legend",
+  });
 }
 
-/** Matches AridityLegend.tsx — only shown when precip bars are visible, since the
- * arid/humid coloring only applies to those bars (StandardClimateChart.tsx). */
-function buildAridityLegend(payload: TExportPayload, colors: TExportChartColors): string {
-  if (!payload.visibleSeries.prec) return "";
-
-  const entries: { color: string; label: string }[] = [
-    { color: colors.arid, label: payload.labels.aridityLegend.arid },
-    { color: colors.humid, label: payload.labels.aridityLegend.humid },
-  ];
-  const itemWidth = 130;
-  const totalWidth = entries.length * itemWidth;
-  let x = (L.width - totalWidth) / 2;
-
-  return entries
-    .map(({ color, label }) => {
-      const swatch = `<rect x="${x}" y="${L.aridityLegendY - 9}" width="12" height="12" fill="${color}" rx="2" />`;
-      const text = `<text x="${x + 18}" y="${L.aridityLegendY}" font-size="11" fill="${colors.textSecondary}">${escapeXml(label)}</text>`;
-      x += itemWidth;
-      return swatch + text;
-    })
-    .join("");
-}
-
-/**
- * Two rows (avg temp, precip) × one column per month — the export counterpart to
- * ClimateDataTable.tsx. Mode-independent (same table regardless of chartMode), so it's
- * called once from buildExportSvg() rather than from either body-assembly function.
- * Follows buildStatsTable()'s conventions: escapeXml on every label/value, a bordered
- * rect spanning paddingX..width-paddingX, divider <line>s at cell boundaries, and the
- * same 11px label / 16px-600 value font scale.
- */
-function buildDataTable(payload: TExportPayload, colors: TExportChartColors): string {
-  const { monthlyData, labels } = payload;
-  const tableWidth = L.width - L.paddingX * 2;
-  const labelColWidth = L.dataTableLabelWidth;
-  const monthColWidth = (tableWidth - labelColWidth) / monthlyData.length;
-  const rowHeight = L.dataTableRowHeight;
-  const tableHeight = rowHeight * 3;
-  const y0 = L.dataTableY;
-
-  const rows: { label: string; format: (d: TExportPayload["monthlyData"][number]) => string }[] = [
-    { label: `${labels.tableLabels.avgTemp} (°C)`, format: (d) => d.tavg.toFixed(1) },
-    { label: `${labels.tableLabels.precip} (mm)`, format: (d) => Math.round(d.prec).toString() },
-  ];
-
-  const colX = (i: number) => L.paddingX + labelColWidth + monthColWidth * i;
-
-  const border = `<rect x="${L.paddingX}" y="${y0}" width="${tableWidth}" height="${tableHeight}" fill="none" stroke="${colors.border}" stroke-width="1" />`;
-
-  const vDividers = [
-    `<line x1="${L.paddingX + labelColWidth}" y1="${y0}" x2="${L.paddingX + labelColWidth}" y2="${y0 + tableHeight}" stroke="${colors.border}" stroke-width="1" />`,
-    ...monthlyData.slice(1).map((_, i) => {
-      const x = colX(i + 1);
-      return `<line x1="${x}" y1="${y0}" x2="${x}" y2="${y0 + tableHeight}" stroke="${colors.border}" stroke-width="1" />`;
+/** The monthly values table under the plot — the page's: °C and mm under the plot's months. */
+function buildValuesTable(
+  payload: TExportPayload,
+  colors: TExportChartColors,
+  chartBottom: number,
+) {
+  const { left, right } = getSingleExportPlotBox(L.chartTop);
+  return buildMonthlyValuesSvg({
+    rows: buildExportValuesRows({
+      series: [
+        {
+          key: "single",
+          label: payload.location.cityName,
+          color: colors.text,
+          data: payload.monthlyData,
+        },
+      ],
+      colors,
+      locale: payload.labels.locale,
     }),
-  ].join("");
-
-  const hDividers = [1, 2]
-    .map((r) => {
-      const y = y0 + rowHeight * r;
-      return `<line x1="${L.paddingX}" y1="${y}" x2="${L.paddingX + tableWidth}" y2="${y}" stroke="${colors.border}" stroke-width="1" />`;
-    })
-    .join("");
-
-  const headerRow = monthlyData
-    .map((_, i) => {
-      const cx = colX(i) + monthColWidth / 2;
-      const cy = y0 + rowHeight / 2 + 4;
-      return `<text x="${cx}" y="${cy}" text-anchor="middle" font-size="11" fill="${colors.textSecondary}">${escapeXml(labels.monthNames[i])}</text>`;
-    })
-    .join("");
-
-  const dataRows = rows
-    .map((row, ri) => {
-      const rowY = y0 + rowHeight * (ri + 1);
-      const labelText = `<text x="${L.paddingX + 10}" y="${rowY + rowHeight / 2 + 4}" text-anchor="start" font-size="11" fill="${colors.textSecondary}">${escapeXml(row.label)}</text>`;
-      const valueTexts = monthlyData
-        .map((d, i) => {
-          const cx = colX(i) + monthColWidth / 2;
-          const cy = rowY + rowHeight / 2 + 5;
-          return `<text x="${cx}" y="${cy}" text-anchor="middle" font-size="16" font-weight="600" fill="${colors.text}">${escapeXml(row.format(d))}</text>`;
-        })
-        .join("");
-      return labelText + valueTexts;
-    })
-    .join("");
-
-  return border + vDividers + hDividers + headerRow + dataRows;
+    span: { left, right },
+    // * the table spans the content width: its gutters are the plot margins inside the padding
+    gutter: L.chartMarginLeft - L.paddingX,
+    top: getValuesTableTop(chartBottom, WALTER_LIETH_EXPORT_TEXT.MONTH_LABEL_OFFSET),
+    colors,
+  });
 }
 
-function buildFooter(payload: TExportPayload, colors: TExportChartColors): string {
-  const text = `Climatica · WorldClim · ${payload.labels.periodLabel}`;
-  return `<text x="${L.paddingX}" y="${L.footerY}" font-size="11" fill="${colors.textSecondary}">${escapeXml(text)}</text>`;
+function renderFooterLines(
+  lines: TFooterTextLine[],
+  colors: TExportChartColors,
+  footerY: number,
+): string {
+  return lines
+    .map(({ text, fontSize }, i) => {
+      const y = footerY + i * L.footerLineHeight;
+      return `<text x="${L.paddingX}" y="${y}" font-size="${fontSize}" fill="${colors.textSecondary}">${escapeXml(text)}</text>`;
+    })
+    .join("\n");
 }
 
-export function buildExportSvg(payload: TExportPayload, colors: TExportChartColors): string {
-  const plotLeft = L.chartMarginLeft;
-  const plotRight = L.width - L.chartMarginRight;
-  const chartBottom = L.chartTop + L.chartHeight;
+export function buildExportSvg(
+  payload: TExportPayload,
+  colors: TExportChartColors,
+): TSvgExportResult {
+  const {
+    left: plotLeft,
+    right: plotRight,
+    bottom: chartBottom,
+  } = getSingleExportPlotBox(L.chartTop);
   const isWalterLieth = payload.chartMode === "walter-lieth";
 
-  // Walter-Lieth mode draws precip through this same scale (see buildWalterLiethBody), so
-  // its ceiling must reach plotMax; standard mode's temp lines only ever need tempMax.
+  // Standard mode only — Walter-Lieth builds its own scale from getSharedDomain.
   const tempScale = createLinearScale(
     payload.scales.tempMin,
-    isWalterLieth ? payload.scales.plotMax : payload.scales.tempMax,
+    payload.scales.tempMax,
     chartBottom,
     L.chartTop,
   );
@@ -499,27 +444,29 @@ export function buildExportSvg(payload: TExportPayload, colors: TExportChartColo
   }));
 
   const plotBody = isWalterLieth
-    ? buildWalterLiethBody(
-        payload,
-        colors,
-        tempScale,
-        plotLeft,
-        plotRight,
-        chartBottom,
-        shiftedBands,
-      )
+    ? buildWalterLiethBody(payload, colors, plotLeft, plotRight, chartBottom)
     : buildStandardBody(payload, colors, tempScale, plotLeft, plotRight, chartBottom, shiftedBands);
+
+  const footerLines = buildFooterTextLines({
+    contextLabel: payload.labels.periodLabel,
+    datasetAttribution: payload.datasetAttribution,
+    shareUrl: payload.shareUrl,
+    layout: L,
+  });
+  // * plot, table, legend, footer — each below the last
+  const table = buildValuesTable(payload, colors, chartBottom);
+  const legend = buildLegend(payload, colors, table.bottom + EXPORT_LEGEND.GAP);
+  const footerY = legend.bottom + L.footerGap;
+  const height = footerY + footerLines.length * L.footerLineHeight + L.footerBottomMargin;
 
   const body = [
     buildHeader(payload, colors),
     buildStatsTable(payload, colors),
     plotBody,
     buildMonthLabels(payload, colors, shiftedBands, chartBottom),
-    `<text x="${(plotLeft + plotRight) / 2}" y="${chartBottom + 40}" text-anchor="middle" font-size="11" font-weight="600" fill="${colors.textSecondary}">${escapeXml(payload.labels.monthAxisLabel)}</text>`,
-    isWalterLieth ? "" : buildLegend(payload, colors),
-    buildAridityLegend(payload, colors),
-    buildDataTable(payload, colors),
-    buildFooter(payload, colors),
+    table.svg,
+    legend.svg,
+    renderFooterLines(footerLines, colors, footerY),
   ].join("\n");
 
   // Built as a joined array, not a single multi-line template literal — a raw
@@ -527,11 +474,13 @@ export function buildExportSvg(payload: TExportPayload, colors: TExportChartColo
   // literal's surrounding return statement, which inserts whitespace BEFORE
   // <?xml ...?>. The XML spec requires the declaration to be the document's
   // very first character, so that whitespace breaks every consumer's parser.
-  return [
+  const svg = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${L.width}" height="${L.height}" viewBox="0 0 ${L.width} ${L.height}" font-family="Inter, Roboto, Helvetica Neue, Arial, sans-serif">`,
-    `<rect width="${L.width}" height="${L.height}" fill="${colors.bg}" />`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${L.width}" height="${height}" viewBox="0 0 ${L.width} ${height}" font-family="${EXPORT_FONT_FAMILY}">`,
+    `<rect width="${L.width}" height="${height}" fill="${colors.bg}" />`,
     body,
     `</svg>`,
   ].join("\n");
+
+  return { svg, height };
 }

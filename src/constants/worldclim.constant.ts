@@ -35,6 +35,15 @@ export const CLIMATE_PERIOD_LABELS: Record<TClimatePeriod, string> = {
   "c1991-2020": "1991–2020",
 };
 
+// * each normals period's first year — orders periods (the comparison's later − earlier)
+export const CLIMATE_PERIOD_START_YEAR: Record<TClimatePeriod, number> = {
+  "c1951-1980": 1951,
+  "c1961-1990": 1961,
+  "c1970-2000": 1970,
+  "c1981-2010": 1981,
+  "c1991-2020": 1991,
+};
+
 /**
  * tavg excluded — derived as (tmax + tmin) / 2
  * BIO variables excluded from sidebar (reserved for advanced filter)

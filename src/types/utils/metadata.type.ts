@@ -1,4 +1,4 @@
-import type { TLocale } from "@/constants";
+import type { TLocale } from "@/types";
 
 export type TSearchParams = Record<string, string | string[] | undefined>;
 

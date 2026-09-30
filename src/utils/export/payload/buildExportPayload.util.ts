@@ -1,12 +1,5 @@
-import type { TBuildExportPayloadParams, TExportPayload, TExportVisibleSeries } from "@/types";
-
-/** Must match TempPrecipChart.tsx's DEFAULT_VISIBLE — the pre-toggle-interaction default. */
-const FALLBACK_VISIBLE_SERIES: TExportVisibleSeries = {
-  tmax: true,
-  tmin: true,
-  tavg: false,
-  prec: true,
-};
+import { DEFAULT_VISIBLE_SERIES } from "@/components/TempPrecipChart/TempPrecipChart.constant";
+import type { TBuildExportPayloadParams, TExportPayload } from "@/types";
 
 export function buildExportPayload(params: TBuildExportPayloadParams): TExportPayload | null {
   const { chartDataSingle, aridity, scales, summary, visibleSeries } = params;
@@ -26,7 +19,7 @@ export function buildExportPayload(params: TBuildExportPayloadParams): TExportPa
     subtitle: params.subtitle,
     variables: params.variables,
     selectedMonths: params.selectedMonths,
-    visibleSeries: visibleSeries ?? FALLBACK_VISIBLE_SERIES,
+    visibleSeries: visibleSeries ?? DEFAULT_VISIBLE_SERIES,
     monthlyData: chartDataSingle,
     summary,
     aridity,
@@ -34,5 +27,7 @@ export function buildExportPayload(params: TBuildExportPayloadParams): TExportPa
     rightMax: params.rightMax,
     chartMode: params.chartMode,
     labels: params.labels,
+    shareUrl: params.shareUrl,
+    datasetAttribution: params.datasetAttribution,
   };
 }

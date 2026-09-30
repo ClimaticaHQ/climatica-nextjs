@@ -1,11 +1,12 @@
 import type { useRouter } from "@/libs/I18nNavigation";
+import type { TLocale } from "@/types";
 
 export type TAppRouter = ReturnType<typeof useRouter>;
 
-/** Structurally matches createUrlParamHelpers's return shape (urlParams.util.ts). */
-export type TUrlParamHelpers = {
-  set: (key: string, val: string) => void;
-  delete: (key: string) => void;
-  changed: boolean;
-  params: URLSearchParams;
+export type TNavigateWithIntentArgs = {
+  router: TAppRouter;
+  /** the route without its locale prefix, as the i18n router takes it */
+  pathname: string;
+  query: Record<string, string>;
+  locale: TLocale;
 };

@@ -1,3 +1,4 @@
+import { FOCUS_RING_CLASS } from "@/constants";
 import type { TFilterChipProps } from "./FilterChip.type";
 
 export default function FilterChip({
@@ -12,7 +13,8 @@ export default function FilterChip({
         type="button"
         onClick={onClick}
         disabled={disabled}
-        className={`whitespace-nowrap rounded-full border px-2.5 py-1 text-sm font-medium transition-colors duration-150 ${
+        aria-pressed={isActive}
+        className={`${FOCUS_RING_CLASS} whitespace-nowrap rounded-full border px-2.5 py-1 text-sm font-medium transition-colors duration-150 ${
           disabled
             ? "cursor-not-allowed border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] opacity-35"
             : isActive

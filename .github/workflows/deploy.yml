@@ -7,18 +7,18 @@ on:
     types: [completed]
   workflow_dispatch:
 
-# workflow_run fires once PER upstream workflow, so a single main push can
-# trigger this job twice (once when Tests completes, once when Validation
-# completes). The "Ensure Tests and Validation passed" step re-checks both
-# for idempotency, but this still stops a second, overlapping run from
-# actually redeploying in parallel.
 concurrency:
   group: deploy-climatica
   cancel-in-progress: false
 
+permissions:
+  actions: read
+  contents: read
+
 jobs:
   deploy:
     runs-on: self-hosted
+    timeout-minutes: 20
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
@@ -27,12 +27,12 @@ jobs:
     env:
       PATH: /home/guiveg/.nvm/versions/node/v25.1.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       REPO_DIR: /home/guiveg/climatica-nextjs
+      DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      DATA_SCRIPT: docker/solr/scripts/prepare_data.py
+      LOCALES_JSON: src/configs/locales.json
+      SOLR_CONFIG: docker/solr/solrconfig.xml
 
     steps:
-      # Manual (workflow_dispatch) runs are a deliberate human override — e.g. a
-      # hotfix or rollback — and skip this gate. Automatic runs must confirm BOTH
-      # workflows succeeded for the exact commit, since workflow_run only tells us
-      # one of them finished, not which, or whether the other one even ran yet.
       - name: Ensure Tests and Validation passed for this commit
         if: github.event_name == 'workflow_run'
         env:
@@ -48,25 +48,174 @@ jobs:
             fi
           done
 
+      - name: Skip if this commit is already deployed
+        id: guard
+        run: |
+          MARKER="$REPO_DIR/.deployed_sha"
+          if [ -f "$MARKER" ]; then
+            OLD_SHA="$(cat "$MARKER")"
+          else
+            OLD_SHA=""
+          fi
+          echo "old_sha=$OLD_SHA" >> "$GITHUB_OUTPUT"
+
+          if [ "$OLD_SHA" == "$DEPLOY_SHA" ]; then
+            echo "Commit $DEPLOY_SHA already deployed — skipping remaining steps."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Mark repository as safe
+        if: steps.guard.outputs.skip != 'true'
         run: git config --global --add safe.directory "$REPO_DIR"
 
       - name: Update repository
-        run: git -C "$REPO_DIR" pull origin main
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          git -C "$REPO_DIR" fetch origin main
+          git -C "$REPO_DIR" reset --hard origin/main
+
+      - name: Check if data-generation inputs changed
+        id: data_script
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          OLD_SHA="${{ steps.guard.outputs.old_sha }}"
+
+          if [ -z "$OLD_SHA" ]; then
+            echo "No previous deploy recorded — will (re)generate cities.csv."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif ! git -C "$REPO_DIR" cat-file -e "$OLD_SHA" 2>/dev/null; then
+            echo "Previous commit $OLD_SHA not found in local history — will (re)generate cities.csv."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            changed_files=$(git -C "$REPO_DIR" diff --name-only "$OLD_SHA" "$DEPLOY_SHA" -- "$DATA_SCRIPT" "$LOCALES_JSON")
+            if [ -z "$changed_files" ]; then
+              echo "Neither $DATA_SCRIPT nor $LOCALES_JSON changed since last deploy — skipping regeneration."
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "Changed since last deploy:"
+              echo "$changed_files"
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Check if Solr core config changed
+        id: solr_config
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          OLD_SHA="${{ steps.guard.outputs.old_sha }}"
+
+          if [ -z "$OLD_SHA" ]; then
+            echo "No previous deploy recorded — will reload Solr core to be safe."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif ! git -C "$REPO_DIR" cat-file -e "$OLD_SHA" 2>/dev/null; then
+            echo "Previous commit $OLD_SHA not found in local history — will reload Solr core to be safe."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            changed_files=$(git -C "$REPO_DIR" diff --name-only "$OLD_SHA" "$DEPLOY_SHA" -- "$SOLR_CONFIG")
+            if [ -z "$changed_files" ]; then
+              echo "$SOLR_CONFIG unchanged since last deploy — no reload needed."
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "$SOLR_CONFIG changed since last deploy — will reload Solr core."
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Generate cities CSV
+        if: steps.guard.outputs.skip != 'true' && steps.data_script.outputs.changed == 'true'
+        run: cd "$REPO_DIR" && python3 "$DATA_SCRIPT"
+
+      - name: Ensure Docker services are running
+        if: steps.guard.outputs.skip != 'true'
+        run: cd "$REPO_DIR/docker" && docker compose up -d
+
+      - name: Wait for Solr to be healthy
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          for i in $(seq 1 15); do
+            status=$(docker inspect --format='{{.State.Health.Status}}' climatica-solr 2>/dev/null)
+            if [ "$status" == "healthy" ]; then
+              echo "Solr is healthy"
+              exit 0
+            fi
+            echo "Waiting for Solr to become healthy ($i/15)..."
+            sleep 5
+          done
+          echo "Solr did not become healthy in time"
+          exit 1
+
+      - name: Reload Solr core if config changed
+        if: steps.guard.outputs.skip != 'true' && steps.solr_config.outputs.changed == 'true'
+        run: |
+          # docker compose up -d is a no-op for an already-running container, so a
+          # solrconfig.xml change (request handlers, fl defaults, etc.) is never
+          # picked up without an explicit core RELOAD — Solr only reads this file
+          # at core load time, not per-request.
+          response=$(curl -s "http://172.17.0.1:8983/solr/admin/cores?action=RELOAD&core=cities")
+          echo "$response"
+          if echo "$response" | jq -e '.error' > /dev/null 2>&1; then
+            echo "::error::Solr core reload failed: $response"
+            exit 1
+          fi
+          echo "Solr core 'cities' reloaded."
+
+      - name: Reindex Solr if empty or data inputs changed
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          get_count() {
+            curl -s "http://172.17.0.1:8983/solr/cities/select?q=*:*&rows=0" | jq -r '.response.numFound'
+          }
+
+          count=$(get_count)
+          echo "Solr 'cities' core has $count documents"
+
+          if [ "$count" -eq 0 ] || [ "${{ steps.data_script.outputs.changed }}" == "true" ]; then
+            if [ "$count" -eq 0 ]; then
+              echo "::warning::Solr 'cities' core is empty — running solr:reindex."
+            else
+              echo "::notice::$DATA_SCRIPT or $LOCALES_JSON changed — forcing solr:reindex with fresh data."
+            fi
+
+            (cd "$REPO_DIR" && npm run solr:reindex)
+
+            count=$(get_count)
+            echo "After reindex: $count documents"
+            if [ "$count" -eq 0 ]; then
+              echo "::error::Solr 'cities' core is still empty after reindex — aborting deploy."
+              exit 1
+            fi
+          fi
+
+      - name: Flush Redis cache if data or Solr config changed
+        if: >
+          steps.guard.outputs.skip != 'true' &&
+          (steps.data_script.outputs.changed == 'true' || steps.solr_config.outputs.changed == 'true')
+        run: |
+          # City search results are cached for 7 days (see README). Without an
+          # explicit flush here, a data/schema/config fix that just shipped would
+          # keep serving stale cached results for up to a week.
+          docker exec climatica-redis redis-cli FLUSHALL
+          echo "Redis cache flushed."
 
       - name: Install dependencies
+        if: steps.guard.outputs.skip != 'true'
         run: cd "$REPO_DIR" && npm ci
 
       - name: Build application
+        if: steps.guard.outputs.skip != 'true'
         run: cd "$REPO_DIR" && npm run build
 
       - name: Restart application
-        run: sudo systemctl restart climatica
+        if: steps.guard.outputs.skip != 'true'
+        run: script -qc "sudo systemctl restart climatica" /dev/null
 
       - name: Verify service is active
+        if: steps.guard.outputs.skip != 'true'
         run: |
           for i in $(seq 1 10); do
-            if sudo systemctl is-active --quiet climatica; then
+            if script -qc "sudo systemctl is-active --quiet climatica" /dev/null; then
               echo "climatica is active"
               exit 0
             fi
@@ -74,5 +223,9 @@ jobs:
             sleep 2
           done
           echo "climatica did not become active in time"
-          sudo systemctl status climatica --no-pager || true
+          script -qc "sudo systemctl status climatica --no-pager" /dev/null || true
           exit 1
+
+      - name: Record deployed commit
+        if: steps.guard.outputs.skip != 'true'
+        run: echo "$DEPLOY_SHA" > "$REPO_DIR/.deployed_sha"

@@ -8,7 +8,7 @@ import type { TLocationSearchProps } from "./LocationSearch.type";
 export function LocationSearch({
   isLocating,
   locationError,
-  defaultValue,
+  cityLabel,
   showLocateButton = true,
   onCitySelect,
   onLocate,
@@ -22,7 +22,7 @@ export function LocationSearch({
         <div className="flex-1">
           <SearchBar
             onCitySelect={onCitySelect}
-            {...(defaultValue !== undefined ? { defaultValue } : {})}
+            {...(cityLabel !== undefined ? { cityLabel } : {})}
           />
         </div>
         {showLocateButton && (

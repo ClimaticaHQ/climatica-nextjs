@@ -1,58 +1,21 @@
-import { MONTH_NAMES } from "@/constants";
-import { useDelayedHide } from "@/hooks";
-import { useTranslations } from "next-intl";
+import { ChartLegend } from "@/components/ChartLegend";
 import {
-  Bar,
-  CartesianGrid,
-  ComposedChart,
-  Legend,
-  Line,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { PrecipBarShape } from "../../components";
-import { PRECIP_BAR_ANIMATION_DURATION_MS } from "../../TempPrecipChart.constant";
+  CHART_PLOT,
+  CHART_LEGEND,
+  CHART_LINE_DASH,
+  MONTH_NAMES,
+  MISSING_VALUE_LABEL,
+  TOOLTIP_DIGITS,
+} from "@/constants";
+import { getMonthLabelFormat, getSeriesLegendItems } from "@/utils";
+import { useDelayedHide, useElementWidth, useFormatNumber, useLegendLabels } from "@/hooks";
+import { useTranslations } from "next-intl";
+import { Bar, ComposedChart, Line, ResponsiveContainer, Tooltip } from "recharts";
+import { useSeriesToggleMotion } from "../../hooks/useSeriesToggleMotion";
+import { PrecipBarShape, StandardChartAxes } from "../../components";
 import type { TDotRendererProps } from "../../TempPrecipChart.type";
-import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle } from "../../utils";
+import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle, periodColor } from "../../utils";
 import type { TMultiPeriodChartProps } from "./MultiPeriodChart.type";
-
-function periodColor(i: number, colors: readonly string[] | undefined): string {
-  return colors?.[i] ?? `var(--color-period-${i})`;
-}
-
-function MultiPeriodLegend({
-  periods,
-  periodColors: colors,
-  hiddenPeriods,
-}: {
-  periods: { year: number }[];
-  periodColors: readonly string[] | undefined;
-  hiddenPeriods: number[];
-}) {
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-3 pt-3" style={{ fontSize: 11 }}>
-      {periods.map(({ year }, i) => {
-        const color = periodColor(i, colors);
-        const isHidden = hiddenPeriods.includes(year);
-        return (
-          <span
-            key={year}
-            className="flex items-center gap-1.5 transition-opacity"
-            style={{ opacity: isHidden ? 0.35 : 1 }}
-          >
-            <span
-              className="inline-block h-2.5 w-2.5 rounded-sm"
-              style={{ backgroundColor: color }}
-            />
-            <span style={{ color }}>{year}</span>
-          </span>
-        );
-      })}
-    </div>
-  );
-}
 
 export function MultiPeriodChart({
   chartData,
@@ -65,9 +28,13 @@ export function MultiPeriodChart({
   hiddenPeriods = [],
 }: TMultiPeriodChartProps) {
   const t = useTranslations();
-  const hidePrecBar = useDelayedHide(!visible.prec, PRECIP_BAR_ANIMATION_DURATION_MS);
-  const hideTmaxLine = useDelayedHide(!visible.tmax, PRECIP_BAR_ANIMATION_DURATION_MS);
-  const hideTminLine = useDelayedHide(!visible.tmin, PRECIP_BAR_ANIMATION_DURATION_MS);
+  const legendLabels = useLegendLabels();
+  const seriesMotion = useSeriesToggleMotion();
+  const formatNumber = useFormatNumber();
+  const { ref: plotRef, width: plotWidth } = useElementWidth<HTMLDivElement>();
+  const hidePrecBar = useDelayedHide(!visible.prec, seriesMotion.toggleMs);
+  const hideTmaxLine = useDelayedHide(!visible.tmax, seriesMotion.toggleMs);
+  const hideTminLine = useDelayedHide(!visible.tmin, seriesMotion.toggleMs);
 
   function localMonthName(v: unknown): string {
     const idx = (MONTH_NAMES as readonly string[]).indexOf(String(v));
@@ -75,7 +42,7 @@ export function MultiPeriodChart({
   }
 
   function makeDot(color: string, isSeriesVisible: boolean) {
-    function DotRenderer({ cx = 0, cy = 0, fill = color, index = -1 }: TDotRendererProps) {
+    function DotRenderer({ cx = 0, cy = 0, index = -1 }: TDotRendererProps) {
       const month = index >= 0 ? index + 1 : -1;
       const isSelected =
         !selectedMonths || selectedMonths.length === 0 || selectedMonths.includes(month);
@@ -86,7 +53,8 @@ export function MultiPeriodChart({
           cx={cx}
           cy={cy}
           r={isHighlighted ? 5 : 3}
-          fill={fill}
+          // * the series color — Recharts passes a white default fill, never wanted here
+          fill={color}
           stroke="none"
           style={buildOpacityFadeStyle(isSeriesVisible ? opacity : 0)}
         />
@@ -96,146 +64,118 @@ export function MultiPeriodChart({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <div className="h-[300px] sm:h-[360px] md:h-[420px] lg:h-[460px] min-w-[520px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart
-            data={chartData}
-            margin={{ top: 20, right: 60, bottom: 50, left: 20 }}
-            barGap={2}
-            barCategoryGap="30%"
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+    <>
+      <div ref={plotRef} className={CHART_PLOT.HEIGHT.FULL}>
+        <div className="h-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart
+              data={chartData}
+              margin={CHART_PLOT.MARGIN}
+              barGap={2}
+              barCategoryGap="30%"
+            >
+              <StandardChartAxes
+                scales={scales}
+                rightMax={rightMax}
+                isCompact={false}
+                monthFormat={getMonthLabelFormat(plotWidth)}
+              />
 
-            <XAxis
-              dataKey="monthName"
-              interval={0}
-              tickFormatter={localMonthName}
-              tick={{ fontSize: 11, fill: "var(--color-text-secondary)" }}
-              label={{
-                value: t("chart.monthAxis"),
-                position: "insideBottom",
-                offset: -10,
-                fill: "var(--color-text-secondary)",
-                fontWeight: 600,
-              }}
-            />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--color-bg)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-md)",
+                  fontSize: 13,
+                }}
+                labelFormatter={localMonthName}
+                formatter={(value, name) => {
+                  // * a missing month is unknown — Number(null) / Number("") would print "0.00"
+                  if (value === null || value === undefined) return [MISSING_VALUE_LABEL, name];
+                  const num = Number(value);
+                  const formatted = isNaN(num)
+                    ? String(value ?? "")
+                    : formatNumber(num, { digits: TOOLTIP_DIGITS.STANDARD });
+                  const isPrecip = String(name).includes(t("chart.precipitation"));
+                  return [`${formatted} ${t(isPrecip ? "units.mm" : "units.celsius")}`, name];
+                }}
+              />
 
-            <YAxis
-              yAxisId="temp"
-              domain={scales ? [scales.tempMin, scales.tempMax] : ["auto", "auto"]}
-              tickFormatter={(v: unknown) => String(Math.round(Number(v)))}
-              tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
-              label={{
-                value: "°C",
-                angle: -90,
-                position: "insideLeft",
-                offset: 12,
-                fill: "var(--color-text-secondary)",
-                fontWeight: 600,
-              }}
-            />
-
-            <YAxis
-              yAxisId="prec"
-              orientation="right"
-              domain={[0, rightMax]}
-              allowDataOverflow={false}
-              tickFormatter={(v: unknown) => String(Math.round(Number(v)))}
-              tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
-              label={{
-                value: "mm",
-                angle: 90,
-                position: "insideRight",
-                offset: 12,
-                fill: "var(--color-text-secondary)",
-                fontWeight: 600,
-              }}
-            />
-
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--color-bg)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius-md)",
-                fontSize: 13,
-              }}
-              labelFormatter={localMonthName}
-              formatter={(value, name) => {
-                const num = Number(value ?? "");
-                const formatted = isNaN(num) ? String(value ?? "") : num.toFixed(2);
-                const isPrecip = String(name).includes(t("chart.precipitation"));
-                return [isPrecip ? `${formatted} mm` : `${formatted} °C`, name];
-              }}
-            />
-
-            <Legend
-              verticalAlign="bottom"
-              height={36}
-              content={() => (
-                <MultiPeriodLegend
-                  periods={multiPeriodData}
-                  periodColors={periodColors}
-                  hiddenPeriods={hiddenPeriods}
-                />
-              )}
-            />
-
-            {multiPeriodData.flatMap(({ year }, i) => {
-              const color = periodColor(i, periodColors);
-              const hidden = hiddenPeriods.includes(year);
-              const series = [];
-              series.push(
-                <Bar
-                  key={`bar-${year}`}
-                  yAxisId="prec"
-                  dataKey={(entry: Record<string, unknown>) =>
-                    visible.prec ? Number(entry[`${year}_prec`]) : 0
-                  }
-                  name={`${year} — ${t("chart.precipitation")}`}
-                  fill={color}
-                  minPointSize={0}
-                  hide={hidden || hidePrecBar}
-                  animationDuration={PRECIP_BAR_ANIMATION_DURATION_MS}
-                  shape={<PrecipBarShape selectedMonths={selectedMonths} />}
-                />,
-              );
-              series.push(
-                <Line
-                  key={`line-tmax-${year}`}
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey={`${year}_tmax`}
-                  name={`${year} — ${t("chart.maxTemperature")}`}
-                  stroke={color}
-                  strokeWidth={2}
-                  dot={makeDot(color, visible.tmax)}
-                  activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tmax ? 1 : 0) }}
-                  hide={hidden || hideTmaxLine}
-                  style={buildStrokeOpacityFadeStyle(visible.tmax ? 1 : 0)}
-                />,
-              );
-              series.push(
-                <Line
-                  key={`line-tmin-${year}`}
-                  yAxisId="temp"
-                  type="monotone"
-                  dataKey={`${year}_tmin`}
-                  name={`${year} — ${t("chart.minTemperature")}`}
-                  stroke={color}
-                  strokeWidth={2}
-                  strokeDasharray="4 2"
-                  dot={makeDot(color, visible.tmin)}
-                  activeDot={{ r: 3, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
-                  hide={hidden || hideTminLine}
-                  style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
-                />,
-              );
-              return series;
-            })}
-          </ComposedChart>
-        </ResponsiveContainer>
+              {multiPeriodData.flatMap(({ year }, i) => {
+                const color = periodColor(i, periodColors);
+                const hidden = hiddenPeriods.includes(year);
+                const series = [];
+                series.push(
+                  <Bar
+                    isAnimationActive={seriesMotion.isAnimationActive}
+                    key={`bar-${year}`}
+                    yAxisId="prec"
+                    dataKey={(entry: Record<string, unknown>) =>
+                      visible.prec ? Number(entry[`${year}_prec`]) : 0
+                    }
+                    name={`${year} — ${t("chart.precipitation")}`}
+                    fill={color}
+                    minPointSize={0}
+                    hide={hidden || hidePrecBar}
+                    animationDuration={seriesMotion.toggleMs}
+                    shape={<PrecipBarShape selectedMonths={selectedMonths} />}
+                  />,
+                );
+                series.push(
+                  <Line
+                    isAnimationActive={seriesMotion.isAnimationActive}
+                    key={`line-tmax-${year}`}
+                    yAxisId="temp"
+                    type="monotone"
+                    dataKey={`${year}_tmax`}
+                    name={`${year} — ${t("chart.maxTemperature")}`}
+                    stroke={color}
+                    strokeWidth={2}
+                    dot={makeDot(color, visible.tmax)}
+                    activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tmax ? 1 : 0) }}
+                    hide={hidden || hideTmaxLine}
+                    style={buildStrokeOpacityFadeStyle(visible.tmax ? 1 : 0)}
+                  />,
+                );
+                series.push(
+                  <Line
+                    isAnimationActive={seriesMotion.isAnimationActive}
+                    key={`line-tmin-${year}`}
+                    yAxisId="temp"
+                    type="monotone"
+                    dataKey={`${year}_tmin`}
+                    name={`${year} — ${t("chart.minTemperature")}`}
+                    stroke={color}
+                    strokeWidth={2}
+                    strokeDasharray={CHART_LINE_DASH.SERIES.tmin}
+                    dot={makeDot(color, visible.tmin)}
+                    activeDot={{ r: 3, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
+                    hide={hidden || hideTminLine}
+                    style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
+                  />,
+                );
+                return series;
+              })}
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
       </div>
-    </div>
+      <ChartLegend
+        items={getSeriesLegendItems({
+          labels: legendLabels,
+          series: multiPeriodData.map(({ year }, i) => ({
+            key: String(year),
+            label: String(year),
+            color: periodColor(i, periodColors),
+            isHidden: hiddenPeriods.includes(year),
+          })),
+          visible,
+          neutral: CHART_LEGEND.NEUTRAL_COLOR,
+          // * years are compared by max / min — no mean line
+          hasTavg: false,
+          aridity: null,
+        })}
+      />
+    </>
   );
 }

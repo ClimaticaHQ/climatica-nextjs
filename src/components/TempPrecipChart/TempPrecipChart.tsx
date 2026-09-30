@@ -1,230 +1,81 @@
+import { Card } from "@/components/Card";
+import { DataUpdateFade, DataUpdateProgress } from "@/components/DataUpdate";
 import {
-  ClimateDataTable,
-  FilterChip,
-  WalterLiethChart,
-  WalterLiethCitiesLayout,
-  WalterLiethPeriodsLayout,
-} from "@/components";
-import { CLIMATE_PERIOD_LABELS, DATASETS } from "@/constants";
-import { TChartMode, TVisibleSeries } from "@/types";
-import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
-import { CompareChart, MultiPeriodChart, StandardClimateChart } from "./charts";
-import { ModeToggle } from "./components";
-import { useTempPrecipChart } from "./hooks";
-import { CalendarIcon, DatabaseIcon } from "./icons";
+  DATA_UPDATE_ALL_SERIES,
+  DEFAULT_CHART_MODE,
+  DEFAULT_COMPARE_LAYOUT,
+  NO_FLASH_KEYS,
+  WALTER_LIETH_COMPARISON,
+} from "@/constants";
+import { ECompareLayout } from "@/enums";
+import type { TChartMode } from "@/types";
+import { useId } from "react";
+import { ChartBody, ChartHeader, SecondaryControls } from "./components";
+import { useChartSeries, useSubtitleText, useTempPrecipChart, useVisibleSeries } from "./hooks";
+import { CHART_CARD_LAYOUT_CLASS, NO_PANEL_EXPANSION } from "./TempPrecipChart.constant";
 import type { TTempPrecipChartProps } from "./TempPrecipChart.type";
-import { resolveVisibleSeries } from "./utils";
-
-const DEFAULT_VISIBLE: TVisibleSeries = { tmax: true, tmin: true, tavg: false, prec: true };
 
 export function TempPrecipChart(props: TTempPrecipChartProps) {
-  const t = useTranslations();
-  const [visible, setVisible] = useState<TVisibleSeries>(() =>
-    resolveVisibleSeries(props.variables, DEFAULT_VISIBLE),
-  );
-  const [chartMode, setChartMode] = useState<TChartMode>("standard");
-  const [prevVariables, setPrevVariables] = useState(props.variables);
-
-  /** Render-phase state update — intentional; avoids a stale-render flash from useEffect */
-  if (props.variables !== prevVariables) {
-    setPrevVariables(props.variables);
-    setVisible((prev) => resolveVisibleSeries(props.variables, prev));
-  }
-
-  useEffect(() => {
-    props.onVisibleSeriesChange?.(visible);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
-
-  useEffect(() => {
-    props.onChartModeChange?.(chartMode);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartMode]);
-
+  const { visible, setVisible } = useVisibleSeries(props);
+  // * controlled by the page (URL state), so shared links open in the same mode
+  const chartMode: TChartMode = props.chartMode ?? DEFAULT_CHART_MODE;
   const chart = useTempPrecipChart(props);
+  const subtitleText = useSubtitleText(props.subtitle);
+  const syncId = useId();
+  const { seriesSingle, comparison } = useChartSeries({ chartProps: props, chart, subtitleText });
+  const layout = props.layout ?? DEFAULT_COMPARE_LAYOUT;
+  // * in the split layout the panels flash, not the card around them
+  const isSplit = chart.isCompare && layout === ECompareLayout.SPLIT;
 
   if (!chart.hasData) return null;
 
   const canUseWalterLieth = props.showWalterLiethToggle !== false && !chart.isMultiPeriod;
   const isWalterLieth = canUseWalterLieth && chartMode === "walter-lieth";
-  const showAridity = props.showAridity !== false;
-  const activeCount = Object.values(visible).filter(Boolean).length;
-
-  function handleToggle(key: keyof TVisibleSeries) {
-    if (visible[key] && activeCount === 1) return;
-    setVisible((prev) => ({ ...prev, [key]: !prev[key] }));
-  }
-
-  const selectedMonthsCount = !chart.isCompare ? (props.selectedMonths?.length ?? 0) : 0;
-  const isPartialMonthFilter = selectedMonthsCount > 0 && selectedMonthsCount < 12;
-  const selectedMonth =
-    isPartialMonthFilter && props.selectedMonths?.length === 1 ? props.selectedMonths[0] : null;
-  const showMonthsCountBadge = isPartialMonthFilter && selectedMonthsCount >= 2;
-
-  const subtitleText = props.subtitle
-    ? (props.subtitle.rawLabel ??
-      (props.subtitle.dataset === DATASETS.CLIMATE && props.subtitle.climatePeriod
-        ? t("chart.subtitle.climate", {
-            period: CLIMATE_PERIOD_LABELS[props.subtitle.climatePeriod],
-          })
-        : props.subtitle.weatherYear !== undefined
-          ? t("chart.subtitle.weather", { year: props.subtitle.weatherYear })
-          : null))
-    : null;
-
-  const storeVarSet = new Set<string>(props.variables ?? []);
-
-  const chips: { key: keyof TVisibleSeries; label: string }[] = [
-    { key: "tmax", label: t("sidebar.variables.tmax") },
-    { key: "tmin", label: t("sidebar.variables.tmin") },
-    { key: "tavg", label: t("sidebar.variables.tavg") },
-    { key: "prec", label: t("sidebar.variables.prec") },
-  ];
+  // * kept across chart types; overlay ignores it, going back to split restores it
+  const expansion = props.panelExpansion ?? NO_PANEL_EXPANSION;
 
   return (
-    <div className="w-full overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4 shadow-sm">
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        {canUseWalterLieth && <ModeToggle mode={chartMode} onChange={setChartMode} />}
-        {props.cityName && (
-          <div className="flex flex-col gap-0.5">
-            <h3 className="font-semibold text-[length:var(--font-md)] md:text-[length:var(--font-lg)] text-[var(--color-text)]">
-              {t("chart.title")}: {props.cityName}
-            </h3>
-            {(!!subtitleText ||
-              (!isWalterLieth && (selectedMonth !== null || showMonthsCountBadge))) && (
-              <div className="flex flex-wrap items-center gap-2">
-                {!!subtitleText && (
-                  <span className="flex items-center gap-1 text-[12px] text-[var(--color-text-secondary)]">
-                    <DatabaseIcon />
-                    {subtitleText}
-                  </span>
-                )}
-                {!isWalterLieth && (selectedMonth !== null || showMonthsCountBadge) && (
-                  <span className="flex items-center gap-1" style={{ color: "#1a6fa0" }}>
-                    <CalendarIcon />
-                    <span
-                      style={{
-                        fontSize: 12,
-                        padding: "3px 10px",
-                        borderRadius: 20,
-                        background: "#e8f4fd",
-                        border: "0.5px solid #b3d9f5",
-                        color: "#1a6fa0",
-                      }}
-                    >
-                      {selectedMonth !== null
-                        ? t(`months.${selectedMonth}`)
-                        : t("chart.selectedMonthsCount", { count: selectedMonthsCount })}
-                    </span>
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-        <div className="ml-auto flex flex-wrap gap-2">
-          {chips.map(({ key, label }) => {
-            const isLastActive = visible[key] && activeCount === 1;
-            const isDisabledInWL = isWalterLieth;
-            const isUnavailable =
-              props.variables !== undefined && key !== "tavg" && !storeVarSet.has(key);
-            return (
-              <div
-                key={key}
-                title={isDisabledInWL ? t("chart.walterLiethTabUnavailable") : undefined}
-                className={
-                  isLastActive || isDisabledInWL || isUnavailable
-                    ? "pointer-events-none cursor-not-allowed opacity-40"
-                    : ""
-                }
-              >
-                <FilterChip
-                  label={label}
-                  isActive={visible[key] && !isDisabledInWL && !isUnavailable}
-                  onClick={() => handleToggle(key)}
-                />
-              </div>
-            );
-          })}
-        </div>
-      </div>
+    <Card
+      flashKeys={isSplit ? NO_FLASH_KEYS : (props.flashKeys ?? DATA_UPDATE_ALL_SERIES)}
+      shouldClip
+      // * a comparison below `sm`: the panel cards frame the diagrams, so this card goes flat
+      isFlatBelowSm={chart.isCompare}
+      className={CHART_CARD_LAYOUT_CLASS}
+    >
+      <DataUpdateProgress />
+      <ChartHeader
+        chartProps={props}
+        chartMode={chartMode}
+        isWalterLieth={isWalterLieth}
+        canUseWalterLieth={canUseWalterLieth}
+        isCompare={chart.isCompare}
+        layout={layout}
+        subtitleText={subtitleText}
+      />
+      <SecondaryControls
+        isWalterLieth={isWalterLieth}
+        isOverlay={chart.isCompare && layout === ECompareLayout.OVERLAY}
+        comparison={comparison}
+        shading={props.wlShading ?? WALTER_LIETH_COMPARISON.DEFAULT_SHADING}
+        onShadingChange={(shading) => props.onWlShadingChange?.(shading)}
+        visible={visible}
+        variables={props.variables}
+        onVisibleChange={setVisible}
+      />
 
-      {isWalterLieth && !chart.isCompare ? (
-        <WalterLiethChart
-          chartData={chart.chartDataSingle}
-          scales={chart.scales}
-          summary={chart.summary}
-          activeMonthIndex={chart.activeMonthIndex}
-          onActiveMonthIndexChange={chart.setActiveMonthIndex}
-          {...(props.altitude !== undefined ? { altitude: props.altitude } : {})}
-        />
-      ) : isWalterLieth && props.compareMode === "periods" ? (
-        <WalterLiethPeriodsLayout
-          chartDataA={chart.chartDataA}
-          chartDataB={chart.chartDataB}
-          scales={chart.scales}
-          labelA={props.labelA ?? ""}
-          labelB={props.labelB ?? ""}
-          summaryA={chart.summaryA}
-          summaryB={chart.summaryB}
-        />
-      ) : isWalterLieth ? (
-        <WalterLiethCitiesLayout
-          chartDataA={chart.chartDataA}
-          chartDataB={chart.chartDataB}
-          labelA={props.labelA ?? ""}
-          labelB={props.labelB ?? ""}
-          scales={chart.scales}
-          summaryA={chart.summaryA}
-          summaryB={chart.summaryB}
-        />
-      ) : chart.isMultiPeriod ? (
-        <MultiPeriodChart
-          chartData={chart.chartData}
-          multiPeriodData={props.multiPeriodData ?? []}
+      <DataUpdateFade>
+        <ChartBody
+          chartProps={props}
+          chart={chart}
+          seriesSingle={seriesSingle}
+          comparison={comparison}
           visible={visible}
-          scales={chart.scales}
-          rightMax={chart.rightMax}
-          {...(props.selectedMonths !== undefined ? { selectedMonths: props.selectedMonths } : {})}
-          {...(props.periodColors !== undefined ? { periodColors: props.periodColors } : {})}
-          {...(props.hiddenPeriods !== undefined ? { hiddenPeriods: props.hiddenPeriods } : {})}
+          isWalterLieth={isWalterLieth}
+          layout={layout}
+          syncId={syncId}
+          expansion={expansion}
         />
-      ) : chart.isCompare ? (
-        <CompareChart
-          chartData={chart.chartData}
-          visible={visible}
-          scales={chart.scales}
-          rightMax={chart.rightMax}
-          showAridity={showAridity}
-          aridityA={chart.aridityA}
-          {...(props.labelA !== undefined ? { labelA: props.labelA } : {})}
-          {...(props.labelB !== undefined ? { labelB: props.labelB } : {})}
-          {...(props.selectedMonths !== undefined ? { selectedMonths: props.selectedMonths } : {})}
-        />
-      ) : (
-        <StandardClimateChart
-          chartData={chart.chartData}
-          aridity={chart.aridity}
-          scales={chart.scales}
-          rightMax={chart.rightMax}
-          summary={chart.summary}
-          visible={visible}
-          showAridity={showAridity}
-          activeMonthIndex={chart.activeMonthIndex}
-          onActiveMonthIndexChange={chart.setActiveMonthIndex}
-          {...(props.selectedMonths !== undefined ? { selectedMonths: props.selectedMonths } : {})}
-          {...(props.altitude !== undefined ? { altitude: props.altitude } : {})}
-        />
-      )}
-
-      {!chart.isCompare && !chart.isMultiPeriod && (
-        <ClimateDataTable
-          monthlyData={chart.chartDataSingle}
-          activeMonthIndex={chart.activeMonthIndex}
-          onMonthHover={chart.setActiveMonthIndex}
-        />
-      )}
-    </div>
+      </DataUpdateFade>
+    </Card>
   );
 }

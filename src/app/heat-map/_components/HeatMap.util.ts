@@ -1,17 +1,42 @@
-import type { TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
-import { CELL_SIZE_OPTIONS, GRID_DELTA, MONTH_NAMES } from "@/constants";
+import type { TPolygon, TUrlField, TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
+import { GRID_DELTA, MONTH_NAMES, SIDEBAR_PARAMS } from "@/constants";
 import { iriToCellBounds } from "@/utils";
+import { parseCoord } from "@/utils/urlParams.util";
 import type { TCellBounds, TCellSize } from "@/types";
 import type {
   THeatmapStats,
+  THeatMapSelectionValue,
   TLooseBinding,
-  TPolygon,
   TRegionalProfile,
   TSumAndCount,
 } from "./HeatMap.type";
 
 export { GRID_DELTA, iriToCellBounds };
 export type { TCellBounds, TCellSize };
+
+/** A cell's bounds either come straight off the binding's own lat/lng (± half a
+ * cell), or — when those aren't present — get derived from its cell IRI. Shared
+ * by the live HeatmapLayer and the SVG export, so both draw the exact same
+ * rectangles from the exact same bindings. */
+export function resolveCellBounds(
+  binding: TWorldClimBoxBinding,
+  cellSize: number,
+): TCellBounds | null {
+  const lat = parseFloat(binding.lat?.value ?? "");
+  const lng = parseFloat(binding.lng?.value ?? "");
+
+  if (!isNaN(lat) && !isNaN(lng)) {
+    return {
+      north: lat + cellSize / 2,
+      south: lat - cellSize / 2,
+      west: lng - cellSize / 2,
+      east: lng + cellSize / 2,
+    };
+  }
+
+  const iri = binding.cell?.value;
+  return iri ? iriToCellBounds(iri, cellSize) : null;
+}
 
 /** Candidate key sets — SPARQL variable names are API-defined; fallbacks cover naming variants */
 const KEY_SETS = [
@@ -143,10 +168,19 @@ export function gridDelta(gridSize: string): number {
   return GRID_DELTA[gridSize] ?? GRID_DELTA["10m"];
 }
 
+// 5 decimal places is ~1m of precision at the equator -- far finer than any
+// WorldClim grid cell -- and keeps the polygon short in query/share URLs.
+const WKT_COORDINATE_PRECISION = 5;
+
 /** lng lat order in WKT spec — note the inversion from the [lat, lng] input */
 export function polygonToWkt(vertices: [number, number][]): string {
   const ring = [...vertices, vertices[0]];
-  const coords = ring.map(([lat, lng]) => `${lng} ${lat}`).join(", ");
+  const coords = ring
+    .map(
+      ([lat, lng]) =>
+        `${lng.toFixed(WKT_COORDINATE_PRECISION)} ${lat.toFixed(WKT_COORDINATE_PRECISION)}`,
+    )
+    .join(", ");
   return `POLYGON((${coords}))`;
 }
 
@@ -164,10 +198,36 @@ export function wktToPolygon(wkt: string): TPolygon | null {
   return vertices;
 }
 
-/** "2.5 min" from "2.5 min (~20.25 km²)" */
-export function shortGridLabel(gridSize: TCellSize): string {
-  return CELL_SIZE_OPTIONS[gridSize]?.split(" (~")[0] ?? gridSize;
-}
+/** Polygon and bbox are mutually exclusive — polygon (if present) always wins on parse. */
+export const selectionUrlField: TUrlField<THeatMapSelectionValue> = {
+  serialize(value, params) {
+    if (value.kind === "polygon") {
+      params.set(SIDEBAR_PARAMS.POLYGON, polygonToWkt(value.polygon));
+    } else if (value.kind === "bbox") {
+      params.set(SIDEBAR_PARAMS.BBOX_NORTH, String(value.bbox.north));
+      params.set(SIDEBAR_PARAMS.BBOX_SOUTH, String(value.bbox.south));
+      params.set(SIDEBAR_PARAMS.BBOX_WEST, String(value.bbox.west));
+      params.set(SIDEBAR_PARAMS.BBOX_EAST, String(value.bbox.east));
+    }
+  },
+  parse(params) {
+    const polygonRaw = params.get(SIDEBAR_PARAMS.POLYGON);
+    if (polygonRaw !== null) {
+      const polygon = wktToPolygon(polygonRaw);
+      return polygon ? { kind: "polygon", polygon } : { kind: "none" };
+    }
+
+    const north = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_NORTH));
+    const south = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_SOUTH));
+    const west = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_WEST));
+    const east = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_EAST));
+    if (north !== null && south !== null && west !== null && east !== null) {
+      return { kind: "bbox", bbox: { north, south, west, east } };
+    }
+
+    return { kind: "none" };
+  },
+};
 
 /**
  * Returns a short month string for the summary bar.

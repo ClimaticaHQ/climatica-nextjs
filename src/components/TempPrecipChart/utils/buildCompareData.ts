@@ -1,21 +1,23 @@
 import type { TComparePoint, TMonthlyTemperature } from "@/types";
+import { getMonthlyMean } from "@/utils/monthlyClimate.util";
 
 export function buildCompareData(
   dataA: TMonthlyTemperature[],
   dataB: TMonthlyTemperature[],
 ): TComparePoint[] {
   return dataA.map((a, i) => {
-    const b = dataB[i] ?? { tmax: 0, tmin: 0, prec: 0 };
+    // * a month B lacks stays null (a gap), never 0
+    const b = dataB[i] ?? { tmax: null, tmin: null, prec: null };
     return {
       month: a.month,
       monthName: a.monthName,
       tmaxA: a.tmax,
       tminA: a.tmin,
-      tavgA: (a.tmax + a.tmin) / 2,
+      tavgA: getMonthlyMean(a),
       precA: a.prec,
       tmaxB: b.tmax,
       tminB: b.tmin,
-      tavgB: (b.tmax + b.tmin) / 2,
+      tavgB: getMonthlyMean(b),
       precB: b.prec,
     };
   });

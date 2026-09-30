@@ -4,7 +4,7 @@ import {
   APP_TITLE,
   CLIMATE_PERIOD_LABELS,
   DATASETS,
-  SIDEBAR_PARAMS,
+  DEFAULT_CHART_MODE,
   TIME,
   VARIABLE_LABELS,
 } from "@/constants";
@@ -13,33 +13,21 @@ import {
   useGetAltitude,
   useGetCellBounds,
   useGetClimateData,
+  useGetDatasetVersion,
   usePersistedCity,
   usePersistedComparisonCities,
   useResolveCityByCoordinates,
+  useUrlStateSync,
 } from "@/hooks";
-import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { useFiltersStore, useSettingsStore } from "@/stores";
-import type { TChartSubtitle, TWikidataCity } from "@/types";
-import {
-  applyUrlFiltersToStore,
-  cityFromUrl,
-  createUrlParamHelpers,
-  encodeMonths,
-  encodeVars,
-  pushUrlParams,
-  scrollToSection,
-  syncUrlParams,
-} from "@/utils";
+import type { TChartMode, TChartSubtitle, TCity } from "@/types";
+import { scrollToSection, getLocationName } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { CLIMATE_STATISTICS_URL_SCHEMA } from "./ClimateStatistics.constant";
 import { formatCoordinate } from "./ClimateStatistics.util";
 import { ClimateStatisticsView } from "./ClimateStatisticsView";
-
-function resolveCityName(city: TWikidataCity): string {
-  return /^Q\d+$/.test(city.label) ? city.description : city.label;
-}
 
 export function ClimateStatistics() {
   const t = useTranslations();
@@ -53,9 +41,6 @@ export function ClimateStatistics() {
   const latestMapClickIdRef = useRef(0);
   const userSelectedRef = useRef(false);
   const chartSectionRef = useRef<HTMLDivElement>(null);
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
 
   const { dataset, climatePeriod, weatherYear, gridSize, months, variables } = useFiltersStore();
   const selectedMonths: number[] | null = Array.isArray(months) ? months : null;
@@ -66,78 +51,29 @@ export function ClimateStatistics() {
     }
   }, [selectedCity.lat, selectedCity.lng]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [chartCityName, setChartCityName] = useState<string>(() => resolveCityName(selectedCity));
+  // * from the current city — URL, persisted or picked — never a value captured on first render
+  const chartCityName = getLocationName(selectedCity);
 
   const subtitle: TChartSubtitle =
     dataset === DATASETS.CLIMATE
       ? { dataset: DATASETS.CLIMATE, climatePeriod }
       : { dataset: DATASETS.WEATHER, weatherYear };
 
-  // Restore city and filters from URL once on mount
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    const cityLabel = searchParams.get(SIDEBAR_PARAMS.CITY);
-    const urlCity = cityFromUrl(
-      searchParams.get(SIDEBAR_PARAMS.LAT),
-      searchParams.get(SIDEBAR_PARAMS.LNG),
-      cityLabel,
-    );
-    if (urlCity) {
-      selectCity(urlCity);
-      if (cityLabel) setChartCityName(cityLabel);
-    }
+  const [chartMode, setChartMode] = useState<TChartMode>(DEFAULT_CHART_MODE);
 
-    applyUrlFiltersToStore(searchParams, useFiltersStore.getState().actions, {
-      includeMonths: true,
-    });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  /* eslint-enable react-hooks/set-state-in-effect */
-
-  // Sync all shareable state → URL (replace, no history pollution)
-  const cityLabel = selectedCity.label.trim();
-  const latStr = selectedCity.lat.toFixed(4);
-  const lngStr = selectedCity.lng.toFixed(4);
-  const varsStr = useMemo(() => encodeVars(variables), [variables]);
-  const monthsStr = useMemo(() => encodeMonths(months), [months]);
-
-  useEffect(() => {
-    const helper = createUrlParamHelpers(searchParams);
-
-    helper.set(SIDEBAR_PARAMS.CITY, cityLabel);
-    helper.set(SIDEBAR_PARAMS.LAT, latStr);
-    helper.set(SIDEBAR_PARAMS.LNG, lngStr);
-    helper.set(SIDEBAR_PARAMS.DATASET, dataset);
-    helper.set(SIDEBAR_PARAMS.VAR, varsStr);
-    helper.set(SIDEBAR_PARAMS.GRID, gridSize);
-    helper.set(SIDEBAR_PARAMS.MONTHS, monthsStr);
-
-    if (dataset === DATASETS.CLIMATE) {
-      helper.set(SIDEBAR_PARAMS.PERIOD, climatePeriod);
-      helper.delete(SIDEBAR_PARAMS.YEAR);
-    } else {
-      helper.set(SIDEBAR_PARAMS.YEAR, String(weatherYear));
-      helper.delete(SIDEBAR_PARAMS.PERIOD);
-    }
-
-    syncUrlParams(router, pathname, helper);
-  }, [
-    cityLabel,
-    latStr,
-    lngStr,
-    dataset,
-    climatePeriod,
-    weatherYear,
-    varsStr,
-    gridSize,
-    monthsStr,
-    searchParams,
-    router,
-    pathname,
-  ]);
+  const { pushUrlState, shareUrl } = useUrlStateSync({
+    schema: CLIMATE_STATISTICS_URL_SCHEMA,
+    state: { city: selectedCity, chartMode },
+    onRestore(parsed) {
+      // * absent or unknown param = standard, so back/forward restores it too
+      setChartMode(parsed.chartMode ?? DEFAULT_CHART_MODE);
+      if (parsed.city) selectCity(parsed.city);
+    },
+  });
 
   // Document title
   useEffect(() => {
-    const cityStr = chartCityName || cityLabel;
+    const cityStr = chartCityName || selectedCity.label.trim();
     if (!cityStr) {
       document.title = `City Climate | ${APP_TITLE}`;
       return;
@@ -148,13 +84,11 @@ export function ClimateStatistics() {
         ? (CLIMATE_PERIOD_LABELS[climatePeriod] ?? climatePeriod)
         : String(weatherYear);
     document.title = `${cityStr} · ${varLabel} ${periodStr} | ${APP_TITLE}`;
-  }, [chartCityName, cityLabel, variables, dataset, climatePeriod, weatherYear]);
+  }, [chartCityName, selectedCity.label, variables, dataset, climatePeriod, weatherYear]);
 
-  function handleCitySelect(city: TWikidataCity) {
+  function handleCitySelect(city: TCity) {
     userSelectedRef.current = true;
     clearLocationError();
-    const name = resolveCityName(city);
-    if (name) setChartCityName(name);
     selectCity(city);
     if (syncCity && hasHydrated) {
       selectCityA(city);
@@ -162,19 +96,14 @@ export function ClimateStatistics() {
       void queryClient.invalidateQueries({ queryKey: ["compare-periods"] });
     }
 
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set(SIDEBAR_PARAMS.CITY, city.label.trim());
-    nextParams.set(SIDEBAR_PARAMS.LAT, city.lat.toFixed(4));
-    nextParams.set(SIDEBAR_PARAMS.LNG, city.lng.toFixed(4));
-    pushUrlParams(router, pathname, nextParams);
+    pushUrlState({ city });
   }
 
   function handleLocate() {
     locate((city) => {
       userSelectedRef.current = true;
-      const name = resolveCityName(city);
-      if (name) setChartCityName(name);
       selectCity(city);
+      pushUrlState({ city });
     });
   }
 
@@ -185,7 +114,7 @@ export function ClimateStatistics() {
     const latLabel = formatCoordinate(lat);
     const lngLabel = formatCoordinate(lng);
 
-    const provisionalCity: TWikidataCity = {
+    const provisionalCity: TCity = {
       id: `map:${latLabel},${lngLabel}`,
       label: t("map.pointLabel", { lat: latLabel, lng: lngLabel }),
       description: t("map.selectedFromMap"),
@@ -195,15 +124,13 @@ export function ClimateStatistics() {
 
     userSelectedRef.current = true;
     selectCity(provisionalCity);
+    pushUrlState({ city: provisionalCity });
 
     try {
       const resolvedCity = await resolveCityByCoordinates({ lat, lng });
       if (!resolvedCity || latestMapClickIdRef.current !== currentMapClickId) {
         return;
       }
-
-      const name = resolveCityName(resolvedCity);
-      if (name) setChartCityName(name);
 
       selectCity({
         ...resolvedCity,
@@ -220,11 +147,13 @@ export function ClimateStatistics() {
   }
 
   const {
-    data: temperatureData = [],
+    data: temperatureData,
     isLoading,
     isFetching,
     isError,
   } = useGetClimateData(selectedCity.lat, selectedCity.lng, gridSize);
+
+  const { data: datasetAttribution = null } = useGetDatasetVersion();
 
   const { data: altitude = null } = useGetAltitude(selectedCity.lat, selectedCity.lng, gridSize);
   const { data: cellBounds = null } = useGetCellBounds(
@@ -234,7 +163,7 @@ export function ClimateStatistics() {
   );
 
   useEffect(() => {
-    if (!temperatureData.length || !chartSectionRef.current) return;
+    if (!temperatureData?.length || !chartSectionRef.current) return;
     if (!userSelectedRef.current || !autoScroll) return;
 
     const timer = setTimeout(() => {
@@ -256,10 +185,12 @@ export function ClimateStatistics() {
       cityName={chartCityName}
       subtitle={subtitle}
       altitude={altitude}
+      datasetAttribution={datasetAttribution}
       cellBounds={cellBounds}
       gridSize={gridSize}
       selectedMonths={selectedMonths}
       variables={variables}
+      shareUrl={shareUrl}
       isLoading={isLoading}
       isFetching={isFetching || isResolving}
       isLocating={isLocating}
@@ -270,6 +201,8 @@ export function ClimateStatistics() {
       onLocate={handleLocate}
       onClearLocationError={clearLocationError}
       chartSectionRef={chartSectionRef}
+      chartMode={chartMode}
+      onChartModeChange={setChartMode}
     />
   );
 }

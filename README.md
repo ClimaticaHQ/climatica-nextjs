@@ -16,13 +16,12 @@
 
 ## Features
 
-- **City Climate** — search any city and see temperature/precipitation charts, key stats, and an interactive map
-- **Compare Cities** — compare two cities side-by-side with overlaid charts
-- **Compare Periods** — compare climate across different 30-year baselines for the same city
+- **City Climate** — search any city and see its climate as a Walter-Lieth diagram or a standard climograph, with an interactive map and key stats
+- **Compare Cities / Compare Periods** — compare two cities, or one city across two periods, in side-by-side or overlaid charts, with a table of metrics showing the differences
 - **Regional Heatmap** — draw a region on the map and analyze its climate distribution
 - **Flexible Controls** — switch datasets (climate/weather), variables, grid resolution, and month filters
-- **Multilingual** — English, Spanish, Ukrainian
-- **Export** — save charts as PNG or download data as CSV
+- **Multilingual** — English, French, German, Greek, Italian, Norwegian Bokmål, Portuguese, Romanian, Spanish, Ukrainian
+- **Export** — save charts with stats information as SVG, PNG and download raw data as CSV or JSON
 
 ---
 
@@ -32,7 +31,8 @@
 
 - [Node.js LTS](https://nodejs.org/) (v18+)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Python 3](https://www.python.org/downloads/) (for one-time data preparation)
+- [Python 3](https://www.python.org/downloads/) (for one-time data preparation and running Python unit tests)
+  - On macOS/Homebrew Python, installing packages requires a virtual environment — `pip install` directly into the system Python will fail with `externally-managed-environment`. See the [Tests](#tests) section for the exact setup.
 
 ### Steps
 
@@ -117,6 +117,22 @@ WorldClim route, SolrService, WorldClimService, URL utils, city descriptions.
 E2E tests cover: city search, climate data loading, i18n switching,
 navigation, 404 page.
 
+**Python unit tests** (`docker/solr/scripts/prepare_data.py`):
+
+```bash
+python3 -m venv .venv          # first time only
+source .venv/bin/activate
+pip install -r docker/solr/scripts/requirements-dev.txt
+pytest docker/solr/scripts/
+deactivate                     # when done
+```
+
+Cover: per-language label fallback order in `build_labels()` (including the
+`uk`-specific fallback to `label_en`), alternate-name preference resolution
+in `should_update_name()`, and locale-list loading/validation in
+`load_lang_order()`. Runs against small in-memory/tmp_path fixtures, not the
+real GeoNames dump — no download required.
+
 ---
 
 ## Developer Setup
@@ -145,7 +161,7 @@ climatica-next-app/
 ├── docker/
 │   ├── solr/
 │   │   ├── data/           # GeoNames data files (gitignored)
-│   │   ├── scripts/        # prepare_data.py
+│   │   ├── scripts/        # prepare_data.py, generate_schema.py, test_prepare_data.py
 │   │   ├── schema.json     # Solr schema
 │   │   └── solrconfig.xml  # Solr configuration
 │   └── docker-compose.yml
@@ -159,6 +175,7 @@ climatica-next-app/
 │   │   ├── compare-periods/
 │   │   └── heat-map/
 │   ├── components/         # Shared UI components
+│   ├── configs/            # locales.json — json for supported locales
 │   ├── hooks/              # Custom React hooks
 │   ├── libs/
 │   │   ├── api/            # Axios client
@@ -179,6 +196,32 @@ Component → Hook → fetch /api/* → Route Handler → Redis → Solr/WorldCl
 - Redis caches city search results (7 days) and climate data (30 days)
 - Popular queries get extended TTL automatically
 - WorldClim API key stays server-side only
+
+### Adding a new locale
+
+`src/configs/locales.json` is the single source of truth for supported
+locales — the frontend (`src/constants/locales.constant.ts`), the CSV
+generator (`prepare_data.py`), and the Solr schema generator
+(`generate_schema.py`) all read from it. Adding a language means touching
+this one file plus regenerating two derived artifacts:
+
+```bash
+# 1. Add the locale code to src/configs/locales.json
+
+# 2. Regenerate the Solr schema (adds label_<lang> + label_<lang>_ngram fields)
+python3 docker/solr/scripts/generate_schema.py
+
+# 3. Regenerate the cities CSV (adds the label_<lang> column)
+python3 docker/solr/scripts/prepare_data.py
+
+# 4. Push the new schema to Solr and reimport the data
+npm run solr:reindex
+```
+
+`schema.json` is committed to the repo but treated as a build artifact of
+`generate_schema.py` — don't hand-edit the per-locale fields directly, since
+the next regeneration will overwrite them. Run `git diff docker/solr/schema.json`
+after step 2 to confirm the change is only additive before reindexing.
 
 ### Code Standards
 

@@ -4,6 +4,7 @@ import { Dropdown } from "@/components/UI";
 import { LANGUAGES } from "@/constants";
 import { usePathname, useRouter } from "@/libs/I18nNavigation";
 import { parseLocale } from "@/libs/I18nRouting";
+import { navigateWithIntent } from "@/utils";
 import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import type { TLanguageSwitcherProps } from "./LanguageSwitcher.type";
@@ -15,10 +16,12 @@ export function LanguageSwitcher({ variant = "dropdown" }: TLanguageSwitcherProp
   const searchParams = useSearchParams();
 
   function change(code: string) {
-    router.push(
-      { pathname, query: Object.fromEntries(searchParams.entries()) },
-      { locale: parseLocale(code), scroll: false },
-    );
+    navigateWithIntent({
+      router,
+      pathname,
+      query: Object.fromEntries(searchParams.entries()),
+      locale: parseLocale(code),
+    });
   }
 
   if (variant === "inline") {

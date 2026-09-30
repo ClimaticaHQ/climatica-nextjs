@@ -1,9 +1,11 @@
+export { useAvailableClimatePeriods } from "./useAvailableClimatePeriods";
 export { useFetchFullClimateData } from "./useFetchFullClimateData";
 export { useGetAltitude } from "./useGetAltitude";
 export { useGetCellBounds } from "./useGetCellBounds";
 export { useGetClimateData } from "./useGetClimateData";
 export { useGetCompareData } from "./useGetCompareData";
 export { useGetComparePeriods } from "./useGetComparePeriods";
+export { useGetDatasetVersion } from "./useGetDatasetVersion";
 export { useGetHeatmapData } from "./useGetHeatmapData";
 export { useGetHeatmapPolygonData } from "./useGetHeatmapPolygonData";
 export { useGetMultiPeriodData } from "./useGetMultiPeriodData";

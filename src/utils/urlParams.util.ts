@@ -3,7 +3,6 @@ import {
   CLIMATE_PERIODS,
   CLIMATE_VARIABLES,
   DATASETS,
-  SIDEBAR_PARAMS,
   WEATHER_MAX_YEAR,
   WEATHER_MIN_YEAR,
 } from "@/constants";
@@ -11,10 +10,10 @@ import type {
   TCellSize,
   TClimatePeriod,
   TDataset,
-  TFiltersState,
   TMonthFilter,
+  TUrlSchema,
+  TUrlSyncAction,
   TVariable,
-  TWikidataCity,
 } from "@/types";
 
 const VALID_VARIABLES = new Set<string>(CLIMATE_VARIABLES);
@@ -97,74 +96,42 @@ export function encodePeriods(years: number[]): string {
   return years.join(",");
 }
 
-export function applyUrlFiltersToStore(
-  searchParams: { get(name: string): string | null },
-  actions: TFiltersState["actions"],
-  options?: { includeMonths?: boolean },
-) {
-  const ds = parseDataset(searchParams.get(SIDEBAR_PARAMS.DATASET));
-  if (ds !== null) actions.setDataset(ds);
+export function serializeUrlState<TState extends Record<string, unknown>>(
+  schema: TUrlSchema<TState>,
+  state: TState,
+): URLSearchParams {
+  const params = new URLSearchParams();
+  (Object.keys(schema) as (keyof TState)[]).forEach((key) => {
+    schema[key].serialize(state[key], params);
+  });
+  return params;
+}
 
-  const period = parsePeriod(searchParams.get(SIDEBAR_PARAMS.PERIOD));
-  if (period !== null) actions.setClimatePeriod(period);
+export function parseUrlState<TState extends Record<string, unknown>>(
+  schema: TUrlSchema<TState>,
+  params: URLSearchParams,
+): Partial<TState> {
+  const result: Partial<TState> = {};
+  (Object.keys(schema) as (keyof TState)[]).forEach((key) => {
+    const value = schema[key].parse(params);
+    if (value !== undefined) result[key] = value;
+  });
+  return result;
+}
 
-  const year = parseYear(searchParams.get(SIDEBAR_PARAMS.YEAR));
-  if (year !== null) actions.setWeatherYear(year);
-
-  const vars = parseVars(searchParams.get(SIDEBAR_PARAMS.VAR));
-  if (vars !== null) actions.setVariables(vars);
-
-  const grid = parseCellSize(searchParams.get(SIDEBAR_PARAMS.GRID));
-  if (grid !== null) actions.setGridSize(grid);
-
-  if (options?.includeMonths) {
-    const monthFilter = parseMonths(searchParams.get(SIDEBAR_PARAMS.MONTHS));
-    if (monthFilter !== null) actions.setMonths(monthFilter);
+/** searchParamsChanged distinguishes "URL not caught up to our own push yet"
+ * (not external) from an actual back/forward or hand-edited URL (external). */
+export function decideUrlSyncAction(input: {
+  searchParamsChanged: boolean;
+  searchParamsString: string;
+  lastWritten: string | null;
+  nextFromState: string;
+}): TUrlSyncAction {
+  if (input.searchParamsChanged && input.searchParamsString !== input.lastWritten) {
+    return "external";
   }
-}
-
-export function createUrlParamHelpers(base: URLSearchParams): {
-  set: (key: string, val: string) => void;
-  delete: (key: string) => void;
-  changed: boolean;
-  params: URLSearchParams;
-} {
-  const params = new URLSearchParams(base.toString());
-  let _changed = false;
-
-  return {
-    params,
-    get changed() {
-      return _changed;
-    },
-    set(key: string, val: string) {
-      if (params.get(key) !== val) {
-        params.set(key, val);
-        _changed = true;
-      }
-    },
-    delete(key: string) {
-      if (params.has(key)) {
-        params.delete(key);
-        _changed = true;
-      }
-    },
-  };
-}
-
-export function cityFromUrl(
-  latRaw: string | null,
-  lngRaw: string | null,
-  labelRaw: string | null,
-): TWikidataCity | null {
-  const lat = latRaw ? Number(latRaw) : NaN;
-  const lng = lngRaw ? Number(lngRaw) : NaN;
-  if (isNaN(lat) || isNaN(lng)) return null;
-  return {
-    id: `url:${lat},${lng}`,
-    label: labelRaw ?? `${lat}, ${lng}`,
-    description: "",
-    lat,
-    lng,
-  };
+  if (input.nextFromState !== input.lastWritten) {
+    return "stateChange";
+  }
+  return "ownWrite";
 }

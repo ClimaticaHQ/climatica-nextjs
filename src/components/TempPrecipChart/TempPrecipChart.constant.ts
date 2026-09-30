@@ -1,7 +1,12 @@
-/** Precip Bar's animationDuration and its useDelayedHide() delay must stay
- * equal — the hide transition (which excludes the bar from tooltip/legend)
- * should only kick in once the shrink animation has visibly finished. */
-export const PRECIP_BAR_ANIMATION_DURATION_MS = 400;
+import type { TPanelExpansion, TVisibleSeries } from "@/types";
+
+/** The chart's pre-toggle-interaction default — also the export payload's fallback. */
+export const DEFAULT_VISIBLE_SERIES: TVisibleSeries = {
+  tmax: true,
+  tmin: true,
+  tavg: false,
+  prec: true,
+};
 
 export const CHART_COLORS = {
   arid: "var(--chart-arid)",
@@ -23,12 +28,19 @@ export const CHART_COLORS = {
     prec: "var(--chart-compare-b-prec)",
     tavg: "var(--chart-compare-b-tavg)",
   },
-  wl: {
-    tempStroke: "var(--color-wl-temp-line-a)",
-    precStroke: "var(--color-wl-prec-line-a)",
-    humidFill: "var(--color-wl-humid-fill)",
-    aridFill: "var(--color-wl-arid-fill)",
-    aridTooltip: "var(--color-wl-arid-tooltip)",
-    humidTooltip: "var(--color-wl-prec-line-b)",
-  },
 };
+
+// * the chart card's layout — relative: the data update's progress bar runs along its top edge
+export const CHART_CARD_LAYOUT_CLASS = "relative w-full";
+
+// * a chart without a page-held expanded panel (single city): both panels, always
+export const NO_PANEL_EXPANSION: TPanelExpansion = {
+  expanded: null,
+  onExpandedChange: () => undefined,
+};
+
+// * bars recolored by aridity — the legend's arid / humid entries
+export const ARIDITY_BAR_COLORS = {
+  arid: CHART_COLORS.arid,
+  humid: CHART_COLORS.humid,
+} as const;

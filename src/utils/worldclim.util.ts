@@ -1,20 +1,25 @@
 import {
   CELL_IRI_ROW_COL_REGEX,
+  CELL_SIZE_OPTIONS,
+  CLIMATE_PERIODS,
   CLIMATE_VARIABLES,
   MONTH_NAMES,
   WORLDCLIM_GRID_BASE,
+  WORLDCLIM_RASTER_BASE,
   WORLDCLIM_VARIABLE_BASE,
 } from "@/constants";
 import { env } from "@/libs/Env";
 import type {
   TCellBounds,
   TCellSize,
+  TClimatePeriod,
   TFullVariableMonthRow,
   TMonthlyTemperature,
   TRawAvgValueBinding,
   TRawPixelValueBinding,
   TSparqlUriValue,
   TSparqlValue,
+  TVariable,
   TWorldClimAvgBoxBinding,
   TWorldClimBoxBinding,
   TWorldClimCellResponse,
@@ -79,8 +84,24 @@ export function buildGridIri(gridSize: TCellSize): string {
   return `${WORLDCLIM_GRID_BASE}${gridSize}`;
 }
 
+/** "2.5 min" from "2.5 min (~20.25 km²)" */
+export function shortGridLabel(gridSize: TCellSize): string {
+  return CELL_SIZE_OPTIONS[gridSize]?.split(" (~")[0] ?? gridSize;
+}
+
 export function buildVariableIris(variables: readonly string[]): string[] {
   return variables.map((v) => `${WORLDCLIM_VARIABLE_BASE}${v}`);
+}
+
+/** Mirrors the raster IRI shape SCRAPI names rasters with: "Raster_{grid}_{variable}_{period}",
+ * where period is a climate period (already "c1970-2000"-shaped) or "w{year}" for weather. */
+export function buildRasterIri(
+  gridSize: TCellSize,
+  variable: TVariable,
+  period: TClimatePeriod | number,
+): string {
+  const periodSuffix = typeof period === "number" ? `w${period}` : period;
+  return `${WORLDCLIM_RASTER_BASE}${gridSize}_${variable}_${periodSuffix}`;
 }
 
 export function buildDatasetParams(
@@ -100,9 +121,13 @@ export function validateResponseData(response: { data: unknown }): void {
   }
 }
 
+/** null means no bindings matched (e.g. this grid has no raster for the
+ * requested period) — callers must treat that as "unavailable", not zero. */
 export function buildMonthlyTemperaturesFromPointValues(
   bindings: TWorldClimPointValueBinding[],
-): TMonthlyTemperature[] {
+): TMonthlyTemperature[] | null {
+  if (bindings.length === 0) return null;
+
   const vals = new Map<string, number>();
 
   for (const b of bindings) {
@@ -115,10 +140,33 @@ export function buildMonthlyTemperaturesFromPointValues(
   return Array.from({ length: 12 }, (_, i) => ({
     month: i + 1,
     monthName: MONTH_NAMES[i],
-    tmin: vals.get(`tmin_${i + 1}`) ?? 0,
-    tmax: vals.get(`tmax_${i + 1}`) ?? 0,
-    prec: vals.get(`prec_${i + 1}`) ?? 0,
+    // * a value the response lacks stays null — 0 would be read as real data
+    tmin: vals.get(`tmin_${i + 1}`) ?? null,
+    tmax: vals.get(`tmax_${i + 1}`) ?? null,
+    prec: vals.get(`prec_${i + 1}`) ?? null,
   }));
+}
+
+/** SCRAPI's climate point-value endpoint returns every period's rasters
+ * together — this narrows to the one the caller actually wants. */
+export function filterPointBindingsByPeriod(
+  bindings: TWorldClimPointValueBinding[],
+  period: TClimatePeriod,
+): TWorldClimPointValueBinding[] {
+  return bindings.filter((b) => b.raster.value.includes(period));
+}
+
+/** Which climate periods this specific grid/point combination actually has
+ * rasters for — e.g. Grid_30s only ever has c1970-2000. */
+export function extractAvailableClimatePeriods(
+  bindings: TWorldClimPointValueBinding[],
+): TClimatePeriod[] {
+  const present = new Set(
+    bindings
+      .map((b) => Object.values(CLIMATE_PERIODS).find((period) => b.raster.value.includes(period)))
+      .filter((period): period is TClimatePeriod => period !== undefined),
+  );
+  return Object.values(CLIMATE_PERIODS).filter((period) => present.has(period));
 }
 
 /**

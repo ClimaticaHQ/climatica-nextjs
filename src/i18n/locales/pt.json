@@ -35,7 +35,8 @@
       "autoResolutionTooltip": "A resolução é definida automaticamente de acordo com o conjunto de dados selecionado",
       "altitude": "Altitude",
       "filteredMonths": "Filtrado: {months}"
-    }
+    },
+    "noPeriodData": "Não há dados de {period} na resolução {grid}"
   },
   "compareCities": {
     "title": "Comparar Cidades",
@@ -46,7 +47,8 @@
     "trend": {
       "tempTitle": "Tendência de temperatura",
       "precipTitle": "Tendência de precipitação",
-      "noChange": "Sem alterações"
+      "noChange": "Sem alterações",
+      "comparedTo": "{b} vs {a}"
     },
     "weather": {
       "periods": "Anos",
@@ -74,7 +76,7 @@
       "avgTmin": "Temp. mín. média",
       "totalPrec": "Precipitação total",
       "aridMonths": "Meses áridos",
-      "martonne": "Martonne (M)"
+      "frostMonths": "Meses de geada"
     },
     "diff": {
       "warmerCity": "Cidade mais quente",
@@ -83,17 +85,15 @@
       "coldestMonth": "Mês mais frio",
       "byDegrees": "em {value}°C",
       "byMm": "em {value} mm",
-      "tie": "Empate"
+      "tie": "Empate",
+      "tieSub": "=",
+      "monthTemps": "{a}: {tempA} / {b}: {tempB}"
     },
     "autoResolution": "Resolução automática: {resolution}",
-    "wlCompare": {
-      "warmerBy": "{label} mais quente em {value}°C",
-      "coolerBy": "{label} mais frio em {value}°C",
-      "sameTemp": "Temperatura média igual",
-      "moreArid": "{label} tem mais {value} mês(es) árido(s)",
-      "fewerArid": "{label} tem menos {value} mês(es) árido(s)",
-      "sameArid": "Mesmos meses áridos"
-    }
+    "noPeriodData": "Não há dados de {period} na resolução {grid}",
+    "difference": "Diferença",
+    "metric": "Indicador",
+    "tableCaption": "Comparação de {a} e {b}"
   },
   "heatMap": {
     "title": "Mapa de Calor Regional",
@@ -105,6 +105,7 @@
     "drawingPolygon": "Clique para adicionar vértices — clique no primeiro ponto para fechar o polígono",
     "noSelection": "Desenhe uma caixa ou polígono no mapa para analisar os dados climáticos dessa região",
     "noData": "Não há dados disponíveis para esta região",
+    "noPeriodData": "Não há dados de {period} na resolução {grid}",
     "stats": {
       "minValue": "Mín.",
       "maxValue": "Máx.",
@@ -132,8 +133,7 @@
     }
   },
   "chart": {
-    "title": "Temperatura",
-    "monthAxis": "Mês",
+    "versus": "vs",
     "temperatureAxis": "Temperatura (graus C)",
     "precipitation": "Precipitação",
     "maxTemperature": "Temperatura Máxima",
@@ -144,10 +144,28 @@
     "meanTemp": "Temp. média",
     "annualPrec": "Precip. anual",
     "aridMonths": "Meses áridos",
-    "martonne": "Aridez (M)",
+    "martonne": "Índice de Martonne (M)",
+    "martonneShort": "Martonne (M)",
     "martonneTooltip": "Índice de aridez de De Martonne: M = P/(T+10). <5 Hiperárido | 5–10 Árido | 10–20 Semiárido | 20–30 Subúmido | >30 Húmido",
     "aridPeriod": "Período árido",
     "humidPeriod": "Período húmido",
+    "perhumidPeriod": "Muito úmido (> 100 mm)",
+    "wlAriaSummary": "Diagrama de Walter-Lieth, {location}, {period}: temperatura média {temp} °C, precipitação anual {prec} mm, meses áridos: {arid}",
+    "wlIncomplete": "Dados incompletos para {label}: o diagrama de Walter-Lieth precisa de temperatura e precipitação dos 12 meses.",
+    "layout": "Layout",
+    "layoutSplit": "Lado a lado",
+    "layoutOverlay": "Sobreposto",
+    "wlGuideButton": "Como ler este diagrama",
+    "wlGuide": {
+      "scale": "Escala: 10 °C = 20 mm",
+      "humid": "Período húmido (linhas verticais): precipitação acima da temperatura",
+      "arid": "Período árido (pontos): temperatura acima da precipitação",
+      "veryHumid": "Muito úmido (preenchimento sólido): acima de 100 mm, escala comprimida 1:10",
+      "frost": "Faixa de geada: meses com mínima média abaixo de 0 °C"
+    },
+    "wlShading": "Sombreado",
+    "wlShadingNone": "Nenhum",
+    "mode": "Tipo de gráfico",
     "modeStandard": "Gráfico padrão",
     "modeWalterLieth": "Diagrama de Walter-Lieth",
     "walterLiethTabUnavailable": "Não disponível na vista Walter-Lieth",
@@ -158,13 +176,21 @@
       "climate": "Clima {period}",
       "weather": "Tempo {year}"
     },
-    "legend": {
-      "seriesNote": "Contínua = tmax · Tracejada = tmin · Barras = precip"
-    }
+    "expandPanel": "Expandir {name}",
+    "showBoth": "Mostrar ambos",
+    "expandedPanel": "Painel expandido",
+    "frostLegend": "Geada (mín. média < 0 °C)",
+    "maxTempShort": "Temp. máx.",
+    "minTempShort": "Temp. mín.",
+    "monthlyTableCaption": "Valores mensais: {names}",
+    "month": "Mês",
+    "showMonthlyValues": "Mostrar valores mensais",
+    "hideMonthlyValues": "Ocultar valores mensais"
   },
   "loading": {
     "fetchingClimateData": "A obter dados climáticos...",
-    "updating": "A atualizar..."
+    "updating": "A atualizar...",
+    "dataUpdated": "Dados atualizados: {location}, {period}"
   },
   "errors": {
     "fetchClimateData": "Não foi possível obter os dados climáticos",
@@ -181,7 +207,8 @@
   },
   "map": {
     "selectedFromMap": "Selecionado a partir do mapa",
-    "pointLabel": "Ponto do mapa {lat}, {lng}"
+    "pointLabel": "Ponto do mapa {lat}, {lng}",
+    "gridCell": "Célula da grelha: {size}"
   },
   "cellSizes": {
     "10m": "10 min (~324 km2)",
@@ -212,6 +239,8 @@
     "rawCsv": "Dados completos (CSV)",
     "rawJson": "Dados completos (JSON)",
     "rawDataUnavailable": "Disponível apenas para Clima 1970–2000",
+    "incompleteData": "Exportação indisponível: faltam dados de temperatura ou precipitação em alguns meses",
+    "updating": "Exportação indisponível enquanto os dados são atualizados",
     "failed": "Falha na exportação — tente novamente",
     "metricColumn": "Métrica"
   },
@@ -261,16 +290,15 @@
     "autoScroll": "Deslocamento automático para os resultados",
     "syncCity": "Sincronizar cidade selecionada em todas as páginas",
     "autoApplyFilters": "Aplicar filtros automaticamente",
+    "animations": "Animações",
+    "updateHighlight": "Destaque de atualização",
+    "updateHighlightGlow": "Brilho",
+    "updateHighlightBorder": "Contorno",
+    "reducedMotionNotice": "O movimento reduzido está ativado neste dispositivo",
     "filters": "Filtros",
     "settings": "Definições",
     "applyFilters": "Aplicar filtros",
-    "cellCount": {
-      "fast": "Rápido",
-      "moderate": "Moderado",
-      "slow": "Lento",
-      "tooMany": "Demasiadas células",
-      "tooManyError": "Reduza a área ou a resolução para aplicar"
-    },
+    "cellCount": "({count} células)",
     "notes": {
       "climateNormals": "Normais climáticas de 30 anos",
       "weatherData": "Dados meteorológicos anuais (CRU-TS-4.09)",
@@ -320,5 +348,13 @@
       "title": "Mapa de calor regional — {variables} ({period})",
       "description": "Intensidade climática de {variables} na região selecionada ({period})"
     }
+  },
+  "units": {
+    "celsius": "°C",
+    "mm": "mm",
+    "meters": "m",
+    "celsiusValue": "{value}°C",
+    "mmValue": "{value} mm",
+    "metersValue": "{value} m"
   }
 }

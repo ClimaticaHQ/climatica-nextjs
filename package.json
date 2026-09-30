@@ -21,7 +21,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "solr:schema": "curl -X POST -H 'Content-type:application/json' --data-binary @docker/solr/schema.json http://localhost:8983/api/cores/cities/schema",
+    "solr:schema": "node docker/solr/scripts/apply-schema.mjs",
     "solr:import": "docker cp docker/solr/data/cities.csv climatica-solr:/var/solr/data/cities.csv && docker exec climatica-solr post -c cities /var/solr/data/cities.csv",
     "solr:reindex": "npm run solr:schema && npm run solr:import",
     "start": "next start",
@@ -31,6 +31,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
+    "test:python": "./.venv/bin/pytest docker/solr/scripts/",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -38,7 +39,6 @@
     "@t3-oss/env-nextjs": "^0.13.11",
     "@tanstack/react-query": "^4.43.0",
     "axios": "^1.13.6",
-    "dom-to-image-more": "^3.10.0",
     "ioredis": "^5.10.1",
     "leaflet": "^1.9.4",
     "next": "16.2.6",

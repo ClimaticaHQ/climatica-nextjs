@@ -91,6 +91,12 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install Python test dependencies
+        run: pip install -r docker/solr/scripts/requirements-dev.txt
+
+      - name: Run prepare_data.py unit tests
+        run: pytest docker/solr/scripts/
+
       - name: Download GeoNames data
         run: |
           wget -q https://download.geonames.org/export/dump/allCountries.zip

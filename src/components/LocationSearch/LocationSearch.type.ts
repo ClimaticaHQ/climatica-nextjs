@@ -1,11 +1,11 @@
-import type { TWikidataCity } from "@/types";
+import type { TCity } from "@/types";
 
 export type TLocationSearchProps = {
   isLocating: boolean;
   locationError: string | null;
-  defaultValue?: string;
+  cityLabel?: string;
   showLocateButton?: boolean;
-  onCitySelect: (city: TWikidataCity) => void;
+  onCitySelect: (city: TCity) => void;
   onLocate: () => void;
   onClearLocationError: () => void;
 };

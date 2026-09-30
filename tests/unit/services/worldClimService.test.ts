@@ -76,47 +76,15 @@ describe("WorldClimService.getCellForPoint", () => {
 });
 
 describe("WorldClimService.getClimateDataForPoint", () => {
-  it("filters bindings to only those containing the requested period", async () => {
+  it("returns every period's bindings unfiltered — no period param sent", async () => {
     mockGet.mockResolvedValue(
       makeAxiosResponse(makePointValueResponse(["c1970-2000", "c1961-1990", "c1951-1980"])),
     );
-    const result = await WorldClimService.getClimateDataForPoint(
-      48.0,
-      16.0,
-      "10m",
-      ["tmax"],
-      "c1970-2000",
-    );
-    expect(result.results.bindings).toHaveLength(1);
-    expect(result.results.bindings[0].raster.value).toContain("c1970-2000");
-  });
-
-  it("returns all bindings when all match the requested period", async () => {
-    mockGet.mockResolvedValue(
-      makeAxiosResponse(makePointValueResponse(["c1970-2000", "c1970-2000"])),
-    );
-    const result = await WorldClimService.getClimateDataForPoint(
-      48.0,
-      16.0,
-      "10m",
-      ["tmax"],
-      "c1970-2000",
-    );
-    expect(result.results.bindings).toHaveLength(2);
-  });
-
-  it("returns empty bindings when none match the requested period", async () => {
-    mockGet.mockResolvedValue(
-      makeAxiosResponse(makePointValueResponse(["c1961-1990", "c1951-1980"])),
-    );
-    const result = await WorldClimService.getClimateDataForPoint(
-      48.0,
-      16.0,
-      "10m",
-      ["tmax"],
-      "c1970-2000",
-    );
-    expect(result.results.bindings).toHaveLength(0);
+    const result = await WorldClimService.getClimateDataForPoint(48.0, 16.0, "10m", ["tmax"]);
+    expect(result.results.bindings).toHaveLength(3);
+    const params = mockGet.mock.calls[0]?.[1]?.params;
+    expect(params).not.toHaveProperty("period");
+    expect(params).toMatchObject({ isClimate: true });
   });
 });
 

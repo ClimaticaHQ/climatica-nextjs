@@ -1,4 +1,6 @@
-import type { TAppRouter, TUrlParamHelpers } from "@/types";
+import { useNavigationIntentStore } from "@/stores/navigationIntentStore";
+import type { TAppRouter, TNavigateWithIntentArgs } from "@/types";
+import { buildLocalePathname } from "./export/shared/shareUrl.util";
 
 /**
  * Filter/sidebar-driven URL updates must never move the viewport — Next.js
@@ -16,12 +18,12 @@ export function pushUrlParams(router: TAppRouter, pathname: string, params: URLS
   router.push(`${pathname}?${params.toString()}`, { scroll: false });
 }
 
-/** For the createUrlParamHelpers() sync-effect pattern — only navigates when
- * the helper actually changed something, same as every call site did inline. */
-export function syncUrlParams(
-  router: TAppRouter,
-  pathname: string,
-  helper: TUrlParamHelpers,
-): void {
-  if (helper.changed) replaceUrlParams(router, pathname, helper.params);
+/**
+ * The one way to navigate to another route (or locale) from code: records the navigation
+ * intent first — as NavigationIntentTracker does for link clicks — so a pending URL-state
+ * write on the page being left can't cancel it.
+ */
+export function navigateWithIntent({ router, pathname, query, locale }: TNavigateWithIntentArgs) {
+  useNavigationIntentStore.getState().setPendingPathname(buildLocalePathname(locale, pathname));
+  router.push({ pathname, query }, { locale, scroll: false });
 }

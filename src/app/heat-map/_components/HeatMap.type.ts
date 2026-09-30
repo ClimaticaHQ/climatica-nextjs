@@ -1,12 +1,26 @@
 import type {
   TBbox,
   TCellSize,
+  TCity,
   TColorScale,
+  TDatasetAttribution,
+  TDatasetPeriodUrlValue,
+  TNumberFormatter,
+  TPolygon,
   TVariable,
-  TWikidataCity,
   TWorldClimBoxBinding,
   TWorldClimBoxResponse,
 } from "@/types";
+
+export type THeatMapSelectionValue =
+  { kind: "bbox"; bbox: TBbox } | { kind: "polygon"; polygon: TPolygon } | { kind: "none" };
+
+export type THeatMapUrlState = {
+  datasetPeriod: TDatasetPeriodUrlValue;
+  variables: TVariable[];
+  gridSize: TCellSize;
+  selection: THeatMapSelectionValue;
+};
 
 export type TLooseBinding = Record<string, unknown>;
 
@@ -23,8 +37,6 @@ export type TRegionalProfile = {
 };
 
 export type TDrawMode = "none" | "bbox" | "polygon";
-
-export type TPolygon = [number, number][];
 
 export type TMapTarget = { lat: number; lng: number };
 
@@ -45,7 +57,10 @@ export type TRegionHeatmapViewProps = {
   activeVariable: TVariable;
   colorScale: TColorScale;
   drawMode: TDrawMode;
+  /** the first load of a selection — no cells to show yet */
   isLoading: boolean;
+  /** any load, also while the previous selection's cells are still shown */
+  isFetching: boolean;
   isLocating: boolean;
   isClimate: boolean;
   error: Error | null;
@@ -55,11 +70,13 @@ export type TRegionHeatmapViewProps = {
   periodLabel: string;
   profile: TRegionalProfile | null;
   isProfileLoading: boolean;
+  datasetAttribution: TDatasetAttribution | null;
+  shareUrl: string;
   onDrawModeChange: (mode: TDrawMode) => void;
   onBboxChange: (bbox: TBbox | null) => void;
   onPolygonChange: (polygon: TPolygon | null) => void;
   onClear: () => void;
-  onCitySelect: (city: TWikidataCity) => void;
+  onCitySelect: (city: TCity) => void;
   onLocate: () => void;
   onClearLocationError: () => void;
 };
@@ -99,6 +116,7 @@ export type TToolbarProps = {
   onClear: () => void;
   onExportCSV?: (() => void) | undefined;
   onExportPNG?: (() => Promise<void>) | undefined;
+  onExportSVG?: (() => void | Promise<void>) | undefined;
 };
 
 export type TStatsLegendBarProps = {
@@ -119,7 +137,6 @@ export type TMapCanvasProps = {
   unit: string;
   mapTarget: TMapTarget | null;
   bindings: TWorldClimBoxBinding[];
-  isLoading: boolean;
   selectedMonths: number[];
   onBboxComplete: (bbox: TBbox) => void;
   onPolygonComplete: (polygon: TPolygon) => void;
@@ -131,4 +148,12 @@ export type TRegionalClimateProfileProps = {
   isClimate: boolean;
   periodLabel: string;
   cellCount: number;
+};
+
+/** A heat map cell's popup: its value and where the cell is. */
+export type TPopupContentArgs = {
+  value: number;
+  unit: string;
+  center: { lat: number; lng: number };
+  formatNumber: TNumberFormatter;
 };

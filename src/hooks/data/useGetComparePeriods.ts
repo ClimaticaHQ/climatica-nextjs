@@ -2,12 +2,18 @@ import { DATASETS } from "@/constants";
 import type {
   TCellSize,
   TClimatePeriod,
-  TComparePeriods,
+  TComparePeriodBindings,
   TDataset,
   TUseGetComparePeriodsReturn,
 } from "@/types";
+import {
+  buildMonthlyTemperaturesFromPointValues,
+  extractAvailableClimatePeriods,
+  filterPointBindingsByPeriod,
+} from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCityData } from "./useGetCompareData";
+import { useMemo } from "react";
+import { fetchCityBindings } from "./useGetCompareData";
 
 export function useGetComparePeriods(
   lat: number | null,
@@ -22,22 +28,19 @@ export function useGetComparePeriods(
   const enabled = lat !== null && lng !== null;
   const isClimate = dataset === DATASETS.CLIMATE;
 
-  const { data, isLoading, error } = useQuery<TComparePeriods, Error>({
-    queryKey: [
-      "compare-periods",
-      lat,
-      lng,
-      dataset,
-      isClimate ? climatePeriodA : yearA,
-      isClimate ? climatePeriodB : yearB,
-      gridSize,
-    ],
-    queryFn: async (): Promise<TComparePeriods> => {
+  const { data, isLoading, isFetching, error } = useQuery<TComparePeriodBindings, Error>({
+    queryKey: ["compare-periods", lat, lng, gridSize, isClimate ? "climate" : [yearA, yearB]],
+    queryFn: async (): Promise<TComparePeriodBindings> => {
       if (lat === null || lng === null) throw new Error("No location selected");
 
+      if (isClimate) {
+        const bindings = await fetchCityBindings(lat, lng, gridSize, true);
+        return { dataA: bindings, dataB: bindings };
+      }
+
       const [dataA, dataB] = await Promise.all([
-        fetchCityData(lat, lng, gridSize, isClimate, climatePeriodA, isClimate ? undefined : yearA),
-        fetchCityData(lat, lng, gridSize, isClimate, climatePeriodB, isClimate ? undefined : yearB),
+        fetchCityBindings(lat, lng, gridSize, false, yearA),
+        fetchCityBindings(lat, lng, gridSize, false, yearB),
       ]);
       return { dataA, dataB };
     },
@@ -47,10 +50,33 @@ export function useGetComparePeriods(
     keepPreviousData: true,
   });
 
+  const availablePeriods = useMemo(
+    () => (isClimate && data ? extractAvailableClimatePeriods(data.dataA) : null),
+    [isClimate, data],
+  );
+
+  const dataA = useMemo(() => {
+    if (!data) return null;
+    const bindings = isClimate
+      ? filterPointBindingsByPeriod(data.dataA, climatePeriodA)
+      : data.dataA;
+    return buildMonthlyTemperaturesFromPointValues(bindings);
+  }, [data, isClimate, climatePeriodA]);
+
+  const dataB = useMemo(() => {
+    if (!data) return null;
+    const bindings = isClimate
+      ? filterPointBindingsByPeriod(data.dataB, climatePeriodB)
+      : data.dataB;
+    return buildMonthlyTemperaturesFromPointValues(bindings);
+  }, [data, isClimate, climatePeriodB]);
+
   return {
-    dataA: data?.dataA ?? [],
-    dataB: data?.dataB ?? [],
+    dataA,
+    dataB,
+    availablePeriods,
     isLoading: enabled && isLoading,
+    isFetching: enabled && isFetching,
     error: error ?? null,
   };
 }

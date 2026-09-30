@@ -7,14 +7,35 @@ vi.mock("@/libs/Env", () => ({ env: { WORLDCLIM_API_KEY: "test-key" } }));
 import {
   buildDatasetParams,
   buildGridIri,
+  buildMonthlyTemperaturesFromPointValues,
   buildVariableIris,
+  extractAvailableClimatePeriods,
   extractCellBySize,
+  filterPointBindingsByPeriod,
   validateResponseData,
 } from "@/utils/worldclim.util";
-import type { TWorldClimCellResponse } from "@/types";
+import type { TWorldClimCellResponse, TWorldClimPointValueBinding } from "@/types";
 
 const GRID_BASE = "http://climate.gsic.uva.es/data/Grid_";
 const VAR_BASE = "http://climate.gsic.uva.es/data/Variable_";
+const RASTER_BASE = "http://climate.gsic.uva.es/data/Raster_";
+
+function makeBinding(
+  period: string,
+  variable: string,
+  month: number,
+  value: string,
+): TWorldClimPointValueBinding {
+  return {
+    value: { type: "literal", value },
+    month: { type: "literal", value: `--${String(month).padStart(2, "0")}` },
+    pixel: { type: "uri", value: `${GRID_BASE}10m_Pixel_r1c1` },
+    raster: { type: "uri", value: `${RASTER_BASE}10m_${variable}_${period}` },
+    var: { type: "uri", value: `${VAR_BASE}${variable}` },
+    cell: { type: "uri", value: `${GRID_BASE}10m_Cell_r1c1` },
+    grid: { type: "uri", value: `${GRID_BASE}10m` },
+  };
+}
 
 describe("buildGridIri", () => {
   it('"10m" → Grid_10m IRI', () => {
@@ -104,5 +125,68 @@ describe("validateResponseData", () => {
 
   it("throws for a response with undefined data", () => {
     expect(() => validateResponseData({ data: undefined })).toThrow("No data returned from API");
+  });
+});
+
+describe("buildMonthlyTemperaturesFromPointValues", () => {
+  it("returns null when there are no bindings (grid has no raster for this period)", () => {
+    expect(buildMonthlyTemperaturesFromPointValues([])).toBeNull();
+  });
+
+  it("builds all 12 months from tmax/tmin/prec bindings", () => {
+    const bindings = [
+      makeBinding("c1970-2000", "tmax", 1, "10"),
+      makeBinding("c1970-2000", "tmin", 1, "2"),
+      makeBinding("c1970-2000", "prec", 1, "50"),
+    ];
+    const result = buildMonthlyTemperaturesFromPointValues(bindings);
+    expect(result).not.toBeNull();
+    expect(result?.[0]).toMatchObject({ month: 1, tmax: 10, tmin: 2, prec: 50 });
+    expect(result).toHaveLength(12);
+  });
+
+  it("REGRESSION: leaves a variable the response lacks as null, never 0", () => {
+    // * 0 is a real temperature/precipitation — defaulting to it skewed means and aridity
+    const bindings = [makeBinding("c1970-2000", "tmax", 1, "10")];
+    const result = buildMonthlyTemperaturesFromPointValues(bindings);
+    expect(result?.[0]).toMatchObject({ tmax: 10, tmin: null, prec: null });
+  });
+});
+
+describe("filterPointBindingsByPeriod", () => {
+  const bindings = [
+    makeBinding("c1970-2000", "tmax", 1, "10"),
+    makeBinding("c1991-2020", "tmax", 1, "11"),
+  ];
+
+  it("keeps only bindings whose raster IRI contains the requested period", () => {
+    const result = filterPointBindingsByPeriod(bindings, "c1970-2000");
+    expect(result).toHaveLength(1);
+    expect(result[0].raster.value).toContain("c1970-2000");
+  });
+
+  it("returns an empty array when the grid has no raster for that period", () => {
+    const result = filterPointBindingsByPeriod(bindings, "c1981-2010");
+    expect(result).toHaveLength(0);
+  });
+});
+
+describe("extractAvailableClimatePeriods", () => {
+  it("returns the distinct periods present, in canonical order", () => {
+    const bindings = [
+      makeBinding("c1991-2020", "tmax", 1, "1"),
+      makeBinding("c1970-2000", "tmax", 1, "2"),
+      makeBinding("c1970-2000", "tmin", 1, "3"),
+    ];
+    expect(extractAvailableClimatePeriods(bindings)).toEqual(["c1970-2000", "c1991-2020"]);
+  });
+
+  it("returns a single-period list for a grid restricted to one period (e.g. Grid_30s)", () => {
+    const bindings = [makeBinding("c1970-2000", "tmax", 1, "1")];
+    expect(extractAvailableClimatePeriods(bindings)).toEqual(["c1970-2000"]);
+  });
+
+  it("returns [] for no bindings", () => {
+    expect(extractAvailableClimatePeriods([])).toEqual([]);
   });
 });

@@ -11,7 +11,7 @@ test.describe("Internationalisation", () => {
     await page.getByTestId("language-switcher").click();
     await page.getByTestId("language-option-es").click();
     await expect(page).toHaveURL(/\/es\//);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Estadisticas Climaticas");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Estadísticas Climáticas");
   });
 
   test("switches the UI to Ukrainian when UA is selected", async ({ page }) => {

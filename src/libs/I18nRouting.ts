@@ -1,9 +1,9 @@
-import { APP_CONFIG } from "@/constants/app.constant";
-import type { TLocale } from "@/constants/app.constant";
+import { APP_CONFIG, LOCALES } from "@/constants";
+import type { TLocale } from "@/types";
 import { defineRouting } from "next-intl/routing";
 
 export const routing = defineRouting({
-  locales: APP_CONFIG.i18n.locales,
+  locales: LOCALES,
   defaultLocale: APP_CONFIG.i18n.defaultLocale,
   localePrefix: APP_CONFIG.i18n.localePrefix,
 });

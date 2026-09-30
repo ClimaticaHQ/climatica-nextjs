@@ -1,4 +1,5 @@
 import csv
+import json
 import os
 from collections import defaultdict
 
@@ -9,6 +10,9 @@ DATA_DIR = os.path.join(BASE_DIR, "../data")
 ALL_COUNTRIES = os.path.join(DATA_DIR, "allCountries.txt")
 ALTERNATE_NAMES = os.path.join(DATA_DIR, "alternateNamesV2.txt")
 OUTPUT_CSV = os.path.join(DATA_DIR, "cities.csv")
+
+# * all languages are stored to one json file for one source of truth across the app
+LOCALES_JSON = os.path.join(BASE_DIR, "../../../src/configs/locales.json")
 
 # * feature codes to include
 ALLOWED_FEATURE_CODES = {
@@ -22,8 +26,37 @@ ALLOWED_FEATURE_CODES = {
     #"PPLX",   # section of populated place
 }
 
+
+def load_lang_order(path=None):
+    with open(path or LOCALES_JSON, encoding="utf-8") as f:
+        langs = json.load(f)
+
+    if not isinstance(langs, list) or not langs:
+        raise ValueError(f"{path or LOCALES_JSON} must contain a non-empty JSON array of locale codes")
+
+    return langs
+
+
 # * languages to extract from alternateNamesV2
-TARGET_LANGS = {"en", "uk", "es"}
+# * in the output CSV (label_<lang> columns follow abc order accordingly to locales.json). 
+LANG_ORDER = load_lang_order()
+TARGET_LANGS = set(LANG_ORDER)
+
+
+def should_update_name(current, is_preferred):
+    """Decide whether a new alternate-name entry should replace the current one for a lang.
+
+    Priority: first entry for a lang is always taken; a later preferred=1 entry
+    upgrades a non-preferred current entry; a later preferred=0 entry never
+    overwrites an already-preferred current entry.
+    """
+    if current["name"] is None:
+        # * first entry for this lang — always take it
+        return True
+    if is_preferred and not current["preferred"]:
+        # * new entry is preferred, current is not — upgrade
+        return True
+    return False
 
 
 def load_alternate_names():
@@ -66,17 +99,7 @@ def load_alternate_names():
 
             current = names[geonameid][lang]
 
-            should_update = False
-
-            if current["name"] is None:
-                # * first entry for this lang — always take it
-                should_update = True
-            elif is_preferred and not current["preferred"]:
-                # * new entry is preferred, current is not — upgrade
-                should_update = True
-            # NO FURTHER PROCESSING
-
-            if should_update:
+            if should_update_name(current, is_preferred):
                 names[geonameid][lang] = {
                     "name": name,
                     "alt_id": alt_id,
@@ -90,6 +113,27 @@ def load_alternate_names():
 
     print(f"Loaded alternate names for {len(result)} places")
     return result
+
+# ? extracted previous logic for building labels in different languages
+def build_labels(alt, default_name, ascii_name):
+    """Resolve the label_<lang> columns for one city, in LANG_ORDER."""
+    # * for label_en prefer:
+    # *   1. alternate name with lang=en (preferred/recent)
+    # *   2. default_name
+    # *   3. ascii_name (no diacritics, good for search)
+    label_en = alt.get("en") or default_name or ascii_name
+
+    labels = {"en": label_en}
+    # * label_uk falls back to label_en (not ascii_name) rather than the
+    # * Latin-transliterated ascii_name, which would be a poor UK label
+    labels["uk"] = alt.get("uk") or default_name or label_en
+
+    for lang in LANG_ORDER:
+        if lang in ("en", "uk"):
+            continue
+        labels[lang] = alt.get(lang) or default_name or ascii_name
+
+    return labels
 
 
 def prepare_cities():
@@ -106,18 +150,11 @@ def prepare_cities():
         writer = csv.writer(outfile)
 
         # * header
-        writer.writerow([
-            "id",
-            "geonameid",
-            "label_en",
-            "label_uk",
-            "label_es",
-            "latitude",
-            "longitude",
-            "feature_code",
-            "country_code",
-            "population",
-        ])
+        writer.writerow(
+            ["id", "geonameid"]
+            + [f"label_{lang}" for lang in LANG_ORDER]
+            + ["latitude", "longitude", "feature_code", "country_code", "population"]
+        )
 
         for line in infile:
             parts = line.strip().split("\t")
@@ -149,27 +186,13 @@ def prepare_cities():
                 continue
 
             alt = alt_names.get(geonameid, {})
+            labels = build_labels(alt, default_name, ascii_name)
 
-            # * for label_en prefer:
-            # *   1. alternate name with lang=en (preferred/recent)
-            # *   2. default_name
-            # *   3. ascii_name (no diacritics, good for search)
-            label_en = alt.get("en") or default_name or ascii_name
-            label_uk = alt.get("uk") or default_name or label_en
-            label_es = alt.get("es") or default_name or ascii_name
-
-            writer.writerow([
-                geonameid,
-                geonameid,
-                label_en,
-                label_uk,
-                label_es,
-                latitude,
-                longitude,
-                feature_code,
-                country_code,
-                population,
-            ])
+            writer.writerow(
+                [geonameid, geonameid]
+                + [labels[lang] for lang in LANG_ORDER]
+                + [latitude, longitude, feature_code, country_code, population]
+            )
 
             count += 1
             if count % 100_000 == 0:

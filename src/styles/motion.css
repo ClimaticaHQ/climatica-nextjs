@@ -1,0 +1,131 @@
+/* * All UI motion. Durations, easings and sizes come from MOTION (src/constants/motion.constant.ts)
+   as --motion-* custom properties, set once on <html> by the root layout. The update flash is
+   played from JS (useUpdateFlash), and chart series fades set inline through motionVar(), with
+   the same constants. */
+
+/* * SegmentedControl: the active pill sliding to the selected option */
+.segmented-indicator {
+  transition-property: transform, width;
+  transition-duration: var(--motion-control-slide);
+  transition-timing-function: var(--motion-control-slide-easing);
+}
+
+/* * ChartTransition: a chart card's old content fades out while the new one fades in */
+@keyframes chart-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-chart-crossfade-offset));
+  }
+}
+
+@keyframes chart-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* * a split panel expanding: fade plus a slight scale-up from its side */
+@keyframes chart-expand-in {
+  from {
+    opacity: 0;
+    transform: scale(var(--motion-panel-expand-scale-from));
+  }
+}
+
+.chart-fade-in {
+  animation: chart-fade-in var(--motion-chart-crossfade) var(--motion-chart-crossfade-easing) both;
+}
+
+.chart-fade-out {
+  animation: chart-fade-out var(--motion-chart-crossfade) var(--motion-chart-crossfade-easing) both;
+}
+
+.chart-expand-in {
+  animation: chart-expand-in var(--motion-panel-expand) var(--motion-panel-expand-easing) both;
+}
+
+/* * the content a panel expansion replaces: fades out over the expansion's time */
+.chart-expand-out {
+  animation: chart-fade-out var(--motion-panel-expand) var(--motion-panel-expand-easing) both;
+}
+
+/* * MultiPeriodStatsTable: columns resizing when a period is added or removed */
+.table-column-resize {
+  transition: width var(--motion-table-column-resize) var(--motion-table-column-resize-easing);
+}
+
+/* * FiltersTab: the panel's height, then its content fading in slightly after */
+.filters-collapse {
+  transition: grid-template-rows var(--motion-filters-collapse)
+    var(--motion-filters-collapse-easing);
+}
+
+.filters-content-fade {
+  transition-property: opacity, transform;
+  transition-duration: var(--motion-filters-content-fade);
+  transition-delay: var(--motion-filters-content-delay);
+  transition-timing-function: var(--motion-filters-content-easing);
+}
+
+/* * DataUpdateFade: content dimmed while an update loads */
+.update-fade {
+  transition: opacity var(--motion-update-fade) var(--motion-update-fade-easing);
+}
+
+.update-fade[aria-busy="true"] {
+  opacity: var(--motion-update-fade-opacity);
+}
+
+/* * DataUpdateProgress: a segment crossing the chart card's top edge while data loads */
+@keyframes update-progress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(var(--motion-update-progress-travel));
+  }
+}
+
+.update-progress-track {
+  height: var(--motion-update-progress-height);
+}
+
+.update-progress {
+  width: var(--motion-update-progress-segment);
+  animation: update-progress var(--motion-update-progress-cycle) linear infinite;
+}
+
+/* * Motion off — the Animations setting (MotionRoot's data-motion="off" on <html>, also set
+   under reduced motion) or the device's prefers-reduced-motion: nothing in the UI moves. The
+   loading state stays visible as a static bar across the card's top edge. */
+:root[data-motion="off"] *,
+:root[data-motion="off"] *::before,
+:root[data-motion="off"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+:root[data-motion="off"] {
+  scroll-behavior: auto;
+}
+
+:root[data-motion="off"] .update-progress {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .update-progress {
+    width: 100%;
+  }
+}

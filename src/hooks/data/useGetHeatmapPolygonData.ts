@@ -20,7 +20,7 @@ export function useGetHeatmapPolygonData(
 ) {
   const enabled = wkt !== null;
 
-  const { data, isLoading, error } = useQuery<TPolygonResult, Error>({
+  const { data, isLoading, isFetching, error } = useQuery<TPolygonResult, Error>({
     queryKey: ["heatmap-polygon", wkt, gridSize, variable, isClimate ? climatePeriod : year],
     queryFn: async (): Promise<TPolygonResult> => {
       const [rawPixels, rawAvg] = await Promise.all([
@@ -45,12 +45,16 @@ export function useGetHeatmapPolygonData(
     enabled,
     staleTime: Infinity,
     retry: 1,
+    // * the old region's cells stay on the map while the new ones load
+    keepPreviousData: true,
   });
 
   return {
-    pixels: data?.pixels ?? null,
-    avg: data?.avg ?? null,
+    // * none once the selection is cleared — the kept data belongs to the old one
+    pixels: enabled ? (data?.pixels ?? null) : null,
+    avg: enabled ? (data?.avg ?? null) : null,
     isLoading: enabled && isLoading,
+    isFetching: enabled && isFetching,
     error: error instanceof Error ? error : null,
   };
 }

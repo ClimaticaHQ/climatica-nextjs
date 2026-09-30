@@ -1,177 +1,80 @@
-import { ClimateStatsBar } from "@/components/ClimateStatsBar";
-import { resolveActiveTooltipIndex } from "@/components/TempPrecipChart/utils";
-import { MONTH_NAMES } from "@/constants";
-import { computeWLAxisTicks, computeWLPrecAxisTicks, precToScaled, scaledToPrec } from "@/utils";
-import { useTranslations } from "next-intl";
+import { ChartLegend } from "@/components/ChartLegend";
+import { MONTHLY_VALUES_TEXT_COLOR, MonthlyValuesTable } from "@/components/MonthlyValuesTable";
+import { SeriesPanelHeader, SplitPanelHeader } from "@/components/SeriesPanelHeader";
 import {
-  CartesianGrid,
-  ComposedChart,
-  Customized,
-  Line,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { AridityLegend, WalterLiethCustomized, WalterLiethTooltip } from "./components";
-import { WL_COLORS_A } from "./WalterLiethChart.constant";
-import type { TWLScaledPoint, TWalterLiethChartProps } from "./WalterLiethChart.type";
+  SPLIT_PANEL_ROWS_CLASS,
+  WALTER_LIETH_COMPARISON,
+  WALTER_LIETH_CONVENTION_COLORS,
+  WALTER_LIETH_DIAGRAM,
+} from "@/constants";
+import { useWalterLiethLegendItems } from "@/hooks";
+import type { TWalterLiethChartProps } from "@/types";
+import { WalterLiethPlot, WalterLiethTooltip } from "./components";
+import { useWalterLiethChart } from "./hooks/useWalterLiethChart";
 
+/** One Walter-Lieth diagram. Presentational: draws the util-computed geometry, nothing more. */
 export function WalterLiethChart({
-  chartData,
-  scales,
-  summary,
-  colors = WL_COLORS_A,
-  title,
-  altitude,
+  series,
+  domain,
+  isCompact = false,
+  showLegend = true,
+  isPanel = false,
+  syncId,
+  monthOrder = WALTER_LIETH_DIAGRAM.CALENDAR_MONTH_ORDER,
   activeMonthIndex,
   onActiveMonthIndexChange,
+  headerSlots,
 }: TWalterLiethChartProps) {
-  const t = useTranslations();
-
-  function localMonthName(v: unknown): string {
-    const idx = (MONTH_NAMES as readonly string[]).indexOf(String(v));
-    return idx >= 0 ? t(`months.${idx + 1}`) : String(v);
-  }
-
-  const scaledData: TWLScaledPoint[] = chartData.map((d) => ({
-    monthName: d.monthName,
-    tavg: d.tavg,
-    prec: d.prec,
-    precScaled: precToScaled(d.prec),
-  }));
-
-  const leftTicks = scales ? computeWLAxisTicks(scales.tempMin, scales.tempMax) : undefined;
-  // Ticks below tempMin fall outside the shared domain (e.g. a raw-mm tick at 0 sits below
-  // the plot floor once tempMin is above 0°C, as in tropical climates that never freeze).
-  const rightTicks = scales
-    ? computeWLPrecAxisTicks(scaledToPrec(scales.precMax))
-        .map(precToScaled)
-        .filter((pos) => pos >= scales.tempMin)
-    : undefined;
+  const chart = useWalterLiethChart({ series, monthOrder });
+  const legendItems = useWalterLiethLegendItems();
 
   return (
-    <div>
-      {title && (
-        <p className="mb-1 font-semibold text-[length:var(--font-md)] text-[var(--color-text)]">
-          {title}
-        </p>
+    <figure
+      aria-label={chart.ariaLabel}
+      // * inside a split panel card the figure continues its two-row subgrid (header, plot)
+      className={`m-0 min-w-0 ${isPanel ? SPLIT_PANEL_ROWS_CLASS : ""}`}
+    >
+      {/* * a split panel: name and subtitle (the comparison table has the stats); the city
+          page's single diagram: its stats bar */}
+      {isPanel ? (
+        <SplitPanelHeader series={series} slots={headerSlots} />
+      ) : (
+        <SeriesPanelHeader series={series} summary={chart.summary} />
       )}
-      {summary && (
-        <ClimateStatsBar
-          meanTemp={summary.annualAvgTemp}
-          annualPrecip={summary.totalPrec}
-          aridMonths={summary.aridCount}
-          martonneIndex={summary.martonne}
-          {...(altitude !== undefined ? { altitude } : {})}
-        />
-      )}
-      <div className="overflow-x-auto">
-        <div className="h-[300px] sm:h-[360px] md:h-[420px] lg:h-[460px] min-w-[520px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart
-              data={scaledData}
-              margin={{ top: 20, right: 70, bottom: 50, left: 20 }}
-              onMouseMove={(state) =>
-                onActiveMonthIndexChange?.(resolveActiveTooltipIndex(state.activeTooltipIndex))
-              }
-              onMouseLeave={() => onActiveMonthIndexChange?.(null)}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis
-                dataKey="monthName"
-                interval={0}
-                tickFormatter={localMonthName}
-                tick={{ fontSize: 11, fill: "var(--color-text-secondary)" }}
-                label={{
-                  value: t("chart.monthAxis"),
-                  position: "insideBottom",
-                  offset: -10,
-                  fill: "var(--color-text-secondary)",
-                  fontWeight: 600,
-                }}
-              />
-              <YAxis
-                yAxisId="left"
-                domain={scales ? [scales.tempMin, scales.plotMax] : ["auto", "auto"]}
-                {...(leftTicks ? { ticks: leftTicks } : {})}
-                tickFormatter={(v: unknown) => String(Math.round(Number(v)))}
-                tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
-                label={{
-                  value: "°C",
-                  angle: -90,
-                  position: "insideLeft",
-                  offset: 12,
-                  fill: "var(--color-text-secondary)",
-                  fontWeight: 600,
-                }}
-              />
-              <YAxis
-                yAxisId="right"
-                orientation="right"
-                domain={scales ? [scales.tempMin, scales.plotMax] : [0, "auto"]}
-                allowDataOverflow={false}
-                {...(rightTicks ? { ticks: rightTicks } : {})}
-                tickFormatter={(v: unknown) => String(Math.round(scaledToPrec(Number(v))))}
-                tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
-                axisLine={{ stroke: "var(--color-border)" }}
-                tickLine={{ stroke: "var(--color-border)" }}
-                label={{
-                  value: "mm",
-                  angle: 90,
-                  position: "insideRight",
-                  offset: 12,
-                  fill: "var(--color-text-secondary)",
-                  fontWeight: 600,
-                }}
-              />
-              {scales && scales.plotMax > scales.tempMax && (
-                <ReferenceLine
-                  yAxisId="left"
-                  y={scales.tempMax}
-                  stroke="var(--color-text-secondary)"
-                  strokeOpacity={0.5}
-                  strokeDasharray="4 4"
-                />
-              )}
-              <Tooltip content={<WalterLiethTooltip wlData={scaledData} />} />
-              {/* Invisible lines — needed for recharts to initialise axis scales */}
-              <Line
-                yAxisId="left"
-                dataKey="precScaled"
-                stroke={colors.precLineColor}
-                strokeWidth={0}
-                dot={false}
-                legendType="none"
-              />
-              <Line
-                yAxisId="left"
-                dataKey="tavg"
-                stroke={colors.tempLineColor}
-                strokeWidth={0}
-                dot={false}
-                legendType="none"
-              />
-              <Line
-                yAxisId="right"
-                dataKey="precScaled"
-                strokeWidth={0}
-                dot={false}
-                legendType="none"
-              />
-              <Customized
-                component={WalterLiethCustomized}
-                wlData={scaledData}
-                wlScales={scales}
-                colors={colors}
-                {...(activeMonthIndex !== undefined ? { activeMonthIndex } : {})}
-              />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-      <AridityLegend />
-    </div>
+      <WalterLiethPlot
+        rows={chart.rows}
+        domain={domain}
+        isCompact={isCompact}
+        frost={chart.frost}
+        syncId={syncId}
+        tooltip={<WalterLiethTooltip />}
+        activeMonthIndex={activeMonthIndex}
+        onActiveMonthIndexChange={onActiveMonthIndexChange}
+        layers={[
+          {
+            key: series.id,
+            rows: chart.rows,
+            segments: chart.segments,
+            patternIds: chart.patternIds,
+            colors: WALTER_LIETH_CONVENTION_COLORS,
+            dotShape: WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
+          },
+        ]}
+      />
+      <MonthlyValuesTable
+        series={[
+          {
+            key: series.id,
+            label: series.label,
+            color: MONTHLY_VALUES_TEXT_COLOR,
+            data: series.months,
+          },
+        ]}
+        isCompact={isCompact}
+        activeMonthIndex={activeMonthIndex ?? null}
+        onActiveMonthIndexChange={onActiveMonthIndexChange}
+      />
+      {showLegend && <ChartLegend items={legendItems} />}
+    </figure>
   );
 }

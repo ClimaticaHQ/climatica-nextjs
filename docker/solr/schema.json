@@ -9,8 +9,12 @@
           "class": "solr.StandardTokenizerFactory"
         },
         "filters": [
-          { "class": "solr.LowerCaseFilterFactory" },
-          { "class": "solr.ASCIIFoldingFilterFactory" }
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.ASCIIFoldingFilterFactory"
+          }
         ]
       },
       "queryAnalyzer": {
@@ -18,8 +22,12 @@
           "class": "solr.StandardTokenizerFactory"
         },
         "filters": [
-          { "class": "solr.LowerCaseFilterFactory" },
-          { "class": "solr.ASCIIFoldingFilterFactory" }
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.ASCIIFoldingFilterFactory"
+          }
         ]
       }
     },
@@ -28,10 +36,16 @@
       "class": "solr.TextField",
       "positionIncrementGap": "100",
       "indexAnalyzer": {
-        "tokenizer": { "class": "solr.StandardTokenizerFactory" },
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
         "filters": [
-          { "class": "solr.LowerCaseFilterFactory" },
-          { "class": "solr.ASCIIFoldingFilterFactory" },
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.ASCIIFoldingFilterFactory"
+          },
           {
             "class": "solr.NGramFilterFactory",
             "minGramSize": "3",
@@ -40,10 +54,16 @@
         ]
       },
       "queryAnalyzer": {
-        "tokenizer": { "class": "solr.StandardTokenizerFactory" },
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
         "filters": [
-          { "class": "solr.LowerCaseFilterFactory" },
-          { "class": "solr.ASCIIFoldingFilterFactory" }
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.ASCIIFoldingFilterFactory"
+          }
         ]
       }
     }
@@ -57,14 +77,21 @@
       "stored": true
     },
     {
-      "name": "label_en",
+      "name": "label_de",
       "type": "suggestType",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
-      "name": "label_uk",
+      "name": "label_el",
+      "type": "suggestType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_en",
       "type": "suggestType",
       "multiValued": false,
       "indexed": true,
@@ -78,6 +105,48 @@
       "stored": true
     },
     {
+      "name": "label_fr",
+      "type": "suggestType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_it",
+      "type": "suggestType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_pt",
+      "type": "suggestType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_uk",
+      "type": "suggestType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_de_ngram",
+      "type": "trigramType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": false
+    },
+    {
+      "name": "label_el_ngram",
+      "type": "trigramType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": false
+    },
+    {
       "name": "label_en_ngram",
       "type": "trigramType",
       "multiValued": false,
@@ -85,14 +154,35 @@
       "stored": false
     },
     {
-      "name": "label_uk_ngram",
+      "name": "label_es_ngram",
       "type": "trigramType",
       "multiValued": false,
       "indexed": true,
       "stored": false
     },
     {
-      "name": "label_es_ngram",
+      "name": "label_fr_ngram",
+      "type": "trigramType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": false
+    },
+    {
+      "name": "label_it_ngram",
+      "type": "trigramType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": false
+    },
+    {
+      "name": "label_pt_ngram",
+      "type": "trigramType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": false
+    },
+    {
+      "name": "label_uk_ngram",
       "type": "trigramType",
       "multiValued": false,
       "indexed": true,
@@ -135,8 +225,37 @@
     }
   ],
   "add-copy-field": [
-    { "source": "label_en", "dest": "label_en_ngram" },
-    { "source": "label_uk", "dest": "label_uk_ngram" },
-    { "source": "label_es", "dest": "label_es_ngram" }
+    {
+      "source": "label_de",
+      "dest": "label_de_ngram"
+    },
+    {
+      "source": "label_el",
+      "dest": "label_el_ngram"
+    },
+    {
+      "source": "label_en",
+      "dest": "label_en_ngram"
+    },
+    {
+      "source": "label_es",
+      "dest": "label_es_ngram"
+    },
+    {
+      "source": "label_fr",
+      "dest": "label_fr_ngram"
+    },
+    {
+      "source": "label_it",
+      "dest": "label_it_ngram"
+    },
+    {
+      "source": "label_pt",
+      "dest": "label_pt_ngram"
+    },
+    {
+      "source": "label_uk",
+      "dest": "label_uk_ngram"
+    }
   ]
 }

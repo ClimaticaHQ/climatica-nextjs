@@ -1,7 +1,7 @@
 import { ChevronDownIcon, CodeIcon, ImageIcon, SpinnerIcon, TableIcon } from "@/components/svg";
 import { TExportOptionKey } from "@/types";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { ExportMenuProps } from "./ExportMenu.type";
 
 export function ExportMenu({
@@ -12,8 +12,11 @@ export function ExportMenu({
   onExportRawJson,
   isRawDataAvailable = true,
   isDisabled = false,
+  disabledReason,
 }: ExportMenuProps) {
   const t = useTranslations();
+  const reasonId = useId();
+  const reason = isDisabled ? disabledReason : undefined;
   const [isOpen, setIsOpen] = useState(false);
   const [loadingKey, setLoadingKey] = useState<TExportOptionKey | null>(null);
   const [errorKey, setErrorKey] = useState<TExportOptionKey | null>(null);
@@ -100,11 +103,23 @@ export function ExportMenu({
   ];
 
   return (
-    <div ref={ref} className="relative" style={{ pointerEvents: loadingKey ? "none" : "auto" }}>
+    <div
+      ref={ref}
+      className="relative"
+      style={{ pointerEvents: loadingKey ? "none" : "auto" }}
+      // * on the wrapper: a disabled button doesn't reliably show its own title
+      {...(reason !== undefined ? { title: reason } : {})}
+    >
+      {reason !== undefined && (
+        <span id={reasonId} className="sr-only">
+          {reason}
+        </span>
+      )}
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         disabled={isDisabled}
+        {...(reason !== undefined ? { "aria-describedby": reasonId } : {})}
         aria-haspopup="true"
         aria-expanded={isOpen}
         className="flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-[length:var(--font-sm)] text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)] disabled:cursor-not-allowed disabled:opacity-50"

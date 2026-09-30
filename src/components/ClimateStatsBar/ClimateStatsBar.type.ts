@@ -1,18 +1,4 @@
-export type TComparisonEntity = {
-  meanTemp: number;
-  annualPrecip: number;
-  aridMonths: number;
-  altitude?: number;
-  martonneIndex: number | null;
-  color: string;
-};
-
-export type TDualValueProps = {
-  a: string;
-  b: string;
-  aColor: string;
-  bColor: string;
-};
+import type { ReactNode } from "react";
 
 export type TClimateStatsBarProps = {
   meanTemp: number;
@@ -20,6 +6,20 @@ export type TClimateStatsBarProps = {
   aridMonths: number;
   altitude?: number;
   martonneIndex: number | null;
-  comparison?: TComparisonEntity;
-  primaryColor?: string;
+};
+
+export type TStatCellProps = {
+  label: string;
+  /** full name for assistive tech when the visible label is shortened */
+  fullLabel?: string;
+  title?: string;
+  children: ReactNode;
+  /** reserve the meta row (badge / delta) so values align across bars; it may stay empty */
+  hasMetaRow: boolean;
+  meta?: ReactNode;
+  cellClassName: string;
+};
+
+export type TStatValueProps = {
+  value: string;
 };

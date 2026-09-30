@@ -1,10 +1,12 @@
+import { Card } from "@/components/Card";
+import { ECardPadding } from "@/enums";
 import type { TComparisonTableSkeletonProps } from "./ComparisonTableSkeleton.type";
 
 const ROW_COUNT = 5;
 
 export function ComparisonTableSkeleton({ cols = 2 }: TComparisonTableSkeletonProps) {
   return (
-    <div className="animate-pulse overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)]">
+    <Card padding={ECardPadding.NONE} shouldClip className="animate-pulse">
       <table className="w-full table-fixed text-[length:var(--font-sm)]">
         <thead>
           <tr className="border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)]">
@@ -37,6 +39,6 @@ export function ComparisonTableSkeleton({ cols = 2 }: TComparisonTableSkeletonPr
           ))}
         </tbody>
       </table>
-    </div>
+    </Card>
   );
 }
