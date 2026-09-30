@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import type { TMartonneBadgeProps } from "../ClimateStatsBar.type";
+import type { TMartonneBadgeProps } from "./MartonneBadge.type";
 
 export function MartonneBadge({ badge }: TMartonneBadgeProps) {
   const t = useTranslations();
