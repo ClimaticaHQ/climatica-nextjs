@@ -4,10 +4,13 @@ import {
   APP_TITLE,
   CLIMATE_PERIOD_LABELS,
   DATASETS,
+  DEFAULT_CHART_MODE,
+  DEFAULT_COMPARE_LAYOUT,
   TIME,
   VARIABLE_LABELS,
   WEATHER_MAX_YEAR,
   WEATHER_MIN_YEAR,
+  WALTER_LIETH_COMPARISON,
 } from "@/constants";
 import {
   useGeolocation,
@@ -22,11 +25,12 @@ import {
   useUrlStateSync,
 } from "@/hooks";
 import { useFiltersStore, useSettingsStore } from "@/stores";
-import type { TCity } from "@/types";
+import type { ECompareLayout, EWalterLiethShading } from "@/enums";
+import type { TChartMode, TCity, TExpandedPanel } from "@/types";
 import { scrollToSection } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { COMPARE_PERIODS_URL_SCHEMA } from "./ComparePeriods.constant";
 import { ComparePeriodsView } from "./ComparePeriodsView";
 
@@ -48,9 +52,21 @@ export function ComparePeriods() {
     usePersistedClimatePeriods();
   const [periods, setPeriods] = usePersistedPeriods();
 
+  const [layout, setLayout] = useState<ECompareLayout>(DEFAULT_COMPARE_LAYOUT);
+  const [wlShading, setWlShading] = useState<EWalterLiethShading>(
+    WALTER_LIETH_COMPARISON.DEFAULT_SHADING,
+  );
+  const [chartMode, setChartMode] = useState<TChartMode>(DEFAULT_CHART_MODE);
+  // * kept while overlay is shown, so going back to split restores it
+  const [expanded, setExpanded] = useState<TExpandedPanel>(null);
+
   const { pushUrlState, shareUrl } = useUrlStateSync({
     schema: COMPARE_PERIODS_URL_SCHEMA,
     state: {
+      layout,
+      wlShading,
+      chartMode,
+      expanded,
       city: cityA,
       comparePeriods:
         dataset === DATASETS.CLIMATE
@@ -59,6 +75,11 @@ export function ComparePeriods() {
     },
     onRestore(parsed) {
       if (parsed.city) selectCityA(parsed.city);
+      // * absent param = default, so back/forward to a split URL restores split too
+      setLayout(parsed.layout ?? DEFAULT_COMPARE_LAYOUT);
+      setWlShading(parsed.wlShading ?? WALTER_LIETH_COMPARISON.DEFAULT_SHADING);
+      setChartMode(parsed.chartMode ?? DEFAULT_CHART_MODE);
+      setExpanded(parsed.expanded ?? null);
       if (parsed.comparePeriods) {
         useFiltersStore.getState().actions.setDataset(parsed.comparePeriods.dataset);
         if (parsed.comparePeriods.dataset === DATASETS.CLIMATE) {
@@ -92,6 +113,7 @@ export function ComparePeriods() {
     dataA,
     dataB,
     isLoading: isClimateLoading,
+    isFetching: isClimateFetching,
     error: climateError,
   } = useGetComparePeriods(
     cityA.lat,
@@ -107,6 +129,7 @@ export function ComparePeriods() {
   const {
     data: periodsData,
     isLoading: isWeatherLoading,
+    isFetching: isWeatherFetching,
     loadingPeriods,
     error: weatherError,
   } = useGetMultiPeriodData(
@@ -120,6 +143,7 @@ export function ComparePeriods() {
   const { data: datasetAttribution = null } = useGetDatasetVersion();
 
   const isLoading = dataset === DATASETS.CLIMATE ? isClimateLoading : isWeatherLoading;
+  const isFetching = dataset === DATASETS.CLIMATE ? isClimateFetching : isWeatherFetching;
   const error = dataset === DATASETS.CLIMATE ? climateError : weatherError;
 
   function handleLocate() {
@@ -173,6 +197,7 @@ export function ComparePeriods() {
       variables={variables}
       shareUrl={shareUrl}
       isLoading={isLoading}
+      isFetching={isFetching}
       isLocating={isLocating}
       error={error}
       locationError={resolvedLocationError}
@@ -187,6 +212,13 @@ export function ComparePeriods() {
       periodsData={periodsData}
       loadingPeriods={loadingPeriods}
       chartSectionRef={chartSectionRef}
+      layout={layout}
+      onLayoutChange={setLayout}
+      wlShading={wlShading}
+      onWlShadingChange={setWlShading}
+      chartMode={chartMode}
+      onChartModeChange={setChartMode}
+      panelExpansion={{ expanded, onExpandedChange: setExpanded }}
     />
   );
 }

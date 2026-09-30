@@ -4,7 +4,11 @@ import {
   cityUrlField,
   gridSizeUrlField,
   monthsUrlField,
+  chartModeUrlField,
+  expandedPanelUrlField,
   variablesUrlField,
+  compareLayoutUrlField,
+  walterLiethShadingUrlField,
 } from "@/utils/urlFields.util";
 import { comparePeriodsUrlField } from "./ComparePeriods.util";
 import type { TComparePeriodsUrlState } from "./ComparePeriods.type";
@@ -19,4 +23,8 @@ export const COMPARE_PERIODS_URL_SCHEMA: TUrlSchema<TComparePeriodsUrlState> = {
   variables: variablesUrlField,
   gridSize: gridSizeUrlField,
   months: monthsUrlField,
+  layout: compareLayoutUrlField,
+  wlShading: walterLiethShadingUrlField,
+  chartMode: chartModeUrlField,
+  expanded: expandedPanelUrlField,
 };

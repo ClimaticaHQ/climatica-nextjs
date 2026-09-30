@@ -1,3 +1,5 @@
+import type { ECompareLayout, EWalterLiethShading } from "@/enums";
+import type { TChartMode, TExpandedPanel, TPanelExpansion } from "@/types";
 import { DATASETS } from "@/constants";
 import type { TClimatePeriod } from "@/constants/worldclim.constant";
 import type {
@@ -26,6 +28,10 @@ export type TComparePeriodsUrlState = {
   variables: TVariable[];
   gridSize: TCellSize;
   months: TMonthFilter;
+  layout: ECompareLayout;
+  wlShading: EWalterLiethShading;
+  chartMode: TChartMode;
+  expanded: TExpandedPanel;
 };
 
 export type TComparePeriodsViewProps = {
@@ -39,6 +45,8 @@ export type TComparePeriodsViewProps = {
   autoGrid: TCellSize;
   shareUrl: string;
   isLoading: boolean;
+  /** a refetch after a filter change — the shown data stays until it lands */
+  isFetching: boolean;
   isLocating: boolean;
   error: Error | null;
   locationError: string | null;
@@ -56,4 +64,13 @@ export type TComparePeriodsViewProps = {
   periods: number[];
   periodsData: TMultiPeriodEntry[];
   loadingPeriods: number[];
+
+  // * Walter-Lieth comparison layout (URL state)
+  layout: ECompareLayout;
+  onLayoutChange: (layout: ECompareLayout) => void;
+  wlShading: EWalterLiethShading;
+  onWlShadingChange: (shading: EWalterLiethShading) => void;
+  chartMode: TChartMode;
+  onChartModeChange: (mode: TChartMode) => void;
+  panelExpansion: TPanelExpansion;
 };

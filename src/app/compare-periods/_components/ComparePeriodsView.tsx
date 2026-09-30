@@ -1,13 +1,16 @@
 "use client";
+import { getLaterPeriodSeries, getPeriodsUpdateSeries } from "./ComparePeriods.util";
+import { ENumberSign, EStatValueSize, EWalterLiethSeriesId } from "@/enums";
 
 import type { TMiniMapLocation } from "@/components";
+import { DataUpdateProvider } from "@/components/DataUpdate";
 import {
-  CompareStatsGrid,
-  DiffCard,
   LocationSearch,
   MultiPeriodStatsTable,
   TempPrecipChart,
   useTempPrecipChart,
+  ComparisonTable,
+  StatCard,
 } from "@/components";
 import {
   ChartSkeleton,
@@ -23,13 +26,17 @@ import {
 import {
   CELL_SIZE_OPTIONS,
   CLIMATE_COMPARISON_COLORS,
+  VALUE_DIGITS,
   CLIMATE_PERIOD_LABELS,
   COMPARE_EXPORT_SVG_LAYOUT,
+  DATA_UPDATE_NAMES_SEPARATOR,
   DATASETS,
   EXPORT_PNG_SCALE,
   PERIOD_COLORS,
+  COMPARE_EXPORT_DEFAULT_VISIBLE,
 } from "@/constants";
-import type { TCompareExportLabels, TCompareExportPayload } from "@/types";
+import type { TCompareExportLabels, TCompareExportPayload, TVisibleSeries } from "@/types";
+import { useState } from "react";
 import {
   buildClimateStatsRows,
   buildCompareExportSvg,
@@ -42,8 +49,12 @@ import {
   resolveExportColors,
   shortGridLabel,
   svgToPng,
+  getExportedSeriesLabels,
+  buildComparisonTable,
 } from "@/utils";
-import { useTranslations } from "next-intl";
+import { useComparisonExport, useFormatNumber, useMonthlyTableLabels } from "@/hooks";
+import { differenceOf, withMonthlyMean } from "@/utils/monthlyClimate.util";
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import type { TComparePeriodsViewProps } from "./ComparePeriods.type";
 
@@ -69,6 +80,7 @@ export function ComparePeriodsView({
   altitude,
   datasetAttribution,
   isLoading,
+  isFetching,
   isLocating,
   error,
   locationError,
@@ -79,8 +91,20 @@ export function ComparePeriodsView({
   periodsData,
   loadingPeriods,
   chartSectionRef,
+  layout,
+  onLayoutChange,
+  wlShading,
+  onWlShadingChange,
+  chartMode,
+  onChartModeChange,
+  panelExpansion,
 }: TComparePeriodsViewProps) {
   const t = useTranslations();
+  const locale = useLocale();
+  const formatNumber = useFormatNumber();
+  const tableLabels = useMonthlyTableLabels();
+  // * reported by the chart — the export follows its chips
+  const [visibleSeries, setVisibleSeries] = useState<TVisibleSeries | null>(null);
 
   const isClimate = dataset === DATASETS.CLIMATE;
 
@@ -91,12 +115,59 @@ export function ComparePeriodsView({
 
   const labelA = isClimate ? CLIMATE_PERIOD_LABELS[climatePeriodA] : String(periods[0] ?? "");
   const labelB = isClimate ? CLIMATE_PERIOD_LABELS[climatePeriodB] : String(periods[1] ?? "");
+  const updateAnnouncement = t("loading.dataUpdated", {
+    location: city.label,
+    period: (isClimate ? [labelA, labelB] : periods).join(DATA_UPDATE_NAMES_SEPARATOR),
+  });
+  // * a refetch in progress: exporting now would save the data being replaced
+  const exportLock = isFetching
+    ? { isDisabled: true, disabledReason: t("exportMenu.updating") }
+    : { isDisabled: false };
+
+  // * the difference always reads later − earlier, whichever period was picked first
+  const comparisonTable =
+    dataA && dataB
+      ? buildComparisonTable({
+          seriesA: { id: EWalterLiethSeriesId.A, label: labelA, data: dataA, altitude },
+          seriesB: { id: EWalterLiethSeriesId.B, label: labelB, data: dataB, altitude },
+          minuend: getLaterPeriodSeries(climatePeriodA, climatePeriodB),
+          locale,
+        })
+      : null;
+
+  // * two-series comparisons — the export then follows chart type, layout and shading exactly
+  const comparisonExport = useComparisonExport({
+    isEnabled: isClimate,
+    // * only Climate pairs get here: Weather compares years in the multi-period chart
+    chartMode,
+    layout,
+    shading: wlShading,
+    expanded: panelExpansion.expanded,
+    table: comparisonTable,
+    visible: visibleSeries ?? COMPARE_EXPORT_DEFAULT_VISIBLE,
+    chartDataA: chart.chartDataA,
+    chartDataB: chart.chartDataB,
+    labelA,
+    labelB,
+    compareMode: "periods",
+    cityName: city.label,
+    subtitleText: `${labelA} vs ${labelB}`,
+    altitudeA: altitude ?? undefined,
+    altitudeB: altitude ?? undefined,
+  });
+
+  // * PNG / SVG show the expanded panel alone — the file name says which series
+  const exportedLabels = getExportedSeriesLabels({
+    expanded: comparisonExport?.expanded ?? null,
+    labelA,
+    labelB,
+  });
 
   const hasBothClimateData = dataA !== null && dataB !== null;
   const statsA = dataA ? computeCompareStats(dataA) : null;
   const statsB = dataB ? computeCompareStats(dataB) : null;
-  const tmaxDiff = statsA && statsB ? statsB.avgTmax - statsA.avgTmax : null;
-  const precDiff = statsA && statsB ? statsB.totalPrec - statsA.totalPrec : null;
+  const tmaxDiff = statsA && statsB ? differenceOf(statsB.avgTmax, statsA.avgTmax) : null;
+  const precDiff = statsA && statsB ? differenceOf(statsB.totalPrec, statsA.totalPrec) : null;
 
   const noDataMessageA =
     isClimate && dataA === null
@@ -132,7 +203,7 @@ export function ComparePeriodsView({
       rows.push([t("chart.altitude"), `${altitude} m`, `${altitude} m`]);
     }
     rows.push([
-      t("climateComparison.stats.martonne"),
+      t("chart.martonne"),
       statsA.martonneIndex !== null
         ? `${statsA.martonneIndex.toFixed(1)} (${t(getMartonneLabelKey(statsA.martonneIndex))})`
         : "—",
@@ -149,8 +220,9 @@ export function ComparePeriodsView({
 
   function buildExportLabels(): TCompareExportLabels {
     return {
+      locale,
       monthNames: Array.from({ length: 12 }, (_, i) => t(`months.${i + 1}`)),
-      monthAxisLabel: t("chart.monthAxis"),
+      tableLabels,
       seriesLabels: {
         tmax: t("chart.maxTemperature"),
         tmin: t("chart.minTemperature"),
@@ -163,7 +235,7 @@ export function ComparePeriodsView({
         totalPrec: t("climateComparison.stats.totalPrec"),
         aridMonths: t("climateComparison.stats.aridMonths"),
         altitude: t("chart.altitude"),
-        martonne: t("climateComparison.stats.martonne"),
+        martonne: t("chart.martonne"),
       },
     };
   }
@@ -198,7 +270,8 @@ export function ComparePeriodsView({
           colors: seriesColors.B,
         },
       ],
-      visibleSeries: { tmax: true, tmin: true, tavg: false, prec: true },
+      // * the chart's chips, so the export's lines, legend and table follow the screen
+      visibleSeries: visibleSeries ?? COMPARE_EXPORT_DEFAULT_VISIBLE,
       selectedMonths,
       scales: chart.scales,
       rightMax: chart.rightMax,
@@ -206,6 +279,7 @@ export function ComparePeriodsView({
       showTavgLine: true,
       datasetAttribution,
       shareUrl,
+      ...(comparisonExport ? { comparison: comparisonExport } : {}),
     };
   }
 
@@ -220,7 +294,7 @@ export function ComparePeriodsView({
         const color = PERIOD_COLORS[i % PERIOD_COLORS.length] ?? PERIOD_COLORS[0];
         return {
           label: String(year),
-          data: rows.map((row) => ({ ...row, tavg: (row.tmax + row.tmin) / 2 })),
+          data: withMonthlyMean(rows),
           stats,
           altitude,
           martonneClassLabel:
@@ -228,7 +302,8 @@ export function ComparePeriodsView({
           colors: { tmax: color, tmin: color, tavg: color, prec: color },
         };
       }),
-      visibleSeries: { tmax: true, tmin: true, tavg: false, prec: true },
+      // * the chart's chips, so the export's lines, legend and table follow the screen
+      visibleSeries: visibleSeries ?? COMPARE_EXPORT_DEFAULT_VISIBLE,
       selectedMonths,
       scales: chart.scales,
       rightMax: chart.rightMax,
@@ -249,7 +324,7 @@ export function ComparePeriodsView({
       width: COMPARE_EXPORT_SVG_LAYOUT.width,
       height,
       scale: EXPORT_PNG_SCALE,
-      filename: buildFilename("compare-periods", [city.label, labelA, labelB], "png"),
+      filename: buildFilename("compare-periods", [city.label, ...exportedLabels], "png"),
     });
   }
 
@@ -258,7 +333,10 @@ export function ComparePeriodsView({
     if (!payload) return;
     const colors = resolveExportColors();
     const { svg } = buildCompareExportSvg(payload, colors);
-    downloadSvgString(svg, buildFilename("compare-periods", [city.label, labelA, labelB], "svg"));
+    downloadSvgString(
+      svg,
+      buildFilename("compare-periods", [city.label, ...exportedLabels], "svg"),
+    );
   }
 
   function handleWeatherExportCSV() {
@@ -278,7 +356,7 @@ export function ComparePeriodsView({
       rows.push([t("chart.altitude"), ...periods.map(() => `${altitude} m`)]);
     }
     rows.push([
-      t("climateComparison.stats.martonne"),
+      t("chart.martonne"),
       ...periods.map((year) => {
         const s = statsMap.get(year);
         return s !== undefined && s.martonneIndex !== null ? s.martonneIndex.toFixed(1) : "—";
@@ -355,97 +433,117 @@ export function ComparePeriodsView({
 
         {error && !isLoading && <ErrorBanner message={error.message} />}
 
-        {isClimate &&
-          (isLoading ? (
-            <div className="flex flex-col gap-2">
-              <div className="flex h-10 items-center justify-end">
-                <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
+        {/* * around the table, the chart card and the trend cards: each flashes when the data it
+            shows updates */}
+        {isClimate && (
+          <DataUpdateProvider
+            series={{ [EWalterLiethSeriesId.A]: dataA, [EWalterLiethSeriesId.B]: dataB }}
+            isFetching={isFetching}
+            announcement={updateAnnouncement}
+          >
+            {isLoading ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex h-10 items-center justify-end">
+                  <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
+                </div>
+                <div className="flex flex-col gap-6">
+                  <TableSkeleton rows={5} cols={2} />
+                  <ChartSkeleton />
+                </div>
               </div>
-              <div className="flex flex-col gap-6">
-                <TableSkeleton rows={5} cols={2} />
-                <ChartSkeleton />
+            ) : dataA && dataB && statsA && statsB ? (
+              <div ref={chartSectionRef} className="flex flex-col gap-2">
+                <div className="flex h-10 items-center justify-end">
+                  <ExportMenu
+                    onExportCSV={handleClimateExportCSV}
+                    onExportPNG={handleClimateExportPNG}
+                    onExportSVG={handleClimateExportSVG}
+                    {...exportLock}
+                  />
+                </div>
+                <div className="flex flex-col gap-6">
+                  {comparisonTable && <ComparisonTable table={comparisonTable} />}
+                  <TempPrecipChart
+                    onVisibleSeriesChange={setVisibleSeries}
+                    dataA={dataA}
+                    dataB={dataB}
+                    labelA={labelA}
+                    labelB={labelB}
+                    compareMode="periods"
+                    cityName={city.label}
+                    subtitle={{ rawLabel: `${labelA} vs ${labelB}` }}
+                    variables={variables}
+                    showAridity={false}
+                    layout={layout}
+                    onLayoutChange={onLayoutChange}
+                    wlShading={wlShading}
+                    onWlShadingChange={onWlShadingChange}
+                    chartMode={chartMode}
+                    onChartModeChange={onChartModeChange}
+                    panelExpansion={panelExpansion}
+                    {...(altitude !== null ? { altitude } : {})}
+                    {...(selectedMonths !== null && selectedMonths.length > 0
+                      ? { selectedMonths }
+                      : {})}
+                  />
+                </div>
               </div>
-            </div>
-          ) : dataA && dataB && statsA && statsB ? (
-            <div ref={chartSectionRef} className="flex flex-col gap-2">
-              <div className="flex h-10 items-center justify-end">
-                <ExportMenu
-                  onExportCSV={handleClimateExportCSV}
-                  onExportPNG={handleClimateExportPNG}
-                  onExportSVG={handleClimateExportSVG}
-                />
+            ) : !hasBothClimateData && !error ? (
+              <div className="flex flex-col gap-2">
+                {noDataMessageA && <EmptyState message={noDataMessageA} />}
+                {noDataMessageB && <EmptyState message={noDataMessageB} />}
+                {!noDataMessageA && !noDataMessageB && (
+                  <EmptyState message={t("climateComparison.noDataPeriods")} />
+                )}
               </div>
-              <div className="flex flex-col gap-6">
-                <CompareStatsGrid
-                  labelA={labelA}
-                  labelB={labelB}
-                  statsA={statsA}
-                  statsB={statsB}
-                  altitudeA={altitude}
-                  altitudeB={altitude}
-                />
-                <TempPrecipChart
-                  dataA={dataA}
-                  dataB={dataB}
-                  labelA={labelA}
-                  labelB={labelB}
-                  compareMode="periods"
-                  cityName={city.label}
-                  subtitle={{ rawLabel: `${labelA} vs ${labelB}` }}
-                  variables={variables}
-                  showWalterLiethToggle={false}
-                  showAridity={false}
-                  {...(selectedMonths !== null && selectedMonths.length > 0
-                    ? { selectedMonths }
-                    : {})}
-                />
-              </div>
-            </div>
-          ) : !hasBothClimateData && !error ? (
-            <div className="flex flex-col gap-2">
-              {noDataMessageA && <EmptyState message={noDataMessageA} />}
-              {noDataMessageB && <EmptyState message={noDataMessageB} />}
-              {!noDataMessageA && !noDataMessageB && (
-                <EmptyState message={t("climateComparison.noDataPeriods")} />
-              )}
-            </div>
-          ) : null)}
+            ) : null}
 
-        {isClimate && hasBothClimateData && tmaxDiff !== null && precDiff !== null && (
-          <div className="grid grid-cols-2 gap-3">
-            <DiffCard
-              title={t("comparePeriods.trend.tempTitle")}
-              value={
-                tmaxDiff === 0
-                  ? t("comparePeriods.trend.noChange")
-                  : `${tmaxDiff > 0 ? "+" : ""}${tmaxDiff.toFixed(1)}°C`
-              }
-              sub={`${labelB} vs ${labelA}`}
-              valueColor={
-                tmaxDiff > 0
-                  ? CLIMATE_COMPARISON_COLORS.B.tmax
-                  : tmaxDiff < 0
-                    ? CLIMATE_COMPARISON_COLORS.A.tmax
-                    : undefined
-              }
-            />
-            <DiffCard
-              title={t("comparePeriods.trend.precipTitle")}
-              value={
-                precDiff === 0
-                  ? t("comparePeriods.trend.noChange")
-                  : `${precDiff > 0 ? "+" : ""}${precDiff.toFixed(0)} mm`
-              }
-              sub={`${labelB} vs ${labelA}`}
-              valueColor={
-                precDiff > 0
-                  ? CLIMATE_COMPARISON_COLORS.B.tmax
-                  : precDiff < 0
-                    ? CLIMATE_COMPARISON_COLORS.A.tmax
-                    : undefined
-              }
-            />
-          </div>
+            {hasBothClimateData && tmaxDiff !== null && precDiff !== null && (
+              <div className="grid grid-cols-2 gap-3">
+                <StatCard
+                  valueSize={EStatValueSize.LG}
+                  label={t("comparePeriods.trend.tempTitle")}
+                  value={
+                    tmaxDiff === 0
+                      ? t("comparePeriods.trend.noChange")
+                      : t("units.celsiusValue", {
+                          value: formatNumber(tmaxDiff, {
+                            digits: VALUE_DIGITS.TEMP,
+                            sign: ENumberSign.SIGNED,
+                          }),
+                        })
+                  }
+                  sub={t("comparePeriods.trend.comparedTo", { a: labelA, b: labelB })}
+                  valueColor={
+                    tmaxDiff > 0
+                      ? CLIMATE_COMPARISON_COLORS.B.tmax
+                      : tmaxDiff < 0
+                        ? CLIMATE_COMPARISON_COLORS.A.tmax
+                        : undefined
+                  }
+                />
+                <StatCard
+                  valueSize={EStatValueSize.LG}
+                  label={t("comparePeriods.trend.precipTitle")}
+                  value={
+                    precDiff === 0
+                      ? t("comparePeriods.trend.noChange")
+                      : t("units.mmValue", {
+                          value: formatNumber(precDiff, { sign: ENumberSign.SIGNED }),
+                        })
+                  }
+                  sub={t("comparePeriods.trend.comparedTo", { a: labelA, b: labelB })}
+                  valueColor={
+                    precDiff > 0
+                      ? CLIMATE_COMPARISON_COLORS.B.tmax
+                      : precDiff < 0
+                        ? CLIMATE_COMPARISON_COLORS.A.tmax
+                        : undefined
+                  }
+                />
+              </div>
+            )}
+          </DataUpdateProvider>
         )}
 
         {/* ── Weather: multi-period ── */}
@@ -457,6 +555,7 @@ export function ComparePeriodsView({
                   onExportCSV={handleWeatherExportCSV}
                   onExportPNG={handleWeatherExportPNG}
                   onExportSVG={handleWeatherExportSVG}
+                  {...exportLock}
                 />
               </div>
             ) : loadingPeriods.length > 0 ? (
@@ -464,30 +563,37 @@ export function ComparePeriodsView({
                 <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
               </div>
             ) : null}
-            <div className="flex flex-col gap-6">
-              <MultiPeriodStatsTable
-                periods={periods}
-                periodsData={periodsData}
-                loadingPeriods={loadingPeriods}
-                altitude={altitude}
-                periodColors={PERIOD_COLORS}
-              />
-              {periodsData.length > 0 ? (
-                <TempPrecipChart
-                  cityName={city.label}
-                  multiPeriodData={periodsData}
+            <DataUpdateProvider
+              series={getPeriodsUpdateSeries(periods, periodsData)}
+              isFetching={isFetching}
+              announcement={updateAnnouncement}
+            >
+              <div className="flex flex-col gap-6">
+                <MultiPeriodStatsTable
+                  periods={periods}
+                  periodsData={periodsData}
+                  loadingPeriods={loadingPeriods}
+                  altitude={altitude}
                   periodColors={PERIOD_COLORS}
-                  variables={variables}
-                  showWalterLiethToggle={false}
-                  showAridity={false}
-                  {...(selectedMonths !== null && selectedMonths.length > 0
-                    ? { selectedMonths }
-                    : {})}
                 />
-              ) : loadingPeriods.length > 0 ? (
-                <ChartSkeleton />
-              ) : null}
-            </div>
+                {periodsData.length > 0 ? (
+                  <TempPrecipChart
+                    onVisibleSeriesChange={setVisibleSeries}
+                    cityName={city.label}
+                    multiPeriodData={periodsData}
+                    periodColors={PERIOD_COLORS}
+                    variables={variables}
+                    showWalterLiethToggle={false}
+                    showAridity={false}
+                    {...(selectedMonths !== null && selectedMonths.length > 0
+                      ? { selectedMonths }
+                      : {})}
+                  />
+                ) : loadingPeriods.length > 0 ? (
+                  <ChartSkeleton />
+                ) : null}
+              </div>
+            </DataUpdateProvider>
           </div>
         )}
       </div>
