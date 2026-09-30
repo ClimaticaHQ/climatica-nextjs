@@ -71,13 +71,11 @@ export default function FiltersTab({ children, summary, className = "" }: TFilte
 
       <div
         id={panelId}
-        className={`grid transition-[grid-template-rows] duration-[320ms] ease-[cubic-bezier(.4,0,.2,1)] ${
-          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-        }`}
+        className={`filters-collapse grid ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
       >
         <div className="overflow-hidden">
           <div
-            className={`px-5 pb-5 pt-5 border-t border-[var(--color-border)] flex flex-col gap-6 transition-[opacity,transform] duration-[250ms] delay-[60ms] ${
+            className={`px-5 pb-5 pt-5 border-t border-[var(--color-border)] flex flex-col gap-6 filters-content-fade ${
               isOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1.5"
             }`}
           >
