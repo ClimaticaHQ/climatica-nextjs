@@ -13,6 +13,7 @@ import type {
   TExportChartColors,
   TStandardSplitLegendArgs,
   TWalterLiethExportBox,
+  TWalterLiethSeriesInput,
 } from "@/types";
 import { getStandardSplitLegendItems } from "@/utils";
 import { buildGridAndAxes, computeNiceAxisTicks } from "./buildExportSvg.util";
@@ -20,6 +21,7 @@ import { buildGroupedBars, buildMonthLabels, buildSeriesLines } from "./compareC
 import { createLinearScale, monthBandX } from "./scales.util";
 import { buildComparisonPanels } from "./splitPanelExport.util";
 import { buildExportLegend } from "./legendExport.util";
+import { buildExportValuesRows } from "./monthlyValuesExport.util";
 
 const contentLeft = L.paddingX;
 const contentWidth = L.width - L.paddingX * 2;
@@ -98,14 +100,28 @@ export function buildStandardSplitBody(
   colors: TExportChartColors,
   top: number,
 ): TCompareWalterLiethBody {
+  // * payload.series is always [A, B]; an expanded panel may be either
+  const exportSeriesOf = (series: TWalterLiethSeriesInput) =>
+    payload.series[series.id === EWalterLiethSeriesId.A ? 0 : 1];
   const panels = buildComparisonPanels({
     comparison,
     colors,
     top,
     renderPlot: (series) => (box) => {
-      // * payload.series is always [A, B]; an expanded panel may be either
-      const exportSeries = payload.series[series.id === EWalterLiethSeriesId.A ? 0 : 1];
+      const exportSeries = exportSeriesOf(series);
       return exportSeries ? buildStandardPlot(payload, exportSeries, colors, box) : "";
+    },
+    valuesRows: (series) => {
+      const exportSeries = exportSeriesOf(series);
+      return exportSeries
+        ? buildExportValuesRows({
+            series: [
+              { key: series.id, label: series.label, color: colors.text, data: exportSeries.data },
+            ],
+            colors,
+            locale: payload.labels.locale,
+          })
+        : [];
     },
   });
   const legend = buildSplitLegend({

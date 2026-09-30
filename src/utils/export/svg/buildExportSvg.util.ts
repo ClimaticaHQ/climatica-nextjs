@@ -2,8 +2,10 @@ import {
   EXPORT_SVG_LAYOUT as L,
   EXPORT_AXES_STYLE,
   EXPORT_FONT_FAMILY,
+  EXPORT_LEGEND,
+  EXPORT_UNITS,
+  VALUE_DIGITS,
   WALTER_LIETH_EXPORT_TEXT,
-  MONTHLY_TABLE,
 } from "@/constants";
 import type {
   TGridAxesStyle,
@@ -22,7 +24,8 @@ import {
   getWalterLiethLegendItems,
   toWalterLiethMonths,
   getFrostMonths,
-  buildMonthlyTableRows,
+  formatLatLng,
+  formatNumber,
 } from "@/utils";
 import { buildExportLegend, getWalterLiethExportPalette } from "./legendExport.util";
 import { buildFooterTextLines } from "../shared/footerLines.util";
@@ -34,7 +37,11 @@ import {
   getConventionExportPaint,
 } from "./walterLiethExport.util";
 import { getSingleExportPlotBox } from "./exportPlotBox.util";
-import { buildMonthlyTableSvg } from "./monthlyTableExport.util";
+import {
+  buildExportValuesRows,
+  buildMonthlyValuesSvg,
+  getValuesTableTop,
+} from "./monthlyValuesExport.util";
 
 export function escapeXml(text: string): string {
   return text
@@ -42,12 +49,6 @@ export function escapeXml(text: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
-}
-
-function formatCoordinate(lat: number, lng: number): string {
-  const latDir = lat >= 0 ? "N" : "S";
-  const lngDir = lng >= 0 ? "E" : "W";
-  return `${Math.abs(lat).toFixed(4)}°${latDir}, ${Math.abs(lng).toFixed(4)}°${lngDir}`;
 }
 
 export function monthOpacity(month: number, selectedMonths: number[] | null): number {
@@ -83,7 +84,7 @@ export function computeNiceAxisTicks(max: number, targetCount = 6): number[] {
 
 function buildHeader(payload: TExportPayload, colors: TExportChartColors): string {
   const { location } = payload;
-  const coords = formatCoordinate(location.lat, location.lng);
+  const coords = formatLatLng(location.lat, location.lng);
   const altitudeText = location.altitude !== null ? ` · ${Math.round(location.altitude)} m` : "";
   const subtitle = `${coords}${altitudeText} · ${payload.labels.periodLabel}`;
 
@@ -96,15 +97,23 @@ function buildHeader(payload: TExportPayload, colors: TExportChartColors): strin
 
 function buildStatsTable(payload: TExportPayload, colors: TExportChartColors): string {
   const { summary, location, labels } = payload;
+  const { locale } = labels;
+  const number = (value: number | null, digits = 0) => formatNumber(value, { locale, digits });
   const cells: [string, string][] = [
-    [labels.statsLabels.meanTemp, `${summary.annualAvgTemp.toFixed(1)}°C`],
-    [labels.statsLabels.annualPrec, `${summary.totalPrec} mm`],
-    [labels.statsLabels.aridMonths, String(summary.aridCount)],
+    [
+      labels.statsLabels.meanTemp,
+      `${number(summary.annualAvgTemp, VALUE_DIGITS.TEMP)}${EXPORT_UNITS.TEMP}`,
+    ],
+    [labels.statsLabels.annualPrec, `${number(summary.totalPrec)} ${EXPORT_UNITS.PREC}`],
+    [labels.statsLabels.aridMonths, number(summary.aridCount)],
   ];
   if (location.altitude !== null) {
-    cells.push([labels.statsLabels.altitude, `${Math.round(location.altitude)} m`]);
+    cells.push([
+      labels.statsLabels.altitude,
+      `${number(Math.round(location.altitude))} ${EXPORT_UNITS.ALTITUDE}`,
+    ]);
   }
-  const martonneValue = summary.martonne !== null ? summary.martonne.toFixed(1) : "—";
+  const martonneValue = number(summary.martonne, VALUE_DIGITS.MARTONNE);
   const martonneSuffix = labels.martonneClassLabel ? ` (${labels.martonneClassLabel})` : "";
   cells.push([labels.statsLabels.martonne, `${martonneValue}${martonneSuffix}`]);
 
@@ -186,13 +195,16 @@ export function buildGridAndAxes(
   `;
 }
 
-/** °C / mm upright above the axes, aligned with the tick labels — as on screen. */
+/**
+ * °C / mm above the plot: °C starts at the left axis, mm ends at the right, in the WL
+ * temperature red and precipitation blue — as on screen.
+ */
 function buildUnitTitles({ plotLeft, plotRight, chartTop, colors, axesStyle }: TUnitTitlesArgs) {
-  const font = `font-size="11" font-weight="600" fill="${colors.textSecondary}"`;
+  const font = `font-size="11" font-weight="600"`;
   const y = chartTop - axesStyle.unitTitlesAbove;
   return `
-    <text x="${plotLeft - axesStyle.tickGap}" y="${y}" text-anchor="end" ${font}>°C</text>
-    <text x="${plotRight + axesStyle.tickGap}" y="${y}" text-anchor="start" ${font}>mm</text>`;
+    <text x="${plotLeft}" y="${y}" text-anchor="start" ${font} fill="${colors.wlTemp}">°C</text>
+    <text x="${plotRight}" y="${y}" text-anchor="end" ${font} fill="${colors.wlPrec}">mm</text>`;
 }
 
 function buildBars(
@@ -339,7 +351,8 @@ function buildMonthLabels(
 }
 
 /** The single-city legend — the same items ChartLegend shows for this chart type. */
-function buildLegend(payload: TExportPayload, colors: TExportChartColors, isWalterLieth: boolean) {
+function buildLegend(payload: TExportPayload, colors: TExportChartColors, y: number) {
+  const isWalterLieth = payload.chartMode === "walter-lieth";
   const { seriesLabels, aridityLegend } = payload.labels;
   const items = isWalterLieth
     ? getWalterLiethLegendItems({
@@ -354,34 +367,50 @@ function buildLegend(payload: TExportPayload, colors: TExportChartColors, isWalt
       });
   return buildExportLegend({
     items,
-    y: L.legendY,
+    y,
     left: L.paddingX,
     width: L.width - L.paddingX * 2,
     textColor: colors.textSecondary,
     idPrefix: "export-legend",
-  }).svg;
+  });
 }
 
-/** The monthly table — the city page's rows (mean temperature, precipitation) as SVG. */
-function buildDataTable(payload: TExportPayload, colors: TExportChartColors): string {
-  return buildMonthlyTableSvg({
-    rows: buildMonthlyTableRows({
-      series: [{ key: "single", data: payload.monthlyData }],
-      variables: MONTHLY_TABLE.CITY_VARIABLES,
-      labels: payload.labels.tableLabels,
+/** The monthly values table under the plot — the page's: °C and mm under the plot's months. */
+function buildValuesTable(
+  payload: TExportPayload,
+  colors: TExportChartColors,
+  chartBottom: number,
+) {
+  const { left, right } = getSingleExportPlotBox(L.chartTop);
+  return buildMonthlyValuesSvg({
+    rows: buildExportValuesRows({
+      series: [
+        {
+          key: "single",
+          label: payload.location.cityName,
+          color: colors.text,
+          data: payload.monthlyData,
+        },
+      ],
+      colors,
+      locale: payload.labels.locale,
     }),
-    monthNames: payload.labels.monthNames,
-    top: L.dataTableY,
-    left: L.paddingX,
-    width: L.width - L.paddingX * 2,
+    span: { left, right },
+    // * the table spans the content width: its gutters are the plot margins inside the padding
+    gutter: L.chartMarginLeft - L.paddingX,
+    top: getValuesTableTop(chartBottom, WALTER_LIETH_EXPORT_TEXT.MONTH_LABEL_OFFSET),
     colors,
-  }).svg;
+  });
 }
 
-function renderFooterLines(lines: TFooterTextLine[], colors: TExportChartColors): string {
+function renderFooterLines(
+  lines: TFooterTextLine[],
+  colors: TExportChartColors,
+  footerY: number,
+): string {
   return lines
     .map(({ text, fontSize }, i) => {
-      const y = L.footerY + i * L.footerLineHeight;
+      const y = footerY + i * L.footerLineHeight;
       return `<text x="${L.paddingX}" y="${y}" font-size="${fontSize}" fill="${colors.textSecondary}">${escapeXml(text)}</text>`;
     })
     .join("\n");
@@ -424,16 +453,20 @@ export function buildExportSvg(
     shareUrl: payload.shareUrl,
     layout: L,
   });
-  const height = L.footerY + footerLines.length * L.footerLineHeight + L.footerBottomMargin;
+  // * plot, table, legend, footer — each below the last
+  const table = buildValuesTable(payload, colors, chartBottom);
+  const legend = buildLegend(payload, colors, table.bottom + EXPORT_LEGEND.GAP);
+  const footerY = legend.bottom + L.footerGap;
+  const height = footerY + footerLines.length * L.footerLineHeight + L.footerBottomMargin;
 
   const body = [
     buildHeader(payload, colors),
     buildStatsTable(payload, colors),
     plotBody,
     buildMonthLabels(payload, colors, shiftedBands, chartBottom),
-    buildLegend(payload, colors, isWalterLieth),
-    buildDataTable(payload, colors),
-    renderFooterLines(footerLines, colors),
+    table.svg,
+    legend.svg,
+    renderFooterLines(footerLines, colors, footerY),
   ].join("\n");
 
   // Built as a joined array, not a single multi-line template literal — a raw

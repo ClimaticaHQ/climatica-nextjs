@@ -21,13 +21,14 @@ import type {
   TWalterLiethProjection,
   TWalterLiethSegment,
   TExportFrostBandArgs,
+  TWalterLiethFrostRect,
   TExportNoticeArgs,
 } from "@/types";
 import {
   buildWalterLiethRows,
   escapeXml,
   getAridHumidSegments,
-  getFrostCells,
+  getFrostBand,
   getHatchGeometry,
   getRegimeFill,
   getWalterLiethPrecTicks,
@@ -174,22 +175,32 @@ function buildLayer(
   ].join("");
 }
 
-/** String twin of WalterLiethFrostBand.tsx: the same getFrostCells rects, below the x axis. */
+/**
+ * String twin of WalterLiethFrostBand.tsx: the same getFrostBand cells, boundary dividers /
+ * ticks and frame. Exports always draw the full-height band (their month labels sit below it).
+ */
 function buildFrostBand(
   frost: readonly EWalterLiethFrost[],
   { colors, scaleX, axisY }: TExportFrostBandArgs,
 ) {
-  return getFrostCells({
+  const { cells, boundaries, frame } = getFrostBand({
     frost,
-    palette: { frost: colors.wlFrost, neutral: colors.border },
+    palette: { frost: colors.wlFrost, outline: colors.wlFrostOutline, unknown: colors.border },
     scaleX,
     axisY,
-  })
-    .map(
-      ({ x, y, width, height, fill, stroke }) =>
-        `<rect x="${x.toFixed(2)}" y="${y}" width="${width.toFixed(2)}" height="${height}" fill="${fill}" stroke="${stroke}" stroke-width="${WALTER_LIETH_FROST.STROKE_WIDTH}" />`,
-    )
-    .join("");
+    isCompact: false,
+  });
+  const stroke = `stroke="${colors.wlFrostOutline}" stroke-width="${WALTER_LIETH_FROST.STROKE_WIDTH}"`;
+  const rect = ({ x, y, width, height }: TWalterLiethFrostRect) =>
+    `x="${x.toFixed(2)}" y="${y}" width="${width.toFixed(2)}" height="${height}"`;
+  return [
+    ...cells.map((cell) => `<rect ${rect(cell)} fill="${cell.fill}" stroke="none" />`),
+    ...boundaries.map(
+      ({ x, y1, y2 }) =>
+        `<line x1="${x.toFixed(2)}" y1="${y1}" x2="${x.toFixed(2)}" y2="${y2}" ${stroke} />`,
+    ),
+    `<rect ${rect(frame)} fill="none" ${stroke} />`,
+  ].join("");
 }
 
 /**

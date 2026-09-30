@@ -5,6 +5,7 @@ import type {
   TExpandedPanel,
   TExportedPanelArgs,
   TExportedSeriesLabelsArgs,
+  TWalterLiethSeriesInput,
 } from "@/types";
 import { isCompleteSeries } from "./walterLieth.util";
 
@@ -50,6 +51,14 @@ export function getExportedPanel({
 export function getExportedSeriesLabels({ expanded, labelA, labelB }: TExportedSeriesLabelsArgs) {
   if (expanded === null) return [labelA, labelB];
   return [expanded === EWalterLiethSeriesId.A ? labelA : labelB];
+}
+
+/** A split panel's subtitle: "Climate 1970–2000 · 261 m" — period, then altitude when known. */
+export function getPanelSubtitle({
+  period,
+  altitude,
+}: Pick<TWalterLiethSeriesInput, "period" | "altitude">) {
+  return joinSubtitle(period, altitude !== undefined ? `${Math.round(altitude)} m` : undefined);
 }
 
 /** A panel's period line from its parts, the empty ones left out. */

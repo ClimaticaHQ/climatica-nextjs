@@ -34,6 +34,11 @@ import {
 } from "./splitPanelExport.util";
 import { buildExportLegend, getWalterLiethExportPalette } from "./legendExport.util";
 import {
+  buildExportValuesRows,
+  buildMonthlyValuesSvg,
+  getValuesTableTop,
+} from "./monthlyValuesExport.util";
+import {
   buildNotice,
   buildWalterLiethPanel,
   getConventionExportPaint,
@@ -81,6 +86,17 @@ function buildSplit(
     colors,
     top,
     renderPlot: (series) => renderWalterLiethPlot(series, wl, { domain, colors }),
+    // * a panel showing its "incomplete data" notice has no table
+    valuesRows: (series) =>
+      isCompleteSeries(series)
+        ? buildExportValuesRows({
+            series: [
+              { key: series.id, label: series.label, color: colors.text, data: series.months },
+            ],
+            colors,
+            locale: wl.labels.locale,
+          })
+        : [],
   });
 
   // * no legend when neither series could be drawn; it sits below the cards, outside them
@@ -127,7 +143,25 @@ function buildOverlay(
     top,
     bottom: top + W.overlayPlotHeight,
   };
-  const legendY = box.bottom + T.MONTH_LABEL_OFFSET + EXPORT_LEGEND.GAP;
+  // * the values table: both series, A's value above B's in their colors
+  const table = buildMonthlyValuesSvg({
+    rows: buildExportValuesRows({
+      series: pair.map((series) => ({
+        key: series.id,
+        label: series.label,
+        color: seriesColor(series, colors),
+        data: series.months,
+      })),
+      colors,
+      locale: wl.labels.locale,
+    }),
+    span: box,
+    // * the table spans the content width: its gutters are the plot margins inside the padding
+    gutter: W.overlayPlotMarginX - L.paddingX,
+    top: getValuesTableTop(box.bottom, T.MONTH_LABEL_OFFSET),
+    colors,
+  });
+  const legendY = table.bottom + EXPORT_LEGEND.GAP;
 
   const panel = buildWalterLiethPanel({
     layers,
@@ -149,7 +183,7 @@ function buildOverlay(
         shape: WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
       })),
       shadeColor: shaded ? seriesColor(shaded, colors) : null,
-      frostColor: shaded ? colors.wlFrost : null,
+      frost: shaded ? { fill: colors.wlFrost, outline: colors.wlFrostOutline } : null,
       neutral: colors.textSecondary,
     }),
     y: legendY,
@@ -159,7 +193,7 @@ function buildOverlay(
     idPrefix: "wl-ovl-legend",
   });
 
-  return { body: panel + legend.svg, bottom: legend.bottom };
+  return { body: panel + table.svg + legend.svg, bottom: legend.bottom };
 }
 
 /**

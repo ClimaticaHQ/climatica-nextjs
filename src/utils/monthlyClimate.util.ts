@@ -1,4 +1,4 @@
-import { DIFFERENCE_SIGN, MISSING_VALUE_LABEL, WALTER_LIETH_DIAGRAM } from "@/constants";
+import { MISSING_VALUE_LABEL, WALTER_LIETH_DIAGRAM } from "@/constants";
 import type {
   TMonthlyTemperature,
   TMonthlyTemperatureWithAvg,
@@ -48,11 +48,11 @@ export function toWalterLiethMonths(
   return months.length === rows.length ? months : null;
 }
 
-/** "12.3 °C", or "—" when unknown. */
+/** "12.3 °C", or "—" when unknown — for CSV files: always "." (the screen uses formatNumber). */
 export const formatTemp = (value: number | null) =>
   value !== null ? `${value.toFixed(1)} °C` : MISSING_VALUE_LABEL;
 
-/** "405 mm", or "—" when unknown. */
+/** "405 mm", or "—" when unknown — for CSV files, like formatTemp. */
 export const formatPrec = (value: number | null) =>
   value !== null ? `${value.toFixed(0)} mm` : MISSING_VALUE_LABEL;
 
@@ -62,11 +62,3 @@ export const differenceOf = (a: number | null, b: number | null) =>
 
 export const formatCount = (value: number | null) =>
   value !== null ? String(value) : MISSING_VALUE_LABEL;
-
-/** "+", "−" (a real minus) or "±" for no difference. */
-export const differenceSign = (value: number) =>
-  value > 0 ? DIFFERENCE_SIGN.PLUS : value < 0 ? DIFFERENCE_SIGN.MINUS : DIFFERENCE_SIGN.NONE;
-
-/** "+5.0", "−4.0", "±0.0" — the magnitude with its sign. */
-export const formatSigned = (value: number, digits: number) =>
-  `${differenceSign(value)}${Math.abs(value).toFixed(digits)}`;

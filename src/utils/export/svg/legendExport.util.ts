@@ -1,4 +1,4 @@
-import { CHART_LEGEND, EXPORT_LEGEND } from "@/constants";
+import { CHART_LEGEND, EXPORT_LEGEND, WALTER_LIETH_FROST } from "@/constants";
 import { ELegendSwatch } from "@/enums";
 import type {
   TExportChartColors,
@@ -15,6 +15,7 @@ import { measureExportText } from "./textWrap.util";
 import { buildWalterLiethPatterns } from "./walterLiethExport.util";
 
 const R = CHART_LEGEND.SWATCH_RADIUS;
+const FROST_INSET = WALTER_LIETH_FROST.STROKE_WIDTH / 2;
 
 /** The WL legend's palette resolved to export colors — the screen uses the same CSS vars. */
 export const getWalterLiethExportPalette = (
@@ -26,10 +27,11 @@ export const getWalterLiethExportPalette = (
   aridHatch: colors.wlAridHatch,
   perhumid: colors.wlCompressedFill,
   frost: colors.wlFrost,
+  frostOutline: colors.wlFrostOutline,
 });
 
 /** String twin of the ChartLegend swatches — the same descriptors, drawn as SVG markup. */
-function buildSwatch({ swatch, x, top, size, id }: TExportSwatchArgs): TExportSwatch {
+export function buildSwatch({ swatch, x, top, size, id }: TExportSwatchArgs): TExportSwatch {
   const { width: w, height: h } = size;
   const box = (width: number, color: string) =>
     `<rect x="${(x + (w - width) / 2).toFixed(2)}" y="${top}" width="${width.toFixed(2)}" height="${h}" rx="${R}" fill="${color}" />`;
@@ -46,6 +48,12 @@ function buildSwatch({ swatch, x, top, size, id }: TExportSwatchArgs): TExportSw
       return { svg: box(w * CHART_LEGEND.BAR_WIDTH_RATIO, swatch.color), defs: "" };
     case ELegendSwatch.PERHUMID:
       return { svg: box(w, swatch.color), defs: "" };
+    case ELegendSwatch.FROST:
+      return {
+        // * inset by half the stroke, like FrostSwatch.tsx, so the outline stays in the box
+        svg: `<rect x="${x + FROST_INSET}" y="${top + FROST_INSET}" width="${w - WALTER_LIETH_FROST.STROKE_WIDTH}" height="${h - WALTER_LIETH_FROST.STROKE_WIDTH}" fill="${swatch.color}" stroke="${swatch.outline}" stroke-width="${WALTER_LIETH_FROST.STROKE_WIDTH}" />`,
+        defs: "",
+      };
     case ELegendSwatch.MARKER: {
       const r = h * CHART_LEGEND.MARKER_RADIUS_RATIO;
       const [cx, cy] = [x + w / 2, top + h / 2];

@@ -7,6 +7,7 @@ const CSS_VAR_MAP: Record<keyof TExportChartColors, string> = {
   textSecondary: "--color-text-secondary",
   border: "--color-border",
   bg: "--color-bg",
+  bgSecondary: "--color-bg-secondary",
   tmax: "--chart-temp-max",
   tmin: "--chart-temp-min",
   tavg: "--chart-temp-avg",
@@ -19,6 +20,7 @@ const CSS_VAR_MAP: Record<keyof TExportChartColors, string> = {
   wlAridHatch: WALTER_LIETH_COLOR_VARS.ARID_HATCH,
   wlCompressedFill: WALTER_LIETH_COLOR_VARS.COMPRESSED_FILL,
   wlFrost: WALTER_LIETH_COLOR_VARS.FROST,
+  wlFrostOutline: WALTER_LIETH_COLOR_VARS.FROST_OUTLINE,
   wlSeriesA: WALTER_LIETH_COLOR_VARS.SERIES_A,
   wlSeriesB: WALTER_LIETH_COLOR_VARS.SERIES_B,
 };

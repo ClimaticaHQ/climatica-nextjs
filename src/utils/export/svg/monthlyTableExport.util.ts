@@ -1,7 +1,12 @@
 import { EXPORT_MONTHLY_TABLE as M } from "@/constants";
-import type { TExportChartColors, TExportMonthlyTableArgs, TMonthlyTableMarker } from "@/types";
+import type {
+  TExportChartColors,
+  TExportMonthlyTableArgs,
+  TExportTableRowLabelArgs,
+  TMonthlyTableMarker,
+} from "@/types";
 import { escapeXml, getMonthlyTableRowLabel } from "@/utils";
-import { truncateToWidth } from "./textWrap.util";
+import { measureExportText, truncateToWidth } from "./textWrap.util";
 
 const line = (x1: number, y1: number, x2: number, y2: number, colors: TExportChartColors) =>
   `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colors.border}" stroke-width="1" />`;
@@ -12,6 +17,20 @@ function buildMarker({ shape, color }: TMonthlyTableMarker, x: number, cy: numbe
   return shape === "square"
     ? `<rect x="${x}" y="${cy - half}" width="${M.MARKER_SIZE}" height="${M.MARKER_SIZE}" rx="1" fill="${color}" />`
     : `<circle cx="${x + half}" cy="${cy}" r="${half}" fill="${color}" />`;
+}
+
+/**
+ * A row's label: "Avg Temp (°C)" with the unit in its chart color (temperature red,
+ * precipitation blue), then the series — cut with "…" (plain) when it doesn't fit.
+ */
+function buildRowLabel({ row, maxWidth, colors }: TExportTableRowLabelArgs) {
+  const full = getMonthlyTableRowLabel(row);
+  if (measureExportText(full, M.LABEL_FONT_SIZE) > maxWidth) {
+    return escapeXml(truncateToWidth(full, maxWidth, M.LABEL_FONT_SIZE));
+  }
+  const unitColor = row.variable === "prec" ? colors.wlPrec : colors.wlTemp;
+  const series = full.slice(`${row.variableLabel} (${row.unit})`.length);
+  return `${escapeXml(row.variableLabel)} (<tspan font-weight="${M.UNIT_FONT_WEIGHT}" fill="${unitColor}">${escapeXml(row.unit)}</tspan>)${escapeXml(series)}`;
 }
 
 /**
@@ -52,18 +71,18 @@ export function buildMonthlyTableSvg({
       const cy = rowMid(r + 1);
       const markerX = left + M.LABEL_PADDING_X;
       const textX = row.marker ? markerX + M.MARKER_SIZE + M.MARKER_GAP : markerX;
-      const label = truncateToWidth(
-        getMonthlyTableRowLabel(row),
-        left + labelWidth - M.LABEL_PADDING_X - textX,
-        M.LABEL_FONT_SIZE,
-      );
+      const label = buildRowLabel({
+        row,
+        maxWidth: left + labelWidth - M.LABEL_PADDING_X - textX,
+        colors,
+      });
       const values = row.values
         .map(
           (value, i) =>
             `<text x="${colX(i) + colWidth / 2}" y="${cy + M.VALUE_BASELINE}" text-anchor="middle" font-size="${M.VALUE_FONT_SIZE}" font-weight="${M.VALUE_FONT_WEIGHT}" fill="${colors.text}">${escapeXml(value)}</text>`,
         )
         .join("");
-      return `${row.marker ? buildMarker(row.marker, markerX, cy) : ""}<text x="${textX}" y="${cy + M.LABEL_BASELINE}" font-size="${M.LABEL_FONT_SIZE}" fill="${colors.textSecondary}">${escapeXml(label)}</text>${values}`;
+      return `${row.marker ? buildMarker(row.marker, markerX, cy) : ""}<text x="${textX}" y="${cy + M.LABEL_BASELINE}" font-size="${M.LABEL_FONT_SIZE}" fill="${colors.textSecondary}">${label}</text>${values}`;
     })
     .join("");
 

@@ -2,6 +2,7 @@ import { CHART_LEGEND, CHART_LINE_DASH, CHART_VARIABLE_ORDER } from "@/constants
 import { ELegendSwatch, EWalterLiethSeriesId } from "@/enums";
 import type {
   TAridityPalette,
+  TLegendFrostColors,
   TLegendItem,
   TLegendSeriesColors,
   TAridityLegendLabels,
@@ -56,11 +57,14 @@ function aridityItems(
   ];
 }
 
-/** The WL frost band's entry: a filled cell in the frost color. */
-const frostItem = (labels: TWalterLiethLegendLabels, color: string): TLegendItem => ({
+/** The WL frost band's entry: a cell like the band's — frost-filled, outlined. */
+const frostItem = (
+  labels: TWalterLiethLegendLabels,
+  { fill, outline }: TLegendFrostColors,
+): TLegendItem => ({
   key: "frost",
   label: labels.frost,
-  swatch: bar(color),
+  swatch: { kind: ELegendSwatch.FROST, color: fill, outline },
 });
 
 /** WL diagram (single and split): the two curves, the three regimes and the frost band. */
@@ -86,7 +90,7 @@ export function getWalterLiethLegendItems({
       label: labels.perhumid,
       swatch: { kind: ELegendSwatch.PERHUMID, color: palette.perhumid },
     },
-    frostItem(labels, palette.frost),
+    frostItem(labels, { fill: palette.frost, outline: palette.frostOutline }),
   ];
 }
 
@@ -95,7 +99,7 @@ export function getWalterLiethOverlayLegendItems({
   labels,
   series,
   shadeColor,
-  frostColor,
+  frost,
   neutral,
 }: TWalterLiethOverlayLegendItemsArgs): TLegendItem[] {
   const regimes: TLegendItem[] = shadeColor
@@ -126,12 +130,12 @@ export function getWalterLiethOverlayLegendItems({
     { key: "temp", label: labels.temp, swatch: line(neutral) },
     { key: "prec", label: labels.prec, swatch: line(neutral, CHART_LINE_DASH.SERIES.tavg) },
     ...regimes,
-    ...(frostColor !== null ? [frostItem(labels, frostColor)] : []),
+    ...(frost !== null ? [frostItem(labels, frost)] : []),
   ];
 }
 
 /** One series' variables in the standard chart's styles — its own color per variable. */
-const seriesSwatches = (colors: TLegendSeriesColors) => ({
+export const getStandardVariableSwatches = (colors: TLegendSeriesColors) => ({
   tmax: line(colors.tmax),
   tavg: line(colors.tavg, CHART_LINE_DASH.STANDARD.tavg),
   tmin: line(colors.tmin),
@@ -145,7 +149,7 @@ export function getStandardLegendItems({
   visible,
   aridity,
 }: TStandardLegendItemsArgs): TLegendItem[] {
-  const shown = variableItems(labels, visible, seriesSwatches(colors));
+  const shown = variableItems(labels, visible, getStandardVariableSwatches(colors));
   return [...shown, ...(visible.prec ? aridityItems(labels, aridity) : [])];
 }
 
@@ -164,7 +168,7 @@ export function getStandardSplitLegendItems({
     return variableItems(
       labels,
       visible,
-      seriesSwatches(shown === EWalterLiethSeriesId.A ? colorsA : colorsB),
+      getStandardVariableSwatches(shown === EWalterLiethSeriesId.A ? colorsA : colorsB),
     );
   }
   const { tavg } = CHART_LINE_DASH.STANDARD;

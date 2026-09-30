@@ -1,4 +1,5 @@
 import { TScrollOptions } from "@/types";
+import { getScrollBehavior } from "./motion.util";
 
 const SCROLL_OFFSET_PX = 54;
 
@@ -12,14 +13,14 @@ export function scrollToSection(el: HTMLElement, options: TScrollOptions = {}) {
       ? document.documentElement.scrollHeight
       : el.getBoundingClientRect().top + window.scrollY - offset;
 
-    window.scrollTo({ top: targetY, behavior: "smooth" });
+    window.scrollTo({ top: targetY, behavior: getScrollBehavior() });
     return;
   }
 
   if (toBottom) {
     container.scrollTo({
       top: container.scrollHeight,
-      behavior: "smooth",
+      behavior: getScrollBehavior(),
     });
     return;
   }
@@ -34,5 +35,5 @@ export function scrollToSection(el: HTMLElement, options: TScrollOptions = {}) {
     container.scrollTop -
     offset;
 
-  container.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  container.scrollTo({ top: Math.max(0, top), behavior: getScrollBehavior() });
 }

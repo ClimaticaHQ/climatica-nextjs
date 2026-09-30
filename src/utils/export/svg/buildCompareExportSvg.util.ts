@@ -2,12 +2,16 @@ import {
   COMPARE_EXPORT_SVG_LAYOUT as L,
   COMPARE_WL_EXPORT_LAYOUT as W,
   EXPORT_FONT_FAMILY,
+  EXPORT_COMPARISON_TABLE,
   EXPORT_LEGEND,
   EXPORT_MONTHLY_TABLE,
   WALTER_LIETH_COMPARISON,
   WALTER_LIETH_DIAGRAM,
   EXPORT_AXES_STYLE,
   WALTER_LIETH_EXPORT_TEXT as T,
+  EXPORT_UNITS,
+  MISSING_VALUE_LABEL,
+  VALUE_DIGITS,
 } from "@/constants";
 import { ECompareLayout, EWalterLiethSeriesId } from "@/enums";
 import type {
@@ -17,21 +21,23 @@ import type {
   TExportChartColors,
   TFooterTextLine,
   TLegendMarkerShape,
+  TOverlayValuesArgs,
   TSvgExportResult,
 } from "@/types";
-import {
-  buildMonthlyTableRows,
-  getMonthlyTableVariables,
-  getSeriesLegendItems,
-  isSplitComparison,
-} from "@/utils";
-import { formatCount, formatPrec, formatTemp } from "../../monthlyClimate.util";
+import { buildMonthlyTableRows, getMonthlyTableVariables, getSeriesLegendItems } from "@/utils";
+import { formatNumber } from "../../numberFormat.util";
 import { buildFooterTextLines } from "../shared/footerLines.util";
 import { buildGridAndAxes, computeNiceAxisTicks, escapeXml } from "./buildExportSvg.util";
 import { buildCompareWalterLiethBody } from "./buildCompareWalterLiethSvg.util";
 import { buildStandardSplitBody } from "./buildStandardSplitSvg.util";
 import { buildExportLegend } from "./legendExport.util";
 import { buildGroupedBars, buildMonthLabels, buildSeriesLines } from "./compareChartParts.util";
+import { buildComparisonTableSvg } from "./comparisonTableExport.util";
+import {
+  buildExportValuesRows,
+  buildMonthlyValuesSvg,
+  getValuesTableTop,
+} from "./monthlyValuesExport.util";
 import { buildMonthlyTableSvg } from "./monthlyTableExport.util";
 import { createLinearScale, monthBandX } from "./scales.util";
 
@@ -52,23 +58,43 @@ function buildHeader(payload: TCompareExportPayload, colors: TExportChartColors)
 function buildStatsTable(payload: TCompareExportPayload, colors: TExportChartColors): string {
   const { series, labels } = payload;
   const hasAltitude = series.some((s) => s.altitude !== null);
+  const { locale } = labels;
+  // * a value in the locale's digits with its unit, "—" when unknown
+  const withUnit = (value: number | null, unit: string, digits = 0) =>
+    value === null ? MISSING_VALUE_LABEL : `${formatNumber(value, { locale, digits })} ${unit}`;
 
   const rows: TCompareExportStatsRow[] = [
-    { label: labels.statsLabels.avgTmax, format: (s) => formatTemp(s.stats.avgTmax) },
-    { label: labels.statsLabels.avgTmin, format: (s) => formatTemp(s.stats.avgTmin) },
-    { label: labels.statsLabels.totalPrec, format: (s) => formatPrec(s.stats.totalPrec) },
-    { label: labels.statsLabels.aridMonths, format: (s) => formatCount(s.stats.aridMonths) },
+    {
+      label: labels.statsLabels.avgTmax,
+      format: (s) => withUnit(s.stats.avgTmax, EXPORT_UNITS.TEMP, VALUE_DIGITS.TEMP),
+    },
+    {
+      label: labels.statsLabels.avgTmin,
+      format: (s) => withUnit(s.stats.avgTmin, EXPORT_UNITS.TEMP, VALUE_DIGITS.TEMP),
+    },
+    {
+      label: labels.statsLabels.totalPrec,
+      format: (s) => withUnit(s.stats.totalPrec, EXPORT_UNITS.PREC),
+    },
+    {
+      label: labels.statsLabels.aridMonths,
+      format: (s) => formatNumber(s.stats.aridMonths, { locale }),
+    },
   ];
   if (hasAltitude) {
     rows.push({
       label: labels.statsLabels.altitude,
-      format: (s) => (s.altitude !== null ? `${Math.round(s.altitude)} m` : "—"),
+      format: (s) =>
+        withUnit(s.altitude !== null ? Math.round(s.altitude) : null, EXPORT_UNITS.ALTITUDE),
     });
   }
   rows.push({
     label: labels.statsLabels.martonne,
     format: (s) => {
-      const value = s.stats.martonneIndex !== null ? s.stats.martonneIndex.toFixed(1) : "—";
+      const value = formatNumber(s.stats.martonneIndex, {
+        locale,
+        digits: VALUE_DIGITS.MARTONNE,
+      });
       const suffix = s.martonneClassLabel ? ` (${s.martonneClassLabel})` : "";
       return `${value}${suffix}`;
     },
@@ -185,10 +211,15 @@ function buildStandardChartBody(
     const band = monthBandX(i, plotRight - plotLeft, monthCount);
     return { ...band, x: band.x + plotLeft, center: band.center + plotLeft };
   });
+  // * two-series comparisons: the values table under the plot (weather years keep theirs
+  // * below the chart)
+  const strip = buildOverlayValues({ payload, colors, plotLeft, plotRight, chartBottom });
   const legend = buildLegend(
     payload,
     colors,
-    chartBottom + T.MONTH_LABEL_OFFSET + EXPORT_LEGEND.GAP,
+    strip
+      ? strip.bottom + EXPORT_LEGEND.GAP
+      : chartBottom + T.MONTH_LABEL_OFFSET + EXPORT_LEGEND.GAP,
   );
 
   const body = [
@@ -209,9 +240,41 @@ function buildStandardChartBody(
     buildGroupedBars(payload, precScale, monthBands, chartBottom),
     ...payload.series.map((series) => buildSeriesLines(payload, series, tempScale, monthBands)),
     buildMonthLabels(payload, colors, monthBands, chartBottom),
+    strip?.svg ?? "",
     legend.svg,
   ].join("\n");
   return { body, bottom: legend.bottom };
+}
+
+/** The standard overlay's values table — both series, A's value above B's in their colors. */
+function buildOverlayValues({
+  payload,
+  colors,
+  plotLeft,
+  plotRight,
+  chartBottom,
+}: TOverlayValuesArgs) {
+  if (!payload.comparison) return null;
+  return buildMonthlyValuesSvg({
+    rows: buildExportValuesRows({
+      series: payload.series.map((series, i) => {
+        const isA = i === 0;
+        return {
+          key: isA ? EWalterLiethSeriesId.A : EWalterLiethSeriesId.B,
+          label: series.label,
+          color: isA ? colors.wlSeriesA : colors.wlSeriesB,
+          data: series.data,
+        };
+      }),
+      colors,
+      locale: payload.labels.locale,
+    }),
+    span: { left: plotLeft, right: plotRight },
+    // * the table spans the content width: its gutters are the plot margins inside the padding
+    gutter: W.overlayPlotMarginX - L.paddingX,
+    top: getValuesTableTop(chartBottom, T.MONTH_LABEL_OFFSET),
+    colors,
+  });
 }
 
 /** The chart body the page shows: WL (split or overlay), standard split, or standard overlay. */
@@ -251,6 +314,7 @@ function buildTable(payload: TCompareExportPayload, colors: TExportChartColors, 
         visible: payload.visibleSeries,
       }),
       labels: payload.labels.tableLabels,
+      locale: payload.labels.locale,
     }),
     monthNames: payload.labels.monthNames,
     top,
@@ -260,9 +324,24 @@ function buildTable(payload: TCompareExportPayload, colors: TExportChartColors, 
   });
 }
 
-/** The stats table on top: gone for split panels (their headers carry the stats), as on screen. */
-function hasStatsTable({ comparison }: TCompareExportPayload) {
-  return !comparison || !isSplitComparison(comparison);
+/**
+ * What sits between the header and the chart: a two-series comparison's table (the page's,
+ * complete even when a panel is expanded), or the weather years' stats table.
+ */
+function buildTopTable(payload: TCompareExportPayload, colors: TExportChartColors) {
+  const { comparison } = payload;
+  if (!comparison) {
+    return { svg: buildStatsTable(payload, colors), chartTop: L.chartTop };
+  }
+  const table = buildComparisonTableSvg({
+    table: comparison.table,
+    labels: comparison.labels.table,
+    top: L.statsY,
+    left: L.paddingX,
+    width: L.width - L.paddingX * 2,
+    colors,
+  });
+  return { svg: table.svg, chartTop: table.bottom + EXPORT_COMPARISON_TABLE.GAP_BELOW };
 }
 
 export function buildCompareExportSvg(
@@ -275,20 +354,19 @@ export function buildCompareExportSvg(
     shareUrl: payload.shareUrl,
     layout: L,
   });
-  // * every body sets its own height (panels, legend rows); the table and footer follow it
-  const showStats = hasStatsTable(payload);
-  const chartBody = buildChartBody(
-    payload,
-    colors,
-    showStats ? L.chartTop : L.chartTopWithoutStats,
-  );
-  const table = buildTable(payload, colors, chartBody.bottom + EXPORT_MONTHLY_TABLE.GAP_ABOVE);
+  // * every body sets its own height (panels, strips, legend rows); the footer follows it
+  const top = buildTopTable(payload, colors);
+  const chartBody = buildChartBody(payload, colors, top.chartTop);
+  // * weather years (out of scope) keep their monthly table below the chart
+  const table = payload.comparison
+    ? { svg: "", bottom: chartBody.bottom }
+    : buildTable(payload, colors, chartBody.bottom + EXPORT_MONTHLY_TABLE.GAP_ABOVE);
   const footerY = table.bottom + W.footerGap;
   const height = footerY + footerLines.length * L.footerLineHeight + L.footerBottomMargin;
 
   const body = [
     buildHeader(payload, colors),
-    showStats ? buildStatsTable(payload, colors) : "",
+    top.svg,
     chartBody.body,
     table.svg,
     renderFooterLines(footerLines, colors, footerY),

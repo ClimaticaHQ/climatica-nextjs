@@ -52,10 +52,10 @@ export function computeDiffStats(
     tmaxDiff,
     moreRainCity,
     precDiff,
-    hottestMonthName: dataA[hottestIdx]?.monthName ?? "",
+    hottestMonthIndex: (dataA[hottestIdx]?.month ?? hottestIdx + 1) - 1,
     hottestTempA: tmaxA[hottestIdx],
     hottestTempB: tmaxB[hottestIdx],
-    coldestMonthName: dataA[coldestIdx]?.monthName ?? "",
+    coldestMonthIndex: (dataA[coldestIdx]?.month ?? coldestIdx + 1) - 1,
     coldestTempA: tmaxA[coldestIdx],
     coldestTempB: tmaxB[coldestIdx],
   };

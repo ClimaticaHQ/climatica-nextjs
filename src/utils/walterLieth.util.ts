@@ -1,13 +1,9 @@
-import {
-  differenceSign,
-  formatSigned,
-  getMonthlyMean,
-  toWalterLiethMonths,
-} from "./monthlyClimate.util";
+import { getMonthlyMean, toWalterLiethMonths } from "./monthlyClimate.util";
 import {
   MARTONNE_TEMP_OFFSET,
   MONTH_LABEL_REFERENCE_DATE,
   MONTH_LABEL_TRAILING_PERIOD,
+  WALTER_LIETH_COLORS,
   WALTER_LIETH_COMPARISON,
   WALTER_LIETH_DIAGRAM,
   WALTER_LIETH_FROST,
@@ -23,17 +19,15 @@ import {
 import type {
   TChartSummary,
   TFormatMonthLabelArgs,
-  TFormatSummaryDeltasArgs,
-  TStatDeltas,
   TGetAridHumidSegmentsArgs,
   TMonthAridity,
+  TMonthlyTableMarker,
   TMonthlyTemperature,
   TWalterLiethBandBounds,
   TWalterLiethDomain,
   TWalterLiethDomainExtents,
-  TWalterLiethFrostCell,
-  TWalterLiethFrostCellPaint,
-  TWalterLiethFrostCellsArgs,
+  TWalterLiethFrostBand,
+  TWalterLiethFrostBandArgs,
   TWalterLiethMonth,
   TWalterLiethPoint,
   TWalterLiethScales,
@@ -352,6 +346,11 @@ export function toSvgPath({ points, scaleX, scaleY, isClosed = true }: TToSvgPat
   return isClosed ? `${commands.join(" ")} Z` : commands.join(" ");
 }
 
+/** A series' marker on screen: A a dot, B a square, in its series color. */
+export function getSeriesMarker(id: EWalterLiethSeriesId): TMonthlyTableMarker {
+  return { shape: WALTER_LIETH_COMPARISON.DOT_SHAPE[id], color: WALTER_LIETH_COLORS.SERIES[id] };
+}
+
 /**
  * The frost band, one state per calendar month: frost when the mean minimum temperature is
  * below WALTER_LIETH_FROST.THRESHOLD (WL's "certain frost" — there are no absolute minima for
@@ -365,38 +364,51 @@ export function getFrostMonths(months: readonly TWalterLiethMonth[]): EWalterLie
   });
 }
 
+/** The frost band's height — reserved under every plot (getXAxisProps), frost or not. */
+export function getFrostBandHeight(isCompact: boolean) {
+  const { FULL, COMPACT } = WALTER_LIETH_FROST.BAND_HEIGHT;
+  return isCompact ? COMPACT : FULL;
+}
+
 /**
- * The frost band as px rects, one per month in display order, a CELL_GAP apart: frost filled,
- * none outlined, unknown filled neutral. The screen and the export both draw these.
+ * The frost band in px, the classic way: directly under the x axis, one cell per month with
+ * its boundaries halfway between month points (the outer ones at the plot edges), each
+ * boundary a divider that rises above the axis as a tick, and a frame round the band.
+ * Frost cells are filled, months without frost left empty, unknown months neutral.
  */
-export function getFrostCells({
+export function getFrostBand({
   frost,
   palette,
   scaleX,
   axisY,
+  isCompact,
   monthOrder = CALENDAR_MONTH_ORDER,
-}: TWalterLiethFrostCellsArgs): TWalterLiethFrostCell[] {
-  const { BAND_GAP, BAND_HEIGHT, CELL_GAP } = WALTER_LIETH_FROST;
-  const paint: Record<EWalterLiethFrost, TWalterLiethFrostCellPaint> = {
-    [EWalterLiethFrost.FROST]: { fill: palette.frost, stroke: palette.frost },
-    [EWalterLiethFrost.NONE]: { fill: "none", stroke: palette.neutral },
-    [EWalterLiethFrost.UNKNOWN]: { fill: palette.neutral, stroke: palette.neutral },
+}: TWalterLiethFrostBandArgs): TWalterLiethFrostBand {
+  const height = getFrostBandHeight(isCompact);
+  const fill: Record<EWalterLiethFrost, string> = {
+    [EWalterLiethFrost.FROST]: palette.frost,
+    [EWalterLiethFrost.NONE]: "none",
+    [EWalterLiethFrost.UNKNOWN]: palette.unknown,
   };
-  return monthOrder.flatMap((monthIndex, position) => {
-    const state = frost[monthIndex];
-    if (state === undefined) return [];
-    const left = scaleX(position - HALF_MONTH);
-    return [
-      {
-        key: position,
-        x: left + CELL_GAP / 2,
-        y: axisY + BAND_GAP,
-        width: scaleX(position + HALF_MONTH) - left - CELL_GAP,
-        height: BAND_HEIGHT,
-        ...paint[state],
-      },
-    ];
-  });
+  const edges = Array.from({ length: monthOrder.length + 1 }, (_, i) => scaleX(i - HALF_MONTH));
+  const left = edges[0] ?? 0;
+  const right = edges.at(-1) ?? left;
+
+  return {
+    cells: monthOrder.flatMap((monthIndex, position) => {
+      const state = frost[monthIndex];
+      const [x0, x1] = [edges[position], edges[position + 1]];
+      if (state === undefined || x0 === undefined || x1 === undefined) return [];
+      return [{ key: position, x: x0, y: axisY, width: x1 - x0, height, fill: fill[state] }];
+    }),
+    boundaries: edges.map((x, key) => ({
+      key,
+      x,
+      y1: axisY - WALTER_LIETH_FROST.TICK_LENGTH,
+      y2: axisY + height,
+    })),
+    frame: { x: left, y: axisY, width: right - left, height },
+  };
 }
 
 /**
@@ -466,24 +478,6 @@ export function getSummaryDeltas(a: TChartSummary, b: TChartSummary): TSummaryDe
     totalPrec: b.totalPrec - a.totalPrec,
     aridCount: b.aridCount - a.aridCount,
     martonne: a.martonne !== null && b.martonne !== null ? b.martonne - a.martonne : null,
-  };
-}
-
-/**
- * Series B's difference from A, formatted for the stats cells ("+5.0 °C", "−4 arid months",
- * "+273 mm") — on screen and in the export. Martonne is skipped when either is unknown.
- */
-export function formatSummaryDeltas({
-  reference,
-  summary,
-  formatAridMonths,
-}: TFormatSummaryDeltasArgs): TStatDeltas {
-  const deltas = getSummaryDeltas(reference, summary);
-  return {
-    meanTemp: `${formatSigned(deltas.meanTemp, 1)} °C`,
-    annualPrecip: `${formatSigned(deltas.totalPrec, 0)} mm`,
-    aridMonths: formatAridMonths(differenceSign(deltas.aridCount), Math.abs(deltas.aridCount)),
-    ...(deltas.martonne !== null ? { martonne: formatSigned(deltas.martonne, 1) } : {}),
   };
 }
 
