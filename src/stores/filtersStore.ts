@@ -18,7 +18,7 @@ const DEFAULT_FILTERS: TFiltersData = {
   climatePeriod: CLIMATE_PERIODS.C1970_2000,
   weatherYear: 2024,
   variables: [...DEFAULT_VARIABLES],
-  gridSize: CELL_SIZES.TEN_MINUTES,
+  gridSize: CELL_SIZES.TWO_POINT_FIVE_MINUTES,
   months: "all",
 };
 
