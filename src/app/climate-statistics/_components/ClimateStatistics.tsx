@@ -1,6 +1,13 @@
 "use client";
 
-import { APP_TITLE, CLIMATE_PERIOD_LABELS, DATASETS, TIME, VARIABLE_LABELS } from "@/constants";
+import {
+  APP_TITLE,
+  CLIMATE_PERIOD_LABELS,
+  DATASETS,
+  DEFAULT_CHART_MODE,
+  TIME,
+  VARIABLE_LABELS,
+} from "@/constants";
 import {
   useGeolocation,
   useGetAltitude,
@@ -13,18 +20,14 @@ import {
   useUrlStateSync,
 } from "@/hooks";
 import { useFiltersStore, useSettingsStore } from "@/stores";
-import type { TChartSubtitle, TCity } from "@/types";
-import { scrollToSection } from "@/utils";
+import type { TChartMode, TChartSubtitle, TCity } from "@/types";
+import { scrollToSection, getLocationName } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { CLIMATE_STATISTICS_URL_SCHEMA } from "./ClimateStatistics.constant";
 import { formatCoordinate } from "./ClimateStatistics.util";
 import { ClimateStatisticsView } from "./ClimateStatisticsView";
-
-function resolveCityName(city: TCity): string {
-  return /^Q\d+$/.test(city.label) ? city.description : city.label;
-}
 
 export function ClimateStatistics() {
   const t = useTranslations();
@@ -48,21 +51,23 @@ export function ClimateStatistics() {
     }
   }, [selectedCity.lat, selectedCity.lng]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [chartCityName, setChartCityName] = useState<string>(() => resolveCityName(selectedCity));
+  // * from the current city — URL, persisted or picked — never a value captured on first render
+  const chartCityName = getLocationName(selectedCity);
 
   const subtitle: TChartSubtitle =
     dataset === DATASETS.CLIMATE
       ? { dataset: DATASETS.CLIMATE, climatePeriod }
       : { dataset: DATASETS.WEATHER, weatherYear };
 
+  const [chartMode, setChartMode] = useState<TChartMode>(DEFAULT_CHART_MODE);
+
   const { pushUrlState, shareUrl } = useUrlStateSync({
     schema: CLIMATE_STATISTICS_URL_SCHEMA,
-    state: { city: selectedCity },
+    state: { city: selectedCity, chartMode },
     onRestore(parsed) {
-      if (parsed.city) {
-        selectCity(parsed.city);
-        setChartCityName(parsed.city.label);
-      }
+      // * absent or unknown param = standard, so back/forward restores it too
+      setChartMode(parsed.chartMode ?? DEFAULT_CHART_MODE);
+      if (parsed.city) selectCity(parsed.city);
     },
   });
 
@@ -84,8 +89,6 @@ export function ClimateStatistics() {
   function handleCitySelect(city: TCity) {
     userSelectedRef.current = true;
     clearLocationError();
-    const name = resolveCityName(city);
-    if (name) setChartCityName(name);
     selectCity(city);
     if (syncCity && hasHydrated) {
       selectCityA(city);
@@ -99,8 +102,6 @@ export function ClimateStatistics() {
   function handleLocate() {
     locate((city) => {
       userSelectedRef.current = true;
-      const name = resolveCityName(city);
-      if (name) setChartCityName(name);
       selectCity(city);
       pushUrlState({ city });
     });
@@ -130,9 +131,6 @@ export function ClimateStatistics() {
       if (!resolvedCity || latestMapClickIdRef.current !== currentMapClickId) {
         return;
       }
-
-      const name = resolveCityName(resolvedCity);
-      if (name) setChartCityName(name);
 
       selectCity({
         ...resolvedCity,
@@ -203,6 +201,8 @@ export function ClimateStatistics() {
       onLocate={handleLocate}
       onClearLocationError={clearLocationError}
       chartSectionRef={chartSectionRef}
+      chartMode={chartMode}
+      onChartModeChange={setChartMode}
     />
   );
 }

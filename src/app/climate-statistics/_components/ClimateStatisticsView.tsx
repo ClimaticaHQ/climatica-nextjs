@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  LocationSearch,
-  TempPrecipChart,
-  ThreeDotsScaleLoader,
-  useTempPrecipChart,
-} from "@/components";
+import { LocationSearch, StatCard, TempPrecipChart, useTempPrecipChart } from "@/components";
+import { DataUpdateProvider } from "@/components/DataUpdate";
 import {
   ChartSkeleton,
   EmptyState,
@@ -16,9 +12,16 @@ import {
   PageWrapper,
   StatCardsSkeleton,
 } from "@/components/UI";
-import { CLIMATE_PERIOD_LABELS, DATASETS, EXPORT_PNG_SCALE, EXPORT_SVG_LAYOUT } from "@/constants";
+import {
+  CLIMATE_PERIOD_LABELS,
+  DATA_UPDATE_SINGLE_SERIES,
+  DATASETS,
+  EXPORT_PNG_SCALE,
+  EXPORT_SVG_LAYOUT,
+  MISSING_VALUE_LABEL,
+} from "@/constants";
 import { useFetchFullClimateData } from "@/hooks";
-import type { TChartMode, TExportLabels, TVisibleSeries } from "@/types";
+import type { TExportLabels, TVisibleSeries } from "@/types";
 import {
   buildExportPayload,
   buildExportSvg,
@@ -33,47 +36,22 @@ import {
   shortGridLabel,
   svgToPng,
 } from "@/utils";
-import { useTranslations } from "next-intl";
+import { getShownChartMode } from "@/utils/chartMode.util";
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import type { TClimateStatisticsViewProps, TStatCardProps } from "./ClimateStatistics.type";
+import type { TClimateStatisticsViewProps } from "./ClimateStatistics.type";
+import {
+  CHART_FLASH_KEYS,
+  FILTERED_STATS_SERIES,
+  STAT_CARD_FLASH_KEYS,
+} from "./ClimateStatistics.constant";
 import { computeClimateStats } from "./ClimateStatistics.util";
 
 const LeafletMap = dynamic(
   () => import("@/components/LeafletMap").then((m) => ({ default: m.LeafletMap })),
   { ssr: false, loading: () => <MapSkeleton variant="full" /> },
 );
-
-function StatCard({ label, value, unit, tooltip }: TStatCardProps) {
-  return (
-    <div
-      data-stat-card
-      className="flex flex-col gap-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3"
-    >
-      <span className="flex items-center gap-1 text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
-        {label}
-        {tooltip && (
-          <span
-            title={tooltip}
-            className="cursor-help text-[var(--color-text-secondary)] opacity-60 hover:opacity-100"
-          >
-            <svg viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3" aria-hidden="true">
-              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0-1A6 6 0 1 0 8 2a6 6 0 0 0 0 12zm-.75-4.25h1.5V11h-1.5V9.75zM8 4.5a1.75 1.75 0 0 1 1.394 2.8c-.275.352-.644.56-.894.77-.223.19-.375.394-.375.68V9h-1.25v-.25c0-.637.297-1.047.657-1.36.267-.228.562-.41.743-.645A.75.75 0 0 0 8 5.75 1 1 0 0 0 7 6.75H5.5A2.5 2.5 0 0 1 8 4.5z" />
-            </svg>
-          </span>
-        )}
-      </span>
-      <span className="text-[length:var(--font-xl)] font-bold text-[var(--color-text)] leading-none">
-        {value}
-        {unit && (
-          <span className="ml-1 text-[length:var(--font-sm)] font-normal text-[var(--color-text-secondary)]">
-            {unit}
-          </span>
-        )}
-      </span>
-    </div>
-  );
-}
 
 export function ClimateStatisticsView({
   selectedCity,
@@ -98,17 +76,27 @@ export function ClimateStatisticsView({
   onLocate,
   onClearLocationError,
   chartSectionRef,
+  chartMode,
+  onChartModeChange,
 }: TClimateStatisticsViewProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const [visibleSeries, setVisibleSeries] = useState<TVisibleSeries | null>(null);
-  const [chartMode, setChartMode] = useState<TChartMode>("standard");
   const chart = useTempPrecipChart(temperatureData ? { data: temperatureData } : {});
   const { mutateAsync: fetchFullClimateData } = useFetchFullClimateData();
 
   const canExportFullData = isFullVariableDataAvailable(subtitle.dataset, subtitle.climatePeriod);
 
-  const isFiltered = selectedMonths !== null && selectedMonths.length > 0;
-  const isSingleMonth = isFiltered && selectedMonths.length === 1;
+  const isClimate = subtitle.dataset !== DATASETS.WEATHER;
+  const shownChartMode = getShownChartMode({
+    chartMode,
+    dataset: isClimate ? DATASETS.CLIMATE : DATASETS.WEATHER,
+  });
+  // * WL always plots all 12 months, so while it shows every stat on the page does too; the
+  // * stored selection is kept and applies again in standard mode
+  const statsMonths = shownChartMode === "walter-lieth" ? null : selectedMonths;
+  const isFiltered = statsMonths !== null && statsMonths.length > 0;
+  const isSingleMonth = isFiltered && statsMonths.length === 1;
 
   const noPeriodDataMessage =
     temperatureData === null &&
@@ -124,10 +112,12 @@ export function ClimateStatisticsView({
 
   const showStats = temperatureData !== null && !isLoading && !error;
   const stats =
-    showStats && temperatureData ? computeClimateStats(temperatureData, selectedMonths) : null;
+    showStats && temperatureData
+      ? computeClimateStats({ data: temperatureData, months: statsMonths, locale })
+      : null;
 
   const filteredMonthNames = isFiltered
-    ? selectedMonths
+    ? statsMonths
         .slice()
         .sort((a, b) => a - b)
         .map((n) => t(`months.${n}`))
@@ -148,6 +138,7 @@ export function ClimateStatisticsView({
       : undefined;
 
   const exportLabels: TExportLabels = {
+    locale,
     periodLabel,
     monthNames: Array.from({ length: 12 }, (_, i) => t(`months.${i + 1}`)),
     seriesLabels: {
@@ -163,17 +154,25 @@ export function ClimateStatisticsView({
       altitude: t("chart.altitude"),
       martonne: t("chart.martonne"),
     },
-    tableLabels: {
-      avgTemp: t("chart.avgTempShort"),
-      precip: t("chart.precipShort"),
-    },
-    monthAxisLabel: t("chart.monthAxis"),
     ...(martonneClassLabel !== undefined ? { martonneClassLabel } : {}),
     aridityLegend: {
       arid: t("chart.aridPeriod"),
       humid: t("chart.humidPeriod"),
+      perhumid: t("chart.perhumidPeriod"),
+      frost: t("chart.frostLegend"),
     },
+    walterLiethIncomplete: t("chart.wlIncomplete", { label: cityName }),
   };
+
+  // * the export needs every month's temperature and precipitation (its stats table and the
+  // * WL diagram) — with a gap, disable it and say why instead of silently doing nothing
+  const hasIncompleteMonths = chart.chartDataSingle.length > 0 && chart.summary === null;
+  // * a refetch in progress: exporting now would save the data being replaced
+  const exportDisabledReason = isFetching
+    ? t("exportMenu.updating")
+    : hasIncompleteMonths
+      ? t("exportMenu.incompleteData")
+      : undefined;
 
   const exportPayload = buildExportPayload({
     cityName,
@@ -183,14 +182,14 @@ export function ClimateStatisticsView({
     gridSize,
     subtitle,
     variables,
-    selectedMonths,
+    selectedMonths: statsMonths,
     visibleSeries,
     chartDataSingle: chart.chartDataSingle,
     aridity: chart.aridity,
     scales: chart.scales,
     summary: chart.summary,
     rightMax: chart.rightMax,
-    chartMode,
+    chartMode: shownChartMode,
     labels: exportLabels,
     datasetAttribution,
     shareUrl,
@@ -284,95 +283,115 @@ export function ClimateStatisticsView({
         {selectedCity && noPeriodDataMessage && <EmptyState message={noPeriodDataMessage} />}
 
         {selectedCity && (temperatureData !== null || isLoading || isFetching) && (
-          <div ref={chartSectionRef} id="climate-stats-container" className="flex flex-col gap-8">
-            {isLoading ? (
-              <StatCardsSkeleton />
-            ) : stats ? (
-              <div className="flex flex-col gap-3">
-                <div data-testid="stat-cards" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                  <StatCard
-                    label={
-                      isSingleMonth
-                        ? t("climateStatistics.stats.tmax")
-                        : t("climateStatistics.stats.avgTmax")
-                    }
-                    value={stats.avgTmax}
-                    unit="°C"
-                  />
-                  <StatCard
-                    label={
-                      isSingleMonth
-                        ? t("climateStatistics.stats.tmin")
-                        : t("climateStatistics.stats.avgTmin")
-                    }
-                    value={stats.avgTmin}
-                    unit="°C"
-                  />
-                  <StatCard
-                    label={t("climateStatistics.stats.totalPrec")}
-                    value={stats.totalPrec}
-                    unit={isSingleMonth ? t("climateStatistics.stats.mmThisMonth") : "mm"}
-                  />
-                  <StatCard
-                    label={t("climateStatistics.stats.altitude")}
-                    value={altitude !== null ? String(altitude) : "—"}
-                    {...(altitude !== null ? { unit: "m" } : {})}
-                  />
-                </div>
-                <p
-                  className="text-[length:var(--font-xs)] text-[var(--color-text-secondary)]"
-                  style={{ visibility: filteredMonthNames ? "visible" : "hidden" }}
-                >
-                  {filteredMonthNames
-                    ? t("climateStatistics.stats.filteredMonths", { months: filteredMonthNames })
-                    : " "}
-                </p>
-              </div>
-            ) : null}
-
-            <div
-              id="climate-chart-container"
-              data-testid="climate-chart"
-              className="flex flex-col gap-2"
-            >
-              <div className="flex h-10 items-center justify-end">
-                {isLoading ? (
-                  <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
-                ) : (
-                  <ExportMenu
-                    onExportCSV={handleExportCSV}
-                    onExportPNG={handleExportPNG}
-                    onExportSVG={handleExportSVG}
-                    onExportRawCsv={handleExportRawCsv}
-                    onExportRawJson={handleExportRawJson}
-                    isRawDataAvailable={canExportFullData}
-                    isDisabled={!temperatureData || temperatureData.length === 0}
-                  />
-                )}
-              </div>
+          // * around the stat cards and the chart card: both flash when the data updates
+          <DataUpdateProvider
+            series={{
+              [DATA_UPDATE_SINGLE_SERIES]: temperatureData,
+              // * none in WL (every month): switching chart type is never an update
+              [FILTERED_STATS_SERIES]: shownChartMode === "walter-lieth" ? null : stats,
+            }}
+            isFetching={isFetching}
+            announcement={t("loading.dataUpdated", { location: cityName, period: periodLabel })}
+          >
+            <div ref={chartSectionRef} id="climate-stats-container" className="flex flex-col gap-8">
               {isLoading ? (
-                <ChartSkeleton />
-              ) : (
-                <section className="relative">
-                  {isFetching && (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-bg)]/80 backdrop-blur-sm">
-                      <ThreeDotsScaleLoader className="text-[var(--color-primary)]" size={80} />
-                    </div>
+                <StatCardsSkeleton />
+              ) : stats ? (
+                <div className="flex flex-col gap-3">
+                  <div data-testid="stat-cards" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                    <StatCard
+                      flashKeys={STAT_CARD_FLASH_KEYS}
+                      label={
+                        isSingleMonth
+                          ? t("climateStatistics.stats.tmax")
+                          : t("climateStatistics.stats.avgTmax")
+                      }
+                      value={stats.avgTmax}
+                      unit={t("units.celsius")}
+                    />
+                    <StatCard
+                      flashKeys={STAT_CARD_FLASH_KEYS}
+                      label={
+                        isSingleMonth
+                          ? t("climateStatistics.stats.tmin")
+                          : t("climateStatistics.stats.avgTmin")
+                      }
+                      value={stats.avgTmin}
+                      unit={t("units.celsius")}
+                    />
+                    <StatCard
+                      flashKeys={STAT_CARD_FLASH_KEYS}
+                      label={t("climateStatistics.stats.totalPrec")}
+                      value={stats.totalPrec}
+                      unit={
+                        isSingleMonth ? t("climateStatistics.stats.mmThisMonth") : t("units.mm")
+                      }
+                    />
+                    <StatCard
+                      flashKeys={STAT_CARD_FLASH_KEYS}
+                      label={t("climateStatistics.stats.altitude")}
+                      value={altitude !== null ? String(altitude) : MISSING_VALUE_LABEL}
+                      {...(altitude !== null ? { unit: t("units.meters") } : {})}
+                    />
+                  </div>
+                  <p
+                    className="text-[length:var(--font-xs)] text-[var(--color-text-secondary)]"
+                    style={{ visibility: filteredMonthNames ? "visible" : "hidden" }}
+                  >
+                    {filteredMonthNames
+                      ? t("climateStatistics.stats.filteredMonths", { months: filteredMonthNames })
+                      : " "}
+                  </p>
+                </div>
+              ) : null}
+
+              <div
+                id="climate-chart-container"
+                data-testid="climate-chart"
+                className="flex flex-col gap-2"
+              >
+                <div className="flex h-10 items-center justify-end">
+                  {isLoading ? (
+                    <div className="h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]" />
+                  ) : (
+                    <ExportMenu
+                      onExportCSV={handleExportCSV}
+                      onExportPNG={handleExportPNG}
+                      onExportSVG={handleExportSVG}
+                      onExportRawCsv={handleExportRawCsv}
+                      onExportRawJson={handleExportRawJson}
+                      isRawDataAvailable={canExportFullData}
+                      isDisabled={
+                        !temperatureData ||
+                        temperatureData.length === 0 ||
+                        exportDisabledReason !== undefined
+                      }
+                      {...(exportDisabledReason !== undefined
+                        ? { disabledReason: exportDisabledReason }
+                        : {})}
+                    />
                   )}
+                </div>
+                {isLoading ? (
+                  <ChartSkeleton />
+                ) : (
                   <TempPrecipChart
                     cityName={cityName}
                     subtitle={subtitle}
                     variables={variables}
                     onVisibleSeriesChange={setVisibleSeries}
-                    onChartModeChange={setChartMode}
+                    chartMode={shownChartMode}
+                    onChartModeChange={onChartModeChange}
+                    showWalterLiethToggle={isClimate}
+                    flashKeys={CHART_FLASH_KEYS}
                     {...(temperatureData ? { data: temperatureData } : {})}
                     {...(altitude !== null ? { altitude } : {})}
-                    {...(isFiltered ? { selectedMonths } : {})}
+                    {...(isFiltered ? { selectedMonths: statsMonths } : {})}
                   />
-                </section>
-              )}
+                )}
+              </div>
             </div>
-          </div>
+          </DataUpdateProvider>
         )}
       </div>
     </PageWrapper>

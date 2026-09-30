@@ -1,3 +1,4 @@
+import type { TChartMode } from "@/types";
 import type {
   TCellBounds,
   TCellSize,
@@ -18,6 +19,7 @@ export type TClimateStatisticsUrlState = {
   variables: TVariable[];
   gridSize: TCellSize;
   months: TMonthFilter;
+  chartMode: TChartMode;
 };
 
 export type TClimateStatisticsViewProps = {
@@ -43,17 +45,21 @@ export type TClimateStatisticsViewProps = {
   onMapClick: (lat: number, lng: number) => void;
   onLocate: () => void;
   onClearLocationError: () => void;
-};
-
-export type TStatCardProps = {
-  label: string;
-  value: string;
-  unit?: string;
-  tooltip?: string;
+  /** URL state: shared links open in the same chart mode */
+  chartMode: TChartMode;
+  onChartModeChange: (mode: TChartMode) => void;
 };
 
 export type TClimateStats = {
   avgTmax: string;
   avgTmin: string;
   totalPrec: string;
+};
+
+export type TComputeClimateStatsArgs = {
+  data: TMonthlyTemperature[];
+  /** the month filter — every month when null or empty */
+  months?: number[] | null;
+  /** the UI's locale — the stats' decimal separator */
+  locale: string;
 };
