@@ -1,6 +1,7 @@
 "use client";
 
 import { CellSizeSelector, FilterChip, SectionLabel, YearInput } from "@/components";
+import { AnimationSettings } from "@/components/AnimationSettings";
 import { Button, CollapsibleSection, DotLabel, Dropdown, ToggleSwitch } from "@/components/UI";
 import {
   AUTO_APPLY_DEBOUNCE_MS,
@@ -25,6 +26,7 @@ import { EButtonVariant } from "@/enums";
 import {
   useAvailableClimatePeriods,
   useDebounce,
+  useFormatNumber,
   usePersistedCity,
   usePersistedClimatePeriods,
   usePersistedPeriods,
@@ -33,6 +35,7 @@ import { usePathname } from "@/libs/I18nNavigation";
 import { useClimatePeriodsStore, useFiltersStore, useSettingsStore } from "@/stores";
 import type { TCellSize, TCellSizeOption } from "@/types";
 import { estimateCellCount, getCellCountStatus } from "@/utils";
+import { isWalterLiethShown } from "@/utils/chartMode.util";
 import { sidebarFiltersSchema } from "@/validators";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -50,6 +53,7 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
     hasHydrated: settingsHydrated,
   } = useSettingsStore();
   const t = useTranslations();
+  const formatNumber = useFormatNumber();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -145,6 +149,10 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const isHeatmapPage = pathname.startsWith(ROUTES.HEAT_MAP);
+  // * WL always plots mean temperature and precipitation over all 12 months, whatever is
+  // * selected here — the variable and month chips are disabled (read-only), never cleared,
+  // * so the selection returns with standard
+  const isWalterLieth = isWalterLiethShown({ pathname, searchParams, dataset });
 
   const northRaw = searchParams.get(SIDEBAR_PARAMS.BBOX_NORTH);
   const southRaw = searchParams.get(SIDEBAR_PARAMS.BBOX_SOUTH);
@@ -534,12 +542,17 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
                     key={v}
                     label={t(`sidebar.variables.${v}`)}
                     isActive={draft.variables.includes(v)}
-                    disabled={isRestricted}
+                    disabled={isRestricted || isWalterLieth}
                     onClick={() => handleDraftVariableToggle(v)}
                   />
                 );
               })}
             </div>
+            {isWalterLieth && (
+              <p className="mt-1.5 text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
+                {t("chart.walterLiethTabUnavailable")}
+              </p>
+            )}
             {draft.dataset === DATASETS.WEATHER && (
               <p className="mt-1.5 text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
                 {t("sidebar.notes.weatherVariables")}
@@ -565,7 +578,11 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
                   className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[length:var(--font-xs)] font-medium ${cellStatus.colorClass}`}
                 >
                   {t(cellStatus.labelKey)}
-                  <span className="opacity-70">({cellCount.toLocaleString()} cells)</span>
+                  <span className="opacity-70">
+                    {t("sidebar.cellCount", {
+                      count: formatNumber(cellCount, { hasGrouping: true }),
+                    })}
+                  </span>
                 </span>
                 {isTooMany && (
                   <p className="text-[length:var(--font-xs)] text-[var(--color-error)]">
@@ -588,6 +605,7 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
               <FilterChip
                 label={t("sidebar.months.all")}
                 isActive={isAllActive}
+                disabled={isWalterLieth}
                 onClick={handleDraftSelectAllMonths}
               />
               {Array.from({ length: 12 }, (_, i) => {
@@ -598,11 +616,17 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
                     key={monthNum}
                     label={t(`months.${monthNum}`)}
                     isActive={isActive}
+                    disabled={isWalterLieth}
                     onClick={() => handleDraftMonthToggle(monthNum)}
                   />
                 );
               })}
             </div>
+            {isWalterLieth && (
+              <p className="mt-1.5 text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
+                {t("chart.walterLiethTabUnavailable")}
+              </p>
+            )}
           </div>
         </CollapsibleSection>
 
@@ -627,6 +651,7 @@ export function Sidebar({ isOpen, onClose }: TSidebarProps) {
             checked={autoApplyFilters}
             onChange={toggleAutoApplyFilters}
           />
+          <AnimationSettings />
         </CollapsibleSection>
       </div>
 
