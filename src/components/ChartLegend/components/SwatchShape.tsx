@@ -2,6 +2,7 @@ import { CHART_LEGEND } from "@/constants";
 import { ELegendSwatch } from "@/enums";
 import type { TLegendSwatchProps } from "../ChartLegend.type";
 import { FillSwatch } from "./FillSwatch";
+import { FrostSwatch } from "./FrostSwatch";
 import { HatchSwatch } from "./HatchSwatch";
 import { LineSwatch } from "./LineSwatch";
 import { MarkerSwatch } from "./MarkerSwatch";
@@ -22,6 +23,8 @@ export function SwatchShape({ swatch, size }: TLegendSwatchProps) {
       );
     case ELegendSwatch.PERHUMID:
       return <FillSwatch color={swatch.color} size={size} />;
+    case ELegendSwatch.FROST:
+      return <FrostSwatch color={swatch.color} outline={swatch.outline} size={size} />;
     case ELegendSwatch.MARKER:
       return <MarkerSwatch color={swatch.color} shape={swatch.shape} size={size} />;
     case ELegendSwatch.HUMID:

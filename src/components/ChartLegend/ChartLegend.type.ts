@@ -30,6 +30,10 @@ export type TMarkerSwatchProps = TSwatchShapeProps & {
   shape: TLegendMarkerShape;
 };
 
+export type TFrostSwatchProps = TSwatchShapeProps & {
+  outline: string;
+};
+
 export type THatchSwatchProps = TSwatchShapeProps & {
   regime: ELegendSwatch.HUMID | ELegendSwatch.ARID;
 };
