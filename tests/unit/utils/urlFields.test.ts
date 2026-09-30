@@ -4,7 +4,14 @@ import {
   gridSizeUrlField,
   monthsUrlField,
   variablesUrlField,
+  chartModeUrlField,
+  compareLayoutUrlField,
+  walterLiethShadingUrlField,
+  expandedPanelUrlField,
 } from "@/utils/urlFields.util";
+import { DATASETS } from "@/constants";
+import { ECompareLayout, EWalterLiethSeriesId, EWalterLiethShading } from "@/enums";
+import { getShownChartMode, isWalterLiethShown } from "@/utils/chartMode.util";
 import { describe, expect, it } from "vitest";
 
 describe("cityUrlField", () => {
@@ -143,5 +150,135 @@ describe("monthsUrlField", () => {
       params,
     );
     expect(params.get("months")).toBe("all");
+  });
+});
+
+describe("compareLayoutUrlField", () => {
+  it("omits the param for the default split layout, so existing share links don't change", () => {
+    const params = new URLSearchParams();
+    compareLayoutUrlField.serialize(ECompareLayout.SPLIT, params);
+    expect(params.toString()).toBe("");
+  });
+
+  it("round-trips the overlay layout", () => {
+    const params = new URLSearchParams();
+    compareLayoutUrlField.serialize(ECompareLayout.OVERLAY, params);
+    expect(compareLayoutUrlField.parse(params)).toBe(ECompareLayout.OVERLAY);
+  });
+
+  it("parses an absent or unknown value to undefined", () => {
+    expect(compareLayoutUrlField.parse(new URLSearchParams())).toBeUndefined();
+    expect(compareLayoutUrlField.parse(new URLSearchParams("layout=grid"))).toBeUndefined();
+  });
+
+  it("writes layout=, and still reads wlLayout= from old links", () => {
+    const params = new URLSearchParams();
+    compareLayoutUrlField.serialize(ECompareLayout.OVERLAY, params);
+    expect(params.toString()).toBe("layout=overlay");
+    expect(compareLayoutUrlField.parse(new URLSearchParams("wlLayout=overlay"))).toBe(
+      ECompareLayout.OVERLAY,
+    );
+  });
+});
+
+describe("chartModeUrlField", () => {
+  it("writes chart=standard for the standard chart and nothing for Walter-Lieth (default)", () => {
+    const wl = new URLSearchParams();
+    chartModeUrlField.serialize("walter-lieth", wl);
+    expect(wl.toString()).toBe("");
+
+    const standard = new URLSearchParams();
+    chartModeUrlField.serialize("standard", standard);
+    expect(standard.toString()).toBe("chart=standard");
+  });
+
+  it("parses standard, still accepts old links' chart=wl, and leaves the rest to the default", () => {
+    expect(chartModeUrlField.parse(new URLSearchParams("chart=standard"))).toBe("standard");
+    expect(chartModeUrlField.parse(new URLSearchParams("chart=wl"))).toBe("walter-lieth");
+    expect(chartModeUrlField.parse(new URLSearchParams())).toBeUndefined();
+    expect(chartModeUrlField.parse(new URLSearchParams("chart=bars"))).toBeUndefined();
+  });
+});
+
+describe("chart mode shown", () => {
+  const climate = DATASETS.CLIMATE;
+  const weather = DATASETS.WEATHER;
+
+  it("shows Walter-Lieth by default on the pages that offer it", () => {
+    for (const pathname of ["/climate-statistics", "/compare-cities", "/compare-periods"]) {
+      expect(
+        isWalterLiethShown({ pathname, searchParams: new URLSearchParams(), dataset: climate }),
+      ).toBe(true);
+    }
+    expect(
+      isWalterLiethShown({
+        pathname: "/heat-map",
+        searchParams: new URLSearchParams(),
+        dataset: climate,
+      }),
+    ).toBe(false);
+  });
+
+  it("never shows Walter-Lieth with Weather data, whatever chart= says", () => {
+    expect(getShownChartMode({ chartMode: "walter-lieth", dataset: weather })).toBe("standard");
+    for (const query of ["", "chart=wl"]) {
+      expect(
+        isWalterLiethShown({
+          pathname: "/compare-cities",
+          searchParams: new URLSearchParams(query),
+          dataset: weather,
+        }),
+      ).toBe(false);
+    }
+  });
+
+  it("shows the standard chart for chart=standard", () => {
+    expect(
+      isWalterLiethShown({
+        pathname: "/climate-statistics",
+        searchParams: new URLSearchParams("chart=standard"),
+        dataset: climate,
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("walterLiethShadingUrlField", () => {
+  it("omits the default (series A) and round-trips the others", () => {
+    const params = new URLSearchParams();
+    walterLiethShadingUrlField.serialize(EWalterLiethShading.A, params);
+    expect(params.toString()).toBe("");
+
+    [EWalterLiethShading.B, EWalterLiethShading.NONE].forEach((shading) => {
+      const written = new URLSearchParams();
+      walterLiethShadingUrlField.serialize(shading, written);
+      expect(walterLiethShadingUrlField.parse(written)).toBe(shading);
+    });
+  });
+
+  it("parses an unknown value to undefined", () => {
+    expect(walterLiethShadingUrlField.parse(new URLSearchParams("wlShading=c"))).toBeUndefined();
+  });
+});
+
+describe("expandedPanelUrlField", () => {
+  it("writes nothing while both panels are shown", () => {
+    const params = new URLSearchParams();
+    expandedPanelUrlField.serialize(null, params);
+    expect(params.has("expanded")).toBe(false);
+    // * absent = both panels (the page restores null)
+    expect(expandedPanelUrlField.parse(params)).toBeUndefined();
+  });
+
+  it.each([EWalterLiethSeriesId.A, EWalterLiethSeriesId.B])("round-trips expanded=%s", (id) => {
+    const params = new URLSearchParams();
+    expandedPanelUrlField.serialize(id, params);
+    expect(params.toString()).toBe(`expanded=${id}`);
+    expect(expandedPanelUrlField.parse(params)).toBe(id);
+  });
+
+  it("ignores an unknown value", () => {
+    expect(expandedPanelUrlField.parse(new URLSearchParams("expanded=c"))).toBeUndefined();
+    expect(expandedPanelUrlField.parse(new URLSearchParams("expanded=A"))).toBeUndefined();
   });
 });

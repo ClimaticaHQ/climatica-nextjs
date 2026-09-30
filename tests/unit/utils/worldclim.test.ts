@@ -145,10 +145,11 @@ describe("buildMonthlyTemperaturesFromPointValues", () => {
     expect(result).toHaveLength(12);
   });
 
-  it("defaults an unset variable to 0 for a month that does have other bindings", () => {
+  it("REGRESSION: leaves a variable the response lacks as null, never 0", () => {
+    // * 0 is a real temperature/precipitation — defaulting to it skewed means and aridity
     const bindings = [makeBinding("c1970-2000", "tmax", 1, "10")];
     const result = buildMonthlyTemperaturesFromPointValues(bindings);
-    expect(result?.[0]).toMatchObject({ tmax: 10, tmin: 0, prec: 0 });
+    expect(result?.[0]).toMatchObject({ tmax: 10, tmin: null, prec: null });
   });
 });
 

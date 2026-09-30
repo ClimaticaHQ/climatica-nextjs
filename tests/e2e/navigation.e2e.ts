@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("Navigation", () => {
+  // * a flaky pass here hides a real race (a stale URL write cancelling the click), so never retry
+  test.describe.configure({ retries: 0 });
+
   test("nav links navigate to the correct pages", async ({ page }) => {
     await page.goto("/climate-statistics");
 
@@ -17,6 +20,39 @@ test.describe("Navigation", () => {
 
     await page.getByRole("link", { name: "City Climate" }).click();
     await expect(page).toHaveURL(/climate-statistics/);
+  });
+
+  test("back restores the previous page's URL and state", async ({ page }) => {
+    await page.goto("/climate-statistics?city=Paris&lat=48.8566&lng=2.3522");
+    const chart = page.getByTestId("climate-chart");
+    await expect(chart.getByRole("heading", { name: "Paris" })).toBeVisible({ timeout: 30_000 });
+
+    // * one page-only field and one shared filter (months — enabled on the standard chart),
+    // * both written to the URL by the sync
+    await chart.getByRole("button", { name: "Standard chart" }).click();
+    await page.getByRole("button", { name: "Jul", exact: true }).click();
+    await page.getByRole("button", { name: "Apply filters" }).click();
+    await expect(page).toHaveURL(/chart=standard/);
+    await expect(page).not.toHaveURL(/months=all/);
+    const filteredUrl = page.url();
+
+    await page.getByRole("link", { name: "Compare Cities" }).click();
+    await expect(page).toHaveURL(/compare-cities/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Compare Cities");
+
+    await page.goBack();
+    await expect(chart.getByRole("heading", { name: "Paris" })).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole("button", { name: "Jul", exact: true })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(chart.getByRole("button", { name: "Standard chart" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    // * after the restored page has settled, no late write has replaced its entry
+    await expect(chart.getByRole("button", { name: "Standard chart" })).toBeVisible();
+    expect(page.url()).toBe(filteredUrl);
   });
 
   test("compare cities page renders two city search inputs", async ({ page }) => {
