@@ -8,21 +8,15 @@ export type TSplitPanelsProps = {
   labels: Record<EWalterLiethSeriesId, string>;
   /** panels with a header to expand (an incomplete WL series shows only its notice) */
   expandable: Record<EWalterLiethSeriesId, boolean>;
-  /** A's name when B shows its differences from A — B's note once A is hidden */
-  referenceLabel: string | null;
   /** one panel, with the header slots this container gives it */
   renderPanel: (id: EWalterLiethSeriesId, panel: TSplitPanelRender) => ReactNode;
-  /** a panel's header alone (name, period, stats) — held invisibly to keep the split's height */
-  renderHeader: (id: EWalterLiethSeriesId) => ReactNode;
   /** below the panels; told which panel is shown alone (null: both) */
   renderLegend: (shown: TExpandedPanel) => ReactNode;
 };
 
-/** How the container shows a panel: its header slots, and whether it fills the card. */
+/** How the container shows a panel: the header slots it gives it. */
 export type TSplitPanelRender = {
   slots: TPanelHeaderSlots;
-  /** expanded: the plot fills the height the split's headers leave */
-  isExpanded: boolean;
 };
 
 /** Where focus goes once the panels re-render: the collapse button, the switch, or a panel's expand button. */
@@ -41,17 +35,6 @@ export type TPanelIconButtonProps = {
   /** below `sm` the panels are already full width — the expand button is dropped there */
   isHiddenBelowSm?: boolean;
   ref?: RefObject<HTMLButtonElement | null> | ((element: HTMLButtonElement | null) => void);
-};
-
-export type TExpandedPanelFrameProps = {
-  /** the split's panel headers as they would render — invisible, they only hold its height */
-  sizer: ReactNode;
-  children: ReactNode;
-};
-
-export type TSplitHeaderSizerProps = {
-  expandable: Record<EWalterLiethSeriesId, boolean>;
-  renderHeader: (id: EWalterLiethSeriesId) => ReactNode;
 };
 
 export type TExpandedPanelControlsProps = {

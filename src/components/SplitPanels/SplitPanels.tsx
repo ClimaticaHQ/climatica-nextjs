@@ -4,12 +4,7 @@ import { EWalterLiethSeriesId } from "@/enums";
 import { getShownPanel } from "@/utils";
 import { useTranslations } from "next-intl";
 import { Fragment } from "react";
-import {
-  ExpandedPanelControls,
-  ExpandedPanelFrame,
-  PanelIconButton,
-  SplitHeaderSizer,
-} from "./components";
+import { ExpandedPanelControls, PanelIconButton } from "./components";
 import { usePanelFocus, usePanelOrigin } from "./hooks";
 import {
   SPLIT_PANEL_ORDER,
@@ -27,9 +22,7 @@ export function SplitPanels({
   expansion,
   labels,
   expandable,
-  referenceLabel,
   renderPanel,
-  renderHeader,
   renderLegend,
 }: TSplitPanelsProps) {
   const t = useTranslations();
@@ -59,11 +52,8 @@ export function SplitPanels({
     <div>
       <ChartTransition transitionKey={shown ?? SPLIT_TRANSITION_KEY} enterOrigin={origin}>
         {shown ? (
-          <ExpandedPanelFrame
-            sizer={<SplitHeaderSizer expandable={expandable} renderHeader={renderHeader} />}
-          >
+          <div className={C.EXPANDED}>
             {renderPanel(shown, {
-              isExpanded: true,
               slots: {
                 actions: (
                   <ExpandedPanelControls
@@ -76,20 +66,14 @@ export function SplitPanels({
                     switchRef={switchRef}
                   />
                 ),
-                // * A is hidden: B's deltas say what they're measured against
-                subtitleNote:
-                  shown === EWalterLiethSeriesId.B && referenceLabel !== null
-                    ? t("chart.differencesVs", { name: referenceLabel })
-                    : undefined,
               },
             })}
-          </ExpandedPanelFrame>
+          </div>
         ) : (
           <div className={C.SPLIT}>
             {SPLIT_PANEL_ORDER.map((id) => (
               <Fragment key={id}>
                 {renderPanel(id, {
-                  isExpanded: false,
                   slots: expandable[id] ? { actions: expandButton(id) } : {},
                 })}
               </Fragment>
