@@ -1,4 +1,4 @@
-import { APP_TITLE } from "@/constants";
+import { APP_TITLE, MOTION_CSS_VARIABLES } from "@/constants";
 import { AppLayout } from "@/layouts";
 import { env } from "@/libs/Env";
 import { parseLocale, routing } from "@/libs/I18nRouting";
@@ -29,7 +29,13 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+      // * the motion settings, for src/styles/motion.css
+      style={MOTION_CSS_VARIABLES}
+    >
       <body>
         <Providers>
           <NextIntlClientProvider>
