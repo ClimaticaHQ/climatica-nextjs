@@ -1,0 +1,360 @@
+{
+  "topbar": {
+    "toggleFilters": "Comută filtrele",
+    "toggleTheme": "Comută tema"
+  },
+  "navbar": {
+    "toggleMenu": "Comută meniul",
+    "links": {
+      "climateStatistics": "Clima orașului",
+      "climateComparison": "Compară orașe",
+      "compareCities": "Compară orașe",
+      "comparePeriods": "Compară perioade",
+      "heatMap": "Hartă termică regională"
+    }
+  },
+  "search": {
+    "placeholder": "Caută un oraș sau introdu coordonate (lat, lng)...",
+    "coordsResult": "Mergi la coordonate"
+  },
+  "climateStatistics": {
+    "title": "Statistici Climatice",
+    "subtitle": "Caută un oraș pentru a-i explora datele climatice",
+    "cellResolution": "Rezoluția celulei:",
+    "filtersTab": "Filtre",
+    "useMyLocation": "Folosește locația mea",
+    "locating": "Se localizează...",
+    "stats": {
+      "avgTmax": "Temp. max. medie",
+      "avgTmin": "Temp. min. medie",
+      "tmax": "Temp. max.",
+      "tmin": "Temp. min.",
+      "totalPrec": "Precipitații totale",
+      "mmThisMonth": "mm luna aceasta",
+      "resolution": "Rezoluție",
+      "autoResolutionTooltip": "Rezoluția este setată automat în funcție de setul de date selectat",
+      "altitude": "Altitudine",
+      "filteredMonths": "Filtrat: {months}"
+    },
+    "noPeriodData": "Nu există date pentru {period} la rezoluția {grid}"
+  },
+  "compareCities": {
+    "title": "Compară Orașe",
+    "selectSecondCity": "Selectează al doilea oraș pentru comparare"
+  },
+  "comparePeriods": {
+    "title": "Compară Perioade",
+    "trend": {
+      "tempTitle": "Tendința temperaturii",
+      "precipTitle": "Tendința precipitațiilor",
+      "noChange": "Fără modificări",
+      "comparedTo": "{b} vs {a}"
+    },
+    "weather": {
+      "periods": "Ani",
+      "addPeriod": "Adaugă perioadă",
+      "maxPeriods": "Maxim {max} perioade",
+      "removePeriod": "Elimină {year}",
+      "invalidYear": "Introdu un an între {min} și {max}",
+      "duplicateYear": "Acest an este deja în listă",
+      "periodsCount": "{count} / {max} perioade"
+    }
+  },
+  "climateComparison": {
+    "title": "Comparație Climatică",
+    "modeCities": "Compară orașe",
+    "modePeriods": "Compară perioade",
+    "searchA": "Orașul A",
+    "searchB": "Orașul B",
+    "searchCity": "Oraș",
+    "periodA": "Perioada A",
+    "periodB": "Perioada B",
+    "noData": "Selectează două orașe mai sus pentru a le compara datele climatice",
+    "noDataPeriods": "Selectează un oraș și două perioade de timp pentru a compara datele climatice",
+    "stats": {
+      "avgTmax": "Temp. max. medie",
+      "avgTmin": "Temp. min. medie",
+      "totalPrec": "Precipitații totale",
+      "aridMonths": "Luni aride",
+      "frostMonths": "Luni cu îngheț"
+    },
+    "diff": {
+      "warmerCity": "Orașul mai cald",
+      "moreRain": "Mai multe precipitații",
+      "hottestMonth": "Cea mai caldă lună",
+      "coldestMonth": "Cea mai rece lună",
+      "byDegrees": "cu {value} °C",
+      "byMm": "cu {value} mm",
+      "tie": "Egalitate",
+      "tieSub": "=",
+      "monthTemps": "{a}: {tempA} / {b}: {tempB}"
+    },
+    "autoResolution": "Rezoluție automată: {resolution}",
+    "noPeriodData": "Nu există date pentru {period} la rezoluția {grid}",
+    "difference": "Diferență",
+    "metric": "Metrică",
+    "tableCaption": "Comparație între {a} și {b}"
+  },
+  "heatMap": {
+    "title": "Hartă Termică Regională",
+    "placeholder": "Substituent pentru harta termică. Mai târziu vom afișa intensitatea climatică pe o hartă mondială aici.",
+    "drawBbox": "Desenează cadru de selecție",
+    "drawPolygon": "Desenează poligon",
+    "clearSelection": "Șterge selecția",
+    "drawing": "Apasă și trage pe hartă pentru a selecta o regiune",
+    "drawingPolygon": "Apasă pentru a adăuga puncte — apasă pe primul punct pentru a închide poligonul",
+    "noSelection": "Desenează un cadru sau un poligon pe hartă pentru a analiza datele climatice ale regiunii",
+    "noData": "Nu există date disponibile pentru această regiune",
+    "noPeriodData": "Nu există date pentru {period} la rezoluția {grid}",
+    "stats": {
+      "minValue": "Min.",
+      "maxValue": "Max.",
+      "avgValue": "Medie",
+      "median": "Mediană",
+      "stdDev": "Deviație std.",
+      "cellsAnalyzed": "Celule",
+      "contextClimate": "Medie 30 ani · {period}",
+      "contextWeatherAnnual": "Medie anuală · {year}",
+      "contextWeatherMonth": "Medie {month} {year}",
+      "avgTooltipClimate": "Media climatologică pe 30 de ani ({period}) pentru toate celulele",
+      "avgTooltipWeatherAnnual": "Media anuală: media celor 12 medii lunare pentru toate celulele",
+      "avgTooltipWeatherMonth": "Media lunară: media pentru {variable} în {month} {year} pentru toate celulele"
+    },
+    "showingVariable": "Se afișează: {variable}",
+    "useMyLocation": "Folosește locația mea",
+    "locating": "Se localizează...",
+    "summaryLine": "{count} celule analizate · {period} · {variable} · grilă {grid}",
+    "summaryLineClimate": "{count} celule · Medie 30 ani {variable} · {period} · {grid}",
+    "summaryLineWeatherAnnual": "{count} celule · Medie anuală {variable} · {year} · {grid}",
+    "summaryLineWeatherMonth": "{count} celule · {variable} în {period} · {grid}",
+    "profile": {
+      "subtitle": "Profil climatic regional · {count} celule · {period}",
+      "subtitleWeather": "Profil climatic regional · {count} celule · {year} · nu este o normală climatică"
+    }
+  },
+  "chart": {
+    "versus": "vs",
+    "temperatureAxis": "Temperatură (°C)",
+    "precipitation": "Precipitații",
+    "maxTemperature": "Temperatură maximă",
+    "minTemperature": "Temperatură minimă",
+    "avgTemperature": "Temperatură medie",
+    "avgTempShort": "Temp. medie",
+    "precipShort": "Precip.",
+    "meanTemp": "Temp. medie",
+    "annualPrec": "Precip. anuale",
+    "aridMonths": "Luni aride",
+    "martonne": "Indicele Martonne (M)",
+    "martonneShort": "Martonne (M)",
+    "martonneTooltip": "Indicele de ariditate De Martonne: M = P/(T+10). <5 Hyperarid | 5–10 Arid | 10–20 Semiarid | 20–30 Subumed | >30 Umed",
+    "aridPeriod": "Perioadă aridă",
+    "humidPeriod": "Perioadă umedă",
+    "perhumidPeriod": "Foarte umed (> 100 mm)",
+    "wlAriaSummary": "Diagrama Walter-Lieth, {location}, {period}: temperatură medie {temp} °C, precipitații anuale {prec} mm, luni aride: {arid}",
+    "wlIncomplete": "Date incomplete pentru {label}: diagrama Walter-Lieth necesită date de temperatură și precipitații pentru toate cele 12 luni.",
+    "layout": "Dispunere",
+    "layoutSplit": "Alăturat",
+    "layoutOverlay": "Suprapus",
+    "wlGuideButton": "Cum se citește această diagramă",
+    "wlGuide": {
+      "scale": "Scară: 10 °C = 20 mm",
+      "humid": "Perioadă umedă (linii verticale): precipitațiile depășesc temperatura",
+      "arid": "Perioadă aridă (puncte): temperatura depășeste precipitațiile",
+      "veryHumid": "Foarte umed (hasură plină): peste 100 mm, scară comprimată 1:10",
+      "frost": "Bandă de îngheț: luni cu minima medie sub 0 °C"
+    },
+    "wlShading": "Umbrire",
+    "wlShadingNone": "Fără",
+    "mode": "Tip de grafic",
+    "modeStandard": "Grafic standard",
+    "modeWalterLieth": "Diagramă Walter-Lieth",
+    "walterLiethTabUnavailable": "Indisponibil în vizualizarea Walter-Lieth",
+    "selectedMonth": "valori pentru {month}",
+    "selectedMonthsCount": "{count, plural, one {# lună} few {# luni} other {# de luni}}",
+    "altitude": "Altitudine",
+    "subtitle": {
+      "climate": "Climă {period}",
+      "weather": "Vreme {year}"
+    },
+    "expandPanel": "Extinde {name}",
+    "showBoth": "Afișează ambele",
+    "expandedPanel": "Panou extins",
+    "frostLegend": "Îngheț (min. medie < 0 °C)",
+    "maxTempShort": "Temp. max.",
+    "minTempShort": "Temp. min.",
+    "monthlyTableCaption": "Valori lunare: {names}",
+    "month": "Lună",
+    "showMonthlyValues": "Afișează valorile lunare",
+    "hideMonthlyValues": "Ascunde valorile lunare"
+  },
+  "loading": {
+    "fetchingClimateData": "Se preiau datele climatice...",
+    "updating": "Se actualizează...",
+    "dataUpdated": "Date actualizate: {location}, {period}"
+  },
+  "errors": {
+    "fetchClimateData": "Eroare la preluarea datelor climatice",
+    "geolocationDenied": "Accesul la locație a fost refuzat. Te rugăm să permiți locația în browser.",
+    "geolocationUnavailable": "Nu s-a putut determina locația ta."
+  },
+  "geolocation": {
+    "notSupported": "Geolocarea nu este suportată de browserul tău",
+    "httpsRequired": "Locația necesită o conexiune securizată (HTTPS)",
+    "permissionDenied": "Accesul la locație a fost refuzat. Permite accesul din setările browserului",
+    "unavailable": "Nu s-a putut determina locația ta",
+    "timeout": "Solicitarea de locație a expirat. Te rugăm să încerci din nou",
+    "unknown": "A apărut o eroare necunoscută"
+  },
+  "map": {
+    "selectedFromMap": "Selectat de pe hartă",
+    "pointLabel": "Punct pe hartă {lat}, {lng}",
+    "gridCell": "Celulă grilă: {size}"
+  },
+  "cellSizes": {
+    "10m": "10 min (~324 km²)",
+    "5m": "5 min (~81 km²)",
+    "2_5m": "2,5 min (~20,25 km²)",
+    "30s": "30 sec (~1 km²)"
+  },
+  "filters": {
+    "period": "Perioadă"
+  },
+  "validation": {
+    "year": {
+      "required": "Anul este obligatoriu",
+      "invalid": "Introdu un număr valid",
+      "integer": "Anul trebuie să fie un număr întreg",
+      "tooSmall": "Anul trebuie să fie cel puțin {min}",
+      "tooBig": "Anul nu poate depăși {max}"
+    },
+    "period": {
+      "invalid": "Selectează o perioadă climatică validă"
+    }
+  },
+  "exportMenu": {
+    "button": "Exportă date",
+    "png": "Imagine PNG",
+    "svg": "Vector SVG",
+    "csv": "Date CSV",
+    "rawCsv": "Date complete (CSV)",
+    "rawJson": "Date complete (JSON)",
+    "rawDataUnavailable": "Disponibil doar pentru Climă 1970–2000",
+    "incompleteData": "Export indisponibil: lipsesc date de temperatură sau precipitații pentru unele luni",
+    "updating": "Export indisponibil în timpul actualizării datelor",
+    "failed": "Export eșuat — încearcă din nou",
+    "metricColumn": "Metrică"
+  },
+  "months": {
+    "1": "Ian",
+    "2": "Feb",
+    "3": "Mar",
+    "4": "Apr",
+    "5": "Mai",
+    "6": "Iun",
+    "7": "Iul",
+    "8": "Aug",
+    "9": "Sep",
+    "10": "Oct",
+    "11": "Nov",
+    "12": "Dec"
+  },
+  "sidebar": {
+    "sections": {
+      "dataset": "Set de date",
+      "climatePeriod": "Perioadă climatică",
+      "yearRange": "An",
+      "variables": "Variabile",
+      "months": "Lună",
+      "filters": "Filtre"
+    },
+    "datasets": {
+      "climate": "Climă",
+      "weather": "Vreme"
+    },
+    "variables": {
+      "tmax": "Temp. max.",
+      "tmin": "Temp. min.",
+      "prec": "Precip.",
+      "tavg": "Temp. medie",
+      "srad": "Rad. solară",
+      "wind": "Vânt",
+      "vapr": "Pres. vapori"
+    },
+    "months": {
+      "all": "Toate"
+    },
+    "yearRange": {
+      "from": "De la",
+      "to": "Până la"
+    },
+    "autoScroll": "Derulare automată la rezultate",
+    "syncCity": "Sincronizează orașul selectat pe toate paginile",
+    "autoApplyFilters": "Aplică filtrele automat",
+    "animations": "Animații",
+    "updateHighlight": "Evidențiere modificări",
+    "updateHighlightGlow": "Strălucire",
+    "updateHighlightBorder": "Bordură",
+    "reducedMotionNotice": "Mișcarea redusă este activată pe acest dispozitiv",
+    "filters": "Filtre",
+    "settings": "Setări",
+    "applyFilters": "Aplică filtrele",
+    "cellCount": "({count} celule)",
+    "notes": {
+      "climateNormals": "Normale climatice pe 30 de ani",
+      "weatherData": "Date meteorologice anuale (CRU-TS-4.09)",
+      "weatherVariables": "Datele meteorologice includ doar temperatura și precipitațiile",
+      "notAvailableHeatmap": "Indisponibil pentru harta termică regională"
+    }
+  },
+  "common": {
+    "useMyLocation": "Folosește locația mea",
+    "locating": "Se localizează..."
+  },
+  "error": {
+    "title": "Ceva nu a funcționat corect",
+    "subtitle": "A apărut o eroare neașteptată. Te rugăm să încerci din nou.",
+    "tryAgain": "Încearcă din nou",
+    "goHome": "Mergi la pagina principală"
+  },
+  "notFound": {
+    "title": "Pagina nu a fost găsită",
+    "subtitle": "Pagina pe care o cauți nu există sau a fost mutată.",
+    "goHome": "Mergi la Statistici Climatice"
+  },
+  "martonne": {
+    "arid": "Arid",
+    "semiArid": "Semiarid",
+    "mediterranean": "Mediteranean",
+    "semiHumid": "Subumed",
+    "humid": "Umed",
+    "veryHumid": "Foarte umed",
+    "extremelyHumid": "Extrem de umed"
+  },
+  "meta": {
+    "climateStatistics": {
+      "title": "Statistici climatice pentru {city}",
+      "description": "{variables} pentru {city} ({period})"
+    },
+    "compareCities": {
+      "title": "Se compară {cityA} și {cityB}",
+      "description": "{variables} pentru {cityA} vs {cityB} ({period})"
+    },
+    "comparePeriods": {
+      "title": "{city} — comparație perioade climatice",
+      "description": "{variables} pentru {city} — {periods}",
+      "descriptionGeneric": "Compară datele climatice pentru un oraș în diferite perioade de timp"
+    },
+    "heatMap": {
+      "title": "Hartă termică regională — {variables} ({period})",
+      "description": "Intensitatea climatică pentru {variables} în regiunea selectată ({period})"
+    }
+  },
+  "units": {
+    "celsius": "°C",
+    "mm": "mm",
+    "meters": "m",
+    "celsiusValue": "{value} °C",
+    "mmValue": "{value} mm",
+    "metersValue": "{value} m"
+  }
+}
