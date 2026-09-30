@@ -47,7 +47,8 @@
     "trend": {
       "tempTitle": "Тенденція температури",
       "precipTitle": "Тенденція опадів",
-      "noChange": "Без змін"
+      "noChange": "Без змін",
+      "comparedTo": "{b} проти {a}"
     },
     "weather": {
       "periods": "Роки",
@@ -74,7 +75,8 @@
       "avgTmax": "Серед. макс. темп",
       "avgTmin": "Серед. мін. темп",
       "totalPrec": "Заг. опади",
-      "aridMonths": "Посушливі місяці"
+      "aridMonths": "Посушливі місяці",
+      "frostMonths": "Місяці із заморозками"
     },
     "diff": {
       "warmerCity": "Тепліше місто",
@@ -83,10 +85,15 @@
       "coldestMonth": "Найхолодніший місяць",
       "byDegrees": "на {value}°C",
       "byMm": "на {value} мм",
-      "tie": "Нічия"
+      "tie": "Нічия",
+      "tieSub": "=",
+      "monthTemps": "{a}: {tempA} / {b}: {tempB}"
     },
     "autoResolution": "Авторозрядність: {resolution}",
-    "noPeriodData": "Немає даних за {period} для роздільної здатності {grid}"
+    "noPeriodData": "Немає даних за {period} для роздільної здатності {grid}",
+    "difference": "Різниця",
+    "metric": "Показник",
+    "tableCaption": "Порівняння {a} і {b}"
   },
   "heatMap": {
     "title": "Теплова мапа регіону",
@@ -137,7 +144,6 @@
     "meanTemp": "Сер. темп",
     "annualPrec": "Річні опади",
     "aridMonths": "Посушливих місяців",
-    "deltaAridMonths": "{sign}{count, plural, one {# посушливий місяць} few {# посушливі місяці} many {# посушливих місяців} other {# посушливого місяця}}",
     "martonne": "Індекс Мартонна (M)",
     "martonneShort": "Мартонн (M)",
     "martonneTooltip": "Індекс аридності де Мартонна: M = P/(T+10). <5 Гіпераридний | 5–10 Аридний | 10–20 Напіваридний | 20–30 Напівгумідний | >30 Гумідний",
@@ -149,7 +155,14 @@
     "layout": "Макет",
     "layoutSplit": "Поруч",
     "layoutOverlay": "Накладання",
-    "wlVariablesNote": "Вальтер-Літ використовує середню температуру та опади",
+    "wlGuideButton": "Як читати цю діаграму",
+    "wlGuide": {
+      "scale": "Масштаб: 10 °C = 20 мм",
+      "humid": "Вологий період (вертикальні лінії): опади вище за температуру",
+      "arid": "Посушливий період (крапки): температура вище за опади",
+      "veryHumid": "Дуже вологий (суцільна заливка): понад 100 мм, масштаб стиснуто 1:10",
+      "frost": "Смуга заморозків: місяці із середнім мінімумом нижче 0 °C"
+    },
     "wlShading": "Штрихування",
     "wlShadingNone": "Немає",
     "mode": "Тип діаграми",
@@ -166,15 +179,18 @@
     "expandPanel": "Розгорнути {name}",
     "showBoth": "Показати обидва",
     "expandedPanel": "Розгорнута панель",
-    "differencesVs": "відмінності від {name}",
     "frostLegend": "Заморозки (сер. мін. < 0 °C)",
     "maxTempShort": "Макс. темп.",
     "minTempShort": "Мін. темп.",
-    "monthlyTableCaption": "Місячні значення: {names}"
+    "monthlyTableCaption": "Місячні значення: {names}",
+    "month": "Місяць",
+    "showMonthlyValues": "Показати місячні значення",
+    "hideMonthlyValues": "Сховати місячні значення"
   },
   "loading": {
     "fetchingClimateData": "Завантаження кліматичних даних...",
-    "updating": "Оновлення..."
+    "updating": "Оновлення...",
+    "dataUpdated": "Дані оновлено: {location}, {period}"
   },
   "errors": {
     "fetchClimateData": "Не вдалося завантажити кліматичні дані",
@@ -224,6 +240,7 @@
     "rawJson": "Повні дані (JSON)",
     "rawDataUnavailable": "Доступно лише для клімату 1970–2000",
     "incompleteData": "Експорт недоступний: для деяких місяців бракує даних про температуру чи опади",
+    "updating": "Експорт недоступний, поки дані оновлюються",
     "failed": "Не вдалося експортувати — спробуйте ще раз",
     "metricColumn": "Метрика"
   },
@@ -273,16 +290,15 @@
     "autoScroll": "Автопрокрутка до результатів",
     "syncCity": "Синхронізувати вибране місто на всіх сторінках",
     "autoApplyFilters": "Автоматично застосовувати фільтри",
+    "animations": "Анімації",
+    "updateHighlight": "Підсвічування оновлень",
+    "updateHighlightGlow": "Сяйво",
+    "updateHighlightBorder": "Рамка",
+    "reducedMotionNotice": "На цьому пристрої увімкнено зменшення руху",
     "filters": "Фільтри",
     "settings": "Налаштування",
     "applyFilters": "Застосувати",
-    "cellCount": {
-      "fast": "Швидко",
-      "moderate": "Помірно",
-      "slow": "Повільно",
-      "tooMany": "Забагато клітинок",
-      "tooManyError": "Зменшіть область або роздільність для застосування"
-    },
+    "cellCount": "({count} клітинок)",
     "notes": {
       "climateNormals": "30-річні кліматичні норми",
       "weatherData": "Річні метеодані (CRU-TS-4.09)",
@@ -332,5 +348,13 @@
       "title": "Теплова карта регіону — {variables} ({period})",
       "description": "Інтенсивність клімату {variables} для обраної області ({period})"
     }
+  },
+  "units": {
+    "celsius": "°C",
+    "mm": "mm",
+    "meters": "m",
+    "celsiusValue": "{value}°C",
+    "mmValue": "{value} mm",
+    "metersValue": "{value} m"
   }
 }

@@ -47,7 +47,8 @@
     "trend": {
       "tempTitle": "Tendenza della temperatura",
       "precipTitle": "Tendenza delle precipitazioni",
-      "noChange": "Nessun cambiamento"
+      "noChange": "Nessun cambiamento",
+      "comparedTo": "{b} vs {a}"
     },
     "weather": {
       "periods": "Anni",
@@ -74,7 +75,8 @@
       "avgTmax": "Temp. max media",
       "avgTmin": "Temp. min media",
       "totalPrec": "Precipitazione totale",
-      "aridMonths": "Mesi aridi"
+      "aridMonths": "Mesi aridi",
+      "frostMonths": "Mesi di gelo"
     },
     "diff": {
       "warmerCity": "Città più calda",
@@ -83,10 +85,15 @@
       "coldestMonth": "Mese più freddo",
       "byDegrees": "di {value}°C",
       "byMm": "di {value} mm",
-      "tie": "Pareggio"
+      "tie": "Pareggio",
+      "tieSub": "=",
+      "monthTemps": "{a}: {tempA} / {b}: {tempB}"
     },
     "autoResolution": "Risoluzione automatica: {resolution}",
-    "noPeriodData": "Nessun dato per {period} alla risoluzione {grid}"
+    "noPeriodData": "Nessun dato per {period} alla risoluzione {grid}",
+    "difference": "Differenza",
+    "metric": "Indicatore",
+    "tableCaption": "Confronto tra {a} e {b}"
   },
   "heatMap": {
     "title": "Mappa di Calore Regionale",
@@ -137,7 +144,6 @@
     "meanTemp": "Temp. media",
     "annualPrec": "Precip. annuale",
     "aridMonths": "Mesi aridi",
-    "deltaAridMonths": "{sign}{count, plural, one {# mese arido} other {# mesi aridi}}",
     "martonne": "Indice di Martonne (M)",
     "martonneShort": "Martonne (M)",
     "martonneTooltip": "Indice di aridità di De Martonne: M = P/(T+10). <5 Iperarido | 5–10 Arido | 10–20 Semiarido | 20–30 Subumido | >30 Umido",
@@ -149,7 +155,14 @@
     "layout": "Layout",
     "layoutSplit": "Affiancati",
     "layoutOverlay": "Sovrapposti",
-    "wlVariablesNote": "Walter-Lieth usa la temperatura media e le precipitazioni",
+    "wlGuideButton": "Come leggere questo diagramma",
+    "wlGuide": {
+      "scale": "Scala: 10 °C = 20 mm",
+      "humid": "Periodo umido (linee verticali): precipitazioni sopra la temperatura",
+      "arid": "Periodo arido (punti): temperatura sopra le precipitazioni",
+      "veryHumid": "Molto umido (riempimento pieno): oltre 100 mm, scala compressa 1:10",
+      "frost": "Fascia di gelo: mesi con minima media sotto 0 °C"
+    },
     "wlShading": "Tratteggio",
     "wlShadingNone": "Nessuno",
     "mode": "Tipo di grafico",
@@ -166,15 +179,18 @@
     "expandPanel": "Espandi {name}",
     "showBoth": "Mostra entrambi",
     "expandedPanel": "Pannello espanso",
-    "differencesVs": "differenze rispetto a {name}",
     "frostLegend": "Gelo (min. media < 0 °C)",
     "maxTempShort": "Temp. max",
     "minTempShort": "Temp. min",
-    "monthlyTableCaption": "Valori mensili: {names}"
+    "monthlyTableCaption": "Valori mensili: {names}",
+    "month": "Mese",
+    "showMonthlyValues": "Mostra valori mensili",
+    "hideMonthlyValues": "Nascondi valori mensili"
   },
   "loading": {
     "fetchingClimateData": "Recupero dati climatici...",
-    "updating": "Aggiornamento in corso..."
+    "updating": "Aggiornamento in corso...",
+    "dataUpdated": "Dati aggiornati: {location}, {period}"
   },
   "errors": {
     "fetchClimateData": "Impossibile recuperare i dati climatici",
@@ -224,6 +240,7 @@
     "rawJson": "Dati completi (JSON)",
     "rawDataUnavailable": "Disponibile solo per Clima 1970–2000",
     "incompleteData": "Esportazione non disponibile: mancano dati di temperatura o precipitazioni per alcuni mesi",
+    "updating": "Esportazione non disponibile durante l'aggiornamento dei dati",
     "failed": "Esportazione non riuscita — riprova",
     "metricColumn": "Metrica"
   },
@@ -273,16 +290,15 @@
     "autoScroll": "Scorrimento automatico ai risultati",
     "syncCity": "Sincronizza la città selezionata su tutte le pagine",
     "autoApplyFilters": "Applica i filtri automaticamente",
+    "animations": "Animazioni",
+    "updateHighlight": "Evidenziazione aggiornamenti",
+    "updateHighlightGlow": "Alone",
+    "updateHighlightBorder": "Bordo",
+    "reducedMotionNotice": "Il movimento ridotto è attivo su questo dispositivo",
     "filters": "Filtri",
     "settings": "Impostazioni",
     "applyFilters": "Applica filtri",
-    "cellCount": {
-      "fast": "Veloce",
-      "moderate": "Moderato",
-      "slow": "Lento",
-      "tooMany": "Troppe celle",
-      "tooManyError": "Riduci l'area o la risoluzione per applicare"
-    },
+    "cellCount": "({count} celle)",
     "notes": {
       "climateNormals": "Normali climatiche di 30 anni",
       "weatherData": "Dati meteorologici annuali (CRU-TS-4.09)",
@@ -332,5 +348,13 @@
       "title": "Mappa termica regionale — {variables} ({period})",
       "description": "Intensità climatica di {variables} nella regione selezionata ({period})"
     }
+  },
+  "units": {
+    "celsius": "°C",
+    "mm": "mm",
+    "meters": "m",
+    "celsiusValue": "{value}°C",
+    "mmValue": "{value} mm",
+    "metersValue": "{value} m"
   }
 }

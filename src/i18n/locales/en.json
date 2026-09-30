@@ -47,7 +47,8 @@
     "trend": {
       "tempTitle": "Temperature trend",
       "precipTitle": "Precipitation trend",
-      "noChange": "No change"
+      "noChange": "No change",
+      "comparedTo": "{b} vs {a}"
     },
     "weather": {
       "periods": "Years",
@@ -74,7 +75,8 @@
       "avgTmax": "Avg max temp",
       "avgTmin": "Avg min temp",
       "totalPrec": "Total precip",
-      "aridMonths": "Arid months"
+      "aridMonths": "Arid months",
+      "frostMonths": "Frost months"
     },
     "diff": {
       "warmerCity": "Warmer city",
@@ -83,10 +85,15 @@
       "coldestMonth": "Coldest month",
       "byDegrees": "by {value}°C",
       "byMm": "by {value} mm",
-      "tie": "Tie"
+      "tie": "Tie",
+      "tieSub": "=",
+      "monthTemps": "{a}: {tempA} / {b}: {tempB}"
     },
     "autoResolution": "Auto resolution: {resolution}",
-    "noPeriodData": "No {period} data at {grid} resolution"
+    "noPeriodData": "No {period} data at {grid} resolution",
+    "difference": "Difference",
+    "metric": "Metric",
+    "tableCaption": "Comparison of {a} and {b}"
   },
   "heatMap": {
     "title": "Region Heatmap",
@@ -137,7 +144,6 @@
     "meanTemp": "Mean temp",
     "annualPrec": "Annual precip",
     "aridMonths": "Arid months",
-    "deltaAridMonths": "{sign}{count, plural, one {# arid month} other {# arid months}}",
     "martonne": "Martonne index (M)",
     "martonneShort": "Martonne (M)",
     "martonneTooltip": "De Martonne aridity index: M = P/(T+10). <5 Hyperarid | 5–10 Arid | 10–20 Semi-arid | 20–30 Sub-humid | >30 Humid",
@@ -149,7 +155,14 @@
     "layout": "Layout",
     "layoutSplit": "Side by side",
     "layoutOverlay": "Overlay",
-    "wlVariablesNote": "Walter-Lieth uses mean temperature and precipitation",
+    "wlGuideButton": "How to read this diagram",
+    "wlGuide": {
+      "scale": "Scale: 10 °C = 20 mm",
+      "humid": "Humid period (vertical lines): precipitation above temperature",
+      "arid": "Arid period (dots): temperature above precipitation",
+      "veryHumid": "Very humid (solid fill): above 100 mm, scale compressed 1:10",
+      "frost": "Frost band: months with mean minimum below 0 °C"
+    },
     "wlShading": "Shading",
     "wlShadingNone": "None",
     "mode": "Chart type",
@@ -166,15 +179,18 @@
     "expandPanel": "Expand {name}",
     "showBoth": "Show both",
     "expandedPanel": "Expanded panel",
-    "differencesVs": "differences vs {name}",
     "frostLegend": "Frost (mean min < 0 °C)",
     "maxTempShort": "Max Temp",
     "minTempShort": "Min Temp",
-    "monthlyTableCaption": "Monthly values: {names}"
+    "monthlyTableCaption": "Monthly values: {names}",
+    "month": "Month",
+    "showMonthlyValues": "Show monthly values",
+    "hideMonthlyValues": "Hide monthly values"
   },
   "loading": {
     "fetchingClimateData": "Fetching climate data...",
-    "updating": "Updating..."
+    "updating": "Updating...",
+    "dataUpdated": "Data updated: {location}, {period}"
   },
   "errors": {
     "fetchClimateData": "Failed to fetch climate data",
@@ -224,6 +240,7 @@
     "rawJson": "Full data (JSON)",
     "rawDataUnavailable": "Available only for Climate 1970–2000",
     "incompleteData": "Export unavailable: some months are missing temperature or precipitation data",
+    "updating": "Export unavailable while the data updates",
     "failed": "Export failed — try again",
     "metricColumn": "Metric"
   },
@@ -273,16 +290,15 @@
     "autoScroll": "Auto-scroll to results",
     "syncCity": "Sync selected city across pages",
     "autoApplyFilters": "Auto-apply filters",
+    "animations": "Animations",
+    "updateHighlight": "Update highlight",
+    "updateHighlightGlow": "Glow",
+    "updateHighlightBorder": "Border",
+    "reducedMotionNotice": "Reduced motion is enabled on this device",
     "filters": "Filters",
     "settings": "Settings",
     "applyFilters": "Apply filters",
-    "cellCount": {
-      "fast": "Fast",
-      "moderate": "Moderate",
-      "slow": "Slow",
-      "tooMany": "Too many cells",
-      "tooManyError": "Reduce area or resolution to apply"
-    },
+    "cellCount": "({count} cells)",
     "notes": {
       "climateNormals": "30-year climate normals",
       "weatherData": "Annual weather data (CRU-TS-4.09)",
@@ -332,5 +348,13 @@
       "title": "Region heatmap — {variables} ({period})",
       "description": "{variables} climate intensity across the selected region ({period})"
     }
+  },
+  "units": {
+    "celsius": "°C",
+    "mm": "mm",
+    "meters": "m",
+    "celsiusValue": "{value}°C",
+    "mmValue": "{value} mm",
+    "metersValue": "{value} m"
   }
 }

@@ -47,7 +47,8 @@
     "trend": {
       "tempTitle": "Τάση θερμοκρασίας",
       "precipTitle": "Τάση βροχόπτωσης",
-      "noChange": "Καμία αλλαγή"
+      "noChange": "Καμία αλλαγή",
+      "comparedTo": "{b} έναντι {a}"
     },
     "weather": {
       "periods": "Έτη",
@@ -74,7 +75,8 @@
       "avgTmax": "Μέση μέγ. θερμ.",
       "avgTmin": "Μέση ελάχ. θερμ.",
       "totalPrec": "Συνολική βροχόπτωση",
-      "aridMonths": "Ξηροί μήνες"
+      "aridMonths": "Ξηροί μήνες",
+      "frostMonths": "Μήνες παγετού"
     },
     "diff": {
       "warmerCity": "Θερμότερη πόλη",
@@ -83,10 +85,15 @@
       "coldestMonth": "Ψυχρότερος μήνας",
       "byDegrees": "κατά {value}°C",
       "byMm": "κατά {value} mm",
-      "tie": "Ισοπαλία"
+      "tie": "Ισοπαλία",
+      "tieSub": "=",
+      "monthTemps": "{a}: {tempA} / {b}: {tempB}"
     },
     "autoResolution": "Αυτόματη ανάλυση: {resolution}",
-    "noPeriodData": "Δεν υπάρχουν δεδομένα για {period} στην ανάλυση {grid}"
+    "noPeriodData": "Δεν υπάρχουν δεδομένα για {period} στην ανάλυση {grid}",
+    "difference": "Διαφορά",
+    "metric": "Δείκτης",
+    "tableCaption": "Σύγκριση {a} και {b}"
   },
   "heatMap": {
     "title": "Περιφερειακός Χάρτης Θερμότητας",
@@ -137,7 +144,6 @@
     "meanTemp": "Μέση θερμ.",
     "annualPrec": "Ετήσια βροχόπτ.",
     "aridMonths": "Ξηροί μήνες",
-    "deltaAridMonths": "{sign}{count, plural, one {# ξηρός μήνας} other {# ξηροί μήνες}}",
     "martonne": "Δείκτης Martonne (M)",
     "martonneShort": "Martonne (M)",
     "martonneTooltip": "Δείκτης ξηρότητας De Martonne: M = P/(T+10). <5 Υπερξηρό | 5–10 Ξηρό | 10–20 Ημίξηρο | 20–30 Υφύγρο | >30 Υγρό",
@@ -149,7 +155,14 @@
     "layout": "Διάταξη",
     "layoutSplit": "Δίπλα-δίπλα",
     "layoutOverlay": "Επικάλυψη",
-    "wlVariablesNote": "Το Walter-Lieth χρησιμοποιεί μέση θερμοκρασία και βροχόπτωση",
+    "wlGuideButton": "Πώς διαβάζεται αυτό το διάγραμμα",
+    "wlGuide": {
+      "scale": "Κλίμακα: 10 °C = 20 mm",
+      "humid": "Υγρή περίοδος (κάθετες γραμμές): βροχόπτωση πάνω από τη θερμοκρασία",
+      "arid": "Ξηρή περίοδος (κουκκίδες): θερμοκρασία πάνω από τη βροχόπτωση",
+      "veryHumid": "Πολύ υγρό (συμπαγές γέμισμα): πάνω από 100 mm, κλίμακα συμπιεσμένη 1:10",
+      "frost": "Ζώνη παγετού: μήνες με μέση ελάχιστη κάτω από 0 °C"
+    },
     "wlShading": "Διαγράμμιση",
     "wlShadingNone": "Καμία",
     "mode": "Τύπος γραφήματος",
@@ -166,15 +179,18 @@
     "expandPanel": "Μεγέθυνση {name}",
     "showBoth": "Εμφάνιση και των δύο",
     "expandedPanel": "Μεγεθυμένο διάγραμμα",
-    "differencesVs": "διαφορές από {name}",
     "frostLegend": "Παγετός (μέση ελάχ. < 0 °C)",
     "maxTempShort": "Μέγ. θερμ.",
     "minTempShort": "Ελάχ. θερμ.",
-    "monthlyTableCaption": "Μηνιαίες τιμές: {names}"
+    "monthlyTableCaption": "Μηνιαίες τιμές: {names}",
+    "month": "Μήνας",
+    "showMonthlyValues": "Εμφάνιση μηνιαίων τιμών",
+    "hideMonthlyValues": "Απόκρυψη μηνιαίων τιμών"
   },
   "loading": {
     "fetchingClimateData": "Λήψη κλιματικών δεδομένων...",
-    "updating": "Ενημέρωση..."
+    "updating": "Ενημέρωση...",
+    "dataUpdated": "Τα δεδομένα ενημερώθηκαν: {location}, {period}"
   },
   "errors": {
     "fetchClimateData": "Δεν ήταν δυνατή η λήψη των κλιματικών δεδομένων",
@@ -224,6 +240,7 @@
     "rawJson": "Πλήρη δεδομένα (JSON)",
     "rawDataUnavailable": "Διαθέσιμο μόνο για Κλίμα 1970–2000",
     "incompleteData": "Η εξαγωγή δεν είναι διαθέσιμη: λείπουν δεδομένα θερμοκρασίας ή βροχόπτωσης για ορισμένους μήνες",
+    "updating": "Η εξαγωγή δεν είναι διαθέσιμη όσο ενημερώνονται τα δεδομένα",
     "failed": "Η εξαγωγή απέτυχε — δοκιμάστε ξανά",
     "metricColumn": "Μετρική"
   },
@@ -273,16 +290,15 @@
     "autoScroll": "Αυτόματη κύλιση στα αποτελέσματα",
     "syncCity": "Συγχρονισμός επιλεγμένης πόλης σε όλες τις σελίδες",
     "autoApplyFilters": "Αυτόματη εφαρμογή φίλτρων",
+    "animations": "Κινούμενα εφέ",
+    "updateHighlight": "Επισήμανση ενημέρωσης",
+    "updateHighlightGlow": "Λάμψη",
+    "updateHighlightBorder": "Περίγραμμα",
+    "reducedMotionNotice": "Η μειωμένη κίνηση είναι ενεργή σε αυτή τη συσκευή",
     "filters": "Φίλτρα",
     "settings": "Ρυθμίσεις",
     "applyFilters": "Εφαρμογή φίλτρων",
-    "cellCount": {
-      "fast": "Γρήγορο",
-      "moderate": "Μέτριο",
-      "slow": "Αργό",
-      "tooMany": "Πολλά κελιά",
-      "tooManyError": "Μειώστε την περιοχή ή την ανάλυση για εφαρμογή"
-    },
+    "cellCount": "({count} κελιά)",
     "notes": {
       "climateNormals": "Κλιματικές κανονικές τιμές 30 ετών",
       "weatherData": "Ετήσια μετεωρολογικά δεδομένα (CRU-TS-4.09)",
@@ -332,5 +348,13 @@
       "title": "Θερμικός χάρτης περιοχής — {variables} ({period})",
       "description": "Ένταση κλίματος {variables} στην επιλεγμένη περιοχή ({period})"
     }
+  },
+  "units": {
+    "celsius": "°C",
+    "mm": "mm",
+    "meters": "m",
+    "celsiusValue": "{value}°C",
+    "mmValue": "{value} mm",
+    "metersValue": "{value} m"
   }
 }
