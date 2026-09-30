@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./motion.css";
 
 *,
 *::before,
@@ -104,6 +105,11 @@ button:focus:not(:focus-visible) {
   --color-accent: #f59e0b;
 
   --color-chip-active-bg: #e1f5ee;
+  /* * a hovered month: the chart's hover band and the monthly table's column alike */
+  --color-chart-hover: #e6f4ee;
+  /* * a card whose data just updated: its border and outer glow at the flash's start */
+  --color-update-flash-border: #1d9e75;
+  --color-update-flash-glow: rgba(29, 158, 117, 0.35);
   --color-chip-active-text: #0f6e56;
   --color-chip-active-border: #5dcaa5;
 
@@ -174,8 +180,11 @@ button:focus:not(:focus-visible) {
   --color-wl-humid-hatch: #2563eb;
   --color-wl-arid-hatch: #dc2626;
   --color-wl-compressed-fill: #1d4ed8;
-  /* * Walter-Lieth frost band: months with a mean minimum below 0 °C */
-  --color-wl-frost: #1e3a8a;
+  /* * Walter-Lieth frost band: certain frost (mean minimum below 0 °C), the cell outlines, and
+     a light cyan reserved for "probable frost" (absolute minima below 0 °C) — not used yet */
+  --color-wl-frost: #4682b4;
+  --color-wl-frost-outline: #6b7280;
+  --color-wl-frost-probable: #a5d8ec;
   /* * Walter-Lieth overlay series identity (matches compare A green / B orange) */
   --color-wl-series-a: #1d9e75;
   --color-wl-series-b: #d97706;
@@ -210,6 +219,9 @@ html.dark {
   --color-border: #374151;
 
   --color-chip-active-bg: #052e1c;
+  --color-chart-hover: #173a2d;
+  --color-update-flash-border: #34d399;
+  --color-update-flash-glow: rgba(52, 211, 153, 0.4);
   --color-chip-active-text: #6ee7b7;
   --color-chip-active-border: #059669;
 
@@ -236,54 +248,9 @@ html.dark {
   --color-wl-humid-hatch: #60a5fa;
   --color-wl-arid-hatch: #f87171;
   --color-wl-compressed-fill: #3b82f6;
-  --color-wl-frost: #3452c4;
+  --color-wl-frost: #5f95c8;
+  --color-wl-frost-outline: #9ca3af;
+  --color-wl-frost-probable: #7cc3de;
   --color-wl-series-a: #34d399;
   --color-wl-series-b: #fbbf24;
-}
-
-/* * ChartTransition: a chart card's old content fades out while the new one fades in */
-@keyframes chart-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-}
-
-@keyframes chart-fade-out {
-  to {
-    opacity: 0;
-  }
-}
-
-.chart-fade-in {
-  animation-name: chart-fade-in;
-  animation-timing-function: ease-out;
-  animation-fill-mode: both;
-}
-
-/* * the scale start comes from MOTION.PANEL_EXPAND_SCALE_FROM, set inline by ChartTransition */
-@keyframes chart-expand-in {
-  from {
-    opacity: 0;
-    transform: scale(var(--chart-expand-scale-from));
-  }
-}
-
-.chart-expand-in {
-  animation-name: chart-expand-in;
-  animation-fill-mode: both;
-}
-
-.chart-fade-out {
-  animation-name: chart-fade-out;
-  animation-timing-function: ease-out;
-  animation-fill-mode: both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .chart-fade-in,
-  .chart-expand-in,
-  .chart-fade-out {
-    animation: none;
-  }
 }
