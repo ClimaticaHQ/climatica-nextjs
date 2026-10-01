@@ -1,17 +1,31 @@
-export const LANGUAGES = [
-  { code: "de", label: "DE 🇩🇪" },
-  { code: "el", label: "EL 🇬🇷" },
-  { code: "en", label: "EN 🇬🇧" },
-  { code: "es", label: "ES 🇪🇸" },
-  { code: "fr", label: "FR 🇫🇷" },
-  { code: "it", label: "IT 🇮🇹" },
-  { code: "pt", label: "PT 🇵🇹" },
-  { code: "uk", label: "UA 🇺🇦" },
-];
+import { TLocale } from "@/types";
+import { LOCALES } from "./locales.constant";
 
-export const DEFAULT_LANGUAGE = LANGUAGES[2].code; // * "en"
+const LANGUAGE_METADATA: Record<TLocale, { label: string; flag: string }> = {
+  de: { label: "DE", flag: "🇩🇪" },
+  el: { label: "EL", flag: "🇬🇷" },
+  en: { label: "EN", flag: "🇬🇧" },
+  es: { label: "ES", flag: "🇪🇸" },
+  fr: { label: "FR", flag: "🇫🇷" },
+  it: { label: "IT", flag: "🇮🇹" },
+  nb: { label: "NB", flag: "🇳🇴" },
+  pt: { label: "PT", flag: "🇵🇹" },
+  ro: { label: "RO", flag: "🇷🇴" },
+  uk: { label: "UA", flag: "🇺🇦" },
+};
 
-export const SUPPORTED_LANGUAGE_CODES = new Set(LANGUAGES.map(({ code }) => code));
+export const LANGUAGES = LOCALES.map((code) => {
+  const meta = LANGUAGE_METADATA[code as TLocale];
+
+  return {
+    code,
+    label: meta ? `${meta.label} ${meta.flag}` : code.toUpperCase(),
+  };
+});
+
+export const DEFAULT_LANGUAGE: TLocale = "en";
+
+export const SUPPORTED_LANGUAGE_CODES = new Set<string>(LOCALES);
 
 export const LANGUAGE_SWITCHER_VARIANTS = {
   DROPDOWN: "dropdown",
