@@ -121,15 +121,20 @@ CSV. `generate_schema.py` is only needed by whoever edits `locales.json` (see
 ```bash
 npm run test              # run unit tests
 npm run test:coverage     # unit tests with coverage report
-npm run test:e2e          # E2E tests (requires Docker running + dev server)
+npm run test:e2e          # E2E tests (requires Docker running; starts its own dev server)
 npm run test:e2e:ui       # E2E tests with Playwright UI
 ```
 
 Unit tests cover: Redis client, caching strategies, cities route,
-WorldClim route, SolrService, WorldClimService, URL utils, city descriptions.
+WorldClim routes, SolrService, WorldClimService, URL utils, city descriptions,
+locale key parity.
 
 E2E tests cover: city search, climate data loading, i18n switching,
 navigation, 404 page.
+
+Playwright starts `npm run dev` itself on `PORT` (default 3000) and reuses a dev
+server that is already running there (except in CI). It still needs Solr and
+Redis up (`npm run docker:up`) and network access to WorldClim.
 
 **Python unit tests** (`docker/solr/scripts/prepare_data.py`):
 
@@ -203,12 +208,30 @@ climatica-next-app/
 ### Data Flow
 
 ```
-Component → Hook → fetch /api/* → Route Handler → Redis → Solr/WorldClim
+Component → Hook → client service → apiClient → /api/* Route Handler → Redis → Solr / WorldClim / Wikidata
 ```
 
-- Hooks never call services directly — always via `/api/` routes
-- Redis caches city search results (7 days) and climate data (30 days)
-- Popular queries get extended TTL automatically
+- Components call hooks only; hooks call the client services (`WorldClimService`)
+  or `apiClient` — an axios instance on the same origin (50 s timeout), never `fetch`
+- The browser only talks to the app's own `/api/*` routes; `SolrService` and
+  `WikidataService` are server-only and used by the route handlers
+- Redis caches (in the route handlers):
+
+  | What                                            | TTL                                                                                                                           |
+  | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+  | City search (`/api/cities?q=<text>`)            | 7 days; 1 day for queries under 4 characters; 30 days once a query has been fetched from Solr 10 times                        |
+  | Nearest city (`/api/cities?q=<lat>,<lng>`)      | 7 days                                                                                                                        |
+  | WorldClim resources (`/api/worldclim/resource`) | 7 days; 30 days once fetched 5 times                                                                                          |
+  | WorldClim queries (`/api/worldclim/<id>`)       | not cached in Redis — the browser's TanStack Query cache keeps them (never stale; dropped 5 min after no component uses them) |
+
+  Empty results and upstream errors are never cached. A failing upstream is
+  answered with an error status (Solr: 503, WorldClim and Wikidata: 502), not
+  with an empty or error body as data.
+
+- Rate limits: 1000 requests per minute per IP, counted separately for
+  `/api/cities`, `/api/worldclim/<id>` and `/api/worldclim/resource`; over the
+  limit the route answers 429 with `Retry-After`. If Redis is down the limit is
+  not enforced.
 - WorldClim API key stays server-side only
 
 ### Adding a new locale
