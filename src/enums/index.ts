@@ -9,3 +9,4 @@ export * from "./filters.enum";
 export * from "./bottomSheet.enum";
 export * from "./theme.enum";
 export * from "./pair.enum";
+export * from "./chip.enum";

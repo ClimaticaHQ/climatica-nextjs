@@ -58,16 +58,15 @@ export enum EFilterNavigation {
 }
 
 /** How a note under a filter reads: a plain explanation, a muted aside, or an error. */
-export enum EFilterHintVariant {
+export enum EFilterNoteVariant {
   INFO = "info",
   MUTED = "muted",
   ERROR = "error",
 }
 
-/** Which mobile filter sheet is open: every filter, one filter's, or the Walter-Lieth note. */
-export enum EMobileFilterSheet {
+/** What the filters sheet shows: every filter, one filter's section, or why chips are disabled. */
+export enum EFiltersSheetMode {
   ALL = "all",
   SINGLE = "single",
-  // * why Walter-Lieth disables variables and months, and the way out
-  WALTER_LIETH_INFO = "walterLiethInfo",
+  UNAVAILABLE_INFO = "unavailableInfo",
 }
