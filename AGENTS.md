@@ -29,6 +29,19 @@
 Before reporting a task as done: `npm run check`, `npm run test`, `npm run build`,
 `npm run test:e2e`.
 
+## Docs
+
+- Before working in an area, read its document in docs/:
+  - docs/architecture.md — structure, data flow, page pattern, shared UI
+  - docs/url-state.md — URL state, URL hooks, canonical and legacy params, navbar cache
+  - docs/filters.md — filter config, sections, containers, draft, availability
+  - docs/backend.md — API routes, Redis, Solr, WorldClim, Wikidata, error handling
+  - docs/i18n.md — locales, translations, adding a language
+  - docs/operations.md — Docker, env variables, Solr reindex, updating an environment
+  - docs/testing.md — Vitest, Playwright, test conventions
+- A change that alters how an area works updates its document in the same task.
+- Every task report lists the docs/ files changed.
+
 ## Git
 
 - Never commit, amend, stash, reset or otherwise change git history or the index.
@@ -77,8 +90,9 @@ wikidataService.ts) or the WorldClim API
 
 - The URL is the single source of truth for filters and page view state.
 - Router calls only in dedicated URL hooks: useFilterNavigation (filters),
-  useUrlStateSync (page params), useChartModeUrl (chart mode),
-  useNavbarNavigation (navbar and logo links) — nowhere else.
+  useCanonicalFilterUrl (canonical filter params), useUrlStateSync (page params),
+  useChartModeUrl (chart mode), useNavbarNavigation (navbar and logo links),
+  useLocaleNavigation (language switch) — nowhere else.
   - Below lg, the filters sheet (useFiltersSheet) writes only after it has closed
     (`await closeSheet()`); a router call while a sheet is open drops its history
     marker.

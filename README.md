@@ -10,6 +10,7 @@
 - [Features](#features)
 - [Quick Start](#quick-start)
 - [Developer Setup](#developer-setup)
+- [Documentation](#documentation)
 - [License](#license)
 
 ---
@@ -262,6 +263,20 @@ npm run check   # type-check + lint + format
 **GeoNames** — one-time data import into local Solr
 
 - Source: [geonames.org](https://www.geonames.org/)
+
+---
+
+## Documentation
+
+Developer documentation lives in [`docs/`](docs):
+
+- [architecture.md](docs/architecture.md) — folder structure, data flow, the container/view page pattern, where shared UI lives
+- [url-state.md](docs/url-state.md) — the URL as the source of truth, the URL hooks, canonical and legacy params, the navbar's last-page-params cache
+- [filters.md](docs/filters.md) — FILTERS_CONFIG, sections and containers, draft and auto-apply, availability, adding a filter
+- [backend.md](docs/backend.md) — API routes, Redis caching and rate limits, Solr, WorldClim proxy, Wikidata, known issues
+- [i18n.md](docs/i18n.md) — locales, next-intl usage, key conventions, adding a language (app and Solr)
+- [operations.md](docs/operations.md) — Docker services, environment variables, Solr reindex, updating an environment
+- [testing.md](docs/testing.md) — Vitest and Playwright setup, mobile scenarios, test conventions
 
 ---
 
