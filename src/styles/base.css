@@ -1,0 +1,28 @@
+/* * Element base styles: box sizing, the page's font and colours, keyboard-only focus rings */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.6;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* * focus rings show for keyboard focus only — a mouse click never leaves an outline */
+button:focus:not(:focus-visible) {
+  outline: none;
+}

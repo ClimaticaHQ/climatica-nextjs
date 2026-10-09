@@ -1,4 +1,5 @@
-/* * All UI motion. Durations, easings and sizes come from MOTION (src/constants/motion.constant.ts)
+/* * All UI motion: keyframes, transitions, and the motion-off / reduced-motion rules. Durations,
+   easings and sizes come from MOTION (src/constants/motion.constant.ts)
    as --motion-* custom properties, set once on <html> by the root layout. The update flash is
    played from JS (useUpdateFlash), and chart series fades set inline through motionVar(), with
    the same constants. */
