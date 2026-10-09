@@ -1,6 +1,7 @@
 export { AreaChartIcon } from "./AreaChartIcon";
 export { BarChartIcon } from "./BarChartIcon";
 export { ChevronDownIcon } from "./ChevronDownIcon";
+export { CloseIcon } from "./CloseIcon";
 export { CodeIcon } from "./CodeIcon";
 export { CollapseIcon } from "./CollapseIcon";
 export { ExpandIcon } from "./ExpandIcon";
@@ -16,6 +17,7 @@ export { OverlayLayoutIcon } from "./OverlayLayoutIcon";
 export { ClimaticaLogo } from "./logos";
 export { SeriesMarkerIcon } from "./SeriesMarkerIcon";
 export { SpinnerIcon } from "./SpinnerIcon";
+export { SwapIcon } from "./SwapIcon";
 export { SplitLayoutIcon } from "./SplitLayoutIcon";
 export { TableIcon } from "./TableIcon";
 export { MoonIcon, SunIcon } from "./themes";
