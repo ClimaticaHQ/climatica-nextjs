@@ -1,6 +1,18 @@
 import type { ECompareLayout, EWalterLiethShading } from "@/enums";
 import type { TChartMode, TComparisonTable, TExpandedPanel, TVisibleSeries } from "@/types";
-import type { TBuildComparisonSeriesArgs } from "@/components/TempPrecipChart/TempPrecipChart.type";
+import type {
+  TBuildComparisonSeriesArgs,
+  TBuildYearSeriesArgs,
+} from "@/components/TempPrecipChart/TempPrecipChart.type";
+
+export type TUseWeatherYearsExportArgs = Omit<TBuildYearSeriesArgs, "period"> & {
+  /** Compare Periods with weather years */
+  isEnabled: boolean;
+  chartMode: TChartMode;
+  layout: ECompareLayout;
+  /** the years the screen draws: the side-by-side pair, or the overlay's shown years */
+  drawn: readonly number[];
+};
 
 export type TUseComparisonExportArgs = TBuildComparisonSeriesArgs & {
   /** a two-series comparison (not compare-periods' multi-year Weather chart) */

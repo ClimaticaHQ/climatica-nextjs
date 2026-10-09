@@ -1,3 +1,4 @@
+import type { TWalterLiethLegendLabels } from "../../components/legend";
 import type {
   ECompareLayout,
   EWalterLiethFrost,
@@ -8,6 +9,7 @@ import type {
   TWalterLiethDomain,
   TWalterLiethLayerPaint,
   TWalterLiethMonth,
+  TWalterLiethSeries,
   TWalterLiethSeriesInput,
 } from "../walterLieth.type";
 import type { TChartMode, TExpandedPanel, TVisibleSeries } from "../../components/chart";
@@ -82,6 +84,53 @@ export type TComparisonExport = {
     /** translated "incomplete data" notice per series */
     incomplete: Record<EWalterLiethSeriesId, string>;
   };
+};
+
+/** Compare Periods with weather years in WL mode: one diagram per year, as on screen. */
+export type TWalterLiethYearsExport = {
+  /** one per compared year, in the page's order — the same series the screen draws */
+  series: readonly TWalterLiethSeriesInput[];
+  /** short, locale-aware month labels */
+  monthLabels: readonly string[];
+  labels: TWalterLiethLegendLabels & {
+    /** the UI's locale — the export's numbers read as on screen */
+    locale: string;
+    /** translated "incomplete data" notice per year, by series label */
+    incomplete: Readonly<Record<string, string>>;
+  };
+};
+
+/**
+ * Compare Periods with weather years, either chart type: the per-year series and what the screen
+ * draws — the side-by-side pair, or the overlay's shown years.
+ */
+export type TWeatherYearsExport = TWalterLiethYearsExport & {
+  chartMode: TChartMode;
+  layout: ECompareLayout;
+  /** the years drawn: the pair (A, B) side by side, the shown years overlaid */
+  drawn: readonly number[];
+};
+
+/** One series of a WL overlay export: Climate A / B, or a weather year. */
+export type TWalterLiethOverlayExportEntry = {
+  key: string;
+  series: TWalterLiethSeries;
+  color: string;
+  shape: "circle" | "square";
+  isShaded: boolean;
+};
+
+export type TWalterLiethOverlayExportArgs = {
+  entries: readonly TWalterLiethOverlayExportEntry[];
+  domain: TWalterLiethDomain;
+  colors: TExportChartColors;
+  top: number;
+  monthLabels: readonly string[];
+  labels: TWalterLiethLegendLabels & { locale: string };
+};
+
+export type TPanelGridArgs = Omit<TComparisonPanelsArgs, "comparison"> & {
+  series: readonly TWalterLiethSeriesInput[];
 };
 
 export type TCompareWalterLiethBody = {

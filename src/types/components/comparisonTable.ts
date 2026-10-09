@@ -50,6 +50,8 @@ export type TComparisonTable = {
   minuend: string;
   subtrahend: string;
   rows: TComparisonTableRow[];
+  /** both series are this one weather year — the Martonne row names it */
+  martonneYear?: number;
 };
 
 export type TBuildComparisonTableArgs = {
@@ -59,6 +61,8 @@ export type TBuildComparisonTableArgs = {
   minuend: EWalterLiethSeriesId;
   /** the UI's locale — the values' decimal separator */
   locale: string;
+  /** both series are this one weather year (Compare Cities with Weather) */
+  martonneYear?: number | undefined;
 };
 
 /** The table's translated texts, as the export carries them (the page uses its hooks). */

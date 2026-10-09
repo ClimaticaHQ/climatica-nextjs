@@ -55,6 +55,10 @@ export type TWalterLiethSeries = {
   altitude?: number;
   /** 12 entries, January first */
   months: readonly TWalterLiethMonth[];
+  /** the weather year, when the series is one year of data — not long-term normals */
+  singleYear?: number;
+  /** the panel marker's colour when the series has its own (a compared weather year) */
+  markerColor?: string;
 };
 
 /** A point in chart space: x = month position (0 = January), y = °C / scaled units. */
@@ -164,7 +168,10 @@ export type TToWalterLiethSeriesArgs = Omit<TWalterLiethSeries, "months"> & {
  * A series whose data lacks a month's temperature or precipitation: never drawn as WL (the
  * standard split still plots it, with gaps, under its name and period).
  */
-export type TWalterLiethIncompleteSeries = Pick<TWalterLiethSeries, "id" | "label" | "altitude"> & {
+export type TWalterLiethIncompleteSeries = Pick<
+  TWalterLiethSeries,
+  "id" | "label" | "altitude" | "singleYear" | "markerColor"
+> & {
   period?: string;
   months: null;
 };

@@ -1,4 +1,4 @@
-import type { TComparisonExport } from "./walterLiethExport.type";
+import type { TComparisonExport, TWeatherYearsExport } from "./walterLiethExport.type";
 import type { TExportChartColors } from "./shared.type";
 import type {
   TCompareStats,
@@ -62,6 +62,8 @@ export type TCompareExportPayload = {
   shareUrl: string;
   /** two-series comparisons: WL panels or standard split panels replace the standard body */
   comparison?: TComparisonExport;
+  /** Compare Periods with weather years: what the screen draws (pair or shown years) */
+  weatherYears?: TWeatherYearsExport;
 };
 
 /** Pixel geometry of the standard compare chart body. */

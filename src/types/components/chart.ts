@@ -1,3 +1,4 @@
+import type { TPair } from "../utils/pair.type";
 import type { EWalterLiethSeriesId } from "@/enums";
 import type { ReactNode } from "react";
 import { TClimatePeriod } from "../api";
@@ -33,15 +34,9 @@ export type TPanelExpansion = {
   onExpandedChange: (expanded: TExpandedPanel) => void;
 };
 
-export type TShownChartModeArgs = {
-  chartMode: TChartMode;
-  dataset: TDataset;
-};
-
 export type TWalterLiethShownArgs = {
   pathname: string;
   searchParams: URLSearchParams;
-  dataset: TDataset;
 };
 
 export type TCompareMode = "cities" | "periods";
@@ -79,6 +74,8 @@ export type TPlotHeightArgs = {
 export type TPanelHeaderSlots = {
   /** top-right of the header, beside the name */
   actions?: ReactNode;
+  /** in place of the name — e.g. a picker choosing which year the panel shows */
+  name?: ReactNode;
 };
 
 /** Which axis a unit title (°C / mm) belongs to. */
@@ -89,4 +86,20 @@ export type TUnitTitlePlacementArgs = {
   chartWidth: number;
   /** one panel of a split pair — the compact margins */
   isCompact: boolean;
+};
+
+/** Compare Periods with weather years: which years each layout draws, and how to change them. */
+export type TYearsViewState = {
+  /** side by side: the two years drawn */
+  pair: TPair<number> | null;
+  onPairChange: (pair: TPair<number>) => void;
+  /** overlay: the years drawn, in the page's order */
+  shown: readonly number[];
+  onShownChange: (years: readonly number[]) => void;
+};
+
+/** A compared weather year and its series colour — the stats table's, the chips', the pickers'. */
+export type TYearOption = {
+  year: number;
+  color: string;
 };

@@ -1,27 +1,13 @@
-import type { TCellSize, TMonthFilter, TVariable } from "../domain";
-import type {
-  TDatasetPeriodUrlValue,
-  TSharedFilterUrlState,
-  TUrlSchema,
-} from "../utils/urlParams.type";
+import type { TUrlSchema } from "../utils/urlParams.type";
 
-export type TUseUrlStateSyncParams<TState extends TSharedFilterUrlState & Record<string, unknown>> =
-  {
-    schema: TUrlSchema<TState>;
-    state: Omit<TState, keyof TSharedFilterUrlState>;
-    onRestore: (parsed: Partial<TState>) => void;
-  };
+/** A page's own URL state — filters aren't part of it (see useFilters). TState comes from the schema. */
+export type TUseUrlStateSyncParams<TState extends Record<string, unknown>> = {
+  schema: TUrlSchema<TState>;
+  state: NoInfer<TState>;
+  onRestore: (parsed: Partial<NoInfer<TState>>) => void;
+};
 
-export type TUseUrlStateSyncReturn<TState extends TSharedFilterUrlState & Record<string, unknown>> =
-  {
-    pushUrlState: (partial: Partial<Omit<TState, keyof TSharedFilterUrlState>>) => void;
-    shareUrl: string;
-  };
-
-/** Explicit `| undefined` — matches Partial<TState>'s field types under exactOptionalPropertyTypes. */
-export type TParsedSharedFilterUrlState = {
-  datasetPeriod?: TDatasetPeriodUrlValue | undefined;
-  variables?: TVariable[] | undefined;
-  gridSize?: TCellSize | undefined;
-  months?: TMonthFilter | undefined;
+export type TUseUrlStateSyncReturn<TState extends Record<string, unknown>> = {
+  pushUrlState: (partial: Partial<TState>) => void;
+  shareUrl: string;
 };
