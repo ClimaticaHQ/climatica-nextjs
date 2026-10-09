@@ -1,7 +1,6 @@
 export { useDebounce } from "./useDebounce";
 export { useDelayedHide } from "./useDelayedHide";
 export { useGeolocation } from "./useGeolocation";
-export { useHasHydrated } from "./useHasHydrated";
 export { useMediaQuery } from "./useMediaQuery";
 export { useTheme } from "./useTheme";
 export { useUrlStateSync } from "./useUrlStateSync";
@@ -18,3 +17,10 @@ export { useDelayedFlag } from "./useDelayedFlag";
 export { useMotionPreference } from "./useMotionPreference";
 export { useMonthName } from "./useMonthName";
 export { useFormatNumber } from "./useFormatNumber";
+export { useBodyScrollLock } from "./useBodyScrollLock";
+export { useFocusTrap } from "./useFocusTrap";
+export { usePresence } from "./usePresence";
+export { useSheetHistory } from "./useSheetHistory";
+export { useSwipeToClose } from "./useSwipeToClose";
+export { useScrollEdges } from "./useScrollEdges";
+export { useWeatherYearsExport } from "./useWeatherYearsExport";

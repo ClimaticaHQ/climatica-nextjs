@@ -1,6 +1,6 @@
 import { DATASETS, WEATHER_VARIABLES } from "@/constants";
 import { WorldClimService } from "@/libs/services/worldClimService";
-import { useFiltersStore } from "@/stores";
+import { useFilters } from "@/hooks/filters";
 import type {
   TCellSize,
   TCompareBindings,
@@ -42,7 +42,7 @@ export function useGetCompareData(
   lngB: number | null,
   gridSize: TCellSize,
 ): TUseGetCompareDataReturn {
-  const { dataset, climatePeriod, weatherYear } = useFiltersStore();
+  const { dataset, climatePeriod, weatherYear } = useFilters();
   const isClimate = dataset === DATASETS.CLIMATE;
   const year = isClimate ? undefined : weatherYear;
 

@@ -38,7 +38,10 @@ export function useComparisonExport({
   const martonne = table.rows.find((row) => row.metric === "martonne");
   const className = (value: TComparisonTableValue | undefined) =>
     value?.badge ? t(value.badge.labelKey) : null;
-  const metricLabel = (metric: TComparisonMetric) => t(COMPARISON_METRIC_LABEL_KEYS[metric]);
+  const metricLabel = (metric: TComparisonMetric) =>
+    metric === "martonne" && table.martonneYear !== undefined
+      ? t("chart.martonneShortYear", { year: table.martonneYear })
+      : t(COMPARISON_METRIC_LABEL_KEYS[metric]);
 
   return {
     chartMode,
