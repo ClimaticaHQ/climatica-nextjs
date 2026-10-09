@@ -63,6 +63,7 @@ export function buildComparisonTable({
   seriesB,
   minuend,
   locale,
+  martonneYear,
 }: TBuildComparisonTableArgs): TComparisonTable {
   const valuesA = getMetricValues(seriesA);
   const valuesB = getMetricValues(seriesB);
@@ -74,6 +75,7 @@ export function buildComparisonTable({
     seriesB: { id: seriesB.id, label: seriesB.label },
     minuend: isAFirst ? seriesA.label : seriesB.label,
     subtrahend: isAFirst ? seriesB.label : seriesA.label,
+    ...(martonneYear !== undefined ? { martonneYear } : {}),
     rows: COMPARISON_METRICS.map((format) => {
       const [x, y] = [first[format.metric], second[format.metric]];
       return {

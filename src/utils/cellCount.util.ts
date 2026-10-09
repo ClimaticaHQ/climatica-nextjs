@@ -1,4 +1,5 @@
-import type { TCellSize } from "@/types";
+import { FILTER_MAX_HEATMAP_CELLS } from "@/constants";
+import type { TBbox, TCellSize } from "@/types";
 import { TCellCountStatus } from "@/types";
 
 const CELL_SIZE_DEGREES: Record<TCellSize, number> = {
@@ -18,7 +19,7 @@ const CELL_COUNT_THRESHOLDS = [
     status: { labelKey: "sidebar.cellCount.moderate", colorClass: "bg-yellow-100 text-yellow-700" },
   },
   {
-    threshold: 10_000,
+    threshold: FILTER_MAX_HEATMAP_CELLS,
     status: { labelKey: "sidebar.cellCount.slow", colorClass: "bg-orange-100 text-orange-700" },
   },
   {
@@ -37,4 +38,9 @@ export function estimateCellCount(
 
 export function getCellCountStatus(count: number): TCellCountStatus {
   return CELL_COUNT_THRESHOLDS.find(({ threshold }) => count < threshold)!.status;
+}
+
+/** Whether the heat map box holds more cells at this resolution than can be loaded. */
+export function isHeatmapCellLimitExceeded(bbox: TBbox | null, gridSize: TCellSize) {
+  return bbox !== null && estimateCellCount(bbox, gridSize) > FILTER_MAX_HEATMAP_CELLS;
 }

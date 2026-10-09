@@ -11,6 +11,7 @@ import type {
   TClimatePeriod,
   TDataset,
   TMonthFilter,
+  TUrlField,
   TUrlSchema,
   TUrlSyncAction,
   TVariable,
@@ -105,6 +106,26 @@ export function serializeUrlState<TState extends Record<string, unknown>>(
     schema[key].serialize(state[key], params);
   });
   return params;
+}
+
+// * one field read and written back — absent or invalid values write nothing
+function roundTripUrlField<TValue>(
+  field: TUrlField<TValue>,
+  from: URLSearchParams,
+  to: URLSearchParams,
+) {
+  const value = field.parse(from);
+  if (value !== undefined) field.serialize(value, to);
+}
+
+/** The URL's values for these fields, written canonically; invalid ones are dropped. */
+export function normalizeUrlState<TState extends Record<string, unknown>>(
+  schema: TUrlSchema<TState>,
+  params: URLSearchParams,
+): URLSearchParams {
+  const normalized = new URLSearchParams();
+  for (const key in schema) roundTripUrlField(schema[key], params, normalized);
+  return normalized;
 }
 
 export function parseUrlState<TState extends Record<string, unknown>>(
