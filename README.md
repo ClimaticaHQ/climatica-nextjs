@@ -100,6 +100,19 @@ npm run solr:reindex    # Re-import city data into Solr
 npm run docker:logs     # View Docker logs
 ```
 
+**Updating an existing Solr setup** (after pulling changes to the Solr files):
+
+| When                                                                                | Run                                                            |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `docker/solr/solrconfig.xml` changed, or the `cities` core fails to load            | `npm run docker:reboot` (recreates the core; also wipes Redis) |
+| `src/configs/locales.json` or `prepare_data.py` changed (`cities.csv` isn't in git) | `python3 docker/solr/scripts/prepare_data.py`                  |
+| `docker/solr/schema.json` changed, or after any of the above                        | `npm run solr:reindex`                                         |
+
+Solr copies `solrconfig.xml` into the core only when the core is first created, so a
+config change needs the reboot; `solr:reindex` applies `schema.json` and reimports the
+CSV. `generate_schema.py` is only needed by whoever edits `locales.json` (see
+[Adding a new locale](#adding-a-new-locale)) — its output is committed.
+
 ---
 
 ### Tests
