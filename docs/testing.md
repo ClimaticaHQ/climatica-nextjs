@@ -41,6 +41,20 @@ Layout of [`tests/unit/`](../tests/unit): `app/` (page URL state), `components/`
   matchers aren't installed.
 - **Hooks:** `renderHook` and `act` from `@testing-library/react`, as in
   [`useFiltersSheet.test.ts`](../tests/unit/hooks/useFiltersSheet.test.ts).
+- **Data hooks against an API error:** set `axiosInstance.defaults.adapter = "fetch"` and
+  stub `fetch` with a `Response` carrying the route's error status, so the real
+  `apiClient` decides what counts as an error. Wrap in a `QueryClientProvider` with
+  `retry: false`. See [`upstreamErrors.test.tsx`](../tests/unit/hooks/upstreamErrors.test.tsx).
+
+### Conventions for route handler tests
+
+- Mock `server-only`, `@/libs/Logger`, `@/libs/redis/client`, `@/libs/Env` and, for
+  `/api/cities`, `@/libs/services`. See
+  [`citiesRoute.test.ts`](../tests/unit/routes/citiesRoute.test.ts).
+- **Stub `fetch` with `ok` and `status`,** not only `json`, and cover the failures: a
+  non-2xx status, a rejected `fetch` and a body that isn't JSON must each give the error
+  status and no Redis write. See
+  [`worldclimQueryRoute.test.ts`](../tests/unit/routes/worldclimQueryRoute.test.ts).
 
 ## Playwright
 
