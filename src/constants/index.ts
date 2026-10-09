@@ -37,5 +37,4 @@ export * from "./monthlyValues.constant";
 export * from "./dataUpdate.constant";
 export * from "./filters.constant";
 export * from "./bottomSheet.constant";
-export * from "./mobileFilters.constant";
 export * from "./breakpoint.constant";

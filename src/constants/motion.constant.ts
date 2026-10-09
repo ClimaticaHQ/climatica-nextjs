@@ -26,11 +26,6 @@ export const MOTION = {
   TABLE_COLUMN_RESIZE_EASING: "ease",
   // * the city page's filters tab opening / closing: the panel's height, then its content
   // * fading and sliding in slightly after it starts
-  FILTERS_COLLAPSE_MS: 320,
-  FILTERS_COLLAPSE_EASING: "cubic-bezier(0.4, 0, 0.2, 1)",
-  FILTERS_CONTENT_FADE_MS: 250,
-  FILTERS_CONTENT_DELAY_MS: 60,
-  FILTERS_CONTENT_EASING: "cubic-bezier(0.4, 0, 0.2, 1)",
   // * filters auto-applying: only a fetch longer than the delay fades the chart card's
   // * content and runs the progress bar along its top edge — fast responses never flicker
   UPDATE_LOADING_DELAY_MS: 300,
@@ -92,11 +87,6 @@ export const MOTION_CSS_VAR = {
   CHART_SERIES_TOGGLE_EASING: "--motion-chart-series-toggle-easing",
   TABLE_COLUMN_RESIZE: "--motion-table-column-resize",
   TABLE_COLUMN_RESIZE_EASING: "--motion-table-column-resize-easing",
-  FILTERS_COLLAPSE: "--motion-filters-collapse",
-  FILTERS_COLLAPSE_EASING: "--motion-filters-collapse-easing",
-  FILTERS_CONTENT_FADE: "--motion-filters-content-fade",
-  FILTERS_CONTENT_DELAY: "--motion-filters-content-delay",
-  FILTERS_CONTENT_EASING: "--motion-filters-content-easing",
   UPDATE_FADE: "--motion-update-fade",
   UPDATE_FADE_EASING: "--motion-update-fade-easing",
   UPDATE_FADE_OPACITY: "--motion-update-fade-opacity",
@@ -126,11 +116,6 @@ export const MOTION_CSS_VARIABLES: TMotionCssVariables = {
   [MOTION_CSS_VAR.CHART_SERIES_TOGGLE_EASING]: MOTION.CHART_SERIES_TOGGLE_EASING,
   [MOTION_CSS_VAR.TABLE_COLUMN_RESIZE]: ms(MOTION.TABLE_COLUMN_RESIZE_MS),
   [MOTION_CSS_VAR.TABLE_COLUMN_RESIZE_EASING]: MOTION.TABLE_COLUMN_RESIZE_EASING,
-  [MOTION_CSS_VAR.FILTERS_COLLAPSE]: ms(MOTION.FILTERS_COLLAPSE_MS),
-  [MOTION_CSS_VAR.FILTERS_COLLAPSE_EASING]: MOTION.FILTERS_COLLAPSE_EASING,
-  [MOTION_CSS_VAR.FILTERS_CONTENT_FADE]: ms(MOTION.FILTERS_CONTENT_FADE_MS),
-  [MOTION_CSS_VAR.FILTERS_CONTENT_DELAY]: ms(MOTION.FILTERS_CONTENT_DELAY_MS),
-  [MOTION_CSS_VAR.FILTERS_CONTENT_EASING]: MOTION.FILTERS_CONTENT_EASING,
   [MOTION_CSS_VAR.UPDATE_FADE]: ms(MOTION.UPDATE_FADE_MS),
   [MOTION_CSS_VAR.UPDATE_FADE_EASING]: MOTION.UPDATE_FADE_EASING,
   [MOTION_CSS_VAR.UPDATE_FADE_OPACITY]: String(MOTION.UPDATE_FADE_OPACITY),

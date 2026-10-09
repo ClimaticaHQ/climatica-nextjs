@@ -2,14 +2,14 @@ import {
   EFilterApplyMode,
   EFilterAvailability,
   EFilterChoice,
-  EFilterHintVariant,
+  EFilterNoteVariant,
   EFilterKey,
   EFilterNavigation,
   EFilterPlacement,
   EFilterView,
 } from "@/enums";
 import type {
-  TFilterHintRule,
+  TFilterNoteRule,
   TFilters,
   TFilterNavigationModes,
   TFiltersConfig,
@@ -199,13 +199,13 @@ export const FILTER_UNAVAILABLE_LAYOUTS: TFilterUnavailableLayouts = {
   [EFilterAvailability.WALTER_LIETH]: {
     isDimmed: false,
     isNoteFirst: false,
-    noteVariant: EFilterHintVariant.INFO,
+    noteVariant: EFilterNoteVariant.INFO,
     noteClassName: "mt-1.5",
   },
   [EFilterAvailability.HEAT_MAP]: {
     isDimmed: true,
     isNoteFirst: true,
-    noteVariant: EFilterHintVariant.MUTED,
+    noteVariant: EFilterNoteVariant.MUTED,
     noteClassName: "mb-1.5",
   },
 };
@@ -217,14 +217,14 @@ export const FILTER_FALLBACK_VIEW = EFilterView.CLIMATE_STATISTICS;
 export const FILTER_MAX_HEATMAP_CELLS = 10_000;
 
 // * notes under the variable chips, by context
-export const VARIABLES_HINT_RULES: readonly TFilterHintRule[] = [
+export const VARIABLES_NOTE_RULES: readonly TFilterNoteRule[] = [
   {
     isShown: ({ dataset }) => dataset === DATASETS.WEATHER,
-    hint: { textKey: "sidebar.notes.weatherVariables", variant: EFilterHintVariant.INFO },
+    note: { textKey: "sidebar.notes.weatherVariables", variant: EFilterNoteVariant.INFO },
   },
   {
     isShown: ({ view, dataset }) => view === EFilterView.HEAT_MAP && dataset === DATASETS.CLIMATE,
-    hint: { textKey: "sidebar.notes.notAvailableHeatmap", variant: EFilterHintVariant.MUTED },
+    note: { textKey: "sidebar.notes.notAvailableHeatmap", variant: EFilterNoteVariant.MUTED },
   },
 ];
 
