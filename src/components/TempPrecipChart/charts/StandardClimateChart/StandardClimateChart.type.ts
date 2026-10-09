@@ -15,6 +15,8 @@ export type TStandardClimateChartProps = {
   visible: TVisibleSeries;
   selectedMonths?: number[];
   altitude?: number;
+  /** the one weather year the stats describe — the Martonne cell names it */
+  martonneYear?: number | undefined;
   showAridity?: boolean;
   activeMonthIndex?: number | null;
   onActiveMonthIndexChange?: (index: number | null) => void;

@@ -13,6 +13,7 @@ import type {
   TVisibleSeries,
   TWalterLiethScales,
   TWalterLiethSeriesInput,
+  TYearsViewState,
 } from "@/types";
 import type { useTempPrecipChart } from "./hooks/useTempPrecipChart";
 
@@ -27,16 +28,16 @@ export type TTempPrecipChartProps = {
   labelA?: string;
   labelB?: string;
   compareMode?: TCompareMode;
-  showWalterLiethToggle?: boolean;
   showAridity?: boolean;
   variables?: readonly TVariable[];
   multiPeriodData?: TMultiPeriodEntry[] | undefined;
-  hiddenPeriods?: number[] | undefined;
-  periodColors?: readonly string[] | undefined;
+  /** Compare Periods with weather years: every compared year, in order — their colours */
+  comparedYears?: readonly number[] | undefined;
   onVisibleSeriesChange?: (visible: TVisibleSeries) => void;
   /** controlled by the page (URL state); Walter-Lieth (the default) when omitted */
   chartMode?: TChartMode;
-  onChartModeChange?: (mode: TChartMode) => void;
+  /** Compare Periods with weather years: the years each layout draws (URL state) */
+  years?: TYearsViewState;
   /** compare pages only: per-series altitude for the WL headers (cities) */
   altitudeA?: number;
   altitudeB?: number;
@@ -50,6 +51,15 @@ export type TTempPrecipChartProps = {
   panelExpansion?: TPanelExpansion;
   /** the series whose updates flash the card outside the split layout — every series by default */
   flashKeys?: TUpdateFlashKeys;
+};
+
+export type TBuildYearSeriesArgs = {
+  periods: readonly TMultiPeriodEntry[];
+  /** every compared year, loaded or not — each year's colour comes from its place here */
+  years: readonly number[];
+  /** each panel's subtitle, e.g. "Weather · single year" */
+  period: string;
+  altitude?: number | undefined;
 };
 
 export type TBuildComparisonSeriesArgs = {
@@ -98,9 +108,8 @@ export type TDotRendererProps = {
 };
 
 export type TChartSwitchesProps = {
+  /** the chart type selected */
   chartMode: TChartMode;
-  onChartModeChange: (mode: TChartMode) => void;
-  canUseWalterLieth: boolean;
   /** compare pages only (either chart type) — omitted, no layout control is shown */
   layout?: ECompareLayout | undefined;
   onLayoutChange: (layout: ECompareLayout) => void;
@@ -130,6 +139,8 @@ export type TVariableChipsProps = {
   /** the store's fetched variables; undefined = all available */
   variables?: readonly TVariable[] | undefined;
   onChange: (visible: TVisibleSeries) => void;
+  /** one line scrolling sideways, from the left — under the year chips */
+  isScrollRow?: boolean;
 };
 
 export type TUseVisibleSeriesArgs = Pick<
@@ -143,8 +154,9 @@ export type TChartHeaderProps = {
   chartMode: TChartMode;
   /** the chart type drawn — WL only where it's available */
   isWalterLieth: boolean;
-  canUseWalterLieth: boolean;
   isCompare: boolean;
+  /** Climate A / B and weather years: the side by side / overlay switch */
+  hasLayout: boolean;
   layout: ECompareLayout;
   subtitleText: string | null;
 };
@@ -208,8 +220,10 @@ export type TChartBodyProps = {
   chartProps: TTempPrecipChartProps;
   chart: TTempPrecipChartState;
   seriesSingle: TWalterLiethSeriesInput;
+  seriesYears: readonly TWalterLiethSeriesInput[];
   comparison: TComparisonSeries;
   visible: TVisibleSeries;
+  onVisibleChange: (visible: TVisibleSeries) => void;
   isWalterLieth: boolean;
   layout: ECompareLayout;
   syncId: string;

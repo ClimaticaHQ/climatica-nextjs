@@ -3,7 +3,10 @@ import { WALTER_LIETH_COMPARISON } from "@/constants";
 import { getSharedDomain, isCompleteSeries } from "@/utils";
 import type { TWalterLiethBodyProps } from "../../TempPrecipChart.type";
 
-/** WL mode: one diagram (or its notice) on a single-city page, the comparison otherwise. */
+/**
+ * WL mode: one diagram (or its notice) on a single-city page, the A / B comparison otherwise
+ * (weather years: YearsBody).
+ */
 export function WalterLiethBody({
   chart,
   seriesSingle,
@@ -12,6 +15,11 @@ export function WalterLiethBody({
   shading,
   expansion,
 }: TWalterLiethBodyProps) {
+  const activeMonth = {
+    activeMonthIndex: chart.activeMonthIndex,
+    onActiveMonthIndexChange: chart.setActiveMonthIndex,
+  };
+
   if (chart.isCompare) {
     return (
       <WalterLiethComparison
@@ -19,10 +27,7 @@ export function WalterLiethBody({
         layout={layout}
         shading={shading ?? WALTER_LIETH_COMPARISON.DEFAULT_SHADING}
         expansion={expansion}
-        activeMonth={{
-          activeMonthIndex: chart.activeMonthIndex,
-          onActiveMonthIndexChange: chart.setActiveMonthIndex,
-        }}
+        activeMonth={activeMonth}
       />
     );
   }

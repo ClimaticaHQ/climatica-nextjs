@@ -9,3 +9,4 @@ export { StandardChartAxes } from "./StandardChartAxes";
 export { StandardSplitView } from "./StandardSplitView";
 export { VariableChips } from "./VariableChips";
 export { WalterLiethBody } from "./WalterLiethBody";
+export { YearsBody } from "./YearsBody";

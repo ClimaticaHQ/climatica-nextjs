@@ -1,11 +1,11 @@
 import { MonthlyValuesTable } from "@/components/MonthlyValuesTable";
-import { WALTER_LIETH_COLORS } from "@/constants";
-import { CompareChart, MultiPeriodChart, StandardClimateChart } from "../../charts";
+import { DATASETS, WALTER_LIETH_COLORS } from "@/constants";
+import { CompareChart, StandardClimateChart } from "../../charts";
 import { CHART_COLORS } from "../../TempPrecipChart.constant";
 import type { TStandardBodyProps } from "../../TempPrecipChart.type";
 import { StandardSplitView } from "../StandardSplitView";
 
-/** Standard mode: multi-period, split panels or the overlay chart, or the single-city chart. */
+/** Standard mode: split panels or the overlay chart, or the single-city chart (weather years: YearsBody). */
 export function StandardBody({
   chartProps,
   chart,
@@ -20,22 +20,6 @@ export function StandardBody({
   const showAridity = chartProps.showAridity !== false;
   const shared = { scales: chart.scales, rightMax: chart.rightMax, visible };
 
-  if (chart.isMultiPeriod) {
-    return (
-      <MultiPeriodChart
-        chartData={chart.chartData}
-        multiPeriodData={chartProps.multiPeriodData ?? []}
-        {...shared}
-        {...months}
-        {...(chartProps.periodColors !== undefined
-          ? { periodColors: chartProps.periodColors }
-          : {})}
-        {...(chartProps.hiddenPeriods !== undefined
-          ? { hiddenPeriods: chartProps.hiddenPeriods }
-          : {})}
-      />
-    );
-  }
   if (isSplit) {
     return (
       <StandardSplitView
@@ -97,6 +81,11 @@ export function StandardBody({
       chartData={chart.chartDataSingle}
       aridity={chart.aridity}
       summary={chart.summary}
+      martonneYear={
+        chartProps.subtitle?.dataset === DATASETS.WEATHER
+          ? chartProps.subtitle.weatherYear
+          : undefined
+      }
       {...shared}
       showAridity={showAridity}
       activeMonthIndex={chart.activeMonthIndex}

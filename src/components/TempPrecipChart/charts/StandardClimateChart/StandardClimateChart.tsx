@@ -37,6 +37,7 @@ export function StandardClimateChart({
   visible,
   selectedMonths,
   altitude,
+  martonneYear,
   showAridity = true,
   activeMonthIndex,
   onActiveMonthIndexChange,
@@ -97,6 +98,7 @@ export function StandardClimateChart({
           annualPrecip={summary.totalPrec}
           aridMonths={summary.aridCount}
           martonneIndex={summary.martonne}
+          martonneYear={martonneYear}
           {...(altitude !== undefined ? { altitude } : {})}
         />
       )}

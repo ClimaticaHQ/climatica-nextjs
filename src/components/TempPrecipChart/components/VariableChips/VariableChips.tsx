@@ -1,13 +1,20 @@
-import { FilterChip } from "@/components";
+import { FilterChip } from "@/components/FilterChip";
+import { ChipScroller } from "@/components/CompareYears/ChipScroller";
 import type { TVisibleSeries } from "@/types";
 import { useTranslations } from "next-intl";
 import type { TVariableChipsProps } from "../../TempPrecipChart.type";
 
 /**
- * The standard chart's variable toggles. The last active one can't be switched off; a variable
- * the store didn't fetch is shown off and disabled (tavg is derived, so always available).
+ * The standard chart's variable toggles. The last active one stays on — locked, as in the
+ * sidebar: not-allowed cursor, announced as disabled; a variable the store didn't fetch is shown
+ * off and disabled (tavg is derived, so always available).
  */
-export function VariableChips({ visible, variables, onChange }: TVariableChipsProps) {
+export function VariableChips({
+  visible,
+  variables,
+  onChange,
+  isScrollRow = false,
+}: TVariableChipsProps) {
   const t = useTranslations();
   const activeCount = Object.values(visible).filter(Boolean).length;
   const storeVarSet = new Set<string>(variables ?? []);
@@ -18,33 +25,28 @@ export function VariableChips({ visible, variables, onChange }: TVariableChipsPr
     { key: "prec", label: t("sidebar.variables.prec") },
   ];
 
-  function handleToggle(key: keyof TVisibleSeries) {
-    if (visible[key] && activeCount === 1) return;
+  const handleToggle = (key: keyof TVisibleSeries) =>
     onChange({ ...visible, [key]: !visible[key] });
-  }
 
-  return (
-    <div className="flex flex-wrap justify-end gap-2">
-      {chips.map(({ key, label }) => {
-        const isLastActive = visible[key] && activeCount === 1;
-        const isUnavailable = variables !== undefined && key !== "tavg" && !storeVarSet.has(key);
-        return (
-          <div
-            key={key}
-            className={
-              isLastActive || isUnavailable
-                ? "pointer-events-none cursor-not-allowed opacity-40"
-                : ""
-            }
-          >
-            <FilterChip
-              label={label}
-              isActive={visible[key] && !isUnavailable}
-              onClick={() => handleToggle(key)}
-            />
-          </div>
-        );
-      })}
-    </div>
+  const items = chips.map(({ key, label }) => {
+    const isLastActive = visible[key] && activeCount === 1;
+    const isUnavailable = variables !== undefined && key !== "tavg" && !storeVarSet.has(key);
+    return (
+      <div key={key} className="shrink-0">
+        <FilterChip
+          label={label}
+          isActive={visible[key] && !isUnavailable}
+          disabled={isUnavailable}
+          isLocked={isLastActive}
+          onClick={() => handleToggle(key)}
+        />
+      </div>
+    );
+  });
+
+  return isScrollRow ? (
+    <ChipScroller contentKey="variables">{items}</ChipScroller>
+  ) : (
+    <div className="flex flex-wrap justify-end gap-2">{items}</div>
   );
 }
