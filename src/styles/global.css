@@ -156,6 +156,9 @@ button:focus:not(:focus-visible) {
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
 
+  /* * Modal backdrop (bottom sheets) */
+  --color-backdrop: rgba(0, 0, 0, 0.4);
+
   /* * Charts */
   --chart-arid: #fcd34d;
   --chart-humid: #93c5fd;
@@ -241,6 +244,8 @@ html.dark {
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
+
+  --color-backdrop: rgba(0, 0, 0, 0.6);
 
   /* * Walter-Lieth: lighter red/blue for contrast on dark backgrounds */
   --color-wl-temp: #f87171;

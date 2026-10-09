@@ -129,3 +129,50 @@
     width: 100%;
   }
 }
+
+/* * BottomSheet: the panel slides up from the screen edge and back down, the backdrop fades with
+   it. Fill modes leave the panel's inline drag transform in charge once it has slid in. */
+@keyframes sheet-slide-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheet-slide-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheet-backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-backdrop-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.sheet-slide-in {
+  animation: sheet-slide-in var(--motion-sheet-slide) var(--motion-sheet-slide-easing) backwards;
+}
+
+.sheet-slide-out {
+  animation: sheet-slide-out var(--motion-sheet-slide) var(--motion-sheet-slide-easing) forwards;
+}
+
+/* * released short of the close threshold: the panel settles back up */
+.sheet-snap-back {
+  transition: transform var(--motion-sheet-slide) var(--motion-sheet-slide-easing);
+}
+
+.sheet-backdrop-in {
+  animation: sheet-backdrop-in var(--motion-sheet-slide) ease-out backwards;
+}
+
+.sheet-backdrop-out {
+  animation: sheet-backdrop-out var(--motion-sheet-slide) ease-in forwards;
+}
