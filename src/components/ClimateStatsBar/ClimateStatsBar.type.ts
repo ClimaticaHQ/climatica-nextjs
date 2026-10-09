@@ -6,6 +6,8 @@ export type TClimateStatsBarProps = {
   aridMonths: number;
   altitude?: number;
   martonneIndex: number | null;
+  /** the one weather year the stats describe — the Martonne cell names it */
+  martonneYear?: number | undefined;
 };
 
 export type TStatCellProps = {

@@ -1,6 +1,7 @@
 "use client";
 
 import { LocationSearch, StatCard, TempPrecipChart, useTempPrecipChart } from "@/components";
+import { MobileFilterBar } from "@/components/filters";
 import { DataUpdateProvider } from "@/components/DataUpdate";
 import {
   ChartSkeleton,
@@ -8,7 +9,6 @@ import {
   ErrorBanner,
   ExportMenu,
   MapSkeleton,
-  PageTitle,
   PageWrapper,
   StatCardsSkeleton,
 } from "@/components/UI";
@@ -36,7 +36,7 @@ import {
   shortGridLabel,
   svgToPng,
 } from "@/utils";
-import { getShownChartMode } from "@/utils/chartMode.util";
+import { PageHeader } from "@/components/PageHeader";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
@@ -77,7 +77,6 @@ export function ClimateStatisticsView({
   onClearLocationError,
   chartSectionRef,
   chartMode,
-  onChartModeChange,
 }: TClimateStatisticsViewProps) {
   const t = useTranslations();
   const locale = useLocale();
@@ -87,14 +86,9 @@ export function ClimateStatisticsView({
 
   const canExportFullData = isFullVariableDataAvailable(subtitle.dataset, subtitle.climatePeriod);
 
-  const isClimate = subtitle.dataset !== DATASETS.WEATHER;
-  const shownChartMode = getShownChartMode({
-    chartMode,
-    dataset: isClimate ? DATASETS.CLIMATE : DATASETS.WEATHER,
-  });
   // * WL always plots all 12 months, so while it shows every stat on the page does too; the
   // * stored selection is kept and applies again in standard mode
-  const statsMonths = shownChartMode === "walter-lieth" ? null : selectedMonths;
+  const statsMonths = chartMode === "walter-lieth" ? null : selectedMonths;
   const isFiltered = statsMonths !== null && statsMonths.length > 0;
   const isSingleMonth = isFiltered && statsMonths.length === 1;
 
@@ -152,7 +146,10 @@ export function ClimateStatisticsView({
       annualPrec: t("chart.annualPrec"),
       aridMonths: t("chart.aridMonths"),
       altitude: t("chart.altitude"),
-      martonne: t("chart.martonne"),
+      martonne:
+        subtitle.dataset === DATASETS.WEATHER && subtitle.weatherYear !== undefined
+          ? t("chart.martonneYear", { year: subtitle.weatherYear })
+          : t("chart.martonne"),
     },
     ...(martonneClassLabel !== undefined ? { martonneClassLabel } : {}),
     aridityLegend: {
@@ -189,7 +186,7 @@ export function ClimateStatisticsView({
     scales: chart.scales,
     summary: chart.summary,
     rightMax: chart.rightMax,
-    chartMode: shownChartMode,
+    chartMode: chartMode,
     labels: exportLabels,
     datasetAttribution,
     shareUrl,
@@ -252,21 +249,22 @@ export function ClimateStatisticsView({
   return (
     <PageWrapper>
       <div className="flex flex-col gap-10">
-        <header className="text-center">
-          <PageTitle suppressHydrationWarning>{t("climateStatistics.title")}</PageTitle>
-          <p className="mt-1 text-[var(--color-text-secondary)]" suppressHydrationWarning>
-            {t("climateStatistics.subtitle")}
-          </p>
-        </header>
-
-        <LocationSearch
-          isLocating={isLocating}
-          locationError={locationError}
-          cityLabel={cityName}
-          onCitySelect={onCitySelect}
-          onLocate={onLocate}
-          onClearLocationError={onClearLocationError}
+        <PageHeader
+          title={t("pages.climateStatistics.title")}
+          description={t("pages.climateStatistics.description")}
         />
+
+        <div className="flex flex-col gap-3">
+          <LocationSearch
+            isLocating={isLocating}
+            locationError={locationError}
+            cityLabel={cityName}
+            onCitySelect={onCitySelect}
+            onLocate={onLocate}
+            onClearLocationError={onClearLocationError}
+          />
+          <MobileFilterBar />
+        </div>
 
         <section>
           <LeafletMap
@@ -288,7 +286,7 @@ export function ClimateStatisticsView({
             series={{
               [DATA_UPDATE_SINGLE_SERIES]: temperatureData,
               // * none in WL (every month): switching chart type is never an update
-              [FILTERED_STATS_SERIES]: shownChartMode === "walter-lieth" ? null : stats,
+              [FILTERED_STATS_SERIES]: chartMode === "walter-lieth" ? null : stats,
             }}
             isFetching={isFetching}
             announcement={t("loading.dataUpdated", { location: cityName, period: periodLabel })}
@@ -380,9 +378,7 @@ export function ClimateStatisticsView({
                     subtitle={subtitle}
                     variables={variables}
                     onVisibleSeriesChange={setVisibleSeries}
-                    chartMode={shownChartMode}
-                    onChartModeChange={onChartModeChange}
-                    showWalterLiethToggle={isClimate}
+                    chartMode={chartMode}
                     flashKeys={CHART_FLASH_KEYS}
                     {...(temperatureData ? { data: temperatureData } : {})}
                     {...(altitude !== null ? { altitude } : {})}

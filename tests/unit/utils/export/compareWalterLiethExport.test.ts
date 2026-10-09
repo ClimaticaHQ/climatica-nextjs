@@ -253,7 +253,7 @@ function monthLabelCenters(svg: string) {
 function valueLines(svg: string) {
   const lines = new Map<string, { x: number[]; fill: string[] }>();
   for (const m of svg.matchAll(
-    /<text x="([\d.]+)" y="([\d.]+)" text-anchor="middle" font-size="1[13]" font-weight="500" fill="([^"]+)">/g,
+    /<text x="([\d.]+)" y="([\d.]+)" text-anchor="middle" font-size="[\d.]+" font-weight="500" fill="([^"]+)">/g,
   )) {
     const line = lines.get(m[2] ?? "") ?? { x: [], fill: [] };
     line.x.push(Number(m[1]));

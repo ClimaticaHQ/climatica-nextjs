@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   APP_TITLE,
   DATASETS,
@@ -14,9 +15,10 @@ import {
   useGetDatasetVersion,
   usePersistedCity,
   usePersistedComparisonCities,
+  useFilters,
   useUrlStateSync,
 } from "@/hooks";
-import { useFiltersStore, useSettingsStore } from "@/stores";
+import { useSettingsStore } from "@/stores";
 import type { ECompareLayout, EWalterLiethShading } from "@/enums";
 import type { TChartMode, TChartSubtitle, TCity, TExpandedPanel } from "@/types";
 import { scrollToSection } from "@/utils";
@@ -32,7 +34,8 @@ export function CompareCities() {
   const chartSectionRef = useRef<HTMLDivElement>(null);
   const { cityA, cityB, selectCityA, selectCityB } = usePersistedComparisonCities();
   const { selectCity: selectCityClimate } = usePersistedCity();
-  const { gridSize, dataset, climatePeriod, weatherYear, months, variables } = useFiltersStore();
+  const t = useTranslations();
+  const { gridSize, dataset, climatePeriod, weatherYear, months, variables } = useFilters();
   const selectedMonths = Array.isArray(months) ? months : null;
 
   const [layout, setLayout] = useState<ECompareLayout>(DEFAULT_COMPARE_LAYOUT);
@@ -57,6 +60,8 @@ export function CompareCities() {
     },
   });
 
+  // * the <title>: the page's name (the navbar's, the heading's) until both cities are chosen
+  const pageTitle = t("pages.compareCities.title");
   useEffect(() => {
     const labelA = cityA.label;
     const labelB = cityB.label;
@@ -69,8 +74,8 @@ export function CompareCities() {
       !/^Q\d+$/.test(labelB);
     document.title = bothValid
       ? `${labelA} vs ${labelB} | ${APP_TITLE}`
-      : `Compare Cities | ${APP_TITLE}`;
-  }, [cityA.label, cityB.label]);
+      : `${pageTitle} | ${APP_TITLE}`;
+  }, [cityA.label, cityB.label, pageTitle]);
 
   const subtitle: TChartSubtitle =
     dataset === DATASETS.CLIMATE ? { dataset, climatePeriod } : { dataset, weatherYear };
@@ -130,7 +135,7 @@ export function CompareCities() {
       cityB={cityB}
       dataA={dataA}
       dataB={dataB}
-      autoGrid={gridSize}
+      gridSize={gridSize}
       subtitle={subtitle}
       selectedMonths={selectedMonths}
       isLoading={isLoading}
@@ -148,7 +153,6 @@ export function CompareCities() {
       wlShading={wlShading}
       onWlShadingChange={setWlShading}
       chartMode={chartMode}
-      onChartModeChange={setChartMode}
       panelExpansion={{ expanded, onExpandedChange: setExpanded }}
       chartSectionRef={chartSectionRef}
     />

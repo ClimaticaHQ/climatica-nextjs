@@ -7,6 +7,9 @@ export type TMultiPeriodChartProps = {
   scales: TWalterLiethScales | null;
   rightMax: number;
   selectedMonths?: number[];
-  periodColors?: readonly string[];
-  hiddenPeriods?: number[];
+  /** every compared year, in order — each year's colour comes from its place here */
+  years: readonly number[];
+  hiddenPeriods?: readonly number[];
+  /** hovered / focused year chip: the other years dim */
+  highlightedYear?: number | null;
 };

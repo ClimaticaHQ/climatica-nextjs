@@ -4,7 +4,6 @@ import type {
   TCity,
   TColorScale,
   TDatasetAttribution,
-  TDatasetPeriodUrlValue,
   TNumberFormatter,
   TPolygon,
   TVariable,
@@ -16,9 +15,6 @@ export type THeatMapSelectionValue =
   { kind: "bbox"; bbox: TBbox } | { kind: "polygon"; polygon: TPolygon } | { kind: "none" };
 
 export type THeatMapUrlState = {
-  datasetPeriod: TDatasetPeriodUrlValue;
-  variables: TVariable[];
-  gridSize: TCellSize;
   selection: THeatMapSelectionValue;
 };
 

@@ -79,13 +79,19 @@ test.describe("Climate data loading", () => {
 
   test("shows a monthly values table under each compare split panel", async ({ page }) => {
     await page.goto(COMPARE_CITIES_URL);
+    // * a split panel is too narrow for twelve aligned columns: each opens its table on its side
+    const disclosures = page.getByRole("button", { name: "Show monthly values" });
+    await expect(disclosures).toHaveCount(2, { timeout: 30_000 });
+    // * an opened one turns into "Hide monthly values", so the next to open is always the first
+    await disclosures.first().click();
+    await disclosures.first().click();
     const tables = page.getByRole("table", { name: /^Monthly values: / });
-    await expect(tables).toHaveCount(2, { timeout: 30_000 });
+    await expect(tables).toHaveCount(2);
     for (const table of await tables.all()) {
       const rows = table.locator("tbody tr");
-      await expect(rows).toHaveCount(2);
+      await expect(rows).toHaveCount(12);
       for (const row of await rows.all()) {
-        await expect(row.getByRole("cell").filter({ hasText: /\S/ })).toHaveCount(12);
+        await expect(row.getByRole("cell").filter({ hasText: /\S/ })).toHaveCount(2);
       }
     }
   });

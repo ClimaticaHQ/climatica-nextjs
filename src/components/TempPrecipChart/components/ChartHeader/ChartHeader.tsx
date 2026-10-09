@@ -8,8 +8,8 @@ export function ChartHeader({
   chartProps,
   chartMode,
   isWalterLieth,
-  canUseWalterLieth,
   isCompare,
+  hasLayout,
   layout,
   subtitleText,
 }: TChartHeaderProps) {
@@ -31,9 +31,7 @@ export function ChartHeader({
       controls={
         <ChartSwitches
           chartMode={chartMode}
-          onChartModeChange={(mode) => chartProps.onChartModeChange?.(mode)}
-          canUseWalterLieth={canUseWalterLieth}
-          layout={isCompare ? layout : undefined}
+          layout={hasLayout ? layout : undefined}
           onLayoutChange={(next) => chartProps.onLayoutChange?.(next)}
         />
       }

@@ -1,42 +1,37 @@
-import { TOOLTIP_DIGITS, WALTER_LIETH_COLORS } from "@/constants";
-import { useFormatNumber } from "@/hooks";
+import { TOOLTIP_DIGITS } from "@/constants";
+import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
 import { useTranslations } from "next-intl";
 import type { TOverlayTooltipProps } from "../WalterLiethComparison.type";
 
-export function OverlayTooltip({ active, payload, rowsB, seriesA, seriesB }: TOverlayTooltipProps) {
+/** The hovered month for every overlaid series, each in its colour. */
+export function OverlayTooltip({ active, payload, entries }: TOverlayTooltipProps) {
   const t = useTranslations();
   const formatNumber = useFormatNumber();
-  const rowA = payload?.[0]?.payload;
-  const rowB = rowA ? rowsB[rowA.position] : undefined;
-  if (!active || !rowA || !rowB) return null;
-
-  const entries = [
-    { series: seriesA, row: rowA },
-    { series: seriesB, row: rowB },
-  ];
+  const hovered = payload?.[0]?.payload;
+  if (!active || !hovered) return null;
 
   return (
     <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg)] p-2 text-[13px]">
       <p className="mb-1 font-semibold text-[var(--color-text)]">
-        {t(`months.${rowA.monthIndex + 1}`)}
+        {t(`months.${hovered.monthIndex + 1}`)}
       </p>
-      {entries.map(({ series, row }) => (
-        <div
-          key={series.id}
-          className="mb-1"
-          style={{ color: WALTER_LIETH_COLORS.SERIES[series.id] }}
-        >
-          <p className="font-medium">{series.label}</p>
-          <p>
-            {t("chart.avgTemperature")}:{" "}
-            {t("units.celsiusValue", {
-              value: formatNumber(row.tavg, { digits: TOOLTIP_DIGITS.WL }),
-            })}{" "}
-            · {t("chart.precipitation")}:{" "}
-            {t("units.mmValue", { value: formatNumber(row.prec, { digits: TOOLTIP_DIGITS.WL }) })}
-          </p>
-        </div>
-      ))}
+      {entries.map(({ key, label, color, rows }) => {
+        const row = rows[hovered.position];
+        if (!row) return null;
+        return (
+          <div key={key} className="mb-1" style={{ color }}>
+            <p className="font-medium">{label}</p>
+            <p>
+              {t("chart.avgTemperature")}:{" "}
+              {t("units.celsiusValue", {
+                value: formatNumber(row.tavg, { digits: TOOLTIP_DIGITS.WL }),
+              })}{" "}
+              · {t("chart.precipitation")}:{" "}
+              {t("units.mmValue", { value: formatNumber(row.prec, { digits: TOOLTIP_DIGITS.WL }) })}
+            </p>
+          </div>
+        );
+      })}
     </div>
   );
 }

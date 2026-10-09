@@ -2,7 +2,7 @@ import { Card } from "@/components/Card";
 import { MartonneBadge } from "@/components/MartonneBadge";
 import { VALUE_DIGITS } from "@/constants";
 import { ECardPadding, ECardSize } from "@/enums";
-import { useFormatNumber } from "@/hooks";
+import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
 import { getMartonneBadge } from "@/utils";
 import { useTranslations } from "next-intl";
 import {
@@ -20,11 +20,25 @@ export function ClimateStatsBar({
   aridMonths,
   altitude,
   martonneIndex,
+  martonneYear,
 }: TClimateStatsBarProps) {
   const t = useTranslations();
   const formatNumber = useFormatNumber();
   const showAltitude = altitude !== undefined;
   const badge = martonneIndex !== null ? getMartonneBadge(martonneIndex) : null;
+  // * a single weather year: the index describes that year alone, and says so
+  const martonneLabels =
+    martonneYear === undefined
+      ? {
+          label: t("chart.martonneShort"),
+          fullLabel: t("chart.martonne"),
+          title: t("chart.martonneTooltip"),
+        }
+      : {
+          label: t("chart.martonneShortYear", { year: martonneYear }),
+          fullLabel: t("chart.martonneYear", { year: martonneYear }),
+          title: t("chart.martonneTooltipYear", { year: martonneYear }),
+        };
   // * every cell reserves the meta row (Martonne class), so the values line up
   const cell = { hasMetaRow: true, cellClassName: STATS_BAR_STYLE.cell };
 
@@ -56,13 +70,7 @@ export function ClimateStatsBar({
             <StatValue value={t("units.metersValue", { value: formatNumber(altitude) })} />
           </StatCell>
         )}
-        <StatCell
-          {...cell}
-          label={t("chart.martonneShort")}
-          fullLabel={t("chart.martonne")}
-          title={t("chart.martonneTooltip")}
-          meta={badge && <MartonneBadge badge={badge} />}
-        >
+        <StatCell {...cell} {...martonneLabels} meta={badge && <MartonneBadge badge={badge} />}>
           <StatValue value={formatNumber(martonneIndex, { digits: VALUE_DIGITS.MARTONNE })} />
         </StatCell>
       </div>

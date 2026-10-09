@@ -10,7 +10,9 @@ export function ComparisonTableRow({ row, table }: TComparisonTableRowProps) {
   return (
     <tr className={C.ROW}>
       <th scope="row" className={C.METRIC_CELL}>
-        {t(COMPARISON_METRIC_LABEL_KEYS[row.metric])}
+        {row.metric === "martonne" && table.martonneYear !== undefined
+          ? t("chart.martonneShortYear", { year: table.martonneYear })
+          : t(COMPARISON_METRIC_LABEL_KEYS[row.metric])}
       </th>
       <ComparisonValueCell value={row.a} color={WALTER_LIETH_COLORS.SERIES[table.seriesA.id]} />
       <ComparisonValueCell

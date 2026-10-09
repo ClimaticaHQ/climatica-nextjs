@@ -6,7 +6,6 @@ import type {
   TChartSubtitle,
   TCity,
   TDatasetAttribution,
-  TDatasetPeriodUrlValue,
   TMonthlyTemperature,
   TVariable,
 } from "@/types";
@@ -16,9 +15,6 @@ import type { RefObject } from "react";
 export type TCompareCitiesUrlState = {
   cityA: TCity;
   cityB: TCity;
-  datasetPeriod: TDatasetPeriodUrlValue;
-  variables: TVariable[];
-  gridSize: TCellSize;
   layout: ECompareLayout;
   wlShading: EWalterLiethShading;
   chartMode: TChartMode;
@@ -31,7 +27,8 @@ export type TCompareCitiesViewProps = {
   cityB: TCity;
   dataA: TMonthlyTemperature[] | null;
   dataB: TMonthlyTemperature[] | null;
-  autoGrid: TCellSize;
+  /** the Cell Resolution filter — the grid every request uses */
+  gridSize: TCellSize;
   subtitle: TChartSubtitle;
   selectedMonths: number[] | null;
   variables: readonly TVariable[];
@@ -50,7 +47,6 @@ export type TCompareCitiesViewProps = {
   wlShading: EWalterLiethShading;
   onWlShadingChange: (shading: EWalterLiethShading) => void;
   chartMode: TChartMode;
-  onChartModeChange: (mode: TChartMode) => void;
   panelExpansion: TPanelExpansion;
 };
 

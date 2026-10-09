@@ -33,7 +33,8 @@ test.describe("Navigation", () => {
     await page.getByRole("button", { name: "Jul", exact: true }).click();
     await page.getByRole("button", { name: "Apply filters" }).click();
     await expect(page).toHaveURL(/chart=standard/);
-    await expect(page).not.toHaveURL(/months=all/);
+    // * defaults are omitted from the URL, so wait for the picked month itself
+    await expect(page).toHaveURL(/months=7(&|$)/);
     const filteredUrl = page.url();
 
     await page.getByRole("link", { name: "Compare Cities" }).click();

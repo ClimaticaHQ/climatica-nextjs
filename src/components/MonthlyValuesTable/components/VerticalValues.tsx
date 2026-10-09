@@ -8,7 +8,7 @@ import { UnitLabel } from "./UnitLabel";
 import { ValueStack } from "./ValueStack";
 
 /**
- * Below `sm` twelve columns don't fit: a "Show monthly values" button (closed by default)
+ * Where twelve columns don't fit (phones, split panels): a "Show monthly values" button (closed by default)
  * reveals the same table on its side — Month | °C | mm, the same cells.
  */
 export function VerticalValues({

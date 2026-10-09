@@ -1,665 +1,95 @@
 "use client";
 
-import { CellSizeSelector, FilterChip, SectionLabel, YearInput } from "@/components";
-import { AnimationSettings } from "@/components/AnimationSettings";
-import { Button, CollapsibleSection, DotLabel, Dropdown, ToggleSwitch } from "@/components/UI";
 import {
-  AUTO_APPLY_DEBOUNCE_MS,
-  CELL_SIZE_OPTIONS,
-  CELL_SIZES,
-  CLIMATE_COMPARISON_COLORS,
-  CLIMATE_PERIOD_LABELS,
-  CLIMATE_PERIODS,
-  CLIMATE_VARIABLES,
-  DATASETS,
-  MAX_PERIODS,
-  MIN_PERIODS,
-  PERIOD_COLORS,
-  PERIOD_RESTRICTED_VARIABLES,
-  ROUTES,
-  SIDEBAR_PARAMS,
-  WEATHER_MAX_YEAR,
-  WEATHER_MIN_YEAR,
-  WEATHER_VARIABLES,
-} from "@/constants";
-import { EButtonVariant } from "@/enums";
+  FilterSections,
+  FilterSettings,
+  FilterUnavailableActionsContext,
+} from "@/components/filters";
+import { Button, CollapsibleSection } from "@/components/UI";
+import { AUTO_APPLY_DEBOUNCE_MS, LG_MEDIA_QUERY } from "@/constants";
+import { EButtonVariant, EFilterApplyMode, EFilterAvailability } from "@/enums";
 import {
-  useAvailableClimatePeriods,
-  useDebounce,
-  useFormatNumber,
-  usePersistedCity,
-  usePersistedClimatePeriods,
-  usePersistedPeriods,
+  useAutoApply,
+  useCityClimatePeriods,
+  useFilterNavigation,
+  useFilterPageContext,
+  useFilters,
+  useFiltersDraft,
 } from "@/hooks";
-import { usePathname } from "@/libs/I18nNavigation";
-import { useClimatePeriodsStore, useFiltersStore, useSettingsStore } from "@/stores";
-import type { TCellSize, TCellSizeOption } from "@/types";
-import { estimateCellCount, getCellCountStatus } from "@/utils";
-import { isWalterLiethShown } from "@/utils/chartMode.util";
-import { sidebarFiltersSchema } from "@/validators";
+import { useChartModeUrl } from "@/hooks/url/useChartModeUrl";
+import { useSettingsStore } from "@/stores";
+import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
+import { getSectionFilterKeys, getSidebarFilterKeys } from "@/utils/filters.util";
+import { serializeFilters } from "@/utils/filtersUrl.util";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import type { TDraftErrors, TDraftFilters, TSidebarProps } from "./Sidebar.type";
+import { SIDEBAR_CLASS } from "./Sidebar.constant";
 
-export function Sidebar({ isOpen, onClose }: TSidebarProps) {
-  const {
-    autoScroll,
-    toggleAutoScroll,
-    autoApplyFilters,
-    toggleAutoApplyFilters,
-    syncCity,
-    toggleSyncCity,
-    hasHydrated: settingsHydrated,
-  } = useSettingsStore();
+/**
+ * The desktop filters column (lg and up — below it, MobileFilterBar). From lg it also holds
+ * Compare Periods' periods or years (on the page below lg). It edits a draft, applied with Apply
+ * (a new history entry) or — when auto-apply is on — shortly after each change (replacing it).
+ */
+export function Sidebar() {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const filters = useFilters();
+  const { view, isWalterLieth, heatmapBbox } = useFilterPageContext();
+  const { applyFilters } = useFilterNavigation();
+  const { setChartMode } = useChartModeUrl();
+  const unavailableActions = { [EFilterAvailability.WALTER_LIETH]: () => setChartMode("standard") };
+  const { autoApplyFilters, hasHydrated } = useSettingsStore();
+  const availablePeriods = useCityClimatePeriods();
+  const filtersDraft = useFiltersDraft({ filters, heatmapBbox });
+  const { draft, isApplyBlocked } = filtersDraft;
+  const draftContext = { view, dataset: draft.dataset, isWalterLieth };
+  // * one render per breakpoint: below lg (this column hidden) the page has the period selectors
+  const isDesktop = useMediaQuery(LG_MEDIA_QUERY);
+  const sectionKeys = isDesktop
+    ? getSidebarFilterKeys(draftContext)
+    : getSectionFilterKeys(draftContext);
 
-  const {
-    dataset,
-    climatePeriod,
-    weatherYear,
-    variables,
-    gridSize,
-    months,
-    actions: {
-      setDataset,
-      setClimatePeriod,
-      setWeatherYear,
-      toggleVariable,
-      setGridSize,
-      setMonths,
-    },
-  } = useFiltersStore();
-  const { city } = usePersistedCity();
-  const availablePeriods = useAvailableClimatePeriods(
-    city.lat,
-    city.lng,
-    gridSize,
-    dataset === DATASETS.CLIMATE,
-  );
-  const climatePeriodOptions = Object.values(CLIMATE_PERIODS).map((period) => ({
-    value: period,
-    label: CLIMATE_PERIOD_LABELS[period],
-    disabled: availablePeriods !== null && !availablePeriods.includes(period),
-  }));
-
-  const isComparePeriods = pathname.startsWith(ROUTES.COMPARE_PERIODS);
-  const { climatePeriodA, climatePeriodB, setClimatePeriodA, setClimatePeriodB } =
-    usePersistedClimatePeriods();
-
-  const [draft, setDraft] = useState<TDraftFilters>(() => ({
-    dataset,
-    climatePeriod,
-    climatePeriodA,
-    climatePeriodB,
-    weatherYear,
-    variables,
-    gridSize,
-    months,
-  }));
-
-  const [mounted, setMounted] = useState(false);
-  const [periods, setPeriods] = usePersistedPeriods();
-  const [addPeriodYear, setAddPeriodYear] = useState<number | undefined>(undefined);
-  const [addPeriodError, setAddPeriodError] = useState<string | null>(null);
-  const [errors, setErrors] = useState<TDraftErrors>({});
-  const [submitAttempted, setSubmitAttempted] = useState(false);
-  const skipNextAutoApplyRef = useRef(true);
-
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    const state = useFiltersStore.getState();
-    const climatePeriods = useClimatePeriodsStore.getState();
-    setMounted(true);
-    setDraft({
-      dataset: state.dataset,
-      climatePeriod: state.climatePeriod,
-      climatePeriodA: climatePeriods.climatePeriodA,
-      climatePeriodB: climatePeriods.climatePeriodB,
-      weatherYear: state.weatherYear,
-      variables: [...state.variables],
-      gridSize: state.gridSize,
-      months: state.months,
-    });
-    skipNextAutoApplyRef.current = true;
-  }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
-
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    if (isOpen) {
-      setDraft({
-        dataset,
-        climatePeriod,
-        climatePeriodA,
-        climatePeriodB,
-        weatherYear,
-        variables: [...variables],
-        gridSize,
-        months,
-      });
-      setErrors({});
-      setSubmitAttempted(false);
-      skipNextAutoApplyRef.current = true;
-    }
-  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
-  /* eslint-enable react-hooks/set-state-in-effect */
-
-  const isHeatmapPage = pathname.startsWith(ROUTES.HEAT_MAP);
-  // * WL always plots mean temperature and precipitation over all 12 months, whatever is
-  // * selected here — the variable and month chips are disabled (read-only), never cleared,
-  // * so the selection returns with standard
-  const isWalterLieth = isWalterLiethShown({ pathname, searchParams, dataset });
-
-  const northRaw = searchParams.get(SIDEBAR_PARAMS.BBOX_NORTH);
-  const southRaw = searchParams.get(SIDEBAR_PARAMS.BBOX_SOUTH);
-  const westRaw = searchParams.get(SIDEBAR_PARAMS.BBOX_WEST);
-  const eastRaw = searchParams.get(SIDEBAR_PARAMS.BBOX_EAST);
-  const heatmapBbox =
-    northRaw !== null && southRaw !== null && westRaw !== null && eastRaw !== null
-      ? {
-          north: Number(northRaw),
-          south: Number(southRaw),
-          west: Number(westRaw),
-          east: Number(eastRaw),
-        }
-      : null;
-
-  const cellCount =
-    isHeatmapPage && heatmapBbox !== null ? estimateCellCount(heatmapBbox, draft.gridSize) : null;
-  const cellStatus = cellCount !== null ? getCellCountStatus(cellCount) : null;
-  const isTooMany = cellCount !== null && cellCount > 10_000;
-
-  const thirtySecDisabled =
-    draft.dataset === DATASETS.WEATHER ||
-    (draft.dataset === DATASETS.CLIMATE && draft.climatePeriod !== CLIMATE_PERIODS.C1970_2000);
-
-  const cellSizeOptions: readonly TCellSizeOption[] = (
-    Object.keys(CELL_SIZE_OPTIONS) as TCellSize[]
-  ).map((value) => ({
-    value,
-    label: t(`cellSizes.${value.replace(".", "_")}`),
-    ...(value === CELL_SIZES.THIRTY_SECONDS && thirtySecDisabled ? { disabled: true } : {}),
-  }));
-
-  function handleDraftDatasetChange(ds: (typeof DATASETS)[keyof typeof DATASETS]) {
-    setDraft((prev) => {
-      const variables =
-        ds === DATASETS.WEATHER
-          ? prev.variables.filter((v) => (WEATHER_VARIABLES as readonly string[]).includes(v))
-          : prev.variables;
-      const gridSize =
-        ds === DATASETS.WEATHER && prev.gridSize === CELL_SIZES.THIRTY_SECONDS
-          ? CELL_SIZES.TWO_POINT_FIVE_MINUTES
-          : prev.gridSize;
-      return { ...prev, dataset: ds, variables, gridSize };
-    });
+  function commit(mode: EFilterApplyMode) {
+    const next = filtersDraft.submit();
+    if (next !== null) applyFilters(next, mode);
+    return next !== null;
   }
 
-  function handleDraftClimatePeriodChange(value: string) {
-    const period = Object.values(CLIMATE_PERIODS).find((p) => p === value);
-    if (period === undefined) return;
-    if (period === CLIMATE_PERIODS.C1970_2000) {
-      setDraft((prev) => ({ ...prev, climatePeriod: period }));
-      return;
-    }
-    const restricted = new Set<string>(PERIOD_RESTRICTED_VARIABLES);
-    setDraft((prev) => {
-      const variables = prev.variables.filter((v) => !restricted.has(v));
-      const gridSize =
-        prev.gridSize === CELL_SIZES.THIRTY_SECONDS
-          ? CELL_SIZES.TWO_POINT_FIVE_MINUTES
-          : prev.gridSize;
-      return { ...prev, climatePeriod: period, variables, gridSize };
-    });
+  function handleApply() {
+    commit(EFilterApplyMode.APPLY);
   }
 
-  function handleDraftClimatePeriodAChange(value: string) {
-    const period = Object.values(CLIMATE_PERIODS).find((p) => p === value);
-    if (period !== undefined) setDraft((prev) => ({ ...prev, climatePeriodA: period }));
-  }
-
-  function handleDraftClimatePeriodBChange(value: string) {
-    const period = Object.values(CLIMATE_PERIODS).find((p) => p === value);
-    if (period !== undefined) setDraft((prev) => ({ ...prev, climatePeriodB: period }));
-  }
-
-  function handleDraftYearChange(year: number) {
-    setDraft((prev) => ({ ...prev, weatherYear: year }));
-    if (submitAttempted && errors["weatherYear"] !== undefined) {
-      setErrors({});
-    }
-  }
-
-  function handleDraftVariableToggle(v: string) {
-    setDraft((prev) => ({
-      ...prev,
-      variables: prev.variables.includes(v as (typeof prev.variables)[number])
-        ? prev.variables.filter((x) => x !== v)
-        : ([...prev.variables, v] as typeof prev.variables),
-    }));
-  }
-
-  function handleDraftGridSizeChange(size: TCellSize) {
-    setDraft((prev) => ({ ...prev, gridSize: size }));
-  }
-
-  function handleDraftMonthToggle(month: number) {
-    setDraft((prev) => {
-      const current = prev.months === "all" ? [] : prev.months;
-      const next = current.includes(month)
-        ? current.filter((m) => m !== month)
-        : [...current, month];
-      return { ...prev, months: next.length === 0 ? "all" : next };
-    });
-  }
-
-  function handleDraftSelectAllMonths() {
-    setDraft((prev) => ({ ...prev, months: "all" }));
-  }
-
-  function handleAddPeriod() {
-    if (
-      addPeriodYear === undefined ||
-      isNaN(addPeriodYear) ||
-      addPeriodYear < WEATHER_MIN_YEAR ||
-      addPeriodYear > WEATHER_MAX_YEAR
-    ) {
-      setAddPeriodError(
-        t("comparePeriods.weather.invalidYear", { min: WEATHER_MIN_YEAR, max: WEATHER_MAX_YEAR }),
-      );
-      return;
-    }
-    if (periods.includes(addPeriodYear)) {
-      setAddPeriodError(t("comparePeriods.weather.duplicateYear"));
-      return;
-    }
-    if (periods.length >= MAX_PERIODS) return;
-    setAddPeriodError(null);
-    setPeriods([...periods, addPeriodYear]);
-    setAddPeriodYear(undefined);
-  }
-
-  function handleRemovePeriod(year: number) {
-    if (periods.length <= MIN_PERIODS) return;
-    setPeriods(periods.filter((y) => y !== year));
-  }
-
-  function commitDraft(): boolean {
-    setSubmitAttempted(true);
-
-    const result = sidebarFiltersSchema.safeParse({
-      dataset: draft.dataset,
-      climatePeriod: draft.climatePeriod,
-      weatherYear: draft.weatherYear,
-    });
-
-    if (!result.success) {
-      const fieldErrors: TDraftErrors = {};
-      result.error.issues.forEach((err) => {
-        const field = err.path[0];
-        if (typeof field === "string") {
-          fieldErrors[field] = t(err.message, {
-            min: WEATHER_MIN_YEAR,
-            max: WEATHER_MAX_YEAR,
-          });
-        }
-      });
-      setErrors(fieldErrors);
-      return false;
-    }
-
-    setDataset(draft.dataset);
-    if (isComparePeriods) {
-      setClimatePeriodA(draft.climatePeriodA);
-      setClimatePeriodB(draft.climatePeriodB);
-    } else {
-      setClimatePeriod(draft.climatePeriod);
-    }
-    setWeatherYear(result.data.weatherYear);
-    draft.variables.forEach((v) => {
-      if (!variables.includes(v)) toggleVariable(v);
-    });
-    variables.forEach((v) => {
-      if (!draft.variables.includes(v)) toggleVariable(v);
-    });
-    setGridSize(draft.gridSize);
-    setMonths(draft.months);
-
-    setSubmitAttempted(false);
-    setErrors({});
-    return true;
-  }
-
-  function handleApplyAndClose() {
-    if (commitDraft()) {
-      onClose();
-    }
-  }
-
-  const draftSnapshot = JSON.stringify(draft);
-  const debouncedDraftSnapshot = useDebounce(draftSnapshot, AUTO_APPLY_DEBOUNCE_MS);
-
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    if (!autoApplyFilters || !settingsHydrated) return;
-    if (skipNextAutoApplyRef.current) {
-      skipNextAutoApplyRef.current = false;
-      return;
-    }
-    if (isTooMany) return;
-    commitDraft();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedDraftSnapshot]);
-  /* eslint-enable react-hooks/set-state-in-effect */
-
-  const isAllActive = draft.months === "all";
+  useAutoApply({
+    key: serializeFilters(draft).toString(),
+    delayMs: AUTO_APPLY_DEBOUNCE_MS,
+    shouldApply: autoApplyFilters && hasHydrated && filtersDraft.isDirty && !isApplyBlocked,
+    onApply: () => commit(EFilterApplyMode.QUICK),
+  });
 
   return (
-    <aside
-      className={`
-        flex w-64 shrink-0 flex-col overflow-hidden
-        border-r border-[var(--color-border)] bg-[var(--color-bg)]
-        fixed bottom-0 left-0 top-16 z-40
-        transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:static lg:top-auto lg:bottom-auto lg:z-auto lg:translate-x-0 lg:w-80
-      `}
-    >
+    <aside className={SIDEBAR_CLASS}>
       <div className="flex flex-1 flex-col overflow-y-auto p-4 gap-y-8">
         <CollapsibleSection title={t("sidebar.filters")} defaultOpen={true}>
-          {/* Dataset */}
-          <div>
-            <SectionLabel text={t("sidebar.sections.dataset")} />
-            <div className="flex flex-wrap gap-2">
-              {Object.values(DATASETS).map((ds) => (
-                <FilterChip
-                  key={ds}
-                  label={t(`sidebar.datasets.${ds}`)}
-                  isActive={mounted && draft.dataset === ds}
-                  onClick={() => handleDraftDatasetChange(ds)}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Climate Period */}
-          {mounted && draft.dataset === DATASETS.CLIMATE && isComparePeriods && (
-            <div className="flex flex-col gap-3">
-              <SectionLabel text={t("sidebar.sections.climatePeriod")} />
-              <div className="flex flex-col gap-1.5">
-                <DotLabel
-                  label={t("climateComparison.periodA")}
-                  dotColor={CLIMATE_COMPARISON_COLORS.A.tmax}
-                />
-                <Dropdown
-                  options={climatePeriodOptions}
-                  value={draft.climatePeriodA}
-                  onChange={handleDraftClimatePeriodAChange}
-                  className="w-full"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <DotLabel
-                  label={t("climateComparison.periodB")}
-                  dotColor={CLIMATE_COMPARISON_COLORS.B.tmax}
-                />
-                <Dropdown
-                  options={climatePeriodOptions}
-                  value={draft.climatePeriodB}
-                  onChange={handleDraftClimatePeriodBChange}
-                  className="w-full"
-                />
-              </div>
-              <p className="text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
-                {t("sidebar.notes.climateNormals")}
-              </p>
-            </div>
-          )}
-          {mounted && draft.dataset === DATASETS.CLIMATE && !isComparePeriods && (
-            <div>
-              <SectionLabel text={t("sidebar.sections.climatePeriod")} />
-              <Dropdown
-                options={climatePeriodOptions}
-                value={draft.climatePeriod}
-                onChange={handleDraftClimatePeriodChange}
-                className="w-full"
-              />
-              <p className="mt-1.5 text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
-                {t("sidebar.notes.climateNormals")}
-              </p>
-            </div>
-          )}
-
-          {/* Weather Year */}
-          {mounted && draft.dataset === DATASETS.WEATHER && (
-            <div className="flex flex-col gap-2">
-              <SectionLabel text={t("sidebar.sections.yearRange")} />
-              {isComparePeriods ? (
-                <>
-                  <div className="flex flex-wrap gap-2">
-                    {periods.map((year, i) => {
-                      const color = PERIOD_COLORS[i] ?? PERIOD_COLORS[0];
-                      return (
-                        <span
-                          key={year}
-                          className="inline-flex items-center gap-1.5 rounded-[20px] border-l-2 bg-[var(--color-bg-secondary)] px-3 py-1.5 text-[13px] font-medium text-[var(--color-text)]"
-                          style={{ borderLeftColor: color }}
-                        >
-                          <span style={{ color }}>●</span>
-                          <span style={{ color }}>{year}</span>
-                          {periods.length > MIN_PERIODS && (
-                            <button
-                              type="button"
-                              onClick={() => handleRemovePeriod(year)}
-                              className="ml-0.5 opacity-60 hover:opacity-100 leading-none text-[var(--color-text-secondary)]"
-                              aria-label={t("comparePeriods.weather.removePeriod", { year })}
-                            >
-                              ×
-                            </button>
-                          )}
-                        </span>
-                      );
-                    })}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1">
-                      <YearInput
-                        value={addPeriodYear}
-                        min={WEATHER_MIN_YEAR}
-                        max={WEATHER_MAX_YEAR}
-                        onChange={(year) => {
-                          setAddPeriodYear(year);
-                          setAddPeriodError(null);
-                        }}
-                        onEnter={handleAddPeriod}
-                        placeholder={`${WEATHER_MIN_YEAR}–${WEATHER_MAX_YEAR}`}
-                        disabled={periods.length >= MAX_PERIODS}
-                      />
-                    </div>
-                    <Button
-                      variant={EButtonVariant.SECONDARY}
-                      onClick={handleAddPeriod}
-                      disabled={periods.length >= MAX_PERIODS}
-                      className="shrink-0 px-3 py-2 text-[length:var(--font-base)]"
-                    >
-                      {t("comparePeriods.weather.addPeriod")}
-                    </Button>
-                  </div>
-                  <p className="text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
-                    {t("comparePeriods.weather.periodsCount", {
-                      count: periods.length,
-                      max: MAX_PERIODS,
-                    })}
-                  </p>
-                  {addPeriodError && (
-                    <p className="text-[length:var(--font-xs)] text-[var(--color-error)]">
-                      {addPeriodError}
-                    </p>
-                  )}
-                </>
-              ) : (
-                <>
-                  <YearInput
-                    value={draft.weatherYear}
-                    min={WEATHER_MIN_YEAR}
-                    max={WEATHER_MAX_YEAR}
-                    onChange={handleDraftYearChange}
-                    placeholder={`${WEATHER_MIN_YEAR}–${WEATHER_MAX_YEAR}`}
-                  />
-                  {errors["weatherYear"] !== undefined && errors["weatherYear"] !== "" && (
-                    <span className="text-[length:var(--font-xs)] font-medium text-[var(--color-error)]">
-                      {errors["weatherYear"]}
-                    </span>
-                  )}
-                  <p className="text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
-                    {t("sidebar.notes.weatherData")}
-                  </p>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Variables */}
-          <div>
-            <SectionLabel text={t("sidebar.sections.variables")} />
-            <div className="flex flex-wrap gap-2">
-              {(mounted && draft.dataset === DATASETS.WEATHER
-                ? WEATHER_VARIABLES
-                : CLIMATE_VARIABLES
-              ).map((v) => {
-                const isRestricted =
-                  mounted &&
-                  draft.dataset === DATASETS.CLIMATE &&
-                  (PERIOD_RESTRICTED_VARIABLES as readonly string[]).includes(v) &&
-                  (draft.climatePeriod !== CLIMATE_PERIODS.C1970_2000 || isHeatmapPage);
-
-                return (
-                  <FilterChip
-                    key={v}
-                    label={t(`sidebar.variables.${v}`)}
-                    isActive={draft.variables.includes(v)}
-                    disabled={isRestricted || isWalterLieth}
-                    onClick={() => handleDraftVariableToggle(v)}
-                  />
-                );
-              })}
-            </div>
-            {isWalterLieth && (
-              <p className="mt-1.5 text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
-                {t("chart.walterLiethTabUnavailable")}
-              </p>
-            )}
-            {draft.dataset === DATASETS.WEATHER && (
-              <p className="mt-1.5 text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
-                {t("sidebar.notes.weatherVariables")}
-              </p>
-            )}
-            {isHeatmapPage && draft.dataset === DATASETS.CLIMATE && (
-              <p className="mt-1.5 text-[11px] italic text-[var(--color-text-secondary)]">
-                {t("sidebar.notes.notAvailableHeatmap")}
-              </p>
-            )}
-          </div>
-
-          {/* Grid resolution */}
-          <div>
-            <CellSizeSelector
-              activeSize={draft.gridSize}
-              options={cellSizeOptions}
-              onSelect={handleDraftGridSizeChange}
+          <FilterUnavailableActionsContext.Provider value={unavailableActions}>
+            <FilterSections
+              keys={sectionKeys}
+              values={draft}
+              context={draftContext}
+              availablePeriods={availablePeriods}
+              weatherYearError={filtersDraft.weatherYearError}
+              cellCount={filtersDraft.cellCount}
+              isApplyBlocked={isApplyBlocked}
+              onChange={filtersDraft.setFilter}
+              onChangeMany={filtersDraft.setFilters}
             />
-            {isHeatmapPage && cellStatus !== null && cellCount !== null && (
-              <div className="mt-2 flex flex-col gap-1">
-                <span
-                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[length:var(--font-xs)] font-medium ${cellStatus.colorClass}`}
-                >
-                  {t(cellStatus.labelKey)}
-                  <span className="opacity-70">
-                    {t("sidebar.cellCount", {
-                      count: formatNumber(cellCount, { hasGrouping: true }),
-                    })}
-                  </span>
-                </span>
-                {isTooMany && (
-                  <p className="text-[length:var(--font-xs)] text-[var(--color-error)]">
-                    {t("sidebar.cellCount.tooManyError")}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Months */}
-          <div className={isHeatmapPage ? "pointer-events-none opacity-40" : ""}>
-            <SectionLabel text={t("sidebar.sections.months")} />
-            {isHeatmapPage && (
-              <p className="mb-1.5 text-[11px] italic text-[var(--color-text-secondary)]">
-                {t("sidebar.notes.notAvailableHeatmap")}
-              </p>
-            )}
-            <div className="flex flex-wrap gap-2">
-              <FilterChip
-                label={t("sidebar.months.all")}
-                isActive={isAllActive}
-                disabled={isWalterLieth}
-                onClick={handleDraftSelectAllMonths}
-              />
-              {Array.from({ length: 12 }, (_, i) => {
-                const monthNum = i + 1;
-                const isActive = !isAllActive && (draft.months as number[]).includes(monthNum);
-                return (
-                  <FilterChip
-                    key={monthNum}
-                    label={t(`months.${monthNum}`)}
-                    isActive={isActive}
-                    disabled={isWalterLieth}
-                    onClick={() => handleDraftMonthToggle(monthNum)}
-                  />
-                );
-              })}
-            </div>
-            {isWalterLieth && (
-              <p className="mt-1.5 text-[length:var(--font-xs)] text-[var(--color-text-secondary)]">
-                {t("chart.walterLiethTabUnavailable")}
-              </p>
-            )}
-          </div>
+          </FilterUnavailableActionsContext.Provider>
         </CollapsibleSection>
-
-        <CollapsibleSection
-          title={t("sidebar.settings")}
-          defaultOpen={false}
-          withDivider
-          gapBetweenOptions="gap-2"
-        >
-          <ToggleSwitch
-            label={t("sidebar.autoScroll")}
-            checked={autoScroll}
-            onChange={toggleAutoScroll}
-          />
-          <ToggleSwitch
-            label={t("sidebar.syncCity")}
-            checked={syncCity}
-            onChange={toggleSyncCity}
-          />
-          <ToggleSwitch
-            label={t("sidebar.autoApplyFilters")}
-            checked={autoApplyFilters}
-            onChange={toggleAutoApplyFilters}
-          />
-          <AnimationSettings />
-        </CollapsibleSection>
+        <FilterSettings />
       </div>
 
       <div className="shrink-0 border-t border-[var(--color-border)] p-4">
         <Button
           variant={EButtonVariant.PRIMARY}
-          onClick={handleApplyAndClose}
-          disabled={isTooMany}
+          onClick={handleApply}
+          disabled={isApplyBlocked}
           className="w-full py-2 text-[length:var(--font-base)]"
         >
           {t("sidebar.applyFilters")}

@@ -5,7 +5,6 @@ export type TMultiPeriodStatsTableProps = {
   periodsData: TMultiPeriodEntry[];
   loadingPeriods: number[];
   altitude: number | null;
-  periodColors: readonly string[];
 };
 
 /** The unit templates a table value is shown with ("{value}°C"). */

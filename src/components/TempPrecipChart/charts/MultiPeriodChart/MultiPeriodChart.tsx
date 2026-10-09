@@ -5,6 +5,7 @@ import {
   CHART_LINE_DASH,
   MONTH_NAMES,
   MISSING_VALUE_LABEL,
+  OVERLAY_DIM_OPACITY,
   TOOLTIP_DIGITS,
 } from "@/constants";
 import { getMonthLabelFormat, getSeriesLegendItems } from "@/utils";
@@ -14,7 +15,8 @@ import { Bar, ComposedChart, Line, ResponsiveContainer, Tooltip } from "recharts
 import { useSeriesToggleMotion } from "../../hooks/useSeriesToggleMotion";
 import { PrecipBarShape, StandardChartAxes } from "../../components";
 import type { TDotRendererProps } from "../../TempPrecipChart.type";
-import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle, periodColor } from "../../utils";
+import { getYearColor } from "@/utils/yearColor.util";
+import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle } from "../../utils";
 import type { TMultiPeriodChartProps } from "./MultiPeriodChart.type";
 
 export function MultiPeriodChart({
@@ -24,8 +26,9 @@ export function MultiPeriodChart({
   scales,
   rightMax,
   selectedMonths,
-  periodColors,
+  years,
   hiddenPeriods = [],
+  highlightedYear = null,
 }: TMultiPeriodChartProps) {
   const t = useTranslations();
   const legendLabels = useLegendLabels();
@@ -41,7 +44,7 @@ export function MultiPeriodChart({
     return idx >= 0 ? t(`months.${idx + 1}`) : String(v);
   }
 
-  function makeDot(color: string, isSeriesVisible: boolean) {
+  function makeDot(color: string, seriesOpacity: number) {
     function DotRenderer({ cx = 0, cy = 0, index = -1 }: TDotRendererProps) {
       const month = index >= 0 ? index + 1 : -1;
       const isSelected =
@@ -56,7 +59,7 @@ export function MultiPeriodChart({
           // * the series color — Recharts passes a white default fill, never wanted here
           fill={color}
           stroke="none"
-          style={buildOpacityFadeStyle(isSeriesVisible ? opacity : 0)}
+          style={buildOpacityFadeStyle(seriesOpacity * opacity)}
         />
       );
     }
@@ -69,6 +72,11 @@ export function MultiPeriodChart({
         <div className="h-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
+              // * Recharts places series (bars side by side, lines, tooltip rows) in the order
+              // * they first mount — a year whose data lands late would go last. A new set of
+              // * years remounts the chart, so every series mounts in the year list's order;
+              // * chips only hide series, which keeps their places
+              key={multiPeriodData.map(({ year }) => year).join("|")}
               data={chartData}
               margin={CHART_PLOT.MARGIN}
               barGap={2}
@@ -101,9 +109,14 @@ export function MultiPeriodChart({
                 }}
               />
 
-              {multiPeriodData.flatMap(({ year }, i) => {
-                const color = periodColor(i, periodColors);
+              {multiPeriodData.flatMap(({ year }) => {
+                const color = getYearColor(year, years);
                 const hidden = hiddenPeriods.includes(year);
+                // * a highlighted year dims the others
+                const emphasis =
+                  highlightedYear !== null && highlightedYear !== year ? OVERLAY_DIM_OPACITY : 1;
+                const tmaxOpacity = visible.tmax ? emphasis : 0;
+                const tminOpacity = visible.tmin ? emphasis : 0;
                 const series = [];
                 series.push(
                   <Bar
@@ -115,6 +128,7 @@ export function MultiPeriodChart({
                     }
                     name={`${year} — ${t("chart.precipitation")}`}
                     fill={color}
+                    fillOpacity={emphasis}
                     minPointSize={0}
                     hide={hidden || hidePrecBar}
                     animationDuration={seriesMotion.toggleMs}
@@ -131,10 +145,10 @@ export function MultiPeriodChart({
                     name={`${year} — ${t("chart.maxTemperature")}`}
                     stroke={color}
                     strokeWidth={2}
-                    dot={makeDot(color, visible.tmax)}
-                    activeDot={{ r: 4, style: buildOpacityFadeStyle(visible.tmax ? 1 : 0) }}
+                    dot={makeDot(color, tmaxOpacity)}
+                    activeDot={{ r: 4, style: buildOpacityFadeStyle(tmaxOpacity) }}
                     hide={hidden || hideTmaxLine}
-                    style={buildStrokeOpacityFadeStyle(visible.tmax ? 1 : 0)}
+                    style={buildStrokeOpacityFadeStyle(tmaxOpacity)}
                   />,
                 );
                 series.push(
@@ -148,10 +162,10 @@ export function MultiPeriodChart({
                     stroke={color}
                     strokeWidth={2}
                     strokeDasharray={CHART_LINE_DASH.SERIES.tmin}
-                    dot={makeDot(color, visible.tmin)}
-                    activeDot={{ r: 3, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
+                    dot={makeDot(color, tminOpacity)}
+                    activeDot={{ r: 3, style: buildOpacityFadeStyle(tminOpacity) }}
                     hide={hidden || hideTminLine}
-                    style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
+                    style={buildStrokeOpacityFadeStyle(tminOpacity)}
                   />,
                 );
                 return series;
@@ -163,12 +177,8 @@ export function MultiPeriodChart({
       <ChartLegend
         items={getSeriesLegendItems({
           labels: legendLabels,
-          series: multiPeriodData.map(({ year }, i) => ({
-            key: String(year),
-            label: String(year),
-            color: periodColor(i, periodColors),
-            isHidden: hiddenPeriods.includes(year),
-          })),
+          // * the year chips above name the years — the legend keeps line and bar styles only
+          series: [],
           visible,
           neutral: CHART_LEGEND.NEUTRAL_COLOR,
           // * years are compared by max / min — no mean line

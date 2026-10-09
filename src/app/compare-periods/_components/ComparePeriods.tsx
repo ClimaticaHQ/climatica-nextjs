@@ -18,16 +18,21 @@ import {
   useGetComparePeriods,
   useGetDatasetVersion,
   useGetMultiPeriodData,
+  useFilters,
   usePersistedCity,
-  usePersistedClimatePeriods,
   usePersistedComparisonCities,
-  usePersistedPeriods,
   useUrlStateSync,
 } from "@/hooks";
-import { useFiltersStore, useSettingsStore } from "@/stores";
+import { useSettingsStore } from "@/stores";
 import type { ECompareLayout, EWalterLiethShading } from "@/enums";
-import type { TChartMode, TCity, TExpandedPanel } from "@/types";
+import type { TChartMode, TCity, TExpandedPanel, TPair } from "@/types";
 import { scrollToSection } from "@/utils";
+import {
+  getDefaultShownYears,
+  isSameYears,
+  resolveShownYears,
+  resolveYearPair,
+} from "@/utils/pair.util";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
@@ -42,15 +47,19 @@ export function ComparePeriods() {
   const t = useTranslations();
   const { city, selectCity: selectCityA } = usePersistedCity();
   const { selectCityA: selectCompareCityA } = usePersistedComparisonCities();
-  const { gridSize, dataset, months, variables } = useFiltersStore();
+  const {
+    gridSize,
+    dataset,
+    months,
+    variables,
+    climatePeriodA,
+    climatePeriodB,
+    weatherPeriods: periods,
+  } = useFilters();
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
   const selectedMonths = Array.isArray(months) ? months : null;
 
   const cityA = city;
-
-  const { climatePeriodA, climatePeriodB, setClimatePeriodA, setClimatePeriodB } =
-    usePersistedClimatePeriods();
-  const [periods, setPeriods] = usePersistedPeriods();
 
   const [layout, setLayout] = useState<ECompareLayout>(DEFAULT_COMPARE_LAYOUT);
   const [wlShading, setWlShading] = useState<EWalterLiethShading>(
@@ -59,6 +68,32 @@ export function ComparePeriods() {
   const [chartMode, setChartMode] = useState<TChartMode>(DEFAULT_CHART_MODE);
   // * kept while overlay is shown, so going back to split restores it
   const [expanded, setExpanded] = useState<TExpandedPanel>(null);
+  // * weather years: the pair the reader picked (or a link carried); what's drawn is resolved
+  // * against the compared years, so a removed year falls back
+  const [requestedYearPair, setRequestedYearPair] = useState<TPair<number> | null>(null);
+  const yearPair =
+    dataset === DATASETS.WEATHER ? resolveYearPair(periods, requestedYearPair) : null;
+  const isDefaultYearPair =
+    yearPair === null || (yearPair[0] === periods[0] && yearPair[1] === periods[1]);
+  // * overlay: the years the reader turned on; resolved the same way (removed ones dropped)
+  // * until a chip is touched each chart type shows its default (WL the pair, standard all years);
+  // * a set picked by hand then sticks in both, and is the only one the URL carries
+  const [requestedShownYears, setRequestedShownYears] = useState<readonly number[] | null>(null);
+  const defaultShownYears = getDefaultShownYears({
+    years: periods,
+    pair: yearPair,
+    isWalterLieth: chartMode === "walter-lieth",
+  });
+  const shownYears = resolveShownYears({
+    years: periods,
+    requested: requestedShownYears,
+    defaultYears: defaultShownYears,
+  });
+  const hasPickedShownYears =
+    requestedShownYears !== null && periods.some((year) => requestedShownYears.includes(year));
+  // * a pick that is the current default is "follow the default"
+  const handleShownYearsChange = (next: readonly number[]) =>
+    setRequestedShownYears(isSameYears(next, defaultShownYears) ? null : next);
 
   const { pushUrlState, shareUrl } = useUrlStateSync({
     schema: COMPARE_PERIODS_URL_SCHEMA,
@@ -68,10 +103,9 @@ export function ComparePeriods() {
       chartMode,
       expanded,
       city: cityA,
-      comparePeriods:
-        dataset === DATASETS.CLIMATE
-          ? { dataset, climatePeriodA, climatePeriodB }
-          : { dataset, weatherPeriods: periods },
+      // * the drawn pair, so a link opens it — the default (first two years) left out
+      yearPair: isDefaultYearPair ? null : yearPair,
+      shownYears: dataset === DATASETS.WEATHER && hasPickedShownYears ? shownYears : null,
     },
     onRestore(parsed) {
       if (parsed.city) selectCityA(parsed.city);
@@ -80,23 +114,18 @@ export function ComparePeriods() {
       setWlShading(parsed.wlShading ?? WALTER_LIETH_COMPARISON.DEFAULT_SHADING);
       setChartMode(parsed.chartMode ?? DEFAULT_CHART_MODE);
       setExpanded(parsed.expanded ?? null);
-      if (parsed.comparePeriods) {
-        useFiltersStore.getState().actions.setDataset(parsed.comparePeriods.dataset);
-        if (parsed.comparePeriods.dataset === DATASETS.CLIMATE) {
-          setClimatePeriodA(parsed.comparePeriods.climatePeriodA);
-          setClimatePeriodB(parsed.comparePeriods.climatePeriodB);
-        } else {
-          setPeriods(parsed.comparePeriods.weatherPeriods);
-        }
-      }
+      setRequestedYearPair(parsed.yearPair ?? null);
+      setRequestedShownYears(parsed.shownYears ?? null);
     },
   });
 
+  // * the <title>: the page's name (the navbar's, the heading's) until a city is chosen
+  const pageTitle = t("pages.comparePeriods.title");
   useEffect(() => {
     const cityLabel = cityA.label;
     const validCity = cityLabel && !cityLabel.startsWith("url:") && !/^Q\d+$/.test(cityLabel);
     if (!validCity) {
-      document.title = `Compare Periods | ${APP_TITLE}`;
+      document.title = `${pageTitle} | ${APP_TITLE}`;
       return;
     }
     const varLabel = variables[0] ? (VARIABLE_LABELS[variables[0]] ?? variables[0]) : "";
@@ -107,7 +136,7 @@ export function ComparePeriods() {
     } else {
       document.title = `${cityLabel} · ${varLabel} ${periods.join(", ")} | ${APP_TITLE}`;
     }
-  }, [cityA.label, dataset, climatePeriodA, climatePeriodB, periods, variables]);
+  }, [cityA.label, dataset, climatePeriodA, climatePeriodB, periods, variables, pageTitle]);
 
   const {
     dataA,
@@ -192,7 +221,7 @@ export function ComparePeriods() {
       altitude={altitude}
       datasetAttribution={datasetAttribution}
       dataset={dataset}
-      autoGrid={gridSize}
+      gridSize={gridSize}
       selectedMonths={selectedMonths}
       variables={variables}
       shareUrl={shareUrl}
@@ -217,8 +246,13 @@ export function ComparePeriods() {
       wlShading={wlShading}
       onWlShadingChange={setWlShading}
       chartMode={chartMode}
-      onChartModeChange={setChartMode}
       panelExpansion={{ expanded, onExpandedChange: setExpanded }}
+      years={{
+        pair: yearPair,
+        onPairChange: setRequestedYearPair,
+        shown: shownYears,
+        onShownChange: handleShownYearsChange,
+      }}
     />
   );
 }

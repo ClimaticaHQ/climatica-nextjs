@@ -11,12 +11,17 @@ export function SplitPanelHeader({ series, slots }: TSplitPanelHeaderProps) {
   return (
     <figcaption className={C.FRAME}>
       <div className={C.TITLE_BLOCK}>
-        <p className={C.NAME_ROW}>
-          <SeriesMarker id={series.id} />
-          <span className={C.NAME} title={series.label}>
-            {series.label}
-          </span>
-        </p>
+        <div className={C.NAME_ROW}>
+          {/* * a picker in place of the name shows the colour dot itself */}
+          {slots?.name ?? (
+            <>
+              <SeriesMarker id={series.id} color={series.markerColor} />
+              <span className={C.NAME} title={series.label}>
+                {series.label}
+              </span>
+            </>
+          )}
+        </div>
         <p className={C.SUBTITLE}>{getPanelSubtitle(series)}</p>
       </div>
       {slots?.actions}

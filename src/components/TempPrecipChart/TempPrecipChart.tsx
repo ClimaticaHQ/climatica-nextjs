@@ -22,17 +22,40 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
   const chart = useTempPrecipChart(props);
   const subtitleText = useSubtitleText(props.subtitle);
   const syncId = useId();
-  const { seriesSingle, comparison } = useChartSeries({ chartProps: props, chart, subtitleText });
+  const { seriesSingle, seriesYears, comparison } = useChartSeries({
+    chartProps: props,
+    chart,
+    subtitleText,
+  });
   const layout = props.layout ?? DEFAULT_COMPARE_LAYOUT;
   // * in the split layout the panels flash, not the card around them
   const isSplit = chart.isCompare && layout === ECompareLayout.SPLIT;
 
   if (!chart.hasData) return null;
 
-  const canUseWalterLieth = props.showWalterLiethToggle !== false && !chart.isMultiPeriod;
-  const isWalterLieth = canUseWalterLieth && chartMode === "walter-lieth";
+  // * both datasets draw it — Weather as a single year, Compare Periods one diagram per year
+  const isWalterLieth = chartMode === "walter-lieth";
+  // * weather years overlaid in the standard chart: the variable chips sit under the year chips
+  const hasVariablesWithYears =
+    chart.isMultiPeriod && layout === ECompareLayout.OVERLAY && !isWalterLieth;
   // * kept across chart types; overlay ignores it, going back to split restores it
   const expansion = props.panelExpansion ?? NO_PANEL_EXPANSION;
+
+  const body = (
+    <ChartBody
+      chartProps={props}
+      chart={chart}
+      seriesSingle={seriesSingle}
+      seriesYears={seriesYears}
+      comparison={comparison}
+      visible={visible}
+      onVisibleChange={setVisible}
+      isWalterLieth={isWalterLieth}
+      layout={layout}
+      syncId={syncId}
+      expansion={expansion}
+    />
+  );
 
   return (
     <Card
@@ -47,35 +70,25 @@ export function TempPrecipChart(props: TTempPrecipChartProps) {
         chartProps={props}
         chartMode={chartMode}
         isWalterLieth={isWalterLieth}
-        canUseWalterLieth={canUseWalterLieth}
         isCompare={chart.isCompare}
+        hasLayout={chart.isCompare || chart.isMultiPeriod}
         layout={layout}
         subtitleText={subtitleText}
       />
-      <SecondaryControls
-        isWalterLieth={isWalterLieth}
-        isOverlay={chart.isCompare && layout === ECompareLayout.OVERLAY}
-        comparison={comparison}
-        shading={props.wlShading ?? WALTER_LIETH_COMPARISON.DEFAULT_SHADING}
-        onShadingChange={(shading) => props.onWlShadingChange?.(shading)}
-        visible={visible}
-        variables={props.variables}
-        onVisibleChange={setVisible}
-      />
-
-      <DataUpdateFade>
-        <ChartBody
-          chartProps={props}
-          chart={chart}
-          seriesSingle={seriesSingle}
-          comparison={comparison}
-          visible={visible}
+      {!hasVariablesWithYears && (
+        <SecondaryControls
           isWalterLieth={isWalterLieth}
-          layout={layout}
-          syncId={syncId}
-          expansion={expansion}
+          isOverlay={chart.isCompare && layout === ECompareLayout.OVERLAY}
+          comparison={comparison}
+          shading={props.wlShading ?? WALTER_LIETH_COMPARISON.DEFAULT_SHADING}
+          onShadingChange={(shading) => props.onWlShadingChange?.(shading)}
+          visible={visible}
+          variables={props.variables}
+          onVisibleChange={setVisible}
         />
-      </DataUpdateFade>
+      )}
+
+      <DataUpdateFade>{body}</DataUpdateFade>
     </Card>
   );
 }

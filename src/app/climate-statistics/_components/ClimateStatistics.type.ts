@@ -6,8 +6,6 @@ import type {
   TCity,
   TCoordinates,
   TDatasetAttribution,
-  TDatasetPeriodUrlValue,
-  TMonthFilter,
   TMonthlyTemperature,
   TVariable,
 } from "@/types";
@@ -15,10 +13,6 @@ import type { RefObject } from "react";
 
 export type TClimateStatisticsUrlState = {
   city: TCity;
-  datasetPeriod: TDatasetPeriodUrlValue;
-  variables: TVariable[];
-  gridSize: TCellSize;
-  months: TMonthFilter;
   chartMode: TChartMode;
 };
 
@@ -47,7 +41,6 @@ export type TClimateStatisticsViewProps = {
   onClearLocationError: () => void;
   /** URL state: shared links open in the same chart mode */
   chartMode: TChartMode;
-  onChartModeChange: (mode: TChartMode) => void;
 };
 
 export type TClimateStats = {

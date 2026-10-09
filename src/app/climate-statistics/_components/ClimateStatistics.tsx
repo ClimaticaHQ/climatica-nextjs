@@ -17,9 +17,10 @@ import {
   usePersistedCity,
   usePersistedComparisonCities,
   useResolveCityByCoordinates,
+  useFilters,
   useUrlStateSync,
 } from "@/hooks";
-import { useFiltersStore, useSettingsStore } from "@/stores";
+import { useSettingsStore } from "@/stores";
 import type { TChartMode, TChartSubtitle, TCity } from "@/types";
 import { scrollToSection, getLocationName } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -42,7 +43,7 @@ export function ClimateStatistics() {
   const userSelectedRef = useRef(false);
   const chartSectionRef = useRef<HTMLDivElement>(null);
 
-  const { dataset, climatePeriod, weatherYear, gridSize, months, variables } = useFiltersStore();
+  const { dataset, climatePeriod, weatherYear, gridSize, months, variables } = useFilters();
   const selectedMonths: number[] | null = Array.isArray(months) ? months : null;
 
   useEffect(() => {
@@ -71,11 +72,12 @@ export function ClimateStatistics() {
     },
   });
 
-  // Document title
+  // * the <title>: the page's name (the navbar's, the heading's) until a city is chosen
+  const pageTitle = t("pages.climateStatistics.title");
   useEffect(() => {
     const cityStr = chartCityName || selectedCity.label.trim();
     if (!cityStr) {
-      document.title = `City Climate | ${APP_TITLE}`;
+      document.title = `${pageTitle} | ${APP_TITLE}`;
       return;
     }
     const varLabel = variables[0] ? (VARIABLE_LABELS[variables[0]] ?? variables[0]) : "";
@@ -84,7 +86,15 @@ export function ClimateStatistics() {
         ? (CLIMATE_PERIOD_LABELS[climatePeriod] ?? climatePeriod)
         : String(weatherYear);
     document.title = `${cityStr} · ${varLabel} ${periodStr} | ${APP_TITLE}`;
-  }, [chartCityName, selectedCity.label, variables, dataset, climatePeriod, weatherYear]);
+  }, [
+    chartCityName,
+    selectedCity.label,
+    variables,
+    dataset,
+    climatePeriod,
+    weatherYear,
+    pageTitle,
+  ]);
 
   function handleCitySelect(city: TCity) {
     userSelectedRef.current = true;
@@ -202,7 +212,6 @@ export function ClimateStatistics() {
       onClearLocationError={clearLocationError}
       chartSectionRef={chartSectionRef}
       chartMode={chartMode}
-      onChartModeChange={setChartMode}
     />
   );
 }
