@@ -14,12 +14,14 @@ import type {
   TStandardSplitLegendArgs,
   TWalterLiethExportBox,
   TWalterLiethSeriesInput,
+  TWeatherYearsExport,
 } from "@/types";
 import { getStandardSplitLegendItems } from "@/utils";
 import { buildGridAndAxes, computeNiceAxisTicks } from "./buildExportSvg.util";
 import { buildGroupedBars, buildMonthLabels, buildSeriesLines } from "./compareChartParts.util";
 import { createLinearScale, monthBandX } from "./scales.util";
-import { buildComparisonPanels } from "./splitPanelExport.util";
+import { getDrawnYearSeries } from "./buildCompareWalterLiethSvg.util";
+import { buildComparisonPanels, buildPanelGrid } from "./splitPanelExport.util";
 import { buildExportLegend } from "./legendExport.util";
 import { buildExportValuesRows } from "./monthlyValuesExport.util";
 
@@ -129,6 +131,68 @@ export function buildStandardSplitBody(
     comparison,
     colors,
     y: panels.bottom + EXPORT_LEGEND.GAP,
+  });
+
+  return { body: panels.body + legend.svg, bottom: legend.bottom };
+}
+
+/**
+ * Weather years side by side in the standard chart, as on screen: the pair's two panels, each
+ * year in the single-city palette (the header names the year) on the shared scales.
+ */
+export function buildStandardYearPairBody(
+  payload: TCompareExportPayload,
+  years: TWeatherYearsExport,
+  colors: TExportChartColors,
+  top: number,
+): TCompareWalterLiethBody {
+  const single = { tmax: colors.tmax, tmin: colors.tmin, tavg: colors.tavg, prec: colors.humid };
+  // * a panel is a single-city chart: its mean line too, when its chip is on
+  const panelPayload = { ...payload, showTavgLine: true };
+  const exportSeriesOf = (series: TWalterLiethSeriesInput): TCompareExportSeries | undefined => {
+    const exportSeries = payload.series.find(({ label }) => label === series.label);
+    return exportSeries ? { ...exportSeries, colors: single } : undefined;
+  };
+  const panels = buildPanelGrid({
+    series: getDrawnYearSeries(years),
+    colors,
+    top,
+    renderPlot: (series) => (box) => {
+      const exportSeries = exportSeriesOf(series);
+      return exportSeries ? buildStandardPlot(panelPayload, exportSeries, colors, box) : "";
+    },
+    valuesRows: (series) => {
+      const exportSeries = exportSeriesOf(series);
+      return exportSeries
+        ? buildExportValuesRows({
+            series: [
+              {
+                key: series.label,
+                label: series.label,
+                color: colors.text,
+                data: exportSeries.data,
+              },
+            ],
+            colors,
+            locale: payload.labels.locale,
+          })
+        : [];
+    },
+  });
+  // * both panels share one palette: each variable once
+  const legend = buildExportLegend({
+    items: getStandardSplitLegendItems({
+      labels: payload.labels.seriesLabels,
+      colorsA: single,
+      colorsB: single,
+      visible: payload.visibleSeries,
+      shown: EWalterLiethSeriesId.A,
+    }),
+    y: panels.bottom + EXPORT_LEGEND.GAP,
+    left: contentLeft,
+    width: contentWidth,
+    textColor: colors.textSecondary,
+    idPrefix: "std-years-legend",
   });
 
   return { body: panels.body + legend.svg, bottom: legend.bottom };

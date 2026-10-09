@@ -40,6 +40,26 @@ export const getValuesTableTop = (plotBottom: number, monthLabelOffset: number) 
   plotBottom + monthLabelOffset + V.GAP_ABOVE;
 
 /**
+ * The values' font size: the width's own size, smaller where the longest value wouldn't fit
+ * its month's column with a gap — so neighbours never run together ("−16.0−16.0").
+ */
+export function fitValueFontSize(
+  rows: readonly TMonthlyValuesRow[],
+  monthWidth: number,
+  preferred: number,
+) {
+  const longest = Math.max(
+    0,
+    ...rows.flatMap(({ cells }) =>
+      cells.flatMap((entries) => entries.map(({ text }) => text.length)),
+    ),
+  );
+  if (longest === 0) return preferred;
+  const fitting = (monthWidth - V.FIT.CELL_GAP) / (longest * V.FIT.CHAR_WIDTH_EM);
+  return Math.max(V.FIT.MIN_FONT_SIZE, Math.min(preferred, Math.floor(fitting * 2) / 2));
+}
+
+/**
  * String twin of MonthlyValuesTable: a framed two-row table under a plot — the unit in its
  * color in the left gutter, one column per month exactly under that month of the plot, A's
  * value above B's in overlay.
@@ -56,7 +76,11 @@ export function buildMonthlyValuesSvg({
   const monthWidth = (span.right - span.left) / monthCount;
   const left = span.left - gutter;
   const width = span.right - span.left + gutter * 2;
-  const fontSize = width >= V.WIDE_MIN_WIDTH ? V.VALUE_FONT_SIZE.WIDE : V.VALUE_FONT_SIZE.NARROW;
+  const fontSize = fitValueFontSize(
+    rows,
+    monthWidth,
+    width >= V.WIDE_MIN_WIDTH ? V.VALUE_FONT_SIZE.WIDE : V.VALUE_FONT_SIZE.NARROW,
+  );
 
   let rowTop = top;
   const body = rows

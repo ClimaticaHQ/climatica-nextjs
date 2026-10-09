@@ -14,6 +14,7 @@ import type {
   TExportChartColors,
   TExportPosition,
   TMonthlyValuesRow,
+  TPanelGridArgs,
   TPlotWithValuesArgs,
   TSplitPanelArgs,
   TWalterLiethExportPatternIds,
@@ -35,7 +36,8 @@ export const patternIdsOf = (prefix: string): TWalterLiethExportPatternIds => ({
 });
 
 export const seriesColor = (series: TWalterLiethSeriesInput, colors: TExportChartColors) =>
-  series.id === EWalterLiethSeriesId.A ? colors.wlSeriesA : colors.wlSeriesB;
+  series.markerColor ??
+  (series.id === EWalterLiethSeriesId.A ? colors.wlSeriesA : colors.wlSeriesB);
 
 /** The series the split export draws, left to right: the expanded one alone, or both. */
 export function getExportPanels({ expanded, seriesA, seriesB }: TComparisonExport) {
@@ -163,4 +165,45 @@ export function buildComparisonPanels({
     )
     .join("");
   return { body, bottom: top + panelHeight };
+}
+
+/**
+ * Any number of panels, two to a row as on the page (Compare Periods' weather years); each
+ * row's cards as tall as its tallest, so the plots and strips line up across the row.
+ */
+export function buildPanelGrid({
+  series,
+  colors,
+  top,
+  renderPlot,
+  valuesRows,
+}: TPanelGridArgs): TCompareWalterLiethBody {
+  const panelWidth = (CONTENT_WIDTH - W.splitGap) / 2;
+  const rows = Array.from({ length: Math.ceil(series.length / 2) }, (_, i) =>
+    series.slice(i * 2, i * 2 + 2),
+  );
+  return rows.reduce<TCompareWalterLiethBody>(
+    ({ body, bottom }, row, i) => {
+      const rowTop = i === 0 ? top : bottom + W.splitGap;
+      const tallest = row.map(valuesRows).reduce((a, b) => (b.length > a.length ? b : a));
+      const panelHeight =
+        W.panelPadding * 2 + W.panelHeaderHeight + W.splitPlotHeight + getBelowPlotHeight(tallest);
+      const cards = row.map((panel, j) =>
+        buildSplitPanel({
+          series: panel,
+          context: {
+            colors,
+            left: CL.paddingX + (panelWidth + W.splitGap) * j,
+            top: rowTop,
+            panelWidth,
+            panelHeight,
+          },
+          renderPlot: renderPlot(panel),
+          valuesRows: valuesRows(panel),
+        }),
+      );
+      return { body: body + cards.join(""), bottom: rowTop + panelHeight };
+    },
+    { body: "", bottom: top },
+  );
 }

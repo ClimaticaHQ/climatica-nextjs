@@ -28,8 +28,11 @@ import { buildMonthlyTableRows, getMonthlyTableVariables, getSeriesLegendItems }
 import { formatNumber } from "../../numberFormat.util";
 import { buildFooterTextLines } from "../shared/footerLines.util";
 import { buildGridAndAxes, computeNiceAxisTicks, escapeXml } from "./buildExportSvg.util";
-import { buildCompareWalterLiethBody } from "./buildCompareWalterLiethSvg.util";
-import { buildStandardSplitBody } from "./buildStandardSplitSvg.util";
+import {
+  buildCompareWalterLiethBody,
+  buildWeatherYearsWalterLiethBody,
+} from "./buildCompareWalterLiethSvg.util";
+import { buildStandardSplitBody, buildStandardYearPairBody } from "./buildStandardSplitSvg.util";
 import { buildExportLegend } from "./legendExport.util";
 import { buildGroupedBars, buildMonthLabels, buildSeriesLines } from "./compareChartParts.util";
 import { buildComparisonTableSvg } from "./comparisonTableExport.util";
@@ -277,9 +280,18 @@ function buildOverlayValues({
   });
 }
 
-/** The chart body the page shows: WL (split or overlay), standard split, or standard overlay. */
+/**
+ * The chart body the page shows: WL (split or overlay), standard split, or standard overlay —
+ * for weather years, of the years drawn (`payload` holds only those).
+ */
 function buildChartBody(payload: TCompareExportPayload, colors: TExportChartColors, top: number) {
-  const { comparison } = payload;
+  const { comparison, weatherYears } = payload;
+  if (weatherYears?.chartMode === "walter-lieth") {
+    return buildWeatherYearsWalterLiethBody(weatherYears, colors, top);
+  }
+  if (weatherYears?.layout === ECompareLayout.SPLIT) {
+    return buildStandardYearPairBody(payload, weatherYears, colors, top);
+  }
   if (comparison?.chartMode === "walter-lieth") {
     return buildCompareWalterLiethBody(comparison, colors, top);
   }
@@ -344,6 +356,21 @@ function buildTopTable(payload: TCompareExportPayload, colors: TExportChartColor
   return { svg: table.svg, chartTop: table.bottom + EXPORT_COMPARISON_TABLE.GAP_BELOW };
 }
 
+/** For weather years, the payload with only the series the screen draws (pair or shown years). */
+function getDrawnPayload(payload: TCompareExportPayload): TCompareExportPayload {
+  const { weatherYears } = payload;
+  if (!weatherYears) return payload;
+  return {
+    ...payload,
+    series: payload.series.filter(({ label }) => weatherYears.drawn.includes(Number(label))),
+  };
+}
+
+const hasTableBelow = ({ comparison, weatherYears }: TCompareExportPayload) =>
+  !comparison &&
+  (!weatherYears ||
+    (weatherYears.chartMode === "standard" && weatherYears.layout === ECompareLayout.OVERLAY));
+
 export function buildCompareExportSvg(
   payload: TCompareExportPayload,
   colors: TExportChartColors,
@@ -355,12 +382,15 @@ export function buildCompareExportSvg(
     layout: L,
   });
   // * every body sets its own height (panels, strips, legend rows); the footer follows it
+  // * the stats table keeps every year; the chart and its monthly table only the years drawn
   const top = buildTopTable(payload, colors);
-  const chartBody = buildChartBody(payload, colors, top.chartTop);
-  // * weather years (out of scope) keep their monthly table below the chart
-  const table = payload.comparison
-    ? { svg: "", bottom: chartBody.bottom }
-    : buildTable(payload, colors, chartBody.bottom + EXPORT_MONTHLY_TABLE.GAP_ABOVE);
+  const drawn = getDrawnPayload(payload);
+  const chartBody = buildChartBody(drawn, colors, top.chartTop);
+  // * the standard weather-years overlay keeps its monthly table below it; the rest carry their
+  // * values in each panel or under the overlay
+  const table = hasTableBelow(payload)
+    ? buildTable(drawn, colors, chartBody.bottom + EXPORT_MONTHLY_TABLE.GAP_ABOVE)
+    : { svg: "", bottom: chartBody.bottom };
   const footerY = table.bottom + W.footerGap;
   const height = footerY + footerLines.length * L.footerLineHeight + L.footerBottomMargin;
 
