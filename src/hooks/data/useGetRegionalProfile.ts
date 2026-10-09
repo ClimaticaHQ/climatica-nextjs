@@ -20,7 +20,7 @@ export function useGetRegionalProfile(
 ) {
   const hasSelection = bbox !== null || wkt !== null;
 
-  const { data, isLoading } = useQuery<TProfileResult, Error>({
+  const { data, isLoading, error } = useQuery<TProfileResult, Error>({
     queryKey: [
       "regional-profile",
       bbox?.north,
@@ -61,5 +61,7 @@ export function useGetRegionalProfile(
   return {
     profileData: data ?? null,
     isProfileLoading: hasSelection && enabled && isLoading,
+    // * a failed request is an error, never a profile — the panel isn't drawn from it
+    profileError: error ?? null,
   };
 }
