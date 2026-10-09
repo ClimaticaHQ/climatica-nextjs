@@ -3,7 +3,7 @@ import type {
   EFilterApplyMode,
   EFilterAvailability,
   EFilterChoice,
-  EFilterHintVariant,
+  EFilterNoteVariant,
   EFilterKey,
   EFilterNavigation,
   EFilterPlacement,
@@ -84,22 +84,22 @@ export type TFilterUnavailableLayout = {
   isDimmed: boolean;
   /** the explanation goes above the controls instead of below */
   isNoteFirst: boolean;
-  noteVariant: EFilterHintVariant;
+  noteVariant: EFilterNoteVariant;
   noteClassName: string;
 };
 
 export type TFilterUnavailableLayouts = Record<TFilterUnavailableReason, TFilterUnavailableLayout>;
 
 /** A note under a filter, translated where it's rendered. */
-export type TFilterHint = {
+export type TFilterNote = {
   textKey: string;
-  variant: EFilterHintVariant;
+  variant: EFilterNoteVariant;
 };
 
 /** A note shown under a filter when its context matches. */
-export type TFilterHintRule = {
+export type TFilterNoteRule = {
   isShown: (context: TFilterAvailabilityContext) => boolean;
-  hint: TFilterHint;
+  note: TFilterNote;
 };
 
 /** An option of a filter, and whether it can be picked in the current context. */
@@ -136,34 +136,8 @@ export type TFilterChip = {
   isDisabled: boolean;
 };
 
-/** What both mobile filter sheets get from the bar that owns them. */
-export type TFilterSheetProps = {
-  isOpen: boolean;
-  /** the applied filters — each opening starts from them */
-  filters: TFilters;
-  context: TFilterAvailabilityContext;
-  heatmapBbox: TBbox | null;
-  availablePeriods: readonly TClimatePeriod[] | null;
-  /** closed without applying — the edits are dropped */
-  onClose: () => void;
-  onApply: (next: TFilters) => void;
-};
-
-export type TFullFiltersSheetProps = TFilterSheetProps & {
-  /** leaves Walter-Lieth — offered next to its note on variables and months */
-  onSwitchToStandardChart: () => void;
-};
-
 /** Compare Periods' two climate periods, changed together (a swap is one change). */
 export type TClimatePeriodPair = Pick<
   TFilters,
   EFilterKey.CLIMATE_PERIOD_A | EFilterKey.CLIMATE_PERIOD_B
->;
-
-/** What can be done about a filter being disabled, per reason — e.g. leave Walter-Lieth. */
-export type TFilterUnavailableActions = Partial<Record<TFilterUnavailableReason, () => void>>;
-
-/** The label of the way out of each disabling reason that has one. */
-export type TFilterUnavailableActionLabels = Partial<
-  Record<TFilterUnavailableReason, (t: TTranslate) => string>
 >;
