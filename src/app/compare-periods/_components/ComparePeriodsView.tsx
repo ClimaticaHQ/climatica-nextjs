@@ -1,6 +1,6 @@
 "use client";
 import { getLaterPeriodSeries, getPeriodsUpdateSeries } from "./ComparePeriods.util";
-import { MobileFilterBar, PeriodSelectors } from "@/components/filters";
+import { FilterBar, ComparedPeriods } from "@/components/filters";
 import { ENumberSign, EStatValueSize, EWalterLiethSeriesId } from "@/enums";
 
 import type { TMiniMapLocation } from "@/components";
@@ -446,8 +446,8 @@ export function ComparePeriodsView({
               <MiniMap locations={miniMapLocations} activeIndex={0} onToggle={() => undefined} />
             )}{" "}
           </div>
-          <MobileFilterBar />
-          <PeriodSelectors />
+          <FilterBar />
+          <ComparedPeriods />
         </div>
 
         {error && !isLoading && <ErrorBanner message={error.message} />}

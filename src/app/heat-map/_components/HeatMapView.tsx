@@ -1,7 +1,7 @@
 "use client";
 
 import { LocationSearch } from "@/components";
-import { MobileFilterBar } from "@/components/filters";
+import { FilterBar } from "@/components/filters";
 import { useFormatNumber } from "@/hooks";
 import { DataUpdateProvider } from "@/components/DataUpdate";
 import { EmptyState, ErrorBanner, MapSkeleton, PageWrapper } from "@/components/UI";
@@ -242,7 +242,7 @@ export function HeatMapView({
             onLocate={onLocate}
             onClearLocationError={onClearLocationError}
           />
-          <MobileFilterBar />
+          <FilterBar />
         </div>
 
         <Toolbar

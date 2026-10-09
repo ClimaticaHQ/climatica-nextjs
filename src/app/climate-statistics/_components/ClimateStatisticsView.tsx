@@ -1,7 +1,7 @@
 "use client";
 
 import { LocationSearch, StatCard, TempPrecipChart, useTempPrecipChart } from "@/components";
-import { MobileFilterBar } from "@/components/filters";
+import { FilterBar } from "@/components/filters";
 import { DataUpdateProvider } from "@/components/DataUpdate";
 import {
   ChartSkeleton,
@@ -263,7 +263,7 @@ export function ClimateStatisticsView({
             onLocate={onLocate}
             onClearLocationError={onClearLocationError}
           />
-          <MobileFilterBar />
+          <FilterBar />
         </div>
 
         <section>

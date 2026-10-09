@@ -1,6 +1,6 @@
 "use client";
 import { EStatValueSize, EWalterLiethSeriesId } from "@/enums";
-import { MobileFilterBar } from "@/components/filters";
+import { FilterBar } from "@/components/filters";
 
 import type { TMiniMapLocation } from "@/components";
 import {
@@ -355,7 +355,7 @@ export function CompareCitiesView({
               onToggle={setActiveCity}
             />
           </div>
-          <MobileFilterBar />
+          <FilterBar />
         </div>
 
         {/* * around the table, the chart card and the difference cards: each flashes when the
