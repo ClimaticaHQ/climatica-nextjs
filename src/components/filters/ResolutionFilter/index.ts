@@ -1,1 +1,0 @@
-export { ResolutionFilter } from "./ResolutionFilter";

@@ -1,1 +1,0 @@
-export { WeatherPeriodList } from "./WeatherPeriodList";

@@ -1,4 +1,4 @@
-import { FilterChip } from "@/components/FilterChip";
+import { Chip } from "@/components/UI/Chip";
 import { ChipScroller } from "@/components/CompareYears/ChipScroller";
 import type { TVisibleSeries } from "@/types";
 import { useTranslations } from "next-intl";
@@ -33,7 +33,7 @@ export function VariableChips({
     const isUnavailable = variables !== undefined && key !== "tavg" && !storeVarSet.has(key);
     return (
       <div key={key} className="shrink-0">
-        <FilterChip
+        <Chip
           label={label}
           isActive={visible[key] && !isUnavailable}
           disabled={isUnavailable}

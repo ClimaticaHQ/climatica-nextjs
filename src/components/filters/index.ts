@@ -1,15 +1,3 @@
-export { DatasetFilter } from "./DatasetFilter";
-export { FilterHint } from "./FilterHint";
-export { FilterSection } from "./FilterSection";
-export { FilterSections } from "./FilterSections";
-export { FilterSettings } from "./FilterSettings";
-export { FilterUnavailableActionsContext, FilterUnavailableNote } from "./FilterUnavailableNote";
-export { FilterUrlSync } from "./FilterUrlSync";
-export { MonthsFilter } from "./MonthsFilter";
-export { PeriodFilter } from "./PeriodFilter";
-export { ResolutionFilter } from "./ResolutionFilter";
-export { VariablesFilter } from "./VariablesFilter";
-export { WeatherPeriodList } from "./WeatherPeriodList";
-export { WeatherPeriodsEditor } from "./WeatherPeriodsEditor";
-export * from "./mobile";
-export * from "./PeriodSelectors";
+export { FilterBar } from "./FilterBar";
+export { FiltersSidebar } from "./FiltersSidebar";
+export { ComparedPeriods } from "./sections/ComparedPeriods";

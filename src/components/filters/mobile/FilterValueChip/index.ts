@@ -1,1 +1,0 @@
-export { FilterValueChip } from "./FilterValueChip";

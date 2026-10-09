@@ -1,6 +1,6 @@
 "use client";
 
-import { FilterChip } from "@/components/FilterChip";
+import { Chip } from "@/components/UI/Chip";
 import { toggleFilterOption } from "@/utils/filters.util";
 import { useTranslations } from "next-intl";
 import { ChipScroller } from "../ChipScroller";
@@ -28,7 +28,7 @@ export function YearChips({ years, shown, onShownChange, onHighlight }: TYearChi
               onFocus={() => onHighlight(year)}
               onBlur={() => onHighlight(null)}
             >
-              <FilterChip
+              <Chip
                 label={String(year)}
                 dotColor={color}
                 isActive={shown.includes(year)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { SwapPeriodsButton } from "@/components/filters/PeriodSelectors/SwapPeriodsButton";
+import { SwapButton } from "@/components/UI/SwapButton";
 import { EPairSide } from "@/enums";
 import { setPairSide, swapPair } from "@/utils/pair.util";
 import { useTranslations } from "next-intl";
@@ -53,7 +53,10 @@ export function YearPairView({
           <Fragment key={side}>
             {index === 1 && canPick && (
               <div className={C.SWAP}>
-                <SwapPeriodsButton onClick={() => onPairChange(swapPair(pair))} />
+                <SwapButton
+                  label={t("comparePeriods.swapPeriods")}
+                  onClick={() => onPairChange(swapPair(pair))}
+                />
               </div>
             )}
             {renderPanel(pair[index], picker(side, index))}

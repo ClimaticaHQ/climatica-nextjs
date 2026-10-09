@@ -8,7 +8,7 @@ import { GLOBAL_CONFIG } from "@/libs/GlobalConfig";
 import { Link, usePathname } from "@/libs/I18nNavigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { FilterSettings } from "../filters/FilterSettings";
+import { Settings } from "../Settings/Settings";
 import { ClimaticaLogo, MoonIcon, SunIcon } from "../svg";
 
 function BurgerIcon({ isOpen }: { isOpen: boolean }) {
@@ -181,7 +181,7 @@ export function Topbar() {
 
           {/* * below lg the settings live here; from lg up they're in the sidebar */}
           <li className="mt-2 px-4">
-            <FilterSettings />
+            <Settings />
           </li>
         </ul>
       </div>

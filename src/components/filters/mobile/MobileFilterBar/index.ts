@@ -1,1 +1,0 @@
-export { MobileFilterBar } from "./MobileFilterBar";
