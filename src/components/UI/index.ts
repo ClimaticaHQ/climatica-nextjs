@@ -1,5 +1,6 @@
 export { Button } from "./Button";
 export { ChartSkeleton } from "./ChartSkeleton";
+export { Chip } from "./Chip";
 export { CollapsibleSection } from "./CollapsibleSection";
 export { ComparisonTableSkeleton } from "./ComparisonTableSkeleton";
 export { DotLabel } from "./DotLabel/DotLabel";
@@ -16,6 +17,7 @@ export { RangeSlider } from "./RangeSlider";
 export { SectionLabel } from "./SectionLabel";
 export { SidebarSkeleton } from "./SidebarSkeleton";
 export { StatCardsSkeleton } from "./StatCardsSkeleton";
+export { SwapButton } from "./SwapButton";
 export { TableSkeleton } from "./TableSkeleton";
 export { ToggleSwitch } from "./ToggleSwitch";
 export { TopbarSkeleton } from "./TopbarSkeleton";
