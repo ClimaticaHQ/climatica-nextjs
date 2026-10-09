@@ -1,5 +1,5 @@
 import { MOTION, NO_DATA_UPDATE } from "@/constants";
-import { useDelayedFlag } from "@/hooks";
+import { useDelayedFlag } from "@/hooks/ui/useDelayedFlag";
 import type { TDataUpdateState } from "@/types";
 import { reduceDataUpdate } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

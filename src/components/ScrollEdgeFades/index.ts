@@ -1,0 +1,1 @@
+export { ScrollEdgeFades } from "./ScrollEdgeFades";

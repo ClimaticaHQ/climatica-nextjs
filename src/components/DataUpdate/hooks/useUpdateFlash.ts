@@ -6,7 +6,7 @@ import {
   UPDATE_FLASH_VARIANT_ATTRIBUTE,
 } from "@/constants";
 import type { EUpdateFlashVariant } from "@/enums";
-import { useMotionPreference } from "@/hooks";
+import { useMotionPreference } from "@/hooks/ui/useMotionPreference";
 import type { TUpdateFlashKeys } from "@/types";
 import { getUpdateFlashKeyframe, shouldFlash } from "@/utils";
 import { useEffect, useRef } from "react";
