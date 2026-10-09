@@ -41,7 +41,7 @@ export default async function LocaleLayout({
       lang={locale}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      // * the motion settings, for src/styles/motion.css
+      // * the motion settings, for src/styles/animations.css
       style={MOTION_CSS_VARIABLES}
     >
       <body>

@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 /**
  * Marks <html> with `data-motion="off"` while motion is off (the setting, or reduced motion),
- * so motion.css stops every CSS transition and animation. Renders nothing.
+ * so animations.css stops every CSS transition and animation. Renders nothing.
  */
 export function MotionRoot() {
   const { isMotionEnabled } = useMotionPreference();

@@ -16,7 +16,6 @@ export { LocationSearch } from "./LocationSearch";
 export type { TLocationSearchProps } from "./LocationSearch";
 export { MultiPeriodStatsTable } from "./MultiPeriodStatsTable";
 export { PeriodSelectRow } from "./PeriodSelectRow";
-export { PeriodSlider } from "./PeriodSlider";
 export { SearchBar } from "./SearchBar";
 export { SegmentedControl } from "./SegmentedControl";
 export { StatCard } from "./StatCard";

@@ -235,7 +235,6 @@
     "30s": "30 s"
   },
   "filters": {
-    "period": "Zeitraum",
     "names": {
       "dataset": "Datensatz",
       "climatePeriod": "Klimaperiode",

@@ -12,7 +12,7 @@ import { DataUpdateContext } from "./DataUpdateContext";
  * first load and unchanged refetches don't count), and whether an update is loading — the
  * query's own isFetching, shown only past MOTION.UPDATE_LOADING_DELAY_MS. Announces each
  * update once in a polite live region. With motion off the loading state still shows, without
- * moving (motion.css).
+ * moving (animations.css).
  */
 export function DataUpdateProvider({
   series,

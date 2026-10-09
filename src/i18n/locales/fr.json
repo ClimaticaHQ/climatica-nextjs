@@ -235,7 +235,6 @@
     "30s": "30 s"
   },
   "filters": {
-    "period": "Période",
     "names": {
       "dataset": "Jeu de données",
       "climatePeriod": "Période climatique",
