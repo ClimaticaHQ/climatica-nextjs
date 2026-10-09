@@ -1,6 +1,5 @@
 {
   "topbar": {
-    "toggleFilters": "Εναλλαγή φίλτρων",
     "toggleTheme": "Αλλαγή θέματος"
   },
   "navbar": {
@@ -58,7 +57,8 @@
       "invalidYear": "Εισαγάγετε ένα έτος μεταξύ {min} και {max}",
       "duplicateYear": "Αυτό το έτος υπάρχει ήδη στη λίστα",
       "periodsCount": "{count} / {max} περίοδοι"
-    }
+    },
+    "swapPeriods": "Εναλλαγή περιόδων"
   },
   "climateComparison": {
     "title": "Κλιματική Σύγκριση",
@@ -174,7 +174,8 @@
     "altitude": "Υψόμετρο",
     "subtitle": {
       "climate": "Κλίμα {period}",
-      "weather": "Καιρός {year}"
+      "weather": "Καιρός {year} · ένα μόνο έτος",
+      "weatherYears": "Καιρός {years} · το καθένα ένα μόνο έτος"
     },
     "expandPanel": "Μεγέθυνση {name}",
     "showBoth": "Εμφάνιση και των δύο",
@@ -185,7 +186,15 @@
     "monthlyTableCaption": "Μηνιαίες τιμές: {names}",
     "month": "Μήνας",
     "showMonthlyValues": "Εμφάνιση μηνιαίων τιμών",
-    "hideMonthlyValues": "Απόκρυψη μηνιαίων τιμών"
+    "hideMonthlyValues": "Απόκρυψη μηνιαίων τιμών",
+    "switchToStandard": "Μετάβαση στο τυπικό γράφημα",
+    "walterLiethFiltersExplanation": "Το διάγραμμα Walter-Lieth δείχνει πάντα τη μέση θερμοκρασία και τον υετό και των 12 μηνών, οπότε οι μεταβλητές και οι μήνες δεν επιλέγονται όσο εμφανίζεται.",
+    "weatherSingleYear": "Καιρός · ένα μόνο έτος",
+    "martonneShortYear": "Martonne (M) · {year}",
+    "martonneYear": "Δείκτης Martonne (M) για το {year}",
+    "martonneTooltipYear": "Δείκτης ξηρασίας De Martonne μόνο για το {year}, από τα δεδομένα αυτού του έτους: M = P/(T+10). <5 Υπερξηρό | 5–10 Ξηρό | 10–20 Ημίξηρο | 20–30 Υφύγρο | >30 Υγρό",
+    "martonnePerYear": "Δείκτης Martonne (M), ανά έτος",
+    "yearsShown": "Εμφανιζόμενα έτη"
   },
   "loading": {
     "fetchingClimateData": "Λήψη κλιματικών δεδομένων...",
@@ -216,8 +225,34 @@
     "2_5m": "2.5 λεπ (~20.25 km2)",
     "30s": "30 δευτ (~1 km2)"
   },
+  "cellSizesShort": {
+    "10m": "10 λεπ.",
+    "5m": "5 λεπ.",
+    "2_5m": "2,5 λεπ.",
+    "30s": "30 δευτ."
+  },
   "filters": {
-    "period": "Περίοδος"
+    "period": "Περίοδος",
+    "names": {
+      "dataset": "Σύνολο δεδομένων",
+      "climatePeriod": "Κλιματική περίοδος",
+      "weatherYear": "Έτος",
+      "variables": "Μεταβλητές",
+      "gridSize": "Ανάλυση",
+      "months": "Μήνες"
+    },
+    "chips": {
+      "allFilters": "Φίλτρα",
+      "allFiltersLabel": "Φίλτρα, {count, plural, =0 {καμία αλλαγή} one {# αλλαγμένο} other {# αλλαγμένα}}",
+      "value": "{name}: {value}",
+      "moreVariables": "{label} +{count}",
+      "allMonths": "Όλοι οι μήνες",
+      "monthsCount": "{count, plural, one {# μήνας} other {# μήνες}}"
+    },
+    "sheet": {
+      "apply": "Εφαρμογή",
+      "reset": "Επαναφορά"
+    }
   },
   "validation": {
     "year": {
@@ -298,7 +333,14 @@
     "filters": "Φίλτρα",
     "settings": "Ρυθμίσεις",
     "applyFilters": "Εφαρμογή φίλτρων",
-    "cellCount": "({count} κελιά)",
+    "cellCount": {
+      "label": "({count} κελιά)",
+      "fast": "Γρήγορο",
+      "moderate": "Μέτριο",
+      "slow": "Αργό",
+      "tooMany": "Πάρα πολλά κελιά",
+      "tooManyError": "Πάρα πολλά κελιά για φόρτωση. Μεγεθύνετε ή επιλέξτε πιο αδρή ανάλυση."
+    },
     "notes": {
       "climateNormals": "Κλιματικές κανονικές τιμές 30 ετών",
       "weatherData": "Ετήσια μετεωρολογικά δεδομένα (CRU-TS-4.09)",
@@ -308,7 +350,8 @@
   },
   "common": {
     "useMyLocation": "Χρήση της τοποθεσίας μου",
-    "locating": "Εντοπισμός θέσης..."
+    "locating": "Εντοπισμός θέσης...",
+    "close": "Κλείσιμο"
   },
   "error": {
     "title": "Κάτι πήγε στραβά",

@@ -1,6 +1,5 @@
 {
   "topbar": {
-    "toggleFilters": "Veksle filtre",
     "toggleTheme": "Veksle tema"
   },
   "navbar": {
@@ -58,7 +57,8 @@
       "invalidYear": "Skriv inn et år mellom {min} og {max}",
       "duplicateYear": "Dette året er allerede i listen",
       "periodsCount": "{count} / {max} perioder"
-    }
+    },
+    "swapPeriods": "Bytt perioder"
   },
   "climateComparison": {
     "title": "Klimasammenligning",
@@ -174,7 +174,8 @@
     "altitude": "Høyde over havet",
     "subtitle": {
       "climate": "Klima {period}",
-      "weather": "Vær {year}"
+      "weather": "Vær {year} · ett enkelt år",
+      "weatherYears": "Vær {years} · hvert ett enkelt år"
     },
     "expandPanel": "Utvid {name}",
     "showBoth": "Vis begge",
@@ -185,7 +186,15 @@
     "monthlyTableCaption": "Månedlige verdier: {names}",
     "month": "Måned",
     "showMonthlyValues": "Vis månedlige verdier",
-    "hideMonthlyValues": "Skjul månedlige verdier"
+    "hideMonthlyValues": "Skjul månedlige verdier",
+    "switchToStandard": "Bytt til standarddiagram",
+    "walterLiethFiltersExplanation": "Walter-Lieth-diagrammet viser alltid middeltemperatur og nedbør for alle 12 måneder, så variabler og måneder kan ikke velges mens det vises.",
+    "weatherSingleYear": "Vær · ett enkelt år",
+    "martonneShortYear": "Martonne (M) · {year}",
+    "martonneYear": "Martonne-indeks (M) for {year}",
+    "martonneTooltipYear": "De Martonnes tørkeindeks for {year} alene, ut fra det årets data: M = P/(T+10). <5 Ekstremt tørt | 5–10 Tørt | 10–20 Halvtørt | 20–30 Halvfuktig | >30 Fuktig",
+    "martonnePerYear": "Martonne-indeks (M), per år",
+    "yearsShown": "Viste år"
   },
   "loading": {
     "fetchingClimateData": "Henter klimadata...",
@@ -216,8 +225,34 @@
     "2_5m": "2,5 min (~20,25 km²)",
     "30s": "30 sek (~1 km²)"
   },
+  "cellSizesShort": {
+    "10m": "10 min",
+    "5m": "5 min",
+    "2_5m": "2,5 min",
+    "30s": "30 s"
+  },
   "filters": {
-    "period": "Periode"
+    "period": "Periode",
+    "names": {
+      "dataset": "Datasett",
+      "climatePeriod": "Klimaperiode",
+      "weatherYear": "År",
+      "variables": "Variabler",
+      "gridSize": "Oppløsning",
+      "months": "Måneder"
+    },
+    "chips": {
+      "allFilters": "Filtre",
+      "allFiltersLabel": "Filtre, {count, plural, =0 {ingen endret} one {# endret} other {# endret}}",
+      "value": "{name}: {value}",
+      "moreVariables": "{label} +{count}",
+      "allMonths": "Alle måneder",
+      "monthsCount": "{count, plural, one {# måned} other {# måneder}}"
+    },
+    "sheet": {
+      "apply": "Bruk",
+      "reset": "Tilbakestill"
+    }
   },
   "validation": {
     "year": {
@@ -298,7 +333,14 @@
     "filters": "Filtre",
     "settings": "Innstillinger",
     "applyFilters": "Bruk filtre",
-    "cellCount": "({count} celler)",
+    "cellCount": {
+      "label": "({count} celler)",
+      "fast": "Rask",
+      "moderate": "Moderat",
+      "slow": "Treg",
+      "tooMany": "For mange celler",
+      "tooManyError": "For mange celler å laste inn. Zoom inn eller velg en grovere oppløsning."
+    },
     "notes": {
       "climateNormals": "30-års klimanormaler",
       "weatherData": "Årlige værdata (CRU-TS-4.09)",
@@ -308,7 +350,8 @@
   },
   "common": {
     "useMyLocation": "Bruk min posisjon",
-    "locating": "Finner posisjon..."
+    "locating": "Finner posisjon...",
+    "close": "Lukk"
   },
   "error": {
     "title": "Noe gikk galt",

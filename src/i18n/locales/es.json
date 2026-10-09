@@ -1,6 +1,5 @@
 {
   "topbar": {
-    "toggleFilters": "Alternar filtros",
     "toggleTheme": "Cambiar tema"
   },
   "navbar": {
@@ -58,7 +57,8 @@
       "invalidYear": "Introduce un año entre {min} y {max}",
       "duplicateYear": "Este año ya está en la lista",
       "periodsCount": "{count} / {max} períodos"
-    }
+    },
+    "swapPeriods": "Intercambiar períodos"
   },
   "climateComparison": {
     "title": "Comparación Climática",
@@ -174,7 +174,8 @@
     "altitude": "Altitud",
     "subtitle": {
       "climate": "Clima {period}",
-      "weather": "Tiempo {year}"
+      "weather": "Tiempo {year} · un solo año",
+      "weatherYears": "Tiempo {years} · cada uno, un solo año"
     },
     "expandPanel": "Ampliar {name}",
     "showBoth": "Mostrar ambos",
@@ -185,7 +186,15 @@
     "monthlyTableCaption": "Valores mensuales: {names}",
     "month": "Mes",
     "showMonthlyValues": "Mostrar valores mensuales",
-    "hideMonthlyValues": "Ocultar valores mensuales"
+    "hideMonthlyValues": "Ocultar valores mensuales",
+    "switchToStandard": "Cambiar al gráfico estándar",
+    "walterLiethFiltersExplanation": "El diagrama de Walter-Lieth siempre muestra la temperatura media y la precipitación de los 12 meses, así que no se pueden elegir variables ni meses mientras se muestra.",
+    "weatherSingleYear": "Tiempo · un solo año",
+    "martonneShortYear": "Martonne (M) · {year}",
+    "martonneYear": "Índice de Martonne (M) de {year}",
+    "martonneTooltipYear": "Índice de aridez de De Martonne solo para {year}, con los datos de ese año: M = P/(T+10). <5 Hiperárido | 5–10 Árido | 10–20 Semiárido | 20–30 Subhúmedo | >30 Húmedo",
+    "martonnePerYear": "Índice de Martonne (M), por año",
+    "yearsShown": "Años mostrados"
   },
   "loading": {
     "fetchingClimateData": "Obteniendo datos climáticos...",
@@ -216,8 +225,34 @@
     "2_5m": "2.5 min (~20.25 km2)",
     "30s": "30 seg (~1 km2)"
   },
+  "cellSizesShort": {
+    "10m": "10 min",
+    "5m": "5 min",
+    "2_5m": "2,5 min",
+    "30s": "30 s"
+  },
   "filters": {
-    "period": "Período"
+    "period": "Período",
+    "names": {
+      "dataset": "Conjunto de datos",
+      "climatePeriod": "Período climático",
+      "weatherYear": "Año",
+      "variables": "Variables",
+      "gridSize": "Resolución",
+      "months": "Meses"
+    },
+    "chips": {
+      "allFilters": "Filtros",
+      "allFiltersLabel": "Filtros, {count, plural, =0 {ninguno cambiado} one {# cambiado} other {# cambiados}}",
+      "value": "{name}: {value}",
+      "moreVariables": "{label} +{count}",
+      "allMonths": "Todos los meses",
+      "monthsCount": "{count, plural, one {# mes} other {# meses}}"
+    },
+    "sheet": {
+      "apply": "Aplicar",
+      "reset": "Restablecer"
+    }
   },
   "validation": {
     "year": {
@@ -298,7 +333,14 @@
     "filters": "Filtros",
     "settings": "Configuración",
     "applyFilters": "Aplicar filtros",
-    "cellCount": "({count} celdas)",
+    "cellCount": {
+      "label": "({count} celdas)",
+      "fast": "Rápido",
+      "moderate": "Moderado",
+      "slow": "Lento",
+      "tooMany": "Demasiadas celdas",
+      "tooManyError": "Demasiadas celdas para cargar. Acerca el mapa o elige una resolución menor."
+    },
     "notes": {
       "climateNormals": "Normales climáticas de 30 años",
       "weatherData": "Datos meteorológicos anuales (CRU-TS-4.09)",
@@ -308,7 +350,8 @@
   },
   "common": {
     "useMyLocation": "Usar mi ubicación",
-    "locating": "Localizando..."
+    "locating": "Localizando...",
+    "close": "Cerrar"
   },
   "error": {
     "title": "Algo salió mal",

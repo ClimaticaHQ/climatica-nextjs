@@ -1,6 +1,5 @@
 {
   "topbar": {
-    "toggleFilters": "Фільтри",
     "toggleTheme": "Змінити тему"
   },
   "navbar": {
@@ -58,7 +57,8 @@
       "invalidYear": "Введіть рік між {min} та {max}",
       "duplicateYear": "Цей рік вже є у списку",
       "periodsCount": "{count} / {max} періодів"
-    }
+    },
+    "swapPeriods": "Поміняти періоди місцями"
   },
   "climateComparison": {
     "title": "Порівняння клімату",
@@ -174,7 +174,8 @@
     "altitude": "Висота",
     "subtitle": {
       "climate": "Клімат {period}",
-      "weather": "Погода {year}"
+      "weather": "Погода {year} · один рік",
+      "weatherYears": "Погода {years} · кожен — один рік"
     },
     "expandPanel": "Розгорнути {name}",
     "showBoth": "Показати обидва",
@@ -185,7 +186,15 @@
     "monthlyTableCaption": "Місячні значення: {names}",
     "month": "Місяць",
     "showMonthlyValues": "Показати місячні значення",
-    "hideMonthlyValues": "Сховати місячні значення"
+    "hideMonthlyValues": "Сховати місячні значення",
+    "switchToStandard": "Перейти до стандартного графіка",
+    "walterLiethFiltersExplanation": "Діаграма Вальтера-Літа завжди показує середню температуру й опади за всі 12 місяців, тому змінні та місяці не можна вибрати, поки вона відображається.",
+    "weatherSingleYear": "Погода · один рік",
+    "martonneShortYear": "Мартонн (M) · {year}",
+    "martonneYear": "Індекс Мартонна (M) за {year} рік",
+    "martonneTooltipYear": "Індекс аридності де Мартонна лише за {year} рік, за даними цього року: M = P/(T+10). <5 Гіпераридний | 5–10 Аридний | 10–20 Напіваридний | 20–30 Напівгумідний | >30 Гумідний",
+    "martonnePerYear": "Індекс Мартонна (M), за рік",
+    "yearsShown": "Показані роки"
   },
   "loading": {
     "fetchingClimateData": "Завантаження кліматичних даних...",
@@ -216,8 +225,34 @@
     "2_5m": "2.5 хв (~20.25 км2)",
     "30s": "30 с (~1 км2)"
   },
+  "cellSizesShort": {
+    "10m": "10 хв",
+    "5m": "5 хв",
+    "2_5m": "2,5 хв",
+    "30s": "30 с"
+  },
   "filters": {
-    "period": "Період"
+    "period": "Період",
+    "names": {
+      "dataset": "Набір даних",
+      "climatePeriod": "Кліматичний період",
+      "weatherYear": "Рік",
+      "variables": "Змінні",
+      "gridSize": "Роздільна здатність",
+      "months": "Місяці"
+    },
+    "chips": {
+      "allFilters": "Фільтри",
+      "allFiltersLabel": "Фільтри, {count, plural, =0 {без змін} one {# змінено} few {# змінено} many {# змінено} other {# змінено}}",
+      "value": "{name}: {value}",
+      "moreVariables": "{label} +{count}",
+      "allMonths": "Усі місяці",
+      "monthsCount": "{count, plural, one {# місяць} few {# місяці} many {# місяців} other {# місяця}}"
+    },
+    "sheet": {
+      "apply": "Застосувати",
+      "reset": "Скинути"
+    }
   },
   "validation": {
     "year": {
@@ -298,7 +333,14 @@
     "filters": "Фільтри",
     "settings": "Налаштування",
     "applyFilters": "Застосувати",
-    "cellCount": "({count} клітинок)",
+    "cellCount": {
+      "label": "({count} клітинок)",
+      "fast": "Швидко",
+      "moderate": "Помірно",
+      "slow": "Повільно",
+      "tooMany": "Забагато клітинок",
+      "tooManyError": "Забагато клітинок для завантаження. Наблизьте карту або оберіть нижчу роздільну здатність."
+    },
     "notes": {
       "climateNormals": "30-річні кліматичні норми",
       "weatherData": "Річні метеодані (CRU-TS-4.09)",
@@ -308,7 +350,8 @@
   },
   "common": {
     "useMyLocation": "Моє місцезнаходження",
-    "locating": "Визначення..."
+    "locating": "Визначення...",
+    "close": "Закрити"
   },
   "error": {
     "title": "Щось пішло не так",
