@@ -2,7 +2,7 @@ import { EUpdateFlashVariant } from "@/enums";
 import type { TMotionCssVariables } from "@/types";
 
 // * UI motion — every duration here is skipped under prefers-reduced-motion. The CSS in
-// * src/styles/motion.css reads these through MOTION_CSS_VARIABLES, set once on <html>
+// * src/styles/animations.css reads these through MOTION_CSS_VARIABLES, set once on <html>
 export const MOTION = {
   // * a SegmentedControl's active pill sliding to the selected option
   CONTROL_SLIDE_MS: 200,
@@ -74,11 +74,11 @@ export const UPDATE_FLASH_ACTIVE = "active";
 // * and its variant — `data-update-flash-variant="glow" | "border"`
 export const UPDATE_FLASH_VARIANT_ATTRIBUTE = "updateFlashVariant";
 
-// * on <html> while motion is off — `data-motion="off"` — set by MotionRoot, read by motion.css
+// * on <html> while motion is off — `data-motion="off"` — set by MotionRoot, read by animations.css
 export const MOTION_ROOT_ATTRIBUTE = "motion";
 export const MOTION_OFF = "off";
 
-// * the names motion.css reads
+// * the names animations.css reads
 export const MOTION_CSS_VAR = {
   CONTROL_SLIDE: "--motion-control-slide",
   CONTROL_SLIDE_EASING: "--motion-control-slide-easing",

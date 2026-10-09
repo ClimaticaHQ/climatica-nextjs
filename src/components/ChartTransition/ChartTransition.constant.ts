@@ -8,7 +8,7 @@ export const CHART_TRANSITION_CLASSES = {
   LEAVING: "pointer-events-none",
 } as const;
 
-// * the animations (motion.css): the plain crossfade, or a split panel expanding — fade plus a
+// * the animations (animations.css): the plain crossfade, or a split panel expanding — fade plus a
 // * slight scale-up (transform only — the layout never moves), the old content fading out
 // * over the same time
 export const CHART_TRANSITION_MOTION = {

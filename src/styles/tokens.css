@@ -1,0 +1,147 @@
+/* * Design tokens: fonts, colours, radii, shadows — the light palette on :root (and on
+   [data-export-palette], for exports), the dark one on html.dark */
+
+/* * [data-export-palette]: the light tokens again, for exports — an element carrying it
+   resolves to the light palette even while html.dark is active (see exportPalette.util) */
+:root,
+[data-export-palette] {
+  /* * Fonts */
+  --font-sans: "Inter", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --font-xs: 12px;
+  --font-base: 14px;
+  --font-sm: 16px;
+  --font-md: 18px;
+  --font-lg: 22px;
+  --font-xl: 30px;
+  --font-2xl: 36px;
+
+  /* * Colors */
+  --color-primary: #1d9e75;
+  --color-primary-muted: rgba(29, 158, 117, 0.2);
+  --color-primary-subtle: rgba(29, 158, 117, 0.15);
+  --color-secondary: #5dcaa5;
+  --color-light: #9fe1cb;
+  --color-dark: #0f6e56;
+
+  --color-chip-active-bg: #e1f5ee;
+  /* * a hovered month: the chart's hover band and the monthly table's column alike */
+  --color-chart-hover: #e6f4ee;
+  /* * a card whose data just updated: its border and outer glow at the flash's start */
+  --color-update-flash-border: #1d9e75;
+  --color-update-flash-glow: rgba(29, 158, 117, 0.35);
+  --color-chip-active-text: #0f6e56;
+  --color-chip-active-border: #5dcaa5;
+
+  /* * Chart title's month badge (a filtered month or month count) */
+  --color-month-badge-bg: #e8f4fd;
+  --color-month-badge-border: #b3d9f5;
+  --color-month-badge-text: #1a6fa0;
+
+  /* * Segmented control: grey track, raised active pill */
+  --color-control-track: #eef0f3;
+  --color-control-active: #ffffff;
+
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-text: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-strong: #374151;
+  --color-border: #e5e7eb;
+  /* * behind a plot — halos around curves and dots; the card surface every chart sits on */
+  --color-plot-bg: var(--color-bg);
+  --color-error: #ef4444;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fecaca;
+
+  /* * Border radius */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* * Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+
+  /* * Modal backdrop (bottom sheets) */
+  --color-backdrop: rgba(0, 0, 0, 0.4);
+
+  /* * Charts */
+  --chart-arid: #fcd34d;
+  --chart-humid: #93c5fd;
+
+  --chart-temp-max: #ef4444;
+  --chart-temp-min: #3b82f6;
+  --chart-temp-avg: #f97316;
+
+  --chart-compare-a-max: #1d9e75;
+  --chart-compare-a-min: #5dcaa5;
+  --chart-compare-a-prec: #9fe1cb;
+  --chart-compare-a-tavg: #0f6e56;
+
+  --chart-compare-b-max: #d97706;
+  --chart-compare-b-min: #f59e0b;
+  --chart-compare-b-prec: #fcd34d;
+  --chart-compare-b-tavg: #92400e;
+
+  /* * Walter-Lieth convention: red temperature, blue precipitation */
+  --color-wl-temp: #dc2626;
+  --color-wl-prec: #2563eb;
+  --color-wl-humid-hatch: #2563eb;
+  --color-wl-arid-hatch: #dc2626;
+  --color-wl-compressed-fill: #1d4ed8;
+  /* * Walter-Lieth frost band: certain frost (mean minimum below 0 °C), and the cell outlines */
+  --color-wl-frost: #4682b4;
+  --color-wl-frost-outline: #6b7280;
+  /* * Walter-Lieth overlay series identity (matches compare A green / B orange) */
+  --color-wl-series-a: #1d9e75;
+  --color-wl-series-b: #d97706;
+}
+
+html.dark {
+  --color-bg: #111827;
+  --color-bg-secondary: #1f2937;
+  --color-text: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-text-strong: #e5e7eb;
+  --color-border: #374151;
+
+  --color-chip-active-bg: #052e1c;
+  --color-chart-hover: #173a2d;
+  --color-update-flash-border: #34d399;
+  --color-update-flash-glow: rgba(52, 211, 153, 0.4);
+  --color-chip-active-text: #6ee7b7;
+  --color-chip-active-border: #059669;
+
+  --color-control-track: #1f2937;
+  --color-control-active: #374151;
+
+  --color-month-badge-bg: #0c2a3d;
+  --color-month-badge-border: #1e4f70;
+  --color-month-badge-text: #7cc4f0;
+
+  --color-primary-muted: rgba(29, 158, 117, 0.25);
+  --color-primary-subtle: rgba(29, 158, 117, 0.18);
+
+  --color-error-bg: #1f0a0a;
+  --color-error-border: #7f1d1d;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
+
+  --color-backdrop: rgba(0, 0, 0, 0.6);
+
+  /* * Walter-Lieth: lighter red/blue for contrast on dark backgrounds */
+  --color-wl-temp: #f87171;
+  --color-wl-prec: #60a5fa;
+  --color-wl-humid-hatch: #60a5fa;
+  --color-wl-arid-hatch: #f87171;
+  --color-wl-compressed-fill: #3b82f6;
+  --color-wl-frost: #5f95c8;
+  --color-wl-frost-outline: #9ca3af;
+  --color-wl-series-a: #34d399;
+  --color-wl-series-b: #fbbf24;
+}

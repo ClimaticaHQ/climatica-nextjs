@@ -235,7 +235,6 @@
     "30s": "30 с"
   },
   "filters": {
-    "period": "Період",
     "names": {
       "dataset": "Набір даних",
       "climatePeriod": "Кліматичний період",

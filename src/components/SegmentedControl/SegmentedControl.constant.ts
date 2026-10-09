@@ -4,7 +4,7 @@ export const SEGMENTED_CONTROL_CLASSES = {
   TRACK:
     "relative inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-full bg-[var(--color-control-track)] p-0.5",
   // * one pill behind the options, slid to the active one (transform + width, never top/left;
-  // * the slide is in motion.css)
+  // * the slide is in animations.css)
   INDICATOR:
     "pointer-events-none absolute top-0.5 bottom-0.5 left-0 rounded-full bg-[var(--color-control-active)] shadow-[var(--shadow-sm)] segmented-indicator",
   // * compact on desktop; a ≥44 px touch target below Tailwind's `sm`

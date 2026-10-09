@@ -1,0 +1,22 @@
+/* * Leaflet overrides: the map below the app's overlays, popups in the app's card style */
+
+.leaflet-container {
+  z-index: 0;
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--color-bg);
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  padding: 0;
+  color: var(--color-text);
+}
+
+.leaflet-popup-tip-container {
+  display: none;
+}
+
+.leaflet-popup-content {
+  margin: 6px 10px;
+}

@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { YearChips } from "@/components/CompareYears/YearChips";
+import { PERIOD_COLORS } from "@/constants";
 import messages from "@/i18n/locales/en.json";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
@@ -17,9 +18,9 @@ beforeAll(() => {
 afterEach(cleanup);
 
 const YEARS = [
-  { year: 2021, color: "var(--color-period-0)" },
-  { year: 1990, color: "var(--color-period-1)" },
-  { year: 1967, color: "var(--color-period-2)" },
+  { year: 2021, color: PERIOD_COLORS[0] },
+  { year: 1990, color: PERIOD_COLORS[1] },
+  { year: 1967, color: PERIOD_COLORS[2] },
 ];
 
 function renderChips(shown: readonly number[]) {
