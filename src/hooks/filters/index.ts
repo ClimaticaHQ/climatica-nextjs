@@ -7,4 +7,5 @@ export { useAutoApply } from "./useAutoApply";
 export { useFilterPageContext } from "./useFilterPageContext";
 export { useFiltersDraft } from "./useFiltersDraft";
 export { useCityClimatePeriods } from "./useCityClimatePeriods";
-export { useMobileFilterSheets } from "./useMobileFilterSheets";
+export { useFiltersSheet } from "./useFiltersSheet";
+export { useFilterUrlSync } from "./useFilterUrlSync";
