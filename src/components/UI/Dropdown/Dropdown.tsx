@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { TDropdownProps } from "./Dropdown.type";
+import { OptionDot } from "./OptionDot";
 
 export default function Dropdown({
   options,
@@ -8,8 +9,12 @@ export default function Dropdown({
   className,
   "data-testid": testId,
   optionTestIdPrefix,
+  ariaLabelledBy,
+  accentColor,
+  isStretched = false,
 }: TDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const buttonId = useId();
   const ref = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -38,7 +43,13 @@ export default function Dropdown({
       <button
         data-testid={testId}
         onClick={() => setIsOpen((o) => !o)}
+        id={buttonId}
+        // * named by its label, then its value: "Period A 1970–2000"
+        aria-labelledby={ariaLabelledBy === undefined ? undefined : `${ariaLabelledBy} ${buttonId}`}
+        aria-expanded={isOpen}
+        style={accentColor === undefined ? undefined : { borderColor: accentColor }}
         className={`
+          ${isStretched ? "w-full justify-between" : ""}
           flex items-center gap-2 px-3 py-1.5
           rounded-[var(--radius-sm)] text-[length:var(--font-base)] md:text-[length:var(--font-sm)]
           border border-[var(--color-border)]
@@ -47,7 +58,10 @@ export default function Dropdown({
           transition-colors duration-150
         `}
       >
-        <span>{selected?.label}</span>
+        <span className="inline-flex items-center gap-1.5">
+          {selected?.color !== undefined && <OptionDot color={selected.color} />}
+          {selected?.label}
+        </span>
         <svg
           className={`w-3 h-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
           viewBox="0 0 10 6"
@@ -92,7 +106,10 @@ export default function Dropdown({
               }
             `}
           >
-            {option.label}
+            <span className="inline-flex items-center gap-1.5">
+              {option.color !== undefined && <OptionDot color={option.color} />}
+              {option.label}
+            </span>
           </button>
         ))}
       </div>

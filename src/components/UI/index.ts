@@ -20,3 +20,4 @@ export { StatCardsSkeleton } from "./StatCardsSkeleton";
 export { TableSkeleton } from "./TableSkeleton";
 export { ToggleSwitch } from "./ToggleSwitch";
 export { TopbarSkeleton } from "./TopbarSkeleton";
+export { BottomSheet } from "./BottomSheet";

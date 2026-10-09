@@ -1,4 +1,4 @@
-import { usePopover } from "@/hooks";
+import { usePopover } from "@/hooks/ui/usePopover";
 import { POPOVER_CLASSES as C } from "./Popover.constant";
 import type { TPopoverProps } from "./Popover.type";
 

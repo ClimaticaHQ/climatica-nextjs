@@ -1,5 +1,3 @@
-import type { TSidebarSkeletonProps } from "./SidebarSkeleton.type";
-
 function ChipsRow({ widths }: { widths: string[] }) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -10,18 +8,9 @@ function ChipsRow({ widths }: { widths: string[] }) {
   );
 }
 
-export function SidebarSkeleton({ isOpen }: TSidebarSkeletonProps) {
+export function SidebarSkeleton() {
   return (
-    <aside
-      className={`
-        flex w-64 shrink-0 flex-col overflow-hidden
-        border-r border-[var(--color-border)] bg-[var(--color-bg)]
-        fixed bottom-0 left-0 top-16 z-40 animate-pulse
-        transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:static lg:top-auto lg:bottom-auto lg:z-auto lg:translate-x-0 lg:w-80
-      `}
-    >
+    <aside className="hidden w-80 shrink-0 animate-pulse flex-col overflow-hidden border-r border-[var(--color-border)] bg-[var(--color-bg)] lg:flex">
       <div className="flex flex-1 flex-col overflow-y-auto p-4 gap-y-8">
         {/* Filters section — defaultOpen */}
         <div>
