@@ -45,6 +45,9 @@ export const MOTION = {
   // * then fades back — the glow's spread per variant is UPDATE_FLASH_GLOW_PX
   UPDATE_FLASH_MS: 800,
   UPDATE_FLASH_EASING: "ease-out",
+  // * a bottom sheet sliding up from / down off the screen edge, its backdrop fading with it
+  SHEET_SLIDE_MS: 280,
+  SHEET_SLIDE_EASING: "cubic-bezier(0.32, 0.72, 0, 1)",
   REDUCED_MOTION_QUERY: "(prefers-reduced-motion: reduce)",
 } as const;
 
@@ -101,6 +104,8 @@ export const MOTION_CSS_VAR = {
   UPDATE_PROGRESS_CYCLE: "--motion-update-progress-cycle",
   UPDATE_PROGRESS_SEGMENT: "--motion-update-progress-segment",
   UPDATE_PROGRESS_TRAVEL: "--motion-update-progress-travel",
+  SHEET_SLIDE: "--motion-sheet-slide",
+  SHEET_SLIDE_EASING: "--motion-sheet-slide-easing",
 } as const;
 
 const ms = (value: number) => `${value}ms`;
@@ -134,4 +139,6 @@ export const MOTION_CSS_VARIABLES: TMotionCssVariables = {
   [MOTION_CSS_VAR.UPDATE_PROGRESS_SEGMENT]: percent(MOTION.UPDATE_PROGRESS_SEGMENT),
   // * the segment crosses the whole track: its own width times this
   [MOTION_CSS_VAR.UPDATE_PROGRESS_TRAVEL]: percent(1 / MOTION.UPDATE_PROGRESS_SEGMENT),
+  [MOTION_CSS_VAR.SHEET_SLIDE]: ms(MOTION.SHEET_SLIDE_MS),
+  [MOTION_CSS_VAR.SHEET_SLIDE_EASING]: MOTION.SHEET_SLIDE_EASING,
 };

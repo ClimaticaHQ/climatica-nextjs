@@ -128,6 +128,9 @@ export const EXPORT_MONTHLY_VALUES = {
   // * the values' size follows the table's width, as on screen: a split panel's is smaller
   WIDE_MIN_WIDTH: 576,
   VALUE_FONT_SIZE: { WIDE: 13, NARROW: 11 },
+  // * a static file can't switch layout: where a column is too narrow for its longest value
+  // * ("−44.0"), the strip's values shrink to fit — the gap kept, never below the floor
+  FIT: { CHAR_WIDTH_EM: 0.6, CELL_GAP: 4, MIN_FONT_SIZE: 8 },
   VALUE_FONT_WEIGHT: 500,
   UNIT_FONT_SIZE: 11,
   UNIT_FONT_WEIGHT: 600,

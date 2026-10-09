@@ -51,6 +51,14 @@ export const SIDEBAR_PARAMS = {
   WL_SHADING: "wlShading",
   // * split: the panel shown across the card (a | b); omitted when both are shown, the default
   EXPANDED: "expanded",
+  // * Compare Periods with weather years, side by side: the two years drawn ("2021,1990");
+  // * omitted for the first two compared years, the default
+  PAIR_YEARS: "pair",
+  // * legacy name of PAIR_YEARS, from when only Walter-Lieth drew a pair — still read
+  WL_YEARS: "wlYears",
+  // * Compare Periods with weather years, overlay: the years drawn ("2021,1990"); omitted
+  // * when every compared year is, the default
+  SHOWN_YEARS: "shownYears",
   CHART_MODE_STANDARD: "standard",
   // * old links wrote chart=wl when standard was the default — still accepted
   CHART_MODE_WALTER_LIETH: "wl",

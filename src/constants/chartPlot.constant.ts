@@ -24,3 +24,6 @@ export const CHART_X_AXIS = {
 
 // * a hovered month: the chart's band and the monthly values table's column, the same token
 export const CHART_HOVER_COLOR = "var(--color-chart-hover)";
+
+// * an overlay with one series highlighted (a year chip hovered or focused): the others fade
+export const OVERLAY_DIM_OPACITY = 0.18;
