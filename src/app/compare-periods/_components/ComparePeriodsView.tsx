@@ -1,5 +1,6 @@
 "use client";
 import { getLaterPeriodSeries, getPeriodsUpdateSeries } from "./ComparePeriods.util";
+import { MobileFilterBar, PeriodSelectors } from "@/components/filters";
 import { ENumberSign, EStatValueSize, EWalterLiethSeriesId } from "@/enums";
 
 import type { TMiniMapLocation } from "@/components";
@@ -19,12 +20,10 @@ import {
   ErrorBanner,
   ExportMenu,
   MapSkeleton,
-  PageTitle,
   PageWrapper,
   TableSkeleton,
 } from "@/components/UI";
 import {
-  CELL_SIZE_OPTIONS,
   CLIMATE_COMPARISON_COLORS,
   VALUE_DIGITS,
   CLIMATE_PERIOD_LABELS,
@@ -32,7 +31,6 @@ import {
   DATA_UPDATE_NAMES_SEPARATOR,
   DATASETS,
   EXPORT_PNG_SCALE,
-  PERIOD_COLORS,
   COMPARE_EXPORT_DEFAULT_VISIBLE,
 } from "@/constants";
 import type { TCompareExportLabels, TCompareExportPayload, TVisibleSeries } from "@/types";
@@ -52,8 +50,16 @@ import {
   getExportedSeriesLabels,
   buildComparisonTable,
 } from "@/utils";
-import { useComparisonExport, useFormatNumber, useMonthlyTableLabels } from "@/hooks";
+import {
+  useComparisonExport,
+  useFormatNumber,
+  useMonthlyTableLabels,
+  useWeatherYearsExport,
+} from "@/hooks";
 import { differenceOf, withMonthlyMean } from "@/utils/monthlyClimate.util";
+import { getDrawnYears } from "@/utils/pair.util";
+import { getYearColor } from "@/utils/yearColor.util";
+import { PageHeader } from "@/components/PageHeader";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import type { TComparePeriodsViewProps } from "./ComparePeriods.type";
@@ -73,7 +79,7 @@ export function ComparePeriodsView({
   climatePeriodB,
   dataA,
   dataB,
-  autoGrid,
+  gridSize,
   selectedMonths,
   variables,
   shareUrl,
@@ -96,7 +102,7 @@ export function ComparePeriodsView({
   wlShading,
   onWlShadingChange,
   chartMode,
-  onChartModeChange,
+  years,
   panelExpansion,
 }: TComparePeriodsViewProps) {
   const t = useTranslations();
@@ -156,6 +162,19 @@ export function ComparePeriodsView({
     altitudeB: altitude ?? undefined,
   });
 
+  // * weather years: the export draws what the screen does — the pair side by side, the shown
+  // * years overlaid, in either chart type; its stats table keeps every year
+  const drawnYears = getDrawnYears({ layout, pair: years.pair, shown: years.shown });
+  const weatherYears = useWeatherYearsExport({
+    isEnabled: !isClimate,
+    chartMode,
+    layout,
+    drawn: drawnYears,
+    periods: periodsData,
+    years: periods,
+    altitude: altitude ?? undefined,
+  });
+
   // * PNG / SVG show the expanded panel alone — the file name says which series
   const exportedLabels = getExportedSeriesLabels({
     expanded: comparisonExport?.expanded ?? null,
@@ -173,14 +192,14 @@ export function ComparePeriodsView({
     isClimate && dataA === null
       ? t("climateComparison.noPeriodData", {
           period: CLIMATE_PERIOD_LABELS[climatePeriodA],
-          grid: shortGridLabel(autoGrid),
+          grid: shortGridLabel(gridSize),
         })
       : null;
   const noDataMessageB =
     isClimate && dataB === null
       ? t("climateComparison.noPeriodData", {
           period: CLIMATE_PERIOD_LABELS[climatePeriodB],
-          grid: shortGridLabel(autoGrid),
+          grid: shortGridLabel(gridSize),
         })
       : null;
 
@@ -235,7 +254,8 @@ export function ComparePeriodsView({
         totalPrec: t("climateComparison.stats.totalPrec"),
         aridMonths: t("climateComparison.stats.aridMonths"),
         altitude: t("chart.altitude"),
-        martonne: t("chart.martonne"),
+        // * weather years: each column's index describes that year alone
+        martonne: isClimate ? t("chart.martonne") : t("chart.martonnePerYear"),
       },
     };
   }
@@ -288,10 +308,10 @@ export function ComparePeriodsView({
 
     return {
       headerTitle: city.label,
-      headerSubtitle: periods.join(", "),
-      series: periodsData.map(({ year, rows }, i) => {
+      headerSubtitle: t("chart.subtitle.weatherYears", { years: periods.join(", ") }),
+      series: periodsData.map(({ year, rows }) => {
         const stats = computeCompareStats(rows);
-        const color = PERIOD_COLORS[i % PERIOD_COLORS.length] ?? PERIOD_COLORS[0];
+        const color = getYearColor(year, periods);
         return {
           label: String(year),
           data: withMonthlyMean(rows),
@@ -311,6 +331,7 @@ export function ComparePeriodsView({
       showTavgLine: false,
       datasetAttribution,
       shareUrl,
+      ...(weatherYears ? { weatherYears } : {}),
     };
   }
 
@@ -379,7 +400,7 @@ export function ComparePeriodsView({
       width: COMPARE_EXPORT_SVG_LAYOUT.width,
       height,
       scale: EXPORT_PNG_SCALE,
-      filename: buildFilename("compare-periods", [city.label, ...periods.map(String)], "png"),
+      filename: buildFilename("compare-periods", [city.label, ...drawnYears.map(String)], "png"),
     });
   }
 
@@ -390,45 +411,43 @@ export function ComparePeriodsView({
     const { svg } = buildCompareExportSvg(payload, colors);
     downloadSvgString(
       svg,
-      buildFilename("compare-periods", [city.label, ...periods.map(String)], "svg"),
+      buildFilename("compare-periods", [city.label, ...drawnYears.map(String)], "svg"),
     );
   }
 
   return (
     <PageWrapper>
       <div className="flex flex-col gap-10">
-        <header className="text-center">
-          <PageTitle suppressHydrationWarning>{t("comparePeriods.title")}</PageTitle>
-        </header>
+        <PageHeader
+          title={t("pages.comparePeriods.title")}
+          description={t("pages.comparePeriods.description")}
+        />
 
-        <p
-          className="text-center text-[length:var(--font-xs)] text-[var(--color-text-secondary)]"
-          suppressHydrationWarning
-        >
-          {t("climateComparison.autoResolution", { resolution: CELL_SIZE_OPTIONS[autoGrid] })}
-        </p>
-
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <div className="flex-1 flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <DotLabel
-                label={t("climateComparison.searchCity")}
-                dotColor={CLIMATE_COMPARISON_COLORS.A.tmax}
-              />
-              <LocationSearch
-                key={city.id}
-                cityLabel={city.label}
-                isLocating={isLocating}
-                locationError={locationError}
-                onCitySelect={onCitySelect}
-                onLocate={onLocate}
-                onClearLocationError={onClearLocationError}
-              />
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <DotLabel
+                  label={t("climateComparison.searchCity")}
+                  dotColor={CLIMATE_COMPARISON_COLORS.A.tmax}
+                />
+                <LocationSearch
+                  key={city.id}
+                  cityLabel={city.label}
+                  isLocating={isLocating}
+                  locationError={locationError}
+                  onCitySelect={onCitySelect}
+                  onLocate={onLocate}
+                  onClearLocationError={onClearLocationError}
+                />
+              </div>
             </div>
+            {city?.lat && city?.lng && (
+              <MiniMap locations={miniMapLocations} activeIndex={0} onToggle={() => undefined} />
+            )}{" "}
           </div>
-          {city?.lat && city?.lng && (
-            <MiniMap locations={miniMapLocations} activeIndex={0} onToggle={() => undefined} />
-          )}{" "}
+          <MobileFilterBar />
+          <PeriodSelectors />
         </div>
 
         {error && !isLoading && <ErrorBanner message={error.message} />}
@@ -479,7 +498,6 @@ export function ComparePeriodsView({
                     wlShading={wlShading}
                     onWlShadingChange={onWlShadingChange}
                     chartMode={chartMode}
-                    onChartModeChange={onChartModeChange}
                     panelExpansion={panelExpansion}
                     {...(altitude !== null ? { altitude } : {})}
                     {...(selectedMonths !== null && selectedMonths.length > 0
@@ -574,16 +592,18 @@ export function ComparePeriodsView({
                   periodsData={periodsData}
                   loadingPeriods={loadingPeriods}
                   altitude={altitude}
-                  periodColors={PERIOD_COLORS}
                 />
                 {periodsData.length > 0 ? (
                   <TempPrecipChart
                     onVisibleSeriesChange={setVisibleSeries}
                     cityName={city.label}
                     multiPeriodData={periodsData}
-                    periodColors={PERIOD_COLORS}
+                    comparedYears={periods}
+                    years={years}
+                    layout={layout}
+                    onLayoutChange={onLayoutChange}
                     variables={variables}
-                    showWalterLiethToggle={false}
+                    chartMode={chartMode}
                     showAridity={false}
                     {...(selectedMonths !== null && selectedMonths.length > 0
                       ? { selectedMonths }

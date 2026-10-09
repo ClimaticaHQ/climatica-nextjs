@@ -1,12 +1,15 @@
 import { DATA_UPDATE_SINGLE_SERIES, SIDEBAR_PARAMS } from "@/constants";
 import type { TUrlSchema } from "@/types";
-import {
-  chartModeUrlField,
-  cityUrlField,
-  monthsUrlField,
-  SHARED_FILTER_URL_FIELDS,
-} from "@/utils/urlFields.util";
+import { chartModeUrlField, cityUrlField } from "@/utils/urlFields.util";
 import type { TClimateStatisticsUrlState } from "./ClimateStatistics.type";
+
+// * what the navbar remembers of this page (useLastPageParamsSync) — its URL state but the
+// * city, which the persisted city stores (and the sync-city setting) own
+export const CLIMATE_STATISTICS_REMEMBERED_URL_SCHEMA: TUrlSchema<
+  Omit<TClimateStatisticsUrlState, "city">
+> = {
+  chartMode: chartModeUrlField,
+};
 
 export const CLIMATE_STATISTICS_URL_SCHEMA: TUrlSchema<TClimateStatisticsUrlState> = {
   city: cityUrlField({
@@ -14,9 +17,7 @@ export const CLIMATE_STATISTICS_URL_SCHEMA: TUrlSchema<TClimateStatisticsUrlStat
     lat: SIDEBAR_PARAMS.LAT,
     lng: SIDEBAR_PARAMS.LNG,
   }),
-  ...SHARED_FILTER_URL_FIELDS,
-  months: monthsUrlField,
-  chartMode: chartModeUrlField,
+  ...CLIMATE_STATISTICS_REMEMBERED_URL_SCHEMA,
 };
 
 // * the stat cards' values under the month filter (standard mode) — their own series, so a

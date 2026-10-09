@@ -1,5 +1,6 @@
 "use client";
 import { EStatValueSize, EWalterLiethSeriesId } from "@/enums";
+import { MobileFilterBar } from "@/components/filters";
 
 import type { TMiniMapLocation } from "@/components";
 import {
@@ -17,12 +18,10 @@ import {
   ErrorBanner,
   ExportMenu,
   MapSkeleton,
-  PageTitle,
   PageWrapper,
   TableSkeleton,
 } from "@/components/UI";
 import {
-  CELL_SIZE_OPTIONS,
   CLIMATE_COMPARISON_COLORS,
   VALUE_DIGITS,
   CLIMATE_PERIOD_LABELS,
@@ -47,9 +46,9 @@ import {
   getExportedSeriesLabels,
   buildComparisonTable,
 } from "@/utils";
-import { getShownChartMode } from "@/utils/chartMode.util";
 import { computeCompareStats, computeDiffStats } from "@/utils/climateComparison.util";
 import { useComparisonExport, useFormatNumber, useMonthName, useMonthlyTableLabels } from "@/hooks";
+import { PageHeader } from "@/components/PageHeader";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
@@ -77,7 +76,7 @@ export function CompareCitiesView({
   cityB,
   dataA,
   dataB,
-  autoGrid,
+  gridSize,
   subtitle,
   selectedMonths,
   variables,
@@ -96,7 +95,6 @@ export function CompareCitiesView({
   wlShading,
   onWlShadingChange,
   chartMode,
-  onChartModeChange,
   panelExpansion,
 }: TCompareCitiesViewProps) {
   const t = useTranslations();
@@ -131,6 +129,7 @@ export function CompareCitiesView({
           },
           minuend: EWalterLiethSeriesId.B,
           locale,
+          martonneYear: subtitle.dataset === DATASETS.WEATHER ? subtitle.weatherYear : undefined,
         })
       : null;
   const statsA = dataA ? computeCompareStats(dataA) : null;
@@ -139,12 +138,6 @@ export function CompareCitiesView({
 
   const labelA = cityA.label;
   const labelB = cityB.label;
-  const isClimate = subtitle.dataset !== DATASETS.WEATHER;
-  // * WL needs climate normals — with Weather data the page shows the standard chart
-  const shownChartMode = getShownChartMode({
-    chartMode,
-    dataset: isClimate ? DATASETS.CLIMATE : DATASETS.WEATHER,
-  });
 
   const periodLabel =
     subtitle.dataset === DATASETS.CLIMATE && subtitle.climatePeriod
@@ -156,7 +149,7 @@ export function CompareCitiesView({
   // * two-series comparisons — the export then follows chart type, layout and shading exactly
   const comparisonExport = useComparisonExport({
     isEnabled: true,
-    chartMode: shownChartMode,
+    chartMode: chartMode,
     layout,
     shading: wlShading,
     expanded: panelExpansion.expanded,
@@ -184,7 +177,7 @@ export function CompareCitiesView({
     subtitle.dataset === DATASETS.CLIMATE && subtitle.climatePeriod
       ? t("climateComparison.noPeriodData", {
           period: CLIMATE_PERIOD_LABELS[subtitle.climatePeriod],
-          grid: shortGridLabel(autoGrid),
+          grid: shortGridLabel(gridSize),
         })
       : null;
 
@@ -332,36 +325,37 @@ export function CompareCitiesView({
   return (
     <PageWrapper>
       <div className="flex flex-col gap-10">
-        <header className="text-center">
-          <PageTitle suppressHydrationWarning>{t("compareCities.title")}</PageTitle>
-        </header>
+        <PageHeader
+          title={t("pages.compareCities.title")}
+          description={t("pages.compareCities.description")}
+        />
 
-        <p
-          className="text-center text-[length:var(--font-xs)] text-[var(--color-text-secondary)]"
-          suppressHydrationWarning
-        >
-          {t("climateComparison.autoResolution", { resolution: CELL_SIZE_OPTIONS[autoGrid] })}
-        </p>
-
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <div className="flex-1">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <CitySearchRow
-                label={t("climateComparison.searchA")}
-                dotColor={CLIMATE_COMPARISON_COLORS.A.tmax}
-                cityLabel={cityA.label}
-                onCitySelect={onCityASelect}
-              />
-              <CitySearchRow
-                label={t("climateComparison.searchB")}
-                dotColor={CLIMATE_COMPARISON_COLORS.B.tmax}
-                cityLabel={cityB.label}
-                onCitySelect={onCityBSelect}
-              />
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <div className="flex-1">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <CitySearchRow
+                  label={t("climateComparison.searchA")}
+                  dotColor={CLIMATE_COMPARISON_COLORS.A.tmax}
+                  cityLabel={cityA.label}
+                  onCitySelect={onCityASelect}
+                />
+                <CitySearchRow
+                  label={t("climateComparison.searchB")}
+                  dotColor={CLIMATE_COMPARISON_COLORS.B.tmax}
+                  cityLabel={cityB.label}
+                  onCitySelect={onCityBSelect}
+                />
+              </div>
             </div>
-          </div>
 
-          <MiniMap locations={miniMapLocations} activeIndex={activeCity} onToggle={setActiveCity} />
+            <MiniMap
+              locations={miniMapLocations}
+              activeIndex={activeCity}
+              onToggle={setActiveCity}
+            />
+          </div>
+          <MobileFilterBar />
         </div>
 
         {/* * around the table, the chart card and the difference cards: each flashes when the
@@ -413,9 +407,7 @@ export function CompareCitiesView({
                   onLayoutChange={onLayoutChange}
                   wlShading={wlShading}
                   onWlShadingChange={onWlShadingChange}
-                  chartMode={shownChartMode}
-                  showWalterLiethToggle={isClimate}
-                  onChartModeChange={onChartModeChange}
+                  chartMode={chartMode}
                   panelExpansion={panelExpansion}
                   {...(altitudeA !== null ? { altitudeA } : {})}
                   {...(altitudeB !== null ? { altitudeB } : {})}

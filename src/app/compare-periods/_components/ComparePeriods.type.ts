@@ -1,37 +1,27 @@
 import type { ECompareLayout, EWalterLiethShading } from "@/enums";
-import type { TChartMode, TExpandedPanel, TPanelExpansion } from "@/types";
-import { DATASETS } from "@/constants";
+import type { TChartMode, TExpandedPanel, TPanelExpansion, TPair, TYearsViewState } from "@/types";
 import type { TClimatePeriod } from "@/constants/worldclim.constant";
 import type {
   TCellSize,
   TCity,
   TDataset,
   TDatasetAttribution,
-  TMonthFilter,
   TMonthlyTemperature,
   TMultiPeriodEntry,
   TVariable,
 } from "@/types";
 import type { RefObject } from "react";
 
-export type TComparePeriodsValue =
-  | {
-      dataset: typeof DATASETS.CLIMATE;
-      climatePeriodA: TClimatePeriod;
-      climatePeriodB: TClimatePeriod;
-    }
-  | { dataset: typeof DATASETS.WEATHER; weatherPeriods: number[] };
-
 export type TComparePeriodsUrlState = {
   city: TCity;
-  comparePeriods: TComparePeriodsValue;
-  variables: TVariable[];
-  gridSize: TCellSize;
-  months: TMonthFilter;
   layout: ECompareLayout;
   wlShading: EWalterLiethShading;
   chartMode: TChartMode;
   expanded: TExpandedPanel;
+  /** weather years, side by side: the two drawn — null for the first two, the default */
+  yearPair: TPair<number> | null;
+  /** weather years, overlay: the years drawn — null for all of them, the default */
+  shownYears: readonly number[] | null;
 };
 
 export type TComparePeriodsViewProps = {
@@ -42,7 +32,8 @@ export type TComparePeriodsViewProps = {
   variables: readonly TVariable[];
   altitude: number | null;
   datasetAttribution: TDatasetAttribution | null;
-  autoGrid: TCellSize;
+  /** the Cell Resolution filter — the grid every request uses */
+  gridSize: TCellSize;
   shareUrl: string;
   isLoading: boolean;
   /** a refetch after a filter change — the shown data stays until it lands */
@@ -71,6 +62,7 @@ export type TComparePeriodsViewProps = {
   wlShading: EWalterLiethShading;
   onWlShadingChange: (shading: EWalterLiethShading) => void;
   chartMode: TChartMode;
-  onChartModeChange: (mode: TChartMode) => void;
   panelExpansion: TPanelExpansion;
+  /** weather years: the pair (side by side) and the shown set (overlay) */
+  years: TYearsViewState;
 };

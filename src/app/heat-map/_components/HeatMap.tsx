@@ -9,9 +9,10 @@ import {
   useGetRegionalProfile,
   usePersistedCity,
   usePersistedComparisonCities,
+  useFilters,
   useUrlStateSync,
 } from "@/hooks";
-import { useFiltersStore, useSettingsStore } from "@/stores";
+import { useSettingsStore } from "@/stores";
 import type { TBbox, TColorScale, TCity, TPolygon } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -34,14 +35,7 @@ export function HeatMap() {
   const [mapTarget, setMapTarget] = useState<TMapTarget | null>(null);
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
 
-  const {
-    dataset,
-    climatePeriod,
-    weatherYear,
-    gridSize: grid,
-    variables,
-    months,
-  } = useFiltersStore();
+  const { dataset, climatePeriod, weatherYear, gridSize: grid, variables, months } = useFilters();
   const { syncCity, hasHydrated } = useSettingsStore();
   const isClimate = dataset === DATASETS.CLIMATE;
   const year = isClimate ? undefined : weatherYear;
@@ -86,13 +80,15 @@ export function HeatMap() {
   }, [persistedCity.lat, persistedCity.lng]); // eslint-disable-line react-hooks/exhaustive-deps
   /* eslint-enable react-hooks/set-state-in-effect */
 
+  // * the <title> leads with the page's name (the navbar's, the heading's)
+  const pageTitle = t("pages.heatMap.title");
   useEffect(() => {
     const varLabel = VARIABLE_LABELS[activeVariable] ?? activeVariable;
     const periodStr = isClimate
       ? (CLIMATE_PERIOD_LABELS[climatePeriod] ?? climatePeriod)
       : String(weatherYear);
-    document.title = `Region Heatmap · ${varLabel} ${periodStr} | ${APP_TITLE}`;
-  }, [activeVariable, isClimate, climatePeriod, weatherYear]);
+    document.title = `${pageTitle} · ${varLabel} ${periodStr} | ${APP_TITLE}`;
+  }, [activeVariable, isClimate, climatePeriod, weatherYear, pageTitle]);
 
   const wkt = polygon ? polygonToWkt(polygon) : null;
 

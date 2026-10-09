@@ -1,9 +1,10 @@
 "use client";
 
 import { LocationSearch } from "@/components";
+import { MobileFilterBar } from "@/components/filters";
 import { useFormatNumber } from "@/hooks";
 import { DataUpdateProvider } from "@/components/DataUpdate";
-import { EmptyState, ErrorBanner, MapSkeleton, PageTitle, PageWrapper } from "@/components/UI";
+import { EmptyState, ErrorBanner, MapSkeleton, PageWrapper } from "@/components/UI";
 import {
   DATA_UPDATE_REGION_SERIES,
   DIFFERENCE_SIGN,
@@ -23,6 +24,7 @@ import {
   svgToPng,
 } from "@/utils";
 import dynamic from "next/dynamic";
+import { PageHeader } from "@/components/PageHeader";
 import { useTranslations } from "next-intl";
 import { HEATMAP_VALUE_DIGITS } from "./HeatMap.constant";
 import type { TRegionHeatmapViewProps } from "./HeatMap.type";
@@ -179,7 +181,7 @@ export function HeatMapView({
     const fmt = (v: number) => `${formatNumber(v, { digits: HEATMAP_VALUE_DIGITS })} ${unit}`;
 
     return {
-      headerTitle: t("heatMap.title"),
+      headerTitle: t("pages.heatMap.title"),
       headerSubtitle: `${VARIABLE_LABELS[activeVariable]} · ${statSubtitle}`,
       stats: [
         { label: t("heatMap.stats.minValue"), value: fmt(stats.min), subtitle: statSubtitle },
@@ -230,17 +232,18 @@ export function HeatMapView({
   return (
     <PageWrapper>
       <div className="flex flex-col gap-8">
-        <header className="text-center">
-          <PageTitle suppressHydrationWarning>{t("heatMap.title")}</PageTitle>
-        </header>
+        <PageHeader title={t("pages.heatMap.title")} description={t("pages.heatMap.description")} />
 
-        <LocationSearch
-          isLocating={isLocating}
-          locationError={locationError}
-          onCitySelect={onCitySelect}
-          onLocate={onLocate}
-          onClearLocationError={onClearLocationError}
-        />
+        <div className="flex flex-col gap-3">
+          <LocationSearch
+            isLocating={isLocating}
+            locationError={locationError}
+            onCitySelect={onCitySelect}
+            onLocate={onLocate}
+            onClearLocationError={onClearLocationError}
+          />
+          <MobileFilterBar />
+        </div>
 
         <Toolbar
           drawMode={drawMode}
@@ -263,7 +266,7 @@ export function HeatMapView({
           series={{ [DATA_UPDATE_REGION_SERIES]: hasData ? stats : null }}
           isFetching={isFetching}
           announcement={t("loading.dataUpdated", {
-            location: t("heatMap.title"),
+            location: t("pages.heatMap.title"),
             period: periodLabel,
           })}
         >

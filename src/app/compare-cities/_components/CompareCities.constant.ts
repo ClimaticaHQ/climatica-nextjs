@@ -4,11 +4,21 @@ import {
   cityUrlField,
   chartModeUrlField,
   expandedPanelUrlField,
-  SHARED_FILTER_URL_FIELDS,
   compareLayoutUrlField,
   walterLiethShadingUrlField,
 } from "@/utils/urlFields.util";
 import type { TCompareCitiesUrlState } from "./CompareCities.type";
+
+// * what the navbar remembers of this page (useLastPageParamsSync) — its URL state but the
+// * cities, which the persisted city stores (and the sync-city setting) own
+export const COMPARE_CITIES_REMEMBERED_URL_SCHEMA: TUrlSchema<
+  Omit<TCompareCitiesUrlState, "cityA" | "cityB">
+> = {
+  layout: compareLayoutUrlField,
+  wlShading: walterLiethShadingUrlField,
+  chartMode: chartModeUrlField,
+  expanded: expandedPanelUrlField,
+};
 
 export const COMPARE_CITIES_URL_SCHEMA: TUrlSchema<TCompareCitiesUrlState> = {
   cityA: cityUrlField({
@@ -21,9 +31,5 @@ export const COMPARE_CITIES_URL_SCHEMA: TUrlSchema<TCompareCitiesUrlState> = {
     lat: SIDEBAR_PARAMS.LAT_B,
     lng: SIDEBAR_PARAMS.LNG_B,
   }),
-  ...SHARED_FILTER_URL_FIELDS,
-  layout: compareLayoutUrlField,
-  wlShading: walterLiethShadingUrlField,
-  chartMode: chartModeUrlField,
-  expanded: expandedPanelUrlField,
+  ...COMPARE_CITIES_REMEMBERED_URL_SCHEMA,
 };
