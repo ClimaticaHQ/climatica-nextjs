@@ -29,7 +29,6 @@
   },
   "climateStatistics": {
     "cellResolution": "Ανάλυση κελιού:",
-    "filtersTab": "Φίλτρα",
     "useMyLocation": "Χρήση της τοποθεσίας μου",
     "locating": "Εντοπισμός θέσης...",
     "stats": {

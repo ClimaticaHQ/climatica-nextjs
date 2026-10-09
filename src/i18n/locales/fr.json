@@ -29,7 +29,6 @@
   },
   "climateStatistics": {
     "cellResolution": "Résolution de la cellule :",
-    "filtersTab": "Filtres",
     "useMyLocation": "Utiliser ma position",
     "locating": "Localisation en cours...",
     "stats": {

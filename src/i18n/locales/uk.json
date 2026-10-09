@@ -29,7 +29,6 @@
   },
   "climateStatistics": {
     "cellResolution": "Роздільність сітки:",
-    "filtersTab": "Фільтри",
     "useMyLocation": "Моє місцезнаходження",
     "locating": "Визначення...",
     "stats": {

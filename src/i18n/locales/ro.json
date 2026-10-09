@@ -29,7 +29,6 @@
   },
   "climateStatistics": {
     "cellResolution": "Rezoluția celulei:",
-    "filtersTab": "Filtre",
     "useMyLocation": "Folosește locația mea",
     "locating": "Se localizează...",
     "stats": {

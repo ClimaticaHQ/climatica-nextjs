@@ -29,7 +29,6 @@
   },
   "climateStatistics": {
     "cellResolution": "Celleoppløsning:",
-    "filtersTab": "Filtre",
     "useMyLocation": "Bruk min posisjon",
     "locating": "Finner posisjon...",
     "stats": {
