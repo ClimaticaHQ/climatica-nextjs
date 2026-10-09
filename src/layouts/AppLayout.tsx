@@ -1,8 +1,10 @@
 "use client";
 
-import { FilterUrlSync, MotionRoot, NavigationIntentTracker, Sidebar, Topbar } from "@/components";
+import { MotionRoot, NavigationIntentTracker, Topbar } from "@/components";
+import { FiltersSidebar } from "@/components/filters";
 import { SidebarSkeleton, TopbarSkeleton } from "@/components/UI";
 import { Suspense } from "react";
+import { UrlSync } from "./UrlSync";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,14 +12,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <MotionRoot />
       <NavigationIntentTracker />
       <Suspense fallback={null}>
-        <FilterUrlSync />
+        <UrlSync />
       </Suspense>
       <Suspense fallback={<TopbarSkeleton />}>
         <Topbar />
       </Suspense>
       <div className="relative flex flex-1 overflow-hidden">
         <Suspense fallback={<SidebarSkeleton />}>
-          <Sidebar />
+          <FiltersSidebar />
         </Suspense>
         <main className="flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
           {children}
