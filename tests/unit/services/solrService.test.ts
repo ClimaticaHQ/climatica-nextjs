@@ -63,16 +63,20 @@ describe("SolrService.searchCities", () => {
     expect(results).toEqual([]);
   });
 
-  it("returns [] when fetch throws an error", async () => {
+  // * an outage must not look like "no cities found"
+  it("rejects when fetch throws an error", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network error")));
-    const results = await SolrService.searchCities("rome", "en");
-    expect(results).toEqual([]);
+    await expect(SolrService.searchCities("rome", "en")).rejects.toThrow("network error");
   });
 
-  it("returns [] when Solr responds with non-ok HTTP status", async () => {
+  it("rejects when Solr responds with non-ok HTTP status", async () => {
     stubFetch({}, false);
-    const results = await SolrService.searchCities("rome", "en");
-    expect(results).toEqual([]);
+    await expect(SolrService.searchCities("rome", "en")).rejects.toThrow(/status/);
+  });
+
+  it("rejects when Solr reports a non-zero responseHeader status", async () => {
+    stubFetch({ ...makeSolrResponse([]), responseHeader: { status: 400, QTime: 1 } });
+    await expect(SolrService.searchCities("rome", "en")).rejects.toThrow(/Solr error status/);
   });
 
   it("uses label_en when lang is en", async () => {

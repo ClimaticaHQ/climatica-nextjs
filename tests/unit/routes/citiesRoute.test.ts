@@ -21,6 +21,7 @@ vi.mock("@/libs/Env", () => ({
 }));
 
 import { GET } from "@/app/api/cities/route";
+import { API_ERRORS } from "@/constants";
 import { REDIS_STRATEGIES } from "@/libs/redis";
 import { RedisClient } from "@/libs/redis/client";
 import { SolrService, WikidataService } from "@/libs/services";
@@ -183,6 +184,48 @@ describe("GET /api/cities — coordinate queries", () => {
     const res = await GET(makeRequest("0,0"));
 
     expect(await res.json()).toEqual([]);
+    expect(RedisClient.set).not.toHaveBeenCalled();
+  });
+});
+
+describe("GET /api/cities — coordinate separators", () => {
+  it.each(["48.8566,2.3522", "48.8566, 2.3522", "48.8566 2.3522", "-33.86 151.21"])(
+    "reverse-geocodes %j",
+    async (q) => {
+      vi.mocked(RedisClient.get).mockResolvedValue(null);
+      vi.mocked(WikidataService.findNearestCityByCoordinates).mockResolvedValue(mockCity);
+
+      await GET(makeRequest(q));
+
+      const [lat, lng] = q.split(/[,\s]+/).map(Number);
+      expect(WikidataService.findNearestCityByCoordinates).toHaveBeenCalledWith(lat, lng);
+      expect(SolrService.searchCities).not.toHaveBeenCalled();
+    },
+  );
+});
+
+describe("GET /api/cities — upstream failure", () => {
+  beforeEach(() => vi.mocked(RedisClient.get).mockResolvedValue(null));
+
+  it("answers 503, not 200 [], and caches nothing when Solr fails", async () => {
+    vi.mocked(SolrService.searchCities).mockRejectedValue(new Error("Solr down"));
+
+    const res = await GET(makeRequest("rome"));
+
+    expect(res.status).toBe(API_ERRORS.CITY_SEARCH_UNAVAILABLE.status);
+    expect(await res.json()).toEqual({ error: API_ERRORS.CITY_SEARCH_UNAVAILABLE.message });
+    expect(RedisClient.set).not.toHaveBeenCalled();
+    expect(RedisClient.incrementCounter).not.toHaveBeenCalled();
+  });
+
+  it("answers 502 and caches nothing when reverse geocoding fails", async () => {
+    vi.mocked(WikidataService.findNearestCityByCoordinates).mockRejectedValue(
+      new Error("Wikidata down"),
+    );
+
+    const res = await GET(makeRequest("48.8566,2.3522"));
+
+    expect(res.status).toBe(API_ERRORS.REVERSE_GEOCODING_UNAVAILABLE.status);
     expect(RedisClient.set).not.toHaveBeenCalled();
   });
 });
