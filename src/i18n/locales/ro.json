@@ -3,13 +3,24 @@
     "toggleTheme": "Comută tema"
   },
   "navbar": {
-    "toggleMenu": "Comută meniul",
-    "links": {
-      "climateStatistics": "Clima orașului",
-      "climateComparison": "Compară orașe",
-      "compareCities": "Compară orașe",
-      "comparePeriods": "Compară perioade",
-      "heatMap": "Hartă termică regională"
+    "toggleMenu": "Comută meniul"
+  },
+  "pages": {
+    "climateStatistics": {
+      "title": "Clima orașului",
+      "description": "Caută un oraș pentru a-i explora datele climatice"
+    },
+    "compareCities": {
+      "title": "Compară orașe",
+      "description": "Compară clima a două orașe, unul lângă altul"
+    },
+    "comparePeriods": {
+      "title": "Compară perioade",
+      "description": "Vezi cum se schimbă clima unui oraș de-a lungul perioadelor și anilor"
+    },
+    "heatMap": {
+      "title": "Hartă termică regională",
+      "description": "Desenează o zonă pe hartă pentru a vedea cum variază clima ei"
     }
   },
   "search": {
@@ -17,8 +28,6 @@
     "coordsResult": "Mergi la coordonate"
   },
   "climateStatistics": {
-    "title": "Statistici Climatice",
-    "subtitle": "Caută un oraș pentru a-i explora datele climatice",
     "cellResolution": "Rezoluția celulei:",
     "filtersTab": "Filtre",
     "useMyLocation": "Folosește locația mea",
@@ -31,18 +40,13 @@
       "totalPrec": "Precipitații totale",
       "mmThisMonth": "mm luna aceasta",
       "resolution": "Rezoluție",
-      "autoResolutionTooltip": "Rezoluția este setată automat în funcție de setul de date selectat",
       "altitude": "Altitudine",
       "filteredMonths": "Filtrat: {months}"
     },
     "noPeriodData": "Nu există date pentru {period} la rezoluția {grid}"
   },
-  "compareCities": {
-    "title": "Compară Orașe",
-    "selectSecondCity": "Selectează al doilea oraș pentru comparare"
-  },
+  "compareCities": {},
   "comparePeriods": {
-    "title": "Compară Perioade",
     "trend": {
       "tempTitle": "Tendința temperaturii",
       "precipTitle": "Tendința precipitațiilor",
@@ -89,14 +93,12 @@
       "tieSub": "=",
       "monthTemps": "{a}: {tempA} / {b}: {tempB}"
     },
-    "autoResolution": "Rezoluție automată: {resolution}",
     "noPeriodData": "Nu există date pentru {period} la rezoluția {grid}",
     "difference": "Diferență",
     "metric": "Metrică",
     "tableCaption": "Comparație între {a} și {b}"
   },
   "heatMap": {
-    "title": "Hartă Termică Regională",
     "placeholder": "Substituent pentru harta termică. Mai târziu vom afișa intensitatea climatică pe o hartă mondială aici.",
     "drawBbox": "Desenează cadru de selecție",
     "drawPolygon": "Desenează poligon",
@@ -223,7 +225,8 @@
     "10m": "10 min (~324 km²)",
     "5m": "5 min (~81 km²)",
     "2_5m": "2,5 min (~20,25 km²)",
-    "30s": "30 sec (~1 km²)"
+    "30s": "30 sec (~1 km²)",
+    "onlyForPeriod": "Doar pentru Climă {period}"
   },
   "cellSizesShort": {
     "10m": "10 min",
@@ -375,7 +378,7 @@
   },
   "meta": {
     "climateStatistics": {
-      "title": "Statistici climatice pentru {city}",
+      "title": "{city} · {page}",
       "description": "{variables} pentru {city} ({period})"
     },
     "compareCities": {
@@ -384,11 +387,10 @@
     },
     "comparePeriods": {
       "title": "{city} — comparație perioade climatice",
-      "description": "{variables} pentru {city} — {periods}",
-      "descriptionGeneric": "Compară datele climatice pentru un oraș în diferite perioade de timp"
+      "description": "{variables} pentru {city} — {periods}"
     },
     "heatMap": {
-      "title": "Hartă termică regională — {variables} ({period})",
+      "title": "{page} · {variables} ({period})",
       "description": "Intensitatea climatică pentru {variables} în regiunea selectată ({period})"
     }
   },

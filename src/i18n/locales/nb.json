@@ -3,13 +3,24 @@
     "toggleTheme": "Veksle tema"
   },
   "navbar": {
-    "toggleMenu": "Veksle meny",
-    "links": {
-      "climateStatistics": "Byklima",
-      "climateComparison": "Sammenlign byer",
-      "compareCities": "Sammenlign byer",
-      "comparePeriods": "Sammenlign perioder",
-      "heatMap": "Varmekart for region"
+    "toggleMenu": "Veksle meny"
+  },
+  "pages": {
+    "climateStatistics": {
+      "title": "Byklima",
+      "description": "Søk etter en by for å utforske klimadata"
+    },
+    "compareCities": {
+      "title": "Sammenlign byer",
+      "description": "Sammenlign klimaet i to byer side om side"
+    },
+    "comparePeriods": {
+      "title": "Sammenlign perioder",
+      "description": "Se hvordan klimaet i en by endrer seg over perioder og år"
+    },
+    "heatMap": {
+      "title": "Varmekart for region",
+      "description": "Tegn et område på kartet for å se hvordan klimaet varierer"
     }
   },
   "search": {
@@ -17,8 +28,6 @@
     "coordsResult": "Gå til koordinater"
   },
   "climateStatistics": {
-    "title": "Klimastatistikk",
-    "subtitle": "Søk etter en by for å utforske klimadata",
     "cellResolution": "Celleoppløsning:",
     "filtersTab": "Filtre",
     "useMyLocation": "Bruk min posisjon",
@@ -31,18 +40,13 @@
       "totalPrec": "Total nedbør",
       "mmThisMonth": "mm denne måneden",
       "resolution": "Oppløsning",
-      "autoResolutionTooltip": "Oppløsningen stilles automatisk inn basert på valgt datasett",
       "altitude": "Høyde over havet",
       "filteredMonths": "Filtrert: {months}"
     },
     "noPeriodData": "Ingen data for {period} ved oppløsningen {grid}"
   },
-  "compareCities": {
-    "title": "Sammenlign byer",
-    "selectSecondCity": "Velg en by til å sammenligne med"
-  },
+  "compareCities": {},
   "comparePeriods": {
-    "title": "Sammenlign perioder",
     "trend": {
       "tempTitle": "Temperaturtrend",
       "precipTitle": "Nedbørtrend",
@@ -89,14 +93,12 @@
       "tieSub": "=",
       "monthTemps": "{a}: {tempA} / {b}: {tempB}"
     },
-    "autoResolution": "Automatisk oppløsning: {resolution}",
     "noPeriodData": "Ingen data for {period} ved oppløsningen {grid}",
     "difference": "Forskjell",
     "metric": "Måling",
     "tableCaption": "Sammenligning av {a} og {b}"
   },
   "heatMap": {
-    "title": "Varmekart for region",
     "placeholder": "Plassholder for varmekart. Vi kan senere vise klimaintensitet på et verdenskart her.",
     "drawBbox": "Tegn avgrensningsboks",
     "drawPolygon": "Tegn polygon",
@@ -223,7 +225,8 @@
     "10m": "10 min (~324 km²)",
     "5m": "5 min (~81 km²)",
     "2_5m": "2,5 min (~20,25 km²)",
-    "30s": "30 sek (~1 km²)"
+    "30s": "30 sek (~1 km²)",
+    "onlyForPeriod": "Bare for Klima {period}"
   },
   "cellSizesShort": {
     "10m": "10 min",
@@ -375,7 +378,7 @@
   },
   "meta": {
     "climateStatistics": {
-      "title": "Klimastatistikk for {city}",
+      "title": "{city} · {page}",
       "description": "{variables} for {city} ({period})"
     },
     "compareCities": {
@@ -384,11 +387,10 @@
     },
     "comparePeriods": {
       "title": "{city} — klimaperiode-sammenligning",
-      "description": "{variables} for {city} — {periods}",
-      "descriptionGeneric": "Sammenlign klimadata for en by over ulike tidsperioder"
+      "description": "{variables} for {city} — {periods}"
     },
     "heatMap": {
-      "title": "Varmekart for region — {variables} ({period})",
+      "title": "{page} · {variables} ({period})",
       "description": "Klimaintensitet for {variables} over det valgte området ({period})"
     }
   },

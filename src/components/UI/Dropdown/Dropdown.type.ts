@@ -4,6 +4,8 @@ export type TDropdownOption = {
   disabled?: boolean;
   /** a colour dot before the label — e.g. a compared year's series colour */
   color?: string;
+  /** a line under the label (why a disabled option is), announced as the option's description */
+  description?: string;
 };
 
 export type TDropdownProps = {

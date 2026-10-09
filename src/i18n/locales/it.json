@@ -3,13 +3,24 @@
     "toggleTheme": "Cambia tema"
   },
   "navbar": {
-    "toggleMenu": "Apri o chiudi il menu",
-    "links": {
-      "climateStatistics": "Clima della Città",
-      "climateComparison": "Confronta Città",
-      "compareCities": "Confronta Città",
-      "comparePeriods": "Confronta Periodi",
-      "heatMap": "Mappa di Calore Regionale"
+    "toggleMenu": "Apri o chiudi il menu"
+  },
+  "pages": {
+    "climateStatistics": {
+      "title": "Clima della Città",
+      "description": "Cerca una città per esplorare i suoi dati climatici"
+    },
+    "compareCities": {
+      "title": "Confronta Città",
+      "description": "Confronta il clima di due città, una accanto all'altra"
+    },
+    "comparePeriods": {
+      "title": "Confronta Periodi",
+      "description": "Scopri come cambia il clima di una città nei diversi periodi e anni"
+    },
+    "heatMap": {
+      "title": "Mappa di Calore Regionale",
+      "description": "Disegna un'area sulla mappa per vedere come varia il suo clima"
     }
   },
   "search": {
@@ -17,8 +28,6 @@
     "coordsResult": "Vai alle coordinate"
   },
   "climateStatistics": {
-    "title": "Statistiche Climatiche",
-    "subtitle": "Cerca una città per esplorare i suoi dati climatici",
     "cellResolution": "Risoluzione della cella:",
     "filtersTab": "Filtri",
     "useMyLocation": "Usa la mia posizione",
@@ -31,18 +40,13 @@
       "totalPrec": "Precipitazione totale",
       "mmThisMonth": "mm questo mese",
       "resolution": "Risoluzione",
-      "autoResolutionTooltip": "La risoluzione viene impostata automaticamente in base al set di dati selezionato",
       "altitude": "Altitudine",
       "filteredMonths": "Filtrato: {months}"
     },
     "noPeriodData": "Nessun dato per {period} alla risoluzione {grid}"
   },
-  "compareCities": {
-    "title": "Confronta Città",
-    "selectSecondCity": "Seleziona una seconda città da confrontare"
-  },
+  "compareCities": {},
   "comparePeriods": {
-    "title": "Confronta Periodi",
     "trend": {
       "tempTitle": "Tendenza della temperatura",
       "precipTitle": "Tendenza delle precipitazioni",
@@ -89,14 +93,12 @@
       "tieSub": "=",
       "monthTemps": "{a}: {tempA} / {b}: {tempB}"
     },
-    "autoResolution": "Risoluzione automatica: {resolution}",
     "noPeriodData": "Nessun dato per {period} alla risoluzione {grid}",
     "difference": "Differenza",
     "metric": "Indicatore",
     "tableCaption": "Confronto tra {a} e {b}"
   },
   "heatMap": {
-    "title": "Mappa di Calore Regionale",
     "placeholder": "Segnaposto della mappa di calore. Più avanti potremo mostrare qui l'intensità climatica su una mappa mondiale.",
     "drawBbox": "Disegna riquadro di selezione",
     "drawPolygon": "Disegna poligono",
@@ -223,7 +225,8 @@
     "10m": "10 min (~324 km2)",
     "5m": "5 min (~81 km2)",
     "2_5m": "2.5 min (~20.25 km2)",
-    "30s": "30 sec (~1 km2)"
+    "30s": "30 sec (~1 km2)",
+    "onlyForPeriod": "Solo per Clima {period}"
   },
   "cellSizesShort": {
     "10m": "10 min",
@@ -375,7 +378,7 @@
   },
   "meta": {
     "climateStatistics": {
-      "title": "Statistiche climatiche per {city}",
+      "title": "{city} · {page}",
       "description": "{variables} per {city} ({period})"
     },
     "compareCities": {
@@ -384,11 +387,10 @@
     },
     "comparePeriods": {
       "title": "{city} — confronto tra periodi climatici",
-      "description": "{variables} per {city} — {periods}",
-      "descriptionGeneric": "Confronta i dati climatici di una città tra periodi diversi"
+      "description": "{variables} per {city} — {periods}"
     },
     "heatMap": {
-      "title": "Mappa termica regionale — {variables} ({period})",
+      "title": "{page} · {variables} ({period})",
       "description": "Intensità climatica di {variables} nella regione selezionata ({period})"
     }
   },

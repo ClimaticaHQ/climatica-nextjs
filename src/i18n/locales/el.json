@@ -3,13 +3,24 @@
     "toggleTheme": "Αλλαγή θέματος"
   },
   "navbar": {
-    "toggleMenu": "Άνοιγμα ή κλείσιμο μενού",
-    "links": {
-      "climateStatistics": "Κλίμα Πόλης",
-      "climateComparison": "Σύγκριση Πόλεων",
-      "compareCities": "Σύγκριση Πόλεων",
-      "comparePeriods": "Σύγκριση Περιόδων",
-      "heatMap": "Περιφερειακός Χάρτης Θερμότητας"
+    "toggleMenu": "Άνοιγμα ή κλείσιμο μενού"
+  },
+  "pages": {
+    "climateStatistics": {
+      "title": "Κλίμα Πόλης",
+      "description": "Αναζητήστε μια πόλη για να εξερευνήσετε τα κλιματικά της δεδομένα"
+    },
+    "compareCities": {
+      "title": "Σύγκριση Πόλεων",
+      "description": "Συγκρίνετε το κλίμα δύο πόλεων δίπλα-δίπλα"
+    },
+    "comparePeriods": {
+      "title": "Σύγκριση Περιόδων",
+      "description": "Δείτε πώς αλλάζει το κλίμα μιας πόλης ανά περιόδους και χρόνια"
+    },
+    "heatMap": {
+      "title": "Περιφερειακός Χάρτης Θερμότητας",
+      "description": "Σχεδιάστε μια περιοχή στον χάρτη για να δείτε πώς μεταβάλλεται το κλίμα της"
     }
   },
   "search": {
@@ -17,8 +28,6 @@
     "coordsResult": "Μετάβαση στις συντεταγμένες"
   },
   "climateStatistics": {
-    "title": "Κλιματικά Στατιστικά",
-    "subtitle": "Αναζητήστε μια πόλη για να εξερευνήσετε τα κλιματικά της δεδομένα",
     "cellResolution": "Ανάλυση κελιού:",
     "filtersTab": "Φίλτρα",
     "useMyLocation": "Χρήση της τοποθεσίας μου",
@@ -31,18 +40,13 @@
       "totalPrec": "Συνολική βροχόπτωση",
       "mmThisMonth": "mm αυτόν τον μήνα",
       "resolution": "Ανάλυση",
-      "autoResolutionTooltip": "Η ανάλυση ορίζεται αυτόματα ανάλογα με το επιλεγμένο σύνολο δεδομένων",
       "altitude": "Υψόμετρο",
       "filteredMonths": "Φιλτραρισμένο: {months}"
     },
     "noPeriodData": "Δεν υπάρχουν δεδομένα για {period} στην ανάλυση {grid}"
   },
-  "compareCities": {
-    "title": "Σύγκριση Πόλεων",
-    "selectSecondCity": "Επιλέξτε μια δεύτερη πόλη για σύγκριση"
-  },
+  "compareCities": {},
   "comparePeriods": {
-    "title": "Σύγκριση Περιόδων",
     "trend": {
       "tempTitle": "Τάση θερμοκρασίας",
       "precipTitle": "Τάση βροχόπτωσης",
@@ -89,14 +93,12 @@
       "tieSub": "=",
       "monthTemps": "{a}: {tempA} / {b}: {tempB}"
     },
-    "autoResolution": "Αυτόματη ανάλυση: {resolution}",
     "noPeriodData": "Δεν υπάρχουν δεδομένα για {period} στην ανάλυση {grid}",
     "difference": "Διαφορά",
     "metric": "Δείκτης",
     "tableCaption": "Σύγκριση {a} και {b}"
   },
   "heatMap": {
-    "title": "Περιφερειακός Χάρτης Θερμότητας",
     "placeholder": "Δεσμευτική θέση χάρτη θερμότητας. Σύντομα θα μπορούμε να εμφανίσουμε εδώ την κλιματική ένταση σε έναν παγκόσμιο χάρτη.",
     "drawBbox": "Σχεδίαση πλαισίου επιλογής",
     "drawPolygon": "Σχεδίαση πολυγώνου",
@@ -223,7 +225,8 @@
     "10m": "10 λεπ (~324 km2)",
     "5m": "5 λεπ (~81 km2)",
     "2_5m": "2.5 λεπ (~20.25 km2)",
-    "30s": "30 δευτ (~1 km2)"
+    "30s": "30 δευτ (~1 km2)",
+    "onlyForPeriod": "Μόνο για Κλίμα {period}"
   },
   "cellSizesShort": {
     "10m": "10 λεπ.",
@@ -375,7 +378,7 @@
   },
   "meta": {
     "climateStatistics": {
-      "title": "Κλιματικά στατιστικά για {city}",
+      "title": "{city} · {page}",
       "description": "{variables} για {city} ({period})"
     },
     "compareCities": {
@@ -384,11 +387,10 @@
     },
     "comparePeriods": {
       "title": "{city} — σύγκριση κλιματικών περιόδων",
-      "description": "{variables} για {city} — {periods}",
-      "descriptionGeneric": "Σύγκριση κλιματικών δεδομένων μιας πόλης σε διαφορετικές χρονικές περιόδους"
+      "description": "{variables} για {city} — {periods}"
     },
     "heatMap": {
-      "title": "Θερμικός χάρτης περιοχής — {variables} ({period})",
+      "title": "{page} · {variables} ({period})",
       "description": "Ένταση κλίματος {variables} στην επιλεγμένη περιοχή ({period})"
     }
   },

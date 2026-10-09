@@ -10,7 +10,6 @@ export { MapSkeleton } from "./MapSkeleton";
 export { ExportMenu } from "./ExportMenu";
 export type { ExportMenuProps } from "./ExportMenu";
 export type { TMiniMapLocation, TMiniMapProps } from "./MiniMap";
-export { PageTitle } from "./PageTitle/PageTitle";
 export { PageWrapper } from "./PageWrapper";
 export { Popover } from "./Popover";
 export { RangeSlider } from "./RangeSlider";

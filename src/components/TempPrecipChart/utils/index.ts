@@ -1,5 +1,6 @@
 export { buildCompareData } from "./buildCompareData";
 export { buildComparisonSeries } from "./buildComparisonSeries";
+export { buildYearSeries } from "./buildYearSeries";
 export { buildMultiPeriodChartData } from "./buildMultiPeriodChartData";
 export { catmullRomPath } from "./catmullRomPath";
 export {
@@ -8,4 +9,3 @@ export {
   buildStrokeOpacityFadeStyle,
 } from "./lineFadeStyle";
 export { resolveVisibleSeries } from "./resolveVisibleSeries";
-export { periodColor } from "./periodColor";

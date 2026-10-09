@@ -89,6 +89,9 @@ export default function Dropdown({
             data-value={option.value}
             data-testid={optionTestIdPrefix ? `${optionTestIdPrefix}-${option.value}` : undefined}
             disabled={option.disabled}
+            aria-describedby={
+              option.description !== undefined ? `${buttonId}-${option.value}-desc` : undefined
+            }
             onClick={() => {
               onChange(option.value);
               setIsOpen(false);
@@ -99,17 +102,28 @@ export default function Dropdown({
               transition-colors duration-100
               ${
                 option.disabled
-                  ? "cursor-not-allowed opacity-40 text-[var(--color-text-secondary)]"
+                  ? "cursor-not-allowed text-[var(--color-text-secondary)]"
                   : option.value === value
                     ? "bg-[var(--color-primary)] text-[var(--color-bg)]"
                     : "text-[var(--color-text)] hover:bg-[var(--color-bg-secondary)]"
               }
             `}
           >
-            <span className="inline-flex items-center gap-1.5">
+            {/* * a disabled option's label fades; its description stays readable */}
+            <span
+              className={`inline-flex items-center gap-1.5 ${option.disabled ? "opacity-40" : ""}`}
+            >
               {option.color !== undefined && <OptionDot color={option.color} />}
               {option.label}
             </span>
+            {option.description !== undefined && (
+              <span
+                id={`${buttonId}-${option.value}-desc`}
+                className="block text-[length:var(--font-xs)] text-[var(--color-text-secondary)]"
+              >
+                {option.description}
+              </span>
+            )}
           </button>
         ))}
       </div>

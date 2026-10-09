@@ -113,16 +113,18 @@ export async function resolveClimateStatisticsMeta({
 }: TResolveMetaArgs): Promise<TRouteMeta> {
   const [t, tPage] = await Promise.all([
     getTranslations({ locale, namespace: "meta.climateStatistics" }),
-    getTranslations({ locale, namespace: "climateStatistics" }),
+    getTranslations({ locale, namespace: "pages.climateStatistics" }),
   ]);
 
   const { city } = extractParams(searchParams, { city: SIDEBAR_PARAMS.CITY });
   const { dataset, varParam, periodParam, yearParam, variables, period } =
     resolveCommonClimateParams(searchParams);
 
-  const title = city ? t("title", { city }) : tPage("title");
+  const title = city ? t("title", { city, page: tPage("title") }) : tPage("title");
   const description =
-    city && variables && period ? t("description", { city, variables, period }) : tPage("subtitle");
+    city && variables && period
+      ? t("description", { city, variables, period })
+      : tPage("description");
 
   const imagePath = buildOgImagePath({
     route: ROUTES.CLIMATE_STATISTICS,
@@ -143,7 +145,7 @@ export async function resolveCompareCitiesMeta({
 }: TResolveMetaArgs): Promise<TRouteMeta> {
   const [t, tPage] = await Promise.all([
     getTranslations({ locale, namespace: "meta.compareCities" }),
-    getTranslations({ locale, namespace: "compareCities" }),
+    getTranslations({ locale, namespace: "pages.compareCities" }),
   ]);
 
   const { cityA, cityB } = extractParams(searchParams, {
@@ -157,7 +159,7 @@ export async function resolveCompareCitiesMeta({
   const description =
     cityA && cityB && variables && period
       ? t("description", { cityA, cityB, variables, period })
-      : tPage("selectSecondCity");
+      : tPage("description");
 
   const imagePath = buildOgImagePath({
     route: ROUTES.COMPARE_CITIES,
@@ -179,7 +181,7 @@ export async function resolveComparePeriodsMeta({
 }: TResolveMetaArgs): Promise<TRouteMeta> {
   const [t, tPage] = await Promise.all([
     getTranslations({ locale, namespace: "meta.comparePeriods" }),
-    getTranslations({ locale, namespace: "comparePeriods" }),
+    getTranslations({ locale, namespace: "pages.comparePeriods" }),
   ]);
 
   const { city, dataset, varParam, periodAParam, periodBParam, periodsParam } = extractParams(
@@ -205,7 +207,7 @@ export async function resolveComparePeriodsMeta({
   const description =
     city && variables && periods
       ? t("description", { city, variables, periods })
-      : t("descriptionGeneric");
+      : tPage("description");
 
   const imagePath = buildOgImagePath({
     route: ROUTES.COMPARE_PERIODS,
@@ -227,7 +229,7 @@ export async function resolveHeatMapMeta({
 }: TResolveMetaArgs): Promise<TRouteMeta> {
   const [t, tPage] = await Promise.all([
     getTranslations({ locale, namespace: "meta.heatMap" }),
-    getTranslations({ locale, namespace: "heatMap" }),
+    getTranslations({ locale, namespace: "pages.heatMap" }),
   ]);
 
   const { polygon, north, south, west, east } = extractParams(searchParams, {
@@ -243,11 +245,14 @@ export async function resolveHeatMapMeta({
   const { dataset, varParam, periodParam, yearParam, variables, period } =
     resolveCommonClimateParams(searchParams);
 
-  const title = hasSelection && variables ? t("title", { variables, period }) : tPage("title");
+  const title =
+    hasSelection && variables
+      ? t("title", { page: tPage("title"), variables, period })
+      : tPage("title");
   const description =
     hasSelection && variables && period
       ? t("description", { variables, period })
-      : tPage("noSelection");
+      : tPage("description");
 
   const imagePath = buildOgImagePath({
     route: ROUTES.HEAT_MAP,
