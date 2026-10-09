@@ -55,19 +55,6 @@
   transition: width var(--motion-table-column-resize) var(--motion-table-column-resize-easing);
 }
 
-/* * FiltersTab: the panel's height, then its content fading in slightly after */
-.filters-collapse {
-  transition: grid-template-rows var(--motion-filters-collapse)
-    var(--motion-filters-collapse-easing);
-}
-
-.filters-content-fade {
-  transition-property: opacity, transform;
-  transition-duration: var(--motion-filters-content-fade);
-  transition-delay: var(--motion-filters-content-delay);
-  transition-timing-function: var(--motion-filters-content-easing);
-}
-
 /* * DataUpdateFade: content dimmed while an update loads */
 .update-fade {
   transition: opacity var(--motion-update-fade) var(--motion-update-fade-easing);
