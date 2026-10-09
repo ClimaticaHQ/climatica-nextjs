@@ -20,7 +20,7 @@ export function WalterLiethSeriesLayer({
   hasSmallDots,
   activeMonthIndex,
 }: TWalterLiethSeriesLayerProps) {
-  const { rows, segments, patternIds, colors, precDash, dotShape } = layer;
+  const { rows, segments, patternIds, colors, precDash, dotShape, opacity } = layer;
   const { hatched, perhumid } = partitionSegmentsByLayer(segments);
   const paths = { patternIds, colors, scaleX, scaleY };
   const isHighlighting = activeMonthIndex !== null && activeMonthIndex !== undefined;
@@ -35,7 +35,7 @@ export function WalterLiethSeriesLayer({
   const temp = { d: curve("tavg"), width: WALTER_LIETH_STROKE.TEMP_WIDTH };
 
   return (
-    <g>
+    <g opacity={opacity} className="wl-layer-fade">
       <HatchPatterns
         {...patternIds}
         humidColor={colors.humidHatch}

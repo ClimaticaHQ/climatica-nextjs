@@ -41,6 +41,8 @@ export type TWalterLiethLayerSeries = {
   precDash?: string;
   /** second visual cue besides color, so overlay series never rely on color alone */
   dotShape: TWalterLiethDotShape;
+  /** below 1 while another series is highlighted (an overlay year chip hovered) */
+  opacity?: number;
 };
 
 export type TWalterLiethLayerProps = {
@@ -127,4 +129,9 @@ export type TWalterLiethTooltipProps = {
 
 export type TWalterLiethIncompleteNoticeProps = {
   label: string;
+};
+
+export type TUseWalterLiethChartsArgs = {
+  series: readonly TWalterLiethSeries[];
+  monthOrder: readonly number[];
 };
