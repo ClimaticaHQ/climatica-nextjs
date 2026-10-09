@@ -119,7 +119,21 @@
       "stored": true
     },
     {
+      "name": "label_nb",
+      "type": "suggestType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
       "name": "label_pt",
+      "type": "suggestType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_ro",
       "type": "suggestType",
       "multiValued": false,
       "indexed": true,
@@ -175,7 +189,21 @@
       "stored": false
     },
     {
+      "name": "label_nb_ngram",
+      "type": "trigramType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": false
+    },
+    {
       "name": "label_pt_ngram",
+      "type": "trigramType",
+      "multiValued": false,
+      "indexed": true,
+      "stored": false
+    },
+    {
+      "name": "label_ro_ngram",
       "type": "trigramType",
       "multiValued": false,
       "indexed": true,
@@ -250,8 +278,16 @@
       "dest": "label_it_ngram"
     },
     {
+      "source": "label_nb",
+      "dest": "label_nb_ngram"
+    },
+    {
       "source": "label_pt",
       "dest": "label_pt_ngram"
+    },
+    {
+      "source": "label_ro",
+      "dest": "label_ro_ngram"
     },
     {
       "source": "label_uk",
