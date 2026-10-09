@@ -120,7 +120,7 @@ export function HeatMap() {
 
   const hasData = (pixels?.results.bindings.length ?? 0) > 0;
 
-  const { profileData, isProfileLoading } = useGetRegionalProfile(
+  const { profileData, isProfileLoading, profileError } = useGetRegionalProfile(
     polygon ? null : bbox,
     wkt,
     grid,
@@ -194,7 +194,8 @@ export function HeatMap() {
       isLoading={isLoading}
       isFetching={isFetching}
       isLocating={isLocating}
-      error={error}
+      // * the page's one banner also reports a failed regional profile
+      error={error ?? profileError}
       locationError={resolvedLocationError}
       mapTarget={mapTarget}
       datasetAttribution={datasetAttribution}
