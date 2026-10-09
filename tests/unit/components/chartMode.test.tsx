@@ -1,9 +1,7 @@
 // @vitest-environment jsdom
 import { ChartModeSwitch } from "@/components/ChartModeSwitch";
-import {
-  FilterUnavailableActionsContext,
-  FilterUnavailableNote,
-} from "@/components/filters/FilterUnavailableNote";
+import { FilterSection } from "@/components/filters/FilterSection";
+import { FilterUnavailableActionsContext } from "@/components/filters/filters.context";
 import { EFilterAvailability } from "@/enums";
 import messages from "@/i18n/locales/en.json";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
@@ -16,6 +14,12 @@ const url = vi.hoisted(() => {
   return { writes };
 });
 
+// * FilterSection's module graph reaches the page-level filter hooks — never called here
+vi.mock("@/hooks/filters/useFilterNavigation", () => ({
+  useFilterNavigation: () => ({ applyFilters: vi.fn(), updateFilters: vi.fn() }),
+}));
+vi.mock("@/hooks/filters/useFilters", () => ({ useFilters: vi.fn() }));
+vi.mock("@/hooks/filters/useCityClimatePeriods", () => ({ useCityClimatePeriods: () => null }));
 vi.mock("@/hooks/url/useChartModeUrl", () => ({
   useChartModeUrl: () => ({
     chartMode: "walter-lieth",
@@ -63,9 +67,15 @@ describe("ChartModeSwitch", () => {
   });
 });
 
-describe("FilterUnavailableNote", () => {
+describe("FilterSection: why a filter is unavailable", () => {
   it("shows the note alone outside a provider", () => {
-    render(withIntl(<FilterUnavailableNote availability={EFilterAvailability.WALTER_LIETH} />));
+    render(
+      withIntl(
+        <FilterSection availability={EFilterAvailability.WALTER_LIETH}>
+          <span />
+        </FilterSection>,
+      ),
+    );
     expect(screen.getByText("Not available in Walter-Lieth view")).toBeTruthy();
     expect(screen.queryByRole("button")).toBeNull();
   });
@@ -77,8 +87,12 @@ describe("FilterUnavailableNote", () => {
         <FilterUnavailableActionsContext.Provider
           value={{ [EFilterAvailability.WALTER_LIETH]: onSwitch }}
         >
-          <FilterUnavailableNote availability={EFilterAvailability.WALTER_LIETH} />
-          <FilterUnavailableNote availability={EFilterAvailability.HEAT_MAP} />
+          <FilterSection availability={EFilterAvailability.WALTER_LIETH}>
+            <span />
+          </FilterSection>
+          <FilterSection availability={EFilterAvailability.HEAT_MAP}>
+            <span />
+          </FilterSection>
         </FilterUnavailableActionsContext.Provider>,
       ),
     );

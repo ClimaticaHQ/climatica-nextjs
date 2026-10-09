@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { FILTER_DEFAULTS } from "@/constants";
-import { EFilterApplyMode, EFilterKey, EMobileFilterSheet } from "@/enums";
-import { useMobileFilterSheets } from "@/hooks/filters/useMobileFilterSheets";
+import { EFilterApplyMode, EFilterKey, EFiltersSheetMode } from "@/enums";
+import { useFiltersSheet } from "@/hooks/filters/useFiltersSheet";
 import type { TFilters } from "@/types";
 import { getCurrentSheetMarker } from "@/utils/bottomSheet.util";
 import { act, cleanup, renderHook } from "@testing-library/react";
@@ -40,18 +40,19 @@ beforeEach(() => {
 
 afterEach(cleanup);
 
-describe("useMobileFilterSheets", () => {
-  it("opens the full sheet, or one filter's — remembering which", () => {
-    const { result } = renderHook(() => useMobileFilterSheets());
+describe("useFiltersSheet", () => {
+  it("opens every filter, or one filter's — remembering which", () => {
+    const { result } = renderHook(() => useFiltersSheet());
     act(() => result.current.openFilter(EFilterKey.MONTHS));
-    expect(result.current.openSheet).toBe(EMobileFilterSheet.SINGLE);
-    expect(result.current.singleKey).toBe(EFilterKey.MONTHS);
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.mode).toBe(EFiltersSheetMode.SINGLE);
+    expect(result.current.filterKey).toBe(EFilterKey.MONTHS);
     act(() => result.current.openAll());
-    expect(result.current.openSheet).toBe(EMobileFilterSheet.ALL);
+    expect(result.current.mode).toBe(EFiltersSheetMode.ALL);
   });
 
   it("closes the sheet (its history entry popped) before it navigates", async () => {
-    const { result } = renderHook(() => useMobileFilterSheets());
+    const { result } = renderHook(() => useFiltersSheet());
     act(() => result.current.openAll());
     expect(getCurrentSheetMarker()).not.toBeNull();
 
@@ -63,23 +64,24 @@ describe("useMobileFilterSheets", () => {
     expect(navigation.calls).toEqual([]);
 
     await act(() => applying);
-    expect(result.current.openSheet).toBeNull();
+    expect(result.current.isOpen).toBe(false);
     expect(navigation.calls).toEqual([{ mode: EFilterApplyMode.APPLY, markerAtCall: null }]);
   });
 
-  it("keeps the single sheet's key while it slides out", async () => {
-    const { result } = renderHook(() => useMobileFilterSheets());
+  it("keeps its mode and filter while it slides out", async () => {
+    const { result } = renderHook(() => useFiltersSheet());
     act(() => result.current.openFilter(EFilterKey.GRID_SIZE));
     await act(() => result.current.applyAndClose(NEXT, EFilterApplyMode.QUICK));
-    expect(result.current.openSheet).toBeNull();
-    expect(result.current.singleKey).toBe(EFilterKey.GRID_SIZE);
+    expect(result.current.isOpen).toBe(false);
+    expect(result.current.mode).toBe(EFiltersSheetMode.SINGLE);
+    expect(result.current.filterKey).toBe(EFilterKey.GRID_SIZE);
     expect(navigation.calls[0]?.mode).toBe(EFilterApplyMode.QUICK);
   });
 
   it("switches to the standard chart only after the info sheet has closed", async () => {
-    const { result } = renderHook(() => useMobileFilterSheets());
-    act(() => result.current.openWalterLiethInfo());
-    expect(result.current.openSheet).toBe(EMobileFilterSheet.WALTER_LIETH_INFO);
+    const { result } = renderHook(() => useFiltersSheet());
+    act(() => result.current.openUnavailableInfo());
+    expect(result.current.mode).toBe(EFiltersSheetMode.UNAVAILABLE_INFO);
 
     let switching: Promise<void> = Promise.resolve();
     act(() => {
@@ -88,7 +90,7 @@ describe("useMobileFilterSheets", () => {
     expect(navigation.calls).toEqual([]);
 
     await act(() => switching);
-    expect(result.current.openSheet).toBeNull();
+    expect(result.current.isOpen).toBe(false);
     expect(navigation.calls).toEqual([{ mode: "chart:standard", markerAtCall: null }]);
   });
 });

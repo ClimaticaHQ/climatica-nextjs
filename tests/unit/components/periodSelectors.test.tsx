@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
-import { PeriodPairSelector } from "@/components/filters/PeriodSelectors/PeriodPairSelector";
-import { PeriodSelectors } from "@/components/filters/PeriodSelectors/PeriodSelectors";
+import {
+  ComparedPeriods,
+  ComparedPeriodsSection,
+} from "@/components/filters/sections/ComparedPeriods";
 import { CLIMATE_PERIODS, FILTER_DEFAULTS } from "@/constants";
 import { EFilterApplyMode } from "@/enums";
 import messages from "@/i18n/locales/en.json";
@@ -59,7 +61,15 @@ function withIntl(node: ReactNode) {
 
 function renderPair(onChange = vi.fn()) {
   render(
-    withIntl(<PeriodPairSelector periods={PAIR} availablePeriods={null} onChange={onChange} />),
+    withIntl(
+      <ComparedPeriodsSection
+        values={{ ...FILTER_DEFAULTS, ...PAIR }}
+        availablePeriods={null}
+        onChange={vi.fn()}
+        onChangeMany={onChange}
+        isOnPage
+      />,
+    ),
   );
   return onChange;
 }
@@ -67,7 +77,7 @@ function renderPair(onChange = vi.fn()) {
 const option = (side: "a" | "b", period: string) =>
   screen.getByTestId(`period-${side}-option-${period}`);
 
-describe("PeriodPairSelector", () => {
+describe("ComparedPeriodsSection: the Climate A ↔ B pair", () => {
   it("disables each side's period in the other select", () => {
     renderPair();
     expect(option("a", PAIR.climatePeriodB).hasAttribute("disabled")).toBe(true);
@@ -100,10 +110,10 @@ describe("PeriodPairSelector", () => {
   });
 });
 
-describe("PeriodSelectors (the page, below lg)", () => {
+describe("ComparedPeriods (the page, below lg)", () => {
   it("shows the period pair with Climate, applying changes with replace", () => {
     page.filters = { ...FILTER_DEFAULTS, ...PAIR };
-    render(withIntl(<PeriodSelectors />));
+    render(withIntl(<ComparedPeriods />));
     fireEvent.click(screen.getByRole("button", { name: "Swap periods" }));
     expect(page.updates).toEqual([
       {
@@ -115,7 +125,7 @@ describe("PeriodSelectors (the page, below lg)", () => {
 
   it("falls back to the years editor with Weather", () => {
     page.filters = { ...FILTER_DEFAULTS, dataset: "weather", weatherPeriods: [2021, 1967] };
-    render(withIntl(<PeriodSelectors />));
+    render(withIntl(<ComparedPeriods />));
     expect(screen.queryByRole("button", { name: "Swap periods" })).toBeNull();
     expect(screen.getByRole("button", { name: "Add period" })).toBeTruthy();
     expect(screen.getByText("2021")).toBeTruthy();
@@ -124,7 +134,7 @@ describe("PeriodSelectors (the page, below lg)", () => {
   it("renders nothing from lg — the sidebar has them as a section", () => {
     page.isDesktop = true;
     page.filters = { ...FILTER_DEFAULTS, ...PAIR };
-    render(withIntl(<PeriodSelectors />));
+    render(withIntl(<ComparedPeriods />));
     expect(screen.queryByRole("button", { name: "Swap periods" })).toBeNull();
   });
 });
