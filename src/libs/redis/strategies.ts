@@ -1,7 +1,7 @@
 import "server-only";
 
 import { CACHE_KEYS, CACHE_TTL, THRESHOLDS } from "@/constants";
-import { TCitySearchParams, TClimateSearch, TCoordinates } from "@/types";
+import type { TCitySearchParams, TCoordinates } from "@/types";
 
 export const REDIS_STRATEGIES = {
   citySearch: {
@@ -13,12 +13,12 @@ export const REDIS_STRATEGIES = {
     buildCounterKey: (dto: TCitySearchParams) => CACHE_KEYS.CITY_SEARCH_COUNTER(dto),
   },
 
-  climateData: {
+  worldclimResource: {
     ttl: CACHE_TTL.CLIMATE_DATA,
     popularTtl: CACHE_TTL.POPULAR_CLIMATE,
     popularThreshold: THRESHOLDS.POPULAR_CLIMATE,
-    buildKey: (dto: TClimateSearch) => CACHE_KEYS.CLIMATE(dto),
-    buildCounterKey: (dto: TCoordinates) => CACHE_KEYS.CLIMATE_COUNTER(dto),
+    buildKey: (searchParams: string) => CACHE_KEYS.WORLDCLIM_RESOURCE(searchParams),
+    buildCounterKey: (searchParams: string) => CACHE_KEYS.WORLDCLIM_RESOURCE_COUNTER(searchParams),
   },
 
   nearestCity: {

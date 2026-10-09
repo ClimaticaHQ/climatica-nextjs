@@ -1,4 +1,4 @@
-import { TCitySearchParams, TClimateSearch, TCoordinates } from "@/types";
+import type { TCitySearchParams, TCoordinates } from "@/types";
 import { TIME } from "./time.constant";
 
 export const THRESHOLDS = {
@@ -14,8 +14,6 @@ export const CACHE_TTL = {
 
   CLIMATE_DATA: TIME.IN_SECONDS.SEVEN_DAYS,
   POPULAR_CLIMATE: TIME.IN_SECONDS.THIRTY_DAYS,
-
-  WORLDCLIM_RESOURCE: TIME.IN_SECONDS.THIRTY_DAYS,
 } as const;
 
 export const CACHE_KEYS = {
@@ -23,11 +21,6 @@ export const CACHE_KEYS = {
     `city-search:${dto.lang}:${dto.query.toLowerCase().trim()}`,
   CITY_SEARCH_COUNTER: (dto: TCitySearchParams) =>
     `city-search-counter:${dto.lang}:${dto.query.toLowerCase().trim()}`,
-
-  CLIMATE: (dto: TClimateSearch) =>
-    `climate:${dto.dataset}:${dto.resolution}:${dto.lat.toFixed(4)}:${dto.lng.toFixed(4)}`,
-  CLIMATE_COUNTER: (dto: TCoordinates) =>
-    `climate-counter:${dto.lat.toFixed(4)}:${dto.lng.toFixed(4)}`,
 
   NEAREST_CITY_SEARCH: (dto: TCoordinates) =>
     `nearest-city:${dto.lat.toFixed(4)}:${dto.lng.toFixed(4)}`,
