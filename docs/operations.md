@@ -1,0 +1,87 @@
+# Operations
+
+Running the app locally and keeping an environment up to date: the Docker services, the
+environment variables, and the Solr city index.
+
+## Docker services
+
+[`docker/docker-compose.yml`](../docker/docker-compose.yml) runs two services (project
+`climatica`):
+
+| Service           | Image            | Port | Data                                                                                                                                                   |
+| ----------------- | ---------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `climatica-solr`  | `solr:8`         | 8983 | Volume `solr_data`. Creates the `cities` core on first start; [`solrconfig.xml`](../docker/solr/solrconfig.xml) is mounted into the default configset. |
+| `climatica-redis` | `redis:7-alpine` | 6379 | Volume `redis_data`, with append-only persistence.                                                                                                     |
+
+| Command                               | Does                                                                                |
+| ------------------------------------- | ----------------------------------------------------------------------------------- |
+| `npm run docker:up`                   | Starts both services (reads `.env`).                                                |
+| `npm run docker:stop` / `docker:down` | Stops them / stops and removes the containers. Volumes are kept.                    |
+| `npm run docker:reset`                | `down -v`: removes the containers **and both volumes** (Solr index and Redis data). |
+| `npm run docker:reboot`               | `docker:reset` then `docker:up`. Needs a reindex afterwards.                        |
+| `npm run docker:logs`                 | Follows the services' logs.                                                         |
+| `npm run docker:rm`                   | Force-removes both containers.                                                      |
+
+## Environment variables
+
+They're validated at startup in [`src/libs/Env.ts`](../src/libs/Env.ts). Copy
+[`.example.env`](../.example.env) to `.env` and fill it in.
+
+| Variable               | Side   | Default                         | Purpose                                                      |
+| ---------------------- | ------ | ------------------------------- | ------------------------------------------------------------ |
+| `WORLDCLIM_API_KEY`    | server | — (required)                    | Bearer key for the WorldClim API; never sent to the browser. |
+| `REDIS_URL`            | server | `redis://localhost:6379`        | Redis connection.                                            |
+| `SOLR_URL`             | server | `http://localhost:8983`         | Solr base URL (also used by `npm run solr:schema`).          |
+| `PORT`                 | server | `3000`                          | Dev server port; the server-side axios base URL uses it.     |
+| `NODE_ENV`             | server | `development`                   |                                                              |
+| `NEXT_PUBLIC_SITE_URL` | client | `https://climatica.gsic.uva.es` | Absolute URLs: metadata, share links, OG images.             |
+
+Code never reads `process.env` directly; it imports `env` from `@/libs/Env`.
+
+## First-time setup
+
+1. `npm install`, then create `.env` as above.
+2. Download GeoNames' [`allCountries.zip`](https://download.geonames.org/export/dump/allCountries.zip)
+   and [`alternateNamesV2.zip`](https://download.geonames.org/export/dump/alternateNamesV2.zip)
+   and extract both into `docker/solr/data/` (they're gitignored).
+3. Build the cities CSV: `python3 docker/solr/scripts/prepare_data.py` (Python 3.8+). It
+   keeps populated places and capitals (feature codes `PPL*`, `PPLC`) and writes one
+   `label_<lang>` column per locale.
+4. `npm run docker:up`, and wait until Solr answers (its healthcheck pings the `cities`
+   core).
+5. `npm run solr:reindex`, which takes a few minutes for the full file.
+6. `npm run dev` and open http://localhost:3000.
+
+## Solr reindex
+
+`npm run solr:reindex` runs two steps:
+
+- **`solr:schema`** — [`apply-schema.mjs`](../docker/solr/scripts/apply-schema.mjs)
+  compares [`schema.json`](../docker/solr/schema.json) with Solr's current schema and sends
+  only the missing or changed field types, fields and copy fields. It's safe to run
+  repeatedly, and fails with a clear message if Solr isn't reachable.
+- **`solr:import`** — copies `docker/solr/data/cities.csv` into the container and posts it
+  to the `cities` core.
+
+`schema.json` is generated from `locales.json` by
+[`generate_schema.py`](../docker/solr/scripts/generate_schema.py) and committed; only
+whoever changes the locale list runs the generator (see [i18n.md](i18n.md)).
+
+## Updating an existing environment
+
+After pulling changes:
+
+| What changed                                                                | Run                                                                                             |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `docker/solr/solrconfig.xml`, or the `cities` core fails to load            | `npm run docker:reboot` (recreates the core; wipes the index and Redis), then the reindex below |
+| `src/configs/locales.json` or `prepare_data.py` (`cities.csv` isn't in git) | `python3 docker/solr/scripts/prepare_data.py`                                                   |
+| `docker/solr/schema.json`, or after either of the above                     | `npm run solr:reindex`                                                                          |
+| `.example.env` (a new variable)                                             | add it to `.env`                                                                                |
+
+Solr copies `solrconfig.xml` into the core only when the core is created, which is why a
+config change needs the reboot.
+
+Cached responses survive in Redis across deploys (city searches up to 30 days, see
+[backend.md](backend.md)). After a change that alters what an API returns, clear them with
+`docker exec climatica-redis redis-cli FLUSHDB` (it also resets the rate-limit counters),
+or reboot the services.
