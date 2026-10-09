@@ -18,6 +18,12 @@ async function applySidebarOption(page: Page, label: string | RegExp, value: str
   await page.getByRole("button", { name: "Apply filters" }).click();
 }
 
+/** Picks a period in Compare Periods' own selector (side "a" or "b") — it applies at once. */
+async function selectPagePeriod(page: Page, side: "a" | "b", value: string) {
+  await page.getByTestId(`period-${side}-select`).click();
+  await page.getByTestId(`period-${side}-option-${value}`).click();
+}
+
 test.describe("Data update feedback", () => {
   test("disables export while loading, then announces the update", async ({ page }) => {
     await page.goto(CITY_URL);
@@ -46,7 +52,7 @@ test.describe("Data update feedback", () => {
     const panelB = page.locator('[data-panel-series="b"]:not([inert] *)');
     await expect(panelB).toBeVisible({ timeout: 30_000 });
 
-    await applySidebarOption(page, "Period B", "c1981-2010");
+    await selectPagePeriod(page, "b", "c1981-2010");
 
     await expect(panelB).toHaveAttribute("data-update-flash", "active");
     await expect(panelA).not.toHaveAttribute("data-update-flash");
@@ -122,7 +128,7 @@ test.describe("Animation settings", () => {
       "true",
     );
 
-    await applySidebarOption(page, "Period B", "c1981-2010");
+    await selectPagePeriod(page, "b", "c1981-2010");
 
     await expect(panelB).toHaveAttribute("data-update-flash", "active");
     await expect(panelB).toHaveAttribute("data-update-flash-variant", "border");

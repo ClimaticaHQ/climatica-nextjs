@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("Internationalisation", () => {
-  test("defaults to English with the Climate Statistics heading", async ({ page }) => {
+  test("defaults to English with the City Climate heading", async ({ page }) => {
     await page.goto("/climate-statistics");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Climate Statistics");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("City Climate");
   });
 
   test("switches the UI to Spanish when ES is selected", async ({ page }) => {
@@ -11,7 +11,7 @@ test.describe("Internationalisation", () => {
     await page.getByTestId("language-switcher").click();
     await page.getByTestId("language-option-es").click();
     await expect(page).toHaveURL(/\/es\//);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Estadísticas Climáticas");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Clima de Ciudad");
   });
 
   test("switches the UI to Ukrainian when UA is selected", async ({ page }) => {
@@ -19,7 +19,7 @@ test.describe("Internationalisation", () => {
     await page.getByTestId("language-switcher").click();
     await page.getByTestId("language-option-uk").click();
     await expect(page).toHaveURL(/\/uk\//);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Кліматична статистика");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Клімат міста");
   });
 
   test("selected language persists when navigating to another page", async ({ page }) => {

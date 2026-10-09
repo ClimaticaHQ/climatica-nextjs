@@ -1,17 +1,21 @@
 import { HEAT_MAP_URL_SCHEMA } from "@/app/heat-map/_components/HeatMap.constant";
+import { FILTER_DEFAULTS } from "@/constants";
+import { parseFilters } from "@/utils/filtersUrl.util";
 import { parseUrlState } from "@/utils/urlParams.util";
 import { describe, expect, it } from "vitest";
 
-describe("heat-map URL schema", () => {
+describe("heat-map URL", () => {
   it("parses an existing bbox-selection exported link", () => {
     const params = new URLSearchParams(
       "dataset=climate&var=tmax&grid=10m&period=c1970-2000&north=50&south=49&west=23&east=24",
     );
     expect(parseUrlState(HEAT_MAP_URL_SCHEMA, params)).toEqual({
-      datasetPeriod: { dataset: "climate", climatePeriod: "c1970-2000" },
+      selection: { kind: "bbox", bbox: { north: 50, south: 49, west: 23, east: 24 } },
+    });
+    expect(parseFilters(params)).toEqual({
+      ...FILTER_DEFAULTS,
       variables: ["tmax"],
       gridSize: "10m",
-      selection: { kind: "bbox", bbox: { north: 50, south: 49, west: 23, east: 24 } },
     });
   });
 
@@ -25,9 +29,10 @@ describe("heat-map URL schema", () => {
       year: "2020",
       polygon: wkt,
     });
-    const parsed = parseUrlState(HEAT_MAP_URL_SCHEMA, params);
-    expect(parsed.datasetPeriod).toEqual({ dataset: "weather", weatherYear: 2020 });
-    expect(parsed.selection?.kind).toBe("polygon");
+    expect(parseUrlState(HEAT_MAP_URL_SCHEMA, params).selection?.kind).toBe("polygon");
+    const filters = parseFilters(params);
+    expect(filters.dataset).toBe("weather");
+    expect(filters.weatherYear).toBe(2020);
   });
 
   it("parses a link with no selection at all", () => {
