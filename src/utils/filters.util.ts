@@ -16,9 +16,16 @@ import {
   FULL_VARIABLES_CLIMATE_PERIOD,
   MONTH_NUMBERS,
   PERIOD_RESTRICTED_VARIABLES,
+  VARIABLES_NOTE_RULES,
   WEATHER_VARIABLES,
 } from "@/constants";
-import { EFilterAvailability, EFilterKey, EFilterPlacement, EFilterView } from "@/enums";
+import {
+  EFilterAvailability,
+  EFilterChoice,
+  EFilterKey,
+  EFilterPlacement,
+  EFilterView,
+} from "@/enums";
 import type {
   TCellSize,
   TClimatePeriod,
@@ -243,6 +250,14 @@ export function toClimatePeriodHandler(onChange: (period: TClimatePeriod) => voi
   };
 }
 
+/** A dropdown's change handler that passes on only values naming a grid size. */
+export function toCellSizeHandler(onChange: (gridSize: TCellSize) => void) {
+  return (value: string) => {
+    const gridSize = Object.values(CELL_SIZES).find((size) => size === value);
+    if (gridSize !== undefined) onChange(gridSize);
+  };
+}
+
 /**
  * Climate period dropdown options; null availability = unknown yet, so none is disabled for
  * it. excludedPeriod — the one picked on the other side of a comparison — is disabled too.
@@ -265,4 +280,29 @@ export function getAddedWeatherPeriodError(year: number | undefined, periods: re
     return "comparePeriods.weather.invalidYear";
   }
   return periods.includes(year) ? "comparePeriods.weather.duplicateYear" : null;
+}
+
+/** The variable chips of a dataset, each disabled where the climate period lacks it. */
+export function getVariableOptionStates(values: TFilters, { view }: TFilterAvailabilityContext) {
+  const context = { view, dataset: values.dataset, climatePeriod: values.climatePeriod };
+  return getVariableOptions(values.dataset).map((value) => ({
+    value,
+    isDisabled: isVariableOptionDisabled(value, context),
+  }));
+}
+
+export function getGridSizeOptionStates(values: TFilters) {
+  return Object.values(CELL_SIZES).map((value) => ({
+    value,
+    isDisabled: !isGridSizeOffered(value, values),
+  }));
+}
+
+export function getVariablesNotes(context: TFilterAvailabilityContext) {
+  return VARIABLES_NOTE_RULES.filter(({ isShown }) => isShown(context)).map(({ note }) => note);
+}
+
+/** One-option filters apply as soon as an option is picked; lists and typed values need Apply. */
+export function isAppliedOnSelect(key: EFilterKey) {
+  return FILTERS_CONFIG[key].choice === EFilterChoice.SINGLE;
 }
