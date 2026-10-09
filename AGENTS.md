@@ -23,7 +23,8 @@
 - `npm run format` — Prettier write
 - `npm run check` — type-check + lint + format:check
 - `npm run test` — Vitest unit tests
-- `npm run test:e2e` — Playwright e2e tests (needs Docker services and dev server)
+- `npm run test:e2e` — Playwright e2e tests (needs the Docker services; reuses a running
+  dev server or starts one)
 
 Before reporting a task as done: `npm run check`, `npm run test`, `npm run build`,
 `npm run test:e2e`.
@@ -47,20 +48,27 @@ Before reporting a task as done: `npm run check`, `npm run test`, `npm run build
   at render time
 - Route Handlers in src/app/api/ for all external API calls
 - WorldClim API key is server-only (no NEXT_PUBLIC_ prefix)
+- App-wide hooks that read the URL (useSearchParams) need a host component inside a
+  Suspense boundary, since AppLayout sits above them all. Such a host only calls its
+  hook and returns null, lives with the app shell (src/layouts/), and is named for
+  what it does — e.g. UrlSync, which hosts useFilterUrlSync.
 
 ## Environment Variables
 
-All env vars are validated in `src/env.ts` with Zod. Never read `process.env` or
-`import.meta.env` directly — use `GLOBAL_CONFIG` from `src/global-config.ts`.
+All env vars are validated in `src/libs/Env.ts` (`createEnv` with Zod). Never read
+`process.env` or `import.meta.env` directly — import `env` from `@/libs/Env`, or
+app-wide values from `GLOBAL_CONFIG` in `src/libs/GlobalConfig.ts`.
 
 ## Architecture
 
 ### Data Flow
 
-Component → custom hook (src/hooks/) → client service → /api route handler →
-Redis cache → Solr / WorldClim
+Component → custom hook (src/hooks/) → `apiClient` (src/libs/api/), directly or
+through a client service (src/libs/services/worldClimService.ts) → /api route handler
+(src/app/api/) → Redis cache → server-only services (src/libs/services/solrService.ts,
+wikidataService.ts) or the WorldClim API
 
-- Components consume hooks only — never import services directly
+- Components consume hooks only — never import services or `apiClient` directly
 - Hooks never call external APIs directly — always via /api/ routes
 - Services are plain objects with async methods — no hooks, no React inside
 - All data fetching via useQuery/useMutation with staleTime: Infinity for WorldClim
@@ -71,9 +79,11 @@ Redis cache → Solr / WorldClim
 - Router calls only in dedicated URL hooks: useFilterNavigation (filters),
   useUrlStateSync (page params), useChartModeUrl (chart mode),
   useNavbarNavigation (navbar and logo links) — nowhere else.
-  - On mobile, writes from filter sheets happen only after the sheet has closed
+  - Below lg, the filters sheet (useFiltersSheet) writes only after it has closed
     (`await closeSheet()`); a router call while a sheet is open drops its history
     marker.
+- App-wide URL upkeep — canonical filter params, the last-page-params cache, legacy
+  storage cleanup — is useFilterUrlSync, hosted once by UrlSync in AppLayout.
 - The last-page-params store is a cache for navbar links: written only by
   useLastPageParamsSync, read only by useNavbarNavigation at click time. Pages never
   read it; they read the URL.
@@ -83,7 +93,11 @@ Redis cache → Solr / WorldClim
 - TanStack Query — server/remote state
 - URL search params — filters and page view state (chart mode, layout, selected
   periods/years, selected city)
-- Zustand — client-only caches that are not page state (e.g. last page params)
+- Zustand (src/stores/) — client-only state that is not page state: persisted user
+  settings (settingsStore), the navbar's last-page-params cache (lastPageParamsStore),
+  the in-flight link navigation (navigationIntentStore). The persisted city and
+  heat-map box use small useSyncExternalStore stores (persistedLocationStores), not
+  Zustand.
 - useState — UI-only (open/closed, hover, drafts)
 - Never store derived data in state
 
@@ -127,8 +141,7 @@ Container fetches, handles events. View receives props, renders only.
   one that already does the job. If one fits with a small extension (an optional
   prop, a variant, a slot), extend it instead of creating a new one.
 - Creating a component that duplicates an existing one under a different name is
-  not allowed (e.g. a new picker when Dropdown fits, a new chip when FilterChip
-  fits).
+  not allowed (e.g. a new picker when Dropdown fits, a new chip when Chip fits).
 - Extensions must stay generic: page- or feature-specific logic lives in the caller
   and is passed in via props or slots. Don't add flags that only one page uses.
 - Every task report lists new components with one line each on why no existing
@@ -136,8 +149,52 @@ Container fetches, handles events. View receives props, renders only.
 
 ### Shared UI components
 
-<catalog: one line per shared component — name, path, what it's for, key optional
-props/variants>
+Primitives in src/components/UI/:
+
+- BottomSheet — `UI/BottomSheet` — modal sheet from the bottom edge; `height` (AUTO /
+  TALL), `footer`. Pair it with useSheetHistory so Back closes it.
+- Button — `UI/Button` — the app's button; `variant` (primary / secondary / ghost),
+  `ariaLabel`.
+- Chip — `UI/Chip` — every chip; `variant`: toggle (default: `isActive`, `isLocked`,
+  `disabled`, `dotColor`), value (a filter bar value opening its sheet: `isChanged`,
+  `isDisabled`), allFilters (icon + changed-count badge).
+- CollapsibleSection — `UI/CollapsibleSection` — titled section that folds;
+  `defaultOpen`, `withDivider`.
+- DotLabel — `UI/DotLabel` — a label with a colour dot; `hideDot`.
+- Dropdown — `UI/Dropdown` — the app's select; options with `disabled`, `color` (dot),
+  `description`; `accentColor`, `isStretched`, `ariaLabelledBy`, test-id props.
+  OptionDot (`UI/Dropdown/OptionDot`) is its colour dot, reused elsewhere.
+- EmptyState, ErrorBanner — `UI/EmptyState`, `UI/ErrorBanner` — a page's empty and
+  error messages.
+- ExportMenu — `UI/ExportMenu` — CSV / PNG / SVG / raw export menu; `isDisabled`,
+  `disabledReason`.
+- MiniMap — `UI/MiniMap` — small Leaflet map of one or more locations; `activeIndex`,
+  `onToggle`.
+- PageWrapper — `UI/PageWrapper` — a page's content width and padding.
+- Popover — `UI/Popover` — a trigger and a floating panel.
+- SectionLabel — `UI/SectionLabel` — small uppercase section title.
+- SwapButton — `UI/SwapButton` — icon button exchanging two sides; `label`.
+- ToggleSwitch — `UI/ToggleSwitch` — labelled on / off switch.
+- Skeletons — `UI/ChartSkeleton`, `ComparisonTableSkeleton`, `MapSkeleton`,
+  `SidebarSkeleton`, `StatCardsSkeleton`, `TableSkeleton`, `TopbarSkeleton`.
+
+Shared components outside UI/:
+
+- Card — `components/Card` — the app's card; `size`, `padding`, `elevation`,
+  `flashKeys` (update flash), `shouldClip`, `isFlatBelowSm`.
+- ChartLegend — `components/ChartLegend` — legend items with line / bar / marker
+  swatches; `fontSize`.
+- ChipScroller — `components/CompareYears/ChipScroller` — a row of chips scrolling
+  sideways with faded ends.
+- PageHeader — `components/PageHeader` — every page's title and `description`.
+- ScrollEdgeFades — `components/ScrollEdgeFades` — faded ends of a horizontal
+  scroller; `startInset` (past a pinned column).
+- SegmentedControl — `components/SegmentedControl` — one-of-n switch with a sliding
+  pill; options with `icon`.
+- SeriesMarker — `components/SeriesMarker` — a comparison series' marker (A dot,
+  B square); `color`.
+- Settings — `components/Settings/Settings` — the app's preferences (sidebar and burger
+  menu).
 
 ## TypeScript — file placement
 
