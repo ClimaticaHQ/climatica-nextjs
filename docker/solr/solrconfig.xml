@@ -53,7 +53,7 @@
       </str>
       <str name="pf">label_en^20 label_uk^15 label_es^15</str>
       <!-- fl intentionally omitted: the client never sends it either, so Solr's
-           true default (all stored fields) applies -- returns every label_<lang>
+           true default (all stored fields) applies; returns every label_<lang>
            field automatically as locales are added, instead of a hardcoded list
            that silently strips new languages' fields from the response. -->
       <str name="sort">score desc, population desc</str>
