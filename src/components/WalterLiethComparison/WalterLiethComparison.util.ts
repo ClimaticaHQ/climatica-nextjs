@@ -10,13 +10,15 @@ import type { TOverlayLayerArgs } from "./WalterLiethComparison.type";
 export function toOverlayLayer({
   series,
   isShaded,
+  color,
+  shape,
   ...layer
 }: TOverlayLayerArgs): TWalterLiethLayerSeries {
   return {
     ...layer,
     segments: isShaded ? layer.segments : [],
-    colors: getOverlayPaint(WALTER_LIETH_COLORS.SERIES[series.id]),
+    colors: getOverlayPaint(color ?? WALTER_LIETH_COLORS.SERIES[series.id]),
     precDash: WALTER_LIETH_DASH.OVERLAY_PREC,
-    dotShape: WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
+    dotShape: shape ?? WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
   };
 }

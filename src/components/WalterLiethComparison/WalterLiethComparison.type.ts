@@ -1,4 +1,5 @@
 import type {
+  TWalterLiethDotShape,
   TWalterLiethLayerSeries,
   TWalterLiethTooltipProps,
 } from "@/components/WalterLiethChart/WalterLiethChart.type";
@@ -31,10 +32,24 @@ export type TSplitViewProps = {
   activeMonth: TActiveMonth;
 };
 
-export type TOverlayViewProps = TSeriesPair & {
+/** One series in an overlay: Climate A / B, or a compared weather year. */
+export type TOverlayEntry = {
+  key: string;
+  series: TWalterLiethSeries;
+  color: string;
+  shape: TWalterLiethDotShape;
+  /** hatched (humid / arid) — at most one, so the curves stay readable */
+  isShaded: boolean;
+  /** another entry is highlighted: this one fades */
+  isDimmed?: boolean;
+};
+
+export type TOverlayViewProps = {
+  entries: readonly TOverlayEntry[];
   domain: TWalterLiethDomain;
-  shading: EWalterLiethShading;
   activeMonth: TActiveMonth;
+  /** the legend names each series — off where chips above the diagram name them */
+  shouldListSeries?: boolean;
 };
 
 export type TOverlayLayerArgs = Omit<
@@ -43,9 +58,19 @@ export type TOverlayLayerArgs = Omit<
 > & {
   series: TWalterLiethSeries;
   isShaded: boolean;
+  /** the series' own colour and dot; A / B's when omitted */
+  color?: string;
+  shape?: TWalterLiethDotShape;
 };
 
-export type TOverlayTooltipProps = TWalterLiethTooltipProps &
-  TSeriesPair & {
-    rowsB: readonly TWalterLiethRow[];
-  };
+/** What the overlay tooltip lists for each entry. */
+export type TOverlayTooltipEntry = {
+  key: string;
+  label: string;
+  color: string;
+  rows: readonly TWalterLiethRow[];
+};
+
+export type TOverlayTooltipProps = TWalterLiethTooltipProps & {
+  entries: readonly TOverlayTooltipEntry[];
+};

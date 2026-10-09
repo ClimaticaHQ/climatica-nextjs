@@ -1,6 +1,7 @@
+import { WALTER_LIETH_COLORS, WALTER_LIETH_COMPARISON } from "@/constants";
 import { ECompareLayout } from "@/enums";
 import type { TWalterLiethComparisonProps } from "@/types";
-import { getSharedDomain, isCompleteSeries } from "@/utils";
+import { getSharedDomain, isCompleteSeries, isShadedSeries } from "@/utils";
 import { useId } from "react";
 import { OverlayView, SplitView } from "./components";
 
@@ -27,7 +28,17 @@ export function WalterLiethComparison({
 
   // * the shading control lives in the chart card's controls row (ChartControlsRow)
   return pair && shownLayout === ECompareLayout.OVERLAY ? (
-    <OverlayView {...pair} domain={domain} shading={shading} activeMonth={activeMonth} />
+    <OverlayView
+      entries={[pair.seriesA, pair.seriesB].map((series) => ({
+        key: series.id,
+        series,
+        color: WALTER_LIETH_COLORS.SERIES[series.id],
+        shape: WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
+        isShaded: isShadedSeries(series.id, shading),
+      }))}
+      domain={domain}
+      activeMonth={activeMonth}
+    />
   ) : (
     <SplitView
       seriesA={seriesA}
