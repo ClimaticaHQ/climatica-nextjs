@@ -1,7 +1,7 @@
 import type { ExportMenuProps } from "@/components/UI";
 import { EXPORT_PNG_SCALE, EXPORT_SVG_LAYOUT } from "@/constants";
 import { useFetchFullClimateData } from "@/hooks/data/useFetchFullClimateData";
-import type { TUseChartExportArgs } from "@/types";
+import type { TUseSingleChartExportArgs } from "@/types";
 import {
   buildExportPayload,
   buildExportSvg,
@@ -23,7 +23,7 @@ import { useSingleExportLabels } from "./useSingleExportLabels";
  * every variable — the raw CSV / JSON. Disabled, saying why, while data is replaced or a month
  * is missing.
  */
-export function useChartExport(args: TUseChartExportArgs): ExportMenuProps {
+export function useSingleChartExport(args: TUseSingleChartExportArgs): ExportMenuProps {
   const { model, viewState, features, place, subtitle, isFetching } = args;
   const t = useTranslations();
   const [entry] = model.series;

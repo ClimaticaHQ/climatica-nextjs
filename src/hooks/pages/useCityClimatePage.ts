@@ -14,8 +14,8 @@ import {
   VARIABLE_LABELS,
   WALTER_LIETH_COLORS,
 } from "@/constants";
-import { EDataStatus, ESeriesKind, EWalterLiethSeriesId } from "@/enums";
-import { useChartExport, useChartModel } from "@/hooks/charts";
+import { EChartBlock, EDataStatus, ESeriesKind, EWalterLiethSeriesId } from "@/enums";
+import { useChartModel, useSingleChartExport } from "@/hooks/charts";
 import {
   useGetAltitude,
   useGetCellBounds,
@@ -119,7 +119,8 @@ export function useCityClimatePage(): TCityClimatePage {
     hasSidePickers: false,
     hasMonthBadge: true,
     hasRawExport: true,
-    hiddenBlocks: [],
+    // * one place: its stat cards and the chart's stats bar, no comparison table
+    hiddenBlocks: [EChartBlock.STATS_TABLE],
   };
   const summary =
     state.status === EDataStatus.READY && data
@@ -157,7 +158,7 @@ export function useCityClimatePage(): TCityClimatePage {
       announcement: t("loading.dataUpdated", { location: placeName, period: periodLabel }),
     },
     resultsRef,
-    exportMenu: useChartExport({
+    exportMenu: useSingleChartExport({
       model,
       viewState,
       features,

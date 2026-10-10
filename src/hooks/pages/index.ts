@@ -6,3 +6,4 @@ export { useScrollToResults } from "./useScrollToResults";
 export { useMapPointSelection } from "./useMapPointSelection";
 export { useCityClimatePage } from "./useCityClimatePage";
 export { useCityClimatePicking } from "./useCityClimatePicking";
+export { useCompareCitiesPage } from "./useCompareCitiesPage";
