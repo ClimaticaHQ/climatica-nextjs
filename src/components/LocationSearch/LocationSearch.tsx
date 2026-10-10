@@ -1,7 +1,7 @@
 import { SearchBar } from "@/components/SearchBar";
 import { LocationIcon, SpinnerIcon } from "@/components/svg";
-import { Button } from "@/components/UI";
-import { EButtonVariant } from "@/enums";
+import { Button, StatusMessage } from "@/components/UI";
+import { EButtonVariant, EStatusMessageVariant } from "@/enums";
 import { useTranslations } from "next-intl";
 import type { TLocationSearchProps } from "./LocationSearch.type";
 
@@ -42,26 +42,11 @@ export function LocationSearch({
       </div>
 
       {locationError && (
-        <div className="flex items-start gap-2 rounded-[var(--radius-sm)] border border-[var(--color-error-border)] bg-[var(--color-error-bg)] px-3 py-2">
-          <p className="flex-1 text-[length:var(--font-sm)] text-[var(--color-error)]">
-            {locationError}
-          </p>
-          <button
-            type="button"
-            onClick={onClearLocationError}
-            aria-label="Dismiss"
-            className="shrink-0 text-[var(--color-error)] opacity-60 hover:opacity-100 transition-opacity"
-          >
-            <svg viewBox="0 0 14 14" fill="none" className="h-3.5 w-3.5" aria-hidden="true">
-              <path
-                d="M1 1l12 12M13 1L1 13"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-        </div>
+        <StatusMessage
+          variant={EStatusMessageVariant.ERROR}
+          message={locationError}
+          onDismiss={onClearLocationError}
+        />
       )}
     </div>
   );
