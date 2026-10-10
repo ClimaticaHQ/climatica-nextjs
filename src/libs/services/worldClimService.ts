@@ -2,9 +2,9 @@ import { WORLDCLIM_PROXY_BASE } from "@/constants";
 import { apiClient } from "@/libs/api";
 import type {
   TCellSize,
-  TClimatePeriod,
   TRawAvgValueResponse,
   TRawPixelValueResponse,
+  TRegionQueryArgs,
   TVariable,
   TWorldClimAvgBoxBinding,
   TWorldClimCellResource,
@@ -14,13 +14,18 @@ import type {
   TWorldClimRasterResource,
 } from "@/types";
 import {
-  buildDatasetParams,
   buildGridIri,
+  buildRegionQueryParams,
   buildVariableIris,
   extractCellBySize,
-  getPixelQueryLimit,
-  getWktBounds,
+  getPolygonBounds,
+  getRowsPerCell,
+  getStripRowLimit,
   groupAvgBindings,
+  keepCellsInPolygon,
+  mergeStripBindings,
+  polygonToWkt,
+  splitRegionIntoStrips,
   validateResponseData,
 } from "@/utils";
 
@@ -130,106 +135,63 @@ export const WorldClimService = {
     return response.data;
   },
 
-  async getPixelValuesInBox(
-    north: number,
-    south: number,
-    west: number,
-    east: number,
-    gridSize: TCellSize,
-    variables: string[],
-    isClimate: boolean,
-    year?: number,
-    avg?: boolean,
-  ): Promise<TRawPixelValueResponse | TRawAvgValueResponse> {
-    const endpoint = avg ? "avgpixelvaluesinbox" : "pixelvaluesinbox";
-    const response = await apiClient.get<TRawPixelValueResponse | TRawAvgValueResponse>(
-      `${WORLDCLIM_PROXY_BASE}/${endpoint}`,
-      {
-        params: {
-          north,
-          south,
-          west,
-          east,
-          grid: buildGridIri(gridSize),
-          var: buildVariableIris(variables),
-          ...buildDatasetParams(isClimate, year),
-          limit: getPixelQueryLimit({
-            bounds: { north, south, west, east },
-            gridSize,
-            variableCount: variables.length,
-            isClimate,
-          }),
-        },
-      },
+  /**
+   * Every cell's monthly values in a region, fetched as strips WorldClim answers in full and
+   * merged. A polygon is read from the strips of the box around it, keeping the cells whose
+   * centroid lies inside — the same cells as WorldClim's polygon query.
+   */
+  async getRegionPixelValues({
+    area,
+    gridSize,
+    variables,
+    dataset,
+  }: TRegionQueryArgs): Promise<TRawPixelValueResponse> {
+    const bounds = "bbox" in area ? area.bbox : getPolygonBounds(area.polygon);
+    const rowsPerCell = getRowsPerCell(variables);
+    const strips = splitRegionIntoStrips({ bounds, gridSize, rowsPerCell });
+    const responses = await Promise.all(
+      strips.map((strip) =>
+        apiClient.get<TRawPixelValueResponse>(`${WORLDCLIM_PROXY_BASE}/pixelvaluesinbox`, {
+          params: {
+            ...strip,
+            ...buildRegionQueryParams(gridSize, variables, dataset),
+            limit: getStripRowLimit(strip, gridSize, rowsPerCell),
+          },
+        }),
+      ),
     );
-    validateResponseData(response);
-    return response.data;
+    responses.forEach(validateResponseData);
+    const bindings = mergeStripBindings(responses.map((r) => r.data.results.bindings));
+    return {
+      results: {
+        bindings:
+          "polygon" in area ? keepCellsInPolygon(bindings, area.polygon, gridSize) : bindings,
+      },
+    };
   },
 
-  async getPixelValuesInPolygon(
-    wkt: string,
-    gridSize: TCellSize,
-    variables: string[],
-    isClimate: boolean,
-    year?: number,
-    avg?: boolean,
-  ): Promise<TRawPixelValueResponse | TRawAvgValueResponse> {
-    const endpoint = avg ? "avgpixelvaluesinpolygonGEO" : "pixelvaluesinpolygonGEO";
-    const response = await apiClient.get<TRawPixelValueResponse | TRawAvgValueResponse>(
-      `${WORLDCLIM_PROXY_BASE}/${endpoint}`,
-      {
-        params: {
-          polygon: wkt,
-          grid: buildGridIri(gridSize),
-          var: buildVariableIris(variables),
-          ...buildDatasetParams(isClimate, year),
-          limit: getPixelQueryLimit({
-            bounds: getWktBounds(wkt),
-            gridSize,
-            variableCount: variables.length,
-            isClimate,
-          }),
-        },
-      },
-    );
-    validateResponseData(response);
-    return response.data;
-  },
-
-  async getRegionalAverage(
-    variables: readonly TVariable[],
-    gridSize: TCellSize,
-    area: { bbox: { north: number; south: number; west: number; east: number } } | { wkt: string },
-    isClimate: boolean,
-    period?: TClimatePeriod,
-    year?: number,
-  ): Promise<TWorldClimAvgBoxBinding | null> {
-    const response =
+  /** The region's monthly averages, one binding per variable: WorldClim averages the cells. */
+  async getRegionAverages({
+    area,
+    gridSize,
+    variables,
+    dataset,
+  }: TRegionQueryArgs): Promise<TWorldClimAvgBoxBinding[]> {
+    const [endpoint, areaParams] =
       "bbox" in area
-        ? await this.getPixelValuesInBox(
-            area.bbox.north,
-            area.bbox.south,
-            area.bbox.west,
-            area.bbox.east,
-            gridSize,
-            variables as string[],
-            isClimate,
-            year,
-            true,
-          )
-        : await this.getPixelValuesInPolygon(
-            area.wkt,
-            gridSize,
-            variables as string[],
-            isClimate,
-            year,
-            true,
-          );
-
-    const grouped = groupAvgBindings((response as TRawAvgValueResponse).results.bindings);
-    const filtered =
-      isClimate && period ? grouped.filter((b) => b.raster?.value?.includes(period)) : grouped;
-
-    return filtered[0] ?? null;
+        ? (["avgpixelvaluesinbox", area.bbox] as const)
+        : (["avgpixelvaluesinpolygonGEO", { polygon: polygonToWkt(area.polygon) }] as const);
+    const response = await apiClient.get<TRawAvgValueResponse>(
+      `${WORLDCLIM_PROXY_BASE}/${endpoint}`,
+      {
+        params: {
+          ...areaParams,
+          ...buildRegionQueryParams(gridSize, variables, dataset),
+          limit: getRowsPerCell(variables),
+        },
+      },
+    );
+    validateResponseData(response);
+    return groupAvgBindings(response.data.results.bindings);
   },
 };
