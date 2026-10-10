@@ -8,3 +8,4 @@ export type * from "./pageHooks.type";
 export type * from "./chartExport.type";
 export type * from "./mapPoint.type";
 export type * from "./cityPicking.type";
+export type * from "./periodCharts.type";

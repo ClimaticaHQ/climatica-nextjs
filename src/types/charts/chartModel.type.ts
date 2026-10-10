@@ -5,6 +5,7 @@ import type {
   TMonthlyTemperatureWithAvg,
   TWalterLiethDomain,
   TWalterLiethScales,
+  TPair,
   TWalterLiethSeriesInput,
 } from "@/types";
 import type { TChartSeries } from "./series.type";
@@ -33,4 +34,10 @@ export type TChartModel = {
   /** Walter-Lieth domain shared by every complete series */
   domain: TWalterLiethDomain;
   hasData: boolean;
+};
+
+/** The two series a split shows, panel A's first. */
+export type TSplitPair = {
+  ids: TPair<string>;
+  entries: readonly [TChartSeriesModel, TChartSeriesModel];
 };

@@ -83,3 +83,32 @@ export type TFormatComparisonValueOptions = {
   /** the row's unit as the locale writes it; null: none */
   unit: string | null;
 };
+
+/** One series of the stats table. */
+export type TStatsTableSeries = Pick<TComparisonTableSeries, "label" | "data" | "altitude"> & {
+  id: string;
+  /** its data is still loading: its cells wait */
+  isLoading: boolean;
+};
+
+export type TBuildStatsTableArgs = {
+  series: readonly TStatsTableSeries[];
+  /** a pair's difference starts from this series; null: no difference */
+  minuendId: string | null;
+  locale: string;
+  units: Record<TComparisonUnit, string>;
+};
+
+export type TStatsTableRow = {
+  metric: TComparisonMetric;
+  /** per series, in column order; null while that series loads */
+  values: (TComparisonTableValue | null)[];
+  difference: string | null;
+};
+
+export type TStatsTable = {
+  columns: { id: string; label: string; isLoading: boolean }[];
+  /** the difference's direction, e.g. "1991–2020 − 1970–2000"; null without one */
+  difference: { minuend: string; subtrahend: string } | null;
+  rows: TStatsTableRow[];
+};

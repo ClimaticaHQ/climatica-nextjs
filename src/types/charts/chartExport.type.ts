@@ -60,3 +60,8 @@ export type TUseComparisonExportBlockArgs = Pick<
   table: TComparisonTable | null;
   visible: TVisibleSeries;
 };
+
+export type TUseYearsExportBlockArgs = Pick<TUseSingleChartExportArgs, "model" | "viewState"> & {
+  /** the years the screen draws: the side-by-side pair, or the overlay's shown years */
+  drawn: readonly number[];
+};
