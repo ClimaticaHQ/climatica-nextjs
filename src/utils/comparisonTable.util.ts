@@ -7,7 +7,9 @@ import type {
   TComparisonTable,
   TComparisonTableSeries,
   TComparisonTableValue,
+  TBuildStatsTableArgs,
   TFormatComparisonValueOptions,
+  TStatsTable,
 } from "@/types";
 import { computeCompareStats } from "./climateComparison.util";
 import { getMartonneBadge } from "./martonne.util";
@@ -29,7 +31,7 @@ function countFrostMonths(data: TComparisonTableSeries["data"]) {
 function getMetricValues({
   data,
   altitude,
-}: TComparisonTableSeries): Record<TComparisonMetric, number | null> {
+}: Pick<TComparisonTableSeries, "data" | "altitude">): Record<TComparisonMetric, number | null> {
   const stats = computeCompareStats([...data]);
   return {
     meanTemp: meanOf(withMonthlyMean(data).map((month) => month.tavg)),
@@ -87,6 +89,48 @@ export function buildComparisonTable({
         b: formatValue(valuesB[format.metric], format, { locale, unit }),
         difference:
           x !== null && y !== null
+            ? withUnit(
+                formatNumber(x - y, { locale, digits: format.digits, sign: ENumberSign.SIGNED }),
+                unit,
+              )
+            : null,
+      };
+    }),
+  };
+}
+
+/**
+ * The stats table: every metric for each series, a loading series' cells left empty (null), and
+ * — for a pair with a minuend — the difference, minuend − the other. The page draws these rows;
+ * a pair's export draws buildComparisonTable's.
+ */
+export function buildStatsTable({
+  series,
+  minuendId,
+  locale,
+  units,
+}: TBuildStatsTableArgs): TStatsTable {
+  const values = series.map((entry) => (entry.isLoading ? null : getMetricValues(entry)));
+  const minuendIndex = series.findIndex(({ id }) => id === minuendId);
+  const pairIndexes =
+    series.length === 2 && minuendIndex >= 0 ? [minuendIndex, 1 - minuendIndex] : null;
+  const [minuend, subtrahend] = pairIndexes?.map((index) => series[index]) ?? [];
+
+  return {
+    columns: series.map(({ id, label, isLoading }) => ({ id, label, isLoading })),
+    difference:
+      minuend && subtrahend ? { minuend: minuend.label, subtrahend: subtrahend.label } : null,
+    rows: COMPARISON_METRICS.map((format) => {
+      const unit = format.unit === null ? null : units[format.unit];
+      const raw = values.map((entry) => entry?.[format.metric] ?? null);
+      const [x, y] = pairIndexes?.map((index) => raw[index] ?? null) ?? [null, null];
+      return {
+        metric: format.metric,
+        values: values.map((entry, index) =>
+          entry === null ? null : formatValue(raw[index] ?? null, format, { locale, unit }),
+        ),
+        difference:
+          x !== null && x !== undefined && y !== null && y !== undefined
             ? withUnit(
                 formatNumber(x - y, { locale, digits: format.digits, sign: ENumberSign.SIGNED }),
                 unit,
