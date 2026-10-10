@@ -21,3 +21,6 @@ export const DOCUMENT_TITLE = {
 
 // * after a city is picked, the results scroll into view once the chart has drawn
 export const SCROLL_TO_RESULTS_DELAY_MS = TIME.IN_MILLISECONDS.SECOND * 2;
+
+// * the compared weather years in a line of text: "2021, 1967, 1990"
+export const WEATHER_YEARS_SEPARATOR = ", ";
