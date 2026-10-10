@@ -9,3 +9,4 @@ export { useCityClimatePicking } from "./useCityClimatePicking";
 export { useCompareCitiesPage } from "./useCompareCitiesPage";
 export { useWeatherYearsViewState } from "./useWeatherYearsViewState";
 export { useComparePeriodsPage } from "./useComparePeriodsPage";
+export { useHeatMapPage } from "./useHeatMapPage";
