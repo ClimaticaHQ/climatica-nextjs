@@ -1,6 +1,6 @@
 "use client";
 
-import { ChipScroller } from "@/components/CompareYears/ChipScroller";
+import { ChipScroller } from "@/components/UI/ChipScroller";
 import { Chip } from "@/components/UI";
 import { toggleFilterOption } from "@/utils/filters.util";
 import { useTranslations } from "next-intl";

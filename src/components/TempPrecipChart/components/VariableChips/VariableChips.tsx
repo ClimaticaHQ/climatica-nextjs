@@ -1,5 +1,5 @@
 import { Chip } from "@/components/UI/Chip";
-import { ChipScroller } from "@/components/CompareYears/ChipScroller";
+import { ChipScroller } from "@/components/UI/ChipScroller";
 import type { TVisibleSeries } from "@/types";
 import { useTranslations } from "next-intl";
 import type { TVariableChipsProps } from "../../TempPrecipChart.type";

@@ -1,9 +1,9 @@
 import { ChartTransition } from "@/components/ChartTransition";
 import { ExpandIcon } from "@/components/svg";
-import { EWalterLiethSeriesId } from "@/enums";
+import { PairLayout } from "@/components/UI/PairLayout";
+import { EPairLayoutVariant, EWalterLiethSeriesId } from "@/enums";
 import { getShownPanel } from "@/utils";
 import { useTranslations } from "next-intl";
-import { Fragment } from "react";
 import { ExpandedPanelControls, PanelIconButton } from "./components";
 import { usePanelFocus, usePanelOrigin } from "./hooks";
 import {
@@ -31,6 +31,7 @@ export function SplitPanels({
   const origin = usePanelOrigin(shown);
   const { collapseRef, switchRef, expandRefs, requestFocus } = usePanelFocus(shown);
   const other = SPLIT_PANEL_ORDER.find((id) => id !== shown);
+  const [first, second] = SPLIT_PANEL_ORDER;
 
   const show = (id: EWalterLiethSeriesId | null, focus: TPanelFocusTarget) => {
     requestFocus(focus);
@@ -48,6 +49,9 @@ export function SplitPanels({
       isHiddenBelowSm
     />
   );
+
+  const panelSlots = (id: EWalterLiethSeriesId) =>
+    expandable[id] ? { actions: expandButton(id) } : {};
 
   return (
     <div>
@@ -71,16 +75,12 @@ export function SplitPanels({
             })}
           </div>
         ) : (
-          <div className={between === undefined ? C.SPLIT : C.SPLIT_WITH_BETWEEN}>
-            {SPLIT_PANEL_ORDER.map((id, index) => (
-              <Fragment key={id}>
-                {index > 0 && between !== undefined && <div className={C.BETWEEN}>{between}</div>}
-                {renderPanel(id, {
-                  slots: expandable[id] ? { actions: expandButton(id) } : {},
-                })}
-              </Fragment>
-            ))}
-          </div>
+          <PairLayout
+            variant={EPairLayoutVariant.PANELS}
+            first={renderPanel(first, { slots: panelSlots(first) })}
+            between={between}
+            second={renderPanel(second, { slots: panelSlots(second) })}
+          />
         )}
       </ChartTransition>
       {renderLegend(shown)}

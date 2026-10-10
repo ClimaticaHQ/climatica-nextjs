@@ -57,13 +57,16 @@ export function OverlayChart({
   const months = viewState.selectedMonths;
   return (
     <StandardChart
-      entries={model.series.map((entry) => ({
-        id: entry.series.id,
-        label: entry.series.label,
-        palette: getOverlayPalette(entry, rule),
-        emphasis: isDimmed(entry.series.id) ? OVERLAY_DIM_OPACITY : 1,
-        isHidden: !drawnIds.has(entry.series.id),
-      }))}
+      // * a series still loading takes no place yet: when it lands the chart remounts in order
+      entries={model.series
+        .filter(({ hasData }) => hasData)
+        .map((entry) => ({
+          id: entry.series.id,
+          label: entry.series.label,
+          palette: getOverlayPalette(entry, rule),
+          emphasis: isDimmed(entry.series.id) ? OVERLAY_DIM_OPACITY : 1,
+          isHidden: !drawnIds.has(entry.series.id),
+        }))}
       rows={buildStandardChartRows(model.series)}
       hasMeanLine={rule.hasMeanLine}
       scales={model.scales}

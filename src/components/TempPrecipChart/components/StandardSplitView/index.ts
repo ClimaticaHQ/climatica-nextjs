@@ -1,1 +1,1 @@
-export { StandardSplitView } from "./StandardSplitView";
+export { StandardPanel } from "./components";

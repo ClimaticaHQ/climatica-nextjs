@@ -23,7 +23,6 @@ import type {
   TChartModel,
   TChartSeries,
   TChartSeriesModel,
-  TChartViewState,
   TLegendItem,
   TSeriesKey,
   TSeriesKindRule,
@@ -43,7 +42,6 @@ import type {
   TChartBodyProps,
   TLegendBuilder,
   TResolveChartBodyArgs,
-  TSplitPair,
 } from "./charts.type";
 
 /** A chart's series share one kind; an empty list draws as cities (nothing to draw anyway). */
@@ -217,28 +215,6 @@ export function getBlockContext(
     shadedId: getShadedId(props.model, props.rule, props.viewState.shading?.value),
     ...part,
   };
-}
-
-/**
- * The split's two series: the page's pair (side pickers), or the first two. A picked series
- * that's gone (a removed year) falls back to the first two.
- */
-export function getSplitPair(model: TChartModel, viewState: TChartViewState): TSplitPair | null {
-  const find = (id: string | undefined) => model.series.find(({ series }) => series.id === id);
-  const picked = viewState.pair?.value;
-  const first = find(picked?.[0]);
-  const second = find(picked?.[1]);
-  const [a, b] = first && second && first !== second ? [first, second] : model.series;
-  if (a === undefined || b === undefined) return null;
-  return { ids: [a.series.id, b.series.id], entries: [a, b] };
-}
-
-/** The overlay's drawn series: those the page shows (series chips), else every one. */
-export function getDrawnSeries(model: TChartModel, viewState: TChartViewState) {
-  const shown = viewState.shown?.value;
-  return shown === undefined
-    ? model.series
-    : model.series.filter(({ series }) => shown.includes(series.id));
 }
 
 /** Where the standard chart reads a series' variable in a month's row. */

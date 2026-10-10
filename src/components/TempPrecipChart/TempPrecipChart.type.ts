@@ -12,7 +12,6 @@ import type {
   TVariable,
   TVisibleSeries,
   TWalterLiethScales,
-  TWalterLiethSeriesInput,
   TYearsViewState,
 } from "@/types";
 import type { useTempPrecipChart } from "./hooks/useTempPrecipChart";
@@ -118,11 +117,6 @@ export type TChartSwitchesProps = {
 /** Everything useTempPrecipChart derives from the chart's data. */
 export type TTempPrecipChartState = ReturnType<typeof useTempPrecipChart>;
 
-export type TComparisonSeries = {
-  seriesA: TWalterLiethSeriesInput;
-  seriesB: TWalterLiethSeriesInput;
-};
-
 export type TChartTitleProps = {
   /** one location, or the two compared ones — shown as "A vs B" */
   names: readonly string[];
@@ -148,50 +142,6 @@ export type TUseVisibleSeriesArgs = Pick<
   "variables" | "onVisibleSeriesChange"
 >;
 
-export type TChartHeaderProps = {
-  chartProps: TTempPrecipChartProps;
-  /** the page's chart type (the toggle's state) */
-  chartMode: TChartMode;
-  /** the chart type drawn — WL only where it's available */
-  isWalterLieth: boolean;
-  isCompare: boolean;
-  /** Climate A / B and weather years: the side by side / overlay switch */
-  hasLayout: boolean;
-  layout: ECompareLayout;
-  subtitleText: string | null;
-};
-
-export type TWalterLiethBodyProps = {
-  chart: TTempPrecipChartState;
-  seriesSingle: TWalterLiethSeriesInput;
-  comparison: TComparisonSeries;
-  layout: ECompareLayout;
-  shading?: EWalterLiethShading | undefined;
-  expansion: TPanelExpansion;
-};
-
-export type TSecondaryControlsProps = {
-  isWalterLieth: boolean;
-  /** WL overlay of two complete series: the shading control */
-  isOverlay: boolean;
-  comparison: TComparisonSeries;
-  shading: EWalterLiethShading;
-  onShadingChange: (shading: EWalterLiethShading) => void;
-  visible: TVisibleSeries;
-  variables?: readonly TVariable[] | undefined;
-  onVisibleChange: (visible: TVisibleSeries) => void;
-};
-
-export type TStandardBodyProps = {
-  chartProps: TTempPrecipChartProps;
-  chart: TTempPrecipChartState;
-  comparison: TComparisonSeries;
-  visible: TVisibleSeries;
-  isSplit: boolean;
-  syncId: string;
-  expansion: TPanelExpansion;
-};
-
 export type TUseChartSeriesArgs = {
   chartProps: TTempPrecipChartProps;
   chart: TTempPrecipChartState;
@@ -213,21 +163,6 @@ export type TChartTitleNamesProps = {
 
 export type TMonthBadgeProps = {
   selectedMonths?: number[] | undefined;
-};
-
-/** The chart itself, crossfading between chart types and layouts. */
-export type TChartBodyProps = {
-  chartProps: TTempPrecipChartProps;
-  chart: TTempPrecipChartState;
-  seriesSingle: TWalterLiethSeriesInput;
-  seriesYears: readonly TWalterLiethSeriesInput[];
-  comparison: TComparisonSeries;
-  visible: TVisibleSeries;
-  onVisibleChange: (visible: TVisibleSeries) => void;
-  isWalterLieth: boolean;
-  layout: ECompareLayout;
-  syncId: string;
-  expansion: TPanelExpansion;
 };
 
 /** Recharts' series animation, and how long a hidden series stays for it. */

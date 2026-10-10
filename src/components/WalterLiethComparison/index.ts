@@ -1,2 +1,1 @@
-export { WalterLiethComparison } from "./WalterLiethComparison";
-export { ShadingControl } from "./components";
+export { OverlayView, ShadingControl } from "./components";

@@ -10,13 +10,14 @@ import type {
   TExpandedPanel,
   TLegendItem,
   TLegendLabels,
-  TPair,
   TSeriesKindRule,
   TSeriesKey,
+  TStatsTable,
   TVisibleSeries,
   TWalterLiethScales,
 } from "@/types";
 import type { TStandardChartColors } from "@/components/TempPrecipChart/charts/StandardClimateChart/StandardClimateChart.type";
+import type { TSeriesMarkerProps } from "@/components/SeriesMarker/SeriesMarker.type";
 import type { ComponentType, ReactNode, RefObject } from "react";
 
 export type TChartCardProps = {
@@ -143,12 +144,6 @@ export type TLegendBuilder = (
 /** What differs between the spots of one body. */
 export type TBlockContextPart = Pick<TChartBlockContext, "entries" | "isCompact" | "shownPanel">;
 
-/** The two series a split shows, panel A's first. */
-export type TSplitPair = {
-  ids: TPair<string>;
-  entries: readonly [TChartSeriesModel, TChartSeriesModel];
-};
-
 export type TOverlayChartProps = TChartBodyProps & {
   /** the series drawn: every one, or those the chips leave on */
   drawn: readonly TChartSeriesModel[];
@@ -186,4 +181,17 @@ export type TStandardChartLine = {
   labelKey: string;
   /** none: a solid line */
   dash?: string;
+};
+
+/** A stats table column's look: its values' colour and its header's marker. */
+export type TStatsTableColumn = {
+  color: string;
+  marker: TSeriesMarkerProps;
+};
+
+export type TStatsTableProps = {
+  table: TStatsTable;
+  columns: readonly TStatsTableColumn[];
+  /** the Martonne row's name: per year, for one year, or plain */
+  martonneLabel: string;
 };

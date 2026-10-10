@@ -1,1 +1,0 @@
-export { CompareChart } from "./CompareChart";

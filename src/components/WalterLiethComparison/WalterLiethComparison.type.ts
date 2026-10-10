@@ -7,11 +7,9 @@ import type { EWalterLiethShading } from "@/enums";
 import type { ReactNode } from "react";
 import type {
   TActiveMonth,
-  TPanelExpansion,
   TWalterLiethDomain,
   TWalterLiethRow,
   TWalterLiethSeries,
-  TWalterLiethSeriesInput,
 } from "@/types";
 
 export type TSeriesPair = {
@@ -22,15 +20,6 @@ export type TSeriesPair = {
 export type TShadingControlProps = TSeriesPair & {
   shading: EWalterLiethShading;
   onChange: (shading: EWalterLiethShading) => void;
-};
-
-export type TSplitViewProps = {
-  seriesA: TWalterLiethSeriesInput;
-  seriesB: TWalterLiethSeriesInput;
-  domain: TWalterLiethDomain;
-  syncId: string;
-  expansion: TPanelExpansion;
-  activeMonth: TActiveMonth;
 };
 
 /** One series in an overlay: Climate A / B, or a compared weather year. */

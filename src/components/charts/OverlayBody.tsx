@@ -1,12 +1,12 @@
 "use client";
 
-import { YEAR_OVERLAY_CLASSES as C } from "@/components/CompareYears/YearOverlay/YearOverlay.constant";
 import { VariableChips } from "@/components/TempPrecipChart/components";
 import { useState } from "react";
 import { ChartBlocks } from "./ChartBlocks";
-import { BLOCK_PLACEMENTS } from "./charts.constant";
+import { BLOCK_PLACEMENTS, OVERLAY_CHIPS_CLASSES as C } from "./charts.constant";
 import type { TChartBodyProps } from "./charts.type";
-import { getBlockContext, getDrawnSeries } from "./charts.util";
+import { getDrawnSeries } from "@/utils";
+import { getBlockContext } from "./charts.util";
 import { OverlayChart } from "./OverlayChart";
 import { SeriesChips } from "./SeriesChips";
 

@@ -16,7 +16,8 @@ import { useTranslations } from "next-intl";
 import { ChartBlocks } from "./ChartBlocks";
 import { BLOCK_PLACEMENTS, SPLIT_SIDES } from "./charts.constant";
 import type { TChartBodyProps } from "./charts.type";
-import { getBlockContext, getSplitPair, getStandardPalette } from "./charts.util";
+import { getSplitPair } from "@/utils";
+import { getBlockContext, getStandardPalette } from "./charts.util";
 import { SidePicker } from "./SidePicker";
 
 /**
@@ -87,6 +88,7 @@ export function SplitBody(props: TChartBodyProps) {
           activeMonthIndex={activeMonth.activeMonthIndex}
           onActiveMonthIndexChange={activeMonth.onActiveMonthIndexChange}
           syncId={syncId}
+          flashKeys={[entry.series.id]}
           footer={footer}
         />
       );

@@ -1,10 +1,12 @@
-import { CHART_CARD_HEADER_CLASSES as C } from "@/components/ChartCardHeader/ChartCardHeader.constant";
-import { CHART_CONTROLS_ROW_CLASSES as ROW } from "@/components/ChartControlsRow/ChartControlsRow.constant";
 import { ChartSwitches, ChartTitle, VariableChips } from "@/components/TempPrecipChart/components";
 import { ShadingControl } from "@/components/WalterLiethComparison/components";
 import { WalterLiethGuide } from "@/components/WalterLiethGuide";
 import { ECompareLayout } from "@/enums";
 import { isCompleteSeries } from "@/utils";
+import {
+  CHART_CARD_HEADER_CLASSES as C,
+  CHART_CONTROLS_ROW_CLASSES as ROW,
+} from "./charts.constant";
 import type { TChartCardHeaderProps } from "./charts.type";
 import { getTitleNames } from "./charts.util";
 

@@ -1,10 +1,12 @@
 import { ChartLegend } from "@/components/ChartLegend";
-import { ComparisonTable } from "@/components/ComparisonTable";
 import { MONTHLY_VALUES_TEXT_COLOR, MonthlyValuesTable } from "@/components/MonthlyValuesTable";
 import { EChartBlock, EChartBlockPlacement, EChartBody } from "@/enums";
+import { COMPARISON_METRIC_LABEL_KEYS, SERIES_KIND_RULES } from "@/constants";
 import { useStatsTable } from "@/hooks/charts/useStatsTable";
 import { useLegendLabels } from "@/hooks/ui/useLegendLabels";
 import { useWalterLiethLegendItems } from "@/hooks/ui/useWalterLiethLegendItems";
+import { toWalterLiethSeriesId } from "@/utils";
+import { useTranslations } from "next-intl";
 import type {
   TChartBlockDefinition,
   TChartBlockProps,
@@ -12,6 +14,7 @@ import type {
   TSectionBlockProps,
 } from "./charts.type";
 import { getChartLegendItems, getIdentityColor } from "./charts.util";
+import { StatsTable } from "./StatsTable";
 
 /**
  * The monthly mean temperature and precipitation: one row per series. In an overlay each row
@@ -43,10 +46,34 @@ function LegendBlock({ context }: TChartBlockProps) {
   return <ChartLegend items={getChartLegendItems(context, labels, walterLieth)} />;
 }
 
-/** The compared series' stats, metric by metric, with their difference — above the card. */
+/** Each series' stats, metric by metric (a pair's with their difference) — above the card. */
 function StatsTableBlock({ model, features }: TSectionBlockProps) {
+  const t = useTranslations();
   const table = useStatsTable(model, features);
-  return table ? <ComparisonTable table={table} /> : null;
+  const [first] = model.series;
+  if (!first) return null;
+
+  const rule = SERIES_KIND_RULES[first.series.kind];
+  // * a weather year's index describes that year; a pair of one weather year names it
+  const martonneLabel = rule.isSingleYear
+    ? t("chart.martonnePerYear")
+    : first.series.year !== null
+      ? t("chart.martonneShortYear", { year: first.series.year })
+      : t(COMPARISON_METRIC_LABEL_KEYS.martonne);
+
+  return (
+    <StatsTable
+      table={table}
+      columns={model.series.map((entry) => ({
+        color: getIdentityColor(entry, rule),
+        marker: {
+          id: toWalterLiethSeriesId(entry.series.id),
+          ...(rule.usesOwnColor ? { color: entry.series.color } : {}),
+        },
+      }))}
+      martonneLabel={martonneLabel}
+    />
+  );
 }
 
 /**

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/UI/Button";
 import { DotLabel } from "@/components/UI/DotLabel/DotLabel";
+import { PairLayout } from "@/components/UI/PairLayout";
 import { Dropdown } from "@/components/UI/Dropdown";
 import { OptionDot } from "@/components/UI/Dropdown/OptionDot";
 import { SwapButton } from "@/components/UI/SwapButton";
@@ -12,7 +13,13 @@ import {
   WEATHER_MAX_YEAR,
   WEATHER_MIN_YEAR,
 } from "@/constants";
-import { EButtonVariant, EFilterApplyMode, EFilterKey, EFilterNoteVariant } from "@/enums";
+import {
+  EButtonVariant,
+  EFilterApplyMode,
+  EFilterKey,
+  EFilterNoteVariant,
+  EPairLayoutVariant,
+} from "@/enums";
 import { useCityClimatePeriods } from "@/hooks/filters/useCityClimatePeriods";
 import { useFilterNavigation } from "@/hooks/filters/useFilterNavigation";
 import { useFilters } from "@/hooks/filters/useFilters";
@@ -116,15 +123,18 @@ function PeriodPair({ periods, availablePeriods, onChange, isCompact }: TPeriodP
     </div>
   ));
   const row = (
-    <div className={isCompact ? C.PAIR_COMPACT_ROW : C.PAIR_ROW}>
-      {sideA}
-      <SwapButton
-        label={t("comparePeriods.swapPeriods")}
-        onClick={() => emit(swapPair(pair))}
-        {...(isCompact ? { className: C.PAIR_COMPACT_SWAP } : {})}
-      />
-      {sideB}
-    </div>
+    <PairLayout
+      variant={isCompact ? EPairLayoutVariant.COMPACT : EPairLayoutVariant.ROW}
+      first={sideA}
+      between={
+        <SwapButton
+          label={t("comparePeriods.swapPeriods")}
+          onClick={() => emit(swapPair(pair))}
+          {...(isCompact ? { className: C.PAIR_COMPACT_SWAP } : {})}
+        />
+      }
+      second={sideB}
+    />
   );
 
   return isCompact ? (

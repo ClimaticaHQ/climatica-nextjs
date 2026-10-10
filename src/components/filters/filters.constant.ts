@@ -36,12 +36,9 @@ export const COMPARED_PERIODS_CLASSES = {
   // * on the page below lg; hidden from lg by CSS too, so the server render (no viewport yet)
   // * never flashes it on a desktop, where the sidebar has it as a section
   PAGE: "w-full max-w-xl lg:hidden",
-  PAIR_ROW: "flex items-end gap-2",
   // * compact (sidebar): one row from 20rem of room, stacked below it — the swap then turns
   // * to point up / down, between the two
   PAIR_COMPACT_FRAME: "@container/period-pair",
-  PAIR_COMPACT_ROW:
-    "flex flex-col gap-2 @min-[20rem]/period-pair:flex-row @min-[20rem]/period-pair:items-end",
   PAIR_COMPACT_SWAP: "self-center rotate-90 @min-[20rem]/period-pair:rotate-0",
   SIDE: "flex min-w-0 flex-1 flex-col gap-1.5",
   EDITOR: "flex flex-col gap-2",

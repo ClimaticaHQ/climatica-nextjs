@@ -1,6 +1,6 @@
 "use client";
 
-import { ChipScroller } from "@/components/CompareYears/ChipScroller";
+import { ChipScroller } from "@/components/UI/ChipScroller";
 import { Chip } from "@/components/UI/Chip";
 import { LG_MEDIA_QUERY } from "@/constants";
 import { EChipVariant } from "@/enums";

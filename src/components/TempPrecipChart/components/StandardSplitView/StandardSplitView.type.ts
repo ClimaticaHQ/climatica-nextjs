@@ -3,7 +3,6 @@ import type { TStandardChartColors } from "../../charts/StandardClimateChart/Sta
 import type {
   TMonthAridity,
   TMonthlyTemperatureWithAvg,
-  TPanelExpansion,
   TPanelHeaderSlots,
   TVisibleSeries,
   TWalterLiethScales,
@@ -29,15 +28,11 @@ export type TStandardSplitShared = {
   syncId: string;
 };
 
-export type TStandardSplitViewProps = TStandardSplitShared & {
-  seriesA: TStandardSplitSeries;
-  seriesB: TStandardSplitSeries;
-  expansion: TPanelExpansion;
-};
-
 export type TStandardPanelProps = TStandardSplitShared & {
   panel: TStandardSplitSeries;
   headerSlots?: TPanelHeaderSlots | undefined;
   /** the chart card's panel blocks — see StandardClimateChart's footer */
   footer?: ReactNode;
+  /** the update keys this panel flashes for — its series' id when omitted */
+  flashKeys?: readonly string[];
 };

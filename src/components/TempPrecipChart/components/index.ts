@@ -1,12 +1,5 @@
-export { ChartBody } from "./ChartBody";
-export { ChartHeader } from "./ChartHeader";
 export { ChartSwitches } from "./ChartSwitches";
 export { ChartTitle } from "./ChartTitle";
 export { PrecipBarShape } from "./PrecipBarShape";
-export { SecondaryControls } from "./SecondaryControls";
-export { StandardBody } from "./StandardBody";
 export { StandardChartAxes } from "./StandardChartAxes";
-export { StandardSplitView } from "./StandardSplitView";
 export { VariableChips } from "./VariableChips";
-export { WalterLiethBody } from "./WalterLiethBody";
-export { YearsBody } from "./YearsBody";

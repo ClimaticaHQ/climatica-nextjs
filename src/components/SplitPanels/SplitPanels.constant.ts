@@ -15,11 +15,6 @@ export const PANEL_ORIGIN: Record<EWalterLiethSeriesId, TTransformOrigin> = {
 };
 
 export const SPLIT_PANELS_CLASSES = {
-  // * side by side from `sm`, stacked below; each panel Card spans the rows (header, plot)
-  SPLIT: "grid grid-cols-1 gap-4 sm:grid-cols-2",
-  // * the same with a control between the panels (the side pickers' swap)
-  SPLIT_WITH_BETWEEN: "grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]",
-  BETWEEN: "flex justify-center sm:items-start sm:pt-1",
   // * one panel across the card, on the split's two rows (header, plot) — as tall as the split
   EXPANDED: "grid grid-cols-1",
   CONTROLS: "flex shrink-0 items-center gap-1.5",

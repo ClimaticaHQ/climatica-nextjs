@@ -6,14 +6,20 @@ import { StandardClimateChart } from "../../../charts";
 import type { TStandardPanelProps } from "../StandardSplitView.type";
 
 /** One standard-chart panel: the WL split's card and header, the standard chart below. */
-export function StandardPanel({ panel, headerSlots, footer, ...shared }: TStandardPanelProps) {
+export function StandardPanel({
+  panel,
+  headerSlots,
+  footer,
+  flashKeys,
+  ...shared
+}: TStandardPanelProps) {
   const { selectedMonths, ...chart } = shared;
 
   return (
     <Card
       size={ECardSize.SM}
       padding={ECardPadding.PANEL}
-      flashKeys={[panel.series.id]}
+      flashKeys={flashKeys ?? [panel.series.id]}
       data-panel-series={panel.series.id}
       className={SPLIT_PANEL_CARD_CLASS}
     >
