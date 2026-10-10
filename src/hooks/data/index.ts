@@ -7,7 +7,6 @@ export { useGetCompareData } from "./useGetCompareData";
 export { useGetComparePeriods } from "./useGetComparePeriods";
 export { useGetDatasetVersion } from "./useGetDatasetVersion";
 export { useGetHeatmapData } from "./useGetHeatmapData";
-export { useGetHeatmapPolygonData } from "./useGetHeatmapPolygonData";
 export { useGetMultiPeriodData } from "./useGetMultiPeriodData";
 export { useGetRegionalProfile } from "./useGetRegionalProfile";
 export { useResolveCityByCoordinates } from "./useResolveCityByCoordinates";

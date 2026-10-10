@@ -3,7 +3,7 @@
 import { DATASETS, FILTER_DEFAULTS } from "@/constants";
 import type { EFilterKey } from "@/enums";
 import type { TFilters, TFiltersDraftOptions } from "@/types";
-import { estimateCellCount, isHeatmapCellLimitExceeded } from "@/utils/cellCount.util";
+import { countCellsInBounds, isHeatmapCellLimitExceeded } from "@/utils/cellCount.util";
 import { getWeatherYearError, normalizeFilters, setFilterValue } from "@/utils/filters.util";
 import { areFiltersEqual } from "@/utils/filtersUrl.util";
 import { useState } from "react";
@@ -28,7 +28,7 @@ export function useFiltersDraft({ filters, heatmapBbox }: TFiltersDraftOptions) 
 
   const yearError =
     draft.dataset === DATASETS.WEATHER ? getWeatherYearError(draft.weatherYear) : null;
-  const cellCount = heatmapBbox === null ? null : estimateCellCount(heatmapBbox, draft.gridSize);
+  const cellCount = heatmapBbox === null ? null : countCellsInBounds(heatmapBbox, draft.gridSize);
 
   function setFilter<K extends EFilterKey>(key: K, value: TFilters[K]) {
     setDraft((prev) => normalizeFilters(setFilterValue(prev, key, value)));

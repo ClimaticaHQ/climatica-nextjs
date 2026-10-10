@@ -3,7 +3,6 @@ import {
   computeHeatmapStats,
   computeRegionalProfile,
   formatSelectedMonths,
-  polygonToWkt,
 } from "@/app/heat-map/_components/HeatMap.util";
 import {
   CLIMATE_PERIOD_LABELS,
@@ -12,18 +11,13 @@ import {
   VARIABLE_LABELS,
 } from "@/constants";
 import { ECitySlot } from "@/enums";
-import {
-  useGetDatasetVersion,
-  useGetHeatmapData,
-  useGetHeatmapPolygonData,
-  useGetRegionalProfile,
-} from "@/hooks/data";
+import { useGetDatasetVersion, useGetHeatmapData, useGetRegionalProfile } from "@/hooks/data";
 import { useFilters } from "@/hooks/filters";
 import { usePersistedCity } from "@/hooks/persisted";
 import { useGeolocation } from "@/hooks/ui";
 import { useSettingsStore } from "@/stores";
 import type { TColorScale, TCity } from "@/types";
-import { resolveDataState } from "@/utils";
+import { getPolygonBounds, isHeatmapCellLimitExceeded, resolveDataState } from "@/utils";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useCitySelection } from "./useCitySelection";
@@ -31,6 +25,7 @@ import { useDocumentTitle } from "./useDocumentTitle";
 import { useHeatMapExport } from "./useHeatMapExport";
 import { useHeatMapSelection } from "./useHeatMapSelection";
 import { useNoPeriodDataMessage } from "./useNoPeriodDataMessage";
+import { useTooManyCellsMessage } from "./useTooManyCellsMessage";
 
 /**
  * Region Heatmap: one variable over a drawn box or polygon — the region's stats, its cells on
@@ -40,7 +35,6 @@ export function useHeatMapPage(): THeatMapPage {
   const t = useTranslations();
   const { dataset, climatePeriod, weatherYear, gridSize, variables, months } = useFilters();
   const isClimate = dataset === DATASETS.CLIMATE;
-  const year = isClimate ? undefined : weatherYear;
   const selectedMonths = months === "all" ? [] : months;
   const periodLabel = isClimate ? CLIMATE_PERIOD_LABELS[climatePeriod] : String(weatherYear);
   const activeVariable = variables[0] ?? "tmax";
@@ -49,37 +43,26 @@ export function useHeatMapPage(): THeatMapPage {
 
   const region = useHeatMapSelection();
   const { bbox, polygon } = region.selection;
-  const wkt = polygon ? polygonToWkt(polygon) : null;
-  const boxData = useGetHeatmapData(
-    polygon ? null : bbox,
+  const area = polygon ? { polygon } : bbox ? { bbox } : null;
+  const bounds = polygon ? getPolygonBounds(polygon) : bbox;
+  // * a region over the cell cap isn't loaded: the page suggests a coarser resolution instead
+  const isTooLarge = isHeatmapCellLimitExceeded(bounds, gridSize);
+  const regionData = {
+    area: isTooLarge ? null : area,
     gridSize,
-    activeVariable,
-    isClimate,
-    climatePeriod,
-    year,
-  );
-  const polygonData = useGetHeatmapPolygonData(
-    wkt,
-    gridSize,
-    activeVariable,
-    isClimate,
-    climatePeriod,
-    year,
-  );
-  const cells = polygon ? polygonData : boxData;
+    dataset: isClimate
+      ? { isClimate: true as const, climatePeriod }
+      : { isClimate: false as const, year: weatherYear },
+  };
+  const cells = useGetHeatmapData({ ...regionData, variable: activeVariable });
   const bindings = cells.pixels?.results.bindings ?? [];
   const stats = computeHeatmapStats(bindings);
   const hasData = stats.count > 0;
 
-  const { profileData, isProfileLoading, profileError } = useGetRegionalProfile(
-    polygon ? null : bbox,
-    wkt,
-    gridSize,
-    isClimate,
-    climatePeriod,
-    year,
-    hasData,
-  );
+  const { profileData, isProfileLoading, profileError } = useGetRegionalProfile({
+    ...regionData,
+    isEnabled: hasData,
+  });
   const { data: datasetAttribution = null } = useGetDatasetVersion();
 
   const [mapTarget, setMapTarget] = useState<TMapTarget | null>(null);
@@ -91,6 +74,7 @@ export function useHeatMapPage(): THeatMapPage {
   usePersistedCityFollow(setMapTarget);
 
   const noPeriodData = useNoPeriodDataMessage("heatMap.noPeriodData");
+  const tooManyCells = useTooManyCellsMessage(gridSize);
   const state = resolveDataState({
     isLoading: cells.isLoading,
     // * the page's one message also reports a failed regional profile
@@ -98,9 +82,11 @@ export function useHeatMapPage(): THeatMapPage {
     hasData,
     emptyMessages: !region.hasSelection
       ? [t("heatMap.noSelection")]
-      : isClimate && bindings.length === 0
-        ? [noPeriodData(periodLabel, gridSize)]
-        : [t("heatMap.noData")],
+      : bounds && isTooLarge
+        ? [tooManyCells(bounds)]
+        : isClimate && bindings.length === 0
+          ? [noPeriodData(periodLabel, gridSize)]
+          : [t("heatMap.noData")],
   });
 
   const monthLabel = formatSelectedMonths(selectedMonths);
