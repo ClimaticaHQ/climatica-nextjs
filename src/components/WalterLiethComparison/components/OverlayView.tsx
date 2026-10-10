@@ -25,6 +25,7 @@ export function OverlayView({
   domain,
   activeMonth,
   shouldListSeries = true,
+  footer,
 }: TOverlayViewProps) {
   const charts = useWalterLiethCharts({
     series: entries.map(({ series }) => series),
@@ -71,35 +72,39 @@ export function OverlayView({
         activeMonthIndex={activeMonth.activeMonthIndex}
         onActiveMonthIndexChange={activeMonth.onActiveMonthIndexChange}
       />
-      <MonthlyValuesTable
-        series={drawn.map(({ key, series, color }) => ({
-          key,
-          label: series.label,
-          color,
-          data: series.months,
-        }))}
-        isCompact={false}
-        activeMonthIndex={activeMonth.activeMonthIndex}
-        onActiveMonthIndexChange={activeMonth.onActiveMonthIndexChange}
-      />
-      <ChartLegend
-        items={getWalterLiethOverlayLegendItems({
-          labels: legendLabels,
-          series: shouldListSeries
-            ? drawn.map(({ key, series, color, shape }) => ({
-                key,
-                label: series.label,
-                color,
-                shape,
-              }))
-            : [],
-          shadeColor: shaded ? shaded.color : null,
-          frost: shaded
-            ? { fill: WALTER_LIETH_COLORS.FROST, outline: WALTER_LIETH_COLORS.FROST_OUTLINE }
-            : null,
-          neutral: CHART_LEGEND.NEUTRAL_COLOR,
-        })}
-      />
+      {footer ?? (
+        <>
+          <MonthlyValuesTable
+            series={drawn.map(({ key, series, color }) => ({
+              key,
+              label: series.label,
+              color,
+              data: series.months,
+            }))}
+            isCompact={false}
+            activeMonthIndex={activeMonth.activeMonthIndex}
+            onActiveMonthIndexChange={activeMonth.onActiveMonthIndexChange}
+          />
+          <ChartLegend
+            items={getWalterLiethOverlayLegendItems({
+              labels: legendLabels,
+              series: shouldListSeries
+                ? drawn.map(({ key, series, color, shape }) => ({
+                    key,
+                    label: series.label,
+                    color,
+                    shape,
+                  }))
+                : [],
+              shadeColor: shaded ? shaded.color : null,
+              frost: shaded
+                ? { fill: WALTER_LIETH_COLORS.FROST, outline: WALTER_LIETH_COLORS.FROST_OUTLINE }
+                : null,
+              neutral: CHART_LEGEND.NEUTRAL_COLOR,
+            })}
+          />
+        </>
+      )}
     </figure>
   );
 }

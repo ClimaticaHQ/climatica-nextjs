@@ -4,6 +4,7 @@ import type {
   TWalterLiethTooltipProps,
 } from "@/components/WalterLiethChart/WalterLiethChart.type";
 import type { EWalterLiethShading } from "@/enums";
+import type { ReactNode } from "react";
 import type {
   TActiveMonth,
   TPanelExpansion,
@@ -50,6 +51,9 @@ export type TOverlayViewProps = {
   activeMonth: TActiveMonth;
   /** the legend names each series — off where chips above the diagram name them */
   shouldListSeries?: boolean;
+  /** the chart card's blocks (values table, legend) in place of this chart's own — until every
+   * page draws through the chart card */
+  footer?: ReactNode;
 };
 
 export type TOverlayLayerArgs = Omit<
