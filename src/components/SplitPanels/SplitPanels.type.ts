@@ -12,6 +12,8 @@ export type TSplitPanelsProps = {
   renderPanel: (id: EWalterLiethSeriesId, panel: TSplitPanelRender) => ReactNode;
   /** below the panels; told which panel is shown alone (null: both) */
   renderLegend: (shown: TExpandedPanel) => ReactNode;
+  /** between the two panels while both are shown — e.g. the side pickers' swap button */
+  between?: ReactNode;
 };
 
 /** How the container shows a panel: the header slots it gives it. */

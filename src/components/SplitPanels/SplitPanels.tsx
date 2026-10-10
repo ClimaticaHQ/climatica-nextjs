@@ -24,6 +24,7 @@ export function SplitPanels({
   expandable,
   renderPanel,
   renderLegend,
+  between,
 }: TSplitPanelsProps) {
   const t = useTranslations();
   const shown = getShownPanel(expansion.expanded, expandable);
@@ -70,9 +71,10 @@ export function SplitPanels({
             })}
           </div>
         ) : (
-          <div className={C.SPLIT}>
-            {SPLIT_PANEL_ORDER.map((id) => (
+          <div className={between === undefined ? C.SPLIT : C.SPLIT_WITH_BETWEEN}>
+            {SPLIT_PANEL_ORDER.map((id, index) => (
               <Fragment key={id}>
+                {index > 0 && between !== undefined && <div className={C.BETWEEN}>{between}</div>}
                 {renderPanel(id, {
                   slots: expandable[id] ? { actions: expandButton(id) } : {},
                 })}
