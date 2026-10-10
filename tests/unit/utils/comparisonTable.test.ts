@@ -5,6 +5,8 @@ import type { TMonthlyTemperature } from "@/types";
 import { buildComparisonTable } from "@/utils/comparisonTable.util";
 import { describe, expect, it } from "vitest";
 
+const UNITS = { celsius: "°C", mm: "mm", meters: "m" };
+
 const months = (tmin: number, tmax: number, prec: number): TMonthlyTemperature[] =>
   Array.from({ length: 12 }, (_, i) => ({
     month: i + 1,
@@ -20,6 +22,7 @@ const lviv = { id: EWalterLiethSeriesId.B, label: "Lviv", altitude: 261 };
 
 describe("buildComparisonTable", () => {
   const table = buildComparisonTable({
+    units: UNITS,
     seriesA: { ...valladolid, data: months(5, 20, 35) },
     seriesB: { ...lviv, data: months(-2, 10, 55) },
     minuend: EWalterLiethSeriesId.B,
@@ -58,6 +61,7 @@ describe("buildComparisonTable", () => {
   it("shows — for a missing value and leaves its difference out", () => {
     const gappy = months(5, 20, 35).map((m, i) => (i === 3 ? { ...m, tmin: null } : m));
     const withGap = buildComparisonTable({
+      units: UNITS,
       seriesA: { ...valladolid, data: gappy },
       seriesB: { ...lviv, data: months(-2, 10, 55) },
       minuend: EWalterLiethSeriesId.B,

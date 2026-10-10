@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
-import { ChartCard, type TChartCardProps } from "@/components/charts";
+import { ChartCard } from "@/components/charts/ChartCard";
+import type { TChartCardProps } from "@/components/charts/charts.type";
 import { useChartModel } from "@/hooks/charts/useChartModel";
 import { EChartBlock, ECompareLayout, EWalterLiethShading } from "@/enums";
 import messages from "@/i18n/locales/en.json";
@@ -8,6 +9,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { CITY, CITY_PAIR, PERIOD_PAIR, weatherYears } from "./chartFixtures";
+import { stubChartEnvironment } from "./chartTestEnv";
 
 // * the chart type switch writes the URL — not under test here
 vi.mock("@/hooks/url/useChartModeUrl", () => ({
@@ -26,24 +28,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 
-beforeAll(() => {
-  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-  }));
-  window.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  };
-  // * jsdom lays nothing out: Recharts warns that its container has no size
-  const warn = console.warn.bind(console);
-  vi.spyOn(console, "warn").mockImplementation((...args: unknown[]) => {
-    if (!String(args[0]).includes("width(0) and height(0)")) warn(...args);
-  });
-});
+beforeAll(stubChartEnvironment);
 
 afterEach(cleanup);
 

@@ -8,6 +8,7 @@ import { AxiosError, AxiosHeaders } from "axios";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { months } from "../charts/chartFixtures";
+import { stubChartEnvironment } from "../charts/chartTestEnv";
 
 const page = vi.hoisted(() => ({
   search: "",
@@ -44,24 +45,7 @@ vi.mock("@/hooks/data/useSearchCity", () => ({
 vi.mock("@/components/filters", () => ({ FilterBar: () => null }));
 vi.mock("@/components/LeafletMap", () => ({ LeafletMap: () => null }));
 
-beforeAll(() => {
-  // * reduced motion: a chart type switch replaces the body at once instead of crossfading
-  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
-    matches: query.includes("reduce"),
-    media: query,
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-  }));
-  window.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  };
-  const warn = console.warn.bind(console);
-  vi.spyOn(console, "warn").mockImplementation((...args: unknown[]) => {
-    if (!String(args[0]).includes("width(0) and height(0)")) warn(...args);
-  });
-});
+beforeAll(stubChartEnvironment);
 
 afterEach(cleanup);
 
@@ -90,6 +74,8 @@ describe("City Climate through its page hook", () => {
       expect(screen.getByRole("heading", { level: 3 }).textContent).toBe("Paris");
       expect(blocks(EChartBlock.VALUES_TABLE)).toHaveLength(1);
       expect(blocks(EChartBlock.LEGEND)).toHaveLength(1);
+      // * one place: its stat cards instead of the comparison's stats table
+      expect(blocks(EChartBlock.STATS_TABLE)).toHaveLength(0);
     },
   );
 

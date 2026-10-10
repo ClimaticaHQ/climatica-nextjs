@@ -25,6 +25,8 @@ import {
 } from "@/utils/walterLieth.util";
 import { describe, expect, it } from "vitest";
 
+const UNITS = { celsius: "°C", mm: "mm", meters: "m" };
+
 const toMonths = (rows: readonly (readonly [number, number])[]) =>
   rows.map(([tavg, prec]) => ({ tavg, prec }));
 
@@ -126,6 +128,7 @@ function buildSvg(overrides: Partial<TComparisonExport>) {
       "Dec",
     ],
     table: buildComparisonTable({
+      units: UNITS,
       seriesA: {
         id: EWalterLiethSeriesId.A,
         label: "Madrid",
