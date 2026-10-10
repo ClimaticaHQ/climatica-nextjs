@@ -1,5 +1,6 @@
 import type { ECitySlot } from "@/enums";
 import type { RefObject } from "react";
+import type { TChartMode } from "../components";
 import type { TCity } from "../domain";
 import type { TScrollOptions } from "../utils";
 
@@ -18,4 +19,11 @@ export type TUseCitySelectionArgs = {
   slot: ECitySlot;
   /** after the slots are set: the page's own follow-up (URL state, the map's target) */
   onPicked?: (city: TCity) => void;
+};
+
+export type TUseWeatherYearsViewStateArgs = {
+  /** every compared year, in order */
+  years: readonly number[];
+  isWeather: boolean;
+  chartMode: TChartMode;
 };

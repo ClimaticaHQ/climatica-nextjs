@@ -7,14 +7,14 @@ import type { EDataStatus } from "@/enums";
 export type TDataState =
   | { status: EDataStatus.LOADING }
   | { status: EDataStatus.READY }
-  /** message null: an empty result the page shows nothing for */
-  | { status: EDataStatus.EMPTY; message: string | null }
+  /** what the page says about it, one line each (none: it shows nothing) */
+  | { status: EDataStatus.EMPTY; messages: readonly string[] }
   | { status: EDataStatus.ERROR; error: unknown };
 
 export type TResolveDataStateArgs = {
   isLoading: boolean;
   error: unknown;
   hasData: boolean;
-  /** what an empty result says — e.g. the no-period-data message */
-  emptyMessage: string | null;
+  /** what an empty result says — e.g. the no-period-data message, per missing period */
+  emptyMessages: readonly string[];
 };
