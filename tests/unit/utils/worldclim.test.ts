@@ -13,7 +13,9 @@ import {
   extractCellBySize,
   filterPointBindingsByPeriod,
   validateResponseData,
+  getPixelQueryLimit,
 } from "@/utils/worldclim.util";
+import { CLIMATE_PERIODS } from "@/constants";
 import type { TWorldClimCellResponse, TWorldClimPointValueBinding } from "@/types";
 
 const GRID_BASE = "http://climate.gsic.uva.es/data/Grid_";
@@ -188,5 +190,27 @@ describe("extractAvailableClimatePeriods", () => {
 
   it("returns [] for no bindings", () => {
     expect(extractAvailableClimatePeriods([])).toEqual([]);
+  });
+});
+
+describe("getPixelQueryLimit", () => {
+  const bounds = { north: 50, south: 49, west: 23, east: 24 };
+
+  it("asks for every cell's months, and every normals period with Climate", () => {
+    const weather = getPixelQueryLimit({
+      bounds,
+      gridSize: "10m",
+      variableCount: 1,
+      isClimate: false,
+    });
+    const climate = getPixelQueryLimit({
+      bounds,
+      gridSize: "10m",
+      variableCount: 1,
+      isClimate: true,
+    });
+    // * a 1° box at 10′ holds up to 7 × 7 cells
+    expect(weather).toBe(49 * 12);
+    expect(climate).toBe(weather * Object.keys(CLIMATE_PERIODS).length);
   });
 });
