@@ -108,4 +108,19 @@ test.describe("Climate data loading", () => {
     await expect(button).toHaveAttribute("aria-expanded", "false");
     await expect(button).toBeFocused();
   });
+
+  test("a failed load says why, translated, and leaves no empty space behind", async ({ page }) => {
+    await page.route("**/api/worldclim/pixelvaluesofapoint**", (route) =>
+      route.fulfill({ status: 502, json: { error: "WorldClim API request failed" } }),
+    );
+    await page.goto(PARIS_URL);
+
+    await expect(page.locator("main").getByRole("alert")).toHaveText(
+      "The climate data service isn't responding. Try again in a moment.",
+      { timeout: 30_000 },
+    );
+    await expect(page.locator("main")).not.toContainText("WorldClim API request failed");
+    // * an empty results frame would still take the page's gap; it's not laid out at all
+    await expect(page.getByTestId("page-results")).toHaveCSS("display", "none");
+  });
 });

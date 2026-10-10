@@ -14,12 +14,6 @@ const url = vi.hoisted(() => {
   return { writes };
 });
 
-// * FilterSection's module graph reaches the page-level filter hooks — never called here
-vi.mock("@/hooks/filters/useFilterNavigation", () => ({
-  useFilterNavigation: () => ({ applyFilters: vi.fn(), updateFilters: vi.fn() }),
-}));
-vi.mock("@/hooks/filters/useFilters", () => ({ useFilters: vi.fn() }));
-vi.mock("@/hooks/filters/useCityClimatePeriods", () => ({ useCityClimatePeriods: () => null }));
 vi.mock("@/hooks/url/useChartModeUrl", () => ({
   useChartModeUrl: () => ({
     chartMode: "walter-lieth",
