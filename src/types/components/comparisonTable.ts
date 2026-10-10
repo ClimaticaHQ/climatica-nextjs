@@ -13,10 +13,13 @@ export type TComparisonMetric =
   | "altitude"
   | "martonne";
 
+/** The units the comparison table's values carry — translated by the caller. */
+export type TComparisonUnit = "celsius" | "mm" | "meters";
+
 /** How a row's numbers read: unit (none for counts and Martonne) and decimals. */
 export type TComparisonMetricFormat = {
   metric: TComparisonMetric;
-  unit: string;
+  unit: TComparisonUnit | null;
   digits: number;
 };
 
@@ -63,6 +66,8 @@ export type TBuildComparisonTableArgs = {
   locale: string;
   /** both series are this one weather year (Compare Cities with Weather) */
   martonneYear?: number | undefined;
+  /** each unit as the locale writes it */
+  units: Record<TComparisonUnit, string>;
 };
 
 /** The table's translated texts, as the export carries them (the page uses its hooks). */
@@ -71,4 +76,10 @@ export type TComparisonTableLabels = {
   difference: string;
   /** each series' translated Martonne class (its badge); null when unknown */
   martonneClasses: { a: string | null; b: string | null };
+};
+
+export type TFormatComparisonValueOptions = {
+  locale: string;
+  /** the row's unit as the locale writes it; null: none */
+  unit: string | null;
 };

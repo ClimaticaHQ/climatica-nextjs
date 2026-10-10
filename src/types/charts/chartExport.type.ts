@@ -1,4 +1,10 @@
-import type { TCellSize, TChartSubtitle, TCoordinates, TDatasetAttribution } from "@/types";
+import type {
+  TCellSize,
+  TChartSubtitle,
+  TComparisonTable,
+  TCoordinates,
+  TDatasetAttribution,
+} from "@/types";
 import type { TVisibleSeries } from "../components";
 import type { TChartModel } from "./chartModel.type";
 import type { TChartFeatures, TChartViewState } from "./chartPage.type";
@@ -8,7 +14,7 @@ export type TChartExportPlace = TCoordinates & {
   name: string;
 };
 
-export type TUseChartExportArgs = {
+export type TUseSingleChartExportArgs = {
   model: TChartModel;
   viewState: TChartViewState;
   features: TChartFeatures;
@@ -27,7 +33,30 @@ export type TUseChartExportArgs = {
   isFetching: boolean;
 };
 
-export type TUseSingleExportLabelsArgs = Pick<TUseChartExportArgs, "subtitle" | "periodLabel"> & {
+export type TUseSingleExportLabelsArgs = Pick<
+  TUseSingleChartExportArgs,
+  "subtitle" | "periodLabel"
+> & {
   placeName: string;
   martonne: number | null;
+};
+
+export type TUseComparisonChartExportArgs = Pick<
+  TUseSingleChartExportArgs,
+  | "model"
+  | "viewState"
+  | "features"
+  | "visible"
+  | "fileStem"
+  | "datasetAttribution"
+  | "shareUrl"
+  | "isFetching"
+>;
+
+export type TUseComparisonExportBlockArgs = Pick<
+  TUseSingleChartExportArgs,
+  "model" | "viewState"
+> & {
+  table: TComparisonTable | null;
+  visible: TVisibleSeries;
 };
