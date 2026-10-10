@@ -11,7 +11,7 @@ import {
   STATS_BAR_STYLE,
 } from "./ClimateStatsBar.constant";
 import type { TClimateStatsBarProps } from "./ClimateStatsBar.type";
-import { StatCell, StatValue } from "./components";
+import { StatCell } from "@/components/UI/StatCell";
 
 /** One place's annual stats — the city page (and the heat map's region profile). */
 export function ClimateStatsBar({
@@ -52,27 +52,32 @@ export function ClimateStatsBar({
       <div
         className={`grid grid-cols-2 items-stretch ${STATS_BAR_STYLE.bar} ${STATS_BAR_COLUMNS[showAltitude ? 5 : 4]}`}
       >
-        <StatCell {...cell} label={t("chart.meanTemp")}>
-          <StatValue
-            value={t("units.celsiusValue", {
-              value: formatNumber(meanTemp, { digits: VALUE_DIGITS.TEMP }),
-            })}
-          />
-        </StatCell>
-        <StatCell {...cell} label={t("chart.annualPrec")}>
-          <StatValue value={t("units.mmValue", { value: formatNumber(annualPrecip) })} />
-        </StatCell>
-        <StatCell {...cell} label={t("chart.aridMonths")}>
-          <StatValue value={String(aridMonths)} />
-        </StatCell>
+        <StatCell
+          {...cell}
+          label={t("chart.meanTemp")}
+          value={t("units.celsiusValue", {
+            value: formatNumber(meanTemp, { digits: VALUE_DIGITS.TEMP }),
+          })}
+        />
+        <StatCell
+          {...cell}
+          label={t("chart.annualPrec")}
+          value={t("units.mmValue", { value: formatNumber(annualPrecip) })}
+        />
+        <StatCell {...cell} label={t("chart.aridMonths")} value={String(aridMonths)} />
         {showAltitude && (
-          <StatCell {...cell} label={t("chart.altitude")}>
-            <StatValue value={t("units.metersValue", { value: formatNumber(altitude) })} />
-          </StatCell>
+          <StatCell
+            {...cell}
+            label={t("chart.altitude")}
+            value={t("units.metersValue", { value: formatNumber(altitude) })}
+          />
         )}
-        <StatCell {...cell} {...martonneLabels} meta={badge && <MartonneBadge badge={badge} />}>
-          <StatValue value={formatNumber(martonneIndex, { digits: VALUE_DIGITS.MARTONNE })} />
-        </StatCell>
+        <StatCell
+          {...cell}
+          {...martonneLabels}
+          meta={badge && <MartonneBadge badge={badge} />}
+          value={formatNumber(martonneIndex, { digits: VALUE_DIGITS.MARTONNE })}
+        />
       </div>
     </Card>
   );

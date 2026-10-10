@@ -25,3 +25,4 @@ export { BottomSheet } from "./BottomSheet";
 export { StatusMessage } from "./StatusMessage";
 export { PairLayout } from "./PairLayout";
 export { ChipScroller } from "./ChipScroller";
+export { StatCell } from "./StatCell";

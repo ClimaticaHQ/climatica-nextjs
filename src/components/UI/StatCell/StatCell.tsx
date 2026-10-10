@@ -1,8 +1,9 @@
-import { STAT_TEXT_CLASSES } from "../ClimateStatsBar.constant";
-import type { TStatCellProps } from "../ClimateStatsBar.type";
+import { STAT_CELL_VALUE_CLASS, STAT_TEXT_CLASSES } from "./StatCell.constant";
+import type { TStatCellProps } from "./StatCell.type";
 
 /**
- * Three rows — label / value / meta (Martonne class, delta) — as a subgrid of the bar's rows,
+ * One stat of a stats bar. Three rows — label / value / meta (Martonne class, delta, context) —
+ * as a subgrid of the bar's rows,
  * so across a row of cards the labels share one height, the values sit on one line and the
  * badges and deltas on the next, even when a label wraps.
  */
@@ -10,7 +11,7 @@ export function StatCell({
   label,
   fullLabel,
   title,
-  children,
+  value,
   hasMetaRow,
   meta,
   cellClassName,
@@ -32,7 +33,9 @@ export function StatCell({
           label
         )}
       </span>
-      <div className="min-w-0">{children}</div>
+      <div className="min-w-0">
+        <span className={STAT_CELL_VALUE_CLASS}>{value}</span>
+      </div>
       {hasMetaRow && (
         <div
           className={`flex min-h-5 min-w-0 flex-wrap items-center gap-x-1.5 ${STAT_TEXT_CLASSES.META} tabular-nums text-[var(--color-text-secondary)]`}
