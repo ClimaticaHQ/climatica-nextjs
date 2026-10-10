@@ -34,6 +34,7 @@ export function CompareChart({
   activeMonthIndex,
   onActiveMonthIndexChange,
   strip,
+  footer,
 }: TCompareChartProps) {
   const t = useTranslations();
   const legendLabels = useLegendLabels();
@@ -267,20 +268,32 @@ export function CompareChart({
           </ResponsiveContainer>
         </div>
       </div>
-      {strip}
-      <ChartLegend
-        items={getSeriesLegendItems({
-          labels: legendLabels,
-          series: [
-            { key: EWalterLiethSeriesId.A, label: labelA ?? "", color: CHART_COLORS.compareA.tmax },
-            { key: EWalterLiethSeriesId.B, label: labelB ?? "", color: CHART_COLORS.compareB.tmax },
-          ],
-          visible,
-          neutral: CHART_LEGEND.NEUTRAL_COLOR,
-          hasTavg: true,
-          aridity: showAridity ? { palette: ARIDITY_BAR_COLORS, labels: legendLabels } : null,
-        })}
-      />
+      {footer ?? (
+        <>
+          {strip}
+          <ChartLegend
+            items={getSeriesLegendItems({
+              labels: legendLabels,
+              series: [
+                {
+                  key: EWalterLiethSeriesId.A,
+                  label: labelA ?? "",
+                  color: CHART_COLORS.compareA.tmax,
+                },
+                {
+                  key: EWalterLiethSeriesId.B,
+                  label: labelB ?? "",
+                  color: CHART_COLORS.compareB.tmax,
+                },
+              ],
+              visible,
+              neutral: CHART_LEGEND.NEUTRAL_COLOR,
+              hasTavg: true,
+              aridity: showAridity ? { palette: ARIDITY_BAR_COLORS, labels: legendLabels } : null,
+            })}
+          />
+        </>
+      )}
     </>
   );
 }

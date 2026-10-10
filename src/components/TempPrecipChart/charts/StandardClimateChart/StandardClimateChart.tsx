@@ -45,6 +45,7 @@ export function StandardClimateChart({
   isPanel = false,
   syncId,
   name,
+  footer,
 }: TStandardClimateChartProps) {
   const t = useTranslations();
   const legendLabels = useLegendLabels();
@@ -222,22 +223,26 @@ export function StandardClimateChart({
           </ResponsiveContainer>
         </div>
       </div>
-      <MonthlyValuesTable
-        series={[{ key: name, label: name, color: MONTHLY_VALUES_TEXT_COLOR, data: chartData }]}
-        isCompact={isPanel}
-        activeMonthIndex={activeMonthIndex ?? null}
-        onActiveMonthIndexChange={onActiveMonthIndexChange}
-      />
-      {/* * split panels share one legend below both */}
-      {!isPanel && (
-        <ChartLegend
-          items={getStandardLegendItems({
-            labels: legendLabels,
-            colors,
-            visible,
-            aridity: showAridity ? ARIDITY_BAR_COLORS : null,
-          })}
-        />
+      {footer ?? (
+        <>
+          <MonthlyValuesTable
+            series={[{ key: name, label: name, color: MONTHLY_VALUES_TEXT_COLOR, data: chartData }]}
+            isCompact={isPanel}
+            activeMonthIndex={activeMonthIndex ?? null}
+            onActiveMonthIndexChange={onActiveMonthIndexChange}
+          />
+          {/* * split panels share one legend below both */}
+          {!isPanel && (
+            <ChartLegend
+              items={getStandardLegendItems({
+                labels: legendLabels,
+                colors,
+                visible,
+                aridity: showAridity ? ARIDITY_BAR_COLORS : null,
+              })}
+            />
+          )}
+        </>
       )}
     </>
   );

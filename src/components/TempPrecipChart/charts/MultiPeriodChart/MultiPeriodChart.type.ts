@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { TMultiPeriodEntry, TVisibleSeries, TWalterLiethScales } from "@/types";
 
 export type TMultiPeriodChartProps = {
@@ -12,4 +13,7 @@ export type TMultiPeriodChartProps = {
   hiddenPeriods?: readonly number[];
   /** hovered / focused year chip: the other years dim */
   highlightedYear?: number | null;
+  /** the chart card's blocks (values table, legend) in place of this chart's own — until every
+   * page draws through the chart card */
+  footer?: ReactNode;
 };

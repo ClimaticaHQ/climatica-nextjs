@@ -29,6 +29,7 @@ export function MultiPeriodChart({
   years,
   hiddenPeriods = [],
   highlightedYear = null,
+  footer,
 }: TMultiPeriodChartProps) {
   const t = useTranslations();
   const legendLabels = useLegendLabels();
@@ -174,18 +175,20 @@ export function MultiPeriodChart({
           </ResponsiveContainer>
         </div>
       </div>
-      <ChartLegend
-        items={getSeriesLegendItems({
-          labels: legendLabels,
-          // * the year chips above name the years — the legend keeps line and bar styles only
-          series: [],
-          visible,
-          neutral: CHART_LEGEND.NEUTRAL_COLOR,
-          // * years are compared by max / min — no mean line
-          hasTavg: false,
-          aridity: null,
-        })}
-      />
+      {footer ?? (
+        <ChartLegend
+          items={getSeriesLegendItems({
+            labels: legendLabels,
+            // * the year chips above name the years — the legend keeps line and bar styles only
+            series: [],
+            visible,
+            neutral: CHART_LEGEND.NEUTRAL_COLOR,
+            // * years are compared by max / min — no mean line
+            hasTavg: false,
+            aridity: null,
+          })}
+        />
+      )}
     </>
   );
 }

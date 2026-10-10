@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type {
   TChartSummary,
   TMonthAridity,
@@ -28,6 +29,9 @@ export type TStandardClimateChartProps = {
   name: string;
   /** Recharts syncId — split panels hover in sync */
   syncId?: string;
+  /** the chart card's blocks (values table, legend) in place of this chart's own — until every
+   * page draws through the chart card */
+  footer?: ReactNode;
 };
 
 export type TStandardChartColors = {

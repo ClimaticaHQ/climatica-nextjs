@@ -16,4 +16,7 @@ export type TCompareChartProps = {
   onActiveMonthIndexChange?: ((index: number | null) => void) | undefined;
   /** the monthly strip, directly under the plot (above the legend) */
   strip?: ReactNode;
+  /** the chart card's blocks (values table, legend) in place of this chart's own — until every
+   * page draws through the chart card */
+  footer?: ReactNode;
 };

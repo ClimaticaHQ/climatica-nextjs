@@ -6,7 +6,7 @@ import { StandardClimateChart } from "../../../charts";
 import type { TStandardPanelProps } from "../StandardSplitView.type";
 
 /** One standard-chart panel: the WL split's card and header, the standard chart below. */
-export function StandardPanel({ panel, headerSlots, ...shared }: TStandardPanelProps) {
+export function StandardPanel({ panel, headerSlots, footer, ...shared }: TStandardPanelProps) {
   const { selectedMonths, ...chart } = shared;
 
   return (
@@ -34,6 +34,7 @@ export function StandardPanel({ panel, headerSlots, ...shared }: TStandardPanelP
           syncId={chart.syncId}
           activeMonthIndex={chart.activeMonthIndex}
           onActiveMonthIndexChange={chart.onActiveMonthIndexChange}
+          footer={footer}
           {...(selectedMonths !== undefined ? { selectedMonths } : {})}
         />
       </figure>

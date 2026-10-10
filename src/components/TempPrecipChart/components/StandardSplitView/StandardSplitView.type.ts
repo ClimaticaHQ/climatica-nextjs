@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { TStandardChartColors } from "../../charts/StandardClimateChart/StandardClimateChart.type";
 import type {
   TMonthAridity,
@@ -37,4 +38,6 @@ export type TStandardSplitViewProps = TStandardSplitShared & {
 export type TStandardPanelProps = TStandardSplitShared & {
   panel: TStandardSplitSeries;
   headerSlots?: TPanelHeaderSlots | undefined;
+  /** the chart card's panel blocks — see StandardClimateChart's footer */
+  footer?: ReactNode;
 };
