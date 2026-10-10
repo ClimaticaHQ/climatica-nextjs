@@ -32,16 +32,28 @@ export function useWeatherYearsViewState({
   const hasPickedShown =
     requestedShown !== null && years.some((year) => requestedShown.includes(year));
 
+  // * a pick that is the current default is "follow the default"
+  const onShownChange = (next: readonly number[]) =>
+    setRequestedShown(isSameYears(next, defaultShown) ? null : next);
+
   return {
-    pair,
-    shown,
+    /** the chart's view state: the pair and the shown years by series id (the year) */
+    chartViewState: {
+      ...(pair && {
+        pair: {
+          value: [String(pair[0]), String(pair[1])] as const,
+          onChange: ([a, b]: TPair<string>) => setRequestedPair([Number(a), Number(b)]),
+        },
+      }),
+      shown: {
+        value: shown.map(String),
+        onChange: (ids: readonly string[]) => onShownChange(ids.map(Number)),
+      },
+    },
     /** URL state: the pair and the shown years only when picked, the defaults left out */
     urlPair: isDefaultPair ? null : pair,
     urlShown: isWeather && hasPickedShown ? shown : null,
     setRequestedPair,
     setRequestedShown,
-    // * a pick that is the current default is "follow the default"
-    onShownChange: (next: readonly number[]) =>
-      setRequestedShown(isSameYears(next, defaultShown) ? null : next),
   };
 }

@@ -1,32 +1,27 @@
+import { EDataStatus } from "@/enums";
 import { useUnitLabels } from "@/hooks/ui/useUnitLabels";
-import type { TChartFeatures, TChartModel, TChartSeriesModel } from "@/types";
-import { buildComparisonTable, toWalterLiethSeriesId } from "@/utils";
+import type { TChartFeatures, TChartModel } from "@/types";
+import { buildStatsTable } from "@/utils";
 import { useLocale } from "next-intl";
 
-const toTableSeries = ({ series }: TChartSeriesModel) => ({
-  id: toWalterLiethSeriesId(series.id),
-  label: series.label,
-  data: series.data,
-  altitude: series.altitude,
-});
-
 /**
- * The stats table of a compared pair: every metric for both series and their difference, from
- * the page's minuend. The page and the export draw the same rows; null without the difference
- * feature or without both series' data.
+ * The stats table above the chart: every metric for each series (a loading one's cells wait),
+ * and — with the page's difference feature — the pair's difference from its minuend.
  */
 export function useStatsTable(model: TChartModel, features: TChartFeatures) {
   const locale = useLocale();
   const units = useUnitLabels();
-  const [first, second] = model.series;
-  if (!features.difference || !first?.hasData || !second?.hasData) return null;
 
-  return buildComparisonTable({
-    seriesA: toTableSeries(first),
-    seriesB: toTableSeries(second),
-    minuend: toWalterLiethSeriesId(features.difference.minuendId),
+  return buildStatsTable({
+    series: model.series.map(({ series }) => ({
+      id: series.id,
+      label: series.label,
+      data: series.data,
+      altitude: series.altitude,
+      isLoading: series.state.status === EDataStatus.LOADING,
+    })),
+    minuendId: features.difference?.minuendId ?? null,
     locale,
     units,
-    martonneYear: first.series.year ?? undefined,
   });
 }

@@ -22,5 +22,4 @@ export { usePresence } from "./usePresence";
 export { useSheetHistory } from "./useSheetHistory";
 export { useSwipeToClose } from "./useSwipeToClose";
 export { useScrollEdges } from "./useScrollEdges";
-export { useWeatherYearsExport } from "./useWeatherYearsExport";
 export { useUnitLabels } from "./useUnitLabels";

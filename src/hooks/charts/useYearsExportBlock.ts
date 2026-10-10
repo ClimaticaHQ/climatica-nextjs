@@ -1,27 +1,28 @@
-import { buildYearSeries } from "@/components/TempPrecipChart/utils";
 import { WALTER_LIETH_DIAGRAM, WALTER_LIETH_MONTH_FORMAT } from "@/constants";
-import type { TUseWeatherYearsExportArgs, TWeatherYearsExport } from "@/types";
+import type { TUseYearsExportBlockArgs, TWeatherYearsExport } from "@/types";
 import { formatMonthLabel } from "@/utils";
 import { useLocale, useTranslations } from "next-intl";
 
 /**
- * Compare Periods with weather years: the export's per-year series (the screen's), their labels,
- * and what the screen draws — chart type, layout, the years. Undefined otherwise.
+ * The weather years' block of an export: each loaded year's Walter-Lieth series (the screen's),
+ * their labels, and what the screen draws — chart type, layout, the drawn years. Undefined
+ * without a layout or a loaded year.
  */
-export function useWeatherYearsExport({
-  isEnabled,
-  chartMode,
-  layout,
+export function useYearsExportBlock({
+  model,
+  viewState,
   drawn,
-  ...seriesArgs
-}: TUseWeatherYearsExportArgs): TWeatherYearsExport | undefined {
+}: TUseYearsExportBlockArgs): TWeatherYearsExport | undefined {
   const t = useTranslations();
   const locale = useLocale();
-  if (!isEnabled || seriesArgs.periods.length === 0) return undefined;
+  const layout = viewState.layout?.value;
+  const series = model.series
+    .filter(({ hasData }) => hasData)
+    .map(({ walterLieth }) => walterLieth);
+  if (layout === undefined || series.length === 0) return undefined;
 
-  const series = buildYearSeries({ ...seriesArgs, period: t("chart.weatherSingleYear") });
   return {
-    chartMode,
+    chartMode: viewState.mode,
     layout,
     drawn,
     series,

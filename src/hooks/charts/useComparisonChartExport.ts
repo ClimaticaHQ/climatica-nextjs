@@ -7,7 +7,7 @@ import {
   MISSING_VALUE_LABEL,
   SERIES_KIND_RULES,
 } from "@/constants";
-import { ESeriesKind, ESeriesTitleSource } from "@/enums";
+import { ECompareLayout, ESeriesKind, ESeriesTitleSource } from "@/enums";
 import { useMonthlyTableLabels } from "@/hooks/ui/useMonthlyTableLabels";
 import type { TCompareExportPayload, TUseComparisonChartExportArgs } from "@/types";
 import {
@@ -16,60 +16,87 @@ import {
   buildFilename,
   downloadSvgString,
   exportTableToCsv,
+  getDrawnSeries,
   getExportedSeriesLabels,
   getMartonneLabelKey,
+  getSplitPair,
   resolveCompareSeriesColors,
   resolveExportColors,
   svgToPng,
 } from "@/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useComparisonExportBlock } from "./useComparisonExportBlock";
-import { useStatsTable } from "./useStatsTable";
+import { useComparisonTable } from "./useComparisonTable";
+import { useYearsExportBlock } from "./useYearsExportBlock";
 
 /**
- * The export menu for a compared pair: CSV of the stats table, PNG / SVG of the comparison as
- * shown (chart type, layout, shading, expanded panel, chips). The file is titled like the chart
- * and named after the page's place and the exported series. Disabled while data is replaced.
+ * The export menu for compared series — a pair or the weather years: CSV of their stats, PNG /
+ * SVG of the chart as shown (chart type, layout, shading, expanded panel or drawn years, chips).
+ * The file is titled like the chart and named after the page's place and the exported series.
+ * Disabled while data is replaced.
  */
 export function useComparisonChartExport(args: TUseComparisonChartExportArgs): ExportMenuProps {
   const { model, viewState, features, fileStem, isFetching } = args;
   const t = useTranslations();
   const locale = useLocale();
   const tableLabels = useMonthlyTableLabels();
-  const table = useStatsTable(model, features);
+  const table = useComparisonTable(model, features);
   const visible = args.visible ?? COMPARE_EXPORT_DEFAULT_VISIBLE;
   const comparison = useComparisonExportBlock({ model, viewState, table, visible });
 
-  const [first, second] = model.series;
-  const rule = SERIES_KIND_RULES[first?.series.kind ?? ESeriesKind.CITY];
+  const rule = SERIES_KIND_RULES[model.series[0]?.series.kind ?? ESeriesKind.CITY];
+  const isSplit = viewState.layout?.value === ECompareLayout.SPLIT;
+  const drawn = isSplit
+    ? (getSplitPair(model, viewState)?.entries ?? [])
+    : getDrawnSeries(model, viewState);
+  const years = useYearsExportBlock({
+    model,
+    viewState,
+    drawn: drawn.flatMap(({ series }) => (series.year !== null ? [series.year] : [])),
+  });
+
   const labels = model.series.map(({ series }) => series.label);
   const [labelA = "", labelB = ""] = labels;
   // * the chart's title: the series' names, or the page's place they all belong to
   const pageNames = rule.titleSource === ESeriesTitleSource.PAGE ? features.title.names : [];
   const titleNames = rule.titleSource === ESeriesTitleSource.PAGE ? pageNames : labels;
-  const statsLabels = [
-    t("climateComparison.stats.avgTmax"),
-    t("climateComparison.stats.avgTmin"),
-    t("climateComparison.stats.totalPrec"),
-    t("climateComparison.stats.aridMonths"),
-  ];
+  // * PNG / SVG show the expanded panel, or the drawn years — the file name says which
+  const exportedLabels = comparison
+    ? getExportedSeriesLabels({ expanded: comparison.expanded, labelA, labelB })
+    : drawn.map(({ series }) => series.label);
+  const statsLabels = {
+    avgTmax: t("climateComparison.stats.avgTmax"),
+    avgTmin: t("climateComparison.stats.avgTmin"),
+    totalPrec: t("climateComparison.stats.totalPrec"),
+    aridMonths: t("climateComparison.stats.aridMonths"),
+  };
   const martonneClass = (index: number | null) =>
     index !== null ? t(getMartonneLabelKey(index)) : null;
 
   /** Colours come from the live DOM: build only inside a click, never while rendering. */
   function buildPayload(): TCompareExportPayload | null {
-    if (!first || !second || !model.scales) return null;
-    const colors = resolveCompareSeriesColors();
+    const loaded = model.series.filter(({ hasData }) => hasData);
+    if (loaded.length === 0 || !model.scales) return null;
+    const pairColors = resolveCompareSeriesColors();
     return {
       headerTitle: titleNames.join(DOCUMENT_TITLE.PLACES_SEPARATOR),
       headerSubtitle: features.title.subtitle ?? "",
-      series: [first, second].map((entry, index) => ({
+      series: loaded.map((entry, index) => ({
         label: entry.series.label,
         data: entry.chartData,
         stats: entry.stats,
         altitude: entry.series.altitude,
         martonneClassLabel: martonneClass(entry.stats.martonneIndex),
-        colors: index === 0 ? colors.A : colors.B,
+        colors: rule.usesOwnColor
+          ? {
+              tmax: entry.series.color,
+              tmin: entry.series.color,
+              tavg: entry.series.color,
+              prec: entry.series.color,
+            }
+          : index === 0
+            ? pairColors.A
+            : pairColors.B,
       })),
       visibleSeries: visible,
       selectedMonths: viewState.selectedMonths,
@@ -86,34 +113,27 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
           prec: t("chart.precipitation"),
         },
         statsLabels: {
-          avgTmax: statsLabels[0] ?? "",
-          avgTmin: statsLabels[1] ?? "",
-          totalPrec: statsLabels[2] ?? "",
-          aridMonths: statsLabels[3] ?? "",
+          ...statsLabels,
           altitude: t("chart.altitude"),
-          martonne: t("chart.martonne"),
+          // * a weather year's index describes that year alone
+          martonne: rule.isSingleYear ? t("chart.martonnePerYear") : t("chart.martonne"),
         },
       },
       showTavgLine: rule.hasMeanLine,
       datasetAttribution: args.datasetAttribution,
       shareUrl: args.shareUrl,
       ...(comparison ? { comparison } : {}),
+      ...(!comparison && rule.isSingleYear && years ? { weatherYears: years } : {}),
     };
   }
 
-  // * PNG / SVG show the expanded panel alone — the file name says which series
-  const exportedLabels = getExportedSeriesLabels({
-    expanded: comparison?.expanded ?? null,
-    labelA,
-    labelB,
-  });
   const imageName = (extension: "png" | "svg") =>
     buildFilename(fileStem, [...pageNames, ...exportedLabels], extension);
 
   function exportCsv() {
-    if (!first?.hasData || !second?.hasData) return;
-    const altitudes = [first.series.altitude, second.series.altitude];
-    const rows = buildClimateStatsRows([first.stats, second.stats], statsLabels);
+    const stats = model.series.map((entry) => (entry.hasData ? entry.stats : undefined));
+    const altitudes = model.series.map(({ series }) => series.altitude);
+    const rows = buildClimateStatsRows(stats, Object.values(statsLabels));
     if (altitudes.some((altitude) => altitude !== null)) {
       rows.push([
         t("chart.altitude"),
@@ -122,15 +142,18 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
     }
     rows.push([
       t("chart.martonne"),
-      ...[first.stats, second.stats].map(({ martonneIndex }) =>
-        martonneIndex !== null
-          ? `${martonneIndex.toFixed(1)} (${martonneClass(martonneIndex)})`
-          : MISSING_VALUE_LABEL,
-      ),
+      ...stats.map((entry) => {
+        const index = entry?.martonneIndex ?? null;
+        if (index === null) return MISSING_VALUE_LABEL;
+        // * a weather year's column gives the index alone
+        return rule.isSingleYear
+          ? index.toFixed(1)
+          : `${index.toFixed(1)} (${martonneClass(index)})`;
+      }),
     ]);
     exportTableToCsv(
-      buildFilename(fileStem, [...pageNames, labelA, labelB], "csv"),
-      [t("exportMenu.metricColumn"), labelA, labelB],
+      buildFilename(fileStem, [...pageNames, ...labels], "csv"),
+      [t("exportMenu.metricColumn"), ...labels],
       rows,
     );
   }
