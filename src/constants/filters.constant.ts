@@ -213,8 +213,29 @@ export const FILTER_UNAVAILABLE_LAYOUTS: TFilterUnavailableLayouts = {
 // * the view whose sections a page without filters (home, not found) shows
 export const FILTER_FALLBACK_VIEW = EFilterView.CLIMATE_STATISTICS;
 
-// * the heat map can't load more cells than this: Apply (and auto-apply) is blocked above it
-export const FILTER_MAX_HEATMAP_CELLS = 10_000;
+// * the heat map can't load more cells than this: Apply (and auto-apply) is blocked above it,
+// * and a region drawn larger isn't loaded. At most a few WorldClim requests (see WORLDCLIM_MAX_ROWS)
+export const FILTER_MAX_HEATMAP_CELLS = 2_000;
+
+// * the resolution filter's badge for a heat map region, by its cell count (each up to `max`)
+export const CELL_COUNT_STATUSES = [
+  {
+    max: 500,
+    status: { labelKey: "sidebar.cellCount.fast", colorClass: "bg-green-100 text-green-700" },
+  },
+  {
+    max: 1_000,
+    status: { labelKey: "sidebar.cellCount.moderate", colorClass: "bg-yellow-100 text-yellow-700" },
+  },
+  {
+    max: FILTER_MAX_HEATMAP_CELLS,
+    status: { labelKey: "sidebar.cellCount.slow", colorClass: "bg-orange-100 text-orange-700" },
+  },
+  {
+    max: Infinity,
+    status: { labelKey: "sidebar.cellCount.tooMany", colorClass: "bg-red-100 text-red-700" },
+  },
+] as const;
 
 // * notes under the variable chips, by context
 export const VARIABLES_NOTE_RULES: readonly TFilterNoteRule[] = [

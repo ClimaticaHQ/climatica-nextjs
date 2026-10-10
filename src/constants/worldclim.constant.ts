@@ -53,6 +53,9 @@ export const CLIMATE_VARIABLES = ["tmax", "tmin", "prec", "srad", "wind", "vapr"
 /** weather dataset only has these 3 variables */
 export const WEATHER_VARIABLES = ["tmax", "tmin", "prec"] as const;
 
+// * what a heat map region's climate profile averages
+export const REGIONAL_PROFILE_VARIABLES = WEATHER_VARIABLES;
+
 /** only available in the c1970-2000 climate period */
 export const PERIOD_RESTRICTED_VARIABLES = ["srad", "wind", "vapr"] as const;
 
@@ -88,5 +91,30 @@ export const GRID_DELTA: Record<string, number> = {
   "30s": 30 / 3600,
 };
 
+// * finest first: the first a heat map region fits in is the one to suggest
+export const GRIDS_FINEST_FIRST = [
+  CELL_SIZES.THIRTY_SECONDS,
+  CELL_SIZES.TWO_POINT_FIVE_MINUTES,
+  CELL_SIZES.FIVE_MINUTES,
+  CELL_SIZES.TEN_MINUTES,
+] as const;
+
+// * WorldClim answers a region query with at most this many rows, whatever its `limit`; past
+// * it, `offset` paging repeats and skips rows (the queries have no ORDER BY), so a larger
+// * region is split into strips that each fit
+export const WORLDCLIM_MAX_ROWS = 10_000;
+
+// * inner strip edges are grid lines, rounded: the same region always asks for the same strips
+export const REGION_STRIP_EDGE_DECIMALS = 6;
+
+// * region queries the proxy caches in Redis, each strip under its own query string
+export const WORLDCLIM_CACHED_QUERY_IDS: readonly string[] = [
+  "pixelvaluesinbox",
+  "avgpixelvaluesinbox",
+  "avgpixelvaluesinpolygonGEO",
+];
+
 export const CELL_IRI_ROW_COL_REGEX = /Cell_[^_]+_r(\d+)c(\d+)/;
+// * ~1 m at the equator: far finer than any grid cell, and short in query and share URLs
+export const WKT_COORDINATE_PRECISION = 5;
 export const WKT_POINT_REGEX = /(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g;
