@@ -1,9 +1,10 @@
-import { useDebounce, useSearchCity } from "@/hooks";
+import { useDebounce, useErrorMessage, useSearchCity } from "@/hooks";
 import type { TCity, TCoordinates } from "@/types";
 import { getScrollBehavior } from "@/utils/motion.util";
 import { useTranslations } from "next-intl";
 import { FocusEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { TSearchBarProps } from "./SearchBar.type";
+import { SEARCH_ERROR_CLASS } from "./SearchBar.constant";
 import { tryParseCoords } from "./SearchBar.util";
 
 export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
@@ -27,7 +28,19 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
 
   const debouncedQuery = useDebounce(query, 400);
   const searchQuery = !dirty || coordResult !== null ? "" : debouncedQuery;
-  const { data: results = [], isLoading } = useSearchCity(searchQuery);
+  const { data, isLoading, error } = useSearchCity(searchQuery);
+  const errorMessage = useErrorMessage();
+  // * the typed text isn't searched yet: until it is, the results (or the error) belong to the
+  // * previous text — never shown, never picked; the search shows it's loading instead
+  const isStale = dirty && coordResult === null && query.trim() !== debouncedQuery.trim();
+  const results = isStale ? [] : (data ?? []);
+  const isSearching =
+    dirty && coordResult === null && query.trim().length >= 2 && (isStale || isLoading);
+  // * the search failed (not "no cities found"): the dropdown says why, by cause
+  const searchError =
+    error && !isStale && !dismissed && coordResult === null && debouncedQuery.length >= 2
+      ? errorMessage(error, "errors.searchUnavailable")
+      : null;
 
   const dropdownItems = coordResult ? ["COORDS", ...results] : results;
   const isOpen =
@@ -169,8 +182,9 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
         `}
       />
 
-      {isLoading && dirty && debouncedQuery.length >= 2 && (
+      {isSearching && (
         <span
+          data-testid="city-search-loading"
           className={`
             absolute right-3 top-1/2 -translate-y-1/2 
             w-[18px] h-[18px] 
@@ -179,6 +193,12 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
             animate-spin
           `}
         />
+      )}
+
+      {searchError !== null && (
+        <p role="alert" data-testid="city-search-error" className={SEARCH_ERROR_CLASS}>
+          {searchError}
+        </p>
       )}
 
       {isOpen && (
