@@ -60,5 +60,6 @@ export function useGetClimateData(
     isLoading,
     isFetching,
     isError: error !== null,
+    error,
   };
 }
