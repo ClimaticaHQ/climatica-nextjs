@@ -1,26 +1,7 @@
 import { CLIMATE_COMPARISON_COLORS } from "@/constants";
-import { EFilterAvailability, EFilterKey, EFilterNoteVariant, EPairSide } from "@/enums";
+import { EFilterAvailability, EFilterNoteVariant, EPairSide } from "@/enums";
 import { getSwitchToStandardChartLabel } from "@/utils/chartMode.util";
-import type { TFilterSectionComponents, TFilterUnavailableActionLabels } from "./filters.type";
-import { ComparedPeriodsSection } from "./sections/ComparedPeriods";
-import { DatasetFilter } from "./sections/DatasetFilter";
-import { MonthsFilter } from "./sections/MonthsFilter";
-import { PeriodFilter } from "./sections/PeriodFilter";
-import { ResolutionFilter } from "./sections/ResolutionFilter";
-import { VariablesFilter } from "./sections/VariablesFilter";
-
-// * each filter's section; Period B is part of Period A's section (the pair is one control)
-export const FILTER_SECTION_COMPONENTS: TFilterSectionComponents = {
-  [EFilterKey.DATASET]: DatasetFilter,
-  [EFilterKey.CLIMATE_PERIOD]: PeriodFilter,
-  [EFilterKey.CLIMATE_PERIOD_A]: ComparedPeriodsSection,
-  [EFilterKey.CLIMATE_PERIOD_B]: null,
-  [EFilterKey.WEATHER_YEAR]: PeriodFilter,
-  [EFilterKey.WEATHER_PERIODS]: ComparedPeriodsSection,
-  [EFilterKey.VARIABLES]: VariablesFilter,
-  [EFilterKey.GRID_SIZE]: ResolutionFilter,
-  [EFilterKey.MONTHS]: MonthsFilter,
-};
+import type { TFilterUnavailableActionLabels } from "./filters.type";
 
 export const FILTER_SECTION_DIMMED_CLASS = "pointer-events-none opacity-40";
 

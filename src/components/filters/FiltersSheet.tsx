@@ -26,7 +26,8 @@ import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { FilterNote } from "./FilterSection";
 import { FilterSections } from "./FilterSections";
-import { FILTER_SECTION_COMPONENTS, FILTERS_SHEET_BUTTON_CLASS } from "./filters.constant";
+import { FILTERS_SHEET_BUTTON_CLASS } from "./filters.constant";
+import { FILTER_SECTION_COMPONENTS } from "./FilterSections";
 import { FilterSectionTitleContext, FilterUnavailableActionsContext } from "./filters.context";
 import type {
   TFiltersSheetContent,
