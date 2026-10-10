@@ -204,8 +204,13 @@
   },
   "errors": {
     "fetchClimateData": "Eroare la preluarea datelor climatice",
+    "tooManyRequests": "Prea multe cereri. Așteaptă puțin și încearcă din nou.",
+    "searchUnavailable": "Căutarea orașelor nu este disponibilă momentan. Încearcă din nou în câteva momente.",
+    "dataSourceUnavailable": "Serviciul de date climatice nu răspunde. Încearcă din nou în câteva momente.",
+    "connection": "Serverul nu poate fi accesat. Verifică-ți conexiunea și încearcă din nou.",
     "geolocationDenied": "Accesul la locație a fost refuzat. Te rugăm să permiți locația în browser.",
-    "geolocationUnavailable": "Nu s-a putut determina locația ta."
+    "geolocationUnavailable": "Nu s-a putut determina locația ta.",
+    "placeLookupFailed": "Nu s-a putut obține numele locului pentru acest punct — se afișează coordonatele lui."
   },
   "geolocation": {
     "notSupported": "Geolocarea nu este suportată de browserul tău",

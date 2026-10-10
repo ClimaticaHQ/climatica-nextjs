@@ -204,8 +204,13 @@
   },
   "errors": {
     "fetchClimateData": "Klimadaten konnten nicht abgerufen werden",
+    "tooManyRequests": "Zu viele Anfragen. Warte einen Moment und versuche es dann erneut.",
+    "searchUnavailable": "Die Ortssuche ist gerade nicht verfügbar. Versuche es gleich noch einmal.",
+    "dataSourceUnavailable": "Der Klimadatendienst antwortet nicht. Versuche es gleich noch einmal.",
+    "connection": "Der Server ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.",
     "geolocationDenied": "Standortzugriff verweigert. Erlaube den Standortzugriff in deinem Browser.",
-    "geolocationUnavailable": "Dein Standort konnte nicht ermittelt werden."
+    "geolocationUnavailable": "Dein Standort konnte nicht ermittelt werden.",
+    "placeLookupFailed": "Der Ortsname für diesen Punkt konnte nicht abgerufen werden – es werden seine Koordinaten angezeigt."
   },
   "geolocation": {
     "notSupported": "Dein Browser unterstützt keine Geolokalisierung",

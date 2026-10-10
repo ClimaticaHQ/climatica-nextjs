@@ -204,8 +204,13 @@
   },
   "errors": {
     "fetchClimateData": "No se pudieron obtener los datos climáticos",
+    "tooManyRequests": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.",
+    "searchUnavailable": "La búsqueda de ciudades no está disponible ahora mismo. Inténtalo de nuevo en un momento.",
+    "dataSourceUnavailable": "El servicio de datos climáticos no responde. Inténtalo de nuevo en un momento.",
+    "connection": "No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.",
     "geolocationDenied": "Acceso a ubicación denegado. Permite la ubicación en tu navegador.",
-    "geolocationUnavailable": "No se pudo determinar tu ubicación."
+    "geolocationUnavailable": "No se pudo determinar tu ubicación.",
+    "placeLookupFailed": "No se pudo consultar el nombre del lugar de este punto; se muestran sus coordenadas."
   },
   "geolocation": {
     "notSupported": "Tu navegador no admite geolocalización",

@@ -204,8 +204,13 @@
   },
   "errors": {
     "fetchClimateData": "Kunne ikke hente klimadata",
+    "tooManyRequests": "For mange forespørsler. Vent litt og prøv igjen.",
+    "searchUnavailable": "Bysøket er ikke tilgjengelig akkurat nå. Prøv igjen om litt.",
+    "dataSourceUnavailable": "Klimadatatjenesten svarer ikke. Prøv igjen om litt.",
+    "connection": "Kunne ikke nå serveren. Sjekk tilkoblingen og prøv igjen.",
     "geolocationDenied": "Tilgang til posisjon avslått. Vennligst gi tillatelse i nettleseren.",
-    "geolocationUnavailable": "Kunne ikke fastslå posisjonen din."
+    "geolocationUnavailable": "Kunne ikke fastslå posisjonen din.",
+    "placeLookupFailed": "Kunne ikke hente et stedsnavn for dette punktet – viser koordinatene i stedet."
   },
   "geolocation": {
     "notSupported": "Geolokalisering støttes ikke av nettleseren din",

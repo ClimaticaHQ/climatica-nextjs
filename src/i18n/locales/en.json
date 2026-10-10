@@ -204,8 +204,13 @@
   },
   "errors": {
     "fetchClimateData": "Failed to fetch climate data",
+    "tooManyRequests": "Too many requests. Wait a moment and try again.",
+    "searchUnavailable": "City search is unavailable right now. Try again in a moment.",
+    "dataSourceUnavailable": "The climate data service isn't responding. Try again in a moment.",
+    "connection": "Couldn't reach the server. Check your connection and try again.",
     "geolocationDenied": "Location access denied. Please allow location in your browser.",
-    "geolocationUnavailable": "Unable to determine your location."
+    "geolocationUnavailable": "Unable to determine your location.",
+    "placeLookupFailed": "Couldn't look up a place name for this point — showing its coordinates."
   },
   "geolocation": {
     "notSupported": "Geolocation is not supported by your browser",
