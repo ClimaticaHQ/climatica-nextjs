@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type {
   ECompareLayout,
   EWalterLiethFrost,
@@ -107,6 +108,9 @@ export type TWalterLiethChartProps = {
   isPanel?: boolean;
   /** a split panel's header additions — expand / collapse controls, the "vs A" note */
   headerSlots?: TPanelHeaderSlots | undefined;
+  /** the chart card's blocks (values table, legend) in place of this chart's own — until every
+   * page draws through the chart card */
+  footer?: ReactNode;
   /**
    * Recharts syncId — diagrams sharing it hover in sync. Recharts syncs by data index, so
    * every diagram sharing one must use the same month order (and 12 rows each).
