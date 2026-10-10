@@ -1,16 +1,5 @@
-import type {
-  TCellSize,
-  TChartMode,
-  TExpandedPanel,
-  TPanelExpansion,
-  TChartSubtitle,
-  TCity,
-  TDatasetAttribution,
-  TMonthlyTemperature,
-  TVariable,
-} from "@/types";
 import type { ECompareLayout, EWalterLiethShading } from "@/enums";
-import type { RefObject } from "react";
+import type { TChartMode, TChartPageResult, TCity, TDiffStats, TExpandedPanel } from "@/types";
 
 export type TCompareCitiesUrlState = {
   cityA: TCity;
@@ -21,33 +10,12 @@ export type TCompareCitiesUrlState = {
   expanded: TExpandedPanel;
 };
 
-export type TCompareCitiesViewProps = {
-  chartSectionRef?: RefObject<HTMLDivElement | null>;
+/** The two searches and the mini map. */
+export type TCityPairSearchProps = {
   cityA: TCity;
   cityB: TCity;
-  dataA: TMonthlyTemperature[] | null;
-  dataB: TMonthlyTemperature[] | null;
-  /** the Cell Resolution filter — the grid every request uses */
-  gridSize: TCellSize;
-  subtitle: TChartSubtitle;
-  selectedMonths: number[] | null;
-  variables: readonly TVariable[];
-  shareUrl: string;
-  isLoading: boolean;
-  /** a refetch after a filter change — the shown data stays until it lands */
-  isFetching: boolean;
-  error: Error | null;
-  altitudeA: number | null;
-  altitudeB: number | null;
-  datasetAttribution: TDatasetAttribution | null;
   onCityASelect: (city: TCity) => void;
   onCityBSelect: (city: TCity) => void;
-  layout: ECompareLayout;
-  onLayoutChange: (layout: ECompareLayout) => void;
-  wlShading: EWalterLiethShading;
-  onWlShadingChange: (shading: EWalterLiethShading) => void;
-  chartMode: TChartMode;
-  panelExpansion: TPanelExpansion;
 };
 
 export type TCitySearchRowProps = {
@@ -55,4 +23,24 @@ export type TCitySearchRowProps = {
   dotColor: string;
   cityLabel: string;
   onCitySelect: (city: TCity) => void;
+};
+
+/** The difference cards under the chart: which city is warmer, wetter, and the extreme months. */
+export type TCityDifferences = {
+  diff: TDiffStats;
+  labelA: string;
+  labelB: string;
+};
+
+export type TCityDifferenceCardsProps = {
+  differences: TCityDifferences | null;
+};
+
+/** What Compare Cities' page hook gives its view. */
+export type TCompareCitiesPage = TChartPageResult<null, TCityDifferences | null> & {
+  search: TCityPairSearchProps;
+};
+
+export type TCompareCitiesViewProps = {
+  page: TCompareCitiesPage;
 };
