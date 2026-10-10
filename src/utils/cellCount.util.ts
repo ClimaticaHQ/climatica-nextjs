@@ -1,5 +1,5 @@
-import { FILTER_MAX_HEATMAP_CELLS } from "@/constants";
-import type { TBbox, TCellSize } from "@/types";
+import { FILTER_MAX_HEATMAP_CELLS, WKT_POINT_REGEX } from "@/constants";
+import type { TBbox, TCellSize, TPolygon } from "@/types";
 import { TCellCountStatus } from "@/types";
 
 const CELL_SIZE_DEGREES: Record<TCellSize, number> = {
@@ -43,4 +43,37 @@ export function getCellCountStatus(count: number): TCellCountStatus {
 /** Whether the heat map box holds more cells at this resolution than can be loaded. */
 export function isHeatmapCellLimitExceeded(bbox: TBbox | null, gridSize: TCellSize) {
   return bbox !== null && estimateCellCount(bbox, gridSize) > FILTER_MAX_HEATMAP_CELLS;
+}
+
+/**
+ * At most how many cells a box touches at this resolution: the estimate plus the row and the
+ * column its edges can cut through.
+ */
+export function estimateMaxCellCount(bbox: TBbox, gridSize: TCellSize): number {
+  const size = CELL_SIZE_DEGREES[gridSize];
+  const rows = Math.ceil((bbox.north - bbox.south) / size) + 1;
+  const cols = Math.ceil((bbox.east - bbox.west) / size) + 1;
+  return rows * cols;
+}
+
+/** The box around a WKT polygon ("POLYGON((lng lat, …))"). */
+export function getPolygonBounds(polygon: TPolygon): TBbox {
+  const lats = polygon.map(([lat]) => lat);
+  const lngs = polygon.map(([, lng]) => lng);
+  return {
+    north: Math.max(...lats),
+    south: Math.min(...lats),
+    east: Math.max(...lngs),
+    west: Math.min(...lngs),
+  };
+}
+
+/** WKT lists "lng lat" pairs */
+export function getWktBounds(wkt: string): TBbox {
+  return getPolygonBounds(
+    [...wkt.matchAll(WKT_POINT_REGEX)].map(([, lng, lat]): [number, number] => [
+      Number(lat),
+      Number(lng),
+    ]),
+  );
 }
