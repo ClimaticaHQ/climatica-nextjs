@@ -305,8 +305,13 @@ test("a middle year loading last never shifts the other years' colours", async (
         .sort((a, b) => a.x - b.x)
         .map(({ color }) => color),
     );
+  // * the stats table's header marks each year with its colour
   const headerColor = (year: string) =>
-    page.getByRole("columnheader", { name: year }).evaluate((cell) => getComputedStyle(cell).color);
+    page
+      .getByRole("columnheader", { name: year })
+      .locator("[style]")
+      .first()
+      .evaluate((marker) => getComputedStyle(marker).color);
 
   await page.goto(
     `${PERIODS_URL}&dataset=weather&periods=2021,1990,2010&layout=overlay&chart=standard&grid=10m`,

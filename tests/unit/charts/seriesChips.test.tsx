@@ -1,35 +1,28 @@
 // @vitest-environment jsdom
-import { YearChips } from "@/components/CompareYears/YearChips";
-import { PERIOD_COLORS } from "@/constants";
+import { SeriesChips } from "@/components/charts/SeriesChips";
+import { SERIES_KIND_RULES } from "@/constants";
+import { ESeriesKind } from "@/enums";
 import messages from "@/i18n/locales/en.json";
+import { deriveChartModel } from "@/utils";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { weatherYears } from "./chartFixtures";
+import { stubChartEnvironment } from "./chartTestEnv";
 
-beforeAll(() => {
-  // * the chip row measures its scroll edges
-  window.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  };
-});
-
+beforeAll(stubChartEnvironment);
 afterEach(cleanup);
 
-const YEARS = [
-  { year: 2021, color: PERIOD_COLORS[0] },
-  { year: 1990, color: PERIOD_COLORS[1] },
-  { year: 1967, color: PERIOD_COLORS[2] },
-];
+const ENTRIES = deriveChartModel(weatherYears([2021, 1990, 1967])).series;
 
-function renderChips(shown: readonly number[]) {
+function renderChips(shown: readonly string[]) {
   const onShownChange = vi.fn();
   const onHighlight = vi.fn();
   render(
     <NextIntlClientProvider locale="en" messages={messages}>
-      <YearChips
-        years={YEARS}
+      <SeriesChips
+        entries={ENTRIES}
+        rule={SERIES_KIND_RULES[ESeriesKind.WEATHER_YEAR]}
         shown={shown}
         onShownChange={onShownChange}
         onHighlight={onHighlight}
@@ -39,17 +32,17 @@ function renderChips(shown: readonly number[]) {
   return { onShownChange, onHighlight };
 }
 
-describe("YearChips", () => {
-  it("toggles a year off and on", () => {
-    const { onShownChange } = renderChips([2021, 1990]);
+describe("SeriesChips", () => {
+  it("toggles a series off and on", () => {
+    const { onShownChange } = renderChips(["2021", "1990"]);
     fireEvent.click(screen.getByRole("button", { name: "1990" }));
-    expect(onShownChange).toHaveBeenLastCalledWith([2021]);
+    expect(onShownChange).toHaveBeenLastCalledWith(["2021"]);
     fireEvent.click(screen.getByRole("button", { name: "1967" }));
-    expect(onShownChange).toHaveBeenLastCalledWith([2021, 1990, 1967]);
+    expect(onShownChange).toHaveBeenLastCalledWith(["2021", "1990", "1967"]);
   });
 
-  it("locks the last shown year — announced as disabled, no hint", () => {
-    const { onShownChange } = renderChips([1990]);
+  it("locks the last shown series — announced as disabled, no hint", () => {
+    const { onShownChange } = renderChips(["1990"]);
     const last = screen.getByRole("button", { name: "1990" });
     expect(last.getAttribute("aria-disabled")).toBe("true");
     expect(last.className).toContain("cursor-not-allowed");
@@ -58,11 +51,11 @@ describe("YearChips", () => {
     expect(onShownChange).not.toHaveBeenCalled();
   });
 
-  it("highlights the hovered or focused year", () => {
-    const { onHighlight } = renderChips([2021, 1990, 1967]);
+  it("highlights the hovered or focused series", () => {
+    const { onHighlight } = renderChips(["2021", "1990", "1967"]);
     const chip = screen.getByRole("button", { name: "1967" });
     fireEvent.mouseEnter(chip.parentElement ?? chip);
-    expect(onHighlight).toHaveBeenLastCalledWith(1967);
+    expect(onHighlight).toHaveBeenLastCalledWith("1967");
     fireEvent.focus(chip);
     fireEvent.blur(chip);
     expect(onHighlight).toHaveBeenLastCalledWith(null);

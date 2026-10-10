@@ -18,6 +18,7 @@ const page = vi.hoisted(() => ({
     isFetching: false,
     error: null as unknown,
   },
+  weather: { data: [] as unknown[], loadingPeriods: [] as number[] },
 }));
 
 vi.mock("next/navigation", () => ({
@@ -33,10 +34,10 @@ vi.mock("@/libs/I18nNavigation", () => ({
 vi.mock("@/hooks/data/useGetComparePeriods", () => ({ useGetComparePeriods: () => page.climate }));
 vi.mock("@/hooks/data/useGetMultiPeriodData", () => ({
   useGetMultiPeriodData: () => ({
-    data: [],
+    data: page.weather.data,
     isLoading: false,
     isFetching: false,
-    loadingPeriods: [],
+    loadingPeriods: page.weather.loadingPeriods,
     error: null,
   }),
 }));
@@ -101,5 +102,63 @@ describe("Compare Periods (Climate) through its page hook", () => {
     renderPage(MADRID, {});
     expect(screen.getByText("No 1970–2000 data at 10 min resolution")).toBeTruthy();
     expect(screen.getByText("No 1991–2020 data at 10 min resolution")).toBeTruthy();
+  });
+});
+
+const WEATHER =
+  "city=Madrid&lat=40.4168&lng=-3.7038&grid=10m&dataset=weather&periods=2021,1967,1990";
+const YEARS = [2021, 1967, 1990];
+
+function renderWeather(search: string, loaded: readonly number[], loading: readonly number[] = []) {
+  page.weather = {
+    data: loaded.map((year, index) => ({ year, rows: months(index) })),
+    loadingPeriods: [...loading],
+  };
+  return renderPage(search, {});
+}
+
+describe("Compare Periods (Weather) through its page hook", () => {
+  it.each([
+    ["standard", "split", 2],
+    ["standard", "overlay", 1],
+    ["walter-lieth", "split", 2],
+    ["walter-lieth", "overlay", 1],
+  ])(
+    "%s · %s: a stats column per year, a values table under every chart, one legend",
+    (mode, layout, tables) => {
+      renderWeather(`${WEATHER}&chart=${mode}&layout=${layout}`, YEARS);
+
+      const [statsTable] = blocks(EChartBlock.STATS_TABLE);
+      expect(statsTable?.querySelectorAll("thead th[scope=col]")).toHaveLength(1 + YEARS.length);
+      expect(blocks(EChartBlock.VALUES_TABLE)).toHaveLength(tables);
+      expect(blocks(EChartBlock.LEGEND)).toHaveLength(1);
+    },
+  );
+
+  it("titles the chart by the city and the years, each a single year", () => {
+    renderWeather(`${WEATHER}&chart=standard`, YEARS);
+    expect(screen.getByRole("heading", { level: 3 }).textContent).toBe("Madrid");
+    expect(screen.getByText("Weather 2021, 1967, 1990 · each a single year")).toBeTruthy();
+  });
+
+  it("side by side: each panel picks its year, swaps, and expands", () => {
+    renderWeather(`${WEATHER}&chart=standard&layout=split`, YEARS);
+    expect(screen.getAllByTestId(/^year-[ab]-select$/)).toHaveLength(2);
+    expect(screen.getByRole("button", { name: messages.comparePeriods.swapPeriods })).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: /Expand/ })).toHaveLength(2);
+  });
+
+  it("a year still loading waits in its own cells; the others show", () => {
+    renderWeather(`${WEATHER}&chart=standard&layout=overlay`, [2021, 1967], [1990]);
+    const [statsTable] = blocks(EChartBlock.STATS_TABLE);
+    expect(statsTable?.querySelectorAll(".animate-pulse").length).toBeGreaterThan(0);
+    expect(blocks(EChartBlock.VALUES_TABLE)).toHaveLength(1);
+  });
+
+  it("says so when no compared year has data", () => {
+    renderWeather(WEATHER, []);
+    expect(
+      screen.getByText("No weather data for 2021, 1967, 1990 at this place and resolution."),
+    ).toBeTruthy();
   });
 });
