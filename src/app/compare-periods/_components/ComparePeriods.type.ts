@@ -1,18 +1,6 @@
 import type { TLocationSearchProps } from "@/components/LocationSearch/LocationSearch.type";
 import type { ECompareLayout, EWalterLiethShading } from "@/enums";
-import type {
-  TCellSize,
-  TChartMode,
-  TChartPageResult,
-  TCity,
-  TDatasetAttribution,
-  TExpandedPanel,
-  TMultiPeriodEntry,
-  TPair,
-  TVariable,
-  TYearsViewState,
-} from "@/types";
-import type { RefObject } from "react";
+import type { TChartMode, TChartPageResult, TCity, TExpandedPanel, TPair } from "@/types";
 
 export type TComparePeriodsUrlState = {
   city: TCity;
@@ -45,31 +33,9 @@ export type TPeriodTrendCardsProps = {
   trend: TPeriodTrend | null;
 };
 
-/** The weather years' section, as drawn before the chart card took them over. */
-export type TWeatherYearsSectionProps = {
-  city: TCity;
-  periods: number[];
-  periodsData: TMultiPeriodEntry[];
-  loadingPeriods: number[];
-  altitude: number | null;
-  gridSize: TCellSize;
-  selectedMonths: number[] | null;
-  variables: readonly TVariable[];
-  datasetAttribution: TDatasetAttribution | null;
-  shareUrl: string;
-  isFetching: boolean;
-  layout: ECompareLayout;
-  onLayoutChange: (layout: ECompareLayout) => void;
-  chartMode: TChartMode;
-  years: TYearsViewState;
-  scrollRef: RefObject<HTMLDivElement | null>;
-};
-
 /** What Compare Periods' page hook gives its view. */
 export type TComparePeriodsPage = TChartPageResult<null, TPeriodTrend | null> & {
   search: TPeriodCitySearchProps;
-  /** with Weather: the years' own section (the chart section draws climate periods) */
-  weather: TWeatherYearsSectionProps | null;
 };
 
 export type TComparePeriodsViewProps = {

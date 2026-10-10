@@ -7,7 +7,6 @@ import { useTranslations } from "next-intl";
 import type { TComparePeriodsViewProps } from "./ComparePeriods.type";
 import { PeriodCitySearch } from "./PeriodCitySearch";
 import { PeriodTrendCards } from "./PeriodTrendCards";
-import { WeatherYearsSection } from "./WeatherYearsSection";
 
 export function ComparePeriodsView({ page }: TComparePeriodsViewProps) {
   const t = useTranslations();
@@ -25,13 +24,7 @@ export function ComparePeriodsView({ page }: TComparePeriodsViewProps) {
       }
       state={page.state}
       update={page.update}
-      main={
-        page.weather ? (
-          <WeatherYearsSection {...page.weather} />
-        ) : (
-          <ChartSection chart={page} scrollRef={page.resultsRef} />
-        )
-      }
+      main={<ChartSection chart={page} scrollRef={page.resultsRef} />}
       details={<PeriodTrendCards trend={page.details} />}
     />
   );
