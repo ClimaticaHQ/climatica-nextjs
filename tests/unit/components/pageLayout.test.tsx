@@ -57,7 +57,7 @@ describe("PageLayout", () => {
   });
 
   it("an empty result shows the page's message; loading and ready show none", () => {
-    renderLayout({ status: EDataStatus.EMPTY, message: "No data for 1970–2000 at 10′" });
+    renderLayout({ status: EDataStatus.EMPTY, messages: ["No data for 1970–2000 at 10′"] });
     expect(screen.getByText("No data for 1970–2000 at 10′")).toBeTruthy();
     cleanup();
     renderLayout({ status: EDataStatus.LOADING });
@@ -72,7 +72,7 @@ describe("PageLayout", () => {
           title="City Climate"
           description=""
           controls={null}
-          state={{ status: EDataStatus.EMPTY, message: "No data" }}
+          state={{ status: EDataStatus.EMPTY, messages: ["No data"] }}
           summary={<Nothing />}
           main={<Nothing />}
         />

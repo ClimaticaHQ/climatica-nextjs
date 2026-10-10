@@ -52,7 +52,7 @@ describe("getErrorCause / getErrorMessageKey: what a failed request tells the re
 });
 
 describe("resolveDataState", () => {
-  const base = { isLoading: false, error: null, hasData: true, emptyMessage: "No data" };
+  const base = { isLoading: false, error: null, hasData: true, emptyMessages: ["No data"] };
 
   it("loading first, then an error, then empty, else ready", () => {
     expect(resolveDataState({ ...base, isLoading: true, error: new Error("x") }).status).toBe(
@@ -64,7 +64,7 @@ describe("resolveDataState", () => {
     });
     expect(resolveDataState({ ...base, hasData: false })).toEqual({
       status: EDataStatus.EMPTY,
-      message: "No data",
+      messages: ["No data"],
     });
     expect(resolveDataState(base)).toEqual({ status: EDataStatus.READY });
   });
