@@ -1,4 +1,6 @@
+import { CHART_LINE_DASH } from "@/constants";
 import { EChartBlockPlacement, EPairSide } from "@/enums";
+import type { TStandardChartLine } from "./charts.type";
 
 export const CHART_SECTION_CLASSES = {
   ROOT: "flex flex-col gap-[var(--section-toolbar-gap)]",
@@ -27,3 +29,14 @@ export const BLOCK_PLACEMENTS = {
   PANEL: [EChartBlockPlacement.PANEL],
   BODY: [EChartBlockPlacement.BODY],
 } as const;
+
+// * a dot outside the hovered month or the month filter
+export const STANDARD_CHART_DIMMED_DOT_OPACITY = 0.15;
+
+// * each series' lines in the standard chart, in drawing order — the mean only for kinds that
+// * draw it
+export const STANDARD_CHART_LINES: readonly TStandardChartLine[] = [
+  { variable: "tmax", labelKey: "chart.maxTemperature" },
+  { variable: "tavg", labelKey: "chart.avgTemperature", dash: CHART_LINE_DASH.SERIES.tavg },
+  { variable: "tmin", labelKey: "chart.minTemperature", dash: CHART_LINE_DASH.SERIES.tmin },
+];

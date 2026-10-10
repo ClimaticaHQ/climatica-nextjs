@@ -25,6 +25,7 @@ import type {
   TChartSeriesModel,
   TChartViewState,
   TLegendItem,
+  TSeriesKey,
   TSeriesKindRule,
   TLegendLabels,
 } from "@/types";
@@ -101,6 +102,14 @@ export function getStandardPalette({ series }: TChartSeriesModel, rule: TSeriesK
     : CHART_COLORS.compareA;
 }
 
+/** A series' colours in the overlay: its own colour for every variable, or A's / B's palette. */
+export function getOverlayPalette(entry: TChartSeriesModel, rule: TSeriesKindRule) {
+  const { color } = entry.series;
+  return rule.usesOwnColor
+    ? { tmax: color, tmin: color, tavg: color, prec: color }
+    : getStandardPalette(entry, rule);
+}
+
 /** The hatched series' id in a Walter-Lieth overlay — none for kinds that can't be shaded. */
 export function getShadedId(
   model: TChartModel,
@@ -151,7 +160,7 @@ const STANDARD_LEGENDS = {
         : entries.map((entry) => ({
             key: entry.series.id,
             label: entry.series.label,
-            color: getStandardPalette(entry, rule).tmax,
+            color: getOverlayPalette(entry, rule).tmax,
           })),
       visible,
       neutral: CHART_LEGEND.NEUTRAL_COLOR,
@@ -230,4 +239,26 @@ export function getDrawnSeries(model: TChartModel, viewState: TChartViewState) {
   return shown === undefined
     ? model.series
     : model.series.filter(({ series }) => shown.includes(series.id));
+}
+
+/** Where the standard chart reads a series' variable in a month's row. */
+export function seriesDataKey(id: string, variable: TSeriesKey) {
+  return `${id}:${variable}`;
+}
+
+/** One row per month, every series' values side by side — the standard chart's data. */
+export function buildStandardChartRows(entries: readonly TChartSeriesModel[]) {
+  const base = entries.find(({ hasData }) => hasData)?.chartData ?? [];
+  return base.map(({ month, monthName }, index) => {
+    const row: Record<string, unknown> = { month, monthName };
+    for (const { series, chartData } of entries) {
+      // * a month a series lacks stays null (a gap), never 0
+      const values = chartData[index];
+      row[seriesDataKey(series.id, "tmax")] = values?.tmax ?? null;
+      row[seriesDataKey(series.id, "tmin")] = values?.tmin ?? null;
+      row[seriesDataKey(series.id, "tavg")] = values?.tavg ?? null;
+      row[seriesDataKey(series.id, "prec")] = values?.prec ?? null;
+    }
+    return row;
+  });
 }

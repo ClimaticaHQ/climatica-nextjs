@@ -4,17 +4,20 @@ import type {
   TChartFeatures,
   TChartMode,
   TChartModel,
+  TChartPageResult,
   TChartSeriesModel,
   TChartViewState,
-  TDataState,
   TExpandedPanel,
   TLegendItem,
   TLegendLabels,
   TPair,
   TSeriesKindRule,
+  TSeriesKey,
   TVisibleSeries,
+  TWalterLiethScales,
 } from "@/types";
-import type { ComponentType, ReactNode } from "react";
+import type { TStandardChartColors } from "@/components/TempPrecipChart/charts/StandardClimateChart/StandardClimateChart.type";
+import type { ComponentType, ReactNode, RefObject } from "react";
 
 export type TChartCardProps = {
   /** derived once by the page (useChartModel) — the export draws from the same */
@@ -25,16 +28,16 @@ export type TChartCardProps = {
   onVisibleChange?: ((visible: TVisibleSeries) => void) | undefined;
 };
 
+/** What the chart section draws from: the page hook's chart part. */
+export type TChartSectionInput = Pick<
+  TChartPageResult<unknown, unknown>,
+  "state" | "model" | "viewState" | "features" | "exportMenu" | "onVisibleChange"
+>;
+
 export type TChartSectionProps = {
-  state: TDataState;
-  /** the export menu, right-aligned above the section */
-  toolbar: ReactNode;
-  /** between the toolbar and the card: the stats table */
-  summary?: ReactNode;
-  /** while loading: a table's skeleton in the summary's place */
-  hasSummary: boolean;
-  /** the chart card */
-  children: ReactNode;
+  chart: TChartSectionInput;
+  /** the comparison pages scroll a picked city's chart into view here */
+  scrollRef?: RefObject<HTMLDivElement | null> | undefined;
 };
 
 /** The active month shared by every chart and table of the card, with its setter. */
@@ -77,10 +80,18 @@ export type TChartBlockProps = {
   context: TChartBlockContext;
 };
 
-export type TChartBlockDefinition = {
-  placement: EChartBlockPlacement;
-  Component: ComponentType<TChartBlockProps>;
+/** What a block above the card is given: the whole model and the page's features. */
+export type TSectionBlockProps = {
+  model: TChartModel;
+  features: TChartFeatures;
 };
+
+export type TChartBlockDefinition =
+  | {
+      placement: EChartBlockPlacement.PANEL | EChartBlockPlacement.BODY;
+      Component: ComponentType<TChartBlockProps>;
+    }
+  | { placement: EChartBlockPlacement.SECTION; Component: ComponentType<TSectionBlockProps> };
 
 export type TChartBlocksProps = {
   context: TChartBlockContext;
@@ -90,19 +101,10 @@ export type TChartBlocksProps = {
 };
 
 export type TChartCardHeaderProps = {
-  names: readonly string[];
-  subtitle: string | null;
-  mode: TChartMode;
-  selectedMonths: number[] | null;
-  hasMonthBadge: boolean;
-  viewState: TChartViewState;
-};
-
-export type TChartControlsProps = {
   model: TChartModel;
   rule: TSeriesKindRule;
-  body: EChartBody;
   viewState: TChartViewState;
+  features: TChartFeatures;
   visible: TVisibleSeries;
   onVisibleChange: (visible: TVisibleSeries) => void;
 };
@@ -153,4 +155,35 @@ export type TOverlayChartProps = TChartBodyProps & {
   /** a chip hovered or focused: the other series dim */
   highlightedId: string | null;
   footer: ReactNode;
+};
+
+/** One series in the standard chart. */
+export type TStandardChartEntry = {
+  id: string;
+  label: string;
+  palette: TStandardChartColors;
+  /** 1, or less while another series is highlighted */
+  emphasis: number;
+  /** turned off by its chip: kept mounted (its place) but not drawn */
+  isHidden: boolean;
+};
+
+export type TStandardChartProps = {
+  entries: readonly TStandardChartEntry[];
+  /** one row per month, each series' values under seriesDataKey */
+  rows: readonly Record<string, unknown>[];
+  hasMeanLine: boolean;
+  scales: TWalterLiethScales | null;
+  rightMax: number;
+  visible: TVisibleSeries;
+  selectedMonths?: number[] | undefined;
+  activeMonth: TActiveMonth;
+  footer: ReactNode;
+};
+
+export type TStandardChartLine = {
+  variable: Exclude<TSeriesKey, "prec">;
+  labelKey: string;
+  /** none: a solid line */
+  dash?: string;
 };
