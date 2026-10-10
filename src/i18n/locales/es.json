@@ -109,6 +109,8 @@
     "noSelection": "Dibuja una caja o polígono en el mapa para analizar datos climáticos de esa región",
     "noData": "No hay datos disponibles para esta región",
     "noPeriodData": "No hay datos de {period} en resolución {grid}",
+    "tooManyCells": "Esta región tiene {count, number} celdas a {grid}, más de las {max, number} que el mapa puede cargar. Elige {suggestion} o una resolución más gruesa.",
+    "tooManyCellsAnyGrid": "Esta región tiene más de {max, number} celdas incluso a {grid}. Dibuja una región más pequeña.",
     "stats": {
       "minValue": "Mín",
       "maxValue": "Máx",

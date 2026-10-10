@@ -109,6 +109,8 @@
     "noSelection": "Disegna un riquadro o un poligono sulla mappa per analizzare i dati climatici di quella regione",
     "noData": "Nessun dato disponibile per questa regione",
     "noPeriodData": "Nessun dato per {period} alla risoluzione {grid}",
+    "tooManyCells": "Questa regione contiene {count, number} celle a {grid}, più delle {max, number} che la mappa può caricare. Scegli {suggestion} o una risoluzione più grossolana.",
+    "tooManyCellsAnyGrid": "Questa regione contiene più di {max, number} celle anche a {grid}. Disegna una regione più piccola.",
     "stats": {
       "minValue": "Min",
       "maxValue": "Max",

@@ -109,6 +109,8 @@
     "noSelection": "Desenează un cadru sau un poligon pe hartă pentru a analiza datele climatice ale regiunii",
     "noData": "Nu există date disponibile pentru această regiune",
     "noPeriodData": "Nu există date pentru {period} la rezoluția {grid}",
+    "tooManyCells": "Această regiune are {count, number} celule la {grid}, mai multe decât cele {max, number} pe care le poate încărca harta. Alege {suggestion} sau o rezoluție mai grosieră.",
+    "tooManyCellsAnyGrid": "Această regiune are peste {max, number} celule chiar și la {grid}. Desenează o regiune mai mică.",
     "stats": {
       "minValue": "Min.",
       "maxValue": "Max.",

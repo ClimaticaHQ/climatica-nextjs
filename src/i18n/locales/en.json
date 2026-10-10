@@ -109,6 +109,8 @@
     "noSelection": "Draw a bounding box or polygon on the map to analyze climate data for that region",
     "noData": "No data available for this region",
     "noPeriodData": "No {period} data at {grid} resolution",
+    "tooManyCells": "This region holds {count, number} cells at {grid}, more than the {max, number} the map can load. Choose {suggestion} or a coarser resolution.",
+    "tooManyCellsAnyGrid": "This region holds more than {max, number} cells even at {grid}. Draw a smaller region.",
     "stats": {
       "minValue": "Min",
       "maxValue": "Max",

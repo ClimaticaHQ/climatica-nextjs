@@ -109,6 +109,8 @@
     "noSelection": "Zeichne ein Rechteck oder Polygon auf der Karte, um Klimadaten dieser Region zu analysieren",
     "noData": "Keine Daten für diese Region verfügbar",
     "noPeriodData": "Keine Daten für {period} bei {grid}-Auflösung",
+    "tooManyCells": "Diese Region umfasst bei {grid} {count, number} Zellen, mehr als die {max, number}, die die Karte laden kann. Wähle {suggestion} oder eine gröbere Auflösung.",
+    "tooManyCellsAnyGrid": "Diese Region umfasst selbst bei {grid} mehr als {max, number} Zellen. Zeichne eine kleinere Region.",
     "stats": {
       "minValue": "Min",
       "maxValue": "Max",

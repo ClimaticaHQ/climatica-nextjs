@@ -109,6 +109,8 @@
     "noSelection": "Tegn en avgrensningsboks eller polygon på kartet for å analysere klimadata for det området",
     "noData": "Ingen data tilgjengelig for dette området",
     "noPeriodData": "Ingen data for {period} ved oppløsningen {grid}",
+    "tooManyCells": "Denne regionen har {count, number} celler ved {grid}, flere enn de {max, number} kartet kan laste inn. Velg {suggestion} eller en grovere oppløsning.",
+    "tooManyCellsAnyGrid": "Denne regionen har flere enn {max, number} celler selv ved {grid}. Tegn en mindre region.",
     "stats": {
       "minValue": "Min.",
       "maxValue": "Maks.",
