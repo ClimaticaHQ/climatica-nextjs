@@ -25,4 +25,24 @@ test.describe("Region Heatmap", () => {
     await expect(stats.getByText(/°C/)).toHaveCount(5);
     await expect(stats.locator(".animate-pulse")).toHaveCount(0);
   });
+
+  // * regression: WorldClim stops at 10,000 rows per request, so a region past ~830 cells lost
+  // * the rest; it now loads as strips
+  test("a region larger than one request loads every cell", async ({ page }) => {
+    await page.goto(
+      "/heat-map?dataset=climate&period=c1970-2000&grid=10m&var=tmax&north=50&south=45&west=20&east=26",
+    );
+    const stats = page.getByTestId("region-stats");
+    await expect(stats.getByText("1,080", { exact: true })).toBeVisible({ timeout: 60_000 });
+  });
+
+  test("a region over the cell cap suggests a coarser resolution", async ({ page }) => {
+    await page.goto(
+      "/heat-map?dataset=climate&period=c1970-2000&grid=2.5m&var=tmax&north=50&south=47&west=20&east=23",
+    );
+    await expect(page.getByText(/Choose 5 min or a coarser resolution/)).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(page.getByTestId("region-stats")).toHaveCount(0);
+  });
 });

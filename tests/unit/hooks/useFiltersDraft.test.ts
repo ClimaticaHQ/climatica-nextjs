@@ -7,7 +7,8 @@ import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 // * 10° × 10°: 240 × 240 cells at 2.5m (blocked), 60 × 60 at 10m (allowed)
-const LARGE_BBOX: TBbox = { north: 50, south: 40, west: 0, east: 10 };
+// * 6° × 6°: 20,736 cells at 2.5′, 1,296 at 10′
+const LARGE_BBOX: TBbox = { north: 50, south: 44, west: 0, east: 6 };
 
 function filtersWith(overrides: Partial<TFilters>): TFilters {
   return { ...FILTER_DEFAULTS, ...overrides };
@@ -101,7 +102,7 @@ describe("useFiltersDraft", () => {
   it("blocks Apply when the heat map box has too many cells at the draft resolution", () => {
     const { result } = renderDraft({ heatmapBbox: LARGE_BBOX });
     expect(result.current.isApplyBlocked).toBe(true);
-    expect(result.current.cellCount).toBe(240 * 240);
+    expect(result.current.cellCount).toBe(144 * 144);
 
     act(() => result.current.setFilter(EFilterKey.GRID_SIZE, "10m"));
     expect(result.current.isApplyBlocked).toBe(false);

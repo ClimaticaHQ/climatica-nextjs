@@ -9,6 +9,7 @@ vi.mock("@/libs/Env", () => ({ env: { WORLDCLIM_API_KEY: "test-key" } }));
 
 import { GET } from "@/app/api/worldclim/[queryId]/route";
 import { API_ERRORS } from "@/constants";
+import { RedisClient } from "@/libs/redis/client";
 import { NextRequest } from "next/server";
 
 function callRoute(queryId: string, searchParams: string) {
@@ -83,5 +84,48 @@ describe("GET /api/worldclim/[queryId] — upstream failure", () => {
 
     const res = await callRoute("pixelValue", "lat=1&lng=2");
     expect(res.status).toBe(API_ERRORS.WORLDCLIM_UNAVAILABLE.status);
+  });
+});
+
+describe("GET /api/worldclim/[queryId] — Redis cache for region strips", () => {
+  const STRIP = "north=50&south=47.5&west=20&east=26&limit=8640";
+
+  it("answers a cached strip without calling WorldClim", async () => {
+    const cached = { results: { bindings: [{ value: 7 }] } };
+    vi.mocked(RedisClient.get).mockResolvedValueOnce(cached);
+    const fetchMock = stubFetch({});
+
+    const res = await callRoute("pixelvaluesinbox", STRIP);
+    expect(await res.json()).toEqual(cached);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(RedisClient.get).toHaveBeenCalledWith(`worldclim-query:pixelvaluesinbox:${STRIP}`);
+  });
+
+  it("caches each strip under its own query string", async () => {
+    vi.mocked(RedisClient.get).mockResolvedValue(null);
+    vi.mocked(RedisClient.incrementCounter).mockResolvedValue(1);
+    stubFetch({ results: { bindings: [] } });
+
+    await callRoute("pixelvaluesinbox", STRIP);
+    await callRoute("pixelvaluesinbox", "north=47.5&south=45&west=20&east=26&limit=3600");
+    const keys = vi.mocked(RedisClient.set).mock.calls.map(([key]) => key);
+    expect(keys).toEqual([
+      `worldclim-query:pixelvaluesinbox:${STRIP}`,
+      "worldclim-query:pixelvaluesinbox:north=47.5&south=45&west=20&east=26&limit=3600",
+    ]);
+  });
+
+  it("leaves point queries uncached", async () => {
+    stubFetch({ results: { bindings: [] } });
+    await callRoute("pixelvaluesofapoint", "lat=1&lng=2");
+    expect(RedisClient.get).not.toHaveBeenCalled();
+    expect(RedisClient.set).not.toHaveBeenCalled();
+  });
+
+  it("never caches a failed strip", async () => {
+    vi.mocked(RedisClient.get).mockResolvedValue(null);
+    stubFetch({ error: "no" }, 500);
+    await callRoute("pixelvaluesinbox", STRIP);
+    expect(RedisClient.set).not.toHaveBeenCalled();
   });
 });

@@ -14,6 +14,7 @@ vi.mock("axios", () => ({
   },
 }));
 
+import { CLIMATE_PERIODS, WORLDCLIM_MAX_ROWS } from "@/constants";
 import { WorldClimService } from "@/libs/services/worldClimService";
 import type { TWorldClimCellResponse, TWorldClimPointValueResponse } from "@/types";
 
@@ -104,62 +105,109 @@ describe("WorldClimService.getWeatherDataForPoint", () => {
   });
 });
 
-describe("WorldClimService.getPixelValuesInBox", () => {
-  it("calls pixelvaluesinbox endpoint when avg=false", async () => {
-    mockGet.mockResolvedValue(makeAxiosResponse({ results: { bindings: [] } }));
-    await WorldClimService.getPixelValuesInBox(50, 48, 14, 16, "10m", ["tmax"], true);
-    const url = mockGet.mock.calls[0]?.[0] as string;
-    expect(url).toContain("pixelvaluesinbox");
-    expect(url).not.toContain("avg");
+describe("WorldClimService.getRegionPixelValues", () => {
+  const climate = { isClimate: true, climatePeriod: CLIMATE_PERIODS.C1970_2000 } as const;
+  const requests = () =>
+    mockGet.mock.calls.map(([url, config]) => ({ url: String(url), params: config?.params }));
+
+  beforeEach(() => mockGet.mockResolvedValue(makeAxiosResponse({ results: { bindings: [] } })));
+
+  it("asks a small box in one request, for the selected period's rasters only", async () => {
+    await WorldClimService.getRegionPixelValues({
+      area: { bbox: { north: 50, south: 49, west: 23, east: 24 } },
+      gridSize: "10m",
+      variables: ["tmax"],
+      dataset: climate,
+    });
+    expect(requests()).toHaveLength(1);
+    expect(requests()[0]?.url).toContain("/pixelvaluesinbox");
+    expect(requests()[0]?.params).toMatchObject({
+      north: 50,
+      south: 49,
+      raster: ["http://climate.gsic.uva.es/data/Raster_10m_tmax_c1970-2000"],
+      // * 6 × 6 cells × 12 months
+      limit: 432,
+    });
   });
 
-  it("calls avgpixelvaluesinbox endpoint when avg=true", async () => {
-    mockGet.mockResolvedValue(makeAxiosResponse({ results: { bindings: [] } }));
-    await WorldClimService.getPixelValuesInBox(
-      50,
-      48,
-      14,
-      16,
-      "10m",
-      ["tmax"],
-      true,
-      undefined,
-      true,
+  // * regression: WorldClim stops at 10,000 rows whatever the limit, so one request for a
+  // * region past ~830 cells silently lost the rest
+  it("splits a region past WorldClim's row cap into strips that each fit", async () => {
+    await WorldClimService.getRegionPixelValues({
+      area: { bbox: { north: 50, south: 45, west: 20, east: 26 } },
+      gridSize: "10m",
+      variables: ["tmax"],
+      dataset: climate,
+    });
+    const limits = requests().map(({ params }) => Number(params?.limit));
+    expect(limits.length).toBeGreaterThan(1);
+    expect(Math.max(...limits)).toBeLessThanOrEqual(WORLDCLIM_MAX_ROWS);
+    // * 30 × 36 cells × 12 months, every cell in exactly one strip
+    expect(limits.reduce((sum, limit) => sum + limit, 0)).toBe(30 * 36 * 12);
+  });
+
+  it("asks a weather year without rasters", async () => {
+    await WorldClimService.getRegionPixelValues({
+      area: { bbox: { north: 50, south: 49, west: 23, east: 24 } },
+      gridSize: "10m",
+      variables: ["tmax"],
+      dataset: { isClimate: false, year: 2020 },
+    });
+    expect(requests()[0]?.params).toMatchObject({ isWeather: true, year: 2020 });
+    expect(requests()[0]?.params).not.toHaveProperty("raster");
+  });
+
+  it("reads a polygon from box strips and keeps the cells whose centroid is inside", async () => {
+    const row = (cell: string) => ({
+      value: { type: "literal", value: "1" },
+      month: { type: "literal", value: "--01" },
+      pixel: { type: "uri", value: `Pixel_${cell}` },
+      cell: { type: "uri", value: `http://climate.gsic.uva.es/data/Cell_10m_${cell}` },
+    });
+    // * r240c1218 is the cell at 49.92° N 23.08° E; r245c1223 at 49.08° N 23.92° E
+    mockGet.mockResolvedValue(
+      makeAxiosResponse({ results: { bindings: [row("r240c1218"), row("r245c1223")] } }),
     );
-    const url = mockGet.mock.calls[0]?.[0] as string;
-    expect(url).toContain("avgpixelvaluesinbox");
-  });
-
-  it("passes correct bbox params", async () => {
-    mockGet.mockResolvedValue(makeAxiosResponse({ results: { bindings: [] } }));
-    await WorldClimService.getPixelValuesInBox(50, 48, 14, 16, "10m", ["tmax"], true);
-    const params = mockGet.mock.calls[0]?.[1]?.params;
-    expect(params).toMatchObject({ north: 50, south: 48, west: 14, east: 16 });
+    const result = await WorldClimService.getRegionPixelValues({
+      area: {
+        polygon: [
+          [49, 23],
+          [50, 23],
+          [50, 24],
+        ],
+      },
+      gridSize: "10m",
+      variables: ["tmax"],
+      dataset: climate,
+    });
+    expect(requests()[0]?.url).toContain("/pixelvaluesinbox");
+    expect(result.results.bindings.map((b) => b.cell?.value)).toEqual([
+      "http://climate.gsic.uva.es/data/Cell_10m_r240c1218",
+    ]);
   });
 });
 
-describe("WorldClimService.getPixelValuesInPolygon", () => {
-  const wkt = "POLYGON((14 48, 16 48, 16 50, 14 50, 14 48))";
-
-  it("calls pixelvaluesinpolygonGEO endpoint when avg=false", async () => {
+describe("WorldClimService.getRegionAverages", () => {
+  it("averages every variable in one request, a polygon as WKT", async () => {
     mockGet.mockResolvedValue(makeAxiosResponse({ results: { bindings: [] } }));
-    await WorldClimService.getPixelValuesInPolygon(wkt, "10m", ["tmax"], true);
-    const url = mockGet.mock.calls[0]?.[0] as string;
-    expect(url).toContain("pixelvaluesinpolygonGEO");
-    expect(url).not.toContain("avg");
-  });
-
-  it("calls avgpixelvaluesinpolygonGEO endpoint when avg=true", async () => {
-    mockGet.mockResolvedValue(makeAxiosResponse({ results: { bindings: [] } }));
-    await WorldClimService.getPixelValuesInPolygon(wkt, "10m", ["tmax"], true, undefined, true);
-    const url = mockGet.mock.calls[0]?.[0] as string;
-    expect(url).toContain("avgpixelvaluesinpolygonGEO");
-  });
-
-  it("passes correct polygon WKT string as polygon param", async () => {
-    mockGet.mockResolvedValue(makeAxiosResponse({ results: { bindings: [] } }));
-    await WorldClimService.getPixelValuesInPolygon(wkt, "10m", ["tmax"], true);
-    const params = mockGet.mock.calls[0]?.[1]?.params;
-    expect(params).toMatchObject({ polygon: wkt });
+    await WorldClimService.getRegionAverages({
+      area: {
+        polygon: [
+          [49, 23],
+          [50, 23],
+          [50, 24],
+        ],
+      },
+      gridSize: "10m",
+      variables: ["tmax", "tmin", "prec"],
+      dataset: { isClimate: false, year: 2020 },
+    });
+    expect(mockGet).toHaveBeenCalledTimes(1);
+    expect(String(mockGet.mock.calls[0]?.[0])).toContain("/avgpixelvaluesinpolygonGEO");
+    expect(mockGet.mock.calls[0]?.[1]?.params).toMatchObject({
+      polygon:
+        "POLYGON((23.00000 49.00000, 23.00000 50.00000, 24.00000 50.00000, 23.00000 49.00000))",
+      limit: 36,
+    });
   });
 });

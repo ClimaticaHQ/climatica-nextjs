@@ -72,15 +72,12 @@ describe("useGetRegionalProfile — WorldClim proxy failure", () => {
 
     const { result } = renderHook(
       () =>
-        useGetRegionalProfile(
-          bbox,
-          null,
-          CELL_SIZES.TEN_MINUTES,
-          true,
-          CLIMATE_PERIODS.C1970_2000,
-          undefined,
-          true,
-        ),
+        useGetRegionalProfile({
+          area: { bbox },
+          gridSize: CELL_SIZES.TEN_MINUTES,
+          dataset: { isClimate: true, climatePeriod: CLIMATE_PERIODS.C1970_2000 },
+          isEnabled: true,
+        }),
       { wrapper: makeWrapper() },
     );
 
