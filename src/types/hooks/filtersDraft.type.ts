@@ -4,7 +4,7 @@ import type { TBbox } from "./heatmap.type";
 export type TFiltersDraftOptions = {
   /** the applied filters — the URL's */
   filters: TFilters;
-  /** the heat map's selected box; null off the heat map, where no cell limit applies */
+  /** the heat map region's bounds (its box, or its polygon's); null off the heat map */
   heatmapBbox: TBbox | null;
 };
 

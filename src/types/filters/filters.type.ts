@@ -114,7 +114,7 @@ export type TFilterChangeHandler = <K extends EFilterKey>(key: K, value: TFilter
 export type TFilterPageContext = {
   view: EFilterView;
   isWalterLieth: boolean;
-  /** the heat map's selected box, when the page is the heat map and one is selected */
+  /** the heat map region's bounds (its box, or its polygon's), on the heat map */
   heatmapBbox: TBbox | null;
 };
 
