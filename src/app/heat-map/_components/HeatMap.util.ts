@@ -1,6 +1,6 @@
 import type { TPolygon, TUrlField, TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
 import { GRID_DELTA, MONTH_NAMES, MONTHS_IN_YEAR, SIDEBAR_PARAMS } from "@/constants";
-import { getMonthlyMean, iriToCellBounds, summarizeMonths } from "@/utils";
+import { getMonthlyMean, iriToCellBounds, polygonToWkt, summarizeMonths } from "@/utils";
 import { parseCoord } from "@/utils/urlParams.util";
 import type { TCellBounds, TCellSize } from "@/types";
 import type {
@@ -161,22 +161,6 @@ export function computeRegionalProfile(
 
 export function gridDelta(gridSize: string): number {
   return GRID_DELTA[gridSize] ?? GRID_DELTA["10m"];
-}
-
-// 5 decimal places is ~1m of precision at the equator -- far finer than any
-// WorldClim grid cell -- and keeps the polygon short in query/share URLs.
-const WKT_COORDINATE_PRECISION = 5;
-
-/** lng lat order in WKT spec — note the inversion from the [lat, lng] input */
-export function polygonToWkt(vertices: [number, number][]): string {
-  const ring = [...vertices, vertices[0]];
-  const coords = ring
-    .map(
-      ([lat, lng]) =>
-        `${lng.toFixed(WKT_COORDINATE_PRECISION)} ${lat.toFixed(WKT_COORDINATE_PRECISION)}`,
-    )
-    .join(", ");
-  return `POLYGON((${coords}))`;
 }
 
 /** Inverse of polygonToWkt — returns null for invalid WKT */
