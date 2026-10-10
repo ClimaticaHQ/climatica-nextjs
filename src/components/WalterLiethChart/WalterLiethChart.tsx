@@ -24,6 +24,7 @@ export function WalterLiethChart({
   activeMonthIndex,
   onActiveMonthIndexChange,
   headerSlots,
+  footer,
 }: TWalterLiethChartProps) {
   const chart = useWalterLiethChart({ series, monthOrder });
   const legendItems = useWalterLiethLegendItems();
@@ -61,20 +62,24 @@ export function WalterLiethChart({
           },
         ]}
       />
-      <MonthlyValuesTable
-        series={[
-          {
-            key: series.id,
-            label: series.label,
-            color: MONTHLY_VALUES_TEXT_COLOR,
-            data: series.months,
-          },
-        ]}
-        isCompact={isCompact}
-        activeMonthIndex={activeMonthIndex ?? null}
-        onActiveMonthIndexChange={onActiveMonthIndexChange}
-      />
-      {showLegend && <ChartLegend items={legendItems} />}
+      {footer ?? (
+        <>
+          <MonthlyValuesTable
+            series={[
+              {
+                key: series.id,
+                label: series.label,
+                color: MONTHLY_VALUES_TEXT_COLOR,
+                data: series.months,
+              },
+            ]}
+            isCompact={isCompact}
+            activeMonthIndex={activeMonthIndex ?? null}
+            onActiveMonthIndexChange={onActiveMonthIndexChange}
+          />
+          {showLegend && <ChartLegend items={legendItems} />}
+        </>
+      )}
     </figure>
   );
 }
