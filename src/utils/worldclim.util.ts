@@ -4,7 +4,6 @@ import {
   CLIMATE_PERIODS,
   CLIMATE_VARIABLES,
   MONTH_NAMES,
-  MONTHS_IN_YEAR,
   WORLDCLIM_GRID_BASE,
   WORLDCLIM_RASTER_BASE,
   WORLDCLIM_VARIABLE_BASE,
@@ -25,10 +24,8 @@ import type {
   TWorldClimBoxBinding,
   TWorldClimCellResponse,
   TWorldClimPixelResource,
-  TPixelQueryLimitArgs,
   TWorldClimPointValueBinding,
 } from "@/types";
-import { estimateMaxCellCount } from "./cellCount.util";
 
 export function iriToCellBounds(iri: string, cellSize: number): TCellBounds | null {
   const match = CELL_IRI_ROW_COL_REGEX.exec(iri);
@@ -261,19 +258,4 @@ export function groupAvgBindings(raw: TRawAvgValueBinding[]): TWorldClimAvgBoxBi
     result.push(binding as TWorldClimAvgBoxBinding);
   }
   return result;
-}
-
-/**
- * How many rows a pixel query asks for: one per cell, month and variable — and, with Climate,
- * per normals period (every period comes back; the page keeps the selected one). The API stops
- * at 100 rows unless asked for more, which would drop whole periods and months.
- */
-export function getPixelQueryLimit({
-  bounds,
-  gridSize,
-  variableCount,
-  isClimate,
-}: TPixelQueryLimitArgs) {
-  const periods = isClimate ? Object.keys(CLIMATE_PERIODS).length : 1;
-  return estimateMaxCellCount(bounds, gridSize) * MONTHS_IN_YEAR * variableCount * periods;
 }
