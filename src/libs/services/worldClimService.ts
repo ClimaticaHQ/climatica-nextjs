@@ -18,6 +18,8 @@ import {
   buildGridIri,
   buildVariableIris,
   extractCellBySize,
+  getPixelQueryLimit,
+  getWktBounds,
   groupAvgBindings,
   validateResponseData,
 } from "@/utils";
@@ -151,6 +153,12 @@ export const WorldClimService = {
           grid: buildGridIri(gridSize),
           var: buildVariableIris(variables),
           ...buildDatasetParams(isClimate, year),
+          limit: getPixelQueryLimit({
+            bounds: { north, south, west, east },
+            gridSize,
+            variableCount: variables.length,
+            isClimate,
+          }),
         },
       },
     );
@@ -175,6 +183,12 @@ export const WorldClimService = {
           grid: buildGridIri(gridSize),
           var: buildVariableIris(variables),
           ...buildDatasetParams(isClimate, year),
+          limit: getPixelQueryLimit({
+            bounds: getWktBounds(wkt),
+            gridSize,
+            variableCount: variables.length,
+            isClimate,
+          }),
         },
       },
     );

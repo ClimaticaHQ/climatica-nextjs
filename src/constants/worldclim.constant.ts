@@ -89,3 +89,4 @@ export const GRID_DELTA: Record<string, number> = {
 };
 
 export const CELL_IRI_ROW_COL_REGEX = /Cell_[^_]+_r(\d+)c(\d+)/;
+export const WKT_POINT_REGEX = /(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g;
