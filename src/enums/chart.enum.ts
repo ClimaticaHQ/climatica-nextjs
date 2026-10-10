@@ -12,6 +12,7 @@ export enum EChartBody {
 export enum EChartBlock {
   VALUES_TABLE = "valuesTable",
   LEGEND = "legend",
+  STATS_TABLE = "statsTable",
 }
 
 export enum EChartBlockPlacement {
@@ -19,4 +20,6 @@ export enum EChartBlockPlacement {
   PANEL = "panel",
   /** once under the body: split panels share it */
   BODY = "body",
+  /** above the chart card, in the chart section */
+  SECTION = "section",
 }
