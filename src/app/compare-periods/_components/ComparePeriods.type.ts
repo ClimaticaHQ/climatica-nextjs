@@ -1,14 +1,16 @@
+import type { TLocationSearchProps } from "@/components/LocationSearch/LocationSearch.type";
 import type { ECompareLayout, EWalterLiethShading } from "@/enums";
-import type { TChartMode, TExpandedPanel, TPanelExpansion, TPair, TYearsViewState } from "@/types";
-import type { TClimatePeriod } from "@/constants/worldclim.constant";
 import type {
   TCellSize,
+  TChartMode,
+  TChartPageResult,
   TCity,
-  TDataset,
   TDatasetAttribution,
-  TMonthlyTemperature,
+  TExpandedPanel,
   TMultiPeriodEntry,
+  TPair,
   TVariable,
+  TYearsViewState,
 } from "@/types";
 import type { RefObject } from "react";
 
@@ -24,45 +26,52 @@ export type TComparePeriodsUrlState = {
   shownYears: readonly number[] | null;
 };
 
-export type TComparePeriodsViewProps = {
-  chartSectionRef?: RefObject<HTMLDivElement | null>;
+/** The city search with its period-coloured label, and the mini map. */
+export type TPeriodCitySearchProps = TLocationSearchProps & {
   city: TCity;
-  dataset: TDataset;
-  selectedMonths: number[] | null;
-  variables: readonly TVariable[];
-  altitude: number | null;
-  datasetAttribution: TDatasetAttribution | null;
-  /** the Cell Resolution filter — the grid every request uses */
-  gridSize: TCellSize;
-  shareUrl: string;
-  isLoading: boolean;
-  /** a refetch after a filter change — the shown data stays until it lands */
-  isFetching: boolean;
-  isLocating: boolean;
-  error: Error | null;
-  locationError: string | null;
-  onCitySelect: (city: TCity) => void;
-  onLocate: () => void;
-  onClearLocationError: () => void;
+};
 
-  // * climate-only
-  climatePeriodA: TClimatePeriod;
-  climatePeriodB: TClimatePeriod;
-  dataA: TMonthlyTemperature[] | null;
-  dataB: TMonthlyTemperature[] | null;
+/** The trend cards under a climate comparison: how temperature and precipitation changed. */
+export type TPeriodTrend = {
+  /** later minus earlier, °C; 0: no change */
+  tmaxDiff: number;
+  /** later minus earlier, mm */
+  precDiff: number;
+  labelA: string;
+  labelB: string;
+};
 
-  // * weather multi-period
+export type TPeriodTrendCardsProps = {
+  trend: TPeriodTrend | null;
+};
+
+/** The weather years' section, as drawn before the chart card took them over. */
+export type TWeatherYearsSectionProps = {
+  city: TCity;
   periods: number[];
   periodsData: TMultiPeriodEntry[];
   loadingPeriods: number[];
-
-  // * Walter-Lieth comparison layout (URL state)
+  altitude: number | null;
+  gridSize: TCellSize;
+  selectedMonths: number[] | null;
+  variables: readonly TVariable[];
+  datasetAttribution: TDatasetAttribution | null;
+  shareUrl: string;
+  isFetching: boolean;
   layout: ECompareLayout;
   onLayoutChange: (layout: ECompareLayout) => void;
-  wlShading: EWalterLiethShading;
-  onWlShadingChange: (shading: EWalterLiethShading) => void;
   chartMode: TChartMode;
-  panelExpansion: TPanelExpansion;
-  /** weather years: the pair (side by side) and the shown set (overlay) */
   years: TYearsViewState;
+  scrollRef: RefObject<HTMLDivElement | null>;
+};
+
+/** What Compare Periods' page hook gives its view. */
+export type TComparePeriodsPage = TChartPageResult<null, TPeriodTrend | null> & {
+  search: TPeriodCitySearchProps;
+  /** with Weather: the years' own section (the chart section draws climate periods) */
+  weather: TWeatherYearsSectionProps | null;
+};
+
+export type TComparePeriodsViewProps = {
+  page: TComparePeriodsPage;
 };
