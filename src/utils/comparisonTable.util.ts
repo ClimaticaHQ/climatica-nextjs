@@ -7,6 +7,7 @@ import type {
   TComparisonTable,
   TComparisonTableSeries,
   TComparisonTableValue,
+  TFormatComparisonValueOptions,
 } from "@/types";
 import { computeCompareStats } from "./climateComparison.util";
 import { getMartonneBadge } from "./martonne.util";
@@ -14,7 +15,7 @@ import { meanOf, toWalterLiethMonths, withMonthlyMean } from "./monthlyClimate.u
 import { formatNumber } from "./numberFormat.util";
 import { getFrostMonths } from "./walterLieth.util";
 
-const withUnit = (text: string, unit: string) => (unit ? `${text} ${unit}` : text);
+const withUnit = (text: string, unit: string | null) => (unit ? `${text} ${unit}` : text);
 
 /** Frost months by the WL rule (mean min < 0 °C); null when any month's minimum is unknown. */
 function countFrostMonths(data: TComparisonTableSeries["data"]) {
@@ -44,8 +45,8 @@ function getMetricValues({
 
 function formatValue(
   value: number | null,
-  { metric, unit, digits }: TComparisonMetricFormat,
-  locale: string,
+  { metric, digits }: TComparisonMetricFormat,
+  { locale, unit }: TFormatComparisonValueOptions,
 ): TComparisonTableValue {
   if (value === null) return { text: MISSING_VALUE_LABEL };
   // * every value with a real minus sign ("−3,6"), in the locale's decimals
@@ -64,6 +65,7 @@ export function buildComparisonTable({
   minuend,
   locale,
   martonneYear,
+  units,
 }: TBuildComparisonTableArgs): TComparisonTable {
   const valuesA = getMetricValues(seriesA);
   const valuesB = getMetricValues(seriesB);
@@ -78,15 +80,16 @@ export function buildComparisonTable({
     ...(martonneYear !== undefined ? { martonneYear } : {}),
     rows: COMPARISON_METRICS.map((format) => {
       const [x, y] = [first[format.metric], second[format.metric]];
+      const unit = format.unit === null ? null : units[format.unit];
       return {
         metric: format.metric,
-        a: formatValue(valuesA[format.metric], format, locale),
-        b: formatValue(valuesB[format.metric], format, locale),
+        a: formatValue(valuesA[format.metric], format, { locale, unit }),
+        b: formatValue(valuesB[format.metric], format, { locale, unit }),
         difference:
           x !== null && y !== null
             ? withUnit(
                 formatNumber(x - y, { locale, digits: format.digits, sign: ENumberSign.SIGNED }),
-                format.unit,
+                unit,
               )
             : null,
       };
