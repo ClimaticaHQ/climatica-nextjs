@@ -6,10 +6,10 @@ export function resolveDataState({
   isLoading,
   error,
   hasData,
-  emptyMessage,
+  emptyMessages,
 }: TResolveDataStateArgs): TDataState {
   if (isLoading) return { status: EDataStatus.LOADING };
   if (error) return { status: EDataStatus.ERROR, error };
-  if (!hasData) return { status: EDataStatus.EMPTY, message: emptyMessage };
+  if (!hasData) return { status: EDataStatus.EMPTY, messages: emptyMessages };
   return { status: EDataStatus.READY };
 }
