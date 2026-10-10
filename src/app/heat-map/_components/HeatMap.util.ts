@@ -1,6 +1,6 @@
 import type { TPolygon, TUrlField, TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
-import { GRID_DELTA, MONTH_NAMES, SIDEBAR_PARAMS } from "@/constants";
-import { iriToCellBounds } from "@/utils";
+import { GRID_DELTA, MONTH_NAMES, MONTHS_IN_YEAR, SIDEBAR_PARAMS } from "@/constants";
+import { getMonthlyMean, iriToCellBounds, summarizeMonths } from "@/utils";
 import { parseCoord } from "@/utils/urlParams.util";
 import type { TCellBounds, TCellSize } from "@/types";
 import type {
@@ -124,44 +124,39 @@ export function computeHeatmapStats(pixelBindings: TWorldClimBoxBinding[]): THea
   return { min, max, avg, median, stdDev, count: values.length };
 }
 
-function extractMonthlyNums(binding: TWorldClimAvgBoxBinding | null): number[] {
-  if (!binding) return Array.from({ length: 12 }, () => NaN);
-  return Array.from({ length: 12 }, (_, i) => {
-    const key = `valueMonth${String(i + 1).padStart(2, "0")}`;
-    return extractNumber((binding as Record<string, unknown>)[key]);
+function extractMonthlyValues(binding: TWorldClimAvgBoxBinding | null): (number | null)[] {
+  const fields = new Map<string, unknown>(binding ? Object.entries(binding) : []);
+  return Array.from({ length: MONTHS_IN_YEAR }, (_, i) => {
+    const value = extractNumber(fields.get(`valueMonth${String(i + 1).padStart(2, "0")}`));
+    return isNaN(value) ? null : value;
   });
 }
 
+/** The shared annual summary — null while any month lacks a value, as on every other page. */
 export function computeRegionalProfile(
   tmax: TWorldClimAvgBoxBinding | null,
   tmin: TWorldClimAvgBoxBinding | null,
   prec: TWorldClimAvgBoxBinding | null,
 ): TRegionalProfile | null {
-  const tmaxVals = extractMonthlyNums(tmax);
-  const tminVals = extractMonthlyNums(tmin);
-  const precVals = extractMonthlyNums(prec);
+  const tmaxValues = extractMonthlyValues(tmax);
+  const tminValues = extractMonthlyValues(tmin);
+  const precValues = extractMonthlyValues(prec);
 
-  const tavgVals = tmaxVals.map((mx, i) => {
-    const mn = tminVals[i];
-    return !isNaN(mx) && mn !== undefined && !isNaN(mn) ? (mx + mn) / 2 : NaN;
-  });
+  const summary = summarizeMonths(
+    precValues.map((monthPrec, i) => ({
+      tavg: getMonthlyMean({ tmax: tmaxValues[i], tmin: tminValues[i] }),
+      prec: monthPrec,
+    })),
+  );
 
-  const validTavg = tavgVals.filter((v) => !isNaN(v));
-  const validPrec = precVals.filter((v) => !isNaN(v));
-
-  if (validTavg.length === 0 || validPrec.length === 0) return null;
-
-  const meanTemp = validTavg.reduce((s, v) => s + v, 0) / validTavg.length;
-  const annualPrecip = Math.round(validPrec.reduce((s, v) => s + v, 0));
-
-  const aridMonths = tavgVals.filter((tavg, i) => {
-    const p = precVals[i];
-    return !isNaN(tavg) && p !== undefined && !isNaN(p) && p < 2 * tavg;
-  }).length;
-
-  const martonneIndex = meanTemp + 10 > 0 ? annualPrecip / (meanTemp + 10) : null;
-
-  return { meanTemp, annualPrecip, aridMonths, martonneIndex };
+  return (
+    summary && {
+      meanTemp: summary.annualAvgTemp,
+      annualPrecip: summary.totalPrec,
+      aridMonths: summary.aridCount,
+      martonneIndex: summary.martonne,
+    }
+  );
 }
 
 export function gridDelta(gridSize: string): number {
