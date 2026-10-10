@@ -28,6 +28,11 @@ export const CACHE_KEYS = {
   WORLDCLIM_RESOURCE: (searchParams: string) => `worldclim-resource:${searchParams}`,
   WORLDCLIM_RESOURCE_COUNTER: (searchParams: string) =>
     `worldclim-resource-counter:${searchParams}`,
+
+  WORLDCLIM_QUERY: (queryId: string, searchParams: string) =>
+    `worldclim-query:${queryId}:${searchParams}`,
+  WORLDCLIM_QUERY_COUNTER: (queryId: string, searchParams: string) =>
+    `worldclim-query-counter:${queryId}:${searchParams}`,
 } as const;
 
 /**

@@ -21,6 +21,16 @@ export const REDIS_STRATEGIES = {
     buildCounterKey: (searchParams: string) => CACHE_KEYS.WORLDCLIM_RESOURCE_COUNTER(searchParams),
   },
 
+  worldclimQuery: {
+    ttl: CACHE_TTL.CLIMATE_DATA,
+    popularTtl: CACHE_TTL.POPULAR_CLIMATE,
+    popularThreshold: THRESHOLDS.POPULAR_CLIMATE,
+    buildKey: (queryId: string, searchParams: string) =>
+      CACHE_KEYS.WORLDCLIM_QUERY(queryId, searchParams),
+    buildCounterKey: (queryId: string, searchParams: string) =>
+      CACHE_KEYS.WORLDCLIM_QUERY_COUNTER(queryId, searchParams),
+  },
+
   nearestCity: {
     ttl: CACHE_TTL.NEAREST_CITY,
     buildKey: (dto: TCoordinates) => CACHE_KEYS.NEAREST_CITY_SEARCH(dto),
