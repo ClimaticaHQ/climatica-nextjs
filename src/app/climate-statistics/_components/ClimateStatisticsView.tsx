@@ -1,10 +1,10 @@
 "use client";
 
-import { ChartCard, ChartSection } from "@/components/charts";
+import { ChartSection } from "@/components/charts";
 import { FilterBar } from "@/components/filters";
 import { LocationSearch } from "@/components/LocationSearch";
 import { PageLayout } from "@/components/page";
-import { ExportMenu, MapSkeleton } from "@/components/UI";
+import { MapSkeleton } from "@/components/UI";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { CityStatCards } from "./CityStatCards";
@@ -37,20 +37,7 @@ export function ClimateStatisticsView({ page }: TClimateStatisticsViewProps) {
       update={page.update}
       resultsRef={page.resultsRef}
       summary={<CityStatCards state={page.state} summary={page.summary} />}
-      main={
-        <ChartSection
-          state={page.state}
-          toolbar={<ExportMenu {...page.exportMenu} />}
-          hasSummary={false}
-        >
-          <ChartCard
-            model={page.model}
-            viewState={page.viewState}
-            features={page.features}
-            onVisibleChange={page.onVisibleChange}
-          />
-        </ChartSection>
-      }
+      main={<ChartSection chart={page} />}
     />
   );
 }
