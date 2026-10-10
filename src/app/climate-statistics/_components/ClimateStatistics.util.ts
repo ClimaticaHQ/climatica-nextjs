@@ -1,17 +1,12 @@
 import { MISSING_VALUE_LABEL } from "@/constants";
 import { meanOf, sumOf } from "@/utils/monthlyClimate.util";
 import { formatNumber } from "@/utils/numberFormat.util";
-import type { TClimateStats, TComputeClimateStatsArgs } from "./ClimateStatistics.type";
-
-export type { TClimateStats };
-
-export function toCityQueryParam(cityLabel: string) {
-  return cityLabel.trim().toLowerCase();
-}
-
-export function formatCoordinate(value: number) {
-  return value.toFixed(4);
-}
+import type {
+  TBuildCityStatsSummaryArgs,
+  TCityStatsSummary,
+  TClimateStats,
+  TComputeClimateStatsArgs,
+} from "./ClimateStatistics.type";
 
 export function computeClimateStats({
   data,
@@ -29,4 +24,26 @@ export function computeClimateStats({
   const totalPrec = format(sumOf(filtered.map((d) => d.prec)), 0);
 
   return { avgTmax, avgTmin, totalPrec };
+}
+
+/** The stat cards' values and wording for the month filter. */
+export function buildCityStatsSummary({
+  data,
+  months,
+  locale,
+  altitude,
+  monthNames,
+}: TBuildCityStatsSummaryArgs): TCityStatsSummary {
+  const isFiltered = months !== null && months.length > 0;
+  return {
+    stats: computeClimateStats({ data, months, locale }),
+    isSingleMonth: isFiltered && months.length === 1,
+    filteredMonthNames: isFiltered
+      ? [...months]
+          .sort((a, b) => a - b)
+          .map((month) => monthNames[month - 1])
+          .join(", ")
+      : null,
+    altitude,
+  };
 }
