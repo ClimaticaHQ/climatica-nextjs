@@ -25,7 +25,7 @@ export function PageLayout({
     <div ref={resultsRef} data-testid="page-results" className={C.RESULTS}>
       {summary}
       {main}
-      {details}
+      <div className={C.DETAILS}>{details}</div>
     </div>
   );
 
