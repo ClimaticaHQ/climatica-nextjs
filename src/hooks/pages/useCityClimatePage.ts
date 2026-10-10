@@ -93,10 +93,10 @@ export function useCityClimatePage(): TCityClimatePage {
     error: climate.error,
     hasData: data !== null,
     // * only a climate period can lack data at a resolution; none while a refetch runs
-    emptyMessage:
+    emptyMessages:
       dataset === DATASETS.CLIMATE && !isFetching
-        ? noPeriodData(CLIMATE_PERIOD_LABELS[climatePeriod], gridSize)
-        : null,
+        ? [noPeriodData(CLIMATE_PERIOD_LABELS[climatePeriod], gridSize)]
+        : [],
   });
   const series: TChartSeries[] = [
     {

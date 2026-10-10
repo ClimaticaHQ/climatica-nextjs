@@ -4,7 +4,6 @@ export { useGeolocation } from "./useGeolocation";
 export { useMediaQuery } from "./useMediaQuery";
 export { useTheme } from "./useTheme";
 export { useUrlStateSync } from "./useUrlStateSync";
-export { useComparisonExport } from "./useComparisonExport";
 export { useLegendLabels } from "./useLegendLabels";
 export { useMonthlyValuesNames } from "./useMonthlyValuesNames";
 export { useMonthlyTableLabels } from "./useMonthlyTableLabels";

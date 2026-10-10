@@ -98,10 +98,11 @@ export function useCompareCitiesPage(): TCompareCitiesPage {
     isLoading: compare.isLoading,
     error: compare.error,
     hasData: hasBothData,
-    emptyMessage:
+    emptyMessages: [
       dataset === DATASETS.CLIMATE
         ? noPeriodData(CLIMATE_PERIOD_LABELS[climatePeriod], gridSize)
         : t("climateComparison.noData"),
+    ],
   });
 
   const toSeries = (

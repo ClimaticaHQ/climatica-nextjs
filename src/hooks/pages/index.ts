@@ -7,3 +7,5 @@ export { useMapPointSelection } from "./useMapPointSelection";
 export { useCityClimatePage } from "./useCityClimatePage";
 export { useCityClimatePicking } from "./useCityClimatePicking";
 export { useCompareCitiesPage } from "./useCompareCitiesPage";
+export { useWeatherYearsViewState } from "./useWeatherYearsViewState";
+export { useComparePeriodsPage } from "./useComparePeriodsPage";
