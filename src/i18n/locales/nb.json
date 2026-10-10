@@ -59,7 +59,8 @@
       "removePeriod": "Fjern {year}",
       "invalidYear": "Skriv inn et år mellom {min} og {max}",
       "duplicateYear": "Dette året er allerede i listen",
-      "periodsCount": "{count} / {max} perioder"
+      "periodsCount": "{count} / {max} perioder",
+      "noData": "Ingen værdata for {years} for dette stedet og denne oppløsningen."
     },
     "swapPeriods": "Bytt perioder"
   },
@@ -95,7 +96,8 @@
     "noPeriodData": "Ingen data for {period} ved oppløsningen {grid}",
     "difference": "Forskjell",
     "metric": "Måling",
-    "tableCaption": "Sammenligning av {a} og {b}"
+    "tableCaption": "Sammenligning av {a} og {b}",
+    "statsCaption": "Statistikk for {names}"
   },
   "heatMap": {
     "placeholder": "Plassholder for varmekart. Vi kan senere vise klimaintensitet på et verdenskart her.",

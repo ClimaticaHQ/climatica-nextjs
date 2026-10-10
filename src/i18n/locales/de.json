@@ -59,7 +59,8 @@
       "removePeriod": "{year} entfernen",
       "invalidYear": "Gib ein Jahr zwischen {min} und {max} ein",
       "duplicateYear": "Dieses Jahr ist bereits in der Liste",
-      "periodsCount": "{count} / {max} Zeiträume"
+      "periodsCount": "{count} / {max} Zeiträume",
+      "noData": "Keine Wetterdaten für {years} an diesem Ort und in dieser Auflösung."
     },
     "swapPeriods": "Perioden tauschen"
   },
@@ -95,7 +96,8 @@
     "noPeriodData": "Keine Daten für {period} bei {grid}-Auflösung",
     "difference": "Differenz",
     "metric": "Kennzahl",
-    "tableCaption": "Vergleich von {a} und {b}"
+    "tableCaption": "Vergleich von {a} und {b}",
+    "statsCaption": "Statistiken für {names}"
   },
   "heatMap": {
     "placeholder": "Platzhalter für die Wärmekarte. Später können wir hier die Klimaintensität auf einer Weltkarte anzeigen.",

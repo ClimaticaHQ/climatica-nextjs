@@ -59,7 +59,8 @@
       "removePeriod": "Видалити {year}",
       "invalidYear": "Введіть рік між {min} та {max}",
       "duplicateYear": "Цей рік вже є у списку",
-      "periodsCount": "{count} / {max} періодів"
+      "periodsCount": "{count} / {max} періодів",
+      "noData": "Немає даних про погоду за {years} для цього місця та роздільності."
     },
     "swapPeriods": "Поміняти періоди місцями"
   },
@@ -95,7 +96,8 @@
     "noPeriodData": "Немає даних за {period} для роздільної здатності {grid}",
     "difference": "Різниця",
     "metric": "Показник",
-    "tableCaption": "Порівняння {a} і {b}"
+    "tableCaption": "Порівняння {a} і {b}",
+    "statsCaption": "Статистика для {names}"
   },
   "heatMap": {
     "placeholder": "Плейсхолдер сторінки теплової мапи. Пізніше тут можна показати інтенсивність клімату на карті світу.",

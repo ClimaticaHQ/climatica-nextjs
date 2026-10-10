@@ -59,7 +59,8 @@
       "removePeriod": "Remove {year}",
       "invalidYear": "Enter a year between {min} and {max}",
       "duplicateYear": "This year is already in the list",
-      "periodsCount": "{count} / {max} periods"
+      "periodsCount": "{count} / {max} periods",
+      "noData": "No weather data for {years} at this place and resolution."
     },
     "swapPeriods": "Swap periods"
   },
@@ -95,7 +96,8 @@
     "noPeriodData": "No {period} data at {grid} resolution",
     "difference": "Difference",
     "metric": "Metric",
-    "tableCaption": "Comparison of {a} and {b}"
+    "tableCaption": "Comparison of {a} and {b}",
+    "statsCaption": "Statistics for {names}"
   },
   "heatMap": {
     "placeholder": "Heat map page placeholder. We can later render climate intensity on a world map here.",

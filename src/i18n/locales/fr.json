@@ -59,7 +59,8 @@
       "removePeriod": "Supprimer {year}",
       "invalidYear": "Saisissez une année entre {min} et {max}",
       "duplicateYear": "Cette année est déjà dans la liste",
-      "periodsCount": "{count} / {max} périodes"
+      "periodsCount": "{count} / {max} périodes",
+      "noData": "Aucune donnée météo pour {years} à cet endroit et à cette résolution."
     },
     "swapPeriods": "Inverser les périodes"
   },
@@ -95,7 +96,8 @@
     "noPeriodData": "Aucune donnée pour {period} à la résolution {grid}",
     "difference": "Différence",
     "metric": "Indicateur",
-    "tableCaption": "Comparaison de {a} et {b}"
+    "tableCaption": "Comparaison de {a} et {b}",
+    "statsCaption": "Statistiques pour {names}"
   },
   "heatMap": {
     "placeholder": "Espace réservé pour la carte de chaleur. Nous pourrons bientôt afficher ici l'intensité climatique sur une carte mondiale.",

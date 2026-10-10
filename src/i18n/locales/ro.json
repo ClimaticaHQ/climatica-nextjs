@@ -59,7 +59,8 @@
       "removePeriod": "Elimină {year}",
       "invalidYear": "Introdu un an între {min} și {max}",
       "duplicateYear": "Acest an este deja în listă",
-      "periodsCount": "{count} / {max} perioade"
+      "periodsCount": "{count} / {max} perioade",
+      "noData": "Nu există date meteo pentru {years} în acest loc și la această rezoluție."
     },
     "swapPeriods": "Inversează perioadele"
   },
@@ -95,7 +96,8 @@
     "noPeriodData": "Nu există date pentru {period} la rezoluția {grid}",
     "difference": "Diferență",
     "metric": "Metrică",
-    "tableCaption": "Comparație între {a} și {b}"
+    "tableCaption": "Comparație între {a} și {b}",
+    "statsCaption": "Statistici pentru {names}"
   },
   "heatMap": {
     "placeholder": "Substituent pentru harta termică. Mai târziu vom afișa intensitatea climatică pe o hartă mondială aici.",

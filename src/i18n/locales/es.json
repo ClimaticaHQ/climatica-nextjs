@@ -59,7 +59,8 @@
       "removePeriod": "Eliminar {year}",
       "invalidYear": "Introduce un año entre {min} y {max}",
       "duplicateYear": "Este año ya está en la lista",
-      "periodsCount": "{count} / {max} períodos"
+      "periodsCount": "{count} / {max} períodos",
+      "noData": "No hay datos meteorológicos de {years} para este lugar y resolución."
     },
     "swapPeriods": "Intercambiar períodos"
   },
@@ -95,7 +96,8 @@
     "noPeriodData": "No hay datos de {period} en resolución {grid}",
     "difference": "Diferencia",
     "metric": "Indicador",
-    "tableCaption": "Comparación de {a} y {b}"
+    "tableCaption": "Comparación de {a} y {b}",
+    "statsCaption": "Estadísticas de {names}"
   },
   "heatMap": {
     "placeholder": "Marcador de posición de mapa de calor. Más adelante podremos mostrar la intensidad climática en un mapa mundial aquí.",
