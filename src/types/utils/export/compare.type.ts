@@ -56,7 +56,7 @@ export type TCompareExportPayload = {
   scales: TWalterLiethScales;
   rightMax: number;
   labels: TCompareExportLabels;
-  /** Multi-period mode never draws a tavg line — the others draw all three. */
+  /** Weather years never draw a mean temperature line — the other comparisons do. */
   showTavgLine: boolean;
   datasetAttribution: TDatasetAttribution | null;
   shareUrl: string;
@@ -65,8 +65,6 @@ export type TCompareExportPayload = {
   /** Compare Periods with weather years: what the screen draws (pair or shown years) */
   weatherYears?: TWeatherYearsExport;
 };
-
-/** Pixel geometry of the standard compare chart body. */
 
 /** The standard split export's legend: both series' colors, or the expanded panel's. */
 export type TStandardSplitLegendArgs = {

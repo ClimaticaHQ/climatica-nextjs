@@ -1,12 +1,6 @@
 import type { ReactNode } from "react";
-import type {
-  ECompareLayout,
-  EWalterLiethFrost,
-  EWalterLiethRegime,
-  EWalterLiethSeriesId,
-  EWalterLiethShading,
-} from "@/enums";
-import type { TActiveMonth, TPanelExpansion, TPanelHeaderSlots } from "../components/chart";
+import type { EWalterLiethFrost, EWalterLiethRegime, EWalterLiethSeriesId } from "@/enums";
+import type { TPanelHeaderSlots } from "../components/chart";
 
 export type TMonthAridity = {
   month: number;
@@ -102,15 +96,12 @@ export type TWalterLiethChartProps = {
   domain: TWalterLiethDomain;
   /** smaller height and header, for one diagram of a split pair */
   isCompact?: boolean;
-  /** false hides the legend, e.g. when a split pair shows one shared legend below both */
-  showLegend?: boolean;
   /** one panel of a split pair: its own light card, a series-colored dot before the name */
   isPanel?: boolean;
   /** a split panel's header additions — expand / collapse controls, the "vs A" note */
   headerSlots?: TPanelHeaderSlots | undefined;
-  /** the chart card's blocks (values table, legend) in place of this chart's own — until every
-   * page draws through the chart card */
-  footer?: ReactNode;
+  /** the chart card's blocks (values table, legend), drawn under this chart */
+  footer: ReactNode;
   /**
    * Recharts syncId — diagrams sharing it hover in sync. Recharts syncs by data index, so
    * every diagram sharing one must use the same month order (and 12 rows each).
@@ -183,19 +174,6 @@ export type TWalterLiethIncompleteSeries = Pick<
 /** What a page hands to the WL components — complete, or known to be incomplete. */
 export type TWalterLiethSeriesInput = TWalterLiethSeries | TWalterLiethIncompleteSeries;
 
-export type TWalterLiethComparisonProps = {
-  seriesA: TWalterLiethSeriesInput;
-  seriesB: TWalterLiethSeriesInput;
-  /** persisted by the page (URL state); switched from the chart header */
-  layout: ECompareLayout;
-  /** which series the overlay hatches — persisted by the page (URL state) */
-  shading: EWalterLiethShading;
-  /** split: the panel shown across the card — persisted by the page (URL state) */
-  expansion: TPanelExpansion;
-  /** the card's hovered month, shared by every chart and strip */
-  activeMonth: TActiveMonth;
-};
-
 /** How one series is painted: WL convention colors, or one series color in overlay. */
 export type TWalterLiethLayerPaint = {
   temp: string;
@@ -206,15 +184,6 @@ export type TWalterLiethLayerPaint = {
   perhumidOpacity: number;
 };
 
-/** Series B minus series A, per statistic — null when either side is unknown. */
-export type TSummaryDeltas = {
-  meanTemp: number;
-  totalPrec: number;
-  aridCount: number;
-  martonne: number | null;
-};
-
-/** Pattern geometry for one plot, in px — see getHatchGeometry. */
 /** The frost band's colors: certain-frost cells, the outline (frame, dividers, ticks), unknown. */
 export type TWalterLiethFrostPalette = {
   frost: string;

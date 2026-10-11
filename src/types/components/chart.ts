@@ -1,4 +1,3 @@
-import type { TPair } from "../utils/pair.type";
 import type { EWalterLiethSeriesId } from "@/enums";
 import type { ReactNode } from "react";
 import { TClimatePeriod } from "../api";
@@ -39,22 +38,6 @@ export type TWalterLiethShownArgs = {
   searchParams: URLSearchParams;
 };
 
-export type TCompareMode = "cities" | "periods";
-
-/** Missing values are null — the chart draws a gap there, never a 0. */
-export type TComparePoint = {
-  month: number;
-  monthName: string;
-  tmaxA: number | null;
-  tminA: number | null;
-  tavgA: number | null;
-  precA: number | null;
-  tmaxB: number | null;
-  tminB: number | null;
-  tavgB: number | null;
-  precB: number | null;
-};
-
 export type TChartSummary = {
   annualAvgTemp: number;
   totalPrec: number;
@@ -86,20 +69,4 @@ export type TUnitTitlePlacementArgs = {
   chartWidth: number;
   /** one panel of a split pair — the compact margins */
   isCompact: boolean;
-};
-
-/** Compare Periods with weather years: which years each layout draws, and how to change them. */
-export type TYearsViewState = {
-  /** side by side: the two years drawn */
-  pair: TPair<number> | null;
-  onPairChange: (pair: TPair<number>) => void;
-  /** overlay: the years drawn, in the page's order */
-  shown: readonly number[];
-  onShownChange: (years: readonly number[]) => void;
-};
-
-/** A compared weather year and its series colour — the stats table's, the chips', the pickers'. */
-export type TYearOption = {
-  year: number;
-  color: string;
 };

@@ -65,7 +65,7 @@ export type TComparisonExport = {
   seriesB: TWalterLiethSeriesInput;
   /** split: the one panel shown across the export, as on screen; null = both */
   expanded: TExpandedPanel;
-  /** the comparison table on top — the page's, complete even when a panel is expanded */
+  /** the stats table on top — the page's, complete even when a panel is expanded */
   table: TComparisonTable;
   /** the standard chart's chips: its strips' rows */
   visible: TVisibleSeries;

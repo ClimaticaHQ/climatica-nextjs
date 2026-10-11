@@ -16,7 +16,7 @@ export type TLegendItem = {
   key: string;
   label: string;
   swatch: TLegendSwatch;
-  /** drawn faded, e.g. a hidden multi-period year */
+  /** drawn faded, e.g. a series its chip turned off */
   isMuted?: boolean;
 };
 
@@ -124,7 +124,7 @@ export type TSeriesLegendItemsArgs = {
   series: readonly TLegendSeries[];
   visible: TVisibleSeries;
   neutral: string;
-  /** whether the chart draws a tavg line (multi-period doesn't) */
+  /** whether the chart draws a mean temperature line (weather years don't) */
   hasTavg: boolean;
   aridity: TAridityLegend | null;
 };

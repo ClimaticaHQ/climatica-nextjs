@@ -102,12 +102,6 @@ export type TFilterNoteRule = {
   note: TFilterNote;
 };
 
-/** An option of a filter, and whether it can be picked in the current context. */
-export type TFilterOptionState<TValue> = {
-  value: TValue;
-  isDisabled: boolean;
-};
-
 export type TFilterChangeHandler = <K extends EFilterKey>(key: K, value: TFilters[K]) => void;
 
 /** What the current page tells the filters, beyond their values. */

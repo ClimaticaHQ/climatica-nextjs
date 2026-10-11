@@ -46,10 +46,3 @@ export type TFormatMonthlyValuesValueArgs = {
   value: number | null | undefined;
   locale: string;
 };
-
-/** A monthly values table's column geometry under a plot of the same width. */
-export type TMonthlyValuesColumnsArgs = {
-  tableWidth: number;
-  /** one panel of a split pair: the plot's compact margins */
-  isCompact: boolean;
-};

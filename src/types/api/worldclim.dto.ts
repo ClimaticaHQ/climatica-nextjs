@@ -10,47 +10,11 @@ export type TSparqlUriValue = {
   value: string;
 };
 
-export type TWorldClimCellBinding = {
-  cell: TSparqlUriValue;
-  grid: TSparqlUriValue;
-};
-
-export type TWorldClimCellResponseResults = {
-  distinct: boolean;
-  ordered: boolean;
-  bindings: TWorldClimCellBinding[];
-};
-
-export type TWorldClimTemperatureBinding = {
-  month: TSparqlValue;
-  tmin: TSparqlValue;
-  tmax: TSparqlValue;
-};
-
-export type TWorldClimTemperatureResponse = {
-  head: { vars: string[] };
-  results: TWorldClimTemperatureResponseResults;
-};
-
-export type TWorldClimTemperatureResponseResults = {
-  distinct: boolean;
-  ordered: boolean;
-  bindings: TWorldClimTemperatureBinding[];
-};
-
 export interface TWorldClimCellResponse {
   results: {
     bindings: {
       cell: TSparqlUriValue;
       grid: TSparqlUriValue;
-    }[];
-  };
-}
-
-export interface TWorldClimPixelsResponse {
-  results: {
-    bindings: {
-      pixel: TSparqlUriValue;
     }[];
   };
 }
@@ -155,12 +119,6 @@ export type TWorldClimAvgBoxBinding = {
   valueMonth10?: TSparqlValue;
   valueMonth11?: TSparqlValue;
   valueMonth12?: TSparqlValue;
-};
-
-export type TWorldClimAvgBoxResponse = {
-  results: {
-    bindings: TWorldClimAvgBoxBinding[];
-  };
 };
 
 export type TWorldClimPointValueBinding = {

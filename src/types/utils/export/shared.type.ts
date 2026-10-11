@@ -11,7 +11,7 @@ export type TExportChartColors = {
   textSecondary: string;
   border: string;
   bg: string;
-  /** the comparison table's header row */
+  /** the stats table's header row */
   bgSecondary: string;
   tmax: string;
   tmin: string;
@@ -100,7 +100,7 @@ export type TExportComparisonTableArgs = {
   colors: TExportChartColors;
 };
 
-/** One text of the export's comparison table. */
+/** One text of the export's stats table. */
 export type TExportTableCellArgs = {
   x: number;
   y: number;
@@ -111,7 +111,7 @@ export type TExportTableCellArgs = {
   fill: string;
 };
 
-/** A comparison-table value: right-aligned, with its Martonne badge (translated) before it. */
+/** A stats table value: right-aligned, with its Martonne badge (translated) before it. */
 export type TExportTableValueArgs = {
   value: TComparisonTableValue;
   badgeText: string | null;

@@ -1,5 +1,3 @@
-import type { ECompareLayout } from "@/enums";
-
 /** Two compared values, A first. */
 export type TPair<T> = readonly [T, T];
 
@@ -16,13 +14,6 @@ export type TDefaultShownYearsArgs = {
   /** the side-by-side pair */
   pair: TPair<number> | null;
   isWalterLieth: boolean;
-};
-
-/** What the weather years' chart draws in a layout: the pair, or the overlay's shown years. */
-export type TDrawnYearsArgs = {
-  layout: ECompareLayout;
-  pair: TPair<number> | null;
-  shown: readonly number[];
 };
 
 /** Dropdown-like options, each possibly disabled. */
