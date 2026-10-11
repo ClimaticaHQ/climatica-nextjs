@@ -25,8 +25,3 @@ export type TPageLayoutProps = {
 export type TPageStatusProps = {
   state: TDataState;
 };
-
-export type TPageResultsProps = {
-  update?: TPageUpdate | undefined;
-  children: ReactNode;
-};

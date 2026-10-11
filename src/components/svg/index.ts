@@ -10,7 +10,6 @@ export { FlashBorderIcon } from "./FlashBorderIcon";
 export { FlashGlowIcon } from "./FlashGlowIcon";
 export { ImageIcon } from "./ImageIcon";
 export { InfoIcon } from "./InfoIcon";
-export { ThreeDotsScaleLoader } from "./loaders";
 export { LocationIcon } from "./LocationIcon";
 export { NoShadingIcon } from "./NoShadingIcon";
 export { OverlayLayoutIcon } from "./OverlayLayoutIcon";
