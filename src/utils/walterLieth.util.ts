@@ -3,7 +3,6 @@ import {
   MARTONNE_TEMP_OFFSET,
   MONTH_LABEL_REFERENCE_DATE,
   MONTH_LABEL_TRAILING_PERIOD,
-  WALTER_LIETH_COLORS,
   WALTER_LIETH_COMPARISON,
   WALTER_LIETH_DIAGRAM,
   WALTER_LIETH_FROST,
@@ -21,7 +20,6 @@ import type {
   TFormatMonthLabelArgs,
   TGetAridHumidSegmentsArgs,
   TMonthAridity,
-  TMonthlyTableMarker,
   TMonthlyTemperature,
   TWalterLiethBandBounds,
   TWalterLiethDomain,
@@ -38,7 +36,6 @@ import type {
   TWalterLiethRow,
   TWalterLiethSeries,
   TWalterLiethSeriesInput,
-  TSummaryDeltas,
   TToSvgPathArgs,
   TToWalterLiethSeriesArgs,
 } from "@/types";
@@ -346,11 +343,6 @@ export function toSvgPath({ points, scaleX, scaleY, isClosed = true }: TToSvgPat
   return isClosed ? `${commands.join(" ")} Z` : commands.join(" ");
 }
 
-/** A series' marker on screen: A a dot, B a square, in its series color. */
-export function getSeriesMarker(id: EWalterLiethSeriesId): TMonthlyTableMarker {
-  return { shape: WALTER_LIETH_COMPARISON.DOT_SHAPE[id], color: WALTER_LIETH_COLORS.SERIES[id] };
-}
-
 /**
  * The frost band, one state per calendar month: frost when the mean minimum temperature is
  * below WALTER_LIETH_FROST.THRESHOLD (WL's "certain frost" — there are no absolute minima for
@@ -469,16 +461,6 @@ export function isShadedSeries(id: EWalterLiethSeriesId, shading: EWalterLiethSh
 /** The shaded series is drawn first, so its fill never covers the other series' curves. */
 export function orderShadedFirst<T extends { isShaded: boolean }>(layers: readonly T[]): T[] {
   return [...layers].sort((a, b) => Number(b.isShaded) - Number(a.isShaded));
-}
-
-/** Series B minus series A for each annual statistic (null when either Martonne is). */
-export function getSummaryDeltas(a: TChartSummary, b: TChartSummary): TSummaryDeltas {
-  return {
-    meanTemp: b.annualAvgTemp - a.annualAvgTemp,
-    totalPrec: b.totalPrec - a.totalPrec,
-    aridCount: b.aridCount - a.aridCount,
-    martonne: a.martonne !== null && b.martonne !== null ? b.martonne - a.martonne : null,
-  };
 }
 
 /**

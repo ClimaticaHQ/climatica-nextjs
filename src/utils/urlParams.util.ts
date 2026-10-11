@@ -76,10 +76,6 @@ export function parseCoord(raw: string | null): number | null {
   return isNaN(n) ? null : n;
 }
 
-export function encodeVars(vars: TVariable[]): string {
-  return vars.join(",");
-}
-
 export function encodeMonths(months: TMonthFilter): string {
   return months === "all" ? "all" : months.join(",");
 }
@@ -91,10 +87,6 @@ export function parsePeriods(raw: string | null): number[] | null {
     .map((s) => parseInt(s, 10))
     .filter((n) => !isNaN(n) && n >= WEATHER_MIN_YEAR && n <= WEATHER_MAX_YEAR);
   return years.length > 0 ? years : null;
-}
-
-export function encodePeriods(years: number[]): string {
-  return years.join(",");
 }
 
 export function serializeUrlState<TState extends Record<string, unknown>>(

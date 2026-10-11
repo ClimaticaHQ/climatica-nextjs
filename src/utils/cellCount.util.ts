@@ -28,6 +28,33 @@ export function countCellsInBounds(bounds: TBbox, gridSize: TCellSize): number {
   return Math.max(0, lastRow - firstRow + 1) * Math.max(0, lastCol - firstCol + 1);
 }
 
+/**
+ * How many cells have their centroid inside the polygon — the cells it shows, while loading it
+ * reads its whole box. A scanline per cell row, matching isPointInPolygon's edge rule.
+ */
+export function countCellsInPolygon(polygon: TPolygon, gridSize: TCellSize): number {
+  const size = GRID_DELTA[gridSize] ?? GRID_DELTA["10m"];
+  const { firstRow, lastRow } = getCellIndexRange(getPolygonBounds(polygon), gridSize);
+  let count = 0;
+  for (let row = firstRow; row <= lastRow; row++) {
+    const lat = 90 - (row + 0.5) * size;
+    const crossings = polygon
+      .flatMap(([latA, lngA], i) => {
+        const [latB, lngB] = polygon[(i + 1) % polygon.length] ?? [latA, lngA];
+        return latA > lat !== latB > lat
+          ? [((lngB - lngA) * (lat - latA)) / (latB - latA) + lngA]
+          : [];
+      })
+      .sort((a, b) => a - b);
+    for (let i = 0; i + 1 < crossings.length; i += 2) {
+      const firstCol = Math.ceil(((crossings[i] ?? 0) + 180) / size - 0.5);
+      const lastCol = Math.ceil(((crossings[i + 1] ?? 0) + 180) / size - 0.5) - 1;
+      count += Math.max(0, lastCol - firstCol + 1);
+    }
+  }
+  return count;
+}
+
 export function getCellCountStatus(count: number): TCellCountStatus {
   return CELL_COUNT_STATUSES.find(({ max }) => count <= max)!.status;
 }

@@ -1,5 +1,4 @@
 import type {
-  TBbox,
   TCity,
   TKeyValueStorage,
   TPersistedJsonStore,
@@ -88,20 +87,5 @@ export function isCity(value: unknown): value is TCity {
     typeof value.lat === "number" &&
     "lng" in value &&
     typeof value.lng === "number"
-  );
-}
-
-export function isBboxOrNull(value: unknown): value is TBbox | null {
-  return (
-    value === null ||
-    (typeof value === "object" &&
-      "north" in value &&
-      typeof value.north === "number" &&
-      "south" in value &&
-      typeof value.south === "number" &&
-      "west" in value &&
-      typeof value.west === "number" &&
-      "east" in value &&
-      typeof value.east === "number")
   );
 }

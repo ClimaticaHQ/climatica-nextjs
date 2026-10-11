@@ -1,11 +1,5 @@
-import { ECompareLayout, EPairSide } from "@/enums";
-import type {
-  TDefaultShownYearsArgs,
-  TDrawnYearsArgs,
-  TPair,
-  TPairOption,
-  TResolveShownYearsArgs,
-} from "@/types";
+import { EPairSide } from "@/enums";
+import type { TDefaultShownYearsArgs, TPair, TPairOption, TResolveShownYearsArgs } from "@/types";
 
 /** The pair the other way round — the swap button. */
 export function swapPair<T>([a, b]: TPair<T>): TPair<T> {
@@ -69,9 +63,4 @@ export function resolveShownYears({
 /** Whether two lists hold the same years, in any order. */
 export function isSameYears(a: readonly number[], b: readonly number[]) {
   return a.length === b.length && a.every((year) => b.includes(year));
-}
-
-/** The weather years on screen: the side-by-side pair, or the overlay's shown years. */
-export function getDrawnYears({ layout, pair, shown }: TDrawnYearsArgs): readonly number[] {
-  return layout === ECompareLayout.OVERLAY ? shown : (pair ?? []);
 }

@@ -6,12 +6,7 @@ import {
   WALTER_LIETH_DIAGRAM,
   WALTER_LIETH_MONTH_FORMAT,
 } from "@/constants";
-import type {
-  TMonthLabelFormat,
-  TMonthlyValuesColumnsArgs,
-  TPlotHeightArgs,
-  TUnitTitlePlacementArgs,
-} from "@/types";
+import type { TMonthLabelFormat, TPlotHeightArgs, TUnitTitlePlacementArgs } from "@/types";
 import { getFrostBandHeight } from "./walterLieth.util";
 
 // * axis helpers shared by the WL diagram and the standard chart's split panels, so both chart
@@ -93,19 +88,4 @@ export function getMonthLabelFormat(chartWidth: number | null): TMonthLabelForma
 /** A plot's side margin: its y axis' width (no chart margin beside it) — the same both sides. */
 export function getPlotMargin(isCompact: boolean) {
   return getAxisStyle(isCompact).width + CHART_PLOT.MARGIN.left;
-}
-
-/**
- * The monthly values table's columns under a plot of this width: the label column is the
- * plot's left margin, a spacer its right one, the months share the rest — so each column's
- * centre is exactly that month's position in the plot above.
- */
-export function getMonthlyValuesColumns({ tableWidth, isCompact }: TMonthlyValuesColumnsArgs) {
-  const margin = getPlotMargin(isCompact);
-  const monthWidth = (tableWidth - margin * 2) / WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR;
-  const centers = Array.from(
-    { length: WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR },
-    (_, i) => margin + monthWidth * (i + WALTER_LIETH_DIAGRAM.MONTH_EDGE_PADDING),
-  );
-  return { margin, monthWidth, centers };
 }

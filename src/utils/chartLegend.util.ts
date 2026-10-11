@@ -181,8 +181,8 @@ export function getStandardSplitLegendItems({
 }
 
 /**
- * Multi-series standard charts (overlay compare, multi-period): each series by its dot, then
- * the variables by line style in a neutral color, then the arid / humid bar colors.
+ * Multi-series standard charts (the overlay): each series by its dot, then the variables by
+ * line style in a neutral color, then the arid / humid bar colors.
  */
 export function getSeriesLegendItems({
   labels,

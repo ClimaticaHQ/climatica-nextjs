@@ -8,7 +8,6 @@ import {
   WORLDCLIM_RASTER_BASE,
   WORLDCLIM_VARIABLE_BASE,
 } from "@/constants";
-import { env } from "@/libs/Env";
 import type {
   TCellBounds,
   TCellSize,
@@ -23,7 +22,6 @@ import type {
   TWorldClimAvgBoxBinding,
   TWorldClimBoxBinding,
   TWorldClimCellResponse,
-  TWorldClimPixelResource,
   TWorldClimPointValueBinding,
 } from "@/types";
 
@@ -56,30 +54,6 @@ export function extractPixelIri(iris: string[], variable: string): string | null
   return iris.find((iri) => iri.includes(`_${variable}_`)) ?? null;
 }
 
-export function buildMonthlyTemperatures(
-  tminData: TWorldClimPixelResource,
-  tmaxData: TWorldClimPixelResource,
-  precData: TWorldClimPixelResource,
-): TMonthlyTemperature[] {
-  return Array.from({ length: 12 }, (_, i) => {
-    const monthKey = `valueMonth${String(i + 1).padStart(2, "0")}` as keyof TWorldClimPixelResource;
-
-    return {
-      month: i + 1,
-      monthName: MONTH_NAMES[i],
-      tmin: Number(tminData[monthKey]),
-      tmax: Number(tmaxData[monthKey]),
-      prec: Number(precData[monthKey]),
-    };
-  });
-}
-
-export function createWorldClimAuthHeaders(): { Authorization: string } {
-  return {
-    Authorization: `Bearer ${env.WORLDCLIM_API_KEY}`,
-  };
-}
-
 export function buildGridIri(gridSize: TCellSize): string {
   return `${WORLDCLIM_GRID_BASE}${gridSize}`;
 }
@@ -102,17 +76,6 @@ export function buildRasterIri(
 ): string {
   const periodSuffix = typeof period === "number" ? `w${period}` : period;
   return `${WORLDCLIM_RASTER_BASE}${gridSize}_${variable}_${periodSuffix}`;
-}
-
-export function buildDatasetParams(
-  isClimate: boolean,
-  year?: number,
-): { isClimate: true } | { isWeather: true; year: number } {
-  if (isClimate) {
-    return { isClimate: true };
-  }
-
-  return { isWeather: true, year: year ?? new Date().getFullYear() };
 }
 
 export function validateResponseData(response: { data: unknown }): void {

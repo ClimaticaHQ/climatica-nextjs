@@ -25,10 +25,6 @@ export function scrollToSection(el: HTMLElement, options: TScrollOptions = {}) {
     return;
   }
 
-  /**
-   * calculate the top position of the element
-   * relative to the container, then scroll
-   */
   const top =
     el.getBoundingClientRect().top -
     container.getBoundingClientRect().top +

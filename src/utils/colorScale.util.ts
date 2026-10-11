@@ -56,7 +56,3 @@ export function interpolateColor(
   const t = max === min ? 0.5 : (value - min) / (max - min);
   return interpolateStops(scale === "precipitation" ? PREC_STOPS : TEMP_STOPS, t);
 }
-
-export function getColorStops(scale: TColorScale): TColorStop[] {
-  return scale === "precipitation" ? [...PREC_STOPS] : [...TEMP_STOPS];
-}
