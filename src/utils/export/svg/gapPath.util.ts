@@ -1,4 +1,4 @@
-import { catmullRomPath } from "@/components/TempPrecipChart/utils/catmullRomPath";
+import { catmullRomPath } from "@/utils/catmullRomPath.util";
 import type { TExportPoint } from "@/types";
 
 /**

@@ -41,9 +41,9 @@ function buildValue({ value, badgeText, cell }: TExportTableValueArgs) {
 }
 
 /**
- * String twin of the page's ComparisonTable: metric | A | B | Difference in a framed card,
- * a light header row with the series markers and the difference's direction, thin dividers,
- * values right-aligned in their series colors, the difference muted.
+ * String twin of the page's stats table for a pair: metric | A | B | Difference in a framed
+ * card, a light header row with the series markers and the difference's direction, thin
+ * dividers, values right-aligned in their series colors, the difference muted.
  */
 export function buildComparisonTableSvg({
   table,

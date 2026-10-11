@@ -108,7 +108,6 @@ export function buildExportLegend({
   const textOffset = size.width + EXPORT_LEGEND.SWATCH_TEXT_GAP;
   const itemWidth = (label: string) => textOffset + measureText(label, fontSize);
 
-  // * first pass: split the items into rows that fit the width
   const rows = items.reduce<TLegendItem[][]>(
     (acc, item) => {
       const row = acc.at(-1);
@@ -122,7 +121,6 @@ export function buildExportLegend({
     [[]],
   );
 
-  // * second pass: draw each row centered
   let defs = "";
   const svg = rows
     .map((row, rowIndex) => {

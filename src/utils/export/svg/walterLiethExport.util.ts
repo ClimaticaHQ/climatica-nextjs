@@ -70,8 +70,8 @@ export function getConventionExportPaint(colors: TExportChartColors): TWalterLie
 }
 
 /**
- * String twin of WalterLiethPatterns.tsx — the same getHatchGeometry output, so screen and
- * PNG hatch identically. originX starts the tiles at the plot's left edge.
+ * String twin of HatchPatterns.tsx — the same getHatchGeometry output, so screen and PNG hatch
+ * identically. originX starts the tiles at the plot's left edge.
  */
 export function buildWalterLiethPatterns(
   { humid, arid }: TWalterLiethExportPatternIds,

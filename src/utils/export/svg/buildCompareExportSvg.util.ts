@@ -55,9 +55,7 @@ function buildHeader(payload: TCompareExportPayload, colors: TExportChartColors)
   `;
 }
 
-/** N-column bordered table — the export counterpart to CompareStatsGrid.tsx (2
- * columns) and MultiPeriodStatsTable.tsx (N columns): one shared renderer, since
- * both are structurally identical (label column + one column per series). */
+/** The bordered stats table, one column per series — the export counterpart to the page's StatsTable. */
 function buildStatsTable(payload: TCompareExportPayload, colors: TExportChartColors): string {
   const { series, labels } = payload;
   const hasAltitude = series.some((s) => s.altitude !== null);
@@ -153,7 +151,7 @@ function buildStatsTable(payload: TCompareExportPayload, colors: TExportChartCol
   return border + vDividers + hDividers + headerRow + dataRows;
 }
 
-/** The overlay / multi-period legend — the same items ChartLegend shows for these charts. */
+/** The standard overlay's legend — the same items ChartLegend shows for it. */
 function buildLegend(payload: TCompareExportPayload, colors: TExportChartColors, y: number) {
   return buildExportLegend({
     items: getSeriesLegendItems({
@@ -191,8 +189,8 @@ function renderFooterLines(
 }
 
 /**
- * The standard overlay / multi-period chart in the WL overlay's geometry: the same plot box,
- * °C / mm above the axes, no month axis title, the legend the same gap below the months.
+ * The standard overlay chart in the WL overlay's geometry: the same plot box, °C / mm above
+ * the axes, no month axis title, the legend the same gap below the months.
  */
 function buildStandardChartBody(
   payload: TCompareExportPayload,
