@@ -28,6 +28,7 @@ function ToggleChip({
   disabled = false,
   isLocked = false,
   dotColor,
+  isStretched = false,
   onClick,
 }: TToggleChipProps) {
   const state = disabled
@@ -45,7 +46,7 @@ function ToggleChip({
       disabled={disabled}
       aria-pressed={isActive}
       aria-disabled={isLocked || undefined}
-      className={`${TOGGLE.BASE} ${state}`}
+      className={`${TOGGLE.BASE} ${state} ${isStretched ? TOGGLE.STRETCHED : ""}`}
     >
       {dotColor === undefined ? (
         label
