@@ -29,8 +29,6 @@
   },
   "climateStatistics": {
     "cellResolution": "Risoluzione della cella:",
-    "useMyLocation": "Usa la mia posizione",
-    "locating": "Localizzazione in corso...",
     "stats": {
       "avgTmax": "Temp. max media",
       "avgTmin": "Temp. min media",
@@ -38,7 +36,6 @@
       "tmin": "Temp. min",
       "totalPrec": "Precipitazione totale",
       "mmThisMonth": "mm questo mese",
-      "resolution": "Risoluzione",
       "altitude": "Altitudine",
       "filteredMonths": "Filtrato: {months}"
     },
@@ -53,9 +50,7 @@
       "comparedTo": "{b} vs {a}"
     },
     "weather": {
-      "periods": "Anni",
       "addPeriod": "Aggiungi periodo",
-      "maxPeriods": "Massimo {max} periodi",
       "removePeriod": "Rimuovi {year}",
       "invalidYear": "Inserisci un anno tra {min} e {max}",
       "duplicateYear": "Questo anno è già nell'elenco",
@@ -65,9 +60,6 @@
     "swapPeriods": "Scambia i periodi"
   },
   "climateComparison": {
-    "title": "Confronto Climatico",
-    "modeCities": "Confronta città",
-    "modePeriods": "Confronta periodi",
     "searchA": "Città A",
     "searchB": "Città B",
     "searchCity": "Città",
@@ -100,7 +92,6 @@
     "statsCaption": "Statistiche per {names}"
   },
   "heatMap": {
-    "placeholder": "Segnaposto della mappa di calore. Più avanti potremo mostrare qui l'intensità climatica su una mappa mondiale.",
     "drawBbox": "Disegna riquadro di selezione",
     "drawPolygon": "Disegna poligono",
     "clearSelection": "Cancella selezione",
@@ -110,7 +101,9 @@
     "noData": "Nessun dato disponibile per questa regione",
     "noPeriodData": "Nessun dato per {period} alla risoluzione {grid}",
     "tooManyCells": "Questa regione contiene {count, number} celle a {grid}, più delle {max, number} che la mappa può caricare. Scegli {suggestion} o una risoluzione più grossolana.",
-    "tooManyCellsAnyGrid": "Questa regione contiene più di {max, number} celle anche a {grid}. Disegna una regione più piccola.",
+    "tooManyCellsAnyGrid": "Questa regione contiene più di {max, number} celle anche a {coarsest}. Disegna una regione più piccola.",
+    "tooManyCellsPolygon": "Questo poligono copre {count, number} celle a {grid}, ma per caricarlo si leggono tutte le {boxCount, number} celle del rettangolo che lo racchiude, più delle {max, number} che la mappa può caricare. Scegli {suggestion} o una risoluzione più grossolana, oppure disegna un poligono più compatto.",
+    "tooManyCellsPolygonAnyGrid": "Questo poligono copre {count, number} celle a {grid}, ma per caricarlo si legge il rettangolo che lo racchiude, che contiene più di {max, number} celle anche a {coarsest}. Disegna un poligono più piccolo o più compatto.",
     "stats": {
       "minValue": "Min",
       "maxValue": "Max",
@@ -125,13 +118,6 @@
       "avgTooltipWeatherAnnual": "Media annuale: media dei 12 valori medi mensili su tutte le celle",
       "avgTooltipWeatherMonth": "Media mensile: media di {variable} per {month} {year} su tutte le celle"
     },
-    "showingVariable": "Visualizzazione: {variable}",
-    "useMyLocation": "Usa la mia posizione",
-    "locating": "Localizzazione in corso...",
-    "summaryLine": "{count} celle analizzate · {period} · {variable} · griglia {grid}",
-    "summaryLineClimate": "{count} celle · Media 30 anni {variable} · {period} · {grid}",
-    "summaryLineWeatherAnnual": "{count} celle · Media annuale {variable} · {year} · {grid}",
-    "summaryLineWeatherMonth": "{count} celle · {variable} in {period} · {grid}",
     "profile": {
       "subtitle": "Profilo climatico regionale · {count} celle · {period}",
       "subtitleWeather": "Profilo climatico regionale · {count} celle · {year} · non è una normale climatica"
@@ -139,7 +125,6 @@
   },
   "chart": {
     "versus": "vs",
-    "temperatureAxis": "Temperatura (gradi C)",
     "precipitation": "Precipitazione",
     "maxTemperature": "Temperatura Massima",
     "minTemperature": "Temperatura Minima",
@@ -174,7 +159,6 @@
     "modeStandard": "Grafico standard",
     "modeWalterLieth": "Diagramma Walter-Lieth",
     "walterLiethTabUnavailable": "Non disponibile nella vista Walter-Lieth",
-    "selectedMonth": "valori di {month}",
     "selectedMonthsCount": "{count, plural, one {# mese} other {# mesi}}",
     "altitude": "Altitudine",
     "subtitle": {
@@ -202,8 +186,6 @@
     "yearsShown": "Anni mostrati"
   },
   "loading": {
-    "fetchingClimateData": "Recupero dati climatici...",
-    "updating": "Aggiornamento in corso...",
     "dataUpdated": "Dati aggiornati: {location}, {period}"
   },
   "errors": {
@@ -212,8 +194,6 @@
     "searchUnavailable": "La ricerca delle città non è disponibile al momento. Riprova tra poco.",
     "dataSourceUnavailable": "Il servizio dei dati climatici non risponde. Riprova tra poco.",
     "connection": "Impossibile raggiungere il server. Controlla la connessione e riprova.",
-    "geolocationDenied": "Accesso alla posizione negato. Consenti la posizione nel tuo browser.",
-    "geolocationUnavailable": "Impossibile determinare la tua posizione.",
     "placeLookupFailed": "Impossibile recuperare il nome del luogo per questo punto: vengono mostrate le sue coordinate."
   },
   "geolocation": {
@@ -309,8 +289,7 @@
       "climatePeriod": "Periodo climatico",
       "yearRange": "Anno",
       "variables": "Variabili",
-      "months": "Mese",
-      "filters": "Filtri"
+      "months": "Mese"
     },
     "datasets": {
       "climate": "Clima",
@@ -327,10 +306,6 @@
     },
     "months": {
       "all": "Tutti"
-    },
-    "yearRange": {
-      "from": "Da",
-      "to": "A"
     },
     "autoScroll": "Scorrimento automatico ai risultati",
     "syncCity": "Sincronizza la città selezionata su tutte le pagine",

@@ -29,8 +29,6 @@
   },
   "climateStatistics": {
     "cellResolution": "Resolução da célula:",
-    "useMyLocation": "Usar a minha localização",
-    "locating": "A localizar...",
     "stats": {
       "avgTmax": "Temp. máx. média",
       "avgTmin": "Temp. mín. média",
@@ -38,7 +36,6 @@
       "tmin": "Temp. mín.",
       "totalPrec": "Precipitação total",
       "mmThisMonth": "mm este mês",
-      "resolution": "Resolução",
       "altitude": "Altitude",
       "filteredMonths": "Filtrado: {months}"
     },
@@ -53,9 +50,7 @@
       "comparedTo": "{b} vs {a}"
     },
     "weather": {
-      "periods": "Anos",
       "addPeriod": "Adicionar período",
-      "maxPeriods": "Máximo de {max} períodos",
       "removePeriod": "Remover {year}",
       "invalidYear": "Introduza um ano entre {min} e {max}",
       "duplicateYear": "Este ano já está na lista",
@@ -65,9 +60,6 @@
     "swapPeriods": "Trocar períodos"
   },
   "climateComparison": {
-    "title": "Comparação Climática",
-    "modeCities": "Comparar cidades",
-    "modePeriods": "Comparar períodos",
     "searchA": "Cidade A",
     "searchB": "Cidade B",
     "searchCity": "Cidade",
@@ -100,7 +92,6 @@
     "statsCaption": "Estatísticas de {names}"
   },
   "heatMap": {
-    "placeholder": "Marcador de posição do mapa de calor. Mais adiante poderemos mostrar aqui a intensidade climática num mapa mundial.",
     "drawBbox": "Desenhar caixa delimitadora",
     "drawPolygon": "Desenhar polígono",
     "clearSelection": "Limpar seleção",
@@ -110,7 +101,9 @@
     "noData": "Não há dados disponíveis para esta região",
     "noPeriodData": "Não há dados de {period} na resolução {grid}",
     "tooManyCells": "Esta região tem {count, number} células a {grid}, mais do que as {max, number} que o mapa consegue carregar. Escolha {suggestion} ou uma resolução mais grosseira.",
-    "tooManyCellsAnyGrid": "Esta região tem mais de {max, number} células mesmo a {grid}. Desenhe uma região menor.",
+    "tooManyCellsAnyGrid": "Esta região tem mais de {max, number} células mesmo a {coarsest}. Desenhe uma região menor.",
+    "tooManyCellsPolygon": "Este polígono cobre {count, number} células a {grid}, mas carregá-lo lê todas as {boxCount, number} células do retângulo à sua volta, mais do que as {max, number} que o mapa consegue carregar. Escolha {suggestion} ou uma resolução mais grosseira, ou desenhe um polígono mais compacto.",
+    "tooManyCellsPolygonAnyGrid": "Este polígono cobre {count, number} células a {grid}, mas carregá-lo lê o retângulo à sua volta, que tem mais de {max, number} células mesmo a {coarsest}. Desenhe um polígono menor ou mais compacto.",
     "stats": {
       "minValue": "Mín.",
       "maxValue": "Máx.",
@@ -125,13 +118,6 @@
       "avgTooltipWeatherAnnual": "Média anual: média das 12 médias mensais em todas as células",
       "avgTooltipWeatherMonth": "Média mensal: média de {variable} para {month} {year} em todas as células"
     },
-    "showingVariable": "A mostrar: {variable}",
-    "useMyLocation": "Usar a minha localização",
-    "locating": "A localizar...",
-    "summaryLine": "{count} células analisadas · {period} · {variable} · grelha {grid}",
-    "summaryLineClimate": "{count} células · Média 30 anos {variable} · {period} · {grid}",
-    "summaryLineWeatherAnnual": "{count} células · Média anual {variable} · {year} · {grid}",
-    "summaryLineWeatherMonth": "{count} células · {variable} em {period} · {grid}",
     "profile": {
       "subtitle": "Perfil climático regional · {count} células · {period}",
       "subtitleWeather": "Perfil climático regional · {count} células · {year} · não é uma normal climática"
@@ -139,7 +125,6 @@
   },
   "chart": {
     "versus": "vs",
-    "temperatureAxis": "Temperatura (graus C)",
     "precipitation": "Precipitação",
     "maxTemperature": "Temperatura Máxima",
     "minTemperature": "Temperatura Mínima",
@@ -174,7 +159,6 @@
     "modeStandard": "Gráfico padrão",
     "modeWalterLieth": "Diagrama de Walter-Lieth",
     "walterLiethTabUnavailable": "Não disponível na vista Walter-Lieth",
-    "selectedMonth": "valores de {month}",
     "selectedMonthsCount": "{count, plural, one {# mês} other {# meses}}",
     "altitude": "Altitude",
     "subtitle": {
@@ -202,8 +186,6 @@
     "yearsShown": "Anos exibidos"
   },
   "loading": {
-    "fetchingClimateData": "A obter dados climáticos...",
-    "updating": "A atualizar...",
     "dataUpdated": "Dados atualizados: {location}, {period}"
   },
   "errors": {
@@ -212,8 +194,6 @@
     "searchUnavailable": "A pesquisa de cidades não está disponível de momento. Tente novamente daqui a pouco.",
     "dataSourceUnavailable": "O serviço de dados climáticos não está a responder. Tente novamente daqui a pouco.",
     "connection": "Não foi possível contactar o servidor. Verifique a sua ligação e tente novamente.",
-    "geolocationDenied": "Acesso à localização negado. Permita a localização no seu navegador.",
-    "geolocationUnavailable": "Não foi possível determinar a sua localização.",
     "placeLookupFailed": "Não foi possível obter o nome do local para este ponto — são mostradas as suas coordenadas."
   },
   "geolocation": {
@@ -309,8 +289,7 @@
       "climatePeriod": "Período climático",
       "yearRange": "Ano",
       "variables": "Variáveis",
-      "months": "Mês",
-      "filters": "Filtros"
+      "months": "Mês"
     },
     "datasets": {
       "climate": "Clima",
@@ -327,10 +306,6 @@
     },
     "months": {
       "all": "Todos"
-    },
-    "yearRange": {
-      "from": "De",
-      "to": "Até"
     },
     "autoScroll": "Deslocamento automático para os resultados",
     "syncCity": "Sincronizar cidade selecionada em todas as páginas",

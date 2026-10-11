@@ -29,8 +29,6 @@
   },
   "climateStatistics": {
     "cellResolution": "Celleoppløsning:",
-    "useMyLocation": "Bruk min posisjon",
-    "locating": "Finner posisjon...",
     "stats": {
       "avgTmax": "Gjennomsnittlig maks.temp.",
       "avgTmin": "Gjennomsnittlig min.temp.",
@@ -38,7 +36,6 @@
       "tmin": "Min.temp.",
       "totalPrec": "Total nedbør",
       "mmThisMonth": "mm denne måneden",
-      "resolution": "Oppløsning",
       "altitude": "Høyde over havet",
       "filteredMonths": "Filtrert: {months}"
     },
@@ -53,9 +50,7 @@
       "comparedTo": "{b} mot {a}"
     },
     "weather": {
-      "periods": "År",
       "addPeriod": "Legg til periode",
-      "maxPeriods": "Maksimalt {max} perioder",
       "removePeriod": "Fjern {year}",
       "invalidYear": "Skriv inn et år mellom {min} og {max}",
       "duplicateYear": "Dette året er allerede i listen",
@@ -65,9 +60,6 @@
     "swapPeriods": "Bytt perioder"
   },
   "climateComparison": {
-    "title": "Klimasammenligning",
-    "modeCities": "Sammenlign byer",
-    "modePeriods": "Sammenlign perioder",
     "searchA": "By A",
     "searchB": "By B",
     "searchCity": "By",
@@ -100,7 +92,6 @@
     "statsCaption": "Statistikk for {names}"
   },
   "heatMap": {
-    "placeholder": "Plassholder for varmekart. Vi kan senere vise klimaintensitet på et verdenskart her.",
     "drawBbox": "Tegn avgrensningsboks",
     "drawPolygon": "Tegn polygon",
     "clearSelection": "Tøm valg",
@@ -110,7 +101,9 @@
     "noData": "Ingen data tilgjengelig for dette området",
     "noPeriodData": "Ingen data for {period} ved oppløsningen {grid}",
     "tooManyCells": "Denne regionen har {count, number} celler ved {grid}, flere enn de {max, number} kartet kan laste inn. Velg {suggestion} eller en grovere oppløsning.",
-    "tooManyCellsAnyGrid": "Denne regionen har flere enn {max, number} celler selv ved {grid}. Tegn en mindre region.",
+    "tooManyCellsAnyGrid": "Denne regionen har flere enn {max, number} celler selv ved {coarsest}. Tegn en mindre region.",
+    "tooManyCellsPolygon": "Dette polygonet dekker {count, number} celler ved {grid}, men for å laste det leses alle {boxCount, number} cellene i rektangelet rundt, flere enn de {max, number} kartet kan laste inn. Velg {suggestion} eller en grovere oppløsning, eller tegn et mer kompakt polygon.",
+    "tooManyCellsPolygonAnyGrid": "Dette polygonet dekker {count, number} celler ved {grid}, men for å laste det leses rektangelet rundt, som har flere enn {max, number} celler selv ved {coarsest}. Tegn et mindre eller mer kompakt polygon.",
     "stats": {
       "minValue": "Min.",
       "maxValue": "Maks.",
@@ -125,13 +118,6 @@
       "avgTooltipWeatherAnnual": "Årlig gjennomsnitt: middelverdi av alle 12 månedlige gjennomsnitt over alle celler",
       "avgTooltipWeatherMonth": "Månedlig gjennomsnitt: middelverdi for {variable} for {month} {year} over alle celler"
     },
-    "showingVariable": "Viser: {variable}",
-    "useMyLocation": "Bruk min posisjon",
-    "locating": "Finner posisjon...",
-    "summaryLine": "{count} celler analysert · {period} · {variable} · {grid} rutenett",
-    "summaryLineClimate": "{count} celler · 30-års snitt {variable} · {period} · {grid}",
-    "summaryLineWeatherAnnual": "{count} celler · Årlig snitt {variable} · {year} · {grid}",
-    "summaryLineWeatherMonth": "{count} celler · {variable} i {period} · {grid}",
     "profile": {
       "subtitle": "Regional klimaprofil · {count} celler · {period}",
       "subtitleWeather": "Regional klimaprofil · {count} celler · {year} · ikke en normalverdi"
@@ -139,7 +125,6 @@
   },
   "chart": {
     "versus": "mot",
-    "temperatureAxis": "Temperatur (°C)",
     "precipitation": "Nedbør",
     "maxTemperature": "Maksimal temperatur",
     "minTemperature": "Minimal temperatur",
@@ -174,7 +159,6 @@
     "modeStandard": "Standard diagram",
     "modeWalterLieth": "Walter-Lieth-diagram",
     "walterLiethTabUnavailable": "Ikke tilgjengelig i Walter-Lieth-visning",
-    "selectedMonth": "{month}-verdier",
     "selectedMonthsCount": "{count, plural, one {# måned} other {# måneder}}",
     "altitude": "Høyde over havet",
     "subtitle": {
@@ -202,8 +186,6 @@
     "yearsShown": "Viste år"
   },
   "loading": {
-    "fetchingClimateData": "Henter klimadata...",
-    "updating": "Oppdaterer...",
     "dataUpdated": "Data oppdatert: {location}, {period}"
   },
   "errors": {
@@ -212,8 +194,6 @@
     "searchUnavailable": "Bysøket er ikke tilgjengelig akkurat nå. Prøv igjen om litt.",
     "dataSourceUnavailable": "Klimadatatjenesten svarer ikke. Prøv igjen om litt.",
     "connection": "Kunne ikke nå serveren. Sjekk tilkoblingen og prøv igjen.",
-    "geolocationDenied": "Tilgang til posisjon avslått. Vennligst gi tillatelse i nettleseren.",
-    "geolocationUnavailable": "Kunne ikke fastslå posisjonen din.",
     "placeLookupFailed": "Kunne ikke hente et stedsnavn for dette punktet – viser koordinatene i stedet."
   },
   "geolocation": {
@@ -309,8 +289,7 @@
       "climatePeriod": "Klimaperiode",
       "yearRange": "År",
       "variables": "Variabler",
-      "months": "Måned",
-      "filters": "Filtre"
+      "months": "Måned"
     },
     "datasets": {
       "climate": "Klima",
@@ -327,10 +306,6 @@
     },
     "months": {
       "all": "Alle"
-    },
-    "yearRange": {
-      "from": "Fra",
-      "to": "Til"
     },
     "autoScroll": "Rull automatisk til resultater",
     "syncCity": "Synkroniser valgt by på tvers av sider",

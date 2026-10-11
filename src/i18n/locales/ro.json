@@ -29,8 +29,6 @@
   },
   "climateStatistics": {
     "cellResolution": "Rezoluția celulei:",
-    "useMyLocation": "Folosește locația mea",
-    "locating": "Se localizează...",
     "stats": {
       "avgTmax": "Temp. max. medie",
       "avgTmin": "Temp. min. medie",
@@ -38,7 +36,6 @@
       "tmin": "Temp. min.",
       "totalPrec": "Precipitații totale",
       "mmThisMonth": "mm luna aceasta",
-      "resolution": "Rezoluție",
       "altitude": "Altitudine",
       "filteredMonths": "Filtrat: {months}"
     },
@@ -53,9 +50,7 @@
       "comparedTo": "{b} vs {a}"
     },
     "weather": {
-      "periods": "Ani",
       "addPeriod": "Adaugă perioadă",
-      "maxPeriods": "Maxim {max} perioade",
       "removePeriod": "Elimină {year}",
       "invalidYear": "Introdu un an între {min} și {max}",
       "duplicateYear": "Acest an este deja în listă",
@@ -65,9 +60,6 @@
     "swapPeriods": "Inversează perioadele"
   },
   "climateComparison": {
-    "title": "Comparație Climatică",
-    "modeCities": "Compară orașe",
-    "modePeriods": "Compară perioade",
     "searchA": "Orașul A",
     "searchB": "Orașul B",
     "searchCity": "Oraș",
@@ -100,7 +92,6 @@
     "statsCaption": "Statistici pentru {names}"
   },
   "heatMap": {
-    "placeholder": "Substituent pentru harta termică. Mai târziu vom afișa intensitatea climatică pe o hartă mondială aici.",
     "drawBbox": "Desenează cadru de selecție",
     "drawPolygon": "Desenează poligon",
     "clearSelection": "Șterge selecția",
@@ -110,7 +101,9 @@
     "noData": "Nu există date disponibile pentru această regiune",
     "noPeriodData": "Nu există date pentru {period} la rezoluția {grid}",
     "tooManyCells": "Această regiune are {count, number} celule la {grid}, mai multe decât cele {max, number} pe care le poate încărca harta. Alege {suggestion} sau o rezoluție mai grosieră.",
-    "tooManyCellsAnyGrid": "Această regiune are peste {max, number} celule chiar și la {grid}. Desenează o regiune mai mică.",
+    "tooManyCellsAnyGrid": "Această regiune are peste {max, number} celule chiar și la {coarsest}. Desenează o regiune mai mică.",
+    "tooManyCellsPolygon": "Acest poligon acoperă {count, number} celule la {grid}, dar încărcarea lui citește toate cele {boxCount, number} celule ale dreptunghiului din jur, mai multe decât cele {max, number} pe care le poate încărca harta. Alege {suggestion} sau o rezoluție mai grosieră ori desenează un poligon mai compact.",
+    "tooManyCellsPolygonAnyGrid": "Acest poligon acoperă {count, number} celule la {grid}, dar încărcarea lui citește dreptunghiul din jur, care are peste {max, number} celule chiar și la {coarsest}. Desenează un poligon mai mic sau mai compact.",
     "stats": {
       "minValue": "Min.",
       "maxValue": "Max.",
@@ -125,13 +118,6 @@
       "avgTooltipWeatherAnnual": "Media anuală: media celor 12 medii lunare pentru toate celulele",
       "avgTooltipWeatherMonth": "Media lunară: media pentru {variable} în {month} {year} pentru toate celulele"
     },
-    "showingVariable": "Se afișează: {variable}",
-    "useMyLocation": "Folosește locația mea",
-    "locating": "Se localizează...",
-    "summaryLine": "{count} celule analizate · {period} · {variable} · grilă {grid}",
-    "summaryLineClimate": "{count} celule · Medie 30 ani {variable} · {period} · {grid}",
-    "summaryLineWeatherAnnual": "{count} celule · Medie anuală {variable} · {year} · {grid}",
-    "summaryLineWeatherMonth": "{count} celule · {variable} în {period} · {grid}",
     "profile": {
       "subtitle": "Profil climatic regional · {count} celule · {period}",
       "subtitleWeather": "Profil climatic regional · {count} celule · {year} · nu este o normală climatică"
@@ -139,7 +125,6 @@
   },
   "chart": {
     "versus": "vs",
-    "temperatureAxis": "Temperatură (°C)",
     "precipitation": "Precipitații",
     "maxTemperature": "Temperatură maximă",
     "minTemperature": "Temperatură minimă",
@@ -174,7 +159,6 @@
     "modeStandard": "Grafic standard",
     "modeWalterLieth": "Diagramă Walter-Lieth",
     "walterLiethTabUnavailable": "Indisponibil în vizualizarea Walter-Lieth",
-    "selectedMonth": "valori pentru {month}",
     "selectedMonthsCount": "{count, plural, one {# lună} few {# luni} other {# de luni}}",
     "altitude": "Altitudine",
     "subtitle": {
@@ -202,8 +186,6 @@
     "yearsShown": "Ani afișați"
   },
   "loading": {
-    "fetchingClimateData": "Se preiau datele climatice...",
-    "updating": "Se actualizează...",
     "dataUpdated": "Date actualizate: {location}, {period}"
   },
   "errors": {
@@ -212,8 +194,6 @@
     "searchUnavailable": "Căutarea orașelor nu este disponibilă momentan. Încearcă din nou în câteva momente.",
     "dataSourceUnavailable": "Serviciul de date climatice nu răspunde. Încearcă din nou în câteva momente.",
     "connection": "Serverul nu poate fi accesat. Verifică-ți conexiunea și încearcă din nou.",
-    "geolocationDenied": "Accesul la locație a fost refuzat. Te rugăm să permiți locația în browser.",
-    "geolocationUnavailable": "Nu s-a putut determina locația ta.",
     "placeLookupFailed": "Nu s-a putut obține numele locului pentru acest punct — se afișează coordonatele lui."
   },
   "geolocation": {
@@ -309,8 +289,7 @@
       "climatePeriod": "Perioadă climatică",
       "yearRange": "An",
       "variables": "Variabile",
-      "months": "Lună",
-      "filters": "Filtre"
+      "months": "Lună"
     },
     "datasets": {
       "climate": "Climă",
@@ -327,10 +306,6 @@
     },
     "months": {
       "all": "Toate"
-    },
-    "yearRange": {
-      "from": "De la",
-      "to": "Până la"
     },
     "autoScroll": "Derulare automată la rezultate",
     "syncCity": "Sincronizează orașul selectat pe toate paginile",

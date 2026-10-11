@@ -29,8 +29,6 @@
   },
   "climateStatistics": {
     "cellResolution": "Ανάλυση κελιού:",
-    "useMyLocation": "Χρήση της τοποθεσίας μου",
-    "locating": "Εντοπισμός θέσης...",
     "stats": {
       "avgTmax": "Μέση μέγ. θερμ.",
       "avgTmin": "Μέση ελάχ. θερμ.",
@@ -38,7 +36,6 @@
       "tmin": "Ελάχ. θερμ.",
       "totalPrec": "Συνολική βροχόπτωση",
       "mmThisMonth": "mm αυτόν τον μήνα",
-      "resolution": "Ανάλυση",
       "altitude": "Υψόμετρο",
       "filteredMonths": "Φιλτραρισμένο: {months}"
     },
@@ -53,9 +50,7 @@
       "comparedTo": "{b} έναντι {a}"
     },
     "weather": {
-      "periods": "Έτη",
       "addPeriod": "Προσθήκη περιόδου",
-      "maxPeriods": "Μέγιστο {max} περίοδοι",
       "removePeriod": "Αφαίρεση {year}",
       "invalidYear": "Εισαγάγετε ένα έτος μεταξύ {min} και {max}",
       "duplicateYear": "Αυτό το έτος υπάρχει ήδη στη λίστα",
@@ -65,9 +60,6 @@
     "swapPeriods": "Εναλλαγή περιόδων"
   },
   "climateComparison": {
-    "title": "Κλιματική Σύγκριση",
-    "modeCities": "Σύγκριση πόλεων",
-    "modePeriods": "Σύγκριση περιόδων",
     "searchA": "Πόλη Α",
     "searchB": "Πόλη Β",
     "searchCity": "Πόλη",
@@ -100,7 +92,6 @@
     "statsCaption": "Στατιστικά για {names}"
   },
   "heatMap": {
-    "placeholder": "Δεσμευτική θέση χάρτη θερμότητας. Σύντομα θα μπορούμε να εμφανίσουμε εδώ την κλιματική ένταση σε έναν παγκόσμιο χάρτη.",
     "drawBbox": "Σχεδίαση πλαισίου επιλογής",
     "drawPolygon": "Σχεδίαση πολυγώνου",
     "clearSelection": "Εκκαθάριση επιλογής",
@@ -110,7 +101,9 @@
     "noData": "Δεν υπάρχουν διαθέσιμα δεδομένα για αυτήν την περιοχή",
     "noPeriodData": "Δεν υπάρχουν δεδομένα για {period} στην ανάλυση {grid}",
     "tooManyCells": "Αυτή η περιοχή περιέχει {count, number} κελιά στα {grid}, περισσότερα από τα {max, number} που μπορεί να φορτώσει ο χάρτης. Επίλεξε {suggestion} ή πιο αδρή ανάλυση.",
-    "tooManyCellsAnyGrid": "Αυτή η περιοχή περιέχει περισσότερα από {max, number} κελιά ακόμη και στα {grid}. Σχεδίασε μικρότερη περιοχή.",
+    "tooManyCellsAnyGrid": "Αυτή η περιοχή περιέχει περισσότερα από {max, number} κελιά ακόμη και στα {coarsest}. Σχεδίασε μικρότερη περιοχή.",
+    "tooManyCellsPolygon": "Αυτό το πολύγωνο καλύπτει {count, number} κελιά στα {grid}, αλλά η φόρτωσή του διαβάζει και τα {boxCount, number} κελιά του ορθογωνίου γύρω του, περισσότερα από τα {max, number} που μπορεί να φορτώσει ο χάρτης. Επίλεξε {suggestion} ή πιο αδρή ανάλυση, ή σχεδίασε πιο συμπαγές πολύγωνο.",
+    "tooManyCellsPolygonAnyGrid": "Αυτό το πολύγωνο καλύπτει {count, number} κελιά στα {grid}, αλλά η φόρτωσή του διαβάζει το ορθογώνιο γύρω του, που περιέχει περισσότερα από {max, number} κελιά ακόμη και στα {coarsest}. Σχεδίασε μικρότερο ή πιο συμπαγές πολύγωνο.",
     "stats": {
       "minValue": "Ελάχ.",
       "maxValue": "Μέγ.",
@@ -125,13 +118,6 @@
       "avgTooltipWeatherAnnual": "Ετήσιος μέσος όρος: μέσος όρος των 12 μηνιαίων μέσων όρων σε όλα τα κελιά",
       "avgTooltipWeatherMonth": "Μηνιαίος μέσος όρος: μέσος όρος του {variable} για {month} {year} σε όλα τα κελιά"
     },
-    "showingVariable": "Εμφάνιση: {variable}",
-    "useMyLocation": "Χρήση της τοποθεσίας μου",
-    "locating": "Εντοπισμός θέσης...",
-    "summaryLine": "{count} αναλυμένα κελιά · {period} · {variable} · πλέγμα {grid}",
-    "summaryLineClimate": "{count} κελιά · Μ.Ο. 30 ετών {variable} · {period} · {grid}",
-    "summaryLineWeatherAnnual": "{count} κελιά · Ετήσιος Μ.Ο. {variable} · {year} · {grid}",
-    "summaryLineWeatherMonth": "{count} κελιά · {variable} σε {period} · {grid}",
     "profile": {
       "subtitle": "Περιφερειακό κλιματικό προφίλ · {count} κελιά · {period}",
       "subtitleWeather": "Περιφερειακό κλιματικό προφίλ · {count} κελιά · {year} · δεν αποτελεί κλιματική κανονική περίοδο"
@@ -139,7 +125,6 @@
   },
   "chart": {
     "versus": "έναντι",
-    "temperatureAxis": "Θερμοκρασία (βαθμοί C)",
     "precipitation": "Βροχόπτωση",
     "maxTemperature": "Μέγιστη Θερμοκρασία",
     "minTemperature": "Ελάχιστη Θερμοκρασία",
@@ -174,7 +159,6 @@
     "modeStandard": "Τυπικό γράφημα",
     "modeWalterLieth": "Διάγραμμα Walter-Lieth",
     "walterLiethTabUnavailable": "Μη διαθέσιμο στην προβολή Walter-Lieth",
-    "selectedMonth": "τιμές για {month}",
     "selectedMonthsCount": "{count, plural, one {# μήνας} other {# μήνες}}",
     "altitude": "Υψόμετρο",
     "subtitle": {
@@ -202,8 +186,6 @@
     "yearsShown": "Εμφανιζόμενα έτη"
   },
   "loading": {
-    "fetchingClimateData": "Λήψη κλιματικών δεδομένων...",
-    "updating": "Ενημέρωση...",
     "dataUpdated": "Τα δεδομένα ενημερώθηκαν: {location}, {period}"
   },
   "errors": {
@@ -212,8 +194,6 @@
     "searchUnavailable": "Η αναζήτηση πόλεων δεν είναι διαθέσιμη αυτή τη στιγμή. Δοκιμάστε ξανά σε λίγο.",
     "dataSourceUnavailable": "Η υπηρεσία κλιματικών δεδομένων δεν αποκρίνεται. Δοκιμάστε ξανά σε λίγο.",
     "connection": "Δεν ήταν δυνατή η σύνδεση με τον διακομιστή. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.",
-    "geolocationDenied": "Η πρόσβαση στην τοποθεσία απορρίφθηκε. Επιτρέψτε την τοποθεσία στο πρόγραμμα περιήγησής σας.",
-    "geolocationUnavailable": "Δεν ήταν δυνατός ο προσδιορισμός της τοποθεσίας σας.",
     "placeLookupFailed": "Δεν ήταν δυνατή η αναζήτηση ονόματος τοποθεσίας για αυτό το σημείο — εμφανίζονται οι συντεταγμένες του."
   },
   "geolocation": {
@@ -309,8 +289,7 @@
       "climatePeriod": "Κλιματική περίοδος",
       "yearRange": "Έτος",
       "variables": "Μεταβλητές",
-      "months": "Μήνας",
-      "filters": "Φίλτρα"
+      "months": "Μήνας"
     },
     "datasets": {
       "climate": "Κλίμα",
@@ -327,10 +306,6 @@
     },
     "months": {
       "all": "Όλοι"
-    },
-    "yearRange": {
-      "from": "Από",
-      "to": "Έως"
     },
     "autoScroll": "Αυτόματη κύλιση στα αποτελέσματα",
     "syncCity": "Συγχρονισμός επιλεγμένης πόλης σε όλες τις σελίδες",
