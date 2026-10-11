@@ -6,7 +6,6 @@ export * from "./climate.constant";
 export * from "./comparePeriods.constant";
 export * from "./coordinates.constant";
 export * from "./defaultCity.constant";
-export * from "./error.constant";
 export * from "./export.constant";
 export * from "./focus.constant";
 export * from "./geonames.constant";

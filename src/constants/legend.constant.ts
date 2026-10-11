@@ -21,7 +21,7 @@ export const CHART_LEGEND = {
 
 /**
  * Line dash per variable (tmax is always solid). The single-city chart and its split panels
- * tell tmin from tmax by color; the multi-series charts (overlay, multi-period) also dash it.
+ * tell tmin from tmax by colour; the overlay also dashes it.
  */
 export const CHART_LINE_DASH = {
   STANDARD: { tavg: "5 3" },

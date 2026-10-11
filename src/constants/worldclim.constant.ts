@@ -1,8 +1,3 @@
-export const AUTO_RESOLUTION = {
-  CLIMATE: "30s",
-  WEATHER: "2.5m",
-} as const;
-
 export const CELL_SIZES = {
   TEN_MINUTES: "10m",
   FIVE_MINUTES: "5m",
@@ -44,10 +39,7 @@ export const CLIMATE_PERIOD_START_YEAR: Record<TClimatePeriod, number> = {
   "c1991-2020": 1991,
 };
 
-/**
- * tavg excluded — derived as (tmax + tmin) / 2
- * BIO variables excluded from sidebar (reserved for advanced filter)
- */
+/** tavg isn't one of them: it's derived as (tmax + tmin) / 2. */
 export const CLIMATE_VARIABLES = ["tmax", "tmin", "prec", "srad", "wind", "vapr"] as const;
 
 /** weather dataset only has these 3 variables */

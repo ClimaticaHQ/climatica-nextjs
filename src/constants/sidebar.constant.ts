@@ -23,7 +23,6 @@ export const SIDEBAR_PARAMS = {
   COMPARE_CITY_A: "cityA",
   COMPARE_CITY_B: "cityB",
 
-  // * shareable URL params
   CITY: "city",
   LAT: "lat",
   LNG: "lng",

@@ -1,13 +1,7 @@
 import type { TVisibleSeries } from "@/types";
 import { WALTER_LIETH_AXIS, WALTER_LIETH_FROST } from "./walterLieth.constant";
 import type { TGridAxesStyle } from "@/types";
-/**
- * every drawn svg export (single-city, compare-cities/periods, heat-map)
- * shares the same main setting obj
- *
- * and each page-specific export settings obj spread this obj
- * and adds only the geometry unique to its own content (stats table, chart, etc).
- */
+/** What every SVG export shares; each export's own layout spreads it and adds its own geometry. */
 export const EXPORT_SVG_SHARED_LAYOUT = {
   width: 1000,
   paddingX: 40,
@@ -27,10 +21,7 @@ export const EXPORT_SVG_SHARED_LAYOUT = {
 // * heat-map tiles are fetched at fittedZoom + log2(scale) to match
 export const EXPORT_PNG_SCALE = 2;
 
-/**
- * single-city climate-statistics export — the only one with a monthly data
- * table and aridity legend, since it's the only mode with a per-month breakdown.
- **/
+/** The single-city export: one chart with its monthly values and aridity legend. */
 export const EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,
   statsY: 92,
@@ -44,7 +35,7 @@ export const EXPORT_SVG_LAYOUT = {
   footerGap: 44,
 } as const;
 
-// * shared settings obj by compare-cities, compare-periods pages
+// * the comparison exports (Compare Cities, Compare Periods)
 export const COMPARE_EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,
   statsY: 92,
@@ -55,7 +46,7 @@ export const COMPARE_EXPORT_SVG_LAYOUT = {
   chartTop: 310,
 } as const;
 
-// * heat-map export with NO fixed height
+// * the heat map export: its height follows its content
 export const HEATMAP_EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,
   statsY: 96,
@@ -138,7 +129,7 @@ export const EXPORT_MONTHLY_VALUES = {
   BASELINE: 4,
 } as const;
 
-// * the compare exports' comparison table, on top — the page's ComparisonTable
+// * the comparison exports' stats table, on top — as on the page
 export const EXPORT_COMPARISON_TABLE = {
   HEADER_HEIGHT: 46,
   ROW_HEIGHT: 28,

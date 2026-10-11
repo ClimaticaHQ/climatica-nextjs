@@ -4,7 +4,6 @@ export const LOCAL_STORAGE_KEYS = {
 
   SETTINGS: "climatica:settings",
 
-  HEATMAP_BBOX: "climatica:heatmapBbox",
   LAST_SELECTED_CITY: "climatica:lastSelectedCity",
   LANGUAGE: "climatica:lang",
   THEME: "climatica:theme",
@@ -12,11 +11,12 @@ export const LOCAL_STORAGE_KEYS = {
   LAST_PAGE_PARAMS: "climatica:lastPageParams",
 } as const;
 
-// * filters used to be kept here; the URL holds them now — removed on load
+// * filters and the heat map box used to be kept here; the URL holds them now — removed on load
 export const LEGACY_FILTER_STORAGE_KEYS = [
   "climatica:filters",
   "climatica:comparePeriods",
   "climatica:compareClimatePeriods",
+  "climatica:heatmapBbox",
 ] as const;
 
 // * where older versions saved the theme — moved to LOCAL_STORAGE_KEYS.THEME on load, then removed

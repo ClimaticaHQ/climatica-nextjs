@@ -1,3 +1,4 @@
+import type { TVisibleSeries } from "@/types";
 // * one plot geometry for every chart type (WL and standard), so switching between them moves
 // * nothing: the same margins, y-axis widths (getAxisStyle) and heights give the same plot area
 export const CHART_PLOT = {
@@ -27,3 +28,11 @@ export const CHART_HOVER_COLOR = "var(--color-chart-hover)";
 
 // * an overlay with one series highlighted (a year chip hovered or focused): the others fade
 export const OVERLAY_DIM_OPACITY = 0.18;
+
+/** The chart's series before the reader toggles any — also the export payload's fallback. */
+export const DEFAULT_VISIBLE_SERIES: TVisibleSeries = {
+  tmax: true,
+  tmin: true,
+  tavg: false,
+  prec: true,
+};

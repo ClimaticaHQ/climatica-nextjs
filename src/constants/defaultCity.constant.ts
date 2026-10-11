@@ -1,12 +1,5 @@
 import type { TCity } from "@/types";
 
-export const DEFAULT_HEATMAP_BBOX = {
-  north: -20.87,
-  south: -21.39,
-  west: 55.21,
-  east: 55.84,
-} as const;
-
 export const DEFAULT_HEATMAP_LOCATION = {
   lat: 51.5074,
   lng: -0.1278,

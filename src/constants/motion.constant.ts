@@ -21,11 +21,6 @@ export const MOTION = {
   // * size over the same time, and the series leaves the tooltip once it's done)
   CHART_SERIES_TOGGLE_MS: 400,
   CHART_SERIES_TOGGLE_EASING: "ease",
-  // * the multi-period table's columns resizing when a period is added or removed
-  TABLE_COLUMN_RESIZE_MS: 150,
-  TABLE_COLUMN_RESIZE_EASING: "ease",
-  // * the city page's filters tab opening / closing: the panel's height, then its content
-  // * fading and sliding in slightly after it starts
   // * filters auto-applying: only a fetch longer than the delay fades the chart card's
   // * content and runs the progress bar along its top edge — fast responses never flicker
   UPDATE_LOADING_DELAY_MS: 300,
@@ -85,8 +80,6 @@ export const MOTION_CSS_VAR = {
   PANEL_EXPAND_SCALE_FROM: "--motion-panel-expand-scale-from",
   CHART_SERIES_TOGGLE: "--motion-chart-series-toggle",
   CHART_SERIES_TOGGLE_EASING: "--motion-chart-series-toggle-easing",
-  TABLE_COLUMN_RESIZE: "--motion-table-column-resize",
-  TABLE_COLUMN_RESIZE_EASING: "--motion-table-column-resize-easing",
   UPDATE_FADE: "--motion-update-fade",
   UPDATE_FADE_EASING: "--motion-update-fade-easing",
   UPDATE_FADE_OPACITY: "--motion-update-fade-opacity",
@@ -114,8 +107,6 @@ export const MOTION_CSS_VARIABLES: TMotionCssVariables = {
   [MOTION_CSS_VAR.PANEL_EXPAND_SCALE_FROM]: String(MOTION.PANEL_EXPAND_SCALE_FROM),
   [MOTION_CSS_VAR.CHART_SERIES_TOGGLE]: ms(MOTION.CHART_SERIES_TOGGLE_MS),
   [MOTION_CSS_VAR.CHART_SERIES_TOGGLE_EASING]: MOTION.CHART_SERIES_TOGGLE_EASING,
-  [MOTION_CSS_VAR.TABLE_COLUMN_RESIZE]: ms(MOTION.TABLE_COLUMN_RESIZE_MS),
-  [MOTION_CSS_VAR.TABLE_COLUMN_RESIZE_EASING]: MOTION.TABLE_COLUMN_RESIZE_EASING,
   [MOTION_CSS_VAR.UPDATE_FADE]: ms(MOTION.UPDATE_FADE_MS),
   [MOTION_CSS_VAR.UPDATE_FADE_EASING]: MOTION.UPDATE_FADE_EASING,
   [MOTION_CSS_VAR.UPDATE_FADE_OPACITY]: String(MOTION.UPDATE_FADE_OPACITY),
