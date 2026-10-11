@@ -3,11 +3,10 @@
 import { Dropdown } from "@/components/UI/Dropdown";
 import { CLIMATE_PERIOD_LABELS, FULL_VARIABLES_CLIMATE_PERIOD } from "@/constants";
 import { EFilterKey, EFilterNoteVariant } from "@/enums";
-import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
-import { getCellCountStatus } from "@/utils/cellCount.util";
 import { getGridSizeOptionStates, toCellSizeHandler } from "@/utils/filters.util";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
+import { CellCountBadge } from "../CellCountBadge";
 import { FilterNote, FilterSection } from "../FilterSection";
 import { RESOLUTION_LABEL_CLASS } from "../filters.constant";
 import { FilterSectionTitleContext } from "../filters.context";
@@ -21,9 +20,7 @@ export function ResolutionFilter({
   onChange,
 }: TFilterSectionRenderProps) {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
   const isTitleShown = useContext(FilterSectionTitleContext);
-  const cellStatus = cellCount === null ? null : getCellCountStatus(cellCount);
   const options = getGridSizeOptionStates(values).map((option) => ({
     value: option.value,
     label: t(`cellSizes.${option.value.replace(".", "_")}`),
@@ -51,18 +48,9 @@ export function ResolutionFilter({
           className="w-full"
         />
       </div>
-      {cellStatus !== null && cellCount !== null && (
+      {cellCount !== null && (
         <div className="mt-2 flex flex-col gap-1">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[length:var(--font-xs)] font-medium ${cellStatus.colorClass}`}
-          >
-            {t(cellStatus.labelKey)}
-            <span className="opacity-70">
-              {t("sidebar.cellCount.label", {
-                count: formatNumber(cellCount, { hasGrouping: true }),
-              })}
-            </span>
-          </span>
+          <CellCountBadge count={cellCount} />
           {isApplyBlocked && (
             <FilterNote
               text={t("sidebar.cellCount.tooManyError")}

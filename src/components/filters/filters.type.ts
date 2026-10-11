@@ -154,3 +154,7 @@ export type TFiltersSheetContent = {
   footer?: ReactNode;
   body: ReactNode;
 };
+
+export type TCellCountBadgeProps = {
+  count: number;
+};

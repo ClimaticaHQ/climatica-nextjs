@@ -74,3 +74,6 @@ export const PERIOD_PAIR_SIDES = [
     testId: "period-b",
   },
 ] as const;
+
+export const CELL_COUNT_BADGE_CLASS =
+  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[length:var(--font-xs)] font-medium";
