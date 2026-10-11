@@ -65,13 +65,13 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
 
   useEffect(() => {
     if (activeIndex !== -1 && containerRef.current) {
-      // * finding all list items and scrolling the active one into view
+      // * scroll the active result into view
       const listItems = containerRef.current.querySelectorAll("li");
       const activeElement = listItems[activeIndex];
 
       if (activeElement) {
         activeElement.scrollIntoView({
-          block: "nearest", // * only scrolls if the element is not fully visible
+          block: "nearest",
           behavior: getScrollBehavior(),
         });
       }

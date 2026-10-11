@@ -78,7 +78,6 @@ export function Topbar() {
       className="relative box-content h-16 w-full shrink-0 border-b pt-[env(safe-area-inset-top)] border-[var(--color-border)] bg-[var(--color-bg)]"
     >
       <div className="flex h-full items-center pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
-        {/* Logo */}
         {/* * the home page is City Climate ("/" redirects there, dropping the query) — so the
          * logo goes the navbar's way: shared filters, plus City Climate's remembered params */}
         <Link
@@ -92,7 +91,6 @@ export function Topbar() {
           </span>
         </Link>
 
-        {/* Desktop center nav */}
         <nav className="hidden gap-3 lg:flex">
           {NAV_LINKS.map(({ to, labelKey }) => {
             const isActive = pathname === to || pathname.startsWith(to + "/");
@@ -113,14 +111,11 @@ export function Topbar() {
           })}
         </nav>
 
-        {/* Right section */}
         <div className="flex flex-1 items-center justify-end gap-1">
-          {/* Desktop language switcher */}
           <div className="hidden lg:block">
             <LanguageSwitcher />
           </div>
 
-          {/* Theme toggle — always visible */}
           <button
             type="button"
             aria-label={t("topbar.toggleTheme")}
@@ -130,7 +125,6 @@ export function Topbar() {
             {isDark ? <SunIcon /> : <MoonIcon />}
           </button>
 
-          {/* Nav burger — mobile/tablet only */}
           <button
             type="button"
             aria-label={t("navbar.toggleMenu")}
@@ -143,7 +137,6 @@ export function Topbar() {
         </div>
       </div>
 
-      {/* Mobile nav dropdown — slides down from topbar */}
       <div
         className={`
           absolute left-0 right-0 top-full z-50

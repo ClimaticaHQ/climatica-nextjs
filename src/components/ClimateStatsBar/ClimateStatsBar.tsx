@@ -13,7 +13,7 @@ import {
 import type { TClimateStatsBarProps } from "./ClimateStatsBar.type";
 import { StatCell } from "@/components/UI/StatCell";
 
-/** One place's annual stats — the city page (and the heat map's region profile). */
+/** One place's annual stats: under each chart, and the heat map's regional profile. */
 export function ClimateStatsBar({
   meanTemp,
   annualPrecip,

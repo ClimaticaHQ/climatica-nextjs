@@ -5,7 +5,7 @@ import type { TSplitPanelHeaderProps } from "./SeriesPanelHeader.type";
 
 /**
  * A split panel's header — marker (A dot, B square), name, "{period} · {altitude}" and the
- * expand / collapse controls. The comparison table above the chart carries the stats.
+ * expand / collapse controls. The stats table above the chart carries the stats.
  */
 export function SplitPanelHeader({ series, slots }: TSplitPanelHeaderProps) {
   return (
