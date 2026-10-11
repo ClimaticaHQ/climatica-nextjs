@@ -4,7 +4,7 @@ import { LOCALES } from "@/constants";
 import { env } from "@/libs/Env";
 import { logger } from "@/libs/Logger";
 import type { TCity, TSolrCityDoc, TSolrResponse } from "@/types";
-import { buildSolrQueryParams, getCityDescription } from "@/utils"; // removed buildQueryParams
+import { buildSolrQueryParams, getCityDescription } from "@/utils";
 
 const SOLR_BASE_URL = env.SOLR_URL;
 

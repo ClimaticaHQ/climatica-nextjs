@@ -60,13 +60,11 @@ export const WorldClimService = {
   },
 
   /**
-   * SCRAPI returns every climate period's rasters in one response for a
-   * point — no period param to send, and nothing to filter here. Callers
-   * narrow to one period (filterPointBindingsByPeriod) or read them all
-   * (extractAvailableClimatePeriods) from the same cached fetch.
-   *
-   * ! its necessary to predict climate period without data for specific city
-   **/
+   * SCRAPI returns every climate period's rasters in one response for a point — no period param
+   * to send. Callers narrow to one period (filterPointBindingsByPeriod) or read them all
+   * (extractAvailableClimatePeriods, which tells the periods a place has no data for) from the
+   * same cached fetch.
+   */
   async getClimateDataForPoint(
     lat: number,
     lng: number,
