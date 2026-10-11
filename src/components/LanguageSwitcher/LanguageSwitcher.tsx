@@ -1,35 +1,29 @@
 "use client";
 
-import { Dropdown } from "@/components/UI";
-import { LANGUAGES } from "@/constants";
+import { Chip, Dropdown } from "@/components/UI";
+import { LANGUAGE_SWITCHER_VARIANTS, LANGUAGES } from "@/constants";
 import { useLocaleNavigation } from "@/hooks/url/useLocaleNavigation";
 import { useLocale } from "next-intl";
+import { LANGUAGE_CHIP_GRID_CLASS } from "./LanguageSwitcher.constant";
 import type { TLanguageSwitcherProps } from "./LanguageSwitcher.type";
 
-export function LanguageSwitcher({ variant = "dropdown" }: TLanguageSwitcherProps) {
+export function LanguageSwitcher({
+  variant = LANGUAGE_SWITCHER_VARIANTS.DROPDOWN,
+}: TLanguageSwitcherProps) {
   const locale = useLocale();
   const { switchLocale } = useLocaleNavigation();
 
-  if (variant === "inline") {
+  if (variant === LANGUAGE_SWITCHER_VARIANTS.INLINE) {
     return (
-      <div className="grid grid-cols-4 gap-2 px-4 py-2">
+      <div className={LANGUAGE_CHIP_GRID_CLASS}>
         {LANGUAGES.map(({ code, label }) => (
-          <button
+          <Chip
             key={code}
+            label={label}
+            isActive={locale === code}
+            isStretched
             onClick={() => switchLocale(code)}
-            className={`
-              flex items-center justify-center
-              px-3 py-1.5 rounded-[var(--radius-sm)] border
-              text-[length:var(--font-sm)] transition-colors duration-150
-              ${
-                locale === code
-                  ? "border-transparent bg-[var(--color-primary)] text-[var(--color-bg)] font-medium"
-                  : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)]"
-              }
-            `}
-          >
-            {label}
-          </button>
+          />
         ))}
       </div>
     );
