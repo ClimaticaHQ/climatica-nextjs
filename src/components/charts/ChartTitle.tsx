@@ -1,6 +1,6 @@
-import type { TChartTitleProps } from "../../TempPrecipChart.type";
-import { DatabaseIcon } from "../../icons";
-import { CHART_TITLE_CLASSES as C } from "./ChartTitle.constant";
+import type { TChartTitleProps } from "./charts.type";
+import { DatabaseIcon } from "@/components/svg/DatabaseIcon";
+import { CHART_TITLE_CLASSES as C } from "./charts.constant";
 import { ChartTitleNames } from "./ChartTitleNames";
 import { MonthBadge } from "./MonthBadge";
 

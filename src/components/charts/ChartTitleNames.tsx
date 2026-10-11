@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
-import type { TChartTitleNamesProps } from "../../TempPrecipChart.type";
-import { CHART_TITLE_CLASSES as C } from "./ChartTitle.constant";
+import type { TChartTitleNamesProps } from "./charts.type";
+import { CHART_TITLE_CLASSES as C } from "./charts.constant";
 
 /** One location (wrapping, two lines max), or "A vs B" with each name truncating on its own. */
 export function ChartTitleNames({ names }: TChartTitleNamesProps) {

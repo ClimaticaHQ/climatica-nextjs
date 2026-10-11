@@ -3,7 +3,7 @@
 import { Card } from "@/components/Card";
 import { ChartTransition } from "@/components/ChartTransition";
 import { DataUpdateFade, DataUpdateProgress, useDataUpdate } from "@/components/DataUpdate";
-import { useVisibleSeries } from "@/components/TempPrecipChart/hooks/useVisibleSeries";
+import { useVisibleSeries } from "@/hooks/charts/useVisibleSeries";
 import { NO_FLASH_KEYS } from "@/constants";
 import { EChartBody } from "@/enums";
 import { useId, useState, type ComponentType } from "react";

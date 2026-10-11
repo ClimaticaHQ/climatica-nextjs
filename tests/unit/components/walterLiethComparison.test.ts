@@ -1,4 +1,4 @@
-import { toOverlayLayer } from "@/components/WalterLiethComparison/WalterLiethComparison.util";
+import { toOverlayLayer } from "@/components/charts/charts.util";
 import { WALTER_LIETH_COLORS, WALTER_LIETH_DASH } from "@/constants";
 import { EWalterLiethSeriesId, EWalterLiethShading } from "@/enums";
 import type { TWalterLiethSeries } from "@/types";

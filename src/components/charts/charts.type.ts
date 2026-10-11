@@ -1,4 +1,11 @@
-import type { EChartBlock, EChartBlockPlacement, EChartBody, EPairSide } from "@/enums";
+import type {
+  EChartBlock,
+  EChartBlockPlacement,
+  EChartBody,
+  EPairSide,
+  ECompareLayout,
+  EWalterLiethShading,
+} from "@/enums";
 import type {
   TActiveMonth,
   TChartFeatures,
@@ -15,10 +22,24 @@ import type {
   TStatsTable,
   TVisibleSeries,
   TWalterLiethScales,
+  TMonthLabelFormat,
+  TVariable,
+  TChartSummary,
+  TMonthAridity,
+  TMonthlyTemperatureWithAvg,
+  TPanelHeaderSlots,
+  TWalterLiethSeriesInput,
+  TWalterLiethDomain,
+  TWalterLiethRow,
+  TWalterLiethSeries,
 } from "@/types";
-import type { TStandardChartColors } from "@/components/TempPrecipChart/charts/StandardClimateChart/StandardClimateChart.type";
 import type { TSeriesMarkerProps } from "@/components/SeriesMarker/SeriesMarker.type";
 import type { ComponentType, ReactNode, RefObject } from "react";
+import type {
+  TWalterLiethDotShape,
+  TWalterLiethLayerSeries,
+  TWalterLiethTooltipProps,
+} from "@/components/WalterLiethChart/WalterLiethChart.type";
 
 export type TChartCardProps = {
   /** derived once by the page (useChartModel) — the export draws from the same */
@@ -194,4 +215,205 @@ export type TStatsTableProps = {
   columns: readonly TStatsTableColumn[];
   /** the Martonne row's name: per year, for one year, or plain */
   martonneLabel: string;
+};
+
+export type TBarShape = {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  value?: number;
+  fill?: string;
+  /** passed by Recharts from the data entry */
+  month?: number;
+  /** passed via shape={<PrecipBarShape selectedMonths={...} />} */
+  selectedMonths?: readonly number[] | undefined;
+  /** month → isArid lookup, passed via shape prop to avoid Cell children */
+  aridityByMonth?: Record<number, boolean> | undefined;
+  /** 0-based chart index, matching recharts' activeTooltipIndex — passed via shape prop */
+  activeMonthIndex?: number | null;
+  yAxis?: { scale?: (v: number) => number };
+};
+
+/**
+ * All fields typed as T | undefined because recharts DotItemDotProps uses string | undefined
+ * for some fields, and exactOptionalPropertyTypes requires explicit undefined unions.
+ */
+export type TDotRendererProps = {
+  cx?: number | undefined;
+  cy?: number | undefined;
+  r?: number | string | undefined;
+  fill?: string | undefined;
+  stroke?: string | undefined;
+  index?: number | undefined;
+};
+
+export type TChartSwitchesProps = {
+  /** the chart type selected */
+  chartMode: TChartMode;
+  /** compare pages only (either chart type) — omitted, no layout control is shown */
+  layout?: ECompareLayout | undefined;
+  onLayoutChange: (layout: ECompareLayout) => void;
+};
+
+export type TChartTitleProps = {
+  /** one location, or the two compared ones — shown as "A vs B" */
+  names: readonly string[];
+  /** the chart type, as a small muted line above the title */
+  subtitleText: string | null;
+  eyebrow?: string | undefined;
+  selectedMonths?: number[] | undefined;
+  /** standard single-city chart only — WL and comparisons show every month */
+  showMonthBadge: boolean;
+};
+
+export type TVariableChipsProps = {
+  visible: TVisibleSeries;
+  /** the fetched variables; undefined = all available */
+  variables?: readonly TVariable[] | undefined;
+  onChange: (visible: TVisibleSeries) => void;
+  /** one line scrolling sideways, from the left — under the year chips */
+  isScrollRow?: boolean;
+};
+
+export type TUseVisibleSeriesArgs = {
+  /** the fetched variables; undefined = all available */
+  variables?: readonly TVariable[] | undefined;
+  onVisibleSeriesChange?: ((visible: TVisibleSeries) => void) | undefined;
+};
+
+export type TStandardChartAxesProps = {
+  scales: TWalterLiethScales | null;
+  rightMax: number;
+  /** a split panel's narrower axes and smaller ticks */
+  isCompact: boolean;
+  /** month label format for the chart's measured width (getMonthLabelFormat) */
+  monthFormat: TMonthLabelFormat;
+};
+
+export type TChartTitleNamesProps = {
+  names: readonly string[];
+};
+
+export type TMonthBadgeProps = {
+  selectedMonths?: number[] | undefined;
+};
+
+/** Recharts' series animation, and how long a hidden series stays for it. */
+export type TSeriesToggleMotion = {
+  isAnimationActive: boolean;
+  /** ms — the series leaves the tooltip / legend once its fade-out is done */
+  toggleMs: number;
+};
+
+export type TStandardClimateChartProps = {
+  chartData: TMonthlyTemperatureWithAvg[];
+  aridity: TMonthAridity[] | null;
+  scales: TWalterLiethScales | null;
+  rightMax: number;
+  summary: TChartSummary | null;
+  visible: TVisibleSeries;
+  selectedMonths?: number[];
+  altitude?: number;
+  /** the one weather year the stats describe — the Martonne cell names it */
+  martonneYear?: number | undefined;
+  showAridity?: boolean;
+  activeMonthIndex?: number | null;
+  onActiveMonthIndexChange?: (index: number | null) => void;
+  /** line and bar colors; the single-city palette when omitted */
+  colors?: TStandardChartColors;
+  /** one panel of a split pair: compact, no own legend, WL-panel axes */
+  isPanel?: boolean;
+  /** Recharts syncId — split panels hover in sync */
+  syncId?: string;
+  /** the chart card's blocks (values table, legend), drawn under this chart */
+  footer: ReactNode;
+};
+
+export type TStandardChartColors = {
+  tmax: string;
+  tmin: string;
+  tavg: string;
+  prec: string;
+};
+
+/** One series of the split: its header (name, period, stats) and its own chart rows. */
+export type TStandardSplitSeries = {
+  series: TWalterLiethSeriesInput;
+  chartData: TMonthlyTemperatureWithAvg[];
+  aridity: TMonthAridity[] | null;
+  colors: TStandardChartColors;
+};
+
+/** What both panels share: domains, visible variables, month filter, hover. */
+export type TStandardSplitShared = {
+  scales: TWalterLiethScales | null;
+  rightMax: number;
+  visible: TVisibleSeries;
+  selectedMonths?: number[] | undefined;
+  activeMonthIndex: number | null;
+  onActiveMonthIndexChange: (index: number | null) => void;
+  syncId: string;
+};
+
+export type TStandardPanelProps = TStandardSplitShared & {
+  panel: TStandardSplitSeries;
+  headerSlots?: TPanelHeaderSlots | undefined;
+  /** the chart card's panel blocks, drawn under the panel's chart */
+  footer: ReactNode;
+  /** the update keys this panel flashes for — its series' id when omitted */
+  flashKeys?: readonly string[];
+};
+
+export type TSeriesPair = {
+  seriesA: TWalterLiethSeries;
+  seriesB: TWalterLiethSeries;
+};
+
+export type TShadingControlProps = TSeriesPair & {
+  shading: EWalterLiethShading;
+  onChange: (shading: EWalterLiethShading) => void;
+};
+
+/** One series in an overlay: Climate A / B, or a compared weather year. */
+export type TOverlayEntry = {
+  key: string;
+  series: TWalterLiethSeries;
+  color: string;
+  shape: TWalterLiethDotShape;
+  /** hatched (humid / arid) — at most one, so the curves stay readable */
+  isShaded: boolean;
+  /** another entry is highlighted: this one fades */
+  isDimmed?: boolean;
+};
+
+export type TWalterLiethOverlayProps = {
+  entries: readonly TOverlayEntry[];
+  domain: TWalterLiethDomain;
+  activeMonth: TActiveMonth;
+  /** the chart card's blocks (values table, legend), drawn under this chart */
+  footer: ReactNode;
+};
+
+export type TOverlayLayerArgs = Omit<
+  TWalterLiethLayerSeries,
+  "colors" | "precDash" | "dotShape"
+> & {
+  series: TWalterLiethSeries;
+  isShaded: boolean;
+  /** the series' own colour and dot; A / B's when omitted */
+  color?: string;
+  shape?: TWalterLiethDotShape;
+};
+
+/** What the overlay tooltip lists for each entry. */
+export type TOverlayTooltipEntry = {
+  key: string;
+  label: string;
+  color: string;
+  rows: readonly TWalterLiethRow[];
+};
+
+export type TOverlayTooltipProps = TWalterLiethTooltipProps & {
+  entries: readonly TOverlayTooltipEntry[];
 };

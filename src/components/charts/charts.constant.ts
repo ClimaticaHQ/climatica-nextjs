@@ -1,6 +1,7 @@
 import { CHART_LINE_DASH } from "@/constants";
 import { EChartBlockPlacement, EPairSide } from "@/enums";
-import type { TStandardChartLine } from "./charts.type";
+import type { TStandardChartLine, TStandardChartColors } from "./charts.type";
+import type { TPanelExpansion } from "@/types";
 
 export const CHART_SECTION_CLASSES = {
   ROOT: "flex flex-col gap-[var(--section-toolbar-gap)]",
@@ -108,4 +109,50 @@ export const OVERLAY_CHIPS_CLASSES = {
   YEARS: "min-w-0 sm:flex-1",
   CONTROLS: "min-w-0 sm:shrink-0",
   DIAGRAM: "min-w-0 basis-full",
+} as const;
+
+export const CHART_COLORS = {
+  arid: "var(--chart-arid)",
+  humid: "var(--chart-humid)",
+  single: {
+    tmax: "var(--chart-temp-max)",
+    tmin: "var(--chart-temp-min)",
+    tavg: "var(--chart-temp-avg)",
+  },
+};
+
+// * a chart without a page-held expanded panel (single city): both panels, always
+export const NO_PANEL_EXPANSION: TPanelExpansion = {
+  expanded: null,
+  onExpandedChange: () => undefined,
+};
+
+// * bars recolored by aridity — the legend's arid / humid entries
+export const ARIDITY_BAR_COLORS = {
+  arid: CHART_COLORS.arid,
+  humid: CHART_COLORS.humid,
+} as const;
+
+// * the single-city chart: red/blue/orange lines, humid bars (arid months recolored)
+export const STANDARD_CHART_SINGLE_COLORS: TStandardChartColors = {
+  ...CHART_COLORS.single,
+  prec: CHART_COLORS.humid,
+};
+
+export const CHART_TITLE_CLASSES = {
+  EYEBROW: "text-[12px] font-medium text-[var(--color-text-secondary)]",
+  HEADING:
+    "font-semibold text-[length:var(--font-md)] md:text-[length:var(--font-lg)] text-[var(--color-text)]",
+  // * one location: may wrap, clamped to two lines
+  SINGLE: "line-clamp-2 break-words",
+  // * "A vs B" on one line: each name truncates on its own; B keeps up to this share, so
+  // * "vs B" always shows even next to a very long A
+  PAIR: "flex min-w-0 items-baseline gap-1.5",
+  NAME_A: "min-w-0 truncate",
+  NAME_B: "min-w-0 max-w-[45%] shrink-0 truncate",
+  VERSUS: "shrink-0 font-normal text-[var(--color-text-secondary)]",
+  SUBTITLE_ROW: "flex flex-wrap items-center gap-2",
+  SUBTITLE: "flex items-center gap-1 text-[12px] text-[var(--color-text-secondary)]",
+  MONTH_BADGE:
+    "rounded-full border-[0.5px] border-[var(--color-month-badge-border)] bg-[var(--color-month-badge-bg)] px-2.5 py-0.5 text-[12px] text-[var(--color-month-badge-text)]",
 } as const;

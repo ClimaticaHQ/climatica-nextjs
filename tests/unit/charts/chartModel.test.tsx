@@ -1,7 +1,5 @@
 // @vitest-environment jsdom
-import { useChartSeries } from "@/components/TempPrecipChart/hooks/useChartSeries";
-import { useTempPrecipChart } from "@/components/TempPrecipChart/hooks/useTempPrecipChart";
-import type { TTempPrecipChartProps } from "@/components/TempPrecipChart/TempPrecipChart.type";
+import { EWalterLiethSeriesId } from "@/enums";
 import { useChartModel } from "@/hooks/charts/useChartModel";
 import messages from "@/i18n/locales/en.json";
 import type { TChartSeries } from "@/types";
@@ -18,106 +16,49 @@ const wrapper = ({ children }: { children: ReactNode }) => (
   </NextIntlClientProvider>
 );
 
-/** What the chart card draws today for these props: its state and its WL series. */
-function legacy(props: TTempPrecipChartProps, subtitleText: string) {
-  return renderHook(
-    () => {
-      const chart = useTempPrecipChart(props);
-      return { chart, ...useChartSeries({ chartProps: props, chart, subtitleText }) };
-    },
-    { wrapper },
-  ).result.current;
-}
-
 function model(series: readonly TChartSeries[]) {
   return renderHook(() => useChartModel(series), { wrapper }).result.current;
 }
 
-describe("deriveChartModel — the same numbers the chart card derives today", () => {
-  it("one city: scales, precipitation axis, months, aridity, summary and its WL series", () => {
-    const { chart, seriesSingle } = legacy(
-      { data: [...CITY.data], cityName: CITY.label, altitude: 690 },
-      CITY.context,
-    );
-    const derived = model([CITY]);
-    const [entry] = derived.series;
-
-    expect(derived.scales).toEqual(chart.scales);
-    expect(derived.rightMax).toBe(chart.rightMax);
-    expect(entry?.chartData).toEqual(chart.chartDataSingle);
-    expect(entry?.aridity).toEqual(chart.aridity);
-    expect(entry?.summary).toEqual(chart.summary);
-    expect({ ...entry?.walterLieth, id: seriesSingle.id }).toEqual(seriesSingle);
+describe("deriveChartModel", () => {
+  it("one city: its Walter-Lieth series is named by the city, with its context and altitude", () => {
+    const [entry] = model([CITY]).series;
+    expect(entry?.walterLieth).toMatchObject({
+      label: CITY.label,
+      period: CITY.context,
+      altitude: 690,
+    });
+    expect(entry?.walterLieth).not.toHaveProperty("singleYear");
+    expect(entry?.summary).not.toBeNull();
   });
 
-  it("a city pair: per-series data, the shared scales and the A / B series", () => {
-    const [a, b] = CITY_PAIR;
-    const { chart, comparison } = legacy(
-      {
-        dataA: [...(a?.data ?? [])],
-        dataB: [...(b?.data ?? [])],
-        labelA: a?.label,
-        labelB: b?.label,
-        compareMode: "cities",
-        altitudeA: 690,
-        altitudeB: 296,
-      },
-      "Climate 1970–2000",
-    );
+  it("a pair: A and B, each its own data and summary, on shared scales", () => {
     const derived = model(CITY_PAIR);
-
-    expect(derived.scales).toEqual(chart.scales);
-    expect(derived.rightMax).toBe(chart.rightMax);
-    expect(derived.series.map(({ chartData }) => chartData)).toEqual([
-      chart.chartDataA,
-      chart.chartDataB,
+    expect(derived.series.map(({ walterLieth }) => [walterLieth.id, walterLieth.label])).toEqual([
+      [EWalterLiethSeriesId.A, "Valladolid"],
+      [EWalterLiethSeriesId.B, "Lviv"],
     ]);
-    expect(derived.series.map(({ aridity }) => aridity)).toEqual([chart.aridityA, chart.aridityB]);
-    expect(derived.series.map(({ summary }) => summary)).toEqual([chart.summaryA, chart.summaryB]);
-    expect(derived.series.map(({ walterLieth }) => walterLieth)).toEqual([
-      comparison.seriesA,
-      comparison.seriesB,
-    ]);
+    expect(derived.series[0]?.summary).not.toEqual(derived.series[1]?.summary);
+    expect(derived.scales).not.toBeNull();
   });
 
   it("a period pair: each period named, the city as its second line", () => {
-    const [a, b] = PERIOD_PAIR;
-    const { comparison } = legacy(
-      {
-        dataA: [...(a?.data ?? [])],
-        dataB: [...(b?.data ?? [])],
-        labelA: a?.label,
-        labelB: b?.label,
-        compareMode: "periods",
-        cityName: "Valladolid",
-        altitude: 690,
-      },
-      "",
-    );
-    expect(model(PERIOD_PAIR).series.map(({ walterLieth }) => walterLieth)).toEqual([
-      comparison.seriesA,
-      comparison.seriesB,
+    expect(
+      model(PERIOD_PAIR).series.map(({ walterLieth }) => [walterLieth.label, walterLieth.period]),
+    ).toEqual([
+      ["1970–2000", "Valladolid"],
+      ["2021–2040", "Valladolid"],
     ]);
   });
 
-  it("weather years: one WL series per year, its colour, 'single year' under its name", () => {
+  it("weather years: one series per year, named by it, in its own colour, as a single year", () => {
     const years = weatherYears([2021, 1990, 1967]);
-    const { chart, seriesYears } = legacy(
-      {
-        multiPeriodData: years.map((series) => ({
-          year: series.year ?? 0,
-          rows: [...series.data],
-        })),
-        comparedYears: [2021, 1990, 1967],
-        altitude: 690,
-      },
-      "",
+    const walterLieth = model(years).series.map((entry) => entry.walterLieth);
+    expect(walterLieth.map(({ label }) => label)).toEqual(["2021", "1990", "1967"]);
+    expect(walterLieth.map(({ singleYear }) => singleYear)).toEqual([2021, 1990, 1967]);
+    expect(walterLieth.map(({ markerColor }) => markerColor)).toEqual(
+      years.map(({ color }) => color),
     );
-    const derived = model(years);
-
-    expect(derived.scales).toEqual(chart.scales);
-    expect(derived.rightMax).toBe(chart.rightMax);
-    expect(derived.series.map(({ walterLieth }) => walterLieth)).toEqual(seriesYears);
   });
 
   it("the Walter-Lieth domain spans every complete series and leaves an incomplete one out", () => {

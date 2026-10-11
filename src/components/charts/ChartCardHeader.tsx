@@ -1,5 +1,7 @@
-import { ChartSwitches, ChartTitle, VariableChips } from "@/components/TempPrecipChart/components";
-import { ShadingControl } from "@/components/WalterLiethComparison/components";
+import { ChartSwitches } from "./ChartSwitches";
+import { ChartTitle } from "./ChartTitle";
+import { VariableChips } from "./VariableChips";
+import { ShadingControl } from "./ShadingControl";
 import { WalterLiethGuide } from "@/components/WalterLiethGuide";
 import { ECompareLayout } from "@/enums";
 import { isCompleteSeries } from "@/utils";

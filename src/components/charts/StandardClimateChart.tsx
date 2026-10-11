@@ -1,6 +1,4 @@
 import { ClimateStatsBar } from "@/components";
-import { ChartLegend } from "@/components/ChartLegend";
-import { MONTHLY_VALUES_TEXT_COLOR, MonthlyValuesTable } from "@/components/MonthlyValuesTable";
 import {
   CHART_PLOT,
   CHART_LINE_DASH,
@@ -9,24 +7,18 @@ import {
   MONTH_NAMES,
   TOOLTIP_DIGITS,
 } from "@/constants";
-import {
-  getMonthLabelFormat,
-  getPlotHeightClass,
-  getStandardLegendItems,
-  resolveActiveTooltipIndex,
-} from "@/utils";
-import { useDelayedHide, useElementWidth, useFormatNumber, useLegendLabels } from "@/hooks";
+import { getMonthLabelFormat, getPlotHeightClass, resolveActiveTooltipIndex } from "@/utils";
+import { useDelayedHide, useElementWidth, useFormatNumber } from "@/hooks";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Bar, ComposedChart, Line, ResponsiveContainer, Tooltip, ReferenceArea } from "recharts";
-import { useSeriesToggleMotion } from "../../hooks/useSeriesToggleMotion";
-import { PrecipBarShape, StandardChartAxes } from "../../components";
-import { ARIDITY_BAR_COLORS } from "../../TempPrecipChart.constant";
-import { useStandardChartAxes } from "../../hooks/useStandardChartAxes";
-import { STANDARD_CHART_SINGLE_COLORS } from "./StandardClimateChart.constant";
-import type { TDotRendererProps } from "../../TempPrecipChart.type";
-import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle } from "../../utils";
-import type { TStandardClimateChartProps } from "./StandardClimateChart.type";
+import { useSeriesToggleMotion } from "@/hooks/charts/useSeriesToggleMotion";
+import { PrecipBarShape } from "./PrecipBarShape";
+import { StandardChartAxes } from "./StandardChartAxes";
+import { STANDARD_CHART_SINGLE_COLORS } from "./charts.constant";
+import { useStandardChartAxes } from "@/hooks/charts/useStandardChartAxes";
+import type { TDotRendererProps, TStandardClimateChartProps } from "./charts.type";
+import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle } from "./charts.util";
 
 export function StandardClimateChart({
   chartData,
@@ -44,11 +36,9 @@ export function StandardClimateChart({
   colors = STANDARD_CHART_SINGLE_COLORS,
   isPanel = false,
   syncId,
-  name,
   footer,
 }: TStandardClimateChartProps) {
   const t = useTranslations();
-  const legendLabels = useLegendLabels();
   const seriesMotion = useSeriesToggleMotion();
   const formatNumber = useFormatNumber();
   const { ref: plotRef, width: plotWidth } = useElementWidth<HTMLDivElement>();
@@ -223,27 +213,7 @@ export function StandardClimateChart({
           </ResponsiveContainer>
         </div>
       </div>
-      {footer ?? (
-        <>
-          <MonthlyValuesTable
-            series={[{ key: name, label: name, color: MONTHLY_VALUES_TEXT_COLOR, data: chartData }]}
-            isCompact={isPanel}
-            activeMonthIndex={activeMonthIndex ?? null}
-            onActiveMonthIndexChange={onActiveMonthIndexChange}
-          />
-          {/* * split panels share one legend below both */}
-          {!isPanel && (
-            <ChartLegend
-              items={getStandardLegendItems({
-                labels: legendLabels,
-                colors,
-                visible,
-                aridity: showAridity ? ARIDITY_BAR_COLORS : null,
-              })}
-            />
-          )}
-        </>
-      )}
+      {footer}
     </>
   );
 }

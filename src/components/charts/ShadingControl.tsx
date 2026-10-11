@@ -3,7 +3,7 @@ import { SeriesMarker } from "@/components/SeriesMarker";
 import { NoShadingIcon } from "@/components/svg";
 import { EWalterLiethShading } from "@/enums";
 import { useTranslations } from "next-intl";
-import type { TShadingControlProps } from "../WalterLiethComparison.type";
+import type { TShadingControlProps } from "./charts.type";
 
 /** Which series gets the humid/arid hatching in overlay: A, B or none. */
 export function ShadingControl({ seriesA, seriesB, shading, onChange }: TShadingControlProps) {

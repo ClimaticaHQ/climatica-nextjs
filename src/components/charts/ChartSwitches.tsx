@@ -3,7 +3,7 @@ import { SegmentedControl } from "@/components/SegmentedControl";
 import { OverlayLayoutIcon, SplitLayoutIcon } from "@/components/svg";
 import { ECompareLayout } from "@/enums";
 import { useTranslations } from "next-intl";
-import type { TChartSwitchesProps } from "../../TempPrecipChart.type";
+import type { TChartSwitchesProps } from "./charts.type";
 
 /**
  * The chart card's switches: chart type (Walter-Lieth / Standard, both drawn for every dataset)

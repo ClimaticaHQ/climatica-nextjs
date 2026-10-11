@@ -1,7 +1,7 @@
 import { TOOLTIP_DIGITS } from "@/constants";
 import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
 import { useTranslations } from "next-intl";
-import type { TOverlayTooltipProps } from "../WalterLiethComparison.type";
+import type { TOverlayTooltipProps } from "./charts.type";
 
 /** The hovered month for every overlaid series, each in its colour. */
 export function OverlayTooltip({ active, payload, entries }: TOverlayTooltipProps) {

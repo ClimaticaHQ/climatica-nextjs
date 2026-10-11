@@ -1,1 +1,0 @@
-export { VariableChips } from "./VariableChips";

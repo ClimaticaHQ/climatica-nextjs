@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { VariableChips } from "@/components/TempPrecipChart/components/VariableChips/VariableChips";
+import { VariableChips } from "@/components/charts/VariableChips";
 import messages from "@/i18n/locales/en.json";
 import type { TVisibleSeries } from "@/types";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";

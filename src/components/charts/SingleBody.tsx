@@ -1,4 +1,4 @@
-import { StandardClimateChart } from "@/components/TempPrecipChart/charts";
+import { StandardClimateChart } from "./StandardClimateChart";
 import { WalterLiethChart } from "@/components/WalterLiethChart";
 import { WalterLiethIncompleteNotice } from "@/components/WalterLiethChart/components";
 import { isCompleteSeries } from "@/utils";
@@ -39,7 +39,6 @@ export function SingleBody(props: TChartBodyProps) {
   const months = viewState.selectedMonths;
   return (
     <StandardClimateChart
-      name={series.label}
       chartData={entry.chartData}
       aridity={entry.aridity}
       summary={entry.summary}

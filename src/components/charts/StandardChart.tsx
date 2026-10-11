@@ -1,10 +1,8 @@
-import { PrecipBarShape, StandardChartAxes } from "@/components/TempPrecipChart/components";
-import { useSeriesToggleMotion } from "@/components/TempPrecipChart/hooks/useSeriesToggleMotion";
-import type { TDotRendererProps } from "@/components/TempPrecipChart/TempPrecipChart.type";
-import {
-  buildOpacityFadeStyle,
-  buildStrokeOpacityFadeStyle,
-} from "@/components/TempPrecipChart/utils";
+import { PrecipBarShape } from "./PrecipBarShape";
+import { StandardChartAxes } from "./StandardChartAxes";
+import { useSeriesToggleMotion } from "@/hooks/charts/useSeriesToggleMotion";
+import type { TDotRendererProps, TStandardChartProps } from "./charts.type";
+import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle, seriesDataKey } from "./charts.util";
 import {
   CHART_HOVER_COLOR,
   CHART_PLOT,
@@ -19,8 +17,6 @@ import { getMonthLabelFormat, resolveActiveTooltipIndex } from "@/utils";
 import { useTranslations } from "next-intl";
 import { Bar, ComposedChart, Line, ReferenceArea, ResponsiveContainer, Tooltip } from "recharts";
 import { STANDARD_CHART_DIMMED_DOT_OPACITY, STANDARD_CHART_LINES } from "./charts.constant";
-import type { TStandardChartProps } from "./charts.type";
-import { seriesDataKey } from "./charts.util";
 
 /**
  * Every series in one standard chart: per series its precipitation bars and its max, mean (if

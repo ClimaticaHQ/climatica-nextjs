@@ -2,21 +2,19 @@
 
 import { Card } from "@/components/Card";
 import { SplitPanels, type TSplitPanelRender } from "@/components/SplitPanels";
-import { StandardPanel } from "@/components/TempPrecipChart/components/StandardSplitView/components";
+import { StandardPanel } from "./StandardPanel";
 import { SwapButton } from "@/components/UI";
 import { WalterLiethChart } from "@/components/WalterLiethChart";
 import { WalterLiethIncompleteNotice } from "@/components/WalterLiethChart/components";
-import { NO_PANEL_EXPANSION } from "@/components/TempPrecipChart/TempPrecipChart.constant";
+import { NO_PANEL_EXPANSION, BLOCK_PLACEMENTS, SPLIT_SIDES } from "./charts.constant";
 import { SPLIT_PANEL_CARD_CLASS } from "@/constants";
 import { ECardPadding, ECardSize, EWalterLiethSeriesId } from "@/enums";
 import type { TChartSeriesModel } from "@/types";
-import { isCompleteSeries } from "@/utils";
+import { isCompleteSeries, getSplitPair } from "@/utils";
 import { setPairSide, swapPair } from "@/utils/pair.util";
 import { useTranslations } from "next-intl";
 import { ChartBlocks } from "./ChartBlocks";
-import { BLOCK_PLACEMENTS, SPLIT_SIDES } from "./charts.constant";
 import type { TChartBodyProps } from "./charts.type";
-import { getSplitPair } from "@/utils";
 import { getBlockContext, getStandardPalette } from "./charts.util";
 import { SidePicker } from "./SidePicker";
 

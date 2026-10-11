@@ -1,6 +1,6 @@
 "use client";
 
-import { VariableChips } from "@/components/TempPrecipChart/components";
+import { VariableChips } from "./VariableChips";
 import { useState } from "react";
 import { ChartBlocks } from "./ChartBlocks";
 import { BLOCK_PLACEMENTS, OVERLAY_CHIPS_CLASSES as C } from "./charts.constant";

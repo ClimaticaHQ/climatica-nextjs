@@ -2,8 +2,8 @@ import { Card } from "@/components/Card";
 import { SPLIT_PANEL_CARD_CLASS, SPLIT_PANEL_ROWS_CLASS } from "@/constants";
 import { ECardPadding, ECardSize } from "@/enums";
 import { SplitPanelHeader } from "@/components/SeriesPanelHeader";
-import { StandardClimateChart } from "../../../charts";
-import type { TStandardPanelProps } from "../StandardSplitView.type";
+import { StandardClimateChart } from "./StandardClimateChart";
+import type { TStandardPanelProps } from "./charts.type";
 
 /** One standard-chart panel: the WL split's card and header, the standard chart below. */
 export function StandardPanel({
@@ -26,7 +26,6 @@ export function StandardPanel({
       <figure className={`m-0 min-w-0 ${SPLIT_PANEL_ROWS_CLASS}`}>
         <SplitPanelHeader series={panel.series} slots={headerSlots} />
         <StandardClimateChart
-          name={panel.series.label}
           chartData={panel.chartData}
           aridity={panel.aridity}
           scales={chart.scales}

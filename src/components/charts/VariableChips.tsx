@@ -2,7 +2,7 @@ import { Chip } from "@/components/UI/Chip";
 import { ChipScroller } from "@/components/UI/ChipScroller";
 import type { TVisibleSeries } from "@/types";
 import { useTranslations } from "next-intl";
-import type { TVariableChipsProps } from "../../TempPrecipChart.type";
+import type { TVariableChipsProps } from "./charts.type";
 
 /**
  * The standard chart's variable toggles. The last active one stays on — locked, as in the

@@ -1,15 +1,17 @@
-import { STANDARD_CHART_SINGLE_COLORS } from "@/components/TempPrecipChart/charts/StandardClimateChart/StandardClimateChart.constant";
-import {
-  ARIDITY_BAR_COLORS,
-  CHART_COLORS,
-} from "@/components/TempPrecipChart/TempPrecipChart.constant";
-import type { TWalterLiethDotShape } from "@/components/WalterLiethChart/WalterLiethChart.type";
+import { STANDARD_CHART_SINGLE_COLORS, ARIDITY_BAR_COLORS } from "./charts.constant";
+import type {
+  TWalterLiethDotShape,
+  TWalterLiethLayerSeries,
+} from "@/components/WalterLiethChart/WalterLiethChart.type";
 import {
   CHART_BODY_BY_LAYOUT,
+  CLIMATE_COMPARISON_COLORS,
   CHART_LEGEND,
   SERIES_KIND_RULES,
   WALTER_LIETH_COLORS,
   WALTER_LIETH_COMPARISON,
+  MOTION_CSS_VAR,
+  WALTER_LIETH_DASH,
 } from "@/constants";
 import {
   EChartBody,
@@ -35,6 +37,7 @@ import {
   getWalterLiethOverlayLegendItems,
   isCompleteSeries,
   toWalterLiethSeriesId,
+  getOverlayPaint,
 } from "@/utils";
 import type {
   TBlockContextPart,
@@ -42,7 +45,10 @@ import type {
   TChartBodyProps,
   TLegendBuilder,
   TResolveChartBodyArgs,
+  TOverlayLayerArgs,
 } from "./charts.type";
+import { motionVar } from "@/utils/motion.util";
+import type { CSSProperties } from "react";
 
 /** A chart's series share one kind; an empty list draws as cities (nothing to draw anyway). */
 export function getSeriesKindRule(series: readonly TChartSeries[]): TSeriesKindRule {
@@ -96,8 +102,8 @@ export function getIdentityShape(
 export function getStandardPalette({ series }: TChartSeriesModel, rule: TSeriesKindRule) {
   if (rule.usesOwnColor) return STANDARD_CHART_SINGLE_COLORS;
   return toWalterLiethSeriesId(series.id) === EWalterLiethSeriesId.B
-    ? CHART_COLORS.compareB
-    : CHART_COLORS.compareA;
+    ? CLIMATE_COMPARISON_COLORS.B
+    : CLIMATE_COMPARISON_COLORS.A;
 }
 
 /** A series' colours in the overlay: its own colour for every variable, or A's / B's palette. */
@@ -237,4 +243,46 @@ export function buildStandardChartRows(entries: readonly TChartSeriesModel[]) {
     }
     return row;
   });
+}
+
+const SERIES_TOGGLE_TRANSITION = {
+  transitionDuration: motionVar(MOTION_CSS_VAR.CHART_SERIES_TOGGLE),
+  transitionTimingFunction: motionVar(MOTION_CSS_VAR.CHART_SERIES_TOGGLE_EASING),
+};
+
+/**
+ * Value + transition live in the same style object — required for the browser to treat
+ * the property change as a single animatable CSS value (same fix as PrecipBarShape's
+ * fillOpacity). Lines and bars fade over the same time (MOTION.CHART_SERIES_TOGGLE_MS).
+ */
+export function buildOpacityFadeStyle(opacity: number): CSSProperties {
+  return { opacity, transitionProperty: "opacity", ...SERIES_TOGGLE_TRANSITION };
+}
+
+export function buildStrokeOpacityFadeStyle(strokeOpacity: number): CSSProperties {
+  return { strokeOpacity, transitionProperty: "stroke-opacity", ...SERIES_TOGGLE_TRANSITION };
+}
+
+export function buildFillOpacityFadeStyle(fillOpacity: number): CSSProperties {
+  return { fillOpacity, transitionProperty: "fill-opacity", ...SERIES_TOGGLE_TRANSITION };
+}
+
+/**
+ * Overlay: color = series, line style = variable (solid temperature, dashed precipitation).
+ * Hatching reuses the same segments and patterns, tinted with the series color.
+ */
+export function toOverlayLayer({
+  series,
+  isShaded,
+  color,
+  shape,
+  ...layer
+}: TOverlayLayerArgs): TWalterLiethLayerSeries {
+  return {
+    ...layer,
+    segments: isShaded ? layer.segments : [],
+    colors: getOverlayPaint(color ?? WALTER_LIETH_COLORS.SERIES[series.id]),
+    precDash: WALTER_LIETH_DASH.OVERLAY_PREC,
+    dotShape: shape ?? WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
+  };
 }

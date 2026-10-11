@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
-import { CalendarIcon } from "../../icons";
-import type { TMonthBadgeProps } from "../../TempPrecipChart.type";
-import { CHART_TITLE_CLASSES as C } from "./ChartTitle.constant";
+import { CalendarIcon } from "@/components/svg/CalendarIcon";
+import type { TMonthBadgeProps } from "./charts.type";
+import { CHART_TITLE_CLASSES as C } from "./charts.constant";
 
 /** The month filter in the standard single-city chart: one month's name, or how many. */
 export function MonthBadge({ selectedMonths }: TMonthBadgeProps) {

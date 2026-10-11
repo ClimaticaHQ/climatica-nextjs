@@ -1,4 +1,4 @@
-import { OverlayView } from "@/components/WalterLiethComparison/components";
+import { WalterLiethOverlay } from "./WalterLiethOverlay";
 import { OVERLAY_DIM_OPACITY } from "@/constants";
 import { isCompleteSeries } from "@/utils";
 import type { TOverlayChartProps } from "./charts.type";
@@ -31,7 +31,7 @@ export function OverlayChart({
   if (viewState.mode === "walter-lieth") {
     const shadedId = getShadedId(model, rule, viewState.shading?.value);
     return (
-      <OverlayView
+      <WalterLiethOverlay
         entries={drawn.flatMap((entry) =>
           isCompleteSeries(entry.walterLieth)
             ? [

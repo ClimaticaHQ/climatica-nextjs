@@ -1,6 +1,6 @@
-import { CHART_COLORS } from "../../TempPrecipChart.constant";
-import type { TBarShape } from "../../TempPrecipChart.type";
-import { buildFillOpacityFadeStyle } from "../../utils/lineFadeStyle";
+import { CHART_COLORS } from "./charts.constant";
+import type { TBarShape } from "./charts.type";
+import { buildFillOpacityFadeStyle } from "./charts.util";
 
 /**
  * Opacity is driven by month + selectedMonths (passed via shape prop), not via Cell children,
