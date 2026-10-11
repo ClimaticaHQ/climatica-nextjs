@@ -1,4 +1,5 @@
-/* * Leaflet overrides: the map below the app's overlays, popups in the app's card style */
+/* * Leaflet overrides: the map below the app's overlays, popups in the app's card style, the
+   live cell count a bare badge */
 
 .leaflet-container {
   z-index: 0;
@@ -19,4 +20,15 @@
 
 .leaflet-popup-content {
   margin: 6px 10px;
+}
+
+.leaflet-tooltip.drawing-cell-count {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.leaflet-tooltip.drawing-cell-count::before {
+  display: none;
 }

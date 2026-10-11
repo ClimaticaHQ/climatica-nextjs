@@ -5,7 +5,6 @@
    resolves to the light palette even while html.dark is active (see exportPalette.util) */
 :root,
 [data-export-palette] {
-  /* * Fonts */
   --font-sans: "Inter", "Roboto", "Helvetica Neue", Arial, sans-serif;
   --font-xs: 12px;
   --font-base: 14px;
@@ -15,10 +14,8 @@
   --font-xl: 30px;
   --font-2xl: 36px;
 
-  /* * Colors */
   --color-primary: #1d9e75;
   --color-primary-muted: rgba(29, 158, 117, 0.2);
-  --color-primary-subtle: rgba(29, 158, 117, 0.15);
   --color-secondary: #5dcaa5;
   --color-light: #9fe1cb;
   --color-dark: #0f6e56;
@@ -45,7 +42,6 @@
   --color-bg-secondary: #f9fafb;
   --color-text: #111827;
   --color-text-secondary: #6b7280;
-  --color-text-strong: #374151;
   --color-border: #e5e7eb;
   /* * behind a plot — halos around curves and dots; the card surface every chart sits on */
   --color-plot-bg: var(--color-bg);
@@ -53,7 +49,6 @@
   --color-error-bg: #fef2f2;
   --color-error-border: #fecaca;
 
-  /* * Border radius */
   --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -67,7 +62,6 @@
   --section-toolbar-gap: 0.5rem; /* the export row above a chart section */
   --section-gap: 1.5rem; /* between a chart section's summary and its card */
 
-  /* * Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
@@ -75,7 +69,6 @@
   /* * Modal backdrop (bottom sheets) */
   --color-backdrop: rgba(0, 0, 0, 0.4);
 
-  /* * Charts */
   --chart-arid: #fcd34d;
   --chart-humid: #93c5fd;
 
@@ -112,7 +105,6 @@ html.dark {
   --color-bg-secondary: #1f2937;
   --color-text: #f9fafb;
   --color-text-secondary: #9ca3af;
-  --color-text-strong: #e5e7eb;
   --color-border: #374151;
 
   --color-chip-active-bg: #052e1c;
@@ -130,7 +122,6 @@ html.dark {
   --color-month-badge-text: #7cc4f0;
 
   --color-primary-muted: rgba(29, 158, 117, 0.25);
-  --color-primary-subtle: rgba(29, 158, 117, 0.18);
 
   --color-error-bg: #1f0a0a;
   --color-error-border: #7f1d1d;

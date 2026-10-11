@@ -50,11 +50,6 @@
   animation: chart-fade-out var(--motion-panel-expand) var(--motion-panel-expand-easing) both;
 }
 
-/* * MultiPeriodStatsTable: columns resizing when a period is added or removed */
-.table-column-resize {
-  transition: width var(--motion-table-column-resize) var(--motion-table-column-resize-easing);
-}
-
 /* * DataUpdateFade: content dimmed while an update loads */
 .update-fade {
   transition: opacity var(--motion-update-fade) var(--motion-update-fade-easing);
