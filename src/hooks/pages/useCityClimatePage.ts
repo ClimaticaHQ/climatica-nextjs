@@ -5,7 +5,7 @@ import {
 } from "@/app/climate-statistics/_components/ClimateStatistics.constant";
 import type { TCityClimatePage } from "@/app/climate-statistics/_components/ClimateStatistics.type";
 import { buildCityStatsSummary } from "@/app/climate-statistics/_components/ClimateStatistics.util";
-import { useSubtitleText } from "@/components/TempPrecipChart/hooks/useSubtitleText";
+import { useSubtitleText } from "@/hooks/charts/useSubtitleText";
 import {
   CLIMATE_PERIOD_LABELS,
   DATA_UPDATE_SINGLE_SERIES,
@@ -119,7 +119,7 @@ export function useCityClimatePage(): TCityClimatePage {
     hasSidePickers: false,
     hasMonthBadge: true,
     hasRawExport: true,
-    // * one place: its stat cards and the chart's stats bar, no comparison table
+    // * one place: its stat cards and the chart's stats bar, no stats table
     hiddenBlocks: [EChartBlock.STATS_TABLE],
   };
   const summary =

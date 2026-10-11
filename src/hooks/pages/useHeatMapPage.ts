@@ -82,8 +82,8 @@ export function useHeatMapPage(): THeatMapPage {
     hasData,
     emptyMessages: !region.hasSelection
       ? [t("heatMap.noSelection")]
-      : bounds && isTooLarge
-        ? [tooManyCells(bounds)]
+      : area && isTooLarge
+        ? [tooManyCells(area)]
         : isClimate && bindings.length === 0
           ? [noPeriodData(periodLabel, gridSize)]
           : [t("heatMap.noData")],

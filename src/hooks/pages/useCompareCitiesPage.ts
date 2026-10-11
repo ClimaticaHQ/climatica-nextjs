@@ -3,7 +3,7 @@ import {
   COMPARE_CITIES_URL_SCHEMA,
 } from "@/app/compare-cities/_components/CompareCities.constant";
 import type { TCompareCitiesPage } from "@/app/compare-cities/_components/CompareCities.type";
-import { useSubtitleText } from "@/components/TempPrecipChart/hooks/useSubtitleText";
+import { useSubtitleText } from "@/hooks/charts/useSubtitleText";
 import {
   CLIMATE_PERIOD_LABELS,
   DATA_UPDATE_NAMES_SEPARATOR,
@@ -13,8 +13,13 @@ import {
   WALTER_LIETH_COLORS,
   WALTER_LIETH_COMPARISON,
 } from "@/constants";
-import { ECitySlot, ECompareLayout, ESeriesKind, EWalterLiethSeriesId } from "@/enums";
-import type { EWalterLiethShading } from "@/enums";
+import {
+  ECitySlot,
+  ECompareLayout,
+  ESeriesKind,
+  EWalterLiethSeriesId,
+  type EWalterLiethShading,
+} from "@/enums";
 import { useChartModel, useComparisonChartExport } from "@/hooks/charts";
 import { useGetAltitude, useGetCompareData, useGetDatasetVersion } from "@/hooks/data";
 import { useFilters } from "@/hooks/filters";
