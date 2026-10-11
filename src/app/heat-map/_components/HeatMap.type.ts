@@ -104,12 +104,22 @@ export type TMapFitterProps = { bbox: TBbox | null };
 
 export type TBboxDrawerProps = {
   isDrawMode: boolean;
+  gridSize: TCellSize;
   onBboxComplete: (bbox: TBbox) => void;
 };
 
 export type TBboxOutlineProps = { bbox: TBbox };
 
-export type TPolygonDrawerProps = { onPolygonComplete: (v: TPolygon) => void };
+export type TPolygonDrawerProps = {
+  gridSize: TCellSize;
+  onPolygonComplete: (v: TPolygon) => void;
+};
+
+export type TDrawingCellCountProps = {
+  /** the shape so far, [lat, lng] */
+  vertices: TPolygon;
+  gridSize: TCellSize;
+};
 
 export type TPolygonOutlineProps = { vertices: TPolygon };
 
@@ -139,7 +149,7 @@ export type TMapCanvasProps = {
   bbox: TBbox | null;
   polygon: TPolygon | null;
   drawMode: TDrawMode;
-  gridSize: string;
+  gridSize: TCellSize;
   colorScale: TColorScale;
   unit: string;
   mapTarget: TMapTarget | null;

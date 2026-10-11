@@ -40,16 +40,16 @@ export function resolveCellBounds(
 
 /** Candidate key sets — SPARQL variable names are API-defined; fallbacks cover naming variants */
 const KEY_SETS = [
-  Array.from({ length: 12 }, (_, i) => `valueMonth${String(i + 1).padStart(2, "0")}`), // valueMonth01..12
-  Array.from({ length: 12 }, (_, i) => `valueMonth${i + 1}`), // valueMonth1..12
-  Array.from({ length: 12 }, (_, i) => `value${String(i + 1).padStart(2, "0")}`), // value01..12
-  Array.from({ length: 12 }, (_, i) => `value${i + 1}`), // value1..12
-  Array.from({ length: 12 }, (_, i) => `vm${String(i + 1).padStart(2, "0")}`), // vm01..12
-  Array.from({ length: 12 }, (_, i) => `vm${i + 1}`), // vm1..12
-  Array.from({ length: 12 }, (_, i) => `v${String(i + 1).padStart(2, "0")}`), // v01..12
-  Array.from({ length: 12 }, (_, i) => `v${i + 1}`), // v1..12
-  Array.from({ length: 12 }, (_, i) => `month${String(i + 1).padStart(2, "0")}`), // month01..12
-  Array.from({ length: 12 }, (_, i) => `month${i + 1}`), // month1..12
+  Array.from({ length: 12 }, (_, i) => `valueMonth${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `valueMonth${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `value${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `value${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `vm${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `vm${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `v${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `v${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `month${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `month${i + 1}`),
 ];
 
 function extractNumber(raw: unknown): number {
@@ -208,10 +208,7 @@ export const selectionUrlField: TUrlField<THeatMapSelectionValue> = {
   },
 };
 
-/**
- * Returns a short month string for the summary bar.
- * [] → ""   [2] → "Feb"   [1,2,3] → "Jan, Feb, Mar"   [1..6] → "6 months"
- */
+/** A short list of the selected months: [] → "", [2] → "Feb", [1,2,3] → "Jan, Feb, Mar", six or more → "6 months". */
 export function formatSelectedMonths(selectedMonths: number[]): string {
   if (selectedMonths.length === 0) return "";
   if (selectedMonths.length <= 3)

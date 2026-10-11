@@ -25,5 +25,7 @@ export const STATS_LEGEND_BAR_CLASSES = {
   SUBTITLE: "truncate",
 } as const;
 
-// * the gradient legend's colour stops
 export const STATS_LEGEND_GRADIENT_STOPS = 10;
+
+// * the live cell count on a shape being drawn: a Leaflet tooltip restyled in leaflet.css
+export const DRAWING_CELL_COUNT_TOOLTIP_CLASS = "drawing-cell-count";

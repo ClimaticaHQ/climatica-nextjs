@@ -1,18 +1,42 @@
 "use client";
 
+import { CellCountBadge } from "@/components/filters/CellCountBadge";
 import { RASTER_SELECTION_PATH_OPTIONS } from "@/constants";
+import { countCellsInBounds, getPolygonBounds } from "@/utils/cellCount.util";
 import { useEffect, useRef, useState } from "react";
-import { CircleMarker, Polygon, Polyline, Rectangle, useMap, useMapEvents } from "react-leaflet";
+import {
+  CircleMarker,
+  Polygon,
+  Polyline,
+  Rectangle,
+  Tooltip,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
+import { DRAWING_CELL_COUNT_TOOLTIP_CLASS } from "../HeatMap.constant";
 import type {
   TBboxDrawerProps,
   TBboxOutlineProps,
+  TDrawingCellCountProps,
   TPolygonDrawerProps,
   TPolygonOutlineProps,
 } from "../HeatMap.type";
 
 const CLOSE_PX = 14;
 
-export function BboxDrawer({ isDrawMode, onBboxComplete }: TBboxDrawerProps) {
+/**
+ * The cells the shape being drawn would load at the current resolution — for a polygon, its
+ * whole box, which is what's read — turning into a warning past the cap.
+ */
+function DrawingCellCount({ vertices, gridSize }: TDrawingCellCountProps) {
+  return (
+    <Tooltip permanent direction="top" className={DRAWING_CELL_COUNT_TOOLTIP_CLASS}>
+      <CellCountBadge count={countCellsInBounds(getPolygonBounds(vertices), gridSize)} />
+    </Tooltip>
+  );
+}
+
+export function BboxDrawer({ isDrawMode, gridSize, onBboxComplete }: TBboxDrawerProps) {
   const map = useMap();
   const [start, setStart] = useState<[number, number] | null>(null);
   const [current, setCurrent] = useState<[number, number] | null>(null);
@@ -70,7 +94,9 @@ export function BboxDrawer({ isDrawMode, onBboxComplete }: TBboxDrawerProps) {
         weight: 2,
         dashArray: "6 4",
       }}
-    />
+    >
+      <DrawingCellCount vertices={[start, current]} gridSize={gridSize} />
+    </Rectangle>
   );
 }
 
@@ -86,7 +112,7 @@ export function BboxOutline({ bbox }: TBboxOutlineProps) {
   );
 }
 
-export function PolygonDrawer({ onPolygonComplete }: TPolygonDrawerProps) {
+export function PolygonDrawer({ gridSize, onPolygonComplete }: TPolygonDrawerProps) {
   const map = useMap();
   const [vertices, setVertices] = useState<[number, number][]>([]);
   const [cursor, setCursor] = useState<[number, number] | null>(null);
@@ -137,7 +163,9 @@ export function PolygonDrawer({ onPolygonComplete }: TPolygonDrawerProps) {
       <Polyline
         positions={previewPath}
         pathOptions={{ color: "var(--color-primary)", weight: 2, dashArray: "6 4" }}
-      />
+      >
+        <DrawingCellCount vertices={previewPath} gridSize={gridSize} />
+      </Polyline>
       {showClosingLine && (
         <Polyline
           positions={[cursor, vertices[0]]}

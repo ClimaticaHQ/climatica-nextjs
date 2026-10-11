@@ -50,10 +50,16 @@ export function MapCanvas({
           <MapFitter bbox={bbox} />
           <MapNavigator target={mapTarget} />
 
-          <BboxDrawer isDrawMode={drawMode === "bbox"} onBboxComplete={onBboxComplete} />
+          <BboxDrawer
+            isDrawMode={drawMode === "bbox"}
+            gridSize={gridSize}
+            onBboxComplete={onBboxComplete}
+          />
 
           {/* PolygonDrawer mounts only when active — unmounting resets its vertex state */}
-          {drawMode === "polygon" && <PolygonDrawer onPolygonComplete={onPolygonComplete} />}
+          {drawMode === "polygon" && (
+            <PolygonDrawer gridSize={gridSize} onPolygonComplete={onPolygonComplete} />
+          )}
 
           {bbox && drawMode !== "bbox" && <BboxOutline bbox={bbox} />}
           {polygon && drawMode !== "polygon" && <PolygonOutline vertices={polygon} />}
