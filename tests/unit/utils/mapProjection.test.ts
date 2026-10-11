@@ -1,11 +1,12 @@
 import {
   computeFitZoom,
   computeMapOrigin,
-  computeTileRange,
+  computeTileRangeFromPixelBounds,
   projectLatLngToPixel,
   projectToMapPixel,
   resolveTileZoom,
 } from "@/utils/mapProjection.util";
+import type { TCellBounds } from "@/types";
 import { describe, expect, it } from "vitest";
 
 describe("projectLatLngToPixel", () => {
@@ -26,6 +27,15 @@ describe("projectLatLngToPixel", () => {
     expect(projectLatLngToPixel(0, 0, 0, 512)).toEqual({ x: 256, y: 256 });
   });
 });
+
+/** The tiles a box covers, the way the export computes them from its projected corners. */
+function computeTileRange(bbox: TCellBounds, zoom: number) {
+  return computeTileRangeFromPixelBounds(
+    projectLatLngToPixel(bbox.north, bbox.west, zoom),
+    projectLatLngToPixel(bbox.south, bbox.east, zoom),
+    zoom,
+  );
+}
 
 describe("computeTileRange", () => {
   it("a bbox spanning the whole world at zoom 2 covers all 4×4 tiles", () => {

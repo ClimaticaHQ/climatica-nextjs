@@ -16,6 +16,7 @@ vi.mock("axios", () => ({
 
 import { CLIMATE_PERIODS, WORLDCLIM_MAX_ROWS } from "@/constants";
 import { WorldClimService } from "@/libs/services/worldClimService";
+import { countCellsInBounds, getPolygonBounds } from "@/utils/cellCount.util";
 import type { TWorldClimCellResponse, TWorldClimPointValueResponse } from "@/types";
 
 function makeAxiosResponse<T>(data: T) {
@@ -184,6 +185,28 @@ describe("WorldClimService.getRegionPixelValues", () => {
     expect(result.results.bindings.map((b) => b.cell?.value)).toEqual([
       "http://climate.gsic.uva.es/data/Cell_10m_r240c1218",
     ]);
+  });
+});
+
+describe("WorldClimService.getRegionPixelValues — polygon request budget", () => {
+  it("fetches a thin diagonal polygon's whole box, in strips within the row cap", async () => {
+    mockGet.mockResolvedValue(makeAxiosResponse({ results: { bindings: [] } }));
+    const polygon: [number, number][] = [
+      [43, 0],
+      [50, 7],
+      [50, 7.1],
+      [43, 0.1],
+    ];
+    await WorldClimService.getRegionPixelValues({
+      area: { polygon },
+      gridSize: "10m",
+      variables: ["tmax"],
+      dataset: { isClimate: false, year: 2020 },
+    });
+    const limits = mockGet.mock.calls.map(([, config]) => Number(config?.params?.limit));
+    const boxCells = countCellsInBounds(getPolygonBounds(polygon), "10m");
+    expect(limits.reduce((sum, limit) => sum + limit, 0)).toBe(boxCells * 12);
+    expect(Math.max(...limits)).toBeLessThanOrEqual(WORLDCLIM_MAX_ROWS);
   });
 });
 

@@ -2,12 +2,16 @@ import { CELL_SIZES, FILTER_MAX_HEATMAP_CELLS, GRID_DELTA, WORLDCLIM_MAX_ROWS } 
 import type { TBbox, TRawPixelValueBinding } from "@/types";
 import {
   countCellsInBounds,
+  countCellsInPolygon,
   getCellIndexRange,
   getFinestLoadableGrid,
+  getPolygonBounds,
+  isHeatmapCellLimitExceeded,
 } from "@/utils/cellCount.util";
 import {
   getStripRowLimit,
   isPointInPolygon,
+  keepCellsInPolygon,
   mergeStripBindings,
   splitRegionIntoStrips,
 } from "@/utils/regionQuery.util";
@@ -136,5 +140,49 @@ describe("cell counts", () => {
       CELL_SIZES.FIVE_MINUTES,
     );
     expect(getFinestLoadableGrid({ north: 70, south: 20, west: -20, east: 40 })).toBeNull();
+  });
+});
+
+// * a band about one cell wide from 43° N 0° E to 50° N 7° E: few cells, a 7° × 7° box. Its
+// * vertices are off the grid lines, so no centroid sits exactly on an edge
+const THIN_DIAGONAL: [number, number][] = [
+  [43.013, 0.021],
+  [50.007, 7.033],
+  [50.009, 7.137],
+  [43.017, 0.119],
+];
+
+describe("a thin diagonal polygon", () => {
+  /** every cell of the box as a row, through the same filter the service uses */
+  function cellsKeptByFilter(polygon: [number, number][], gridSize: "10m" | "5m") {
+    const { firstRow, lastRow, firstCol, lastCol } = getCellIndexRange(
+      getPolygonBounds(polygon),
+      gridSize,
+    );
+    const rows: TRawPixelValueBinding[] = [];
+    for (let r = firstRow; r <= lastRow; r++) {
+      for (let c = firstCol; c <= lastCol; c++) {
+        rows.push({
+          pixel: { type: "uri", value: `p${r}:${c}` },
+          month: { type: "literal", value: "--01" },
+          value: { type: "literal", value: "0" },
+          cell: { type: "uri", value: `Cell_${gridSize}_r${r}c${c}` },
+        });
+      }
+    }
+    return keepCellsInPolygon(rows, polygon, gridSize).length;
+  }
+
+  it("counts exactly the cells the polygon filter keeps", () => {
+    expect(countCellsInPolygon(THIN_DIAGONAL, "5m")).toBe(cellsKeptByFilter(THIN_DIAGONAL, "5m"));
+    expect(countCellsInPolygon(THIN_DIAGONAL, "10m")).toBe(cellsKeptByFilter(THIN_DIAGONAL, "10m"));
+  });
+
+  it("is checked against its box, which is what loading it reads", () => {
+    const bounds = getPolygonBounds(THIN_DIAGONAL);
+    expect(countCellsInPolygon(THIN_DIAGONAL, "5m")).toBeLessThan(FILTER_MAX_HEATMAP_CELLS);
+    expect(countCellsInBounds(bounds, "5m")).toBeGreaterThan(FILTER_MAX_HEATMAP_CELLS);
+    expect(isHeatmapCellLimitExceeded(bounds, "5m")).toBe(true);
+    expect(isHeatmapCellLimitExceeded(bounds, "10m")).toBe(false);
   });
 });

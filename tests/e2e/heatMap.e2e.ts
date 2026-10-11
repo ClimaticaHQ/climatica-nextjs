@@ -45,4 +45,26 @@ test.describe("Region Heatmap", () => {
     });
     await expect(page.getByTestId("region-stats")).toHaveCount(0);
   });
+
+  test("drawing a box shows its live cell count, a warning past the cap", async ({ page }) => {
+    // * 30 s: most of the opening view (about 1° × 0.6°) holds past the cap of 2,000 cells
+    await page.goto("/heat-map?dataset=climate&period=c1970-2000&grid=30s&var=tmax");
+    await page.getByRole("button", { name: "Draw bounding box" }).click();
+    const map = page.locator(".leaflet-container");
+    await map.scrollIntoViewIfNeeded();
+    const box = await map.boundingBox();
+    if (!box) throw new Error("no map");
+    const start = { x: box.x + 100, y: box.y + 100 };
+
+    await page.mouse.move(start.x, start.y);
+    await page.mouse.down();
+    await page.mouse.move(start.x + 30, start.y + 30, { steps: 5 });
+    const count = page.locator(".drawing-cell-count");
+    await expect(count).toContainText(/Fast\s*\([1-9][\d,]* cells\)/);
+
+    await page.mouse.move(start.x + 600, start.y + 380, { steps: 10 });
+    await expect(count).toContainText("Too many cells");
+    await page.mouse.up();
+    await expect(count).toHaveCount(0);
+  });
 });

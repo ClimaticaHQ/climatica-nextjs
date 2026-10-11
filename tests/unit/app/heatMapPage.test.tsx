@@ -108,4 +108,13 @@ describe("Region Heatmap through its page hook", () => {
     expect(screen.getByText(/Choose 5 min or a coarser resolution/)).toBeTruthy();
     expect(screen.getByText(/5,184 cells at 2\.5 min/)).toBeTruthy();
   });
+
+  it("explains a thin polygon within the cap whose box isn't", () => {
+    const polygon = "POLYGON((0 43, 7 50, 7.1 50, 0.1 43, 0 43))";
+    renderPage(`dataset=climate&var=tmax&grid=5m&polygon=${encodeURIComponent(polygon)}`);
+    expect(page.requestedArea).toBeNull();
+    const message = screen.getByText(/This polygon covers/);
+    expect(message.textContent).toMatch(/reads all 7,140 cells of the box around it/);
+    expect(message.textContent).toMatch(/Choose 10 min or a coarser resolution/);
+  });
 });

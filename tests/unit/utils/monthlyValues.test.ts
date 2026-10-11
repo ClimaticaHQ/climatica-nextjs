@@ -1,5 +1,4 @@
-import { CHART_PLOT, MISSING_VALUE_LABEL } from "@/constants";
-import { getAxisStyle, getMonthlyValuesColumns } from "@/utils/chartAxis.util";
+import { MISSING_VALUE_LABEL } from "@/constants";
 import { buildMonthlyValuesRows, formatMonthlyValuesValue } from "@/utils/monthlyValues.util";
 import { describe, expect, it } from "vitest";
 
@@ -7,21 +6,6 @@ const palette = { temp: "red", prec: "blue" };
 const names = { tavg: "Mean temperature", prec: "Precipitation" };
 const months = (tavg: number, prec: number) =>
   Array.from({ length: 12 }, (_, i) => ({ tavg: tavg - i, prec: prec + i }));
-
-describe("monthly values table geometry", () => {
-  it.each([false, true])(
-    "puts each column's centre on its month's position in the plot (compact: %s)",
-    (isCompact) => {
-      const tableWidth = 812;
-      const { margin, centers } = getMonthlyValuesColumns({ tableWidth, isCompact });
-      // * the plot: its y axes either side, 12 equal month bands between, month i at its centre
-      const axis = getAxisStyle(isCompact).width + CHART_PLOT.MARGIN.left;
-      const plotWidth = tableWidth - axis * 2;
-      expect(margin).toBe(axis);
-      centers.forEach((x, i) => expect(x).toBeCloseTo(axis + (plotWidth / 12) * (i + 0.5), 9));
-    },
-  );
-});
 
 describe("monthly values rows", () => {
   it("has exactly two rows — °C (red) and mm (blue) — twelve cells each", () => {

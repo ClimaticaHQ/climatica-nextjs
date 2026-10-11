@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/libs/Env", () => ({ env: { WORLDCLIM_API_KEY: "test-key" } }));
 
 import {
-  buildDatasetParams,
   buildGridIri,
   buildMonthlyTemperaturesFromPointValues,
   buildVariableIris,
@@ -95,22 +94,6 @@ describe("extractCellBySize", () => {
 
   it("returns null when no cell matches the requested gridSize", () => {
     expect(extractCellBySize(response, "30s")).toBeNull();
-  });
-});
-
-describe("buildDatasetParams", () => {
-  it("isClimate=true returns { isClimate: true }", () => {
-    expect(buildDatasetParams(true)).toEqual({ isClimate: true });
-  });
-
-  it("isClimate=false with year returns { isWeather: true, year }", () => {
-    expect(buildDatasetParams(false, 2020)).toEqual({ isWeather: true, year: 2020 });
-  });
-
-  it("isClimate=false without year falls back to current year", () => {
-    const result = buildDatasetParams(false);
-    expect(result).toMatchObject({ isWeather: true, year: expect.any(Number) });
-    expect((result as { year: number }).year).toBe(new Date().getFullYear());
   });
 });
 
