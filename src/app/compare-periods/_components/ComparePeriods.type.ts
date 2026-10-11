@@ -33,7 +33,6 @@ export type TPeriodTrendCardsProps = {
   trend: TPeriodTrend | null;
 };
 
-/** What Compare Periods' page hook gives its view. */
 export type TComparePeriodsPage = TChartPageResult<null, TPeriodTrend | null> & {
   search: TPeriodCitySearchProps;
 };

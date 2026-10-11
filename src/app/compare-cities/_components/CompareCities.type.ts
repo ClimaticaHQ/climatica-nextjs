@@ -10,7 +10,6 @@ export type TCompareCitiesUrlState = {
   expanded: TExpandedPanel;
 };
 
-/** The two searches and the mini map. */
 export type TCityPairSearchProps = {
   cityA: TCity;
   cityB: TCity;
@@ -36,7 +35,6 @@ export type TCityDifferenceCardsProps = {
   differences: TCityDifferences | null;
 };
 
-/** What Compare Cities' page hook gives its view. */
 export type TCompareCitiesPage = TChartPageResult<null, TCityDifferences | null> & {
   search: TCityPairSearchProps;
 };

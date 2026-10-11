@@ -24,7 +24,6 @@ export type TCityStatsSummary = {
   altitude: number | null;
 };
 
-/** What City Climate's page hook gives its view. */
 export type TCityClimatePage = TChartPageResult<TCityStatsSummary | null, null> & {
   search: TLocationSearchProps;
   map: TLeafletMapProps;
