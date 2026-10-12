@@ -19,5 +19,6 @@ export { SpinnerIcon } from "./SpinnerIcon";
 export { SwapIcon } from "./SwapIcon";
 export { SplitLayoutIcon } from "./SplitLayoutIcon";
 export { TableIcon } from "./TableIcon";
-export { MoonIcon, SunIcon } from "./themes";
+export { MonitorIcon, MoonIcon, SunIcon } from "./themes";
+export { GearIcon } from "./GearIcon";
 export type { TSeriesMarkerIconProps } from "./svg.type";
