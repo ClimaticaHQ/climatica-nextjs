@@ -1,7 +1,6 @@
 "use client";
 
-import { Settings } from "@/components/Settings/Settings";
-import { Button, CollapsibleSection } from "@/components/UI";
+import { Button } from "@/components/UI";
 import { AUTO_APPLY_DEBOUNCE_MS, LG_MEDIA_QUERY } from "@/constants";
 import { EButtonVariant, EFilterApplyMode, EFilterAvailability } from "@/enums";
 import { useAutoApply } from "@/hooks/filters/useAutoApply";
@@ -17,7 +16,7 @@ import { getSectionFilterKeys, getSidebarFilterKeys } from "@/utils/filters.util
 import { serializeFilters } from "@/utils/filtersUrl.util";
 import { useTranslations } from "next-intl";
 import { FilterSections } from "./FilterSections";
-import { FILTERS_SIDEBAR_CLASS } from "./filters.constant";
+import { FILTERS_SIDEBAR_CLASS, FILTERS_SIDEBAR_SECTIONS_CLASS } from "./filters.constant";
 import { FilterUnavailableActionsContext } from "./filters.context";
 
 /**
@@ -56,24 +55,21 @@ export function FiltersSidebar() {
   });
 
   return (
-    <aside className={FILTERS_SIDEBAR_CLASS}>
-      <div className="flex flex-1 flex-col overflow-y-auto p-4 gap-y-8">
-        <CollapsibleSection title={t("sidebar.filters")} defaultOpen={true}>
-          <FilterUnavailableActionsContext.Provider value={unavailableActions}>
-            <FilterSections
-              keys={sectionKeys}
-              values={draft}
-              context={draftContext}
-              availablePeriods={availablePeriods}
-              weatherYearError={filtersDraft.weatherYearError}
-              cellCount={filtersDraft.cellCount}
-              isApplyBlocked={isApplyBlocked}
-              onChange={filtersDraft.setFilter}
-              onChangeMany={filtersDraft.setFilters}
-            />
-          </FilterUnavailableActionsContext.Provider>
-        </CollapsibleSection>
-        <Settings />
+    <aside className={FILTERS_SIDEBAR_CLASS} aria-label={t("sidebar.filters")}>
+      <div className={FILTERS_SIDEBAR_SECTIONS_CLASS}>
+        <FilterUnavailableActionsContext.Provider value={unavailableActions}>
+          <FilterSections
+            keys={sectionKeys}
+            values={draft}
+            context={draftContext}
+            availablePeriods={availablePeriods}
+            weatherYearError={filtersDraft.weatherYearError}
+            cellCount={filtersDraft.cellCount}
+            isApplyBlocked={isApplyBlocked}
+            onChange={filtersDraft.setFilter}
+            onChangeMany={filtersDraft.setFilters}
+          />
+        </FilterUnavailableActionsContext.Provider>
       </div>
 
       <div className="shrink-0 border-t border-[var(--color-border)] p-4">

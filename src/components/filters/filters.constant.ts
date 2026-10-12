@@ -22,6 +22,9 @@ export const FILTER_UNAVAILABLE_ACTION_CLASS =
 export const FILTERS_SIDEBAR_CLASS =
   "hidden w-80 shrink-0 flex-col overflow-hidden border-r border-[var(--color-border)] bg-[var(--color-bg)] lg:flex";
 
+// * the sidebar's filter sections, scrolling between the top bar and the Apply button
+export const FILTERS_SIDEBAR_SECTIONS_CLASS = "flex flex-1 flex-col gap-8 overflow-y-auto p-4";
+
 export const FILTER_BAR_CLASSES = {
   ROOT: "flex items-center gap-2",
   DIVIDER: "h-6 w-px shrink-0 bg-[var(--color-border)]",
