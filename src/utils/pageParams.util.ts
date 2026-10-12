@@ -55,7 +55,7 @@ export function pickSharedFilterParams(params: URLSearchParams): URLSearchParams
   return pickParams(pickFilterParams(params), SHARED_FILTER_PARAMS);
 }
 
-export function toRouteHref(route: TPageRoute, params: URLSearchParams) {
+export function toRouteHref(route: string, params: URLSearchParams) {
   const query = params.toString();
   return query === "" ? route : `${route}?${query}`;
 }

@@ -6,20 +6,20 @@ import {
   SIDEBAR_PARAMS,
   VARIABLE_LABELS,
 } from "@/constants";
-import { parseLocale } from "@/libs/I18nRouting";
+import { parseLocale } from "./locale.util";
 import type {
   TCommonClimateParams,
   TFormatPeriodLabelParams,
   TFormatPeriodsComparisonParams,
-  TLocalePageProps,
   TMetaResolver,
+  TPageProps,
   TResolveMetaArgs,
   TResolveOgMetaArgs,
   TRouteMeta,
   TSearchParams,
 } from "@/types";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 export function getSearchParam(searchParams: TSearchParams, key: string): string | undefined {
   const value = searchParams[key];
@@ -283,20 +283,32 @@ export async function resolveOgMeta({
   return resolver({ locale, searchParams });
 }
 
-export function createLocaleMetadata(resolver: TMetaResolver) {
-  return async function generateMetadata({
-    params,
-    searchParams,
-  }: TLocalePageProps): Promise<Metadata> {
-    const locale = parseLocale((await params).locale);
-    const { title, description, imagePath } = await resolver({
-      locale,
-      searchParams: await searchParams,
-    });
+/** The page's own URL — no locale prefix: one URL per page, whatever the visitor's language. */
+export function buildCanonicalPath(route: string, searchParams: TSearchParams) {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(searchParams)) {
+    for (const item of Array.isArray(value) ? value : [value]) {
+      if (item !== undefined) query.append(key, item);
+    }
+  }
+  const search = query.toString();
+  return search ? `${route}?${search}` : route;
+}
+
+/**
+ * A page's metadata in the visitor's language: its title and description, the share image,
+ * and the canonical URL. No hreflang: every language shares the one URL.
+ */
+export function createPageMetadata(resolver: TMetaResolver, route: string) {
+  return async function generateMetadata({ searchParams }: TPageProps): Promise<Metadata> {
+    const locale = parseLocale(await getLocale());
+    const params = await searchParams;
+    const { title, description, imagePath } = await resolver({ locale, searchParams: params });
 
     return {
       title,
       description,
+      alternates: { canonical: buildCanonicalPath(route, params) },
       openGraph: {
         title,
         description,

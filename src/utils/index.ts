@@ -49,3 +49,4 @@ export * from "./apiError.util";
 export * from "./chartModel.util";
 export * from "./dataState.util";
 export * from "./documentTitle.util";
+export * from "./locale.util";

@@ -5,7 +5,6 @@ export * from "./raw/exportRawJson.util";
 export * from "./raw/rawDataAvailability.util";
 export * from "./shared/download.util";
 export * from "./shared/footerLines.util";
-export * from "./shared/shareUrl.util";
 export * from "./svg/buildCompareExportSvg.util";
 export * from "./svg/buildExportSvg.util";
 export * from "./svg/buildHeatmapExportSvg.util";
