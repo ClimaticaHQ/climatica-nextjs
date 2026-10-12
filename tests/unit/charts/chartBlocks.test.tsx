@@ -17,11 +17,6 @@ vi.mock("@/hooks/url/useChartModeUrl", () => ({
 }));
 // * the charts reach the hooks barrel, whose URL hooks import next-intl's navigation — which
 // * can't resolve next/navigation under Vitest; nothing here navigates
-vi.mock("@/libs/I18nNavigation", () => ({
-  usePathname: () => "/",
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
-  Link: () => null,
-}));
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
   usePathname: () => "/",

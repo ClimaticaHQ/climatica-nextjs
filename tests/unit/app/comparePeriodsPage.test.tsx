@@ -26,11 +26,6 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/compare-periods",
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
-vi.mock("@/libs/I18nNavigation", () => ({
-  usePathname: () => "/compare-periods",
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
-  Link: () => null,
-}));
 vi.mock("@/hooks/data/useGetComparePeriods", () => ({ useGetComparePeriods: () => page.climate }));
 vi.mock("@/hooks/data/useGetMultiPeriodData", () => ({
   useGetMultiPeriodData: () => ({

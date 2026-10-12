@@ -18,11 +18,6 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/heat-map",
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
-vi.mock("@/libs/I18nNavigation", () => ({
-  usePathname: () => "/heat-map",
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
-  Link: () => null,
-}));
 vi.mock("@/hooks/data/useGetHeatmapData", () => ({
   useGetHeatmapData: (args: { area: unknown }) => {
     page.requestedArea = args.area;

@@ -10,8 +10,11 @@ const search = vi.hoisted(() => ({ error: null as unknown }));
 vi.mock("@/hooks/data/useSearchCity", () => ({
   useSearchCity: () => ({ data: undefined, isLoading: false, error: search.error }),
 }));
-vi.mock("@/libs/I18nNavigation", () => ({ usePathname: () => "/", useRouter: () => ({}) }));
-vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams() }));
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => "/",
+  useRouter: () => ({}),
+}));
 
 afterEach(() => {
   cleanup();

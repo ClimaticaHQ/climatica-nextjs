@@ -26,11 +26,6 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/compare-cities",
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
-vi.mock("@/libs/I18nNavigation", () => ({
-  usePathname: () => "/compare-cities",
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
-  Link: () => null,
-}));
 vi.mock("@/hooks/data/useGetCompareData", () => ({ useGetCompareData: () => page.compare }));
 vi.mock("@/hooks/data/useGetAltitude", () => ({ useGetAltitude: () => ({ data: 690 }) }));
 vi.mock("@/hooks/data/useGetDatasetVersion", () => ({

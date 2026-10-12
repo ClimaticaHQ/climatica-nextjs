@@ -12,15 +12,13 @@ const router = vi.hoisted(() => {
   return state;
 });
 
-vi.mock("@/libs/I18nNavigation", () => ({
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(router.search),
   usePathname: () => "/climate-statistics",
   useRouter: () => ({
     replace: (href: string) => router.replaced.push(href),
     push: (href: string) => router.pushed.push(href),
   }),
-}));
-vi.mock("next/navigation", () => ({
-  useSearchParams: () => new URLSearchParams(router.search),
 }));
 
 beforeEach(() => {

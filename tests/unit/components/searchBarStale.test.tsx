@@ -16,8 +16,11 @@ vi.mock("@/hooks/data/useSearchCity", () => ({
     error: null,
   }),
 }));
-vi.mock("@/libs/I18nNavigation", () => ({ usePathname: () => "/", useRouter: () => ({}) }));
-vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams() }));
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => "/",
+  useRouter: () => ({}),
+}));
 
 const DEBOUNCE_MS = 400;
 let onCitySelect = vi.fn();
