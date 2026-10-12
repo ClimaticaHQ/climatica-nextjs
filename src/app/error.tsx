@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/UI";
 import { EButtonVariant } from "@/enums";
-import { Link } from "@/libs/I18nNavigation";
+import Link from "next/link";
 import { logger } from "@/libs/Logger";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";

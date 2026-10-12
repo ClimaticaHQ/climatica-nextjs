@@ -1,4 +1,4 @@
-import { Link } from "@/libs/I18nNavigation";
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 const primaryLinkClass =

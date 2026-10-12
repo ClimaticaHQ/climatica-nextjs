@@ -1,12 +1,11 @@
-import { APP_TITLE, MOTION_CSS_VARIABLES } from "@/constants";
+import { APP_TITLE, MOTION_CSS_VARIABLES, THEME_INIT_SCRIPT } from "@/constants";
 import { AppLayout } from "@/layouts";
 import { env } from "@/libs/Env";
-import { parseLocale, routing } from "@/libs/I18nRouting";
 import "@/styles/global.css";
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
-import { Providers } from "../providers";
+import { getLocale } from "next-intl/server";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL),
@@ -22,28 +21,21 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
-
-export default async function LocaleLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}) {
-  const locale = parseLocale((await params).locale);
-  setRequestLocale(locale);
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
 
   return (
     <html
       lang={locale}
+      // * the head script sets the theme class before React hydrates
       suppressHydrationWarning
       data-scroll-behavior="smooth"
       // * the motion settings, for src/styles/animations.css
       style={MOTION_CSS_VARIABLES}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>
         <Providers>
           <NextIntlClientProvider>
