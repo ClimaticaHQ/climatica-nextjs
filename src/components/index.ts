@@ -1,12 +1,12 @@
 export { ChartTransition } from "./ChartTransition";
 export { MotionRoot } from "./MotionRoot";
+export { ThemeRoot } from "./ThemeRoot";
 export { NavigationIntentTracker } from "./NavigationIntentTracker";
 export * from "./filters";
 export { ChartLegend } from "./ChartLegend";
 export { ClimateStatsBar } from "./ClimateStatsBar";
 export type { TClimateStatsBarProps } from "./ClimateStatsBar";
 export { Card } from "./Card";
-export { LanguageSwitcher } from "./LanguageSwitcher";
 export { LocationSearch } from "./LocationSearch";
 export type { TLocationSearchProps } from "./LocationSearch";
 export { SearchBar } from "./SearchBar";
