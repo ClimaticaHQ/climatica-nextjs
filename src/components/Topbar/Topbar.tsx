@@ -1,15 +1,14 @@
 "use client";
 
-import { LanguageSwitcher } from "@/components";
-import { LANGUAGE_SWITCHER_VARIANTS, NAV_LINKS, ROUTES } from "@/constants";
-import { useNavbarNavigation, useTheme } from "@/hooks";
+import { NAV_LINKS, ROUTES } from "@/constants";
+import { useNavbarNavigation } from "@/hooks";
 import { GLOBAL_CONFIG } from "@/libs/GlobalConfig";
 
-import { Link, usePathname } from "@/libs/I18nNavigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Settings } from "../Settings/Settings";
-import { ClimaticaLogo, MoonIcon, SunIcon } from "../svg";
+import { ClimaticaLogo, GearIcon } from "../svg";
 
 function BurgerIcon({ isOpen }: { isOpen: boolean }) {
   return (
@@ -38,12 +37,12 @@ function BurgerIcon({ isOpen }: { isOpen: boolean }) {
 
 export function Topbar() {
   const t = useTranslations();
-  const { isDark, toggleTheme } = useTheme();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
   // * links to the other pages: the shared filters, plus (on click) the page's remembered params
-  const { getHref, navigate } = useNavbarNavigation();
+  const { getHref, settingsHref, navigate } = useNavbarNavigation();
+  const isSettingsActive = pathname === ROUTES.SETTINGS;
 
   useEffect(() => {
     queueMicrotask(() => setIsNavOpen(false));
@@ -112,18 +111,18 @@ export function Topbar() {
         </nav>
 
         <div className="flex flex-1 items-center justify-end gap-1">
-          <div className="hidden lg:block">
-            <LanguageSwitcher />
-          </div>
-
-          <button
-            type="button"
-            aria-label={t("topbar.toggleTheme")}
-            onClick={toggleTheme}
-            className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]"
+          <Link
+            href={settingsHref}
+            aria-label={t("navbar.settings")}
+            aria-current={isSettingsActive ? "page" : undefined}
+            className={`hidden h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] transition-colors duration-150 lg:flex ${
+              isSettingsActive
+                ? "bg-[var(--color-primary-muted)] text-[var(--color-primary)]"
+                : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]"
+            }`}
           >
-            {isDark ? <SunIcon /> : <MoonIcon />}
-          </button>
+            <GearIcon />
+          </Link>
 
           <button
             type="button"
@@ -168,13 +167,19 @@ export function Topbar() {
             );
           })}
 
-          <li className="mt-2 border-t border-[var(--color-border)] pt-2">
-            <LanguageSwitcher variant={LANGUAGE_SWITCHER_VARIANTS.INLINE} />
-          </li>
-
-          {/* * below lg the settings live here; from lg up they're in the sidebar */}
-          <li className="mt-2 px-4">
-            <Settings />
+          <li className="mt-2 border-t border-[var(--color-border)] pt-3">
+            <Link
+              href={settingsHref}
+              onClick={() => setIsNavOpen(false)}
+              aria-current={isSettingsActive ? "page" : undefined}
+              className={`block w-full rounded-[var(--radius-sm)] px-4 py-3 text-[length:var(--font-sm)] transition-colors duration-150 ${
+                isSettingsActive
+                  ? "bg-[var(--color-primary)] font-medium text-white"
+                  : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]"
+              }`}
+            >
+              {t("navbar.settings")}
+            </Link>
           </li>
         </ul>
       </div>
