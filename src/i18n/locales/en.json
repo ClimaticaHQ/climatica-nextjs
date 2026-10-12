@@ -1,9 +1,7 @@
 {
-  "topbar": {
-    "toggleTheme": "Toggle theme"
-  },
   "navbar": {
-    "toggleMenu": "Toggle menu"
+    "toggleMenu": "Toggle menu",
+    "settings": "Settings"
   },
   "pages": {
     "climateStatistics": {
@@ -21,6 +19,10 @@
     "heatMap": {
       "title": "Region Heatmap",
       "description": "Draw an area on the map to see how its climate varies"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Language, appearance and how the app behaves"
     }
   },
   "search": {
@@ -307,16 +309,7 @@
     "months": {
       "all": "All"
     },
-    "autoScroll": "Auto-scroll to results",
-    "syncCity": "Sync selected city across pages",
-    "autoApplyFilters": "Auto-apply filters",
-    "animations": "Animations",
-    "updateHighlight": "Update highlight",
-    "updateHighlightGlow": "Glow",
-    "updateHighlightBorder": "Border",
-    "reducedMotionNotice": "Reduced motion is enabled on this device",
     "filters": "Filters",
-    "settings": "Settings",
     "applyFilters": "Apply filters",
     "cellCount": {
       "label": "({count} cells)",
@@ -383,5 +376,37 @@
     "celsiusValue": "{value}°C",
     "mmValue": "{value} mm",
     "metersValue": "{value} m"
+  },
+  "settings": {
+    "sections": {
+      "language": "Language",
+      "appearance": "Appearance",
+      "chartsAndFilters": "Charts and filters"
+    },
+    "theme": "Theme",
+    "themeOptions": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "autoScroll": "Auto-scroll to results",
+    "syncCity": "Sync selected city across pages",
+    "autoApplyFilters": "Auto-apply filters",
+    "animations": "Animations",
+    "updateHighlight": "Update highlight",
+    "updateHighlightGlow": "Glow",
+    "updateHighlightBorder": "Border",
+    "reducedMotionNotice": "Your system asks to reduce motion, so animations are off",
+    "appLanguage": "App language",
+    "descriptions": {
+      "animations": "Smooth transitions when charts and data change",
+      "updateHighlight": "How a card is marked when its data updates",
+      "autoApplyFilters": "Filter changes apply at once; when off, they wait for “Apply filters”",
+      "syncCity": "A city you pick on one page opens on the other pages too",
+      "autoScroll": "Scrolls down to the results after you pick a city"
+    },
+    "hints": {
+      "turnOnAnimations": "Turn on animations to choose a highlight"
+    }
   }
 }

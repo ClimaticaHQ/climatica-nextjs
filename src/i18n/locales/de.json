@@ -1,9 +1,7 @@
 {
-  "topbar": {
-    "toggleTheme": "Design wechseln"
-  },
   "navbar": {
-    "toggleMenu": "Menü öffnen oder schließen"
+    "toggleMenu": "Menü öffnen oder schließen",
+    "settings": "Einstellungen"
   },
   "pages": {
     "climateStatistics": {
@@ -21,6 +19,10 @@
     "heatMap": {
       "title": "Regionale Wärmekarte",
       "description": "Zeichne ein Gebiet auf der Karte, um zu sehen, wie sein Klima variiert"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "description": "Sprache, Darstellung und Verhalten der App"
     }
   },
   "search": {
@@ -307,16 +309,7 @@
     "months": {
       "all": "Alle"
     },
-    "autoScroll": "Automatisch zu Ergebnissen scrollen",
-    "syncCity": "Ausgewählte Stadt auf allen Seiten synchronisieren",
-    "autoApplyFilters": "Filter automatisch anwenden",
-    "animations": "Animationen",
-    "updateHighlight": "Hervorhebung bei Aktualisierung",
-    "updateHighlightGlow": "Leuchten",
-    "updateHighlightBorder": "Rahmen",
-    "reducedMotionNotice": "Reduzierte Bewegung ist auf diesem Gerät aktiviert",
     "filters": "Filter",
-    "settings": "Einstellungen",
     "applyFilters": "Filter anwenden",
     "cellCount": {
       "label": "({count} Zellen)",
@@ -383,5 +376,37 @@
     "celsiusValue": "{value}°C",
     "mmValue": "{value} mm",
     "metersValue": "{value} m"
+  },
+  "settings": {
+    "sections": {
+      "language": "Sprache",
+      "appearance": "Darstellung",
+      "chartsAndFilters": "Diagramme und Filter"
+    },
+    "theme": "Design",
+    "themeOptions": {
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System"
+    },
+    "autoScroll": "Automatisch zu Ergebnissen scrollen",
+    "syncCity": "Ausgewählte Stadt auf allen Seiten synchronisieren",
+    "autoApplyFilters": "Filter automatisch anwenden",
+    "animations": "Animationen",
+    "updateHighlight": "Hervorhebung bei Aktualisierung",
+    "updateHighlightGlow": "Leuchten",
+    "updateHighlightBorder": "Rahmen",
+    "reducedMotionNotice": "Ihr System verlangt reduzierte Bewegung, daher sind Animationen aus",
+    "appLanguage": "App-Sprache",
+    "descriptions": {
+      "animations": "Weiche Übergänge, wenn sich Diagramme und Daten ändern",
+      "updateHighlight": "Wie eine Karte markiert wird, wenn sich ihre Daten ändern",
+      "autoApplyFilters": "Filteränderungen gelten sofort; ausgeschaltet warten sie auf „Filter anwenden“",
+      "syncCity": "Eine auf einer Seite gewählte Stadt öffnet sich auch auf den anderen Seiten",
+      "autoScroll": "Scrollt nach der Wahl einer Stadt zu den Ergebnissen"
+    },
+    "hints": {
+      "turnOnAnimations": "Schalten Sie Animationen ein, um eine Hervorhebung zu wählen"
+    }
   }
 }

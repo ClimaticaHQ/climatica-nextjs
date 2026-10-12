@@ -1,9 +1,7 @@
 {
-  "topbar": {
-    "toggleTheme": "Changer de thème"
-  },
   "navbar": {
-    "toggleMenu": "Ouvrir ou fermer le menu"
+    "toggleMenu": "Ouvrir ou fermer le menu",
+    "settings": "Paramètres"
   },
   "pages": {
     "climateStatistics": {
@@ -21,6 +19,10 @@
     "heatMap": {
       "title": "Carte de Chaleur Régionale",
       "description": "Dessinez une zone sur la carte pour voir comment son climat varie"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "description": "Langue, apparence et comportement de l’application"
     }
   },
   "search": {
@@ -307,16 +309,7 @@
     "months": {
       "all": "Tous"
     },
-    "autoScroll": "Défilement automatique vers les résultats",
-    "syncCity": "Synchroniser la ville sélectionnée sur toutes les pages",
-    "autoApplyFilters": "Appliquer les filtres automatiquement",
-    "animations": "Animations",
-    "updateHighlight": "Mise en évidence des mises à jour",
-    "updateHighlightGlow": "Halo",
-    "updateHighlightBorder": "Bordure",
-    "reducedMotionNotice": "Le mouvement réduit est activé sur cet appareil",
     "filters": "Filtres",
-    "settings": "Paramètres",
     "applyFilters": "Appliquer les filtres",
     "cellCount": {
       "label": "({count} cellules)",
@@ -383,5 +376,37 @@
     "celsiusValue": "{value} °C",
     "mmValue": "{value} mm",
     "metersValue": "{value} m"
+  },
+  "settings": {
+    "sections": {
+      "language": "Langue",
+      "appearance": "Apparence",
+      "chartsAndFilters": "Graphiques et filtres"
+    },
+    "theme": "Thème",
+    "themeOptions": {
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    },
+    "autoScroll": "Défilement automatique vers les résultats",
+    "syncCity": "Synchroniser la ville sélectionnée sur toutes les pages",
+    "autoApplyFilters": "Appliquer les filtres automatiquement",
+    "animations": "Animations",
+    "updateHighlight": "Mise en évidence des mises à jour",
+    "updateHighlightGlow": "Halo",
+    "updateHighlightBorder": "Bordure",
+    "reducedMotionNotice": "Votre système demande de réduire les animations, elles sont donc désactivées",
+    "appLanguage": "Langue de l’application",
+    "descriptions": {
+      "animations": "Transitions fluides quand les graphiques et les données changent",
+      "updateHighlight": "La façon dont une carte est signalée quand ses données changent",
+      "autoApplyFilters": "Les filtres s’appliquent dès qu’ils changent ; désactivé, ils attendent « Appliquer les filtres »",
+      "syncCity": "Une ville choisie sur une page s’ouvre aussi sur les autres pages",
+      "autoScroll": "Fait défiler jusqu’aux résultats après le choix d’une ville"
+    },
+    "hints": {
+      "turnOnAnimations": "Activez les animations pour choisir une mise en évidence"
+    }
   }
 }

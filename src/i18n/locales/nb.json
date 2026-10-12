@@ -1,9 +1,7 @@
 {
-  "topbar": {
-    "toggleTheme": "Veksle tema"
-  },
   "navbar": {
-    "toggleMenu": "Veksle meny"
+    "toggleMenu": "Veksle meny",
+    "settings": "Innstillinger"
   },
   "pages": {
     "climateStatistics": {
@@ -21,6 +19,10 @@
     "heatMap": {
       "title": "Varmekart for region",
       "description": "Tegn et område på kartet for å se hvordan klimaet varierer"
+    },
+    "settings": {
+      "title": "Innstillinger",
+      "description": "Språk, utseende og hvordan appen oppfører seg"
     }
   },
   "search": {
@@ -307,16 +309,7 @@
     "months": {
       "all": "Alle"
     },
-    "autoScroll": "Rull automatisk til resultater",
-    "syncCity": "Synkroniser valgt by på tvers av sider",
-    "autoApplyFilters": "Bruk filtre automatisk",
-    "animations": "Animasjoner",
-    "updateHighlight": "Fremhev endringer",
-    "updateHighlightGlow": "Glød",
-    "updateHighlightBorder": "Ramme",
-    "reducedMotionNotice": "Redusert bevegelse er aktivert på denne enheten",
     "filters": "Filtre",
-    "settings": "Innstillinger",
     "applyFilters": "Bruk filtre",
     "cellCount": {
       "label": "({count} celler)",
@@ -383,5 +376,37 @@
     "celsiusValue": "{value} °C",
     "mmValue": "{value} mm",
     "metersValue": "{value} m"
+  },
+  "settings": {
+    "sections": {
+      "language": "Språk",
+      "appearance": "Utseende",
+      "chartsAndFilters": "Diagrammer og filtre"
+    },
+    "theme": "Tema",
+    "themeOptions": {
+      "light": "Lyst",
+      "dark": "Mørkt",
+      "system": "System"
+    },
+    "autoScroll": "Rull automatisk til resultater",
+    "syncCity": "Synkroniser valgt by på tvers av sider",
+    "autoApplyFilters": "Bruk filtre automatisk",
+    "animations": "Animasjoner",
+    "updateHighlight": "Fremhev endringer",
+    "updateHighlightGlow": "Glød",
+    "updateHighlightBorder": "Ramme",
+    "reducedMotionNotice": "Systemet ditt ber om redusert bevegelse, så animasjoner er av",
+    "appLanguage": "Appspråk",
+    "descriptions": {
+      "animations": "Myke overganger når diagrammer og data endres",
+      "updateHighlight": "Hvordan et kort markeres når dataene i det oppdateres",
+      "autoApplyFilters": "Filterendringer brukes med en gang; når det er av, venter de på «Bruk filtre»",
+      "syncCity": "En by du velger på én side, åpnes også på de andre sidene",
+      "autoScroll": "Ruller ned til resultatene når du har valgt en by"
+    },
+    "hints": {
+      "turnOnAnimations": "Slå på animasjoner for å velge fremheving"
+    }
   }
 }

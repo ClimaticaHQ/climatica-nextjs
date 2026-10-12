@@ -1,9 +1,7 @@
 {
-  "topbar": {
-    "toggleTheme": "Змінити тему"
-  },
   "navbar": {
-    "toggleMenu": "Перемкнути меню"
+    "toggleMenu": "Перемкнути меню",
+    "settings": "Налаштування"
   },
   "pages": {
     "climateStatistics": {
@@ -21,6 +19,10 @@
     "heatMap": {
       "title": "Теплова мапа регіону",
       "description": "Намалюйте ділянку на мапі, щоб побачити, як змінюється її клімат"
+    },
+    "settings": {
+      "title": "Налаштування",
+      "description": "Мова, вигляд і поведінка застосунку"
     }
   },
   "search": {
@@ -307,16 +309,7 @@
     "months": {
       "all": "Усі"
     },
-    "autoScroll": "Автопрокрутка до результатів",
-    "syncCity": "Синхронізувати вибране місто на всіх сторінках",
-    "autoApplyFilters": "Автоматично застосовувати фільтри",
-    "animations": "Анімації",
-    "updateHighlight": "Підсвічування оновлень",
-    "updateHighlightGlow": "Сяйво",
-    "updateHighlightBorder": "Рамка",
-    "reducedMotionNotice": "На цьому пристрої увімкнено зменшення руху",
     "filters": "Фільтри",
-    "settings": "Налаштування",
     "applyFilters": "Застосувати",
     "cellCount": {
       "label": "({count} клітинок)",
@@ -383,5 +376,37 @@
     "celsiusValue": "{value}°C",
     "mmValue": "{value} mm",
     "metersValue": "{value} m"
+  },
+  "settings": {
+    "sections": {
+      "language": "Мова",
+      "appearance": "Вигляд",
+      "chartsAndFilters": "Графіки та фільтри"
+    },
+    "theme": "Тема",
+    "themeOptions": {
+      "light": "Світла",
+      "dark": "Темна",
+      "system": "Системна"
+    },
+    "autoScroll": "Автопрокрутка до результатів",
+    "syncCity": "Синхронізувати вибране місто на всіх сторінках",
+    "autoApplyFilters": "Автоматично застосовувати фільтри",
+    "animations": "Анімації",
+    "updateHighlight": "Підсвічування оновлень",
+    "updateHighlightGlow": "Сяйво",
+    "updateHighlightBorder": "Рамка",
+    "reducedMotionNotice": "Ваша система просить зменшити рух, тому анімації вимкнено",
+    "appLanguage": "Мова застосунку",
+    "descriptions": {
+      "animations": "Плавні переходи, коли змінюються графіки та дані",
+      "updateHighlight": "Як позначається картка, коли її дані оновлюються",
+      "autoApplyFilters": "Зміни фільтрів застосовуються одразу; якщо вимкнено, вони чекають на «Застосувати»",
+      "syncCity": "Місто, вибране на одній сторінці, відкривається й на інших",
+      "autoScroll": "Прокручує до результатів після вибору міста"
+    },
+    "hints": {
+      "turnOnAnimations": "Увімкніть анімації, щоб вибрати підсвічування"
+    }
   }
 }

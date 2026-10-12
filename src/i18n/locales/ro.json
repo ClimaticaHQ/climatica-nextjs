@@ -1,9 +1,7 @@
 {
-  "topbar": {
-    "toggleTheme": "Comută tema"
-  },
   "navbar": {
-    "toggleMenu": "Comută meniul"
+    "toggleMenu": "Comută meniul",
+    "settings": "Setări"
   },
   "pages": {
     "climateStatistics": {
@@ -21,6 +19,10 @@
     "heatMap": {
       "title": "Hartă termică regională",
       "description": "Desenează o zonă pe hartă pentru a vedea cum variază clima ei"
+    },
+    "settings": {
+      "title": "Setări",
+      "description": "Limba, aspectul și comportamentul aplicației"
     }
   },
   "search": {
@@ -307,16 +309,7 @@
     "months": {
       "all": "Toate"
     },
-    "autoScroll": "Derulare automată la rezultate",
-    "syncCity": "Sincronizează orașul selectat pe toate paginile",
-    "autoApplyFilters": "Aplică filtrele automat",
-    "animations": "Animații",
-    "updateHighlight": "Evidențiere modificări",
-    "updateHighlightGlow": "Strălucire",
-    "updateHighlightBorder": "Bordură",
-    "reducedMotionNotice": "Mișcarea redusă este activată pe acest dispozitiv",
     "filters": "Filtre",
-    "settings": "Setări",
     "applyFilters": "Aplică filtrele",
     "cellCount": {
       "label": "({count} celule)",
@@ -383,5 +376,37 @@
     "celsiusValue": "{value} °C",
     "mmValue": "{value} mm",
     "metersValue": "{value} m"
+  },
+  "settings": {
+    "sections": {
+      "language": "Limbă",
+      "appearance": "Aspect",
+      "chartsAndFilters": "Grafice și filtre"
+    },
+    "theme": "Temă",
+    "themeOptions": {
+      "light": "Luminoasă",
+      "dark": "Întunecată",
+      "system": "Sistem"
+    },
+    "autoScroll": "Derulare automată la rezultate",
+    "syncCity": "Sincronizează orașul selectat pe toate paginile",
+    "autoApplyFilters": "Aplică filtrele automat",
+    "animations": "Animații",
+    "updateHighlight": "Evidențiere modificări",
+    "updateHighlightGlow": "Strălucire",
+    "updateHighlightBorder": "Bordură",
+    "reducedMotionNotice": "Sistemul tău cere mișcare redusă, așa că animațiile sunt oprite",
+    "appLanguage": "Limba aplicației",
+    "descriptions": {
+      "animations": "Tranziții line când se schimbă graficele și datele",
+      "updateHighlight": "Cum este marcat un card când datele lui se actualizează",
+      "autoApplyFilters": "Modificările filtrelor se aplică imediat; dezactivat, așteaptă „Aplică filtrele”",
+      "syncCity": "Orașul ales pe o pagină se deschide și pe celelalte pagini",
+      "autoScroll": "Derulează la rezultate după ce alegi un oraș"
+    },
+    "hints": {
+      "turnOnAnimations": "Pornește animațiile ca să alegi o evidențiere"
+    }
   }
 }

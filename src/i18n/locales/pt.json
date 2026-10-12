@@ -1,9 +1,7 @@
 {
-  "topbar": {
-    "toggleTheme": "Alternar tema"
-  },
   "navbar": {
-    "toggleMenu": "Abrir ou fechar o menu"
+    "toggleMenu": "Abrir ou fechar o menu",
+    "settings": "Definições"
   },
   "pages": {
     "climateStatistics": {
@@ -21,6 +19,10 @@
     "heatMap": {
       "title": "Mapa de Calor Regional",
       "description": "Desenhe uma área no mapa para ver como o seu clima varia"
+    },
+    "settings": {
+      "title": "Definições",
+      "description": "Idioma, aparência e comportamento da aplicação"
     }
   },
   "search": {
@@ -307,16 +309,7 @@
     "months": {
       "all": "Todos"
     },
-    "autoScroll": "Deslocamento automático para os resultados",
-    "syncCity": "Sincronizar cidade selecionada em todas as páginas",
-    "autoApplyFilters": "Aplicar filtros automaticamente",
-    "animations": "Animações",
-    "updateHighlight": "Destaque de atualização",
-    "updateHighlightGlow": "Brilho",
-    "updateHighlightBorder": "Contorno",
-    "reducedMotionNotice": "O movimento reduzido está ativado neste dispositivo",
     "filters": "Filtros",
-    "settings": "Definições",
     "applyFilters": "Aplicar filtros",
     "cellCount": {
       "label": "({count} células)",
@@ -383,5 +376,37 @@
     "celsiusValue": "{value}°C",
     "mmValue": "{value} mm",
     "metersValue": "{value} m"
+  },
+  "settings": {
+    "sections": {
+      "language": "Idioma",
+      "appearance": "Aparência",
+      "chartsAndFilters": "Gráficos e filtros"
+    },
+    "theme": "Tema",
+    "themeOptions": {
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
+    },
+    "autoScroll": "Deslocamento automático para os resultados",
+    "syncCity": "Sincronizar cidade selecionada em todas as páginas",
+    "autoApplyFilters": "Aplicar filtros automaticamente",
+    "animations": "Animações",
+    "updateHighlight": "Destaque de atualização",
+    "updateHighlightGlow": "Brilho",
+    "updateHighlightBorder": "Contorno",
+    "reducedMotionNotice": "O seu sistema pede movimento reduzido, por isso as animações estão desativadas",
+    "appLanguage": "Idioma da aplicação",
+    "descriptions": {
+      "animations": "Transições suaves quando os gráficos e os dados mudam",
+      "updateHighlight": "Como um cartão é assinalado quando os seus dados são atualizados",
+      "autoApplyFilters": "As alterações aos filtros aplicam-se logo; desativado, esperam por «Aplicar filtros»",
+      "syncCity": "A cidade que escolhe numa página abre também nas outras",
+      "autoScroll": "Desce até aos resultados depois de escolher uma cidade"
+    },
+    "hints": {
+      "turnOnAnimations": "Ative as animações para escolher um destaque"
+    }
   }
 }
