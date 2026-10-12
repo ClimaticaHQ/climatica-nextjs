@@ -9,8 +9,6 @@ export type TToggleChipProps = {
   isLocked?: boolean;
   /** a colour dot before the label — e.g. a compared year's series colour */
   dotColor?: string;
-  /** fills its cell, the label centred — chips laid out as a grid */
-  isStretched?: boolean;
   onClick: () => void;
 };
 

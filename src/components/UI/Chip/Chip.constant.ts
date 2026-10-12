@@ -10,7 +10,6 @@ export const TOGGLE_CHIP_CLASSES = {
     "cursor-pointer border-[var(--color-chip-active-border)] bg-[var(--color-chip-active-bg)] text-[var(--color-chip-active-text)]",
   IDLE: "cursor-pointer border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:border-[var(--color-chip-active-border)] hover:text-[var(--color-chip-active-text)]",
   LABEL_WITH_DOT: "inline-flex items-center gap-1.5",
-  STRETCHED: "w-full text-center",
 } as const;
 
 // * a filter bar chip is a ≥44px-tall button (the touch target); the pill inside is what shows

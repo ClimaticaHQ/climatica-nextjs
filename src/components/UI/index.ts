@@ -1,7 +1,6 @@
 export { Button } from "./Button";
 export { ChartSkeleton } from "./ChartSkeleton";
 export { Chip } from "./Chip";
-export { CollapsibleSection } from "./CollapsibleSection";
 export { DotLabel } from "./DotLabel/DotLabel";
 export { Dropdown } from "./Dropdown";
 export { MapSkeleton } from "./MapSkeleton";
