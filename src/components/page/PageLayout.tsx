@@ -33,9 +33,9 @@ export function PageLayout({
     <PageWrapper>
       <div className={C.ROOT}>
         <PageHeader title={title} description={description} />
-        <div className={C.CONTROLS}>{controls}</div>
+        {controls !== undefined && <div className={C.CONTROLS}>{controls}</div>}
         {map}
-        <PageStatus state={state} />
+        {state !== undefined && <PageStatus state={state} />}
         {update ? <DataUpdateProvider {...update}>{results}</DataUpdateProvider> : results}
       </div>
     </PageWrapper>

@@ -4,12 +4,13 @@ import type { ReactNode, RefObject } from "react";
 export type TPageLayoutProps = {
   title: string;
   description: string;
-  /** search, mini maps, the filter bar — what the reader picks with */
-  controls: ReactNode;
+  /** search, mini maps, the filter bar — what the reader picks with; none on a page without */
+  controls?: ReactNode;
   /** a map to pick the place on, at the page's spacing below the controls */
   map?: ReactNode;
-  /** the results' state: an empty or error message shows between the controls and the results */
-  state: TDataState;
+  /** the results' state: an empty or error message shows between the controls and the results;
+   * none for a page without data */
+  state?: TDataState;
   /** flashes and announces the results' updates */
   update?: TPageUpdate | undefined;
   /** the results' frame — where a picked city scrolls to */
