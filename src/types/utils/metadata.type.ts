@@ -2,8 +2,7 @@ import type { TLocale } from "@/types";
 
 export type TSearchParams = Record<string, string | string[] | undefined>;
 
-export type TLocalePageProps = {
-  params: Promise<{ locale: string }>;
+export type TPageProps = {
   searchParams: Promise<TSearchParams>;
 };
 
