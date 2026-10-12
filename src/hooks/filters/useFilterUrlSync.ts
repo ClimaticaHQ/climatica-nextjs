@@ -1,15 +1,15 @@
 "use client";
 
+import { useLegacyStorageCleanup } from "../persisted/useLegacyStorageCleanup";
 import { useLastPageParamsSync } from "../url/useLastPageParamsSync";
 import { useCanonicalFilterUrl } from "./useCanonicalFilterUrl";
-import { useLegacyFilterStorageCleanup } from "./useLegacyFilterStorageCleanup";
 
 /**
  * App-wide URL upkeep: keeps the filter params canonical, remembers each page's own params
- * for the navbar links, and clears the filters older versions kept in localStorage.
+ * for the navbar links, and clears what older versions kept in localStorage.
  */
 export function useFilterUrlSync() {
   useCanonicalFilterUrl();
   useLastPageParamsSync();
-  useLegacyFilterStorageCleanup();
+  useLegacyStorageCleanup();
 }

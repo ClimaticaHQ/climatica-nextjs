@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "@/libs/I18nNavigation";
+import { usePathname } from "next/navigation";
 import { useLastPageParamsStore } from "@/stores";
 import { toPageRoute } from "@/utils/lastPageParams.util";
 import { extractPageParams } from "@/utils/pageParams.util";

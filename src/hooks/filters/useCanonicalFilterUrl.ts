@@ -1,9 +1,7 @@
 "use client";
 
-import { useLocale } from "next-intl";
-import { usePathname, useRouter } from "@/libs/I18nNavigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useNavigationIntentStore } from "@/stores";
-import { buildLocalePathname } from "@/utils/export/shared/shareUrl.util";
 import { getCanonicalFilterUrlParams } from "@/utils/filtersUrl.util";
 import { replaceUrlParams } from "@/utils/navigation.util";
 import { canWriteUrlState } from "@/utils/urlStateGuard.util";
@@ -20,7 +18,6 @@ import { useFilterView } from "./useFilterView";
 export function useCanonicalFilterUrl() {
   const router = useRouter();
   const pathname = usePathname();
-  const locale = useLocale();
   const view = useFilterView();
   const search = useSearchParams().toString();
 
@@ -29,11 +26,10 @@ export function useCanonicalFilterUrl() {
     const canonical = getCanonicalFilterUrlParams(new URLSearchParams(search));
     if (canonical === null) return;
 
-    const pagePathname = buildLocalePathname(locale, pathname);
     const timer = window.setTimeout(() => {
       const canWrite = canWriteUrlState({
         currentPathname: window.location.pathname,
-        pagePathname,
+        pagePathname: pathname,
         pendingPathname: useNavigationIntentStore.getState().pendingPathname,
         currentSearch: new URLSearchParams(window.location.search).toString(),
         scheduledSearch: search,
@@ -41,5 +37,5 @@ export function useCanonicalFilterUrl() {
       if (canWrite) replaceUrlParams(router, pathname, canonical);
     });
     return () => window.clearTimeout(timer);
-  }, [view, search, locale, pathname, router]);
+  }, [view, search, pathname, router]);
 }

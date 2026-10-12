@@ -1,7 +1,7 @@
 "use client";
 
 import { DEFAULT_CHART_MODE, SIDEBAR_PARAMS } from "@/constants";
-import { usePathname, useRouter } from "@/libs/I18nNavigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { TChartMode } from "@/types";
 import { replaceUrlParams } from "@/utils/navigation.util";
 import { chartModeUrlField } from "@/utils/urlFields.util";

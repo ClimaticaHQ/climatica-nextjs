@@ -1,5 +1,5 @@
 import { env } from "@/libs/Env";
-import { usePathname, useRouter } from "@/libs/I18nNavigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useNavigationIntentStore } from "@/stores";
 import type { TUseUrlStateSyncParams, TUseUrlStateSyncReturn } from "@/types";
 import {
@@ -12,8 +12,6 @@ import {
   serializeUrlState,
   withFilterParams,
 } from "@/utils";
-import { buildLocalePathname } from "@/utils/export/shared/shareUrl.util";
-import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useIsClient } from "./useIsClient";
@@ -46,7 +44,6 @@ export function useUrlStateSync<TState extends Record<string, unknown>>({
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const locale = useLocale();
   const isReady = useIsClient();
 
   const lastWrittenRef = useRef<string | null>(null);
@@ -74,11 +71,10 @@ export function useUrlStateSync<TState extends Record<string, unknown>>({
     }
 
     if (action !== "stateChange") return;
-    const pagePathname = buildLocalePathname(locale, pathname);
     const timer = window.setTimeout(() => {
       const canWrite = canWriteUrlState({
         currentPathname: window.location.pathname,
-        pagePathname,
+        pagePathname: pathname,
         pendingPathname: useNavigationIntentStore.getState().pendingPathname,
         currentSearch: new URLSearchParams(window.location.search).toString(),
         scheduledSearch: searchParamsString,
@@ -88,7 +84,7 @@ export function useUrlStateSync<TState extends Record<string, unknown>>({
       replaceUrlParams(router, pathname, withFilterParams(next, searchParams));
     });
     return () => window.clearTimeout(timer);
-  }, [isReady, schema, state, searchParams, router, pathname, locale, onRestore]);
+  }, [isReady, schema, state, searchParams, router, pathname, onRestore]);
 
   function pushUrlState(partial: Partial<TState>): void {
     const next = serializeUrlState(schema, { ...state, ...partial });
@@ -97,7 +93,7 @@ export function useUrlStateSync<TState extends Record<string, unknown>>({
   }
 
   const shareParams = withFilterParams(serializeUrlState(schema, state), searchParams);
-  const shareUrl = `${env.NEXT_PUBLIC_SITE_URL}${buildLocalePathname(locale, pathname)}?${shareParams.toString()}`;
+  const shareUrl = `${env.NEXT_PUBLIC_SITE_URL}${pathname}?${shareParams.toString()}`;
 
   return { pushUrlState, shareUrl };
 }

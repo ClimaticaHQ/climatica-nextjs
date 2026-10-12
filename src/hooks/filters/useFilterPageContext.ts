@@ -2,7 +2,7 @@
 
 import { FILTER_FALLBACK_VIEW } from "@/constants";
 import { EFilterView } from "@/enums";
-import { usePathname } from "@/libs/I18nNavigation";
+import { usePathname } from "next/navigation";
 import type { TFilterPageContext } from "@/types";
 import { parseHeatmapBoundsParams } from "@/utils/bbox.util";
 import { isWalterLiethShown } from "@/utils/chartMode.util";

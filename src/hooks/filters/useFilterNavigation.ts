@@ -2,7 +2,7 @@
 
 import { FILTER_NAVIGATION_MODES } from "@/constants";
 import { EFilterNavigation, type EFilterApplyMode } from "@/enums";
-import { usePathname, useRouter } from "@/libs/I18nNavigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { TFilters } from "@/types";
 import { serializeFilters } from "@/utils/filtersUrl.util";
 import { pushUrlParams, replaceUrlParams } from "@/utils/navigation.util";

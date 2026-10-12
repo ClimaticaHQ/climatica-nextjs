@@ -11,3 +11,4 @@ export { useWeatherYearsViewState } from "./useWeatherYearsViewState";
 export { useComparePeriodsPage } from "./useComparePeriodsPage";
 export { useHeatMapPage } from "./useHeatMapPage";
 export { useTooManyCellsMessage } from "./useTooManyCellsMessage";
+export { useSettingsPage } from "./useSettingsPage";
