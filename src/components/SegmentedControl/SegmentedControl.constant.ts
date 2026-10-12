@@ -11,7 +11,9 @@ export const SEGMENTED_CONTROL_CLASSES = {
   OPTION: `${FOCUS_RING_CLASS} relative flex items-center justify-center gap-1.5 rounded-full px-3 py-1 text-[length:var(--font-sm)] font-medium transition-colors duration-150 max-sm:min-h-11 max-sm:min-w-11 max-sm:px-2`,
   // * the pill (INDICATOR) paints the active background
   ACTIVE: "text-[var(--color-chip-active-text)]",
-  INACTIVE: "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]",
+  INACTIVE:
+    "text-[var(--color-text-secondary)] enabled:hover:text-[var(--color-text)] disabled:cursor-not-allowed",
+  DISABLED: "opacity-50",
   // * the label is dropped below `sm`; the button keeps aria-label and title then. A long label
   // * (a series name) is cut with an ellipsis so the control never wraps its row
   LABEL: "max-w-48 truncate max-sm:sr-only",
