@@ -1,33 +1,20 @@
-import { TLocale } from "@/types";
 import { LOCALES } from "./locales.constant";
 
-const LANGUAGE_METADATA: Record<TLocale, { label: string; flag: string }> = {
-  de: { label: "DE", flag: "🇩🇪" },
-  el: { label: "EL", flag: "🇬🇷" },
-  en: { label: "EN", flag: "🇬🇧" },
-  es: { label: "ES", flag: "🇪🇸" },
-  fr: { label: "FR", flag: "🇫🇷" },
-  it: { label: "IT", flag: "🇮🇹" },
-  nb: { label: "NB", flag: "🇳🇴" },
-  pt: { label: "PT", flag: "🇵🇹" },
-  ro: { label: "RO", flag: "🇷🇴" },
-  uk: { label: "UA", flag: "🇺🇦" },
+// * each language in its own name, so a reader finds theirs whatever language the page is in
+const LANGUAGE_NATIVE_NAMES: Readonly<Record<string, string>> = {
+  de: "Deutsch",
+  el: "Ελληνικά",
+  en: "English",
+  es: "Español",
+  fr: "Français",
+  it: "Italiano",
+  nb: "Norsk bokmål",
+  pt: "Português",
+  ro: "Română",
+  uk: "Українська",
 };
 
-export const LANGUAGES = LOCALES.map((code) => {
-  const meta = LANGUAGE_METADATA[code as TLocale];
-
-  return {
-    code,
-    label: meta ? `${meta.label} ${meta.flag}` : code.toUpperCase(),
-  };
-});
-
-export const DEFAULT_LANGUAGE: TLocale = "en";
-
-export const SUPPORTED_LANGUAGE_CODES = new Set<string>(LOCALES);
-
-export const LANGUAGE_SWITCHER_VARIANTS = {
-  DROPDOWN: "dropdown",
-  INLINE: "inline",
-} as const;
+export const LANGUAGES = LOCALES.map((code) => ({
+  code,
+  label: LANGUAGE_NATIVE_NAMES[code] ?? code.toUpperCase(),
+}));
