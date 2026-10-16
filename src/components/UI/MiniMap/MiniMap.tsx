@@ -1,6 +1,8 @@
 "use client";
 
 import type { CircleMarker as LCircleMarker, Map as LMap } from "leaflet";
+import { Card } from "@/components/Card";
+import { ECardPadding } from "@/enums";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
@@ -102,11 +104,15 @@ export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
   const showToggle = locations.length === 2;
 
   return (
-    <div className="h-[120px] w-full shrink-0 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] shadow-sm sm:h-[160px] sm:w-[260px]">
+    <Card
+      padding={ECardPadding.NONE}
+      shouldClip
+      className="h-[120px] w-full shrink-0 sm:h-[160px] sm:w-[260px]"
+    >
       <div className="flex h-full flex-col">
         {showToggle && (
-          <div className="shrink-0 flex justify-center border-b border-[var(--color-border)] bg-[var(--color-bg)] px-2 py-1.5">
-            <div className="flex rounded-full border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-0.5">
+          <div className="shrink-0 flex justify-center border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1.5">
+            <div className="flex rounded-full border border-[var(--color-border)] bg-[var(--color-surface-secondary)] p-0.5">
               {locations.map((loc, i) => (
                 <button
                   key={loc.label}
@@ -114,7 +120,7 @@ export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
                   onClick={() => onToggle?.(i)}
                   className={`rounded-full px-3 py-1 text-[length:var(--font-xs)] font-medium transition-colors duration-150 ${
                     activeIndex === i
-                      ? "text-white"
+                      ? "text-[var(--color-on-series)]"
                       : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
                   }`}
                   style={activeIndex === i ? { backgroundColor: loc.color } : undefined}
@@ -130,6 +136,6 @@ export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
           <div ref={containerRef} style={{ height: "100%" }} className="w-full" />
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

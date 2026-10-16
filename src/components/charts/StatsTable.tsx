@@ -3,8 +3,7 @@
 import { Card } from "@/components/Card";
 import { MartonneBadge } from "@/components/MartonneBadge";
 import { ScrollEdgeFades } from "@/components/ScrollEdgeFades";
-import { SeriesMarker } from "@/components/SeriesMarker";
-import { COMPARISON_METRIC_LABEL_KEYS, DIFFERENCE_DIRECTION_SEPARATOR } from "@/constants";
+import { COMPARISON_METRIC_LABEL_KEYS } from "@/constants";
 import { ECardPadding } from "@/enums";
 import { useScrollEdges } from "@/hooks/ui/useScrollEdges";
 import { useTranslations } from "next-intl";
@@ -15,13 +14,14 @@ import {
   STATS_TABLE_MIN_REM,
 } from "./charts.constant";
 import type { TStatsTableProps } from "./charts.type";
+import { StatsTableHead } from "./StatsTableHead";
 
 /**
  * Every series side by side, metric by metric, in its colour — and a pair's difference (its
- * direction under the header; below `sm` a line under the second value). A loading series' cells
+ * formula in the header's popover; below `sm` a line under the second value). A loading series' cells
  * wait; more series than fit scroll sideways, the metrics pinned. Flashes when a series updates.
  */
-export function StatsTable({ table, columns, martonneLabel }: TStatsTableProps) {
+export function StatsTable({ table, columns, martonneLabel, differenceMeaning }: TStatsTableProps) {
   const t = useTranslations();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const ids = table.columns.map(({ id }) => id);
@@ -47,31 +47,7 @@ export function StatsTable({ table, columns, martonneLabel }: TStatsTableProps) 
               ))}
               {difference && <col className={C.DIFFERENCE} />}
             </colgroup>
-            <thead>
-              <tr className={C.HEAD_ROW}>
-                <th scope="col" className={C.METRIC_HEAD}>
-                  <span className={C.CAPTION}>{t("climateComparison.metric")}</span>
-                </th>
-                {table.columns.map(({ id, label }, index) => (
-                  <th key={id} scope="col" className={C.HEAD_CELL}>
-                    <span className={C.SERIES_NAME} title={label}>
-                      {columns[index] && <SeriesMarker {...columns[index].marker} />}
-                      <span className={C.SERIES_LABEL}>{label}</span>
-                    </span>
-                  </th>
-                ))}
-                {difference && (
-                  <th scope="col" className={`${C.HEAD_CELL} ${C.DIFFERENCE}`}>
-                    {t("climateComparison.difference")}
-                    <span className={C.MUTED_LINE}>
-                      <span className={C.NO_WRAP}>{difference.minuend}</span>
-                      {DIFFERENCE_DIRECTION_SEPARATOR}
-                      <span className={C.NO_WRAP}>{difference.subtrahend}</span>
-                    </span>
-                  </th>
-                )}
-              </tr>
-            </thead>
+            <StatsTableHead table={table} columns={columns} differenceMeaning={differenceMeaning} />
             <tbody>
               {table.rows.map((row) => (
                 <tr key={row.metric} className={C.ROW}>

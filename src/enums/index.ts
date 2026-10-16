@@ -16,3 +16,5 @@ export * from "./chart.enum";
 export * from "./apiError.enum";
 export * from "./statusMessage.enum";
 export * from "./citySlot.enum";
+export * from "./badge.enum";
+export * from "./popover.enum";

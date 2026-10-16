@@ -1,2 +1,2 @@
 export { WalterLiethChart } from "./WalterLiethChart";
-export { WalterLiethIncompleteNotice } from "./components";
+export { WalterLiethGuide, WalterLiethIncompleteNotice } from "./components";

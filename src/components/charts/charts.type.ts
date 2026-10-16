@@ -2,6 +2,7 @@ import type {
   EChartBlock,
   EChartBlockPlacement,
   EChartBody,
+  EDifferenceMeaning,
   EPairSide,
   ECompareLayout,
   EWalterLiethShading,
@@ -215,6 +216,14 @@ export type TStatsTableProps = {
   columns: readonly TStatsTableColumn[];
   /** the Martonne row's name: per year, for one year, or plain */
   martonneLabel: string;
+  /** what the pair's difference compares; null without the difference feature */
+  differenceMeaning: EDifferenceMeaning | null;
+};
+
+export type TStatsTableHeadProps = Omit<TStatsTableProps, "martonneLabel">;
+
+export type TSeriesHeadLabelProps = {
+  label: string;
 };
 
 export type TBarShape = {

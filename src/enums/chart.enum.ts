@@ -23,3 +23,11 @@ export enum EChartBlockPlacement {
   /** above the chart card, in the chart section */
   SECTION = "section",
 }
+
+/** What a pair's difference compares — its header explains a positive value by it. */
+export enum EDifferenceMeaning {
+  /** the second city against the first */
+  CITIES = "cities",
+  /** the later period against the earlier */
+  PERIODS = "periods",
+}

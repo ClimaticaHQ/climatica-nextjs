@@ -7,7 +7,7 @@ export function WalterLiethIncompleteNotice({ label }: TWalterLiethIncompleteNot
   return (
     <p
       role="status"
-      className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-6 text-center text-[length:var(--font-sm)] text-[var(--color-text-secondary)]"
+      className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-secondary)] px-4 py-6 text-center text-[length:var(--font-sm)] text-[var(--color-text-secondary)]"
     >
       {t("chart.wlIncomplete", { label })}
     </p>

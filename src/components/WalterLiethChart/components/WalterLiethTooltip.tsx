@@ -13,7 +13,7 @@ export function WalterLiethTooltip({ active, payload }: TWalterLiethTooltipProps
   const isArid = isAridMonth(row);
 
   return (
-    <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg)] p-2 text-[13px]">
+    <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-[13px]">
       <p className="mb-1 font-semibold text-[var(--color-text)]">
         {t(`months.${row.monthIndex + 1}`)}
       </p>

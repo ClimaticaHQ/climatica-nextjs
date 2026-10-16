@@ -72,6 +72,7 @@ function StatsTableBlock({ model, features }: TSectionBlockProps) {
         },
       }))}
       martonneLabel={martonneLabel}
+      differenceMeaning={features.difference?.meaning ?? null}
     />
   );
 }

@@ -3,7 +3,7 @@
 import { Card } from "@/components";
 import { DataUpdateFade, DataUpdateProgress } from "@/components/DataUpdate";
 import { DEFAULT_HEATMAP_LOCATION, HEATMAP_MAP_CONFIG } from "@/constants";
-import { ECardElevation, ECardPadding } from "@/enums";
+import { ECardPadding } from "@/enums";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer } from "react-leaflet";
 import type { TMapCanvasProps } from "../HeatMap.type";
@@ -25,12 +25,7 @@ export function MapCanvas({
   onPolygonComplete,
 }: TMapCanvasProps) {
   return (
-    <Card
-      padding={ECardPadding.NONE}
-      elevation={ECardElevation.RAISED}
-      shouldClip
-      className="relative h-[70vh] sm:h-[520px]"
-    >
+    <Card padding={ECardPadding.NONE} shouldClip className="relative h-[70vh] sm:h-[520px]">
       {/* * loading: the map dims and the progress bar runs along its top edge, like a chart card;
           the previous cells stay until the new ones arrive */}
       <DataUpdateProgress />

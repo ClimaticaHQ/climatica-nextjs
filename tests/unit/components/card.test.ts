@@ -1,14 +1,13 @@
 import {
   CARD_BACKGROUND_CLASSES,
   CARD_CLIP_CLASS,
-  CARD_ELEVATION_CLASSES,
   CARD_FLAT_BELOW_SM_CLASS,
   CARD_FRAME_CLASS,
   CARD_PADDING_CLASSES,
   CARD_SIZE_CLASSES,
 } from "@/components/Card/Card.constant";
 import { getCardClassName } from "@/components/Card/Card.util";
-import { ECardBackground, ECardElevation, ECardPadding, ECardSize } from "@/enums";
+import { ECardBackground, ECardPadding, ECardSize } from "@/enums";
 import { describe, expect, it } from "vitest";
 
 const classes = (className: string) => className.split(" ");
@@ -51,10 +50,8 @@ describe("Card variants", () => {
       .forEach((padding) => expect(className).not.toContain(padding));
   });
 
-  it("raises only the RAISED elevation", () => {
-    const shadow = CARD_ELEVATION_CLASSES[ECardElevation.RAISED];
-    expect(classes(getCardClassName({ elevation: ECardElevation.RAISED }))).toContain(shadow);
-    expect(classes(getCardClassName({ elevation: ECardElevation.FLAT }))).not.toContain(shadow);
+  it("casts no shadow: a card sits in the page's flow", () => {
+    expect(getCardClassName({})).not.toMatch(/shadow/);
   });
 
   it("uses the muted background for placeholders", () => {

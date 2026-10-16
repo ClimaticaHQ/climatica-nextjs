@@ -15,11 +15,6 @@ export enum ECardPadding {
   DEFAULT = "default",
 }
 
-export enum ECardElevation {
-  FLAT = "flat",
-  RAISED = "raised",
-}
-
 // * a stat card's value: XL for a short number, LG for text that may wrap (a city name)
 export enum EStatValueSize {
   LG = "lg",

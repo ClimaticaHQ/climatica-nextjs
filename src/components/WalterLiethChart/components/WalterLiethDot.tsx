@@ -17,7 +17,7 @@ export function WalterLiethDot({
   }[isSmall ? "small" : "regular"];
   const common = {
     fill: color,
-    stroke: "var(--color-plot-bg)",
+    stroke: "var(--color-surface)",
     strokeWidth: isActive ? WALTER_LIETH_DOT.ACTIVE_STROKE_WIDTH : WALTER_LIETH_DOT.STROKE_WIDTH,
     opacity: isDimmed ? WALTER_LIETH_DOT.DIMMED_OPACITY : 1,
   };

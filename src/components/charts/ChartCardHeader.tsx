@@ -1,8 +1,4 @@
-import { ChartSwitches } from "./ChartSwitches";
-import { ChartTitle } from "./ChartTitle";
-import { VariableChips } from "./VariableChips";
-import { ShadingControl } from "./ShadingControl";
-import { WalterLiethGuide } from "@/components/WalterLiethGuide";
+import { WalterLiethGuide } from "@/components/WalterLiethChart";
 import { ECompareLayout } from "@/enums";
 import { isCompleteSeries } from "@/utils";
 import {
@@ -11,6 +7,10 @@ import {
 } from "./charts.constant";
 import type { TChartCardHeaderProps } from "./charts.type";
 import { getTitleNames } from "./charts.util";
+import { ChartSwitches } from "./ChartSwitches";
+import { ChartTitle } from "./ChartTitle";
+import { ShadingControl } from "./ShadingControl";
+import { VariableChips } from "./VariableChips";
 
 /**
  * The card's top: the title block with the chart type and layout switches (beside it, or under
