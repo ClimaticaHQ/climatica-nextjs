@@ -1,5 +1,6 @@
 import type { TSvgToPngParams } from "@/types";
 import { triggerDownload } from "../shared/download.util";
+import { resolveCssVars } from "../shared/exportPalette.util";
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -19,7 +20,7 @@ export async function svgToPng(params: TSvgToPngParams): Promise<void> {
   const { svg, width, height, filename } = params;
   const scale = params.scale ?? 2;
 
-  const svgBlob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+  const svgBlob = new Blob([resolveCssVars(svg)], { type: "image/svg+xml;charset=utf-8" });
   const svgUrl = URL.createObjectURL(svgBlob);
 
   try {

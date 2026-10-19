@@ -11,23 +11,29 @@ import type {
   TExportTableCellArgs,
   TExportTableValueArgs,
 } from "@/types";
-import { escapeXml } from "@/utils";
+import { escapeXml, getSeriesTextColor } from "@/utils";
 import { estimateTextWidth } from "./textWrap.util";
 
 const seriesColor = (id: EWalterLiethSeriesId, colors: TExportChartColors) =>
   id === EWalterLiethSeriesId.A ? colors.wlSeriesA : colors.wlSeriesB;
+const valueColor = (id: EWalterLiethSeriesId, colors: TExportChartColors) =>
+  getSeriesTextColor({
+    color: seriesColor(id, colors),
+    isLargeText: false,
+    textColor: colors.text,
+  });
 
 const text = ({ x, y, value, anchor, size, weight, fill }: TExportTableCellArgs) =>
   `<text x="${x.toFixed(2)}" y="${y}" text-anchor="${anchor}" font-size="${size}"${weight ? ` font-weight="${weight}"` : ""} fill="${fill}">${escapeXml(value)}</text>`;
 
-/** A value right-aligned at `right`, its Martonne badge (text on its class colors) before it. */
+/** A value right-aligned at `right`, its Martonne badge in its class colours before it. */
 function buildValue({ value, badgeText, cell }: TExportTableValueArgs) {
   const valueSvg = text({ ...cell, value: value.text, anchor: "end", size: C.FONT_SIZE });
   if (!value.badge || badgeText === null) return valueSvg;
   const badgeWidth = estimateTextWidth(badgeText, T.BADGE_FONT_SIZE) + T.BADGE_PADDING_X * 2;
   const badgeX = cell.x - estimateTextWidth(value.text, C.FONT_SIZE) - C.MARKER_GAP - badgeWidth;
   const top = cell.y - T.BADGE_RISE;
-  return `<rect x="${badgeX.toFixed(2)}" y="${top}" width="${badgeWidth.toFixed(2)}" height="${T.BADGE_HEIGHT}" rx="${T.BADGE_RADIUS}" fill="${value.badge.bg}" />${text(
+  return `<rect x="${badgeX.toFixed(2)}" y="${top}" width="${badgeWidth.toFixed(2)}" height="${T.BADGE_HEIGHT}" rx="${T.BADGE_RADIUS}" fill="${value.badge.tone.bg}" stroke="${value.badge.tone.border}" />${text(
     {
       x: badgeX + T.BADGE_PADDING_X,
       y: top + T.BADGE_TEXT_Y,
@@ -35,7 +41,7 @@ function buildValue({ value, badgeText, cell }: TExportTableValueArgs) {
       anchor: "start",
       size: T.BADGE_FONT_SIZE,
       weight: T.BADGE_FONT_WEIGHT,
-      fill: value.badge.color,
+      fill: value.badge.tone.text,
     },
   )}${valueSvg}`;
 }
@@ -43,7 +49,7 @@ function buildValue({ value, badgeText, cell }: TExportTableValueArgs) {
 /**
  * String twin of the page's stats table for a pair: metric | A | B | Difference in a framed
  * card, a light header row with the series markers and the difference's direction, thin
- * dividers, values right-aligned in their series colors, the difference muted.
+ * dividers, values right-aligned in the text colour, the difference muted.
  */
 export function buildComparisonTableSvg({
   table,
@@ -117,7 +123,7 @@ export function buildComparisonTableSvg({
             x: colRight(0),
             y,
             weight: C.VALUE_FONT_WEIGHT,
-            fill: seriesColor(table.seriesA.id, colors),
+            fill: valueColor(table.seriesA.id, colors),
           },
         }),
         buildValue({
@@ -127,7 +133,7 @@ export function buildComparisonTableSvg({
             x: colRight(1),
             y,
             weight: C.VALUE_FONT_WEIGHT,
-            fill: seriesColor(table.seriesB.id, colors),
+            fill: valueColor(table.seriesB.id, colors),
           },
         }),
         row.difference !== null

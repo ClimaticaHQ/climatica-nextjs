@@ -5,7 +5,8 @@ import type {
   TExportValuesRowsArgs,
   TMonthlyValuesRow,
 } from "@/types";
-import { buildMonthlyValuesRows, escapeXml } from "@/utils";
+import { buildMonthlyValuesRows, escapeXml, getSeriesTextColor } from "@/utils";
+import { buildMarker } from "./monthlyTableExport.util";
 
 /** The export's unit colors — the WL red and blue, as on screen. */
 export const getValuesExportPalette = (colors: TExportChartColors) => ({
@@ -13,14 +14,17 @@ export const getValuesExportPalette = (colors: TExportChartColors) => ({
   prec: colors.wlPrec,
 });
 
-/** The export's rows for these series (one: text color; overlay: A / B series colors). */
+/** The export's rows for these series, every value in the text colour, as on screen. */
 export const buildExportValuesRows = ({
   series,
   colors,
   locale,
 }: TExportValuesRowsArgs): TMonthlyValuesRow[] =>
   buildMonthlyValuesRows({
-    series,
+    series: series.map((entry) => ({
+      ...entry,
+      color: getSeriesTextColor({ color: entry.color, isLargeText: false, textColor: colors.text }),
+    })),
     palette: getValuesExportPalette(colors),
     // * screen-reader names only — the export draws the units
     names: { tavg: "", prec: "" },
@@ -59,10 +63,14 @@ export function fitValueFontSize(
   return Math.max(V.FIT.MIN_FONT_SIZE, Math.min(preferred, Math.floor(fitting * 2) / 2));
 }
 
+/** A line's centre in a row: the row's lines stacked around its middle. */
+const lineCentre = (cy: number, line: number, lines: number) =>
+  cy + (line - (lines - 1) / 2) * V.LINE_HEIGHT;
+
 /**
  * String twin of MonthlyValuesTable: a framed two-row table under a plot — the unit in its
- * color in the left gutter, one column per month exactly under that month of the plot, A's
- * value above B's in overlay.
+ * color in the left gutter (in overlay with the series' markers beside it), one column per
+ * month exactly under that month of the plot, A's value above B's in overlay.
  */
 export function buildMonthlyValuesSvg({
   rows,
@@ -70,6 +78,7 @@ export function buildMonthlyValuesSvg({
   gutter,
   top,
   colors,
+  markers = [],
 }: TExportMonthlyValuesArgs) {
   const monthCount = rows[0]?.cells.length ?? 0;
   if (monthCount === 0) return { svg: "", bottom: top };
@@ -91,19 +100,27 @@ export function buildMonthlyValuesSvg({
         r > 0
           ? `<line x1="${left}" y1="${rowTop}" x2="${left + width}" y2="${rowTop}" stroke="${colors.border}" stroke-width="1" />`
           : "";
-      const unit = `<text x="${left + gutter / 2}" y="${cy + V.BASELINE}" text-anchor="middle" font-size="${V.UNIT_FONT_SIZE}" font-weight="${V.UNIT_FONT_WEIGHT}" fill="${row.unitColor}">${escapeXml(row.unit)}</text>`;
+      const centre = left + gutter / 2;
+      const unitX = markers.length > 0 ? centre - V.UNIT_MARKER_GAP : centre;
+      const anchor = markers.length > 0 ? "end" : "middle";
+      const unit = `<text x="${unitX}" y="${cy + V.BASELINE}" text-anchor="${anchor}" font-size="${V.UNIT_FONT_SIZE}" font-weight="${V.UNIT_FONT_WEIGHT}" fill="${row.unitColor}">${escapeXml(row.unit)}</text>`;
+      const unitMarkers = markers
+        .map((marker, m) =>
+          buildMarker(marker, centre + V.UNIT_MARKER_GAP, lineCentre(cy, m, markers.length)),
+        )
+        .join("");
       const values = row.cells
         .map((entries, i) =>
           entries
             .map((entry, e) => {
-              const y = cy + (e - (entries.length - 1) / 2) * V.LINE_HEIGHT + V.BASELINE;
+              const y = lineCentre(cy, e, entries.length) + V.BASELINE;
               return `<text x="${(span.left + monthWidth * (i + 0.5)).toFixed(2)}" y="${y}" text-anchor="middle" font-size="${fontSize}" font-weight="${V.VALUE_FONT_WEIGHT}" fill="${entry.color}">${escapeXml(entry.text)}</text>`;
             })
             .join(""),
         )
         .join("");
       rowTop += height;
-      return divider + unit + values;
+      return divider + unit + unitMarkers + values;
     })
     .join("");
 

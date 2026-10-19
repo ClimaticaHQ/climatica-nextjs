@@ -1,4 +1,5 @@
 import {
+  CHART_LINE_DASH,
   EXPORT_SVG_LAYOUT as L,
   EXPORT_AXES_STYLE,
   EXPORT_FONT_FAMILY,
@@ -247,7 +248,8 @@ function buildLine(
     return value !== null ? { x: monthBands[i].center, y: tempScale(value) } : null;
   });
   const path = buildGapAwarePath(points);
-  const dashArray = key === "tavg" ? ' stroke-dasharray="5 3"' : "";
+  const dash = key === "tmax" ? undefined : CHART_LINE_DASH.STANDARD[key];
+  const dashArray = dash !== undefined ? ` stroke-dasharray="${dash}"` : "";
 
   const dots = payload.monthlyData
     .map((row, i) => {

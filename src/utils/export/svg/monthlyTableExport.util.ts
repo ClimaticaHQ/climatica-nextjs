@@ -12,7 +12,7 @@ const line = (x1: number, y1: number, x2: number, y2: number, colors: TExportCha
   `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colors.border}" stroke-width="1" />`;
 
 /** A row's series marker — circle or square in its color, like the screen table's. */
-function buildMarker({ shape, color }: TMonthlyTableMarker, x: number, cy: number) {
+export function buildMarker({ shape, color }: TMonthlyTableMarker, x: number, cy: number) {
   const half = M.MARKER_SIZE / 2;
   return shape === "square"
     ? `<rect x="${x}" y="${cy - half}" width="${M.MARKER_SIZE}" height="${M.MARKER_SIZE}" rx="1" fill="${color}" />`

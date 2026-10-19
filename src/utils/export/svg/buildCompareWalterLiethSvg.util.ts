@@ -152,7 +152,7 @@ export function buildWalterLiethOverlay({
     top,
     bottom: top + W.overlayPlotHeight,
   };
-  // * the values table: every series, one above the other in their colors
+  // * the values table: every series, one above the other
   const table = buildMonthlyValuesSvg({
     rows: buildExportValuesRows({
       series: entries.map(({ key, series, color }) => ({
@@ -164,6 +164,7 @@ export function buildWalterLiethOverlay({
       colors,
       locale: labels.locale,
     }),
+    markers: entries.map(({ shape, color }) => ({ shape, color })),
     span: box,
     // * the table spans the content width: its gutters are the plot margins inside the padding
     gutter: W.overlayPlotMarginX - L.paddingX,

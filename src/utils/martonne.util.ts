@@ -4,8 +4,8 @@ import type { TMartonneBadge } from "@/types";
 
 export function getMartonneBadge(idm: number): TMartonneBadge {
   const key = getMartonnClass(idm);
-  const { labelKey, bg, color } = MARTONNE_CLASSES[key];
-  return { labelKey, bg, color };
+  const { labelKey, tone } = MARTONNE_CLASSES[key];
+  return { labelKey, tone };
 }
 
 export function getMartonneLabelKey(idm: number): string {

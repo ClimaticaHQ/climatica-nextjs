@@ -10,6 +10,5 @@ export * from "./svg/buildExportSvg.util";
 export * from "./svg/buildHeatmapExportSvg.util";
 export * from "./svg/buildHeatmapMapSection.util";
 export * from "./svg/mapTiles.util";
-export * from "./svg/resolveCompareSeriesColors.util";
 export * from "./svg/resolveExportColors.util";
 export * from "./svg/scales.util";

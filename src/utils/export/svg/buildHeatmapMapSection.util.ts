@@ -113,7 +113,7 @@ function buildSelection(
   colors: TExportChartColors,
 ): string {
   const { selection } = section;
-  const shared = `fill="${colors.primary}" fill-opacity="${SELECTION_FILL_OPACITY}" stroke="${colors.primary}" stroke-width="${SELECTION_STROKE_WIDTH}"`;
+  const shared = `fill="${colors.brand}" fill-opacity="${SELECTION_FILL_OPACITY}" stroke="${colors.brand}" stroke-width="${SELECTION_STROKE_WIDTH}"`;
 
   if (selection.kind === "bbox") {
     const topLeft = projectToMapPixel(selection.bounds.north, selection.bounds.west, zoom, origin);

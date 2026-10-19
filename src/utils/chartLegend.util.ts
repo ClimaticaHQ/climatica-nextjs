@@ -46,6 +46,10 @@ function variableItems(
   });
 }
 
+/** A month's bar swatch when bars are coloured by aridity: its legend entry's (arid / humid). */
+export const getAridityBarSwatch = (palette: TAridityPalette, isArid: boolean) =>
+  bar(isArid ? palette.arid : palette.humid);
+
 function aridityItems(
   labels: TAridityLegendLabels,
   aridity: TAridityPalette | null,
@@ -138,7 +142,7 @@ export function getWalterLiethOverlayLegendItems({
 export const getStandardVariableSwatches = (colors: TLegendSeriesColors) => ({
   tmax: line(colors.tmax),
   tavg: line(colors.tavg, CHART_LINE_DASH.STANDARD.tavg),
-  tmin: line(colors.tmin),
+  tmin: line(colors.tmin, CHART_LINE_DASH.STANDARD.tmin),
   prec: bar(colors.prec),
 });
 
@@ -171,11 +175,11 @@ export function getStandardSplitLegendItems({
       getStandardVariableSwatches(shown === EWalterLiethSeriesId.A ? colorsA : colorsB),
     );
   }
-  const { tavg } = CHART_LINE_DASH.STANDARD;
+  const { tavg, tmin } = CHART_LINE_DASH.STANDARD;
   return variableItems(labels, visible, {
     tmax: pair(line(colorsA.tmax), line(colorsB.tmax)),
     tavg: pair(line(colorsA.tavg, tavg), line(colorsB.tavg, tavg)),
-    tmin: pair(line(colorsA.tmin), line(colorsB.tmin)),
+    tmin: pair(line(colorsA.tmin, tmin), line(colorsB.tmin, tmin)),
     prec: pair(bar(colorsA.prec), bar(colorsB.prec)),
   });
 }

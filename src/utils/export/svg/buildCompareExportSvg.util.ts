@@ -247,7 +247,7 @@ function buildStandardChartBody(
   return { body, bottom: legend.bottom };
 }
 
-/** The standard overlay's values table — both series, A's value above B's in their colors. */
+/** The standard overlay's values table — both series, A's value above B's. */
 function buildOverlayValues({
   payload,
   colors,
@@ -270,6 +270,10 @@ function buildOverlayValues({
       colors,
       locale: payload.labels.locale,
     }),
+    markers: [EWalterLiethSeriesId.A, EWalterLiethSeriesId.B].map((id) => ({
+      shape: WALTER_LIETH_COMPARISON.DOT_SHAPE[id],
+      color: id === EWalterLiethSeriesId.A ? colors.wlSeriesA : colors.wlSeriesB,
+    })),
     span: { left: plotLeft, right: plotRight },
     // * the table spans the content width: its gutters are the plot margins inside the padding
     gutter: W.overlayPlotMarginX - L.paddingX,

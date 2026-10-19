@@ -22,8 +22,8 @@ export function formatMonthlyValuesValue({
 
 /**
  * The monthly values table's two rows — mean temperature and precipitation — with, per month,
- * one entry per series (overlay: A above B, in their colors). The screen and the export draw
- * these rows.
+ * one entry per series (overlay: A above B), each in the colour its series passes. The screen
+ * and the export draw these rows.
  */
 export function buildMonthlyValuesRows({
   series,
