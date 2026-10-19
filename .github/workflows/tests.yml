@@ -17,8 +17,6 @@ jobs:
 
       - name: Setup project
         uses: ./.github/actions/setup-project
-        with:
-          node-version: 20
 
       - name: Run tests with coverage
         run: npm run test:coverage
@@ -58,8 +56,6 @@ jobs:
 
       - name: Setup project
         uses: ./.github/actions/setup-project
-        with:
-          node-version: 20
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
