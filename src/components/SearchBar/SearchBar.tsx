@@ -4,7 +4,7 @@ import { getScrollBehavior } from "@/utils/motion.util";
 import { useTranslations } from "next-intl";
 import { FocusEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { TSearchBarProps } from "./SearchBar.type";
-import { SEARCH_ERROR_CLASS } from "./SearchBar.constant";
+import { SEARCH_ERROR_CLASS, SEARCH_INPUT_CLASS } from "./SearchBar.constant";
 import { tryParseCoords } from "./SearchBar.util";
 
 export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
@@ -159,7 +159,7 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
     text-left text-[length:var(--font-sm)] md:text-[length:var(--font-md)]
     cursor-pointer 
     transition-colors duration-150
-    ${activeIndex === index ? "bg-[var(--color-bg-secondary)]" : "hover:bg-[var(--color-bg-secondary)]"}
+    ${activeIndex === index ? "bg-[var(--color-surface-secondary)]" : "hover:bg-[var(--color-surface-secondary)]"}
   `;
 
   return (
@@ -172,14 +172,7 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         placeholder={t("search.placeholder")}
-        className={`
-          w-full px-3 md:px-4 py-2
-          text-[length:var(--font-sm)] md:text-[length:var(--font-md)]
-          placeholder:text-[var(--color-text-secondary)]
-          border-2 border-[var(--color-border)] rounded-[var(--radius-md)] outline-none
-          focus:border-[var(--color-primary)]
-          transition-colors duration-200
-        `}
+        className={SEARCH_INPUT_CLASS}
       />
 
       {isSearching && (
@@ -188,7 +181,7 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
           className={`
             absolute right-3 top-1/2 -translate-y-1/2 
             w-[18px] h-[18px] 
-            border-2 border-[var(--color-border)] border-t-[var(--color-primary)] 
+            border-2 border-[var(--color-border)] border-t-[var(--color-brand)] 
             rounded-[var(--radius-md)] 
             animate-spin
           `}
@@ -206,7 +199,7 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
           data-testid="city-search-results"
           className={`
             absolute top-[calc(100%+4px)] left-0 right-0 max-h-[280px] 
-            bg-[var(--color-bg)] 
+            bg-[var(--color-surface)] 
             border border-[var(--color-border)] 
             rounded-[var(--radius-lg)] 
             shadow-md 

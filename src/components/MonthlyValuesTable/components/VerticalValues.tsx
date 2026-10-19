@@ -14,6 +14,7 @@ import { ValueStack } from "./ValueStack";
 export function VerticalValues({
   rows,
   caption,
+  markers,
   flashKeys,
   activeMonthIndex,
   onActiveMonthIndexChange,
@@ -51,7 +52,7 @@ export function VerticalValues({
                 </th>
                 {rows.map((row) => (
                   <th key={row.variable} scope="col" className={C.VERTICAL_HEAD}>
-                    <UnitLabel row={row} />
+                    <UnitLabel row={row} markers={[]} />
                   </th>
                 ))}
               </tr>
@@ -76,7 +77,11 @@ export function VerticalValues({
                       onFocus={() => onActiveMonthIndexChange?.(i)}
                       onBlur={() => onActiveMonthIndexChange?.(null)}
                     >
-                      <ValueStack entries={row.cells[i] ?? []} className={C.VERTICAL_STACK} />
+                      <ValueStack
+                        entries={row.cells[i] ?? []}
+                        markers={markers}
+                        className={C.VERTICAL_STACK}
+                      />
                     </td>
                   ))}
                 </tr>

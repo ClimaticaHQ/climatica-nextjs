@@ -12,7 +12,12 @@ import { HorizontalValues, VerticalValues } from "./components";
  * highlights it in every chart and table of the card. Where twelve columns can't fit a value
  * each (phones, split panels): a vertical table behind a disclosure. The export draws the same rows (buildMonthlyValuesRows).
  */
-export function MonthlyValuesTable({ series, isCompact, ...hover }: TMonthlyValuesTableProps) {
+export function MonthlyValuesTable({
+  series,
+  isCompact,
+  markers = [],
+  ...hover
+}: TMonthlyValuesTableProps) {
   const t = useTranslations();
   const locale = useLocale();
   const names = useMonthlyValuesNames();
@@ -26,7 +31,7 @@ export function MonthlyValuesTable({ series, isCompact, ...hover }: TMonthlyValu
     names: series.map(({ label }) => label).join(MONTHLY_TABLE.NAMES_SEPARATOR),
   });
 
-  const variant = { rows, caption, flashKeys: series.map(({ key }) => key), ...hover };
+  const variant = { rows, caption, markers, flashKeys: series.map(({ key }) => key), ...hover };
 
   return (
     <div className={MONTHLY_VALUES_CLASSES.ROOT}>

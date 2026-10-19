@@ -23,7 +23,7 @@ function playUpdateFlash(element: HTMLElement, variant: EUpdateFlashVariant) {
   });
   element.dataset[UPDATE_FLASH_ATTRIBUTE] = UPDATE_FLASH_ACTIVE;
   element.dataset[UPDATE_FLASH_VARIANT_ATTRIBUTE] = variant;
-  // * from the flash colors back to the card's own border and shadow
+  // * from the flash colors back to the card's own border, without a shadow
   const animation = element.animate([keyframe], {
     duration: MOTION.UPDATE_FLASH_MS,
     easing: MOTION.UPDATE_FLASH_EASING,

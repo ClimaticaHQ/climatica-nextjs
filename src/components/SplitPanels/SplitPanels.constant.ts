@@ -18,6 +18,6 @@ export const SPLIT_PANELS_CLASSES = {
   // * one panel across the card, on the split's two rows (header, plot) — as tall as the split
   EXPANDED: "grid grid-cols-1",
   CONTROLS: "flex shrink-0 items-center gap-1.5",
-  ICON_BUTTON: `${FOCUS_RING_CLASS} inline-flex size-7 shrink-0 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]`,
+  ICON_BUTTON: `${FOCUS_RING_CLASS} inline-flex size-7 shrink-0 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]`,
   HIDDEN_BELOW_SM: "max-sm:hidden",
 } as const;

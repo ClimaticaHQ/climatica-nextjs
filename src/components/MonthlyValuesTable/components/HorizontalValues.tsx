@@ -19,6 +19,7 @@ export function HorizontalValues({
   rows,
   caption,
   isCompact,
+  markers,
   flashKeys,
   activeMonthIndex,
   onActiveMonthIndexChange,
@@ -70,7 +71,7 @@ export function HorizontalValues({
           {rows.map((row, r) => (
             <tr key={row.variable} className={r > 0 ? C.ROW_DIVIDER : undefined}>
               <th scope="row" className={C.UNIT}>
-                <UnitLabel row={row} />
+                <UnitLabel row={row} markers={markers} />
               </th>
               {row.cells.map((entries, i) => (
                 <td key={i} {...cellProps(i)}>

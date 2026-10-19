@@ -1,6 +1,7 @@
 import { SearchBar } from "@/components/SearchBar";
 import { LocationIcon, SpinnerIcon } from "@/components/svg";
 import { Button, StatusMessage } from "@/components/UI";
+import { FORM_CONTROL_CLASSES } from "@/constants";
 import { EButtonVariant, EStatusMessageVariant } from "@/enums";
 import { useTranslations } from "next-intl";
 import type { TLocationSearchProps } from "./LocationSearch.type";
@@ -31,7 +32,7 @@ export function LocationSearch({
             onClick={onLocate}
             disabled={isLocating}
             ariaLabel={t("common.useMyLocation")}
-            className="flex h-10 shrink-0 items-center gap-1.5 px-3 text-[length:var(--font-sm)]"
+            className={`${FORM_CONTROL_CLASSES.HEIGHT} flex shrink-0 items-center gap-1.5 px-3 text-[length:var(--font-sm)]`}
           >
             {isLocating ? <SpinnerIcon /> : <LocationIcon />}
             <span className="hidden sm:inline">

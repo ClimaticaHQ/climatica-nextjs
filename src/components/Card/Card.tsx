@@ -7,13 +7,13 @@ import type { TCardProps } from "./Card.type";
 import { getCardClassName } from "./Card.util";
 
 /**
- * Every framed surface: border, radius, background, padding and elevation from typed variants,
- * and the update flash (in the chosen variant) when one of its series' data changes.
+ * Every framed surface: border, radius, background and padding from typed variants, and the
+ * update flash (in the chosen variant) when one of its series' data changes. No shadow: a card
+ * sits in the page's flow — only floating layers (popovers, menus) cast one.
  */
 export function Card({
   size,
   padding,
-  elevation,
   background,
   flashKeys = NO_FLASH_KEYS,
   shouldClip,
@@ -32,7 +32,6 @@ export function Card({
       className={getCardClassName({
         size,
         padding,
-        elevation,
         background,
         shouldClip,
         isFlatBelowSm,

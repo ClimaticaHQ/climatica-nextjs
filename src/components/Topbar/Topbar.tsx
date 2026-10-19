@@ -74,7 +74,7 @@ export function Topbar() {
   return (
     <header
       ref={headerRef}
-      className="relative box-content h-16 w-full shrink-0 border-b pt-[env(safe-area-inset-top)] border-[var(--color-border)] bg-[var(--color-bg)]"
+      className="relative box-content h-16 w-full shrink-0 border-b pt-[env(safe-area-inset-top)] border-[var(--color-border)] bg-[var(--color-surface)]"
     >
       <div className="flex h-full items-center pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
         {/* * the home page is City Climate ("/" redirects there, dropping the query) — so the
@@ -82,7 +82,7 @@ export function Topbar() {
         <Link
           href={getHref(ROUTES.CLIMATE_STATISTICS)}
           onClick={(event) => navigate(event, ROUTES.CLIMATE_STATISTICS)}
-          className="flex flex-1 items-center gap-2.5 text-[var(--color-primary)] hover:opacity-80 transition-opacity duration-150"
+          className="flex flex-1 items-center gap-2.5 text-[var(--color-brand)] hover:opacity-80 transition-opacity duration-150"
         >
           <ClimaticaLogo className="h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 shrink-0" />
           <span className="text-[length:var(--font-sm)] md:text-[length:var(--font-md)] lg:text-[length:var(--font-lg)] font-semibold tracking-wide leading-none">
@@ -101,7 +101,7 @@ export function Topbar() {
                 className={`rounded-[var(--radius-sm)] px-4 py-2 text-[length:var(--font-sm)] font-medium transition-colors duration-150 ${
                   isActive
                     ? "bg-[var(--color-primary-muted)] font-medium text-[var(--color-primary)]"
-                    : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]"
+                    : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]"
                 }`}
               >
                 {t(labelKey)}
@@ -118,7 +118,7 @@ export function Topbar() {
             className={`hidden h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] transition-colors duration-150 lg:flex ${
               isSettingsActive
                 ? "bg-[var(--color-primary-muted)] text-[var(--color-primary)]"
-                : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]"
+                : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]"
             }`}
           >
             <GearIcon />
@@ -129,7 +129,7 @@ export function Topbar() {
             aria-label={t("navbar.toggleMenu")}
             aria-expanded={isNavOpen}
             onClick={() => setIsNavOpen((prev) => !prev)}
-            className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)] lg:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)] lg:hidden"
           >
             <BurgerIcon isOpen={isNavOpen} />
           </button>
@@ -139,7 +139,7 @@ export function Topbar() {
       <div
         className={`
           absolute left-0 right-0 top-full z-50
-          border-t border-[var(--color-border)] bg-[var(--color-bg)] shadow-md
+          border-t border-[var(--color-border)] bg-[var(--color-surface)] shadow-md
           transition-all duration-300 ease-in-out lg:hidden
           ${isNavOpen ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-2 opacity-0"}
         `}
@@ -157,8 +157,8 @@ export function Topbar() {
                   }}
                   className={`block w-full rounded-[var(--radius-sm)] px-4 py-3 text-[length:var(--font-sm)] transition-colors duration-150 ${
                     isActive
-                      ? "bg-[var(--color-primary)] font-medium text-white"
-                      : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]"
+                      ? "bg-[var(--color-primary)] font-medium text-[var(--color-on-primary)]"
+                      : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]"
                   }`}
                 >
                   {t(labelKey)}
@@ -174,8 +174,8 @@ export function Topbar() {
               aria-current={isSettingsActive ? "page" : undefined}
               className={`block w-full rounded-[var(--radius-sm)] px-4 py-3 text-[length:var(--font-sm)] transition-colors duration-150 ${
                 isSettingsActive
-                  ? "bg-[var(--color-primary)] font-medium text-white"
-                  : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]"
+                  ? "bg-[var(--color-primary)] font-medium text-[var(--color-on-primary)]"
+                  : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]"
               }`}
             >
               {t("navbar.settings")}

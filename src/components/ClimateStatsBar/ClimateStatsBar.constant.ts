@@ -10,5 +10,5 @@ export const STATS_BAR_COLUMNS: Record<number, string> = {
 // * inside its Card: the 1px gap over the border-colored grid draws the dividers between cells
 export const STATS_BAR_STYLE = {
   bar: "gap-px bg-[var(--color-border)]",
-  cell: "bg-[var(--color-bg)] px-3",
+  cell: "bg-[var(--color-surface)] px-3",
 } as const;

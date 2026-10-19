@@ -4,7 +4,7 @@ export const DATA_UPDATE_CLASSES = {
   PROGRESS_TRACK:
     "update-progress-track pointer-events-none absolute inset-x-0 top-0 z-10 overflow-hidden",
   // * its width, travel and cycle are in animations.css
-  PROGRESS_SEGMENT: "update-progress h-full bg-[var(--color-primary)]",
+  PROGRESS_SEGMENT: "update-progress h-full bg-[var(--color-brand)]",
   // * dimmed while aria-busy (animations.css)
   FADE: "update-fade",
   // * isolate: content with its own z-indexes (Leaflet's panes) stays under the progress bar

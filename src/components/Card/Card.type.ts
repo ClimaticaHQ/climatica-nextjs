@@ -1,11 +1,10 @@
-import type { ECardBackground, ECardElevation, ECardPadding, ECardSize } from "@/enums";
+import type { ECardBackground, ECardPadding, ECardSize } from "@/enums";
 import type { TUpdateFlashKeys } from "@/types";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 export type TCardProps = Omit<ComponentPropsWithoutRef<"div">, "className" | "style"> & {
   size?: ECardSize | undefined;
   padding?: ECardPadding | undefined;
-  elevation?: ECardElevation | undefined;
   background?: ECardBackground | undefined;
   /** the series whose data updates flash the card; none by default */
   flashKeys?: TUpdateFlashKeys | undefined;
@@ -20,5 +19,5 @@ export type TCardProps = Omit<ComponentPropsWithoutRef<"div">, "className" | "st
 
 export type TCardClassArgs = Pick<
   TCardProps,
-  "size" | "padding" | "elevation" | "background" | "shouldClip" | "isFlatBelowSm" | "className"
+  "size" | "padding" | "background" | "shouldClip" | "isFlatBelowSm" | "className"
 >;

@@ -1,3 +1,5 @@
+import { Badge } from "@/components/UI/Badge";
+import { EBadgeSize } from "@/enums";
 import { useTranslations } from "next-intl";
 import type { TMartonneBadgeProps } from "./MartonneBadge.type";
 
@@ -7,12 +9,8 @@ export function MartonneBadge({ badge }: TMartonneBadgeProps) {
 
   // * one line, cut with an ellipsis in a narrow cell — the full class shows on hover
   return (
-    <span
-      className="min-w-0 max-w-full truncate rounded px-1.5 py-0.5 text-[10px] leading-none font-medium"
-      style={{ backgroundColor: badge.bg, color: badge.color }}
-      title={label}
-    >
+    <Badge tone={badge.tone} size={EBadgeSize.SM} isTruncated title={label}>
       {label}
-    </span>
+    </Badge>
   );
 }
