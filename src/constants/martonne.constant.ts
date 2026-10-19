@@ -73,3 +73,13 @@ export const MARTONNE_CLASSES = {
 } as const;
 
 export type TMartonnClass = keyof typeof MARTONNE_CLASSES;
+
+// * the tooltip's list of the classes, built from MARTONNE_CLASSES: "<10 Arid | 10–20 Semi-arid | … | >55 …"
+export const MARTONNE_SCALE_TEXT = {
+  BELOW: "<",
+  ABOVE: ">",
+  RANGE: "–",
+  CLASS_SEPARATOR: " | ",
+  // * between the tooltip's sentence and the list
+  LEAD_SEPARATOR: " ",
+} as const;

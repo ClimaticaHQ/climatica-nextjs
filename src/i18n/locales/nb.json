@@ -143,7 +143,7 @@
     "aridMonths": "Tørre måneder",
     "martonne": "Martonne-indeks (M)",
     "martonneShort": "Martonne (M)",
-    "martonneTooltip": "De Martonnes tørkeindeks: M = P/(T+10). <5 Ekstremt tørt | 5–10 Tørt | 10–20 Halvtørt | 20–30 Halvfuktig | >30 Fuktig",
+    "martonneTooltip": "De Martonnes tørkeindeks: M = P/(T+10).",
     "aridPeriod": "Tørr periode",
     "humidPeriod": "Fuktig periode",
     "perhumidPeriod": "Svært fuktig (> 100 mm)",
@@ -188,7 +188,7 @@
     "weatherSingleYear": "Vær · ett enkelt år",
     "martonneShortYear": "Martonne (M) · {year}",
     "martonneYear": "Martonne-indeks (M) for {year}",
-    "martonneTooltipYear": "De Martonnes tørkeindeks for {year} alene, ut fra det årets data: M = P/(T+10). <5 Ekstremt tørt | 5–10 Tørt | 10–20 Halvtørt | 20–30 Halvfuktig | >30 Fuktig",
+    "martonneTooltipYear": "De Martonnes tørkeindeks for {year} alene, ut fra det årets data: M = P/(T+10).",
     "martonnePerYear": "Martonne-indeks (M), per år",
     "yearsShown": "Viste år"
   },

@@ -143,7 +143,7 @@
     "aridMonths": "Ξηροί μήνες",
     "martonne": "Δείκτης Martonne (M)",
     "martonneShort": "Martonne (M)",
-    "martonneTooltip": "Δείκτης ξηρότητας De Martonne: M = P/(T+10). <5 Υπερξηρό | 5–10 Ξηρό | 10–20 Ημίξηρο | 20–30 Υφύγρο | >30 Υγρό",
+    "martonneTooltip": "Δείκτης ξηρότητας De Martonne: M = P/(T+10).",
     "aridPeriod": "Ξηρή περίοδος",
     "humidPeriod": "Υγρή περίοδος",
     "perhumidPeriod": "Πολύ υγρό (> 100 mm)",
@@ -188,7 +188,7 @@
     "weatherSingleYear": "Καιρός · ένα μόνο έτος",
     "martonneShortYear": "Martonne (M) · {year}",
     "martonneYear": "Δείκτης Martonne (M) για το {year}",
-    "martonneTooltipYear": "Δείκτης ξηρασίας De Martonne μόνο για το {year}, από τα δεδομένα αυτού του έτους: M = P/(T+10). <5 Υπερξηρό | 5–10 Ξηρό | 10–20 Ημίξηρο | 20–30 Υφύγρο | >30 Υγρό",
+    "martonneTooltipYear": "Δείκτης ξηρασίας De Martonne μόνο για το {year}, από τα δεδομένα αυτού του έτους: M = P/(T+10).",
     "martonnePerYear": "Δείκτης Martonne (M), ανά έτος",
     "yearsShown": "Εμφανιζόμενα έτη"
   },

@@ -143,7 +143,7 @@
     "aridMonths": "Aride Monate",
     "martonne": "Martonne-Index (M)",
     "martonneShort": "Martonne (M)",
-    "martonneTooltip": "De-Martonne-Ariditätsindex: M = P/(T+10). <5 Hyperarid | 5–10 Arid | 10–20 Semiarid | 20–30 Subhumid | >30 Humid",
+    "martonneTooltip": "De-Martonne-Ariditätsindex: M = P/(T+10).",
     "aridPeriod": "Aride Periode",
     "humidPeriod": "Humide Periode",
     "perhumidPeriod": "Sehr feucht (> 100 mm)",
@@ -188,7 +188,7 @@
     "weatherSingleYear": "Wetter · einzelnes Jahr",
     "martonneShortYear": "Martonne (M) · {year}",
     "martonneYear": "Martonne-Index (M) für {year}",
-    "martonneTooltipYear": "De-Martonne-Trockenheitsindex nur für {year}, aus den Daten dieses Jahres: M = P/(T+10). <5 Hyperarid | 5–10 Arid | 10–20 Semiarid | 20–30 Subhumid | >30 Humid",
+    "martonneTooltipYear": "De-Martonne-Trockenheitsindex nur für {year}, aus den Daten dieses Jahres: M = P/(T+10).",
     "martonnePerYear": "Martonne-Index (M), pro Jahr",
     "yearsShown": "Angezeigte Jahre"
   },

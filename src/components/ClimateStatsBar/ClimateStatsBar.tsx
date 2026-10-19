@@ -3,7 +3,7 @@ import { MartonneBadge } from "@/components/MartonneBadge";
 import { VALUE_DIGITS } from "@/constants";
 import { ECardPadding, ECardSize } from "@/enums";
 import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
-import { getMartonneBadge } from "@/utils";
+import { buildMartonneTooltip, getMartonneBadge } from "@/utils";
 import { useTranslations } from "next-intl";
 import {
   STATS_BAR_COLUMNS,
@@ -32,12 +32,12 @@ export function ClimateStatsBar({
       ? {
           label: t("chart.martonneShort"),
           fullLabel: t("chart.martonne"),
-          title: t("chart.martonneTooltip"),
+          title: buildMartonneTooltip(t("chart.martonneTooltip"), t),
         }
       : {
           label: t("chart.martonneShortYear", { year: martonneYear }),
           fullLabel: t("chart.martonneYear", { year: martonneYear }),
-          title: t("chart.martonneTooltipYear", { year: martonneYear }),
+          title: buildMartonneTooltip(t("chart.martonneTooltipYear", { year: martonneYear }), t),
         };
   // * every cell reserves the meta row (Martonne class), so the values line up
   const cell = { hasMetaRow: true, cellClassName: STATS_BAR_STYLE.cell };

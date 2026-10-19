@@ -143,7 +143,7 @@
     "aridMonths": "Luni aride",
     "martonne": "Indicele Martonne (M)",
     "martonneShort": "Martonne (M)",
-    "martonneTooltip": "Indicele de ariditate De Martonne: M = P/(T+10). <5 Hyperarid | 5–10 Arid | 10–20 Semiarid | 20–30 Subumed | >30 Umed",
+    "martonneTooltip": "Indicele de ariditate De Martonne: M = P/(T+10).",
     "aridPeriod": "Perioadă aridă",
     "humidPeriod": "Perioadă umedă",
     "perhumidPeriod": "Foarte umed (> 100 mm)",
@@ -188,7 +188,7 @@
     "weatherSingleYear": "Vreme · un singur an",
     "martonneShortYear": "Martonne (M) · {year}",
     "martonneYear": "Indicele Martonne (M) pentru {year}",
-    "martonneTooltipYear": "Indicele de ariditate De Martonne doar pentru {year}, din datele acelui an: M = P/(T+10). <5 Hyperarid | 5–10 Arid | 10–20 Semiarid | 20–30 Subumed | >30 Umed",
+    "martonneTooltipYear": "Indicele de ariditate De Martonne doar pentru {year}, din datele acelui an: M = P/(T+10).",
     "martonnePerYear": "Indicele Martonne (M), pe an",
     "yearsShown": "Ani afișați"
   },
