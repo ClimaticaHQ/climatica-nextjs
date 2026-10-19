@@ -62,6 +62,8 @@ All in [`src/components/filters/`](../src/components/filters):
   the same props ([`TFilterSectionRenderProps`](../src/components/filters/filters.type.ts)):
   values in, `onChange(key, value)` out. They don't know where they're rendered or when a
   change applies.
+  `ComparedPeriods`' Climate pair puts its swap button (`SwapButton` with `isInline`) at the
+  end of Period B's label row, so both label rows stay the same height.
 - **[`FilterSections`](../src/components/filters/FilterSections.tsx)** renders the sections
   for a list of keys, through [`FILTER_SECTION_COMPONENTS`](../src/components/filters/filters.constant.ts)
   (filter key → component).
@@ -90,8 +92,13 @@ The sidebar and the sheet edit a draft ([`useFiltersDraft`](../src/hooks/filters
   (the Climate A ↔ B swap), so a pair is never equal halfway.
 - `submit()` returns the filters to apply, or `null` while the typed year is invalid (its
   error shows from then on).
-- On the heat map it estimates the cells a resolution would load; above
-  `FILTER_MAX_HEATMAP_CELLS` Apply is blocked and the section says why.
+- On the heat map it counts the cells a resolution would load for the region (a box, or the
+  box around a polygon); above `FILTER_MAX_HEATMAP_CELLS` (2,000) Apply is blocked and the
+  section says why. The page itself doesn't load a region drawn over the cap (see
+  [backend.md](backend.md)).
+  The count is a [`CellCountBadge`](../src/components/filters/CellCountBadge.tsx), the same
+  badge the map shows live on a box or polygon while it's drawn (its box's cells, at the
+  current resolution), red past the cap.
 
 Auto-apply ([`useAutoApply`](../src/hooks/filters/useAutoApply.ts)) applies the sidebar's
 draft once it has been unchanged for `AUTO_APPLY_DEBOUNCE_MS` (200 ms), when the setting is
@@ -118,8 +125,8 @@ navigating (see [url-state.md](url-state.md)).
 5. **Chip.** Add the value's short form to `CHIP_FORMATTERS` in
    [`filterChips.util.ts`](../src/utils/filterChips.util.ts).
 6. **Text.** Add the section title (`labelKey`) and `filters.names.<key>` in all 10 locale
-   files (see [i18n.md](i18n.md)).
-7. **Use it.** Read it with `useFilters()` in the page containers or data hooks that
+   files (see [localization-i18n.md](localization-i18n.md)).
+7. **Use it.** Read it with `useFilters()` in the page hooks or data hooks that
    depend on it.
 8. **Tests.** Round-trip the codec and the canonical form (`tests/unit/utils/`), the
    availability rules, and a Playwright check that the URL changes when it's edited (see

@@ -2,8 +2,7 @@
 
 Two suites: Vitest for units (pure functions, hooks, components, route handlers) and
 Playwright for end-to-end behaviour in a real browser. A Python suite covers the Solr data
-script. Before a task is done, `npm run check`, `npm run test`, `npm run build` and
-`npm run test:e2e` all pass (see [AGENTS.md](../AGENTS.md)).
+script.
 
 ## Vitest
 
@@ -22,21 +21,21 @@ Config: [`vitest.config.mjs`](../vitest.config.mjs). One project, `unit`, runs
   `src/app/`.
 - `npm run test:watch` re-runs on change.
 
-Layout of [`tests/unit/`](../tests/unit): `app/` (page URL state), `components/`, `hooks/`,
-`redis/`, `routes/`, `services/`, `stores/`, `utils/`.
+Layout of [`tests/unit/`](../tests/unit): `app/` (pages and their URL state), `charts/` (chart model and card), `components/`, `hooks/`,
+`redis/`, `routes/`, `services/`, `stores/`, `styles/` (colour tokens and contrast), `utils/`.
 
 ### Conventions for component and hook tests
 
 - **Render inside `NextIntlClientProvider`** with the real messages
   (`import messages from "@/i18n/locales/en.json"`), and assert on the user-visible text.
 - **Import components by their file path,** not through `@/components` or `@/hooks`. The
-  barrels pull in next-intl's navigation, which can't resolve `next/navigation` under
-  Vitest.
+  barrels pull in the URL hooks, which use the Next.js router.
 - **Mock the URL hooks** a component reaches (`vi.mock("@/hooks/filters/useFilterNavigation", …)`,
   `useFilters`, `useChartModeUrl`), with a hoisted object recording the calls. See
   [`periodSelectors.test.tsx`](../tests/unit/components/periodSelectors.test.tsx).
 - **Stub missing browser APIs** in `beforeAll`: jsdom has no `matchMedia` or
-  `ResizeObserver` (see [`yearChips.test.tsx`](../tests/unit/components/yearChips.test.tsx)).
+  `ResizeObserver` (see [`chartTestEnv.ts`](../tests/unit/charts/chartTestEnv.ts)'s
+  `stubChartEnvironment`).
 - **Use plain DOM assertions** (`getAttribute`, `hasAttribute`, `textContent`); jest-dom
   matchers aren't installed.
 - **Hooks:** `renderHook` and `act` from `@testing-library/react`, as in
@@ -45,6 +44,59 @@ Layout of [`tests/unit/`](../tests/unit): `app/` (page URL state), `components/`
   stub `fetch` with a `Response` carrying the route's error status, so the real
   `apiClient` decides what counts as an error. Wrap in a `QueryClientProvider` with
   `retry: false`. See [`upstreamErrors.test.tsx`](../tests/unit/hooks/upstreamErrors.test.tsx).
+
+### Conventions for chart tests
+
+- **Fixtures:** [`chartFixtures.ts`](../tests/unit/charts/chartFixtures.ts) builds the series
+  every chart page draws (a city, a city pair, a period pair, weather years).
+- **Chart blocks:** [`chartBlocks.test.tsx`](../tests/unit/charts/chartBlocks.test.tsx)
+  renders the chart card for every page's series, in both chart types and every layout, and
+  counts the blocks by `data-chart-block`. A block added to the registry is checked there
+  without changes.
+- **Rendering charts in jsdom:** `stubChartEnvironment()`
+  ([`chartTestEnv.ts`](../tests/unit/charts/chartTestEnv.ts)) stubs `matchMedia` (with reduced
+  motion) and `ResizeObserver` and quiets Recharts' size warnings; mock `next/navigation` —
+  the charts reach the hooks barrel, whose URL hooks use the router.
+
+### Conventions for page tests
+
+- **A page through its page hook:** render the page's container with its data hooks mocked
+  by module path (`@/hooks/data/useGetClimateData`, …) and the URL given through a mocked
+  `next/navigation`'s `useSearchParams`; the real URL and filter hooks read it. See
+  [`cityClimatePage.test.tsx`](../tests/unit/app/cityClimatePage.test.tsx).
+- **Region Heatmap:** [`heatMapPage.test.tsx`](../tests/unit/app/heatMapPage.test.tsx) renders
+  the page with its cell hooks mocked: no region, a box from the URL, loading, no data, a
+  failed request (translated). [`heatMap.e2e.ts`](../tests/e2e/heatMap.e2e.ts) opens box URLs
+  against real data and checks the stats bar: the Climate box guards the query row limit, a
+  1,080-cell box the strips, and a box over the cell cap the resolution it suggests.
+  [`regionQuery.test.ts`](../tests/unit/utils/regionQuery.test.ts) covers the strips (every
+  cell once, each within the row cap, at most 4 within the cell cap) and their merging.
+- **Weather years:** [`comparePeriodsPage.test.tsx`](../tests/unit/app/comparePeriodsPage.test.tsx)
+  renders both datasets through the page hook (a year still loading, side pickers, the empty
+  state); [`seriesChips.test.tsx`](../tests/unit/charts/seriesChips.test.tsx) covers the
+  overlay's chips.
+- **Reduced motion** (`stubChartEnvironment`): a chart type switch from the URL, after the first
+  render, replaces the body at once instead of crossfading. See also
+  [`compareCitiesPage.test.tsx`](../tests/unit/app/compareCitiesPage.test.tsx).
+- **Settings and language:** [`settingsStore.test.ts`](../tests/unit/stores/settingsStore.test.ts)
+  covers the store's defaults, invalid values and the migration from every old key;
+  [`theme.test.ts`](../tests/unit/utils/theme.test.ts) the system theme and the inline head
+  script; [`locale.test.ts`](../tests/unit/utils/locale.test.ts) the locale order (cookie,
+  `Accept-Language`, English) and the prefix stripping;
+  [`settingsPage.test.tsx`](../tests/unit/app/settingsPage.test.tsx) the dependent Update
+  highlight (disabled, not hidden) and reduced motion, with a `matchMedia` stub the test can
+  change while the page is open.
+  [`settings.e2e.ts`](../tests/e2e/settings.e2e.ts) opens settings from the gear and the phone
+  menu, checks Back, the theme without a flash (the app's scripts blocked) and the settings
+  taking effect on a chart page; [`i18n.e2e.ts`](../tests/e2e/i18n.e2e.ts) the language from the
+  cookie and `Accept-Language`, switching on settings, and an old prefixed link.
+- **Colours:** [`colorTokens.test.ts`](../tests/unit/styles/colorTokens.test.ts) scans `src/`
+  for colour literals outside `tokens.css` and the allowlist, and checks the token layers
+  ([colors.md](colors.md)).
+- **Stale data after a pick:** [`citySync.e2e.ts`](../tests/e2e/citySync.e2e.ts) picks a city
+  and checks every block, the title, the export's file name and the synced pages. The search
+  only lists results for the text typed (it shows its loading state until then), so a test
+  can pick the first result as soon as the list shows.
 
 ### Conventions for route handler tests
 

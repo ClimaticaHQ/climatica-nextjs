@@ -15,9 +15,9 @@ Router calls happen only in these hooks:
 | [`useFilterNavigation`](../src/hooks/filters/useFilterNavigation.ts)     | filter params                                                                                                                                             | `applyFilters(next, mode)`: replace for quick changes, push for an Apply ([`FILTER_NAVIGATION_MODES`](../src/constants/filters.constant.ts)). Page params are kept. |
 | [`useUrlStateSync`](../src/hooks/ui/useUrlStateSync.ts)                  | a page's own params, described by its URL schema (e.g. [`COMPARE_PERIODS_URL_SCHEMA`](../src/app/compare-periods/_components/ComparePeriods.constant.ts)) | Replaces the URL when page state drifts from it; `pushUrlState` for explicit actions. Filter params are carried along untouched.                                    |
 | [`useChartModeUrl`](../src/hooks/url/useChartModeUrl.ts)                 | `chart`                                                                                                                                                   | Replace, keeping every other param.                                                                                                                                 |
-| [`useNavbarNavigation`](../src/hooks/url/useNavbarNavigation.ts)         | navbar and logo links                                                                                                                                     | Push to another page (see the last-page-params cache below).                                                                                                        |
+| [`useNavbarNavigation`](../src/hooks/url/useNavbarNavigation.ts)         | navbar, logo and settings links                                                                                                                           | Push to another page (see the last-page-params cache below). The settings link carries the shared filters.                                                          |
 | [`useCanonicalFilterUrl`](../src/hooks/filters/useCanonicalFilterUrl.ts) | canonical filter params                                                                                                                                   | Replaces once when the URL isn't canonical (see below).                                                                                                             |
-| [`useLocaleNavigation`](../src/hooks/url/useLocaleNavigation.ts)         | the locale prefix                                                                                                                                         | Push to the same page and params under the new locale (the language switcher).                                                                                      |
+| [`useLocaleSwitch`](../src/hooks/url/useLocaleSwitch.ts)                 | the language (the `NEXT_LOCALE` cookie)                                                                                                                   | Doesn't navigate: saves the cookie, then `router.refresh()` renders the same URL in the new language.                                                               |
 
 Reading is simpler: [`useFilters`](../src/hooks/filters/useFilters.ts) parses the filters
 from `useSearchParams`, and each page's schema parses its own params.
@@ -71,7 +71,8 @@ Old links keep working. These are read but never written:
 
 The names are in [`SIDEBAR_PARAMS`](../src/constants/sidebar.constant.ts). Filters older
 versions kept in localStorage are removed on load
-([`useLegacyFilterStorageCleanup`](../src/hooks/filters/useLegacyFilterStorageCleanup.ts)).
+([`useLegacyStorageCleanup`](../src/hooks/persisted/useLegacyStorageCleanup.ts)). What else is
+kept in localStorage and the cookie is in [settings.md](settings.md#what-is-stored-where).
 
 ## The last-page-params cache
 
@@ -118,11 +119,13 @@ first (the entry is popped and the popstate has arrived), then the router call.
 
 ### Page load from a shared link
 
-1. **Locale.** next-intl's middleware ([`src/proxy.ts`](../src/proxy.ts)) resolves the
-   locale from the path (no prefix means English).
-2. **Server render.** [`[locale]/layout.tsx`](../src/app/[locale]/layout.tsx) sets up the
-   locale's messages, the providers and [`AppLayout`](../src/layouts/AppLayout.tsx). The
-   route's `page.tsx` builds the metadata from the search params (`createLocaleMetadata` +
+1. **Locale.** Paths have no locale prefix. [`src/proxy.ts`](../src/proxy.ts) redirects an
+   old prefixed link (`/es/…`) to the same path and query without it (308); the locale comes
+   from the `NEXT_LOCALE` cookie, then `Accept-Language`, else English ([localization-i18n.md](localization-i18n.md)).
+2. **Server render.** The root [`layout.tsx`](../src/app/layout.tsx) sets the theme before
+   the first paint, loads the locale's messages, the providers and
+   [`AppLayout`](../src/layouts/AppLayout.tsx). The route's `page.tsx` builds the metadata and
+   its canonical URL from the search params (`createPageMetadata` +
    `resolve…Meta` in [`metadata.util.ts`](../src/utils/metadata.util.ts)) and renders the
    page container inside `Suspense`.
 3. **Reading the URL.** Client components render on the server too:
@@ -229,9 +232,8 @@ filters from `useFilters()`, and build TanStack Query keys from what decides the
 | [`useGetCompareData`](../src/hooks/data/useGetCompareData.ts)                                                        | `["compare", latA, lngA, latB, lngB, gridSize, "climate" or weatherYear]`          |
 | [`useGetComparePeriods`](../src/hooks/data/useGetComparePeriods.ts)                                                  | `["compare-periods", lat, lng, gridSize, "climate" or [yearA, yearB]]`             |
 | [`useGetMultiPeriodData`](../src/hooks/data/useGetMultiPeriodData.ts)                                                | one query per year: `["compare-period", lat, lng, gridSize, year]`                 |
-| [`useGetHeatmapData`](../src/hooks/data/useGetHeatmapData.ts)                                                        | `["heatmap", north, south, west, east, gridSize, variable, climatePeriod or year]` |
-| [`useGetHeatmapPolygonData`](../src/hooks/data/useGetHeatmapPolygonData.ts)                                          | `["heatmap-polygon", wkt, gridSize, variable, climatePeriod or year]`              |
-| [`useGetRegionalProfile`](../src/hooks/data/useGetRegionalProfile.ts)                                                | `["regional-profile", bbox…, wkt, gridSize, climatePeriod or year]`                |
+| [`useGetHeatmapData`](../src/hooks/data/useGetHeatmapData.ts)                                                        | `["heatmap", area (box or polygon), gridSize, variable, dataset (period or year)]` |
+| [`useGetRegionalProfile`](../src/hooks/data/useGetRegionalProfile.ts)                                                | `["regional-profile", area, gridSize, dataset]`                                    |
 | [`useGetAltitude`](../src/hooks/data/useGetAltitude.ts), [`useGetCellBounds`](../src/hooks/data/useGetCellBounds.ts) | `["altitude" / "cellBounds", lat, lng, gridSize]`                                  |
 
 - **Why a change refetches:** a filter that's part of a key (location, resolution,
@@ -257,13 +259,13 @@ Filter params are written by `useFilterNavigation` and kept canonical by
 | Param                                            | Owner                   | Pages                                            | Default                                          | Allowed values                                                                                                                                   | Legacy            |
 | ------------------------------------------------ | ----------------------- | ------------------------------------------------ | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- |
 | `dataset`                                        | filters                 | all                                              | `climate`                                        | `climate`, `weather`                                                                                                                             |                   |
-| `period`                                         | filters                 | City Climate, Compare Cities, Heat map (Climate) | `c1970-2000`                                     | `c1951-1980`, `c1961-1990`, `c1970-2000`, `c1981-2010`, `c1991-2020`                                                                             |                   |
-| `year`                                           | filters                 | City Climate, Compare Cities, Heat map (Weather) | `2024`                                           | 1951–2024                                                                                                                                        |                   |
+| `period`                                         | filters                 | City Climate, Compare Cities, Heat map (Climate) | `c1970-2000`                                     | a climate period (`CLIMATE_PERIODS` in [`worldclim.constant.ts`](../src/constants/worldclim.constant.ts))                                        |                   |
+| `year`                                           | filters                 | City Climate, Compare Cities, Heat map (Weather) | the latest year (`WEATHER_MAX_YEAR`)             | `WEATHER_MIN_YEAR`–`WEATHER_MAX_YEAR`                                                                                                            |                   |
 | `var`                                            | filters                 | all                                              | `tmax,tmin,prec`                                 | comma list of `tmax`, `tmin`, `prec`, `srad`, `wind`, `vapr`. `srad`, `wind` and `vapr` only with Climate 1970–2000; Weather has the first three |                   |
 | `grid`                                           | filters                 | all                                              | `2.5m`                                           | `10m`, `5m`, `2.5m`, `30s` (`30s` only with Climate 1970–2000)                                                                                   |                   |
 | `months`                                         | filters                 | all (disabled on the heat map)                   | `all`                                            | `all` or a comma list of 1–12                                                                                                                    |                   |
 | `period1`, `period2`                             | filters                 | Compare Periods (Climate)                        | `c1970-2000`, `c1991-2020`                       | climate periods; never equal                                                                                                                     |                   |
-| `periods`                                        | filters                 | Compare Periods (Weather)                        | `2021,1967`                                      | 2–5 years, 1951–2024                                                                                                                             | `year1` + `year2` |
+| `periods`                                        | filters                 | Compare Periods (Weather)                        | `2021,1967`                                      | 2–5 weather years                                                                                                                                | `year1` + `year2` |
 | `city`, `lat`, `lng`                             | page                    | City Climate, Compare Periods                    | the persisted city (first visit: Madrid)         | name; coordinates with 4 decimals                                                                                                                |                   |
 | `cityA`, `latA`, `lngA`, `cityB`, `latB`, `lngB` | page                    | Compare Cities                                   | the persisted cities (first visit: Madrid, Rome) | as above                                                                                                                                         |                   |
 | `chart`                                          | page, `useChartModeUrl` | City Climate, Compare Cities, Compare Periods    | Walter-Lieth (absent)                            | `standard`                                                                                                                                       | `chart=wl`        |
@@ -275,7 +277,7 @@ Filter params are written by `useFilterNavigation` and kept canonical by
 | `north`, `south`, `west`, `east`                 | page                    | Heat map                                         | no selection                                     | a drawn box                                                                                                                                      |                   |
 | `polygon`                                        | page                    | Heat map                                         | no selection                                     | a drawn polygon (WKT)                                                                                                                            |                   |
 
-The locale isn't a param: it's the path prefix (`/es/…`), changed by `useLocaleNavigation`.
+The locale isn't in the URL: it's the `NEXT_LOCALE` cookie, changed by `useLocaleSwitch` on the settings page.
 
 ## Push or replace
 
@@ -292,8 +294,8 @@ The locale isn't a param: it's the path prefix (`/es/…`), changed by `useLocal
 | Drawing or clearing a heat-map selection                                | `pushUrlState`                                     | push    | the previous selection                           |
 | Layout, shading, expanded panel, the pair, shown years                  | `useUrlStateSync` (state change)                   | replace | skips the change                                 |
 | Chart type (header switch, "Switch to standard chart")                  | `useChartModeUrl` → `replaceUrlParams`             | replace | skips the change                                 |
-| Navbar or logo link                                                     | `useNavbarNavigation` → `router.push`              | push    | the previous page as it was                      |
-| Language switch                                                         | `useLocaleNavigation` → `navigateWithIntent`       | push    | the same page in the previous language           |
+| Navbar, logo or settings link                                           | `useNavbarNavigation` → `router.push`              | push    | the previous page as it was                      |
+| Language switch (settings page)                                         | `useLocaleSwitch` → `router.refresh`               | none    | the page before settings, in the new language    |
 | Opening a filters sheet                                                 | `useSheetHistory` → `history.pushState` (same URL) | push    | closes the sheet                                 |
 
 "Skips the change" means Back goes to the entry before the last push. A replaced change

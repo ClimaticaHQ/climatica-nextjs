@@ -1,7 +1,8 @@
 # Operations
 
 Running the app locally and keeping an environment up to date: the Docker services, the
-environment variables, and the Solr city index.
+environment variables, the Solr city index, the npm scripts, and how CI tests and deploys
+`main`.
 
 ## Docker services
 
@@ -65,7 +66,7 @@ Code never reads `process.env` directly; it imports `env` from `@/libs/Env`.
 
 `schema.json` is generated from `locales.json` by
 [`generate_schema.py`](../docker/solr/scripts/generate_schema.py) and committed; only
-whoever changes the locale list runs the generator (see [i18n.md](i18n.md)).
+whoever changes the locale list runs the generator (see [localization-i18n.md](localization-i18n.md)).
 
 ## Updating an existing environment
 
@@ -85,3 +86,49 @@ Cached responses survive in Redis across deploys (city searches up to 30 days, s
 [backend.md](backend.md)). After a change that alters what an API returns, clear them with
 `docker exec climatica-redis redis-cli FLUSHDB` (it also resets the rate-limit counters),
 or reboot the services.
+
+## npm scripts
+
+Besides the Docker and Solr scripts above, from [`package.json`](../package.json):
+
+| Script                                              | Does                                                                                                 |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `npm run dev`                                       | Next.js dev server on `PORT` (3000)                                                                  |
+| `npm run build`, `npm run start`                    | production build, and serving it                                                                     |
+| `npm run check`                                     | `type-check` (tsc), `lint` (ESLint) and `format:check` (Prettier); `npm run format` fixes formatting |
+| `npm run test`, `test:watch`, `test:coverage`       | Vitest ([testing.md](testing.md))                                                                    |
+| `npm run test:e2e`, `test:e2e:ui`, `test:e2e:debug` | Playwright; needs the Docker services and reuses a running dev server or starts one                  |
+| `npm run test:python`                               | the Solr data script's pytest suite, from the `.venv` virtual environment                            |
+
+The Node version is [`.nvmrc`](../.nvmrc), the single source: local work (`nvm use`) and CI
+(`node-version-file`) both read it.
+
+## Continuous integration and deployment
+
+Three workflows in [`.github/workflows/`](../.github/workflows), sharing the setup action
+[`setup-project`](../.github/actions/setup-project/action.yml) (Node from `.nvmrc`, cached `node_modules`,
+`npm ci`):
+
+| Workflow                                          | Runs on                                                  | Does                                                                                                                                                                                                                                                                               |
+| ------------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Validation](../.github/workflows/validation.yml) | every push and pull request                              | type check, lint, format check, production build (with the `WORLDCLIM_API_KEY` secret)                                                                                                                                                                                             |
+| [Tests](../.github/workflows/tests.yml)           | pushes and pull requests to `development` and `main`     | unit tests with coverage (reported on the pull request); then Solr and Redis services, the `cities` core and schema, the Python tests, and a cities import from freshly downloaded GeoNames. That job (named "E2E Tests") runs no Playwright tests: run `npm run test:e2e` locally |
+| [Deploy](../.github/workflows/deploy.yml)         | after Tests and Validation succeed on `main`, or by hand | the deployment below                                                                                                                                                                                                                                                               |
+
+The deploy job runs on a self-hosted runner on the production server, in its checkout of the
+repository. It deploys a commit only once (it records the deployed SHA) and only after both
+other workflows passed for it. Then, in order:
+
+1. Reset the checkout to `origin/main`.
+2. If `prepare_data.py` or `locales.json` changed since the last deploy, regenerate
+   `cities.csv`.
+3. Start the Docker services if they aren't running and wait for Solr's healthcheck.
+4. If `solrconfig.xml` changed, reload the `cities` core (a core reads it only when it loads;
+   the server reloads the core instead of recreating it, so the index is kept).
+5. Reindex Solr when the core is empty or the data inputs changed, and fail if it's still
+   empty.
+6. Flush Redis when the data or the Solr config changed, so cached city searches don't
+   outlive the fix.
+7. `npm ci`, `npm run build`, restart the `climatica` systemd service and check it's active.
+
+The workflow doesn't create or change `.env`.
