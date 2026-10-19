@@ -108,7 +108,7 @@ export type TStatsTableRow = {
 
 export type TStatsTable = {
   columns: { id: string; label: string; isLoading: boolean }[];
-  /** the difference's direction, e.g. "1991–2020 − 1970–2000"; null without one */
+  /** the pair's labels the difference reads minuend − subtrahend by; null without one */
   difference: { minuend: string; subtrahend: string } | null;
   rows: TStatsTableRow[];
 };

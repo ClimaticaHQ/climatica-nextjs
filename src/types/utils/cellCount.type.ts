@@ -1,9 +1,10 @@
+import type { TBadgeTone } from "../components/badge.type";
 import type { TClimatePeriod, TVariable } from "@/constants/worldclim.constant";
 import type { TCellSize } from "../domain";
 import type { TBbox, TPolygon } from "../hooks/heatmap.type";
 export type TCellCountStatus = {
   labelKey: string;
-  colorClass: string;
+  tone: TBadgeTone;
 };
 
 /** Inclusive cell rows (from the north pole) and columns (from 180° W) of the grid. */

@@ -4,7 +4,7 @@ import type {
   TComparisonTableValue,
 } from "../../components/comparisonTable";
 import type { TMonthlyValuesRow, TMonthlyValuesSeries } from "../../components/monthlyValues";
-import type { TMonthlyTableRow } from "../../components/monthlyTable";
+import type { TMonthlyTableMarker, TMonthlyTableRow } from "../../components/monthlyTable";
 
 export type TExportChartColors = {
   text: string;
@@ -19,7 +19,7 @@ export type TExportChartColors = {
   arid: string;
   humid: string;
   /** Only the heat-map export's selection outline uses this. */
-  primary: string;
+  brand: string;
   /** Walter-Lieth convention colors — resolved from the same CSS vars the live diagram uses. */
   wlTemp: string;
   wlPrec: string;
@@ -132,6 +132,8 @@ export type TExportMonthlyValuesArgs = {
   gutter: number;
   top: number;
   colors: TExportChartColors;
+  /** an overlay: each series' marker, in series order, beside the unit level with its values */
+  markers?: readonly TMonthlyTableMarker[] | undefined;
 };
 
 /** An export's monthly values rows: its series, drawn in the export palette. */

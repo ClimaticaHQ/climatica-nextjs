@@ -1,4 +1,4 @@
-import type { ECompareLayout, EChartBlock, EWalterLiethShading } from "@/enums";
+import type { ECompareLayout, EChartBlock, EDifferenceMeaning, EWalterLiethShading } from "@/enums";
 import type { ExportMenuProps } from "@/components/UI";
 import type {
   TChartMode,
@@ -49,8 +49,8 @@ export type TChartTitle = {
 /** What a page enables. New chart blocks are on by default; a page opts out here. */
 export type TChartFeatures = {
   title: TChartTitle;
-  /** the stats table's difference column: minuend − the other series */
-  difference: { minuendId: string } | null;
+  /** the stats table's difference column: minuend − the other series, and what it compares */
+  difference: { minuendId: string; meaning: EDifferenceMeaning } | null;
   /** split: each panel picks its series (more series than panels) */
   hasSidePickers: boolean;
   /** standard chart: the month filter's badge in the title */

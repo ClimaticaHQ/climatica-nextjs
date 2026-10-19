@@ -1,5 +1,6 @@
+import type { TBadgeTone } from "../components/badge.type";
+
 export type TMartonneBadge = {
   labelKey: string;
-  bg: string;
-  color: string;
+  tone: TBadgeTone;
 };

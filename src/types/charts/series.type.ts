@@ -14,8 +14,10 @@ export type TChartSeries = {
   label: string;
   /** the second line under the name: dataset and period (cities) or the city (periods) */
   context: string;
-  /** filled by the page from the current colour helpers */
+  /** filled by the page from the current colour helpers: its line colour */
   color: string;
+  /** its bar colour, a quieter step of the same hue */
+  barColor: string;
   data: readonly TMonthlyTemperature[];
   altitude: number | null;
   /** the weather year when the data is one year, not long-term normals */
