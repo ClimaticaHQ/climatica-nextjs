@@ -14,7 +14,7 @@ const COLORS: TExportChartColors = {
   tavg: "#f80",
   arid: "#fc0",
   humid: "#9cf",
-  primary: "#1d9e75",
+  brand: "#22a274",
   wlTemp: "#dc2626",
   wlPrec: "#2563eb",
   wlHumidHatch: "#2563eb",

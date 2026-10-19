@@ -1,5 +1,6 @@
 import { toOverlayLayer } from "@/components/charts/charts.util";
-import { WALTER_LIETH_COLORS, WALTER_LIETH_DASH } from "@/constants";
+import { WALTER_LIETH_DASH } from "@/constants";
+import { getPairIdentityColor } from "@/utils/seriesColor.util";
 import { EWalterLiethSeriesId, EWalterLiethShading } from "@/enums";
 import type { TWalterLiethSeries } from "@/types";
 import {
@@ -30,7 +31,7 @@ const layerOf = (id: EWalterLiethSeriesId, isShaded: boolean) =>
 describe("toOverlayLayer", () => {
   it("paints everything in the series color and dashes precipitation", () => {
     const layer = layerOf(EWalterLiethSeriesId.B, true);
-    const color = WALTER_LIETH_COLORS.SERIES[EWalterLiethSeriesId.B];
+    const color = getPairIdentityColor(EWalterLiethSeriesId.B);
 
     expect(layer.colors).toMatchObject({
       temp: color,

@@ -31,6 +31,7 @@ describe("motion CSS variables", () => {
       `${MOTION.UPDATE_PROGRESS_HEIGHT_PX}px`,
     );
     expect(MOTION_CSS_VARIABLES[MOTION_CSS_VAR.SHEET_SLIDE]).toBe(`${MOTION.SHEET_SLIDE_MS}ms`);
+    expect(MOTION_CSS_VARIABLES[MOTION_CSS_VAR.STATE_HOVER]).toBe(`${MOTION.STATE_HOVER_MS}ms`);
   });
 
   it("lets the progress segment cross the whole track", () => {

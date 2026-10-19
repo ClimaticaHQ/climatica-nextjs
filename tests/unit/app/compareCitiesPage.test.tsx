@@ -80,4 +80,14 @@ describe("Compare Cities through its page hook", () => {
     expect(screen.getByRole("heading", { level: 3 }).textContent).toContain("Oslo");
     expect(screen.getByText(messages.climateComparison.diff.warmerCity)).toBeTruthy();
   });
+
+  it("explains the difference B − A by the cities' names in its header's popover", () => {
+    renderPage(`${CITIES}&chart=standard`);
+    const button = screen.getByRole("button", { name: messages.climateComparison.differenceInfo });
+    const panelId = button.getAttribute("aria-controls") ?? "";
+
+    expect(document.getElementById(panelId)?.textContent).toBe(
+      "Difference = Oslo − Paris. A positive value means the metric is higher in Oslo.",
+    );
+  });
 });

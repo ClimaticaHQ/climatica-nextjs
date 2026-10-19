@@ -283,8 +283,6 @@ test("the last selected variable stays on, without a hint", async ({ page }) => 
 });
 
 test("a middle year loading last never shifts the other years' colours", async ({ page }) => {
-  // * PERIOD_COLORS by place in the list: 2021 first, 1990 second (held back), 2010 third
-  const [first, , third] = ["rgb(29, 158, 117)", "rgb(245, 158, 11)", "rgb(59, 130, 246)"];
   let release = () => {};
   const held = new Promise<void>((resolve) => (release = resolve));
   await page.route(/\/api\/worldclim\/.*[?&]year=1990(&|$)/, async (route) => {
@@ -315,6 +313,18 @@ test("a middle year loading last never shifts the other years' colours", async (
 
   await page.goto(
     `${PERIODS_URL}&dataset=weather&periods=2021,1990,2010&layout=overlay&chart=standard&grid=10m`,
+  );
+  // * the series colours by place in the list, read from the tokens: 2021 first, 1990 second
+  // * (held back), 2010 third
+  const [first, , third] = await page.evaluate(() =>
+    [1, 2, 3].map((position) => {
+      const probe = document.createElement("span");
+      probe.style.color = `var(--color-series-${position})`;
+      document.body.append(probe);
+      const color = getComputedStyle(probe).color;
+      probe.remove();
+      return color;
+    }),
   );
   // * 1990 still loading: 2021 and 2010 keep the first and third colours — chart and table
   await expect.poll(barColors, { timeout: 30_000 }).toEqual([first, third]);

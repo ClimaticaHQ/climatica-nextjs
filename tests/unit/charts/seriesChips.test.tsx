@@ -1,7 +1,5 @@
 // @vitest-environment jsdom
 import { SeriesChips } from "@/components/charts/SeriesChips";
-import { SERIES_KIND_RULES } from "@/constants";
-import { ESeriesKind } from "@/enums";
 import messages from "@/i18n/locales/en.json";
 import { deriveChartModel } from "@/utils";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
@@ -22,7 +20,6 @@ function renderChips(shown: readonly string[]) {
     <NextIntlClientProvider locale="en" messages={messages}>
       <SeriesChips
         entries={ENTRIES}
-        rule={SERIES_KIND_RULES[ESeriesKind.WEATHER_YEAR]}
         shown={shown}
         onShownChange={onShownChange}
         onHighlight={onHighlight}
@@ -49,6 +46,13 @@ describe("SeriesChips", () => {
     expect(last.hasAttribute("aria-describedby")).toBe(false);
     fireEvent.click(last);
     expect(onShownChange).not.toHaveBeenCalled();
+  });
+
+  it("draws each chip in its series' tint set, by its place", () => {
+    renderChips(["2021", "1990", "1967"]);
+    const style = screen.getByRole("button", { name: "1967" }).getAttribute("style") ?? "";
+    expect(style).toContain("--chip-tone-bg: var(--color-series-3-tint-bg)");
+    expect(style).toContain("--chip-tone-text: var(--color-series-3-tint-text)");
   });
 
   it("highlights the hovered or focused series", () => {

@@ -15,7 +15,7 @@ const LIGHT: Record<string, string> = {
   [WALTER_LIETH_COLOR_VARS.HUMID_HATCH]: "#2563eb",
   [WALTER_LIETH_COLOR_VARS.ARID_HATCH]: "#dc2626",
   [WALTER_LIETH_COLOR_VARS.COMPRESSED_FILL]: "#1d4ed8",
-  "--color-bg": "#ffffff",
+  "--color-surface": "#ffffff",
 };
 const DARK: Record<string, string> = {
   [WALTER_LIETH_COLOR_VARS.TEMP]: "#f87171",
@@ -23,7 +23,7 @@ const DARK: Record<string, string> = {
   [WALTER_LIETH_COLOR_VARS.HUMID_HATCH]: "#60a5fa",
   [WALTER_LIETH_COLOR_VARS.ARID_HATCH]: "#f87171",
   [WALTER_LIETH_COLOR_VARS.COMPRESSED_FILL]: "#3b82f6",
-  "--color-bg": "#111827",
+  "--color-surface": "#111827",
 };
 
 type TFakeElement = {
@@ -89,7 +89,7 @@ describe("export colors", () => {
 
     expect(colors.wlTemp).toBe(LIGHT[WALTER_LIETH_COLOR_VARS.TEMP]);
     expect(colors.wlCompressedFill).toBe(LIGHT[WALTER_LIETH_COLOR_VARS.COMPRESSED_FILL]);
-    expect(colors.bg).toBe(LIGHT["--color-bg"]);
+    expect(colors.bg).toBe(LIGHT["--color-surface"]);
   });
 
   it("build a WL export with exactly the light colors — none of the dark ones", () => {

@@ -83,7 +83,7 @@ const COLORS: TExportChartColors = {
   tavg: "#f80",
   arid: "#fc0",
   humid: "#9cf",
-  primary: "#1d9e75",
+  brand: "#22a274",
   wlTemp: "#dc2626",
   wlPrec: "#2563eb",
   wlHumidHatch: "#2563eb",
@@ -227,7 +227,7 @@ const valuesUnits = (svg: string) =>
 const valuesY = (svg: string) =>
   Number(
     svg.match(
-      /y="([\d.]+)" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">°C</,
+      /y="([\d.]+)" text-anchor="(?:middle|end)" font-size="11" font-weight="600" fill="#dc2626">°C</,
     )?.[1],
   );
 const plotBottom = (svg: string) =>
@@ -627,12 +627,13 @@ describe("compare export — frost band", () => {
 });
 
 describe("compare export — comparison table and monthly strips", () => {
-  it("puts the comparison table on top: A | B | Difference, B − A, values in series colors", () => {
+  it("puts the comparison table on top: A | B | Difference, B − A, values in the text colour", () => {
     const svg = buildSvg({ layout: ECompareLayout.SPLIT });
     expect(tableHeader(svg)).toEqual(["Madrid", "Mumbai", "Difference"]);
     expect(svg).toContain(">Mumbai \u2212 Madrid</text>");
     expect(svg).toContain(">Frost months</text>");
-    expect(svg).toMatch(new RegExp(`fill="${COLORS.wlSeriesA}">\\d+ mm</text>`));
+    expect(svg).toMatch(new RegExp(`fill="${COLORS.text}">\\d+ mm</text>`));
+    expect(svg).not.toMatch(new RegExp(`fill="${COLORS.wlSeriesA}">\\d+ mm</text>`));
     expect(svg).toContain(">Semi-arid</text>");
     // * above the chart
     expect(svg.indexOf(">Difference</text>")).toBeLessThan(svg.indexOf('clipPath id="wl-cmp-a'));
@@ -647,17 +648,26 @@ describe("compare export — comparison table and monthly strips", () => {
   );
 
   it.each(["walter-lieth", "standard"] as const)(
-    "%s overlay: one two-row table, A's value above B's in their colors, before the legend",
+    "%s overlay: one two-row table, A's value above B's in the text colour, before the legend",
     (chartMode) => {
       const svg = buildSvg({ chartMode, layout: ECompareLayout.OVERLAY });
-      expect(valuesUnits(svg)).toEqual(["°C", "mm"]);
+      // * two rows: each unit followed by the series' markers, A's dot above B's square
+      const markedUnits = [
+        ...svg.matchAll(
+          new RegExp(
+            `>(°C|mm)</text><circle [^>]*fill="${COLORS.wlSeriesA}" /><rect [^>]*fill="${COLORS.wlSeriesB}" />`,
+            "g",
+          ),
+        ),
+      ].map((m) => m[1]);
+      expect(markedUnits).toEqual(["°C", "mm"]);
       const lines = valueLines(svg);
       // * two rows × (A line + B line)
       expect(lines.map(({ fill }) => fill[0])).toEqual([
-        COLORS.wlSeriesA,
-        COLORS.wlSeriesB,
-        COLORS.wlSeriesA,
-        COLORS.wlSeriesB,
+        COLORS.text,
+        COLORS.text,
+        COLORS.text,
+        COLORS.text,
       ]);
       expect(valuesY(svg)).toBeLessThan(legendY(svg) || Infinity);
     },

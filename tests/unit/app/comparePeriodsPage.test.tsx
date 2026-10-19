@@ -93,6 +93,16 @@ describe("Compare Periods (Climate) through its page hook", () => {
     expect(screen.getByText(messages.comparePeriods.trend.tempTitle)).toBeTruthy();
   });
 
+  it("explains the difference later − earlier in its header's popover", () => {
+    renderPage(`${MADRID}&chart=standard`, { dataA: months(0), dataB: months(2) });
+    const button = screen.getByRole("button", { name: messages.climateComparison.differenceInfo });
+    const panelId = button.getAttribute("aria-controls") ?? "";
+
+    expect(document.getElementById(panelId)?.textContent).toBe(
+      "Difference = 1991–2020 − 1970–2000. A positive value means the metric increased in the later period.",
+    );
+  });
+
   it("names each period without data, one line each", () => {
     renderPage(MADRID, {});
     expect(screen.getByText("No 1970–2000 data at 10 min resolution")).toBeTruthy();
