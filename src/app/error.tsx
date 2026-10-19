@@ -13,7 +13,7 @@ type TErrorPageProps = {
 };
 
 const secondaryLinkClass =
-  "rounded-[var(--radius-sm)] font-medium transition-colors duration-150 px-6 py-2 text-[length:var(--font-sm)] border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]";
+  "rounded-[var(--radius-sm)] font-medium transition-colors duration-150 px-6 py-2 text-[length:var(--font-sm)] border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]";
 
 export default function ErrorPage({ error, reset }: TErrorPageProps) {
   const t = useTranslations();
@@ -23,7 +23,7 @@ export default function ErrorPage({ error, reset }: TErrorPageProps) {
   }, [error]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-4 bg-[var(--color-bg)] text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-4 bg-[var(--color-surface)] text-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
@@ -32,7 +32,7 @@ export default function ErrorPage({ error, reset }: TErrorPageProps) {
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="w-16 h-16 text-[var(--color-primary)] opacity-80"
+        className="w-16 h-16 text-[var(--color-brand)] opacity-80"
         aria-hidden="true"
       >
         <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />

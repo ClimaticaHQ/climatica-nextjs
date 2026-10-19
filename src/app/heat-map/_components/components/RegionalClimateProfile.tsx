@@ -13,7 +13,7 @@ export function RegionalClimateProfile({
 
   if (isLoading) {
     return (
-      <div className="h-[52px] animate-pulse rounded-[var(--radius-md)] bg-[var(--color-bg-secondary)]" />
+      <div className="h-[52px] animate-pulse rounded-[var(--radius-md)] bg-[var(--color-surface-secondary)]" />
     );
   }
 

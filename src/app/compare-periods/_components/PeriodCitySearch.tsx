@@ -2,7 +2,8 @@
 
 import { LocationSearch } from "@/components/LocationSearch";
 import { DotLabel, MapSkeleton } from "@/components/UI";
-import { CLIMATE_COMPARISON_COLORS } from "@/constants";
+import { EWalterLiethSeriesId } from "@/enums";
+import { getPairPalette } from "@/utils/seriesColor.util";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { PERIOD_CITY_SEARCH_CLASSES as C } from "./ComparePeriods.constant";
@@ -16,7 +17,7 @@ const MiniMap = dynamic(
 /** The one city both periods belong to: its search (and your location), and the mini map. */
 export function PeriodCitySearch({ city, ...search }: TPeriodCitySearchProps) {
   const t = useTranslations();
-  const color = CLIMATE_COMPARISON_COLORS.A.tmax;
+  const color = getPairPalette(EWalterLiethSeriesId.A).tmax;
 
   return (
     <div className={C.ROOT}>

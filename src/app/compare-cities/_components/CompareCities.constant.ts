@@ -1,4 +1,6 @@
-import { CLIMATE_COMPARISON_COLORS, SIDEBAR_PARAMS } from "@/constants";
+import { SIDEBAR_PARAMS } from "@/constants";
+import { EWalterLiethSeriesId } from "@/enums";
+import { getPairIdentityColor, getSeriesTextColor } from "@/utils/seriesColor.util";
 import type { TUrlSchema } from "@/types";
 import {
   cityUrlField,
@@ -46,9 +48,9 @@ export const CITY_DIFFERENCE_CARDS_CLASS = "grid grid-cols-2 gap-3 lg:grid-cols-
 // * a picked city scrolls the chart's bottom into view
 export const COMPARE_CITIES_SCROLL_OPTIONS = { toBottom: true } as const;
 
-// * a difference card's value in the winning city's colour; a tie in the text colour
+// * a difference card's value (large text) in the winning city's colour; a tie in the text colour
 export const CITY_WINNER_COLORS = {
-  A: CLIMATE_COMPARISON_COLORS.A.tmax,
-  B: CLIMATE_COMPARISON_COLORS.B.tmax,
+  A: getSeriesTextColor({ color: getPairIdentityColor(EWalterLiethSeriesId.A), isLargeText: true }),
+  B: getSeriesTextColor({ color: getPairIdentityColor(EWalterLiethSeriesId.B), isLargeText: true }),
   tie: undefined,
 } as const;

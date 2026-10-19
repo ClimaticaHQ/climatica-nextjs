@@ -2,7 +2,8 @@
 
 import { SearchBar } from "@/components/SearchBar";
 import { DotLabel, MapSkeleton, type TMiniMapLocation } from "@/components/UI";
-import { CLIMATE_COMPARISON_COLORS } from "@/constants";
+import { EWalterLiethSeriesId } from "@/enums";
+import { getPairPalette } from "@/utils/seriesColor.util";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
@@ -33,8 +34,8 @@ export function CityPairSearch({
   const t = useTranslations();
   const [activeCity, setActiveCity] = useState(0);
   const locations: TMiniMapLocation[] = [
-    { city: cityA, color: CLIMATE_COMPARISON_COLORS.A.tmax },
-    { city: cityB, color: CLIMATE_COMPARISON_COLORS.B.tmax },
+    { city: cityA, color: getPairPalette(EWalterLiethSeriesId.A).tmax },
+    { city: cityB, color: getPairPalette(EWalterLiethSeriesId.B).tmax },
   ].flatMap(({ city, color }) =>
     city.lat && city.lng ? [{ lat: city.lat, lng: city.lng, label: city.label, color }] : [],
   );
@@ -45,13 +46,13 @@ export function CityPairSearch({
         <div className={C.SEARCH_GRID}>
           <CitySearchRow
             label={t("climateComparison.searchA")}
-            dotColor={CLIMATE_COMPARISON_COLORS.A.tmax}
+            dotColor={getPairPalette(EWalterLiethSeriesId.A).tmax}
             cityLabel={cityA.label}
             onCitySelect={onCityASelect}
           />
           <CitySearchRow
             label={t("climateComparison.searchB")}
-            dotColor={CLIMATE_COMPARISON_COLORS.B.tmax}
+            dotColor={getPairPalette(EWalterLiethSeriesId.B).tmax}
             cityLabel={cityB.label}
             onCitySelect={onCityBSelect}
           />

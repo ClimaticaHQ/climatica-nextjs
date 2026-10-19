@@ -89,7 +89,7 @@ export function BboxDrawer({ isDrawMode, gridSize, onBboxComplete }: TBboxDrawer
     <Rectangle
       bounds={[start, current]}
       pathOptions={{
-        color: "var(--color-primary)",
+        color: "var(--color-brand)",
         fillOpacity: 0.12,
         weight: 2,
         dashArray: "6 4",
@@ -162,14 +162,14 @@ export function PolygonDrawer({ gridSize, onPolygonComplete }: TPolygonDrawerPro
     <>
       <Polyline
         positions={previewPath}
-        pathOptions={{ color: "var(--color-primary)", weight: 2, dashArray: "6 4" }}
+        pathOptions={{ color: "var(--color-brand)", weight: 2, dashArray: "6 4" }}
       >
         <DrawingCellCount vertices={previewPath} gridSize={gridSize} />
       </Polyline>
       {showClosingLine && (
         <Polyline
           positions={[cursor, vertices[0]]}
-          pathOptions={{ color: "var(--color-primary)", weight: 1, dashArray: "4 4", opacity: 0.4 }}
+          pathOptions={{ color: "var(--color-brand)", weight: 1, dashArray: "4 4", opacity: 0.4 }}
         />
       )}
       {snapToFirst && (
@@ -177,8 +177,8 @@ export function PolygonDrawer({ gridSize, onPolygonComplete }: TPolygonDrawerPro
           center={vertices[0]}
           radius={8}
           pathOptions={{
-            color: "var(--color-primary)",
-            fillColor: "var(--color-primary)",
+            color: "var(--color-brand)",
+            fillColor: "var(--color-brand)",
             fillOpacity: 0.4,
             weight: 2,
           }}

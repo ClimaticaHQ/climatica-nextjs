@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormatNumber } from "@/hooks";
-import { interpolateColor } from "@/utils";
+import { interpolateColor, resolveColorScale } from "@/utils";
 import L from "leaflet";
 import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
@@ -61,6 +61,7 @@ export function HeatmapLayer({
 
     const min = Math.min(...values);
     const max = Math.max(...values);
+    const stops = resolveColorScale(scale, getComputedStyle(document.documentElement));
 
     for (const b of bindings) {
       const value = getValue(b);
@@ -69,7 +70,7 @@ export function HeatmapLayer({
       const bounds = resolveCellBounds(b, cellSize);
       if (!bounds) continue;
 
-      const color = interpolateColor(value, min, max, scale);
+      const color = interpolateColor(value, min, max, stops);
       const leafletBounds = L.latLngBounds(
         [bounds.south, bounds.west],
         [bounds.north, bounds.east],

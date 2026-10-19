@@ -2,6 +2,7 @@ import { Card } from "@/components/Card";
 import { StatCell } from "@/components/UI/StatCell";
 import { DATA_UPDATE_ALL_SERIES, DIFFERENCE_SIGN } from "@/constants";
 import { ECardPadding, ECardSize } from "@/enums";
+import { useColorScale } from "@/hooks/ui/useColorScale";
 import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
 import { interpolateColor } from "@/utils";
 import { useTranslations } from "next-intl";
@@ -28,19 +29,20 @@ export function StatsLegendBar({
 }: TStatsLegendBarProps) {
   const t = useTranslations();
   const formatNumber = useFormatNumber();
+  const stops = useColorScale(scale);
   if (!isLoading && !hasData) return null;
 
   const fmt = (value: number) => `${formatNumber(value, { digits: HEATMAP_VALUE_DIGITS })} ${unit}`;
-  const gradient = `linear-gradient(to right, ${Array.from(
-    { length: STATS_LEGEND_GRADIENT_STOPS },
-    (_, i) =>
+  const gradient =
+    stops &&
+    `linear-gradient(to right, ${Array.from({ length: STATS_LEGEND_GRADIENT_STOPS }, (_, i) =>
       interpolateColor(
         stats.min + (stats.max - stats.min) * (i / (STATS_LEGEND_GRADIENT_STOPS - 1)),
         stats.min,
         stats.max,
-        scale,
+        stops,
       ),
-  ).join(", ")})`;
+    ).join(", ")})`;
   const subtitle = <span className={C.SUBTITLE}>{statSubtitle}</span>;
   const cells = [
     { label: t("heatMap.stats.minValue"), value: fmt(stats.min), meta: subtitle },
@@ -87,7 +89,7 @@ export function StatsLegendBar({
       </div>
       {hasData && (
         <div className={C.LEGEND}>
-          <div className={C.GRADIENT} style={{ background: gradient }} />
+          <div className={C.GRADIENT} style={gradient ? { background: gradient } : undefined} />
           <div className={C.GRADIENT_LABELS}>
             <span className={C.GRADIENT_LABEL}>{fmt(stats.min)}</span>
             <span className={C.GRADIENT_LABEL}>{fmt(stats.max)}</span>
