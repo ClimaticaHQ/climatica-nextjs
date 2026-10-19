@@ -1,9 +1,11 @@
+import { SeriesMarker } from "@/components/SeriesMarker";
 import { TOOLTIP_DIGITS } from "@/constants";
 import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
 import { useTranslations } from "next-intl";
+import { TOOLTIP_CLASSES as C } from "./charts.constant";
 import type { TOverlayTooltipProps } from "./charts.type";
 
-/** The hovered month for every overlaid series, each in its colour. */
+/** The hovered month for every overlaid series: its marker and name, then its values. */
 export function OverlayTooltip({ active, payload, entries }: TOverlayTooltipProps) {
   const t = useTranslations();
   const formatNumber = useFormatNumber();
@@ -11,16 +13,17 @@ export function OverlayTooltip({ active, payload, entries }: TOverlayTooltipProp
   if (!active || !hovered) return null;
 
   return (
-    <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg)] p-2 text-[13px]">
-      <p className="mb-1 font-semibold text-[var(--color-text)]">
-        {t(`months.${hovered.monthIndex + 1}`)}
-      </p>
-      {entries.map(({ key, label, color, rows }) => {
+    <div className={C.FRAME}>
+      <p className={C.TITLE}>{t(`months.${hovered.monthIndex + 1}`)}</p>
+      {entries.map(({ key, label, color, marker, rows }) => {
         const row = rows[hovered.position];
         if (!row) return null;
         return (
-          <div key={key} className="mb-1" style={{ color }}>
-            <p className="font-medium">{label}</p>
+          <div key={key} className={C.SERIES} style={{ color }}>
+            <p className={C.SERIES_LABEL}>
+              <SeriesMarker {...marker} />
+              {label}
+            </p>
             <p>
               {t("chart.avgTemperature")}:{" "}
               {t("units.celsiusValue", {

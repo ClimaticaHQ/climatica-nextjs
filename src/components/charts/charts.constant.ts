@@ -34,6 +34,26 @@ export const BLOCK_PLACEMENTS = {
 // * a dot outside the hovered month or the month filter
 export const STANDARD_CHART_DIMMED_DOT_OPACITY = 0.15;
 
+// * a bar outside the hovered month: dimmed, its value still readable on the light surface
+export const STANDARD_CHART_HOVER_DIMMED_BAR_OPACITY = 0.35;
+
+// * a line's or bar's name in a multi-series chart: "<series> — <variable>"
+export const SERIES_ITEM_SEPARATOR = " — ";
+
+// * px — every chart tooltip's text (TOOLTIP_CLASSES.FRAME); its swatches scale with it
+export const TOOLTIP_FONT_SIZE = 13;
+
+// * every chart tooltip: text in the text colour, a row after its series' marker or, in a chart
+// * of one series, its variable's legend swatch
+export const TOOLTIP_CLASSES = {
+  FRAME:
+    "rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-[13px] text-[var(--color-text)]",
+  TITLE: "mb-1 font-semibold",
+  ROW: "flex items-center gap-1.5",
+  SERIES: "mb-1",
+  SERIES_LABEL: "flex items-center gap-1.5 font-medium",
+} as const;
+
 // * each series' lines in the standard chart, in drawing order — the mean only for kinds that
 // * draw it
 export const STANDARD_CHART_LINES: readonly TStandardChartLine[] = [
@@ -49,20 +69,22 @@ export const STATS_TABLE_CLASSES = {
   SCROLLER: "overflow-x-auto",
   TABLE: "w-full table-fixed text-[length:var(--font-sm)]",
   CAPTION: "sr-only",
-  HEAD_ROW: "bg-[var(--color-bg-secondary)]",
+  HEAD_ROW: "bg-[var(--color-surface-secondary)]",
   METRIC_COL: "w-[36%] sm:w-[28%]",
-  HEAD_CELL: "px-3 py-2.5 text-right align-bottom font-semibold sm:px-4",
-  METRIC_HEAD: "sticky left-0 z-10 bg-inherit px-3 py-2.5 text-left sm:px-4",
+  // * every header bottom-aligned on one line height: the titles share a baseline
+  HEAD_CELL: "px-3 py-2.5 text-right align-bottom font-semibold leading-5 sm:px-4",
+  METRIC_HEAD: "sticky left-0 z-10 bg-inherit px-3 py-2.5 text-left align-bottom leading-5 sm:px-4",
   SERIES_NAME: "inline-flex max-w-full items-center justify-end gap-1.5",
   SERIES_LABEL: "truncate",
   DIFFERENCE: "max-sm:hidden",
+  DIFFERENCE_HEAD: "inline-flex items-center gap-1",
   DIFFERENCE_BELOW: "sm:hidden",
   MUTED_LINE: "block text-[11px] font-normal text-[var(--color-text-secondary)]",
-  // * a series name in the direction line never breaks — the line wraps at the minus only
-  NO_WRAP: "whitespace-nowrap",
-  ROW: "border-t border-[var(--color-border)]",
+  // * hover (only where the device can hover) paints the state layer as an inset shadow on each
+  // * cell: it tints the pinned metric cell over its opaque background too, and it can fade
+  ROW: "state-hover-row border-t border-[var(--color-border)] hover:[&>*]:shadow-[inset_0_0_0_100vmax_var(--color-state-hover)]",
   METRIC_CELL:
-    "sticky left-0 z-10 bg-[var(--color-bg)] px-3 py-2 text-left font-normal text-[var(--color-text-secondary)] sm:px-4",
+    "sticky left-0 z-10 bg-[var(--color-surface)] px-3 py-2 text-left font-normal text-[var(--color-text-secondary)] sm:px-4",
   VALUE_CELL: "px-3 py-2 text-right tabular-nums font-medium sm:px-4",
   VALUE_LINE: "inline-flex max-w-full items-center justify-end gap-1.5",
   LOADING_VALUE: "ml-auto h-4 w-16 animate-pulse rounded bg-[var(--color-border)]",
@@ -112,12 +134,12 @@ export const OVERLAY_CHIPS_CLASSES = {
 } as const;
 
 export const CHART_COLORS = {
-  arid: "var(--chart-arid)",
-  humid: "var(--chart-humid)",
+  arid: "var(--color-chart-arid)",
+  humid: "var(--color-chart-humid)",
   single: {
-    tmax: "var(--chart-temp-max)",
-    tmin: "var(--chart-temp-min)",
-    tavg: "var(--chart-temp-avg)",
+    tmax: "var(--color-chart-temp-max)",
+    tmin: "var(--color-chart-temp-min)",
+    tavg: "var(--color-chart-temp-avg)",
   },
 };
 

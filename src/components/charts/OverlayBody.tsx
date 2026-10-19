@@ -46,7 +46,6 @@ export function OverlayBody(props: TChartBodyProps) {
       <div className={C.YEARS}>
         <SeriesChips
           entries={model.series}
-          rule={rule}
           shown={shown.value}
           onShownChange={shown.onChange}
           onHighlight={setHighlightedId}

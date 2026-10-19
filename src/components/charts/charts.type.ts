@@ -18,6 +18,7 @@ import type {
   TExpandedPanel,
   TLegendItem,
   TLegendLabels,
+  TLegendSwatch,
   TSeriesKindRule,
   TSeriesKey,
   TStatsTable,
@@ -134,7 +135,6 @@ export type TChartCardHeaderProps = {
 
 export type TSeriesChipsProps = {
   entries: readonly TChartSeriesModel[];
-  rule: TSeriesKindRule;
   shown: readonly string[];
   onShownChange: (shown: readonly string[]) => void;
   onHighlight: (id: string | null) => void;
@@ -183,6 +183,21 @@ export type TStandardChartEntry = {
   emphasis: number;
   /** turned off by its chip: kept mounted (its place) but not drawn */
   isHidden: boolean;
+  /** its marker before its rows in the tooltip */
+  marker: TSeriesMarkerProps;
+};
+
+/** A standard chart's tooltip: Recharts passes active, payload and label. */
+export type TStandardTooltipProps = {
+  active?: boolean;
+  payload?: readonly { name?: string | number; value?: unknown; color?: string }[];
+  label?: string | number;
+  /** the axis' month key → the month's name */
+  formatLabel: (label: unknown) => string;
+  /** a row's series marker, by the row's name; none in a chart of one series */
+  markerOf?: (name: string) => TSeriesMarkerProps | undefined;
+  /** a chart of one series: a row's variable swatch, as in its legend, by the row's name */
+  swatchOf?: (name: string) => TLegendSwatch | undefined;
 };
 
 export type TStandardChartProps = {
@@ -394,6 +409,8 @@ export type TOverlayEntry = {
   isShaded: boolean;
   /** another entry is highlighted: this one fades */
   isDimmed?: boolean;
+  /** its marker in the tooltip */
+  marker: TSeriesMarkerProps;
 };
 
 export type TWalterLiethOverlayProps = {
@@ -420,6 +437,7 @@ export type TOverlayTooltipEntry = {
   key: string;
   label: string;
   color: string;
+  marker: TSeriesMarkerProps;
   rows: readonly TWalterLiethRow[];
 };
 

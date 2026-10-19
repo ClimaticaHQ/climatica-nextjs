@@ -3,20 +3,18 @@ import { StandardChartAxes } from "./StandardChartAxes";
 import { useSeriesToggleMotion } from "@/hooks/charts/useSeriesToggleMotion";
 import type { TDotRendererProps, TStandardChartProps } from "./charts.type";
 import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle, seriesDataKey } from "./charts.util";
-import {
-  CHART_HOVER_COLOR,
-  CHART_PLOT,
-  MISSING_VALUE_LABEL,
-  MONTH_NAMES,
-  TOOLTIP_DIGITS,
-} from "@/constants";
+import { CHART_HOVER_COLOR, CHART_PLOT, MONTH_NAMES } from "@/constants";
 import { useDelayedHide } from "@/hooks/ui/useDelayedHide";
 import { useElementWidth } from "@/hooks/ui/useElementWidth";
-import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
 import { getMonthLabelFormat, resolveActiveTooltipIndex } from "@/utils";
 import { useTranslations } from "next-intl";
 import { Bar, ComposedChart, Line, ReferenceArea, ResponsiveContainer, Tooltip } from "recharts";
-import { STANDARD_CHART_DIMMED_DOT_OPACITY, STANDARD_CHART_LINES } from "./charts.constant";
+import {
+  SERIES_ITEM_SEPARATOR,
+  STANDARD_CHART_DIMMED_DOT_OPACITY,
+  STANDARD_CHART_LINES,
+} from "./charts.constant";
+import { StandardTooltip } from "./StandardTooltip";
 
 /**
  * Every series in one standard chart: per series its precipitation bars and its max, mean (if
@@ -36,13 +34,15 @@ export function StandardChart({
 }: TStandardChartProps) {
   const t = useTranslations();
   const seriesMotion = useSeriesToggleMotion();
-  const formatNumber = useFormatNumber();
   const { ref: plotRef, width: plotWidth } = useElementWidth<HTMLDivElement>();
   const hidePrecBar = useDelayedHide(!visible.prec, seriesMotion.toggleMs);
   const hideTmaxLine = useDelayedHide(!visible.tmax, seriesMotion.toggleMs);
   const hideTminLine = useDelayedHide(!visible.tmin, seriesMotion.toggleMs);
   const hideTavgLine = useDelayedHide(!visible.tavg, seriesMotion.toggleMs);
   const isHovering = activeMonthIndex !== null;
+
+  const markerOf = (name: string) =>
+    entries.find(({ label }) => name.startsWith(`${label}${SERIES_ITEM_SEPARATOR}`))?.marker;
 
   function localMonthName(value: unknown): string {
     const index = (MONTH_NAMES as readonly string[]).indexOf(String(value));
@@ -119,23 +119,7 @@ export function StandardChart({
               )}
               <Tooltip
                 cursor={false}
-                contentStyle={{
-                  backgroundColor: "var(--color-bg)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  fontSize: 13,
-                }}
-                labelFormatter={localMonthName}
-                formatter={(value, name) => {
-                  // * a missing month is unknown — Number(null) / Number("") would print "0.00"
-                  if (value === null || value === undefined) return [MISSING_VALUE_LABEL, name];
-                  const num = Number(value);
-                  const formatted = isNaN(num)
-                    ? String(value ?? "")
-                    : formatNumber(num, { digits: TOOLTIP_DIGITS.STANDARD });
-                  const isPrecip = String(name).includes(t("chart.precipitation"));
-                  return [`${formatted} ${t(isPrecip ? "units.mm" : "units.celsius")}`, name];
-                }}
+                content={<StandardTooltip formatLabel={localMonthName} markerOf={markerOf} />}
               />
               {entries.flatMap(({ id, label, palette, emphasis, isHidden }) => [
                 <Bar
@@ -145,7 +129,7 @@ export function StandardChart({
                   dataKey={(row: Record<string, unknown>) =>
                     visible.prec ? Number(row[seriesDataKey(id, "prec")]) : 0
                   }
-                  name={`${label} — ${t("chart.precipitation")}`}
+                  name={`${label}${SERIES_ITEM_SEPARATOR}${t("chart.precipitation")}`}
                   fill={palette.prec}
                   fillOpacity={emphasis}
                   minPointSize={0}
@@ -168,7 +152,7 @@ export function StandardChart({
                       yAxisId="temp"
                       type="monotone"
                       dataKey={seriesDataKey(id, variable)}
-                      name={`${label} — ${t(labelKey)}`}
+                      name={`${label}${SERIES_ITEM_SEPARATOR}${t(labelKey)}`}
                       stroke={palette[variable]}
                       strokeWidth={2}
                       {...(dash !== undefined ? { strokeDasharray: dash } : {})}

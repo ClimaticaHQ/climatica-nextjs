@@ -3,29 +3,25 @@
 import { ChipScroller } from "@/components/UI/ChipScroller";
 import { Chip } from "@/components/UI";
 import { toggleFilterOption } from "@/utils/filters.util";
+import { getSeriesTint } from "@/utils/seriesColor.util";
 import { useTranslations } from "next-intl";
 import type { TSeriesChipsProps } from "./charts.type";
-import { getIdentityColor } from "./charts.util";
 
 /**
- * The overlay's series as colour chips: tap toggles one; the last one shown stays on (locked,
- * as the last variable does). Hovering or focusing a chip highlights its series.
+ * The overlay's series as colour chips, each in its series' tint set (entries in palette order,
+ * as their colours): tap toggles one; the last one shown stays on (locked, as the last variable
+ * does). Hovering or focusing a chip highlights its series.
  */
-export function SeriesChips({
-  entries,
-  rule,
-  shown,
-  onShownChange,
-  onHighlight,
-}: TSeriesChipsProps) {
+export function SeriesChips({ entries, shown, onShownChange, onHighlight }: TSeriesChipsProps) {
   const t = useTranslations();
   const [lockedId] = shown.length === 1 ? shown : [];
 
   return (
     <div role="group" aria-label={t("chart.yearsShown")} className="flex flex-col">
       <ChipScroller contentKey={entries.map(({ series }) => series.id).join("|")}>
-        {entries.map((entry) => {
+        {entries.map((entry, position) => {
           const { id, label } = entry.series;
+          const tint = getSeriesTint(position);
           return (
             <span
               key={id}
@@ -37,7 +33,8 @@ export function SeriesChips({
             >
               <Chip
                 label={label}
-                dotColor={getIdentityColor(entry, rule)}
+                dotColor={tint.dot}
+                tone={tint}
                 isActive={shown.includes(id)}
                 isLocked={id === lockedId}
                 onClick={() => onShownChange(toggleFilterOption(shown, id))}

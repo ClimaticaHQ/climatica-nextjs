@@ -1,4 +1,4 @@
-import { CHART_COLORS } from "./charts.constant";
+import { CHART_COLORS, STANDARD_CHART_HOVER_DIMMED_BAR_OPACITY } from "./charts.constant";
 import type { TBarShape } from "./charts.type";
 import { buildFillOpacityFadeStyle } from "./charts.util";
 
@@ -38,7 +38,7 @@ export function PrecipBarShape(props: TBarShape) {
   const fillOpacity = isHovering
     ? isActive
       ? 1
-      : 0.15
+      : STANDARD_CHART_HOVER_DIMMED_BAR_OPACITY
     : !selectedMonths || selectedMonths.length === 0
       ? 1
       : month !== undefined && selectedMonths.includes(month)

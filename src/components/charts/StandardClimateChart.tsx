@@ -1,21 +1,21 @@
 import { ClimateStatsBar } from "@/components";
+import { CHART_PLOT, CHART_LINE_DASH, CHART_HOVER_COLOR, MONTH_NAMES } from "@/constants";
 import {
-  CHART_PLOT,
-  CHART_LINE_DASH,
-  MISSING_VALUE_LABEL,
-  CHART_HOVER_COLOR,
-  MONTH_NAMES,
-  TOOLTIP_DIGITS,
-} from "@/constants";
-import { getMonthLabelFormat, getPlotHeightClass, resolveActiveTooltipIndex } from "@/utils";
-import { useDelayedHide, useElementWidth, useFormatNumber } from "@/hooks";
+  getAridityBarSwatch,
+  getMonthLabelFormat,
+  getPlotHeightClass,
+  getStandardVariableSwatches,
+  resolveActiveTooltipIndex,
+} from "@/utils";
+import { useDelayedHide, useElementWidth } from "@/hooks";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Bar, ComposedChart, Line, ResponsiveContainer, Tooltip, ReferenceArea } from "recharts";
 import { useSeriesToggleMotion } from "@/hooks/charts/useSeriesToggleMotion";
 import { PrecipBarShape } from "./PrecipBarShape";
 import { StandardChartAxes } from "./StandardChartAxes";
-import { STANDARD_CHART_SINGLE_COLORS } from "./charts.constant";
+import { StandardTooltip } from "./StandardTooltip";
+import { ARIDITY_BAR_COLORS, STANDARD_CHART_SINGLE_COLORS } from "./charts.constant";
 import { useStandardChartAxes } from "@/hooks/charts/useStandardChartAxes";
 import type { TDotRendererProps, TStandardClimateChartProps } from "./charts.type";
 import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle } from "./charts.util";
@@ -40,7 +40,6 @@ export function StandardClimateChart({
 }: TStandardClimateChartProps) {
   const t = useTranslations();
   const seriesMotion = useSeriesToggleMotion();
-  const formatNumber = useFormatNumber();
   const { ref: plotRef, width: plotWidth } = useElementWidth<HTMLDivElement>();
   const monthFormat = getMonthLabelFormat(plotWidth);
   // * the tooltip's month names; the axes themselves are StandardChartAxes
@@ -55,6 +54,23 @@ export function StandardClimateChart({
     // * an unknown month (missing value) is not colored arid
     return Object.fromEntries(aridity.map((m) => [m.month, m.isArid === true]));
   }, [aridity]);
+
+  // * the tooltip's rows by their names: each variable's swatch, as in this chart's legend — the
+  // * hovered month's arid / humid bar when the bars are coloured by aridity
+  const swatches = getStandardVariableSwatches(colors);
+  const hoveredMonthIsArid =
+    showAridity && activeMonthIndex !== null && activeMonthIndex !== undefined
+      ? aridityByMonth?.[activeMonthIndex + 1]
+      : undefined;
+  const swatchByName = {
+    [t("chart.maxTemperature")]: swatches.tmax,
+    [t("chart.avgTemperature")]: swatches.tavg,
+    [t("chart.minTemperature")]: swatches.tmin,
+    [t("chart.precipitation")]:
+      hoveredMonthIsArid === undefined
+        ? swatches.prec
+        : getAridityBarSwatch(ARIDITY_BAR_COLORS, hoveredMonthIsArid),
+  };
 
   function makeDot(color: string, isSeriesVisible: boolean) {
     function DotRenderer(dotProps: TDotRendererProps) {
@@ -125,25 +141,15 @@ export function StandardClimateChart({
                   stroke="none"
                 />
               )}
+              {/* * one series: each row after its variable's legend swatch, not a marker */}
               <Tooltip
                 cursor={false}
-                contentStyle={{
-                  backgroundColor: "var(--color-bg)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  fontSize: 13,
-                }}
-                labelFormatter={axes.localMonthName}
-                formatter={(value, name) => {
-                  // * a missing month is unknown — Number(null) / Number("") would print "0.00"
-                  if (value === null || value === undefined) return [MISSING_VALUE_LABEL, name];
-                  const num = Number(value);
-                  const formatted = isNaN(num)
-                    ? String(value ?? "")
-                    : formatNumber(num, { digits: TOOLTIP_DIGITS.STANDARD });
-                  const isPrecip = String(name).includes(t("chart.precipitation"));
-                  return [`${formatted} ${t(isPrecip ? "units.mm" : "units.celsius")}`, name];
-                }}
+                content={
+                  <StandardTooltip
+                    formatLabel={axes.localMonthName}
+                    swatchOf={(name) => swatchByName[name]}
+                  />
+                }
               />
 
               <Bar
@@ -204,6 +210,7 @@ export function StandardClimateChart({
                 name={t("chart.minTemperature")}
                 stroke={colors.tmin}
                 strokeWidth={2}
+                strokeDasharray={CHART_LINE_DASH.STANDARD.tmin}
                 dot={makeDot(colors.tmin, visible.tmin)}
                 activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
                 hide={hideTminLine}

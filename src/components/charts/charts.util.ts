@@ -1,3 +1,4 @@
+import { getPairIdentityColor, getPairPalette } from "@/utils/seriesColor.util";
 import { STANDARD_CHART_SINGLE_COLORS, ARIDITY_BAR_COLORS } from "./charts.constant";
 import type {
   TWalterLiethDotShape,
@@ -5,7 +6,6 @@ import type {
 } from "@/components/WalterLiethChart/WalterLiethChart.type";
 import {
   CHART_BODY_BY_LAYOUT,
-  CLIMATE_COMPARISON_COLORS,
   CHART_LEGEND,
   SERIES_KIND_RULES,
   WALTER_LIETH_COLORS,
@@ -13,13 +13,7 @@ import {
   MOTION_CSS_VAR,
   WALTER_LIETH_DASH,
 } from "@/constants";
-import {
-  EChartBody,
-  ESeriesKind,
-  ESeriesTitleSource,
-  EWalterLiethSeriesId,
-  EWalterLiethShading,
-} from "@/enums";
+import { EChartBody, ESeriesKind, ESeriesTitleSource, EWalterLiethShading } from "@/enums";
 import type {
   TChartFeatures,
   TChartModel,
@@ -47,6 +41,7 @@ import type {
   TResolveChartBodyArgs,
   TOverlayLayerArgs,
 } from "./charts.type";
+import type { TSeriesMarkerProps } from "@/components/SeriesMarker/SeriesMarker.type";
 import { motionVar } from "@/utils/motion.util";
 import type { CSSProperties } from "react";
 
@@ -84,9 +79,18 @@ export function getTitleNames(
 
 /** The series' identity colour: its own (a weather year), or A's / B's. */
 export function getIdentityColor({ series }: TChartSeriesModel, rule: TSeriesKindRule): string {
-  return rule.usesOwnColor
-    ? series.color
-    : WALTER_LIETH_COLORS.SERIES[toWalterLiethSeriesId(series.id)];
+  return rule.usesOwnColor ? series.color : getPairIdentityColor(toWalterLiethSeriesId(series.id));
+}
+
+/** The series' marker (A dot, B square; a weather year a dot in its own colour). */
+export function getSeriesMarker(
+  { series }: TChartSeriesModel,
+  rule: TSeriesKindRule,
+): TSeriesMarkerProps {
+  return {
+    id: toWalterLiethSeriesId(series.id),
+    ...(rule.usesOwnColor ? { color: series.color } : {}),
+  };
 }
 
 export function getIdentityShape(
@@ -101,16 +105,14 @@ export function getIdentityShape(
 /** A standard chart panel's line and bar colours: A's or B's, or the single-city palette. */
 export function getStandardPalette({ series }: TChartSeriesModel, rule: TSeriesKindRule) {
   if (rule.usesOwnColor) return STANDARD_CHART_SINGLE_COLORS;
-  return toWalterLiethSeriesId(series.id) === EWalterLiethSeriesId.B
-    ? CLIMATE_COMPARISON_COLORS.B
-    : CLIMATE_COMPARISON_COLORS.A;
+  return getPairPalette(toWalterLiethSeriesId(series.id));
 }
 
-/** A series' colours in the overlay: its own colour for every variable, or A's / B's palette. */
+/** A series' colours in the overlay: its own line colour and bar colour, or A's / B's palette. */
 export function getOverlayPalette(entry: TChartSeriesModel, rule: TSeriesKindRule) {
-  const { color } = entry.series;
+  const { color, barColor } = entry.series;
   return rule.usesOwnColor
-    ? { tmax: color, tmin: color, tavg: color, prec: color }
+    ? { tmax: color, tmin: color, tavg: color, prec: barColor }
     : getStandardPalette(entry, rule);
 }
 
@@ -281,7 +283,7 @@ export function toOverlayLayer({
   return {
     ...layer,
     segments: isShaded ? layer.segments : [],
-    colors: getOverlayPaint(color ?? WALTER_LIETH_COLORS.SERIES[series.id]),
+    colors: getOverlayPaint(color ?? getPairIdentityColor(series.id)),
     precDash: WALTER_LIETH_DASH.OVERLAY_PREC,
     dotShape: shape ?? WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
   };

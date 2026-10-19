@@ -7,6 +7,7 @@ import {
   getIdentityColor,
   getIdentityShape,
   getOverlayPalette,
+  getSeriesMarker,
   getShadedId,
 } from "./charts.util";
 import { StandardChart } from "./StandardChart";
@@ -42,6 +43,7 @@ export function OverlayChart({
                   shape: getIdentityShape(entry, rule),
                   isShaded: entry.series.id === shadedId,
                   isDimmed: isDimmed(entry.series.id),
+                  marker: getSeriesMarker(entry, rule),
                 },
               ]
             : [],
@@ -66,6 +68,7 @@ export function OverlayChart({
           palette: getOverlayPalette(entry, rule),
           emphasis: isDimmed(entry.series.id) ? OVERLAY_DIM_OPACITY : 1,
           isHidden: !drawnIds.has(entry.series.id),
+          marker: getSeriesMarker(entry, rule),
         }))}
       rows={buildStandardChartRows(model.series)}
       hasMeanLine={rule.hasMeanLine}

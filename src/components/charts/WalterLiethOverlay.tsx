@@ -1,7 +1,7 @@
 import { WalterLiethPlot } from "@/components/WalterLiethChart/components";
 import { useWalterLiethCharts } from "@/components/WalterLiethChart/hooks/useWalterLiethCharts";
 import { OVERLAY_DIM_OPACITY, WALTER_LIETH_DIAGRAM } from "@/constants";
-import { getFrostMonths, orderShadedFirst } from "@/utils";
+import { getFrostMonths, getSeriesTextColor, orderShadedFirst } from "@/utils";
 import type { TWalterLiethOverlayProps } from "./charts.type";
 import { toOverlayLayer } from "./charts.util";
 import { OverlayTooltip } from "./OverlayTooltip";
@@ -51,10 +51,11 @@ export function WalterLiethOverlay({
         frost={shaded ? getFrostMonths(shaded.series.months) : null}
         tooltip={
           <OverlayTooltip
-            entries={drawn.map(({ key, series, color, chart }) => ({
+            entries={drawn.map(({ key, series, color, marker, chart }) => ({
               key,
               label: series.label,
-              color,
+              color: getSeriesTextColor({ color, isLargeText: false }),
+              marker,
               rows: chart.rows,
             }))}
           />

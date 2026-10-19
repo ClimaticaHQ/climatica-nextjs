@@ -1,11 +1,11 @@
 import { ChartLegend } from "@/components/ChartLegend";
-import { MONTHLY_VALUES_TEXT_COLOR, MonthlyValuesTable } from "@/components/MonthlyValuesTable";
+import { MonthlyValuesTable } from "@/components/MonthlyValuesTable";
 import { EChartBlock, EChartBlockPlacement, EChartBody } from "@/enums";
 import { COMPARISON_METRIC_LABEL_KEYS, SERIES_KIND_RULES } from "@/constants";
 import { useStatsTable } from "@/hooks/charts/useStatsTable";
 import { useLegendLabels } from "@/hooks/ui/useLegendLabels";
 import { useWalterLiethLegendItems } from "@/hooks/ui/useWalterLiethLegendItems";
-import { toWalterLiethSeriesId } from "@/utils";
+import { getSeriesTextColor } from "@/utils";
 import { useTranslations } from "next-intl";
 import type {
   TChartBlockDefinition,
@@ -13,12 +13,12 @@ import type {
   TChartBlocksProps,
   TSectionBlockProps,
 } from "./charts.type";
-import { getChartLegendItems, getIdentityColor } from "./charts.util";
+import { getChartLegendItems, getIdentityColor, getSeriesMarker } from "./charts.util";
 import { StatsTable } from "./StatsTable";
 
 /**
- * The monthly mean temperature and precipitation: one row per series. In an overlay each row
- * takes its series' colour; under one series the text colour.
+ * The monthly mean temperature and precipitation: one row per series, in the text colour — an
+ * overlay's series show by their markers.
  */
 function ValuesTableBlock({ context }: TChartBlockProps) {
   const { entries, body, rule, isCompact, activeMonth } = context;
@@ -29,9 +29,10 @@ function ValuesTableBlock({ context }: TChartBlockProps) {
       series={entries.map((entry) => ({
         key: entry.series.id,
         label: entry.series.label,
-        color: isOverlay ? getIdentityColor(entry, rule) : MONTHLY_VALUES_TEXT_COLOR,
+        color: getSeriesTextColor({ color: getIdentityColor(entry, rule), isLargeText: false }),
         data: entry.chartData,
       }))}
+      {...(isOverlay ? { markers: entries.map((entry) => getSeriesMarker(entry, rule)) } : {})}
       isCompact={isCompact}
       activeMonthIndex={activeMonth.activeMonthIndex}
       onActiveMonthIndexChange={activeMonth.onActiveMonthIndexChange}
@@ -65,11 +66,8 @@ function StatsTableBlock({ model, features }: TSectionBlockProps) {
     <StatsTable
       table={table}
       columns={model.series.map((entry) => ({
-        color: getIdentityColor(entry, rule),
-        marker: {
-          id: toWalterLiethSeriesId(entry.series.id),
-          ...(rule.usesOwnColor ? { color: entry.series.color } : {}),
-        },
+        color: getSeriesTextColor({ color: getIdentityColor(entry, rule), isLargeText: false }),
+        marker: getSeriesMarker(entry, rule),
       }))}
       martonneLabel={martonneLabel}
       differenceMeaning={features.difference?.meaning ?? null}
