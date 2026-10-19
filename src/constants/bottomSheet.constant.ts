@@ -22,7 +22,7 @@ export const BOTTOM_SHEET_CLASSES = {
   LAYER: "fixed inset-0 z-[1100]",
   BACKDROP: "absolute inset-0 bg-[var(--color-backdrop)]",
   PANEL:
-    "absolute inset-x-0 bottom-0 flex flex-col rounded-t-[var(--radius-lg)] border-t border-[var(--color-border)] bg-[var(--color-bg)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] shadow-[var(--shadow-lg)] outline-none",
+    "absolute inset-x-0 bottom-0 flex flex-col rounded-t-[var(--radius-lg)] border-t border-[var(--color-border)] bg-[var(--color-surface)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] shadow-[var(--shadow-lg)] outline-none",
   DRAG_ZONE: "shrink-0 cursor-grab touch-none select-none active:cursor-grabbing",
   CONTENT: "min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4",
   FOOTER: "shrink-0 border-t border-[var(--color-border)] px-4 py-3",

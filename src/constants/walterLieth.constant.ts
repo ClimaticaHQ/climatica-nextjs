@@ -95,8 +95,6 @@ export const WALTER_LIETH_COLOR_VARS = {
   COMPRESSED_FILL: "--color-wl-compressed-fill",
   FROST: "--color-wl-frost",
   FROST_OUTLINE: "--color-wl-frost-outline",
-  SERIES_A: "--color-wl-series-a",
-  SERIES_B: "--color-wl-series-b",
 } as const;
 
 export const WALTER_LIETH_COLORS = {
@@ -107,10 +105,6 @@ export const WALTER_LIETH_COLORS = {
   COMPRESSED_FILL: `var(${WALTER_LIETH_COLOR_VARS.COMPRESSED_FILL})`,
   FROST: `var(${WALTER_LIETH_COLOR_VARS.FROST})`,
   FROST_OUTLINE: `var(${WALTER_LIETH_COLOR_VARS.FROST_OUTLINE})`,
-  SERIES: {
-    [EWalterLiethSeriesId.A]: `var(${WALTER_LIETH_COLOR_VARS.SERIES_A})`,
-    [EWalterLiethSeriesId.B]: `var(${WALTER_LIETH_COLOR_VARS.SERIES_B})`,
-  },
 } as const;
 
 // * the WL legend's colors on screen (CSS vars); the export resolves the same vars

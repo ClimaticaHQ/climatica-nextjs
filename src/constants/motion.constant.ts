@@ -38,6 +38,9 @@ export const MOTION = {
   // * a bottom sheet sliding up from / down off the screen edge, its backdrop fading with it
   SHEET_SLIDE_MS: 280,
   SHEET_SLIDE_EASING: "cubic-bezier(0.32, 0.72, 0, 1)",
+  // * a hover state layer fading in and out (a stats table row)
+  STATE_HOVER_MS: 120,
+  STATE_HOVER_EASING: "ease-out",
   REDUCED_MOTION_QUERY: "(prefers-reduced-motion: reduce)",
 } as const;
 
@@ -89,6 +92,8 @@ export const MOTION_CSS_VAR = {
   UPDATE_PROGRESS_TRAVEL: "--motion-update-progress-travel",
   SHEET_SLIDE: "--motion-sheet-slide",
   SHEET_SLIDE_EASING: "--motion-sheet-slide-easing",
+  STATE_HOVER: "--motion-state-hover",
+  STATE_HOVER_EASING: "--motion-state-hover-easing",
 } as const;
 
 const ms = (value: number) => `${value}ms`;
@@ -117,4 +122,6 @@ export const MOTION_CSS_VARIABLES: TMotionCssVariables = {
   [MOTION_CSS_VAR.UPDATE_PROGRESS_TRAVEL]: percent(1 / MOTION.UPDATE_PROGRESS_SEGMENT),
   [MOTION_CSS_VAR.SHEET_SLIDE]: ms(MOTION.SHEET_SLIDE_MS),
   [MOTION_CSS_VAR.SHEET_SLIDE_EASING]: MOTION.SHEET_SLIDE_EASING,
+  [MOTION_CSS_VAR.STATE_HOVER]: ms(MOTION.STATE_HOVER_MS),
+  [MOTION_CSS_VAR.STATE_HOVER_EASING]: MOTION.STATE_HOVER_EASING,
 };

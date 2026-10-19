@@ -1,3 +1,4 @@
+import { EDifferenceMeaning } from "@/enums";
 import type { TComparisonMetric, TComparisonMetricFormat } from "@/types";
 
 /** The rows in order, each with its unit and decimals; the Martonne row gets its class badge. */
@@ -26,3 +27,9 @@ export const COMPARISON_METRIC_LABEL_KEYS: Record<TComparisonMetric, string> = {
 
 // * "Lviv − Valladolid": the difference's direction, with a real minus
 export const DIFFERENCE_DIRECTION_SEPARATOR = " − ";
+
+// * the difference header's explanation of its formula and sign, by what the pair compares
+export const DIFFERENCE_NOTE_KEYS: Record<EDifferenceMeaning, string> = {
+  [EDifferenceMeaning.CITIES]: "climateComparison.differenceNote.cities",
+  [EDifferenceMeaning.PERIODS]: "climateComparison.differenceNote.periods",
+};

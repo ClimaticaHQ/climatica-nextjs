@@ -2,19 +2,74 @@
 export const MARTONNE_TEMP_OFFSET = 10;
 
 export const MARTONNE_CLASSES = {
-  arid: { max: 10, labelKey: "martonne.arid", bg: "#fde8d0", color: "#7d3c00" },
-  semiArid: { min: 10, max: 20, labelKey: "martonne.semiArid", bg: "#fff3cd", color: "#664d03" },
+  arid: {
+    max: 10,
+    labelKey: "martonne.arid",
+    tone: {
+      bg: "var(--color-martonne-arid-bg)",
+      border: "var(--color-martonne-arid-border)",
+      text: "var(--color-martonne-arid-text)",
+    },
+  },
+  semiArid: {
+    min: 10,
+    max: 20,
+    labelKey: "martonne.semiArid",
+    tone: {
+      bg: "var(--color-martonne-semi-arid-bg)",
+      border: "var(--color-martonne-semi-arid-border)",
+      text: "var(--color-martonne-semi-arid-text)",
+    },
+  },
   mediterranean: {
     min: 20,
     max: 24,
     labelKey: "martonne.mediterranean",
-    bg: "#fef9c3",
-    color: "#713f12",
+    tone: {
+      bg: "var(--color-martonne-mediterranean-bg)",
+      border: "var(--color-martonne-mediterranean-border)",
+      text: "var(--color-martonne-mediterranean-text)",
+    },
   },
-  semiHumid: { min: 24, max: 28, labelKey: "martonne.semiHumid", bg: "#d1f0e0", color: "#0a4d2e" },
-  humid: { min: 28, max: 35, labelKey: "martonne.humid", bg: "#cfe2ff", color: "#084298" },
-  veryHumid: { min: 35, max: 55, labelKey: "martonne.veryHumid", bg: "#dbeafe", color: "#1e3a8a" },
-  extremelyHumid: { min: 55, labelKey: "martonne.extremelyHumid", bg: "#e2d9f3", color: "#3d1a78" },
+  semiHumid: {
+    min: 24,
+    max: 28,
+    labelKey: "martonne.semiHumid",
+    tone: {
+      bg: "var(--color-martonne-semi-humid-bg)",
+      border: "var(--color-martonne-semi-humid-border)",
+      text: "var(--color-martonne-semi-humid-text)",
+    },
+  },
+  humid: {
+    min: 28,
+    max: 35,
+    labelKey: "martonne.humid",
+    tone: {
+      bg: "var(--color-martonne-humid-bg)",
+      border: "var(--color-martonne-humid-border)",
+      text: "var(--color-martonne-humid-text)",
+    },
+  },
+  veryHumid: {
+    min: 35,
+    max: 55,
+    labelKey: "martonne.veryHumid",
+    tone: {
+      bg: "var(--color-martonne-very-humid-bg)",
+      border: "var(--color-martonne-very-humid-border)",
+      text: "var(--color-martonne-very-humid-text)",
+    },
+  },
+  extremelyHumid: {
+    min: 55,
+    labelKey: "martonne.extremelyHumid",
+    tone: {
+      bg: "var(--color-martonne-extremely-humid-bg)",
+      border: "var(--color-martonne-extremely-humid-border)",
+      text: "var(--color-martonne-extremely-humid-text)",
+    },
+  },
 } as const;
 
 export type TMartonnClass = keyof typeof MARTONNE_CLASSES;

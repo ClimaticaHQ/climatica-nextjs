@@ -221,19 +221,47 @@ export const FILTER_MAX_HEATMAP_CELLS = 2_000;
 export const CELL_COUNT_STATUSES = [
   {
     max: 500,
-    status: { labelKey: "sidebar.cellCount.fast", colorClass: "bg-green-100 text-green-700" },
+    status: {
+      labelKey: "sidebar.cellCount.fast",
+      tone: {
+        bg: "var(--color-cell-count-fast-bg)",
+        border: "var(--color-cell-count-fast-border)",
+        text: "var(--color-cell-count-fast-text)",
+      },
+    },
   },
   {
     max: 1_000,
-    status: { labelKey: "sidebar.cellCount.moderate", colorClass: "bg-yellow-100 text-yellow-700" },
+    status: {
+      labelKey: "sidebar.cellCount.moderate",
+      tone: {
+        bg: "var(--color-cell-count-moderate-bg)",
+        border: "var(--color-cell-count-moderate-border)",
+        text: "var(--color-cell-count-moderate-text)",
+      },
+    },
   },
   {
     max: FILTER_MAX_HEATMAP_CELLS,
-    status: { labelKey: "sidebar.cellCount.slow", colorClass: "bg-orange-100 text-orange-700" },
+    status: {
+      labelKey: "sidebar.cellCount.slow",
+      tone: {
+        bg: "var(--color-cell-count-slow-bg)",
+        border: "var(--color-cell-count-slow-border)",
+        text: "var(--color-cell-count-slow-text)",
+      },
+    },
   },
   {
     max: Infinity,
-    status: { labelKey: "sidebar.cellCount.tooMany", colorClass: "bg-red-100 text-red-700" },
+    status: {
+      labelKey: "sidebar.cellCount.tooMany",
+      tone: {
+        bg: "var(--color-cell-count-too-many-bg)",
+        border: "var(--color-cell-count-too-many-border)",
+        text: "var(--color-cell-count-too-many-text)",
+      },
+    },
   },
 ] as const;
 

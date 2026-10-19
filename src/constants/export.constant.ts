@@ -125,6 +125,9 @@ export const EXPORT_MONTHLY_VALUES = {
   VALUE_FONT_WEIGHT: 500,
   UNIT_FONT_SIZE: 11,
   UNIT_FONT_WEIGHT: 600,
+  // * an overlay's markers beside the unit: the unit ends this far left of the gutter's centre,
+  // * the markers start this far right of it
+  UNIT_MARKER_GAP: 2,
   // * a line's baseline below its centre
   BASELINE: 4,
 } as const;
@@ -220,3 +223,6 @@ export const EXPORT_LEGEND = {
 
 // * attribute that makes an element re-declare the light (:root) tokens — see global.css
 export const EXPORT_PALETTE_ATTRIBUTE = "data-export-palette";
+
+// * a colour token reference in an export's markup — resolved before the file is saved
+export const CSS_VAR_REFERENCE_PATTERN = /var\((--[\w-]+)\)/g;

@@ -20,10 +20,10 @@ export const CHART_LEGEND = {
 } as const;
 
 /**
- * Line dash per variable (tmax is always solid). The single-city chart and its split panels
- * tell tmin from tmax by colour; the overlay also dashes it.
+ * Line dash per variable: tmax solid, tavg dashed, tmin dotted — on every standard chart, since
+ * a pair draws all three of a side's lines in one colour.
  */
 export const CHART_LINE_DASH = {
-  STANDARD: { tavg: "5 3" },
-  SERIES: { tavg: "5 3", tmin: "4 2" },
+  STANDARD: { tavg: "5 3", tmin: "2 3" },
+  SERIES: { tavg: "5 3", tmin: "2 3" },
 } as const;
