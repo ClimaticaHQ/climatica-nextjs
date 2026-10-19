@@ -1,12 +1,12 @@
-/* * Leaflet overrides: the map below the app's overlays, popups in the app's card style, the
-   live cell count a bare badge */
+/* * Leaflet overrides: the map below the app's overlays, popups and the zoom buttons in the app's
+   card style (theme border, no shadow), the live cell count a bare badge */
 
 .leaflet-container {
   z-index: 0;
 }
 
 .leaflet-popup-content-wrapper {
-  background: var(--color-bg);
+  background: var(--color-surface);
   border: 0.5px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: none;
@@ -31,4 +31,35 @@
 
 .leaflet-tooltip.drawing-cell-count::before {
   display: none;
+}
+
+/* * the zoom buttons: Leaflet's own selectors (shadow, a 2 px translucent border on touch) are
+   outranked by the extra class */
+.leaflet-container .leaflet-control.leaflet-bar {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+  box-shadow: none;
+  background-clip: border-box;
+  overflow: hidden;
+}
+
+.leaflet-container .leaflet-control.leaflet-bar a {
+  background-color: var(--color-surface);
+  border-bottom-color: var(--color-border);
+  color: var(--color-text);
+  border-radius: 0;
+}
+
+.leaflet-container .leaflet-control.leaflet-bar a:last-child {
+  border-bottom: 0;
+}
+
+.leaflet-container .leaflet-control.leaflet-bar a:hover,
+.leaflet-container .leaflet-control.leaflet-bar a:focus {
+  background-color: var(--color-surface-secondary);
+}
+
+.leaflet-container .leaflet-control.leaflet-bar a.leaflet-disabled {
+  background-color: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
 }

@@ -11,6 +11,11 @@
   transition-timing-function: var(--motion-control-slide-easing);
 }
 
+/* * SwapButton: the icon turning half a turn on each press */
+.swap-icon-turn {
+  transition: transform var(--motion-control-slide) var(--motion-control-slide-easing);
+}
+
 /* * ChartTransition: a chart card's old content fades out while the new one fades in */
 @keyframes chart-fade-in {
   from {
@@ -48,6 +53,11 @@
 /* * the content a panel expansion replaces: fades out over the expansion's time */
 .chart-expand-out {
   animation: chart-fade-out var(--motion-panel-expand) var(--motion-panel-expand-easing) both;
+}
+
+/* * a hover state layer fading in and out on each cell of a row (StatsTable) */
+.state-hover-row > * {
+  transition: box-shadow var(--motion-state-hover) var(--motion-state-hover-easing);
 }
 
 /* * DataUpdateFade: content dimmed while an update loads */
