@@ -1,10 +1,10 @@
 "use client";
 
+import { Badge } from "@/components/UI/Badge";
 import { Button } from "@/components/UI/Button";
 import { DotLabel } from "@/components/UI/DotLabel/DotLabel";
 import { PairLayout } from "@/components/UI/PairLayout";
 import { Dropdown } from "@/components/UI/Dropdown";
-import { OptionDot } from "@/components/UI/Dropdown/OptionDot";
 import { SwapButton } from "@/components/UI/SwapButton";
 import {
   DATASETS,
@@ -19,6 +19,7 @@ import {
   EFilterKey,
   EFilterNoteVariant,
   EPairLayoutVariant,
+  EPairSide,
 } from "@/enums";
 import { useCityClimatePeriods } from "@/hooks/filters/useCityClimatePeriods";
 import { useFilterNavigation } from "@/hooks/filters/useFilterNavigation";
@@ -33,7 +34,7 @@ import {
   toClimatePeriodHandler,
 } from "@/utils/filters.util";
 import { setPairSide, swapPair } from "@/utils/pair.util";
-import { getYearColor } from "@/utils/yearColor.util";
+import { getSeriesTint } from "@/utils/seriesColor.util";
 import { useTranslations } from "next-intl";
 import { useId, useState } from "react";
 import { FilterNote, FilterSection } from "../FilterSection";
@@ -96,7 +97,7 @@ export function ComparedPeriodsSection({
   );
 }
 
-/** Period A, a swap button, Period B; a side never offers the other's period. */
+/** Period A and Period B, a swap button by B's label; a side never offers the other's period. */
 function PeriodPair({ periods, availablePeriods, onChange, isCompact }: TPeriodPairProps) {
   const t = useTranslations();
   const labelId = useId();
@@ -106,8 +107,18 @@ function PeriodPair({ periods, availablePeriods, onChange, isCompact }: TPeriodP
 
   const [sideA, sideB] = PERIOD_PAIR_SIDES.map(({ side, index, labelKey, color, testId }) => (
     <div key={side} className={C.SIDE}>
-      <div id={`${labelId}-${side}`}>
-        <DotLabel label={t(labelKey)} dotColor={color} />
+      <div className={C.LABEL_ROW}>
+        <div id={`${labelId}-${side}`}>
+          <DotLabel label={t(labelKey)} dotColor={color} />
+        </div>
+        {side === EPairSide.B && (
+          <SwapButton
+            label={t("comparePeriods.swapPeriods")}
+            onClick={() => emit(swapPair(pair))}
+            isInline
+            {...(isCompact ? { className: C.PAIR_COMPACT_SWAP } : {})}
+          />
+        )}
       </div>
       <Dropdown
         options={getClimatePeriodOptions(availablePeriods, pair[index === 0 ? 1 : 0])}
@@ -126,13 +137,6 @@ function PeriodPair({ periods, availablePeriods, onChange, isCompact }: TPeriodP
     <PairLayout
       variant={isCompact ? EPairLayoutVariant.COMPACT : EPairLayoutVariant.ROW}
       first={sideA}
-      between={
-        <SwapButton
-          label={t("comparePeriods.swapPeriods")}
-          onClick={() => emit(swapPair(pair))}
-          {...(isCompact ? { className: C.PAIR_COMPACT_SWAP } : {})}
-        />
-      }
       second={sideB}
     />
   );
@@ -168,11 +172,10 @@ function YearsEditor({ value, onChange, isCompact }: TYearsEditorProps) {
       <div className={isCompact ? C.YEARS_COMPACT : undefined}>
         <div className={C.YEARS}>
           {value.map((period) => {
-            const color = getYearColor(period, value);
+            const tint = getSeriesTint(value.indexOf(period));
             return (
-              <span key={period} className={C.YEAR} style={{ borderColor: color }}>
-                <OptionDot color={color} />
-                <span style={{ color }}>{period}</span>
+              <Badge key={period} tone={tint} dotColor={tint.dot}>
+                {period}
                 {canRemove && (
                   <button
                     type="button"
@@ -183,7 +186,7 @@ function YearsEditor({ value, onChange, isCompact }: TYearsEditorProps) {
                     ×
                   </button>
                 )}
-              </span>
+              </Badge>
             );
           })}
         </div>

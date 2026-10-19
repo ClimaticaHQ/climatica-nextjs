@@ -1,5 +1,6 @@
-import { CLIMATE_COMPARISON_COLORS } from "@/constants";
-import { EFilterAvailability, EFilterNoteVariant, EPairSide } from "@/enums";
+import { FORM_CONTROL_CLASSES } from "@/constants";
+import { getPairPalette } from "@/utils/seriesColor.util";
+import { EFilterAvailability, EFilterNoteVariant, EPairSide, EWalterLiethSeriesId } from "@/enums";
 import { getSwitchToStandardChartLabel } from "@/utils/chartMode.util";
 import type { TFilterUnavailableActionLabels } from "./filters.type";
 
@@ -20,7 +21,7 @@ export const FILTER_UNAVAILABLE_ACTION_CLASS =
 
 // * a column from lg up; below lg the filters live in the filter bar's sheet
 export const FILTERS_SIDEBAR_CLASS =
-  "hidden w-80 shrink-0 flex-col overflow-hidden border-r border-[var(--color-border)] bg-[var(--color-bg)] lg:flex";
+  "hidden w-80 shrink-0 flex-col overflow-hidden border-r border-[var(--color-border)] bg-[var(--color-surface)] lg:flex";
 
 // * the sidebar's filter sections, scrolling between the top bar and the Apply button
 export const FILTERS_SIDEBAR_SECTIONS_CLASS = "flex flex-1 flex-col gap-8 overflow-y-auto p-4";
@@ -40,25 +41,23 @@ export const COMPARED_PERIODS_CLASSES = {
   // * never flashes it on a desktop, where the sidebar has it as a section
   PAGE: "w-full max-w-xl lg:hidden",
   // * compact (sidebar): one row from 20rem of room, stacked below it — the swap then turns
-  // * to point up / down, between the two
+  // * to point up / down
   PAIR_COMPACT_FRAME: "@container/period-pair",
-  PAIR_COMPACT_SWAP: "self-center rotate-90 @min-[20rem]/period-pair:rotate-0",
+  PAIR_COMPACT_SWAP: "rotate-90 @min-[20rem]/period-pair:rotate-0",
   SIDE: "flex min-w-0 flex-1 flex-col gap-1.5",
+  // * Period B's carries the swap button at its end; both rows stay as tall as their label
+  LABEL_ROW: "flex items-center justify-between gap-2",
   EDITOR: "flex flex-col gap-2",
   // * compact: the years come after the year field (order), the DOM stays the page's
   YEARS_COMPACT: "order-last",
   YEARS: "flex flex-wrap gap-2",
-  // * a full border in the year's colour — a left-only border on a pill reads as a cut-off arc
-  YEAR: "inline-flex items-center gap-1.5 rounded-[20px] border bg-[var(--color-bg-secondary)] px-3 py-1.5 text-[13px] font-medium text-[var(--color-text)]",
-  YEAR_REMOVE:
-    "ml-0.5 opacity-60 hover:opacity-100 leading-none text-[var(--color-text-secondary)]",
+  YEAR_REMOVE: "ml-0.5 opacity-60 hover:opacity-100 leading-none",
   ADD_ROW: "flex items-center gap-2",
-  ADD_BUTTON: "shrink-0 px-3 py-2 text-[length:var(--font-base)]",
-  ADD_BUTTON_COMPACT: "shrink-0 px-3 py-2 text-[length:var(--font-sm)]",
+  ADD_BUTTON: `${FORM_CONTROL_CLASSES.HEIGHT} shrink-0 px-3 text-[length:var(--font-base)]`,
+  ADD_BUTTON_COMPACT: `${FORM_CONTROL_CLASSES.HEIGHT} shrink-0 px-3 text-[length:var(--font-sm)]`,
 } as const;
 
-export const YEAR_INPUT_CLASS =
-  "w-full rounded-[var(--radius-md)] border-2 border-[var(--color-border)] px-3 py-2 text-[length:var(--font-base)] text-[var(--color-text)] outline-none focus:border-[var(--color-primary)] transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50";
+export const YEAR_INPUT_CLASS = `${FORM_CONTROL_CLASSES.INPUT} text-[length:var(--font-base)]`;
 
 // * each side of Compare Periods' pair: its place, label, colour and test ids
 export const PERIOD_PAIR_SIDES = [
@@ -66,17 +65,14 @@ export const PERIOD_PAIR_SIDES = [
     side: EPairSide.A,
     index: 0,
     labelKey: "climateComparison.periodA",
-    color: CLIMATE_COMPARISON_COLORS.A.tmax,
+    color: getPairPalette(EWalterLiethSeriesId.A).tmax,
     testId: "period-a",
   },
   {
     side: EPairSide.B,
     index: 1,
     labelKey: "climateComparison.periodB",
-    color: CLIMATE_COMPARISON_COLORS.B.tmax,
+    color: getPairPalette(EWalterLiethSeriesId.B).tmax,
     testId: "period-b",
   },
 ] as const;
-
-export const CELL_COUNT_BADGE_CLASS =
-  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[length:var(--font-xs)] font-medium";
