@@ -1,8 +1,184 @@
-/* * Design tokens: fonts, colours, radii, shadows — the light palette on :root (and on
-   [data-export-palette], for exports), the dark one on html.dark */
+/* * Design tokens: fonts, colours, radii, spacing, shadows. Colours follow the Material Design 2
+   colour system and come in two layers (see docs/colors.md):
+   1. primitives — M2 grey and the dark theme's neutrals, the green tonal palette (steps 50…900
+      by lightness), M2 swatches, tint sets, series tones and the heat map's ColorBrewer classes;
+      the only place a colour value is written;
+   2. semantic tokens — roles (surface, text, primary, chart temperature…), each pointing to a
+      primitive: the light theme on :root (and on [data-export-palette], for exports), the dark
+      theme remapping them on html.dark.
+   Components use semantic tokens only. */
 
-/* * [data-export-palette]: the light tokens again, for exports — an element carrying it
-   resolves to the light palette even while html.dark is active (see exportPalette.util) */
+/* * 1. Primitives — names describe the colour, never a role */
+:root {
+  --white: #ffffff;
+  --black: #000000;
+
+  /* * M2 grey */
+  --grey-50: #fafafa;
+  --grey-200: #eeeeee;
+  --grey-300: #e0e0e0;
+  --grey-500: #9e9e9e;
+  --grey-900: #212121;
+  /* * black at 60% on white, opaque */
+  --grey-black-60: #666666;
+
+  /* * M2 dark theme neutrals: white overlays on #121212, named by CIELAB lightness (its lightest,
+     #e0e0e0, is --grey-300) */
+  --dark-grey-6: #121212;
+  --dark-grey-11: #1e1e1e;
+  --dark-grey-18: #2c2c2c;
+  --dark-grey-24: #3a3a3a;
+  --dark-grey-26: #3d3d3d;
+  --dark-grey-46: #6c6c6c;
+  --dark-grey-66: #a0a0a0;
+
+  /* * green: M2 tonal palette built from the brand, #1d9e75 */
+  --green-50: #e4f5ec;
+  --green-100: #bbe6d0;
+  --green-200: #8ed5b3;
+  --green-300: #5ec397;
+  --green-400: #3db384;
+  --green-500: #22a274;
+  --green-600: #199469;
+  --green-700: #10835b;
+  --green-800: #0b714f;
+  --green-900: #015439;
+
+  /* * M2 swatches, the steps in use */
+  --red-300: #e57373;
+  --red-700: #d32f2f;
+  --orange-300: #ffb74d;
+  --orange-800: #ef6c00;
+  --orange-900: #e65100;
+  --blue-200: #90caf9;
+  --blue-300: #64b5f6;
+  --blue-400: #42a5f5;
+  --blue-700: #1976d2;
+  --blue-800: #1565c0;
+  --blue-900: #0d47a1;
+  /* * M2 baseline error */
+  --crimson: #b00020;
+
+  /* * tint sets, one per hue: light (CIELAB tones 95 / 84 / 34), then dark (20 / 34 / 85) */
+  --tint-light-deep-orange-95: #feede8;
+  --tint-light-deep-orange-84: #fec0af;
+  --tint-light-deep-orange-34: #813520;
+  --tint-dark-deep-orange-20: #46271e;
+  --tint-dark-deep-orange-34: #734032;
+  --tint-dark-deep-orange-85: #ffc5b4;
+  /* * orange's light set is M2 Orange 50 and 200, its text a saturated orange at tone 42: at 34
+     orange turns brown */
+  --tint-light-orange-95: #fff3e0;
+  --tint-light-orange-84: #ffcc80;
+  --tint-light-orange-34: #a84300;
+  --tint-dark-orange-20: #422b13;
+  --tint-dark-orange-34: #6c461f;
+  --tint-dark-orange-85: #fcc99a;
+  --tint-light-amber-95: #fbf0d9;
+  --tint-light-amber-84: #e8ce99;
+  --tint-light-amber-34: #664b00;
+  --tint-dark-amber-20: #3c2e0f;
+  --tint-dark-amber-34: #634c17;
+  --tint-dark-amber-85: #eed193;
+  --tint-light-light-green-95: #eaf6e0;
+  --tint-light-light-green-84: #c0dca8;
+  --tint-light-light-green-34: #3a5b0b;
+  --tint-dark-light-green-20: #28351a;
+  --tint-dark-light-green-34: #41582a;
+  --tint-dark-light-green-85: #c1e0a5;
+  --tint-light-green-95: #dff8eb;
+  --tint-light-green-84: #a4e1c3;
+  --tint-light-green-34: #025f41;
+  --tint-dark-green-20: #143829;
+  --tint-dark-green-34: #205d44;
+  --tint-dark-green-85: #a0e6c4;
+  --tint-light-cyan-95: #daf8fd;
+  --tint-light-cyan-84: #96dfed;
+  --tint-light-cyan-34: #025a67;
+  --tint-dark-cyan-20: #06373f;
+  --tint-dark-cyan-34: #055a66;
+  --tint-dark-cyan-85: #8fe4f4;
+  --tint-light-blue-95: #e7f3fe;
+  --tint-light-blue-84: #add6fe;
+  --tint-light-blue-34: #0e5289;
+  --tint-dark-blue-20: #1b3249;
+  --tint-dark-blue-34: #2c5377;
+  --tint-dark-blue-85: #b4d9fe;
+  --tint-light-indigo-95: #ecf1fe;
+  --tint-light-indigo-84: #c1cffe;
+  --tint-light-indigo-34: #3b4a8c;
+  --tint-dark-indigo-20: #272f4a;
+  --tint-dark-indigo-34: #414d79;
+  --tint-dark-indigo-85: #c5d3ff;
+  --tint-light-pink-95: #feecee;
+  --tint-light-pink-84: #febdc6;
+  --tint-light-pink-34: #803142;
+  --tint-dark-pink-20: #46252b;
+  --tint-dark-pink-34: #733d47;
+  --tint-dark-pink-85: #ffc2ca;
+  --tint-light-deep-purple-95: #f2efff;
+  --tint-light-deep-purple-84: #d4c8fe;
+  --tint-light-deep-purple-34: #554185;
+  --tint-dark-deep-purple-20: #322b47;
+  --tint-dark-deep-purple-34: #534775;
+  --tint-dark-deep-purple-85: #d7ccff;
+  --tint-light-red-95: #feecea;
+  --tint-light-red-84: #ffbfb5;
+  --tint-light-red-34: #81332b;
+  --tint-dark-red-20: #462622;
+  --tint-dark-red-34: #733f38;
+  --tint-dark-red-85: #ffc4bb;
+  --tint-light-blue-grey-95: #e8f3f9;
+  --tint-light-blue-grey-84: #bbd6e3;
+  --tint-light-blue-grey-34: #315566;
+  --tint-dark-blue-grey-20: #253339;
+  --tint-dark-blue-grey-34: #3c545f;
+  --tint-dark-blue-grey-85: #bbdae9;
+  /* * crimson's alert surfaces (real tones: 95 / 81, then 18 / 28) */
+  --tint-light-crimson-95: #f9edef;
+  --tint-light-crimson-81: #ebbfc7;
+  --tint-dark-crimson-18: #37282b;
+  --tint-dark-crimson-28: #5c373e;
+
+  /* * calm series tones: moderate chroma, so no series outshines the others — named by hue and
+     CIELAB tone: the dark theme's lines (62–73) and bars (42–52), the light theme's lines (46–50)
+     and bars (66–68) for blue, rose and purple (green and orange take their palettes' steps) */
+  --calm-green-65: #4caf8a;
+  --calm-green-47: #2e7d62;
+  --calm-orange-73: #f5a04a;
+  --calm-orange-52: #b8692a;
+  --calm-blue-68: #7fa9dc;
+  --calm-blue-64: #6f9fd8;
+  --calm-blue-50: #3b78c2;
+  --calm-blue-44: #3f6a9e;
+  --calm-rose-67: #e08aa5;
+  --calm-rose-62: #d97a95;
+  --calm-rose-48: #c2456e;
+  --calm-rose-43: #9c4a63;
+  --calm-purple-66: #ae93db;
+  --calm-purple-63: #a68bd6;
+  --calm-purple-46: #7e57c2;
+  --calm-purple-42: #6d5a96;
+
+  /* * map colour scales: ColorBrewer RdYlBu (9 classes, cold → hot) and YlGnBu (4 classes,
+     dry → wet) */
+  --rdylbu-1: #4575b4;
+  --rdylbu-2: #74add1;
+  --rdylbu-3: #abd9e9;
+  --rdylbu-4: #e0f3f8;
+  --rdylbu-5: #fee090;
+  --rdylbu-6: #fdae61;
+  --rdylbu-7: #f46d43;
+  --rdylbu-8: #d73027;
+  --rdylbu-9: #a50026;
+  --ylgnbu-1: #ffffcc;
+  --ylgnbu-2: #a1dab4;
+  --ylgnbu-3: #41b6c4;
+  --ylgnbu-4: #225ea8;
+}
+
+/* * 2. Semantic tokens, light — and, on [data-export-palette], again for exports: an element
+   carrying it resolves to the light palette even while html.dark is active (exportPalette.util) */
 :root,
 [data-export-palette] {
   --font-sans: "Inter", "Roboto", "Helvetica Neue", Arial, sans-serif;
@@ -14,40 +190,165 @@
   --font-xl: 30px;
   --font-2xl: 36px;
 
-  --color-primary: #1d9e75;
-  --color-primary-muted: rgba(29, 158, 117, 0.2);
-  --color-secondary: #5dcaa5;
-  --color-light: #9fe1cb;
-  --color-dark: #0f6e56;
+  /* * surfaces, text, borders */
+  --color-surface: var(--white);
+  --color-surface-secondary: var(--grey-50);
+  --color-text: var(--grey-900);
+  --color-text-secondary: var(--grey-black-60);
+  --color-border: var(--grey-300);
 
-  --color-chip-active-bg: #e1f5ee;
-  /* * a hovered month: the chart's hover band and the monthly table's column alike */
-  --color-chart-hover: #e6f4ee;
+  /* * the brand: filled controls, active states, the logo */
+  --color-primary: var(--green-700);
+  --color-primary-muted: color-mix(in srgb, var(--green-700) 20%, transparent);
+  --color-primary-hover: var(--green-800);
+  --color-on-primary: var(--white);
+  /* * the brand without text on it, held to 3:1 (WCAG 1.4.11): large text (24px, or 18.66px
+     bold), the logo, map shapes and markers, outlines, focus rings, icons; never under
+     on-primary text — that, and smaller green text, is --color-primary's (4.5:1) */
+  --color-brand: var(--green-500);
+  /* * text on a filled series colour (the mini map's active place) */
+  --color-on-series: var(--white);
+  --color-logo-pale: var(--green-200);
+  --color-logo-light: var(--green-300);
+  --color-logo-dark: var(--green-700);
+
+  --color-chip-active-bg: var(--tint-light-green-95);
+  --color-chip-active-text: var(--tint-light-green-34);
+  --color-chip-active-border: var(--tint-light-green-84);
+
+  /* * hover state layer (M2): the on-surface colour at low opacity, neutral on any surface — a
+     hovered month's band on the charts, its column in the monthly values table, a hovered
+     stats table row */
+  --color-state-hover: color-mix(in srgb, var(--grey-900) 6%, transparent);
   /* * a card whose data just updated: its border and outer glow at the flash's start */
-  --color-update-flash-border: #1d9e75;
-  --color-update-flash-glow: rgba(29, 158, 117, 0.35);
-  --color-chip-active-text: #0f6e56;
-  --color-chip-active-border: #5dcaa5;
+  --color-update-flash-border: var(--green-500);
+  --color-update-flash-glow: color-mix(in srgb, var(--green-500) 35%, transparent);
 
-  /* * Chart title's month badge (a filtered month or month count) */
-  --color-month-badge-bg: #e8f4fd;
-  --color-month-badge-border: #b3d9f5;
-  --color-month-badge-text: #1a6fa0;
+  /* * chart title's month badge (a filtered month or month count) */
+  --color-month-badge-bg: var(--tint-light-blue-grey-95);
+  --color-month-badge-border: var(--tint-light-blue-grey-84);
+  --color-month-badge-text: var(--tint-light-blue-grey-34);
 
-  /* * Segmented control: grey track, raised active pill */
-  --color-control-track: #eef0f3;
-  --color-control-active: #ffffff;
+  /* * segmented control: grey track, raised active pill; a switch's knob */
+  --color-control-track: var(--grey-200);
+  --color-control-active: var(--white);
+  --color-switch-knob: var(--white);
 
-  --color-bg: #ffffff;
-  --color-bg-secondary: #f9fafb;
-  --color-text: #111827;
-  --color-text-secondary: #6b7280;
-  --color-border: #e5e7eb;
-  /* * behind a plot — halos around curves and dots; the card surface every chart sits on */
-  --color-plot-bg: var(--color-bg);
-  --color-error: #ef4444;
-  --color-error-bg: #fef2f2;
-  --color-error-border: #fecaca;
+  --color-error: var(--crimson);
+  --color-error-bg: var(--tint-light-crimson-95);
+  --color-error-border: var(--tint-light-crimson-81);
+
+  /* * modal backdrop (bottom sheets); the map's place marker */
+  --color-backdrop: color-mix(in srgb, var(--black) 40%, transparent);
+  --color-map-marker-border: var(--white);
+  --color-map-marker-shadow: color-mix(in srgb, var(--black) 35%, transparent);
+
+  /* * one series: its variables */
+  --color-chart-temp-max: var(--red-700);
+  --color-chart-temp-min: var(--blue-700);
+  --color-chart-temp-avg: var(--orange-800);
+  /* * bars of arid / humid months */
+  --color-chart-arid: var(--orange-300);
+  --color-chart-humid: var(--blue-200);
+
+  /* * the series, by position — a compared pair's A and B are series 1 and 2: each a line colour
+     (lines, markers, dots, identity; 3:1 on the surface) and a quieter bar colour, a lighter
+     step (a bar fill needs no 3:1: its values are in the values table and the tooltip) */
+  --color-series-1: var(--green-500);
+  --color-series-1-bar: var(--green-300);
+  --color-series-2: var(--orange-800);
+  --color-series-2-bar: var(--orange-300);
+  --color-series-3: var(--calm-blue-50);
+  --color-series-3-bar: var(--calm-blue-68);
+  --color-series-4: var(--calm-rose-48);
+  --color-series-4-bar: var(--calm-rose-67);
+  --color-series-5: var(--calm-purple-46);
+  --color-series-5-bar: var(--calm-purple-66);
+  /* * a compared weather year's badge: its series hue's tint set */
+  --color-series-1-tint-bg: var(--tint-light-green-95);
+  --color-series-1-tint-border: var(--tint-light-green-84);
+  --color-series-1-tint-text: var(--tint-light-green-34);
+  /* * the badge's dot: one step darker than the line where the line misses 3:1 on the tint */
+  --color-series-1-tint-dot: var(--green-600);
+  --color-series-2-tint-bg: var(--tint-light-orange-95);
+  --color-series-2-tint-border: var(--tint-light-orange-84);
+  --color-series-2-tint-text: var(--tint-light-orange-34);
+  --color-series-2-tint-dot: var(--orange-900);
+  --color-series-3-tint-bg: var(--tint-light-blue-95);
+  --color-series-3-tint-border: var(--tint-light-blue-84);
+  --color-series-3-tint-text: var(--tint-light-blue-34);
+  --color-series-3-tint-dot: var(--calm-blue-50);
+  --color-series-4-tint-bg: var(--tint-light-pink-95);
+  --color-series-4-tint-border: var(--tint-light-pink-84);
+  --color-series-4-tint-text: var(--tint-light-pink-34);
+  --color-series-4-tint-dot: var(--calm-rose-48);
+  --color-series-5-tint-bg: var(--tint-light-deep-purple-95);
+  --color-series-5-tint-border: var(--tint-light-deep-purple-84);
+  --color-series-5-tint-text: var(--tint-light-deep-purple-34);
+  --color-series-5-tint-dot: var(--calm-purple-46);
+
+  /* * Walter-Lieth convention: red temperature, blue precipitation */
+  --color-wl-temp: var(--red-700);
+  --color-wl-prec: var(--blue-700);
+  --color-wl-humid-hatch: var(--blue-700);
+  --color-wl-arid-hatch: var(--red-700);
+  --color-wl-compressed-fill: var(--blue-800);
+  /* * Walter-Lieth frost band: certain frost (mean minimum below 0 °C) in dark blue, and the
+     cell outlines */
+  --color-wl-frost: var(--blue-900);
+  --color-wl-frost-outline: var(--grey-500);
+
+  /* * Martonne aridity class badge */
+  --color-martonne-arid-bg: var(--tint-light-deep-orange-95);
+  --color-martonne-arid-text: var(--tint-light-deep-orange-34);
+  --color-martonne-arid-border: var(--tint-light-deep-orange-84);
+  --color-martonne-semi-arid-bg: var(--tint-light-orange-95);
+  --color-martonne-semi-arid-text: var(--tint-light-orange-34);
+  --color-martonne-semi-arid-border: var(--tint-light-orange-84);
+  --color-martonne-mediterranean-bg: var(--tint-light-amber-95);
+  --color-martonne-mediterranean-text: var(--tint-light-amber-34);
+  --color-martonne-mediterranean-border: var(--tint-light-amber-84);
+  --color-martonne-semi-humid-bg: var(--tint-light-light-green-95);
+  --color-martonne-semi-humid-text: var(--tint-light-light-green-34);
+  --color-martonne-semi-humid-border: var(--tint-light-light-green-84);
+  --color-martonne-humid-bg: var(--tint-light-cyan-95);
+  --color-martonne-humid-text: var(--tint-light-cyan-34);
+  --color-martonne-humid-border: var(--tint-light-cyan-84);
+  --color-martonne-very-humid-bg: var(--tint-light-blue-95);
+  --color-martonne-very-humid-text: var(--tint-light-blue-34);
+  --color-martonne-very-humid-border: var(--tint-light-blue-84);
+  --color-martonne-extremely-humid-bg: var(--tint-light-indigo-95);
+  --color-martonne-extremely-humid-text: var(--tint-light-indigo-34);
+  --color-martonne-extremely-humid-border: var(--tint-light-indigo-84);
+
+  /* * a heat-map region's cell count badge */
+  --color-cell-count-fast-bg: var(--tint-light-green-95);
+  --color-cell-count-fast-text: var(--tint-light-green-34);
+  --color-cell-count-fast-border: var(--tint-light-green-84);
+  --color-cell-count-moderate-bg: var(--tint-light-amber-95);
+  --color-cell-count-moderate-text: var(--tint-light-amber-34);
+  --color-cell-count-moderate-border: var(--tint-light-amber-84);
+  --color-cell-count-slow-bg: var(--tint-light-orange-95);
+  --color-cell-count-slow-text: var(--tint-light-orange-34);
+  --color-cell-count-slow-border: var(--tint-light-orange-84);
+  --color-cell-count-too-many-bg: var(--tint-light-red-95);
+  --color-cell-count-too-many-text: var(--tint-light-red-34);
+  --color-cell-count-too-many-border: var(--tint-light-red-84);
+
+  /* * heat map: temperature (cold → hot), precipitation (dry → wet) */
+  --color-heat-temp-1: var(--rdylbu-1);
+  --color-heat-temp-2: var(--rdylbu-2);
+  --color-heat-temp-3: var(--rdylbu-3);
+  --color-heat-temp-4: var(--rdylbu-4);
+  --color-heat-temp-5: var(--rdylbu-5);
+  --color-heat-temp-6: var(--rdylbu-6);
+  --color-heat-temp-7: var(--rdylbu-7);
+  --color-heat-temp-8: var(--rdylbu-8);
+  --color-heat-temp-9: var(--rdylbu-9);
+  --color-heat-prec-1: var(--ylgnbu-1);
+  --color-heat-prec-2: var(--ylgnbu-2);
+  --color-heat-prec-3: var(--ylgnbu-3);
+  --color-heat-prec-4: var(--ylgnbu-4);
 
   --radius-xs: 6px;
   --radius-sm: 10px;
@@ -62,84 +363,134 @@
   --section-toolbar-gap: 0.5rem; /* the export row above a chart section */
   --section-gap: 1.5rem; /* between a chart section's summary and its card */
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
-
-  /* * Modal backdrop (bottom sheets) */
-  --color-backdrop: rgba(0, 0, 0, 0.4);
-
-  --chart-arid: #fcd34d;
-  --chart-humid: #93c5fd;
-
-  --chart-temp-max: #ef4444;
-  --chart-temp-min: #3b82f6;
-  --chart-temp-avg: #f97316;
-
-  --chart-compare-a-max: #1d9e75;
-  --chart-compare-a-min: #5dcaa5;
-  --chart-compare-a-prec: #9fe1cb;
-  --chart-compare-a-tavg: #0f6e56;
-
-  --chart-compare-b-max: #d97706;
-  --chart-compare-b-min: #f59e0b;
-  --chart-compare-b-prec: #fcd34d;
-  --chart-compare-b-tavg: #92400e;
-
-  /* * Walter-Lieth convention: red temperature, blue precipitation */
-  --color-wl-temp: #dc2626;
-  --color-wl-prec: #2563eb;
-  --color-wl-humid-hatch: #2563eb;
-  --color-wl-arid-hatch: #dc2626;
-  --color-wl-compressed-fill: #1d4ed8;
-  /* * Walter-Lieth frost band: certain frost (mean minimum below 0 °C), and the cell outlines */
-  --color-wl-frost: #4682b4;
-  --color-wl-frost-outline: #6b7280;
-  /* * Walter-Lieth overlay series identity (matches compare A green / B orange) */
-  --color-wl-series-a: #1d9e75;
-  --color-wl-series-b: #d97706;
+  --shadow-sm: 0 1px 2px color-mix(in srgb, var(--black) 5%, transparent);
+  --shadow-md: 0 4px 6px color-mix(in srgb, var(--black) 10%, transparent);
+  --shadow-lg: 0 10px 15px color-mix(in srgb, var(--black) 15%, transparent);
 }
 
+/* * 3. Semantic tokens, dark (M2 dark theme): only remaps — what isn't listed keeps its light
+   value */
 html.dark {
-  --color-bg: #111827;
-  --color-bg-secondary: #1f2937;
-  --color-text: #f9fafb;
-  --color-text-secondary: #9ca3af;
-  --color-border: #374151;
+  --color-surface: var(--dark-grey-6);
+  --color-surface-secondary: var(--dark-grey-11);
+  --color-text: var(--grey-300);
+  --color-text-secondary: var(--dark-grey-66);
+  --color-border: var(--dark-grey-24);
 
-  --color-chip-active-bg: #052e1c;
-  --color-chart-hover: #173a2d;
-  --color-update-flash-border: #34d399;
-  --color-update-flash-glow: rgba(52, 211, 153, 0.4);
-  --color-chip-active-text: #6ee7b7;
-  --color-chip-active-border: #059669;
+  /* * M2: a desaturated, lighter primary carrying dark text */
+  --color-primary: var(--green-200);
+  --color-primary-muted: color-mix(in srgb, var(--green-200) 25%, transparent);
+  --color-primary-hover: var(--green-100);
+  --color-on-primary: var(--black);
+  --color-brand: var(--green-200);
+  --color-on-series: var(--black);
+  --color-logo-pale: var(--green-100);
+  --color-logo-light: var(--green-300);
+  --color-logo-dark: var(--green-500);
 
-  --color-control-track: #1f2937;
-  --color-control-active: #374151;
+  --color-chip-active-bg: var(--tint-dark-green-20);
+  --color-chip-active-text: var(--tint-dark-green-85);
+  --color-chip-active-border: var(--tint-dark-green-34);
+  --color-state-hover: color-mix(in srgb, var(--grey-300) 8%, transparent);
+  --color-update-flash-border: var(--green-300);
+  --color-update-flash-glow: color-mix(in srgb, var(--green-300) 40%, transparent);
 
-  --color-month-badge-bg: #0c2a3d;
-  --color-month-badge-border: #1e4f70;
-  --color-month-badge-text: #7cc4f0;
+  --color-month-badge-bg: var(--tint-dark-blue-grey-20);
+  --color-month-badge-border: var(--tint-dark-blue-grey-34);
+  --color-month-badge-text: var(--tint-dark-blue-grey-85);
 
-  --color-primary-muted: rgba(29, 158, 117, 0.25);
+  --color-control-track: var(--dark-grey-18);
+  --color-control-active: var(--dark-grey-26);
 
-  --color-error-bg: #1f0a0a;
-  --color-error-border: #7f1d1d;
+  --color-error: var(--red-300);
+  --color-error-bg: var(--tint-dark-crimson-18);
+  --color-error-border: var(--tint-dark-crimson-28);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 1px 2px color-mix(in srgb, var(--black) 40%, transparent);
+  --shadow-md: 0 4px 6px color-mix(in srgb, var(--black) 50%, transparent);
+  --shadow-lg: 0 10px 15px color-mix(in srgb, var(--black) 60%, transparent);
 
-  --color-backdrop: rgba(0, 0, 0, 0.6);
+  --color-backdrop: color-mix(in srgb, var(--black) 60%, transparent);
 
-  /* * Walter-Lieth: lighter red/blue for contrast on dark backgrounds */
-  --color-wl-temp: #f87171;
-  --color-wl-prec: #60a5fa;
-  --color-wl-humid-hatch: #60a5fa;
-  --color-wl-arid-hatch: #f87171;
-  --color-wl-compressed-fill: #3b82f6;
-  --color-wl-frost: #5f95c8;
-  --color-wl-frost-outline: #9ca3af;
-  --color-wl-series-a: #34d399;
-  --color-wl-series-b: #fbbf24;
+  --color-chart-temp-max: var(--red-300);
+  --color-chart-temp-min: var(--blue-300);
+  --color-chart-temp-avg: var(--orange-300);
+  --color-chart-arid: var(--orange-800);
+  --color-chart-humid: var(--blue-800);
+
+  /* * lines a calm, lighter tone — never pastel, so they don't glow on #121212; bars a darker,
+     less saturated one, receding behind them */
+  --color-series-1: var(--calm-green-65);
+  --color-series-1-bar: var(--calm-green-47);
+  --color-series-2: var(--calm-orange-73);
+  --color-series-2-bar: var(--calm-orange-52);
+  --color-series-3: var(--calm-blue-64);
+  --color-series-3-bar: var(--calm-blue-44);
+  --color-series-4: var(--calm-rose-62);
+  --color-series-4-bar: var(--calm-rose-43);
+  --color-series-5: var(--calm-purple-63);
+  --color-series-5-bar: var(--calm-purple-42);
+  --color-series-1-tint-bg: var(--tint-dark-green-20);
+  --color-series-1-tint-border: var(--tint-dark-green-34);
+  --color-series-1-tint-text: var(--tint-dark-green-85);
+  --color-series-1-tint-dot: var(--calm-green-65);
+  --color-series-2-tint-bg: var(--tint-dark-orange-20);
+  --color-series-2-tint-border: var(--tint-dark-orange-34);
+  --color-series-2-tint-text: var(--tint-dark-orange-85);
+  --color-series-2-tint-dot: var(--calm-orange-73);
+  --color-series-3-tint-bg: var(--tint-dark-blue-20);
+  --color-series-3-tint-border: var(--tint-dark-blue-34);
+  --color-series-3-tint-text: var(--tint-dark-blue-85);
+  --color-series-3-tint-dot: var(--calm-blue-64);
+  --color-series-4-tint-bg: var(--tint-dark-pink-20);
+  --color-series-4-tint-border: var(--tint-dark-pink-34);
+  --color-series-4-tint-text: var(--tint-dark-pink-85);
+  --color-series-4-tint-dot: var(--calm-rose-62);
+  --color-series-5-tint-bg: var(--tint-dark-deep-purple-20);
+  --color-series-5-tint-border: var(--tint-dark-deep-purple-34);
+  --color-series-5-tint-text: var(--tint-dark-deep-purple-85);
+  --color-series-5-tint-dot: var(--calm-purple-63);
+
+  --color-wl-temp: var(--red-300);
+  --color-wl-prec: var(--blue-300);
+  --color-wl-humid-hatch: var(--blue-300);
+  --color-wl-arid-hatch: var(--red-300);
+  --color-wl-compressed-fill: var(--blue-400);
+  --color-wl-frost: var(--blue-700);
+  --color-wl-frost-outline: var(--dark-grey-46);
+
+  --color-martonne-arid-bg: var(--tint-dark-deep-orange-20);
+  --color-martonne-arid-text: var(--tint-dark-deep-orange-85);
+  --color-martonne-arid-border: var(--tint-dark-deep-orange-34);
+  --color-martonne-semi-arid-bg: var(--tint-dark-orange-20);
+  --color-martonne-semi-arid-text: var(--tint-dark-orange-85);
+  --color-martonne-semi-arid-border: var(--tint-dark-orange-34);
+  --color-martonne-mediterranean-bg: var(--tint-dark-amber-20);
+  --color-martonne-mediterranean-text: var(--tint-dark-amber-85);
+  --color-martonne-mediterranean-border: var(--tint-dark-amber-34);
+  --color-martonne-semi-humid-bg: var(--tint-dark-light-green-20);
+  --color-martonne-semi-humid-text: var(--tint-dark-light-green-85);
+  --color-martonne-semi-humid-border: var(--tint-dark-light-green-34);
+  --color-martonne-humid-bg: var(--tint-dark-cyan-20);
+  --color-martonne-humid-text: var(--tint-dark-cyan-85);
+  --color-martonne-humid-border: var(--tint-dark-cyan-34);
+  --color-martonne-very-humid-bg: var(--tint-dark-blue-20);
+  --color-martonne-very-humid-text: var(--tint-dark-blue-85);
+  --color-martonne-very-humid-border: var(--tint-dark-blue-34);
+  --color-martonne-extremely-humid-bg: var(--tint-dark-indigo-20);
+  --color-martonne-extremely-humid-text: var(--tint-dark-indigo-85);
+  --color-martonne-extremely-humid-border: var(--tint-dark-indigo-34);
+
+  --color-cell-count-fast-bg: var(--tint-dark-green-20);
+  --color-cell-count-fast-text: var(--tint-dark-green-85);
+  --color-cell-count-fast-border: var(--tint-dark-green-34);
+  --color-cell-count-moderate-bg: var(--tint-dark-amber-20);
+  --color-cell-count-moderate-text: var(--tint-dark-amber-85);
+  --color-cell-count-moderate-border: var(--tint-dark-amber-34);
+  --color-cell-count-slow-bg: var(--tint-dark-orange-20);
+  --color-cell-count-slow-text: var(--tint-dark-orange-85);
+  --color-cell-count-slow-border: var(--tint-dark-orange-34);
+  --color-cell-count-too-many-bg: var(--tint-dark-red-20);
+  --color-cell-count-too-many-text: var(--tint-dark-red-85);
+  --color-cell-count-too-many-border: var(--tint-dark-red-34);
 }
