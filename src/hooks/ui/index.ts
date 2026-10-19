@@ -23,3 +23,4 @@ export { useSwipeToClose } from "./useSwipeToClose";
 export { useScrollEdges } from "./useScrollEdges";
 export { useUnitLabels } from "./useUnitLabels";
 export { useThemeSync } from "./useThemeSync";
+export { useIsTruncated } from "./useIsTruncated";

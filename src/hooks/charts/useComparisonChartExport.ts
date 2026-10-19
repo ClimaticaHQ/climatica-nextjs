@@ -1,3 +1,5 @@
+import { EWalterLiethSeriesId } from "@/enums";
+import { getPairPalette } from "@/utils/seriesColor.util";
 import type { ExportMenuProps } from "@/components/UI";
 import {
   COMPARE_EXPORT_DEFAULT_VISIBLE,
@@ -20,7 +22,6 @@ import {
   getExportedSeriesLabels,
   getMartonneLabelKey,
   getSplitPair,
-  resolveCompareSeriesColors,
   resolveExportColors,
   svgToPng,
 } from "@/utils";
@@ -73,11 +74,10 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
   const martonneClass = (index: number | null) =>
     index !== null ? t(getMartonneLabelKey(index)) : null;
 
-  /** Colours come from the live DOM: build only inside a click, never while rendering. */
+  /** Built only inside a click, never while rendering. */
   function buildPayload(): TCompareExportPayload | null {
     const loaded = model.series.filter(({ hasData }) => hasData);
     if (loaded.length === 0 || !model.scales) return null;
-    const pairColors = resolveCompareSeriesColors();
     return {
       headerTitle: titleNames.join(DOCUMENT_TITLE.PLACES_SEPARATOR),
       headerSubtitle: features.title.subtitle ?? "",
@@ -92,11 +92,9 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
               tmax: entry.series.color,
               tmin: entry.series.color,
               tavg: entry.series.color,
-              prec: entry.series.color,
+              prec: entry.series.barColor,
             }
-          : index === 0
-            ? pairColors.A
-            : pairColors.B,
+          : getPairPalette(index === 0 ? EWalterLiethSeriesId.A : EWalterLiethSeriesId.B),
       })),
       visibleSeries: visible,
       selectedMonths: viewState.selectedMonths,

@@ -1,11 +1,8 @@
+import { getPairIdentityColor, getPairPalette } from "@/utils/seriesColor.util";
 import type { TPeriodTrend } from "@/app/compare-periods/_components/ComparePeriods.type";
 import { getLaterPeriodSeries } from "@/app/compare-periods/_components/ComparePeriods.util";
-import {
-  CLIMATE_PERIOD_LABELS,
-  DATA_UPDATE_NAMES_SEPARATOR,
-  WALTER_LIETH_COLORS,
-} from "@/constants";
-import { ESeriesKind, EWalterLiethSeriesId } from "@/enums";
+import { CLIMATE_PERIOD_LABELS, DATA_UPDATE_NAMES_SEPARATOR } from "@/constants";
+import { EDifferenceMeaning, ESeriesKind, EWalterLiethSeriesId } from "@/enums";
 import type { TChartSeries, TPeriodsChart, TUseClimatePeriodsChartArgs } from "@/types";
 import { computeCompareStats, resolveDataState } from "@/utils";
 import { differenceOf } from "@/utils/monthlyClimate.util";
@@ -43,7 +40,8 @@ export function useClimatePeriodsChart(
     kind: ESeriesKind.CLIMATE_PERIOD,
     label,
     context: city.label,
-    color: WALTER_LIETH_COLORS.SERIES[id],
+    color: getPairIdentityColor(id),
+    barColor: getPairPalette(id).prec,
     data: data ?? [],
     altitude,
     year: null,
@@ -60,7 +58,10 @@ export function useClimatePeriodsChart(
     features: {
       title: { names: [city.label], subtitle: `${labelA} vs ${labelB}` },
       // * the difference always reads later − earlier, whichever period was picked first
-      difference: { minuendId: getLaterPeriodSeries(periodA, periodB) },
+      difference: {
+        minuendId: getLaterPeriodSeries(periodA, periodB),
+        meaning: EDifferenceMeaning.PERIODS,
+      },
       hasSidePickers: false,
       hasMonthBadge: false,
       hasRawExport: false,

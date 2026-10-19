@@ -1,3 +1,4 @@
+import { getPairIdentityColor, getPairPalette } from "@/utils/seriesColor.util";
 import {
   COMPARE_CITIES_SCROLL_OPTIONS,
   COMPARE_CITIES_URL_SCHEMA,
@@ -10,12 +11,12 @@ import {
   DATASETS,
   DEFAULT_CHART_MODE,
   DEFAULT_COMPARE_LAYOUT,
-  WALTER_LIETH_COLORS,
   WALTER_LIETH_COMPARISON,
 } from "@/constants";
 import {
   ECitySlot,
   ECompareLayout,
+  EDifferenceMeaning,
   ESeriesKind,
   EWalterLiethSeriesId,
   type EWalterLiethShading,
@@ -120,7 +121,8 @@ export function useCompareCitiesPage(): TCompareCitiesPage {
     kind: ESeriesKind.CITY,
     label: city.label,
     context: periodLabel,
-    color: WALTER_LIETH_COLORS.SERIES[id],
+    color: getPairIdentityColor(id),
+    barColor: getPairPalette(id).prec,
     data: data ?? [],
     altitude,
     year: dataset === DATASETS.WEATHER ? weatherYear : null,
@@ -142,7 +144,7 @@ export function useCompareCitiesPage(): TCompareCitiesPage {
   const features = {
     title: { names: [], subtitle: periodLabel },
     // * the difference reads B − A: the second city against the first
-    difference: { minuendId: EWalterLiethSeriesId.B },
+    difference: { minuendId: EWalterLiethSeriesId.B, meaning: EDifferenceMeaning.CITIES },
     hasSidePickers: false,
     hasMonthBadge: false,
     hasRawExport: false,

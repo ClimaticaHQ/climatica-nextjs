@@ -1,3 +1,4 @@
+import { getPairIdentityColor, getPairPalette } from "@/utils/seriesColor.util";
 import {
   CITY_CLIMATE_SCROLL_OPTIONS,
   CLIMATE_STATISTICS_URL_SCHEMA,
@@ -12,7 +13,6 @@ import {
   DATASETS,
   DEFAULT_CHART_MODE,
   VARIABLE_LABELS,
-  WALTER_LIETH_COLORS,
 } from "@/constants";
 import { EChartBlock, EDataStatus, ESeriesKind, EWalterLiethSeriesId } from "@/enums";
 import { useChartModel, useSingleChartExport } from "@/hooks/charts";
@@ -104,7 +104,8 @@ export function useCityClimatePage(): TCityClimatePage {
       kind: ESeriesKind.CITY,
       label: placeName,
       context: periodLabel,
-      color: WALTER_LIETH_COLORS.SERIES[EWalterLiethSeriesId.A],
+      color: getPairIdentityColor(EWalterLiethSeriesId.A),
+      barColor: getPairPalette(EWalterLiethSeriesId.A).prec,
       data: data ?? [],
       altitude,
       year: dataset === DATASETS.WEATHER ? weatherYear : null,

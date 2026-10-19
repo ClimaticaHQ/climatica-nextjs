@@ -1,3 +1,4 @@
+import { readExportPalette } from "@/utils/export/shared/exportPalette.util";
 import type {
   THeatMapExportHandlers,
   TUseHeatMapExportArgs,
@@ -32,6 +33,7 @@ import {
   exportTableToCsv,
   getPolygonBounds,
   interpolateColor,
+  resolveColorScale,
   resolveExportColors,
   svgToPng,
 } from "@/utils";
@@ -88,12 +90,14 @@ export function useHeatMapExport({
     const cellMin = cellValues.length > 0 ? Math.min(...cellValues) : 0;
     const cellMax = cellValues.length > 0 ? Math.max(...cellValues) : 0;
 
+    // * the light palette's colours, as every export
+    const stops = readExportPalette((style) => resolveColorScale(colorScale, style));
     const cells: THeatmapExportCell[] = [];
     for (const binding of bindings) {
       const value = getCellValue(binding);
       const bounds = isNaN(value) ? null : resolveCellBounds(binding, cellSize);
       if (bounds) {
-        cells.push({ bounds, color: interpolateColor(value, cellMin, cellMax, colorScale) });
+        cells.push({ bounds, color: interpolateColor(value, cellMin, cellMax, stops) });
       }
     }
 
@@ -102,7 +106,7 @@ export function useHeatMapExport({
         stats.min + (stats.max - stats.min) * (i / (STATS_LEGEND_GRADIENT_STOPS - 1)),
         stats.min,
         stats.max,
-        colorScale,
+        stops,
       ),
     );
     const fmt = (v: number) => `${formatNumber(v, { digits: HEATMAP_VALUE_DIGITS })} ${unit}`;
