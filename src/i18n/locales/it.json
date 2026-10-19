@@ -89,6 +89,11 @@
     },
     "noPeriodData": "Nessun dato per {period} alla risoluzione {grid}",
     "difference": "Differenza",
+    "differenceInfo": "Come si calcola la differenza",
+    "differenceNote": {
+      "cities": "Differenza = {b} − {a}. Un valore positivo indica che il dato è più alto a {b}.",
+      "periods": "Differenza = {b} − {a}. Un valore positivo indica che il dato è aumentato nel periodo più recente."
+    },
     "metric": "Indicatore",
     "tableCaption": "Confronto tra {a} e {b}",
     "statsCaption": "Statistiche per {names}"

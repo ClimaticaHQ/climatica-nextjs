@@ -89,6 +89,11 @@
     },
     "noPeriodData": "Ingen data for {period} ved oppløsningen {grid}",
     "difference": "Forskjell",
+    "differenceInfo": "Slik beregnes forskjellen",
+    "differenceNote": {
+      "cities": "Forskjell = {b} − {a}. En positiv verdi betyr at målet er høyere i {b}.",
+      "periods": "Forskjell = {b} − {a}. En positiv verdi betyr at målet har økt i den senere perioden."
+    },
     "metric": "Måling",
     "tableCaption": "Sammenligning av {a} og {b}",
     "statsCaption": "Statistikk for {names}"
