@@ -5,6 +5,7 @@ import { OptionDot } from "@/components/UI/Dropdown/OptionDot";
 import { EChipVariant } from "@/enums";
 import { useTranslations } from "next-intl";
 import { BAR_CHIP_CLASSES as BAR, TOGGLE_CHIP_CLASSES as TOGGLE } from "./Chip.constant";
+import { getChipToneStyle } from "./Chip.util";
 import type {
   TAllFiltersChipProps,
   TChipProps,
@@ -28,6 +29,7 @@ function ToggleChip({
   disabled = false,
   isLocked = false,
   dotColor,
+  tone,
   onClick,
 }: TToggleChipProps) {
   const state = disabled
@@ -46,6 +48,7 @@ function ToggleChip({
       aria-pressed={isActive}
       aria-disabled={isLocked || undefined}
       className={`${TOGGLE.BASE} ${state}`}
+      style={tone ? getChipToneStyle(tone) : undefined}
     >
       {dotColor === undefined ? (
         label

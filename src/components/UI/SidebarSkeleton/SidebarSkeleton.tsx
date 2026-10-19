@@ -10,7 +10,7 @@ function ChipsRow({ widths }: { widths: string[] }) {
 
 export function SidebarSkeleton() {
   return (
-    <aside className="hidden w-80 shrink-0 animate-pulse flex-col overflow-hidden border-r border-[var(--color-border)] bg-[var(--color-bg)] lg:flex">
+    <aside className="hidden w-80 shrink-0 animate-pulse flex-col overflow-hidden border-r border-[var(--color-border)] bg-[var(--color-surface)] lg:flex">
       <div className="flex flex-1 flex-col overflow-y-auto p-4 gap-y-8">
         {/* Filters section — defaultOpen */}
         <div>

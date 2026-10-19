@@ -38,7 +38,7 @@ export function ToggleSwitch({
           aria-describedby={description === undefined ? undefined : descriptionId}
           className="peer sr-only"
         />
-        <div className="h-5 w-9 rounded-full bg-[var(--color-border)] transition-colors duration-150 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform after:duration-150 after:content-[''] peer-checked:bg-[var(--color-primary)] peer-checked:after:translate-x-4 peer-disabled:opacity-50" />
+        <div className="h-5 w-9 rounded-full bg-[var(--color-border)] transition-colors duration-150 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-[var(--color-switch-knob)] after:transition-transform after:duration-150 after:content-[''] peer-checked:bg-[var(--color-primary)] peer-checked:after:translate-x-4 peer-disabled:opacity-50" />
       </div>
     </label>
   );

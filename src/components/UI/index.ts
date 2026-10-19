@@ -1,3 +1,4 @@
+export { Badge } from "./Badge";
 export { Button } from "./Button";
 export { ChartSkeleton } from "./ChartSkeleton";
 export { Chip } from "./Chip";

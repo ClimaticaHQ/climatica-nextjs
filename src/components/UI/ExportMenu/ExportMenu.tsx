@@ -2,6 +2,7 @@ import { ChevronDownIcon, CodeIcon, ImageIcon, SpinnerIcon, TableIcon } from "@/
 import { TExportOptionKey } from "@/types";
 import { useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
+import { EXPORT_MENU_BUTTON_CLASS } from "./ExportMenu.constant";
 import type { ExportMenuProps } from "./ExportMenu.type";
 
 export function ExportMenu({
@@ -122,14 +123,14 @@ export function ExportMenu({
         {...(reason !== undefined ? { "aria-describedby": reasonId } : {})}
         aria-haspopup="true"
         aria-expanded={isOpen}
-        className="flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-[length:var(--font-sm)] text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)] disabled:cursor-not-allowed disabled:opacity-50"
+        className={EXPORT_MENU_BUTTON_CLASS}
       >
         {t("exportMenu.button")}
         <ChevronDownIcon open={isOpen} />
       </button>
 
       <div
-        className={`absolute right-0 top-full z-50 mt-1 w-48 overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-bg)] shadow-md transition-all duration-150 origin-top ${
+        className={`absolute right-0 top-full z-50 mt-1 w-48 overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-md transition-all duration-150 origin-top ${
           isOpen
             ? "opacity-100 scale-y-100 pointer-events-auto"
             : "opacity-0 scale-y-95 pointer-events-none"
@@ -142,7 +143,7 @@ export function ExportMenu({
             onClick={handler}
             disabled={disabled}
             title={disabled ? t("exportMenu.rawDataUnavailable") : undefined}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-[length:var(--font-sm)] text-[var(--color-text)] transition-colors duration-100 hover:bg-[var(--color-bg-secondary)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-[length:var(--font-sm)] text-[var(--color-text)] transition-colors duration-100 hover:bg-[var(--color-surface-secondary)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
           >
             {loadingKey === key ? <SpinnerIcon /> : icon}
             {label}

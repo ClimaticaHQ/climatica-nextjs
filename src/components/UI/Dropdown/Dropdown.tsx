@@ -1,3 +1,4 @@
+import { FORM_CONTROL_CLASSES } from "@/constants";
 import { useEffect, useId, useRef, useState } from "react";
 import { TDropdownProps } from "./Dropdown.type";
 import { OptionDot } from "./OptionDot";
@@ -51,10 +52,9 @@ export default function Dropdown({
         className={`
           ${isStretched ? "w-full justify-between" : ""}
           flex items-center gap-2 px-3 py-1.5
-          rounded-[var(--radius-sm)] text-[length:var(--font-base)] md:text-[length:var(--font-sm)]
-          border border-[var(--color-border)]
-          text-[var(--color-text-secondary)] hover:text-[var(--color-text)]
-          hover:bg-[var(--color-bg-secondary)]
+          ${FORM_CONTROL_CLASSES.FRAME} ${FORM_CONTROL_CLASSES.BORDER_COLOR} ${FORM_CONTROL_CLASSES.HOVER}
+          text-[length:var(--font-base)] md:text-[length:var(--font-sm)]
+          text-[var(--color-text-secondary)]
           transition-colors duration-150
         `}
       >
@@ -77,7 +77,7 @@ export default function Dropdown({
         className={`
           absolute right-0 top-full mt-1 min-w-full z-50
           max-h-[7rem] overflow-y-auto overscroll-contain
-          bg-[var(--color-bg)] border border-[var(--color-border)]
+          bg-[var(--color-surface)] border border-[var(--color-border)]
           rounded-[var(--radius-sm)] shadow-md
           transition-all duration-200 origin-top
           ${isOpen ? "opacity-100 scale-y-100 pointer-events-auto" : "opacity-0 scale-y-95 pointer-events-none"}
@@ -104,8 +104,8 @@ export default function Dropdown({
                 option.disabled
                   ? "cursor-not-allowed text-[var(--color-text-secondary)]"
                   : option.value === value
-                    ? "bg-[var(--color-primary)] text-[var(--color-bg)]"
-                    : "text-[var(--color-text)] hover:bg-[var(--color-bg-secondary)]"
+                    ? "bg-[var(--color-primary)] text-[var(--color-surface)]"
+                    : "text-[var(--color-text)] hover:bg-[var(--color-surface-secondary)]"
               }
             `}
           >
