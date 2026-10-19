@@ -30,7 +30,7 @@
 
 ### Requirements
 
-- [Node.js LTS](https://nodejs.org/) (v18+)
+- [Node.js](https://nodejs.org/) 22.13.1, the version in [`.nvmrc`](.nvmrc) (`nvm use` picks it up)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Python 3](https://www.python.org/downloads/) (for one-time data preparation and running Python unit tests)
   - On macOS/Homebrew Python, installing packages requires a virtual environment — `pip install` directly into the system Python will fail with `externally-managed-environment`. See the [Tests](#tests) section for the exact setup.
@@ -291,15 +291,22 @@ npm run check   # type-check + lint + format
 
 ## Documentation
 
-Developer documentation lives in [`docs/`](docs):
+Developer documentation lives in [`docs/`](docs); [docs/README.md](docs/README.md) describes each document and suggests a reading order:
 
 - [architecture.md](docs/architecture.md) — folder structure, data flow, the container/view page pattern, where shared UI lives
 - [url-state.md](docs/url-state.md) — the URL as the source of truth, the URL hooks, canonical and legacy params, the navbar's last-page-params cache
 - [filters.md](docs/filters.md) — FILTERS_CONFIG, sections and containers, draft and auto-apply, availability, adding a filter
-- [backend.md](docs/backend.md) — API routes, Redis caching and rate limits, Solr, WorldClim proxy, Wikidata, known issues
-- [i18n.md](docs/i18n.md) — locales, next-intl usage, key conventions, adding a language (app and Solr)
+- [backend.md](docs/backend.md) — API routes, Redis caching and rate limits, Solr, WorldClim proxy, Wikidata, error handling
+- [localization-i18n.md](docs/localization-i18n.md) — locales, next-intl usage, key conventions, adding a language (app and Solr)
 - [operations.md](docs/operations.md) — Docker services, environment variables, Solr reindex, updating an environment
 - [testing.md](docs/testing.md) — Vitest and Playwright setup, mobile scenarios, test conventions
+- [pages.md](docs/pages.md) — the page hook, PageLayout, the four pages, adding a page or a page block
+- [charts.md](docs/charts.md) — series, the chart model, the chart section and card, hover, tooltips, blocks, exports
+- [climate-indices.md](docs/climate-indices.md) — the Walter-Lieth diagram's rules, arid and frost months, the De Martonne index
+- [export.md](docs/export.md) — CSV, PNG, SVG and raw exports, the heat map image
+- [heat-map.md](docs/heat-map.md) — the heat map page: region, cell cap, strips, colour scales
+- [colors.md](docs/colors.md) — colour layers, series colours, contrast, adding a colour
+- [settings.md](docs/settings.md) — what is stored where, settings, theme, animations
 
 ---
 
