@@ -131,7 +131,10 @@ Besides the Docker and Solr scripts above, from [`package.json`](../package.json
 | `npm run cache:clear-nearest-city`                  | delete the cached reverse geocoding results (`nearest-city:*`)                                       |
 
 The Node version is [`.nvmrc`](../.nvmrc), the single source: local work (`nvm use`) and CI
-(`node-version-file`) both read it.
+(`node-version-file`) both read it. The npm version is `packageManager` in `package.json`; CI
+installs it over the npm bundled with that Node. They must match the npm that writes
+`package-lock.json`: npm 10's `npm ci` rejects a lock written by npm 11 that leaves an optional
+peer dependency out ("Missing: … from lock file"). Update the lock with that npm.
 
 ## Continuous integration and deployment
 

@@ -11,6 +11,12 @@ runs:
         node-version-file: .nvmrc
         cache: npm
 
+    # * the npm that writes package-lock.json (package.json's packageManager): npm 10, bundled with
+    # * the .nvmrc Node, rejects a lock written by npm 11 that leaves an optional peer out
+    - name: Use npm from package.json
+      shell: bash
+      run: npm install -g "$(node -p "require('./package.json').packageManager")" && npm -v
+
     - name: Restore or cache node_modules
       id: cache-node-modules
       uses: actions/cache@v4

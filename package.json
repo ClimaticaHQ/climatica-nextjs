@@ -1,6 +1,7 @@
 {
   "name": "Climatica",
   "version": "1.0.0",
+  "packageManager": "npm@11.11.1",
   "description": "Web application for exploring, comparing, and analyzing climate and weather metrics using WorldClim data",
   "author": {
     "name": "Andrii Kononenko [wastxrq]",
