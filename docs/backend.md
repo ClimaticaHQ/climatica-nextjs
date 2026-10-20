@@ -52,24 +52,7 @@ any upstream failure is retried on the next request.
 
 ## Solr city search
 
-[`SolrService.searchCities`](../src/libs/services/solrService.ts) queries the `cities` core
-(`SOLR_URL`, handler `/cities` in [`solrconfig.xml`](../docker/solr/solrconfig.xml): edismax,
-10 rows, sorted by score, with a population boost).
-
-[`buildSolrQueryParams`](../src/utils/solr.util.ts) sends its own `qf` and `pf`, built from
-every locale in `locales.json`:
-
-- `label_<lang>` and `label_<lang>_ngram` for each language.
-- Weights from [`SOLR_SEARCH_WEIGHTS`](../src/constants/solr.constant.ts): the request's
-  language first, English (`SOLR_SECONDARY_LANG`) second, then the rest.
-- The `/cities` handler has no `qf`/`pf` defaults on purpose: the app always sends
-  both, and a hand-written list would drift from `locales.json` as languages are added.
-  A query sent to Solr by hand has to pass its own `qf`.
-
-Results are de-duplicated by GeoNames id and mapped to `TCity`, with the label in the
-requested language (falling back to English) and a description built from the feature and
-country codes. The index is built from GeoNames (see [operations.md](operations.md) and
-[localization-i18n.md](localization-i18n.md)).
+How the index, the query and the ranking work is in [city-search.md](city-search.md).
 
 ## WorldClim proxy
 

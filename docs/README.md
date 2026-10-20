@@ -15,7 +15,7 @@ If you're new to the project, read in this order:
 4. [pages.md](pages.md) — how a page is put together.
 5. [charts.md](charts.md) — how its chart is drawn.
 6. [climate-indices.md](climate-indices.md) — what the diagram and the numbers mean.
-7. The rest as you need them: [filters.md](filters.md), [heat-map.md](heat-map.md),
+7. The rest as you need them: [filters.md](filters.md), [city-search.md](city-search.md), [heat-map.md](heat-map.md),
    [export.md](export.md), [colors.md](colors.md), [settings.md](settings.md),
    [localization-i18n.md](localization-i18n.md), [testing.md](testing.md), [operations.md](operations.md).
 
@@ -53,6 +53,11 @@ months, the De Martonne index and its classes — with their formulas.
 **[filters.md](filters.md)** — `FILTERS_CONFIG`, availability (hidden, disabled with a reason),
 the filter components and their three containers, the draft and auto-apply, and how to add a
 filter.
+
+**[city-search.md](city-search.md)** — How the search box finds a city: display labels
+versus search names, how names are analysed, the exact/prefix and typo-tolerant clauses and how
+each is scored, edit distance, the population boost, why ranking lives in the app, two worked
+examples, and the limits.
 
 **[heat-map.md](heat-map.md)** — The Region Heatmap page: drawing a box or polygon, grid sizes
 and the cell cap, strip requests, colour scales, the region's statistics and climate profile.

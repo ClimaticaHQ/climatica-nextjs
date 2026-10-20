@@ -11,9 +11,11 @@ languages lives in one file and drives the app and the city search index.
 - [`LOCALES`](../src/constants/locales.constant.ts) in the app, and through it the locale
   resolution, the language dropdown on the settings page and the Solr query builder.
 - [`generate_schema.py`](../docker/solr/scripts/generate_schema.py), which writes a
-  `label_<lang>` and `label_<lang>_ngram` field per locale into `docker/solr/schema.json`.
+  `label_<lang>` field per locale into `docker/solr/schema.json`.
 - [`prepare_data.py`](../docker/solr/scripts/prepare_data.py), which writes a
-  `label_<lang>` column per locale into the cities CSV, from GeoNames' alternate names.
+  `label_<lang>` column per locale into the cities CSV, from GeoNames' alternate names, and
+  takes the locales' alternate names into each city's search names
+  ([backend.md](city-search.md#display-labels-and-search-names)).
 
 The language dropdown shows each language by its own name (`Українська`, `Español`), from
 `LANGUAGE_NATIVE_NAMES` in [`language.constant.ts`](../src/constants/language.constant.ts); a
@@ -89,7 +91,7 @@ Use the ISO 639-1 code GeoNames uses for the language's alternate names (e.g. `p
 4. **Regenerate the Solr schema:**
    ```bash
    python3 docker/solr/scripts/generate_schema.py
-   git diff docker/solr/schema.json   # should only add label_<code> and label_<code>_ngram
+   git diff docker/solr/schema.json   # should only add label_<code>
    ```
    `schema.json` is committed; don't edit its per-language fields by hand.
 5. **Regenerate the cities CSV** (needs the GeoNames files in `docker/solr/data/`, see
@@ -101,8 +103,8 @@ Use the ISO 639-1 code GeoNames uses for the language's alternate names (e.g. `p
    ```bash
    npm run solr:reindex
    ```
-   `solrconfig.xml` needs no change: the app sends its own `qf` and `pf` for every locale in
-   `locales.json` ([`buildSolrQueryParams`](../src/utils/solr.util.ts)).
+   `solrconfig.xml` needs no change: the app sends its own `qf` and `pf`, with the reader's
+   locale's label ([`buildSolrQueryParams`](../src/utils/solr.util.ts)).
 7. **Check it:** run `npm run test` (the parity test fails on a missing or extra key), run the app, pick the new language in Settings, and search a city whose name has
    a translation in it. Run the Python tests (`npm run test:python`) if you changed
    `prepare_data.py`.

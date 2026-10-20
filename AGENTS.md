@@ -41,6 +41,7 @@ Before reporting a task as done: `npm run check`, `npm run test`, `npm run build
   - docs/colors.md — colour layers, series colours, contrast, adding a colour
   - docs/climate-indices.md — Walter-Lieth geometry and rules, arid / frost months, De Martonne
   - docs/export.md — export menu, SVG builders, export palette, PNG, raw data, heat map image
+  - docs/city-search.md — city search: labels vs search names, analysis, the two clauses, ranking, limits
   - docs/heat-map.md — the heat map page: region, cell cap, strips, colour scales, stats
   - docs/settings.md — what is stored where, settings store, theme, animations, settings page
 - A change that alters how an area works updates its document in the same task.

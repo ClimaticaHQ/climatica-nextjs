@@ -245,7 +245,7 @@ this one file plus regenerating two derived artifacts:
 ```bash
 # 1. Add the locale code to src/configs/locales.json
 
-# 2. Regenerate the Solr schema (adds label_<lang> + label_<lang>_ngram fields)
+# 2. Regenerate the Solr schema (adds the label_<lang> field)
 python3 docker/solr/scripts/generate_schema.py
 
 # 3. Regenerate the cities CSV (adds the label_<lang> column)
