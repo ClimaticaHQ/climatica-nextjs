@@ -4,6 +4,7 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/libs/Env", () => ({ env: { SOLR_URL: "http://localhost:8983" } }));
 vi.mock("@/libs/Logger", () => ({ logger: { info: vi.fn(), error: vi.fn() } }));
 
+import { SOLR_QUERY_PARAMS } from "@/constants";
 import { SolrService } from "@/libs/services/solrService";
 import type { TSolrCityDoc, TSolrResponse } from "@/types";
 
@@ -120,7 +121,7 @@ describe("SolrService.searchCities", () => {
     expect(results[0].id).toBe("3169070");
   });
 
-  it("builds a Solr URL containing required edismax params for multi-word query", async () => {
+  it("builds a Solr URL with the exact and fuzzy clauses for a multi-word query", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -130,9 +131,11 @@ describe("SolrService.searchCities", () => {
 
     await SolrService.searchCities("new york", "en");
 
-    const calledUrl: string = fetchMock.mock.calls[0][0];
-    expect(calledUrl).toContain("qf=");
-    expect(calledUrl).toContain("pf=");
+    const params = new URL(fetchMock.mock.calls[0][0]).searchParams;
+    expect(params.get(SOLR_QUERY_PARAMS.EXACT_TEXT)).toBe("new york");
+    expect(params.get(SOLR_QUERY_PARAMS.FUZZY_TEXT)).toBe("new york~1");
+    expect(params.get(SOLR_QUERY_PARAMS.EXACT_QF)).toContain("names");
+    expect(params.get(SOLR_QUERY_PARAMS.EXACT_PF)).toBe("names^10");
   });
 });
 
