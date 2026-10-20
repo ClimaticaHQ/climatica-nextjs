@@ -72,6 +72,10 @@ jobs:
             sleep 3
           done
 
+      # * the project's solrconfig.xml loads ICU, which the schema's name fields need
+      - name: Use the project's Solr config
+        run: docker cp docker/solr/solrconfig.xml ${{ job.services.solr.id }}:/opt/solr/server/solr/configsets/_default/conf/solrconfig.xml
+
       - name: Create Solr core
         run: |
           curl "http://localhost:8983/solr/admin/cores?action=CREATE&name=cities&configSet=_default" || echo "Core already exists, skipping..."
@@ -105,6 +109,6 @@ jobs:
 
       - name: Import cities to Solr
         run: |
-          curl "http://localhost:8983/solr/cities/update?commit=true" \
+          curl "http://localhost:8983/solr/cities/update?commit=true&f.names.split=true&f.names.separator=%7C" \
             -X POST -H 'Content-type:application/csv' \
             --data-binary @docker/solr/data/cities.csv
