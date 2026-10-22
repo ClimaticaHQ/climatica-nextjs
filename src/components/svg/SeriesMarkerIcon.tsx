@@ -1,14 +1,17 @@
+import { getMarkerPath } from "@/utils/seriesShape.util";
 import type { TSeriesMarkerIconProps } from "./svg.type";
 
-/** A series' marker — circle for A, square for B — drawn in currentColor. */
+const SIZE = 14;
+const SHAPE_SIZE = 9;
+
+/** An entity's marker shape (SERIES_SHAPES), drawn in currentColor. */
 export function SeriesMarkerIcon({ shape }: TSeriesMarkerIconProps) {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      {shape === "square" ? (
-        <rect x="3" y="3" width="8" height="8" rx="1" fill="currentColor" />
-      ) : (
-        <circle cx="7" cy="7" r="4.5" fill="currentColor" />
-      )}
+    <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} fill="none" aria-hidden="true">
+      <path
+        d={getMarkerPath({ shape, cx: SIZE / 2, cy: SIZE / 2, size: SHAPE_SIZE })}
+        fill="currentColor"
+      />
     </svg>
   );
 }

@@ -15,10 +15,16 @@ export { NoShadingIcon } from "./NoShadingIcon";
 export { OverlayLayoutIcon } from "./OverlayLayoutIcon";
 export { ClimaticaLogo } from "./logos";
 export { SeriesMarkerIcon } from "./SeriesMarkerIcon";
+export { SeriesHatchIcon } from "./SeriesHatchIcon";
+export { SeriesHatchPattern } from "./SeriesHatchPattern";
 export { SpinnerIcon } from "./SpinnerIcon";
 export { SwapIcon } from "./SwapIcon";
 export { SplitLayoutIcon } from "./SplitLayoutIcon";
 export { TableIcon } from "./TableIcon";
 export { MonitorIcon, MoonIcon, SunIcon } from "./themes";
 export { GearIcon } from "./GearIcon";
-export type { TSeriesMarkerIconProps } from "./svg.type";
+export type {
+  TSeriesHatchIconProps,
+  TSeriesHatchPatternProps,
+  TSeriesMarkerIconProps,
+} from "./svg.type";
