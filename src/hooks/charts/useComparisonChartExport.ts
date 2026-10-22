@@ -1,5 +1,3 @@
-import { EWalterLiethSeriesId } from "@/enums";
-import { getPairPalette } from "@/utils/seriesColor.util";
 import type { ExportMenuProps } from "@/components/UI";
 import {
   COMPARE_EXPORT_DEFAULT_VISIBLE,
@@ -19,6 +17,7 @@ import {
   downloadSvgString,
   exportTableToCsv,
   getDrawnSeries,
+  getEntityShortLabels,
   getExportedSeriesLabels,
   getMartonneLabelKey,
   getSplitPair,
@@ -78,23 +77,19 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
   function buildPayload(): TCompareExportPayload | null {
     const loaded = model.series.filter(({ hasData }) => hasData);
     if (loaded.length === 0 || !model.scales) return null;
+    const shortLabels = getEntityShortLabels(loaded.map(({ series }) => series));
     return {
       headerTitle: titleNames.join(DOCUMENT_TITLE.PLACES_SEPARATOR),
       headerSubtitle: features.title.subtitle ?? "",
       series: loaded.map((entry, index) => ({
         label: entry.series.label,
+        shortLabel: shortLabels[index] ?? entry.series.label,
         data: entry.chartData,
         stats: entry.stats,
         altitude: entry.series.altitude,
         martonneClassLabel: martonneClass(entry.stats.martonneIndex),
-        colors: rule.usesOwnColor
-          ? {
-              tmax: entry.series.color,
-              tmin: entry.series.color,
-              tavg: entry.series.color,
-              prec: entry.series.barColor,
-            }
-          : getPairPalette(index === 0 ? EWalterLiethSeriesId.A : EWalterLiethSeriesId.B),
+        shape: entry.series.shape,
+        hatch: entry.series.hatch,
       })),
       visibleSeries: visible,
       selectedMonths: viewState.selectedMonths,
@@ -110,6 +105,7 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
           tavg: t("chart.avgTemperature"),
           prec: t("chart.precipitation"),
         },
+        aridityLegend: { humid: t("chart.humidPeriod"), arid: t("chart.aridPeriod") },
         statsLabels: {
           ...statsLabels,
           altitude: t("chart.altitude"),

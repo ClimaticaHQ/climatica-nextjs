@@ -1,4 +1,4 @@
-import { getPairIdentityColor, getPairPalette } from "@/utils/seriesColor.util";
+import { getPairHatch, getPairShape } from "@/utils/seriesShape.util";
 import type { TPeriodTrend } from "@/app/compare-periods/_components/ComparePeriods.type";
 import { getLaterPeriodSeries } from "@/app/compare-periods/_components/ComparePeriods.util";
 import { CLIMATE_PERIOD_LABELS, DATA_UPDATE_NAMES_SEPARATOR } from "@/constants";
@@ -40,8 +40,8 @@ export function useClimatePeriodsChart(
     kind: ESeriesKind.CLIMATE_PERIOD,
     label,
     context: city.label,
-    color: getPairIdentityColor(id),
-    barColor: getPairPalette(id).prec,
+    shape: getPairShape(id),
+    hatch: getPairHatch(id),
     data: data ?? [],
     altitude,
     year: null,

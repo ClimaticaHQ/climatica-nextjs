@@ -3,7 +3,7 @@ import { DATA_UPDATE_NAMES_SEPARATOR, WEATHER_YEARS_SEPARATOR } from "@/constant
 import { ESeriesKind } from "@/enums";
 import type { TChartSeries, TPeriodsChart, TUseWeatherYearsChartArgs } from "@/types";
 import { resolveDataState } from "@/utils";
-import { getSeriesBarColor, getSeriesColor } from "@/utils/seriesColor.util";
+import { getSeriesHatch, getSeriesShape } from "@/utils/seriesShape.util";
 import { useTranslations } from "next-intl";
 
 /**
@@ -31,8 +31,8 @@ export function useWeatherYearsChart(args: TUseWeatherYearsChartArgs): TPeriodsC
       context: city.label,
       // * by its place in the full list, never among the years loaded so far, so a year still
       // * loading never shifts the others' colours
-      color: getSeriesColor(years.indexOf(year)),
-      barColor: getSeriesBarColor(years.indexOf(year)),
+      shape: getSeriesShape(years.indexOf(year)),
+      hatch: getSeriesHatch(years.indexOf(year)),
       data: entry?.rows ?? [],
       altitude: args.altitude,
       year,

@@ -8,3 +8,4 @@ export { useFiltersDraft } from "./useFiltersDraft";
 export { useCityClimatePeriods } from "./useCityClimatePeriods";
 export { useFiltersSheet } from "./useFiltersSheet";
 export { useFilterUrlSync } from "./useFilterUrlSync";
+export { useDatasetSelectionScope } from "./useDatasetSelectionScope";

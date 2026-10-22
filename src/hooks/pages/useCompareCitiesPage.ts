@@ -1,4 +1,4 @@
-import { getPairIdentityColor, getPairPalette } from "@/utils/seriesColor.util";
+import { getPairHatch, getPairShape } from "@/utils/seriesShape.util";
 import {
   COMPARE_CITIES_SCROLL_OPTIONS,
   COMPARE_CITIES_URL_SCHEMA,
@@ -121,8 +121,8 @@ export function useCompareCitiesPage(): TCompareCitiesPage {
     kind: ESeriesKind.CITY,
     label: city.label,
     context: periodLabel,
-    color: getPairIdentityColor(id),
-    barColor: getPairPalette(id).prec,
+    shape: getPairShape(id),
+    hatch: getPairHatch(id),
     data: data ?? [],
     altitude,
     year: dataset === DATASETS.WEATHER ? weatherYear : null,

@@ -1,4 +1,4 @@
-import { getPairIdentityColor, getPairPalette } from "@/utils/seriesColor.util";
+import { getPairHatch, getPairShape } from "@/utils/seriesShape.util";
 import {
   CITY_CLIMATE_SCROLL_OPTIONS,
   CLIMATE_STATISTICS_URL_SCHEMA,
@@ -104,8 +104,8 @@ export function useCityClimatePage(): TCityClimatePage {
       kind: ESeriesKind.CITY,
       label: placeName,
       context: periodLabel,
-      color: getPairIdentityColor(EWalterLiethSeriesId.A),
-      barColor: getPairPalette(EWalterLiethSeriesId.A).prec,
+      shape: getPairShape(EWalterLiethSeriesId.A),
+      hatch: getPairHatch(EWalterLiethSeriesId.A),
       data: data ?? [],
       altitude,
       year: dataset === DATASETS.WEATHER ? weatherYear : null,
