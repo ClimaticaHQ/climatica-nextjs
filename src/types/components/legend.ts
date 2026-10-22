@@ -1,16 +1,25 @@
 import type { ELegendSwatch } from "@/enums";
-import type { TExpandedPanel, TVisibleSeries } from "./chart";
-
-export type TLegendMarkerShape = "circle" | "square";
+import type { TSeriesHatch, TSeriesShape } from "../charts/seriesShape.type";
+import type { TVisibleSeries } from "./chart";
 
 /** A legend swatch as data — the screen and the export each render it their own way. */
 export type TLegendSwatch =
   | { kind: ELegendSwatch.LINE; color: string; dash?: string | undefined }
   | { kind: ELegendSwatch.BAR | ELegendSwatch.PERHUMID; color: string }
-  | { kind: ELegendSwatch.MARKER; color: string; shape: TLegendMarkerShape }
+  | { kind: ELegendSwatch.MARKER; color: string; shape: TSeriesShape }
+  | {
+      kind: ELegendSwatch.ENTITY;
+      /** the shape's graphite */
+      color: string;
+      shape: TSeriesShape;
+      hatch: TSeriesHatch;
+      /** the hatch's base: the humid fill */
+      fill: string;
+      /** the hatch itself: the card's surface */
+      hatchColor: string;
+    }
   | { kind: ELegendSwatch.HUMID | ELegendSwatch.ARID; color: string }
-  | { kind: ELegendSwatch.FROST; color: string; outline: string }
-  | { kind: ELegendSwatch.PAIR; a: TLegendSwatch; b: TLegendSwatch };
+  | { kind: ELegendSwatch.FROST; color: string; outline: string };
 
 export type TLegendItem = {
   key: string;
@@ -72,23 +81,25 @@ export type TWalterLiethLegendItemsArgs = {
   palette: TWalterLiethLegendPalette;
 };
 
+/** A compared entity in a legend: named by its shape (never a colour). */
 export type TLegendSeries = {
   key: string;
   label: string;
-  color: string;
-  shape?: TLegendMarkerShape;
+  shape: TSeriesShape;
+  /** an overlay of bars: the entity's hatch too */
+  hatch?: TSeriesHatch;
   isHidden?: boolean;
 };
 
 export type TWalterLiethOverlayLegendItemsArgs = {
   labels: TWalterLiethLegendLabels;
   series: readonly TLegendSeries[];
-  /** the shaded series' color; null = no hatching shown */
-  shadeColor: string | null;
-  /** the frost band's colors — shown with the shaded series' band; null without shading */
-  frost: TLegendFrostColors | null;
-  /** line-style entries are drawn in this neutral color */
-  neutral: string;
+  /** the diagram's semantic colours, as in a single diagram */
+  palette: TWalterLiethLegendPalette;
+  /** a series is hatched: the regimes and the frost band are shown */
+  isShaded: boolean;
+  /** the entities' shapes are drawn in this graphite */
+  markerColor: string;
 };
 
 export type TAridityPalette = {
@@ -100,33 +111,24 @@ export type TStandardLegendItemsArgs = {
   labels: TStandardLegendLabels;
   colors: TLegendSeriesColors;
   visible: TVisibleSeries;
-  /** arid / humid bar colors when the bars are recolored by aridity; null = not shown */
-  aridity: TAridityPalette | null;
-};
-
-export type TStandardSplitLegendItemsArgs = {
-  labels: TVariableLegendLabels;
-  colorsA: TLegendSeriesColors;
-  colorsB: TLegendSeriesColors;
-  visible: TVisibleSeries;
-  /** one panel expanded: only its colors, one swatch per variable */
-  shown?: TExpandedPanel | undefined;
-};
-
-/** Bars recolored by aridity: their colors and legend texts. */
-export type TAridityLegend = {
-  palette: TAridityPalette;
-  labels: TAridityLegendLabels;
+  /** the bars' humid / arid fills: they stand for precipitation in the legend */
+  aridity: TAridityPalette;
 };
 
 export type TSeriesLegendItemsArgs = {
-  labels: TVariableLegendLabels;
+  labels: TStandardLegendLabels;
   series: readonly TLegendSeries[];
   visible: TVisibleSeries;
-  neutral: string;
-  /** whether the chart draws a mean temperature line (weather years don't) */
+  /** the variables' semantic colours, as in a single chart */
+  colors: TLegendSeriesColors;
+  /** the bars' humid / arid fills */
+  aridity: TAridityPalette;
+  /** the entities' shapes are drawn in this graphite */
+  markerColor: string;
+  /** their hatches are knocked out in this colour: the card's surface */
+  hatchColor: string;
+  /** whether the chart draws a mean temperature line */
   hasTavg: boolean;
-  aridity: TAridityLegend | null;
 };
 
 /** Swatch box in px — derived from the legend's font size. */

@@ -1,6 +1,7 @@
 import type { ESeriesKind, ESeriesTitleSource } from "@/enums";
 import type { TMonthlyTemperature } from "../domain";
 import type { TDataState } from "./dataState.type";
+import type { TSeriesHatch, TSeriesShape } from "./seriesShape.type";
 
 /**
  * One monthly dataset a chart draws: a city, a climate period or a weather year. Every chart
@@ -14,10 +15,10 @@ export type TChartSeries = {
   label: string;
   /** the second line under the name: dataset and period (cities) or the city (periods) */
   context: string;
-  /** filled by the page from the current colour helpers: its line colour */
-  color: string;
-  /** its bar colour, a quieter step of the same hue */
-  barColor: string;
+  /** its marker shape, by its place (getSeriesShape, getPairShape): entities never differ by colour */
+  shape: TSeriesShape;
+  /** its overlay bars' hatch, by the same place (getSeriesHatch, getPairHatch) */
+  hatch: TSeriesHatch;
   data: readonly TMonthlyTemperature[];
   altitude: number | null;
   /** the weather year when the data is one year, not long-term normals */
@@ -36,6 +37,10 @@ export type TSeriesKindRule = {
   hasSeriesChips: boolean;
   /** the standard chart draws a mean temperature line */
   hasMeanLine: boolean;
-  /** the series' marker and overlay colour is its own (else the A / B identity colours) */
-  usesOwnColor: boolean;
+};
+
+/** What an entity's short label is made from: its kind and its full label. */
+export type TEntityLabelSource = {
+  kind: ESeriesKind;
+  label: string;
 };

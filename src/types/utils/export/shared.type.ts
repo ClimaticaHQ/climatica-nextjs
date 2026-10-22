@@ -29,8 +29,8 @@ export type TExportChartColors = {
   wlFrost: string;
   wlFrostOutline: string;
   /** WL overlay series identity (A green, B orange) */
-  wlSeriesA: string;
-  wlSeriesB: string;
+  /** every entity marker's graphite: entities differ by shape */
+  seriesMarker: string;
 };
 
 /** Axis placement for buildGridAndAxes — WL panels put °C / mm above the axes. */
@@ -125,6 +125,15 @@ export type TExportTableRowLabelArgs = {
   colors: TExportChartColors;
 };
 
+/** An overlay row's markers beside its unit. */
+export type TExportUnitMarkersArgs = {
+  row: TMonthlyValuesRow;
+  markers: readonly TMonthlyTableMarker[];
+  x: number;
+  cy: number;
+  hatchPrefix?: string | undefined;
+};
+
 export type TExportMonthlyValuesArgs = {
   rows: readonly TMonthlyValuesRow[];
   span: TExportPlotSpan;
@@ -134,6 +143,10 @@ export type TExportMonthlyValuesArgs = {
   colors: TExportChartColors;
   /** an overlay: each series' marker, in series order, beside the unit level with its values */
   markers?: readonly TMonthlyTableMarker[] | undefined;
+  /** an overlay's hatch patterns: the mm row shows each series' hatch beside its shape */
+  hatchPrefix?: string | undefined;
+  /** the standard overlay: each unit a section label, the rows headed by these short labels */
+  rowHeaders?: readonly string[] | undefined;
 };
 
 /** An export's monthly values rows: its series, drawn in the export palette. */

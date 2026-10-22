@@ -11,6 +11,7 @@ import type {
 } from "@/enums";
 import type { TCellSize, TDataset, TMonthFilter, TVariable } from "../domain";
 import type { TBbox } from "../hooks/heatmap.type";
+import type { TDatasetSelections } from "../stores/datasetSelectionStore.type";
 
 /** The availabilities that render a filter disabled, with an explanation. */
 export type TFilterUnavailableReason =
@@ -135,3 +136,21 @@ export type TClimatePeriodPair = Pick<
   TFilters,
   EFilterKey.CLIMATE_PERIOD_A | EFilterKey.CLIMATE_PERIOD_B
 >;
+
+export type TRestoreDatasetSelectionArgs = {
+  /** the filters after a change */
+  next: TFilters;
+  /** the dataset before it */
+  previousDataset: TDataset;
+  /** the URL's filters */
+  applied: TFilters;
+  selections: TDatasetSelections;
+};
+
+export type TRestoreFilterSources = {
+  applied: TFilters;
+  /** the filters last applied with the target dataset */
+  remembered: TFilters;
+  /** the remembered filters as the switch away left them, normalized for the other dataset */
+  leftAs: TFilters;
+};

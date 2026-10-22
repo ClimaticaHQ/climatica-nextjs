@@ -1,3 +1,4 @@
+import type { TSeriesShape } from "../../charts/seriesShape.type";
 import type { TWalterLiethLegendLabels } from "../../components/legend";
 import type {
   ECompareLayout,
@@ -38,7 +39,7 @@ export type TWalterLiethExportLayer = {
   paint: TWalterLiethLayerPaint;
   /** hatching on/off — overlay hatches only the chosen series */
   isShaded: boolean;
-  dotShape: "circle" | "square";
+  dotShape: TSeriesShape;
   /** dash pattern for the precipitation curve; solid when omitted */
   precDash?: string;
 };
@@ -115,8 +116,7 @@ export type TWeatherYearsExport = TWalterLiethYearsExport & {
 export type TWalterLiethOverlayExportEntry = {
   key: string;
   series: TWalterLiethSeries;
-  color: string;
-  shape: "circle" | "square";
+  shape: TSeriesShape;
   isShaded: boolean;
 };
 

@@ -10,6 +10,8 @@ export type TSettings = {
   autoApplyFilters: boolean;
   /** keep a picked city across the pages */
   syncCity: boolean;
+  /** navbar links carry the filters, and a dataset switch restores any page's last selection */
+  syncFilters: boolean;
   /** scroll to the results after a city is picked */
   autoScroll: boolean;
 };

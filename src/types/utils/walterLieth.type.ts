@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { EWalterLiethFrost, EWalterLiethRegime, EWalterLiethSeriesId } from "@/enums";
 import type { TPanelHeaderSlots } from "../components/chart";
+import type { TSeriesShape } from "../charts/seriesShape.type";
 
 export type TMonthAridity = {
   month: number;
@@ -52,8 +53,8 @@ export type TWalterLiethSeries = {
   months: readonly TWalterLiethMonth[];
   /** the weather year, when the series is one year of data — not long-term normals */
   singleYear?: number;
-  /** the panel marker's colour when the series has its own (a compared weather year) */
-  markerColor?: string;
+  /** a compared entity's marker shape (its panel header); a single city has none */
+  shape?: TSeriesShape;
 };
 
 /** A point in chart space: x = month position (0 = January), y = °C / scaled units. */
@@ -165,7 +166,7 @@ export type TToWalterLiethSeriesArgs = Omit<TWalterLiethSeries, "months"> & {
  */
 export type TWalterLiethIncompleteSeries = Pick<
   TWalterLiethSeries,
-  "id" | "label" | "altitude" | "singleYear" | "markerColor"
+  "id" | "label" | "altitude" | "singleYear" | "shape"
 > & {
   period?: string;
   months: null;

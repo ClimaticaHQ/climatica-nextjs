@@ -23,4 +23,6 @@ export type TBuildNavbarHrefArgs = {
   current: URLSearchParams;
   /** the target page's remembered params, if any */
   remembered: string | undefined;
+  /** the syncFilters setting: the current shared filters, or the target page's own */
+  isSyncingFilters: boolean;
 };
