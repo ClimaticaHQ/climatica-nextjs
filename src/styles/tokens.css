@@ -1,7 +1,7 @@
 /* * Design tokens: fonts, colours, radii, spacing, shadows. Colours follow the Material Design 2
    colour system and come in two layers (see docs/colors.md):
    1. primitives — M2 grey and the dark theme's neutrals, the green tonal palette (steps 50…900
-      by lightness), M2 swatches, tint sets, series tones and the heat map's ColorBrewer classes;
+      by lightness), M2 swatches, tint sets and the heat map's ColorBrewer classes;
       the only place a colour value is written;
    2. semantic tokens — roles (surface, text, primary, chart temperature…), each pointing to a
       primitive: the light theme on :root (and on [data-export-palette], for exports), the dark
@@ -110,18 +110,6 @@
   --tint-dark-indigo-20: #272f4a;
   --tint-dark-indigo-34: #414d79;
   --tint-dark-indigo-85: #c5d3ff;
-  --tint-light-pink-95: #feecee;
-  --tint-light-pink-84: #febdc6;
-  --tint-light-pink-34: #803142;
-  --tint-dark-pink-20: #46252b;
-  --tint-dark-pink-34: #733d47;
-  --tint-dark-pink-85: #ffc2ca;
-  --tint-light-deep-purple-95: #f2efff;
-  --tint-light-deep-purple-84: #d4c8fe;
-  --tint-light-deep-purple-34: #554185;
-  --tint-dark-deep-purple-20: #322b47;
-  --tint-dark-deep-purple-34: #534775;
-  --tint-dark-deep-purple-85: #d7ccff;
   --tint-light-red-95: #feecea;
   --tint-light-red-84: #ffbfb5;
   --tint-light-red-34: #81332b;
@@ -139,26 +127,6 @@
   --tint-light-crimson-81: #ebbfc7;
   --tint-dark-crimson-18: #37282b;
   --tint-dark-crimson-28: #5c373e;
-
-  /* * calm series tones: moderate chroma, so no series outshines the others — named by hue and
-     CIELAB tone: the dark theme's lines (62–73) and bars (42–52), the light theme's lines (46–50)
-     and bars (66–68) for blue, rose and purple (green and orange take their palettes' steps) */
-  --calm-green-65: #4caf8a;
-  --calm-green-47: #2e7d62;
-  --calm-orange-73: #f5a04a;
-  --calm-orange-52: #b8692a;
-  --calm-blue-68: #7fa9dc;
-  --calm-blue-64: #6f9fd8;
-  --calm-blue-50: #3b78c2;
-  --calm-blue-44: #3f6a9e;
-  --calm-rose-67: #e08aa5;
-  --calm-rose-62: #d97a95;
-  --calm-rose-48: #c2456e;
-  --calm-rose-43: #9c4a63;
-  --calm-purple-66: #ae93db;
-  --calm-purple-63: #a68bd6;
-  --calm-purple-46: #7e57c2;
-  --calm-purple-42: #6d5a96;
 
   /* * map colour scales: ColorBrewer RdYlBu (9 classes, cold → hot) and YlGnBu (4 classes,
      dry → wet) */
@@ -206,8 +174,6 @@
      bold), the logo, map shapes and markers, outlines, focus rings, icons; never under
      on-primary text — that, and smaller green text, is --color-primary's (4.5:1) */
   --color-brand: var(--green-500);
-  /* * text on a filled series colour (the mini map's active place) */
-  --color-on-series: var(--white);
   --color-logo-pale: var(--green-200);
   --color-logo-light: var(--green-300);
   --color-logo-dark: var(--green-700);
@@ -247,45 +213,18 @@
   --color-chart-temp-max: var(--red-700);
   --color-chart-temp-min: var(--blue-700);
   --color-chart-temp-avg: var(--orange-800);
-  /* * bars of arid / humid months */
+  /* * bars of arid / humid months, on every standard chart */
   --color-chart-arid: var(--orange-300);
   --color-chart-humid: var(--blue-200);
+  /* * an overlay bar's entity hatch: knocked out of the fill in the chart card's surface */
+  --color-chart-bar-hatch: var(--white);
+  /* * an overlay's other entities while one is focused: plain gray, nothing semantic shows */
+  --color-chart-context-line: var(--grey-300);
+  --color-chart-context-bar: var(--grey-200);
 
-  /* * the series, by position — a compared pair's A and B are series 1 and 2: each a line colour
-     (lines, markers, dots, identity; 3:1 on the surface) and a quieter bar colour, a lighter
-     step (a bar fill needs no 3:1: its values are in the values table and the tooltip) */
-  --color-series-1: var(--green-500);
-  --color-series-1-bar: var(--green-300);
-  --color-series-2: var(--orange-800);
-  --color-series-2-bar: var(--orange-300);
-  --color-series-3: var(--calm-blue-50);
-  --color-series-3-bar: var(--calm-blue-68);
-  --color-series-4: var(--calm-rose-48);
-  --color-series-4-bar: var(--calm-rose-67);
-  --color-series-5: var(--calm-purple-46);
-  --color-series-5-bar: var(--calm-purple-66);
-  /* * a compared weather year's badge: its series hue's tint set */
-  --color-series-1-tint-bg: var(--tint-light-green-95);
-  --color-series-1-tint-border: var(--tint-light-green-84);
-  --color-series-1-tint-text: var(--tint-light-green-34);
-  /* * the badge's dot: one step darker than the line where the line misses 3:1 on the tint */
-  --color-series-1-tint-dot: var(--green-600);
-  --color-series-2-tint-bg: var(--tint-light-orange-95);
-  --color-series-2-tint-border: var(--tint-light-orange-84);
-  --color-series-2-tint-text: var(--tint-light-orange-34);
-  --color-series-2-tint-dot: var(--orange-900);
-  --color-series-3-tint-bg: var(--tint-light-blue-95);
-  --color-series-3-tint-border: var(--tint-light-blue-84);
-  --color-series-3-tint-text: var(--tint-light-blue-34);
-  --color-series-3-tint-dot: var(--calm-blue-50);
-  --color-series-4-tint-bg: var(--tint-light-pink-95);
-  --color-series-4-tint-border: var(--tint-light-pink-84);
-  --color-series-4-tint-text: var(--tint-light-pink-34);
-  --color-series-4-tint-dot: var(--calm-rose-48);
-  --color-series-5-tint-bg: var(--tint-light-deep-purple-95);
-  --color-series-5-tint-border: var(--tint-light-deep-purple-84);
-  --color-series-5-tint-text: var(--tint-light-deep-purple-34);
-  --color-series-5-tint-dot: var(--calm-purple-46);
+  /* * a compared entity's marker (its shape: curve points, table heads, chips, the map):
+     graphite, one for every entity — charts never tell entities apart by colour */
+  --color-series-marker: var(--grey-black-60);
 
   /* * Walter-Lieth convention: red temperature, blue precipitation */
   --color-wl-temp: var(--red-700);
@@ -383,7 +322,6 @@ html.dark {
   --color-primary-hover: var(--green-100);
   --color-on-primary: var(--black);
   --color-brand: var(--green-200);
-  --color-on-series: var(--black);
   --color-logo-pale: var(--green-100);
   --color-logo-light: var(--green-300);
   --color-logo-dark: var(--green-500);
@@ -417,39 +355,11 @@ html.dark {
   --color-chart-temp-avg: var(--orange-300);
   --color-chart-arid: var(--orange-800);
   --color-chart-humid: var(--blue-800);
+  --color-chart-bar-hatch: var(--dark-grey-6);
+  --color-chart-context-line: var(--dark-grey-46);
+  --color-chart-context-bar: var(--dark-grey-18);
 
-  /* * lines a calm, lighter tone — never pastel, so they don't glow on #121212; bars a darker,
-     less saturated one, receding behind them */
-  --color-series-1: var(--calm-green-65);
-  --color-series-1-bar: var(--calm-green-47);
-  --color-series-2: var(--calm-orange-73);
-  --color-series-2-bar: var(--calm-orange-52);
-  --color-series-3: var(--calm-blue-64);
-  --color-series-3-bar: var(--calm-blue-44);
-  --color-series-4: var(--calm-rose-62);
-  --color-series-4-bar: var(--calm-rose-43);
-  --color-series-5: var(--calm-purple-63);
-  --color-series-5-bar: var(--calm-purple-42);
-  --color-series-1-tint-bg: var(--tint-dark-green-20);
-  --color-series-1-tint-border: var(--tint-dark-green-34);
-  --color-series-1-tint-text: var(--tint-dark-green-85);
-  --color-series-1-tint-dot: var(--calm-green-65);
-  --color-series-2-tint-bg: var(--tint-dark-orange-20);
-  --color-series-2-tint-border: var(--tint-dark-orange-34);
-  --color-series-2-tint-text: var(--tint-dark-orange-85);
-  --color-series-2-tint-dot: var(--calm-orange-73);
-  --color-series-3-tint-bg: var(--tint-dark-blue-20);
-  --color-series-3-tint-border: var(--tint-dark-blue-34);
-  --color-series-3-tint-text: var(--tint-dark-blue-85);
-  --color-series-3-tint-dot: var(--calm-blue-64);
-  --color-series-4-tint-bg: var(--tint-dark-pink-20);
-  --color-series-4-tint-border: var(--tint-dark-pink-34);
-  --color-series-4-tint-text: var(--tint-dark-pink-85);
-  --color-series-4-tint-dot: var(--calm-rose-62);
-  --color-series-5-tint-bg: var(--tint-dark-deep-purple-20);
-  --color-series-5-tint-border: var(--tint-dark-deep-purple-34);
-  --color-series-5-tint-text: var(--tint-dark-deep-purple-85);
-  --color-series-5-tint-dot: var(--calm-purple-63);
+  --color-series-marker: var(--dark-grey-66);
 
   --color-wl-temp: var(--red-300);
   --color-wl-prec: var(--blue-300);
