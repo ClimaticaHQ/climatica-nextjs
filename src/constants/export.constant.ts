@@ -41,6 +41,12 @@ export const COMPARE_EXPORT_SVG_LAYOUT = {
   statsY: 92,
   statsHeaderRowHeight: 32,
   statsRowHeight: 26,
+  // * the overlay's hatch patterns' id prefix
+  hatchPrefix: "cmp-hatch",
+  statsHeaderFontSize: 13,
+  // * a stats column head's shape, before its name
+  statsMarkerSize: 8,
+  statsMarkerGap: 8,
   // * where the chart body starts under the stats table (overlay, weather years); each body
   // * (WL or standard, split or overlay) sets its own height
   chartTop: 310,
@@ -128,6 +134,8 @@ export const EXPORT_MONTHLY_VALUES = {
   // * an overlay's markers beside the unit: the unit ends this far left of the gutter's centre,
   // * the markers start this far right of it
   UNIT_MARKER_GAP: 2,
+  // * the standard overlay's table: a section label (the unit, in the unit's type) over each row
+  SECTIONS: { PADDING_X: 6, HEIGHT: 14, BASELINE: 11 },
   // * a line's baseline below its centre
   BASELINE: 4,
 } as const;
@@ -156,6 +164,8 @@ export const EXPORT_COMPARISON_TABLE = {
 
 // * the exports' monthly table: the city page's two rows, or a row per variable and series
 export const EXPORT_MONTHLY_TABLE = {
+  // * the table's own hatch patterns' id prefix: it's drawn under charts that define none
+  HATCH_PREFIX: "tbl-hatch",
   ROW_HEIGHT: 26,
   // * px — the label column: variable only (one series), or variable — series (compare)
   LABEL_WIDTH: { SINGLE: 110, MULTI: 250 },

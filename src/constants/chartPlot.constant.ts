@@ -26,6 +26,45 @@ export const CHART_X_AXIS = {
 // * a hovered month: the chart's band and the monthly values table's column, the same token
 export const CHART_HOVER_COLOR = "var(--color-state-hover)";
 
+/**
+ * Precipitation bars on every standard chart: filled by the month's aridity for their own entity
+ * — humid blue, arid amber — never by the entity. In the overlay each entity's hatch is knocked
+ * out of that fill (SERIES_HATCHES; docs/colors.md).
+ */
+export const PRECIP_BAR = {
+  HUMID: "var(--color-chart-humid)",
+  ARID: "var(--color-chart-arid)",
+} as const;
+
+/**
+ * The overlay's bars (px): the visible entities' bars fill GROUP_SHARE of each month's band,
+ * 1 px apart, each at most MAX_WIDTH (still read as separate bars) and never under MIN_WIDTH
+ * (each hatch still told apart, as in the export) — fewer entities, wider bars. Under the share,
+ * the gap between groups gives way down to MIN_GROUP_GAP before the plot scrolls.
+ */
+export const OVERLAY_BARS = {
+  // * between two bars of one month
+  GAP: 1,
+  MAX_WIDTH: 28,
+  MIN_WIDTH: 8,
+  // * the bars' share of a month's band while there's room; the rest is the gap between groups
+  GROUP_SHARE: 0.7,
+  MIN_GROUP_GAP: 4,
+  // * an overflow this small (subpixel layout) still counts as fitting
+  FIT_TOLERANCE: 1,
+} as const;
+
+// * the overlay's hover: a curve's invisible hit area (px wide), its curves' strokes — the
+// * focused entity's thicker, the others' (its context) thin
+export const OVERLAY_FOCUS = {
+  HIT_WIDTH: 14,
+  STROKE_WIDTH: 2,
+  FOCUSED_STROKE_WIDTH: 3,
+  CONTEXT_STROKE_WIDTH: 1.25,
+  // * a hit area's series name: the tooltip leaves these out
+  HIT_NAME_PREFIX: "hit:",
+} as const;
+
 // * an overlay with one series highlighted (a year chip hovered or focused): the others fade
 export const OVERLAY_DIM_OPACITY = 0.18;
 
@@ -36,3 +75,13 @@ export const DEFAULT_VISIBLE_SERIES: TVisibleSeries = {
   tavg: false,
   prec: true,
 };
+
+/**
+ * One entity focused in an overlay (its chip, a curve or a bar hovered): the others are its
+ * context — plain gray, thin curves without points, bars without hatch, muted table values.
+ */
+export const FOCUS_CONTEXT = {
+  LINE: "var(--color-chart-context-line)",
+  BAR: "var(--color-chart-context-bar)",
+  TEXT: "var(--color-text-secondary)",
+} as const;

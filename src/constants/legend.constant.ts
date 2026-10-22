@@ -8,10 +8,10 @@ export const CHART_LEGEND = {
   // * a bar is drawn narrower than the box, like a chart's precipitation bar
   BAR_WIDTH_RATIO: 0.6,
   LINE_WIDTH: 2,
-  // * WL overlay markers: radius as a share of the swatch height
+  // * an entity's marker: its half-size as a share of the swatch height
   MARKER_RADIUS_RATIO: 0.35,
-  // * a series A|B pair: the gap between the two halves, px
-  PAIR_GAP: 2,
+  // * an overlay entity's swatch: its hatch square, this gap (px), its shape square
+  ENTITY_GAP: 3,
   MUTED_OPACITY: 0.35,
   // * the gap between the plot area (or the split panels) and the legend — the same everywhere
   GAP_CLASS: "mt-4",

@@ -156,7 +156,6 @@ export const WALTER_LIETH_COMPARISON = {
   DEFAULT_SHADING: EWalterLiethShading.A,
   // * the shaded series' solid >100 mm region, translucent so the other series stays visible
   OVERLAY_PERHUMID_OPACITY: 0.3,
-  DOT_SHAPE: { [EWalterLiethSeriesId.A]: "circle", [EWalterLiethSeriesId.B]: "square" },
   // * which series each shading option hatches
   SHADED_SERIES: {
     [EWalterLiethShading.A]: EWalterLiethSeriesId.A,

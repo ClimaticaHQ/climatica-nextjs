@@ -211,6 +211,9 @@ export const FILTER_UNAVAILABLE_LAYOUTS: TFilterUnavailableLayouts = {
 };
 
 // * the view whose sections a page without filters (home, not found) shows
+// * the dataset selection's scope while filters are synced: one for every page
+export const DATASET_SELECTION_SHARED_SCOPE = "allPages";
+
 export const FILTER_FALLBACK_VIEW = EFilterView.CLIMATE_STATISTICS;
 
 // * the heat map can't load more cells than this: Apply (and auto-apply) is blocked above it,

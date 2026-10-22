@@ -9,6 +9,7 @@ export const SETTINGS_DEFAULTS: TSettings = {
   updateFlashVariant: DEFAULT_UPDATE_FLASH_VARIANT,
   autoApplyFilters: true,
   syncCity: true,
+  syncFilters: true,
   autoScroll: false,
 };
 

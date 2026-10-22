@@ -45,4 +45,4 @@ export * from "./breakpoint.constant";
 export * from "./apiError.constant";
 export * from "./citySlot.constant";
 export * from "./series.constant";
-export * from "./seriesColor.constant";
+export * from "./seriesShape.constant";
