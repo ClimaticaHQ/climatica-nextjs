@@ -1,26 +1,18 @@
 import { FOCUS_RING_CLASS } from "@/constants";
 
-// * a toggle chip's tint tone (a compared year's tint set), set as custom properties on the chip;
-// * without one, its active, locked and hover states fall back to the active chip's tokens
-export const CHIP_TONE_VARS = {
-  BG: "--chip-tone-bg",
-  BORDER: "--chip-tone-border",
-  TEXT: "--chip-tone-text",
-} as const;
-
-const TONE_BG = "bg-[var(--chip-tone-bg,var(--color-chip-active-bg))]";
-const TONE_BORDER = "border-[var(--chip-tone-border,var(--color-chip-active-border))]";
-const TONE_TEXT = "text-[var(--chip-tone-text,var(--color-chip-active-text))]";
+const ACTIVE_BG = "bg-[var(--color-chip-active-bg)]";
+const ACTIVE_BORDER = "border-[var(--color-chip-active-border)]";
+const ACTIVE_TEXT = "text-[var(--color-chip-active-text)]";
 
 export const TOGGLE_CHIP_CLASSES = {
   BASE: `${FOCUS_RING_CLASS} whitespace-nowrap rounded-full border px-2.5 py-1 text-sm font-medium transition-colors duration-150`,
   DISABLED:
     "cursor-not-allowed border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] opacity-35",
-  LOCKED: `cursor-not-allowed ${TONE_BORDER} ${TONE_BG} ${TONE_TEXT}`,
-  ACTIVE: `cursor-pointer ${TONE_BORDER} ${TONE_BG} ${TONE_TEXT}`,
+  LOCKED: `cursor-not-allowed ${ACTIVE_BORDER} ${ACTIVE_BG} ${ACTIVE_TEXT}`,
+  ACTIVE: `cursor-pointer ${ACTIVE_BORDER} ${ACTIVE_BG} ${ACTIVE_TEXT}`,
   // * the hover classes written out whole: Tailwind only generates classes it finds as text
-  IDLE: "cursor-pointer border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[var(--chip-tone-border,var(--color-chip-active-border))] hover:text-[var(--chip-tone-text,var(--color-chip-active-text))]",
-  LABEL_WITH_DOT: "inline-flex items-center gap-1.5",
+  IDLE: "cursor-pointer border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-chip-active-border)] hover:text-[var(--color-chip-active-text)]",
+  LABEL_WITH_MARKER: "inline-flex items-center gap-1.5",
 } as const;
 
 // * a filter bar chip is a ≥44px-tall button (the touch target); the pill inside is what shows

@@ -1,7 +1,7 @@
 import { FORM_CONTROL_CLASSES } from "@/constants";
 import { useEffect, useId, useRef, useState } from "react";
 import { TDropdownProps } from "./Dropdown.type";
-import { OptionDot } from "./OptionDot";
+import { OptionMarker } from "./OptionMarker";
 
 export default function Dropdown({
   options,
@@ -11,7 +11,6 @@ export default function Dropdown({
   "data-testid": testId,
   optionTestIdPrefix,
   ariaLabelledBy,
-  accentColor,
   isStretched = false,
 }: TDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +47,6 @@ export default function Dropdown({
         // * named by its label, then its value: "Period A 1970–2000"
         aria-labelledby={ariaLabelledBy === undefined ? undefined : `${ariaLabelledBy} ${buttonId}`}
         aria-expanded={isOpen}
-        style={accentColor === undefined ? undefined : { borderColor: accentColor }}
         className={`
           ${isStretched ? "w-full justify-between" : ""}
           flex items-center gap-2 px-3 py-1.5
@@ -59,7 +57,7 @@ export default function Dropdown({
         `}
       >
         <span className="inline-flex items-center gap-1.5">
-          {selected?.color !== undefined && <OptionDot color={selected.color} />}
+          {selected?.markerShape !== undefined && <OptionMarker shape={selected.markerShape} />}
           {selected?.label}
         </span>
         <svg
@@ -113,7 +111,7 @@ export default function Dropdown({
             <span
               className={`inline-flex items-center gap-1.5 ${option.disabled ? "opacity-40" : ""}`}
             >
-              {option.color !== undefined && <OptionDot color={option.color} />}
+              {option.markerShape !== undefined && <OptionMarker shape={option.markerShape} />}
               {option.label}
             </span>
             {option.description !== undefined && (

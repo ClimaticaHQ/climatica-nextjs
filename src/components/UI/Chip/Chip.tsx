@@ -1,11 +1,10 @@
 "use client";
 
 import { FilterIcon } from "@/components/svg";
-import { OptionDot } from "@/components/UI/Dropdown/OptionDot";
+import { OptionMarker } from "@/components/UI/Dropdown/OptionMarker";
 import { EChipVariant } from "@/enums";
 import { useTranslations } from "next-intl";
 import { BAR_CHIP_CLASSES as BAR, TOGGLE_CHIP_CLASSES as TOGGLE } from "./Chip.constant";
-import { getChipToneStyle } from "./Chip.util";
 import type {
   TAllFiltersChipProps,
   TChipProps,
@@ -28,8 +27,8 @@ function ToggleChip({
   isActive = false,
   disabled = false,
   isLocked = false,
-  dotColor,
-  tone,
+  markerShape,
+  markerHatch,
   onClick,
 }: TToggleChipProps) {
   const state = disabled
@@ -48,13 +47,12 @@ function ToggleChip({
       aria-pressed={isActive}
       aria-disabled={isLocked || undefined}
       className={`${TOGGLE.BASE} ${state}`}
-      style={tone ? getChipToneStyle(tone) : undefined}
     >
-      {dotColor === undefined ? (
+      {markerShape === undefined ? (
         label
       ) : (
-        <span className={TOGGLE.LABEL_WITH_DOT}>
-          <OptionDot color={dotColor} />
+        <span className={TOGGLE.LABEL_WITH_MARKER}>
+          <OptionMarker shape={markerShape} hatch={markerHatch} />
           {label}
         </span>
       )}

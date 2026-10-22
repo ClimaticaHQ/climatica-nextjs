@@ -1,12 +1,12 @@
 import type { EBadgeSize } from "@/enums";
-import type { TBadgeTone } from "@/types";
+import type { TBadgeTone, TSeriesShape } from "@/types";
 import type { ReactNode } from "react";
 
 export type TBadgeProps = {
   tone: TBadgeTone;
   size?: EBadgeSize;
-  /** a colour dot before the content — e.g. a compared year's series colour */
-  dotColor?: string;
+  /** an entity's shape before the content — e.g. a compared year's */
+  markerShape?: TSeriesShape;
   /** one line, cut with an ellipsis when the badge is narrower than its content */
   isTruncated?: boolean;
   /** the full text on hover — for a truncated badge */

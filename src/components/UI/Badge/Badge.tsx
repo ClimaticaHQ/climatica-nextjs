@@ -1,5 +1,5 @@
 import { EBadgeSize } from "@/enums";
-import { OptionDot } from "../Dropdown/OptionDot";
+import { OptionMarker } from "../Dropdown/OptionMarker";
 import { BADGE_CLASSES as C } from "./Badge.constant";
 import type { TBadgeProps } from "./Badge.type";
 
@@ -7,7 +7,7 @@ import type { TBadgeProps } from "./Badge.type";
 export function Badge({
   tone,
   size = EBadgeSize.MD,
-  dotColor,
+  markerShape,
   isTruncated = false,
   title,
   children,
@@ -18,7 +18,7 @@ export function Badge({
       style={{ backgroundColor: tone.bg, borderColor: tone.border, color: tone.text }}
       title={title}
     >
-      {dotColor && <OptionDot color={dotColor} />}
+      {markerShape && <OptionMarker shape={markerShape} />}
       {isTruncated ? <span className={C.TRUNCATED_CONTENT}>{children}</span> : children}
     </span>
   );

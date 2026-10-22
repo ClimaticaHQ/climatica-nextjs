@@ -1,7 +1,5 @@
 import type { EChipVariant } from "@/enums";
-import type { TBadgeTone } from "@/types";
-import type { CSSProperties } from "react";
-import type { CHIP_TONE_VARS } from "./Chip.constant";
+import type { TSeriesHatch, TSeriesShape } from "@/types";
 
 export type TToggleChipProps = {
   variant?: EChipVariant.TOGGLE;
@@ -10,17 +8,12 @@ export type TToggleChipProps = {
   disabled?: boolean;
   /** active, but can't be turned off — a not-allowed cursor, announced as disabled */
   isLocked?: boolean;
-  /** a colour dot before the label — e.g. a compared year's series colour */
-  dotColor?: string;
-  /** a tint set for its active, locked and hover states (a compared year's); the active chip's
-   * green when omitted */
-  tone?: TBadgeTone;
+  /** an entity's shape before the label — e.g. a compared year's */
+  markerShape?: TSeriesShape;
+  /** its bars' hatch beside the shape — entity chips that are the chart's legend */
+  markerHatch?: TSeriesHatch;
   onClick: () => void;
 };
-
-/** A chip's tone as its custom properties — assignable to a `style` prop. */
-export type TChipToneStyle = CSSProperties &
-  Record<(typeof CHIP_TONE_VARS)[keyof typeof CHIP_TONE_VARS], string>;
 
 export type TValueChipProps = {
   variant: EChipVariant.VALUE;

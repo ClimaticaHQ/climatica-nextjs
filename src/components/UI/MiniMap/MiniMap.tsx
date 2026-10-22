@@ -1,17 +1,20 @@
 "use client";
 
-import type { CircleMarker as LCircleMarker, Map as LMap } from "leaflet";
+import type { Map as LMap, Marker as LMarker } from "leaflet";
 import { Card } from "@/components/Card";
 import { ECardPadding } from "@/enums";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
+import { OptionMarker } from "@/components/UI/Dropdown/OptionMarker";
+import { MINI_MAP_TOGGLE_CLASSES as T } from "./MiniMap.constant";
 import type { TMiniMapLocation, TMiniMapProps } from "./MiniMap.type";
+import { getMiniMapIcon } from "./MiniMap.util";
 
 export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LMap | null>(null);
-  const markersRef = useRef<LCircleMarker[]>([]);
+  const markersRef = useRef<LMarker[]>([]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -82,12 +85,10 @@ export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
     markersRef.current = [];
 
     markersRef.current = locations.map((loc: TMiniMapLocation, i: number) =>
-      L.circleMarker([loc.lat, loc.lng], {
-        radius: activeIndex === i ? 10 : 7,
-        color: loc.color,
-        fillColor: loc.color,
-        fillOpacity: 0.9,
-        weight: 2,
+      L.marker([loc.lat, loc.lng], {
+        icon: getMiniMapIcon(loc.shape, activeIndex === i),
+        keyboard: false,
+        interactive: false,
       }).addTo(map),
     );
 
@@ -118,13 +119,9 @@ export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
                   key={loc.label}
                   type="button"
                   onClick={() => onToggle?.(i)}
-                  className={`rounded-full px-3 py-1 text-[length:var(--font-xs)] font-medium transition-colors duration-150 ${
-                    activeIndex === i
-                      ? "text-[var(--color-on-series)]"
-                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
-                  }`}
-                  style={activeIndex === i ? { backgroundColor: loc.color } : undefined}
+                  className={`${T.BUTTON} ${activeIndex === i ? T.ACTIVE : T.IDLE}`}
                 >
+                  {loc.shape && <OptionMarker shape={loc.shape} />}
                   {loc.label}
                 </button>
               ))}
