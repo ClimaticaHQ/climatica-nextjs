@@ -4,8 +4,10 @@ export enum ELegendSwatch {
   LINE = "line",
   /** a precipitation bar */
   BAR = "bar",
-  /** a series' marker shape (WL overlay: circle A, square B) */
+  /** an entity's marker shape (its curves' points) */
   MARKER = "marker",
+  /** an overlay entity: its bars' hatch beside its curves' shape */
+  ENTITY = "entity",
   /** WL humid period: vertical hatching */
   HUMID = "humid",
   /** WL arid period: dots */
@@ -14,6 +16,4 @@ export enum ELegendSwatch {
   PERHUMID = "perhumid",
   /** WL frost band: a filled, outlined cell like the band's own */
   FROST = "frost",
-  /** two swatches side by side — one entry serving series A and B (standard split) */
-  PAIR = "pair",
 }
