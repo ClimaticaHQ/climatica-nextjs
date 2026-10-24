@@ -85,7 +85,7 @@ export function Topbar() {
           className="flex flex-1 items-center gap-2.5 text-[var(--color-brand)] hover:opacity-80 transition-opacity duration-150"
         >
           <ClimaticaLogo className="h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 shrink-0" />
-          <span className="text-[length:var(--font-sm)] md:text-[length:var(--font-md)] lg:text-[length:var(--font-lg)] font-semibold tracking-wide leading-none">
+          <span className="text-[length:var(--font-md)] lg:text-[length:var(--font-lg)] font-semibold tracking-wide leading-none">
             {GLOBAL_CONFIG.appName}
           </span>
         </Link>
