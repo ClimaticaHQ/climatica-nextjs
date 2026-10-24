@@ -1,4 +1,5 @@
 import type { ETheme, EUpdateFlashVariant } from "@/enums";
+import type { TBarStyle } from "../charts/overlayChart.type";
 import type { TKeyValueStorage } from "../utils/persistedStore.type";
 
 /** Every user setting but the language (a cookie the server reads). */
@@ -14,6 +15,8 @@ export type TSettings = {
   syncFilters: boolean;
   /** scroll to the results after a city is picked */
   autoScroll: boolean;
+  /** how a comparison overlay's bars tell its cities or periods apart */
+  chartBarStyle: TBarStyle;
 };
 
 export type TSettingsState = TSettings & {

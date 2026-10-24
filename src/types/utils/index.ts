@@ -14,3 +14,4 @@ export type * from "./persistedStore.type";
 export type * from "./splitPanels.type";
 export type * from "./numberFormat.type";
 export type * from "./pair.type";
+export type * from "./radioGroup.type";

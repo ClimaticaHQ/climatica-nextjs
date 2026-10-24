@@ -69,4 +69,6 @@ export type TUnitTitlePlacementArgs = {
   chartWidth: number;
   /** one panel of a split pair — the compact margins */
   isCompact: boolean;
+  /** a phone: the narrow axes */
+  isNarrow?: boolean;
 };

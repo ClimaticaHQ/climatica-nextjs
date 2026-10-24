@@ -6,6 +6,7 @@ import type {
   TMonthlyTableLabels,
   TMonthlyTemperatureWithAvg,
   TAridityLegendLabels,
+  TBarStyle,
   TLineDash,
   TSeriesKey,
   TSeriesShape,
@@ -28,6 +29,8 @@ export type TCompareExportSeries = {
   shape: TSeriesShape;
   /** its overlay bars' hatch */
   hatch: TSeriesHatch;
+  /** its place among the compared series, as on screen: with shades, its bars' step */
+  place: number;
 };
 
 export type TCompareExportStatsRow = {
@@ -67,6 +70,8 @@ export type TCompareExportPayload = {
   labels: TCompareExportLabels;
   /** whether the chart draws a mean temperature line */
   showTavgLine: boolean;
+  /** the standard overlay's bars, legend and table: EXPORT_BAR_STYLE from the page */
+  barStyle: TBarStyle;
   datasetAttribution: TDatasetAttribution | null;
   shareUrl: string;
   /** two-series comparisons: WL panels or standard split panels replace the standard body */
@@ -95,7 +100,9 @@ export type TOverlayValuesArgs = {
 export type TGroupedBarsArgs = {
   /** a split panel draws one series' bars; the overlay every series' */
   seriesList?: readonly TCompareExportSeries[];
-  /** the overlay: the hatch patterns' id prefix — each bar gets its series' hatch */
+  /** the overlay: its bar style — the bars' gap, fills and hatch */
+  barStyle?: TBarStyle;
+  /** the overlay's hatch patterns' id prefix: with the hatch style, each bar its series' hatch */
   hatchPrefix?: string;
 };
 

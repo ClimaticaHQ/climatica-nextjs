@@ -8,6 +8,8 @@ export type TMonthlyTableMarker = {
   color: string;
   /** its bars' hatch — shown in the values table's mm row */
   hatch?: TSeriesHatch;
+  /** its bars' own fill under the hatch; absent: the humid fill */
+  fill?: string;
 };
 
 /** One series of the monthly table — the only one on a city page, two or more on compare. */

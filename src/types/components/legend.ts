@@ -88,6 +88,8 @@ export type TLegendSeries = {
   shape: TSeriesShape;
   /** an overlay of bars: the entity's hatch too */
   hatch?: TSeriesHatch;
+  /** its bars' own fill under the hatch; absent: the humid fill */
+  fill?: string;
   isHidden?: boolean;
 };
 
