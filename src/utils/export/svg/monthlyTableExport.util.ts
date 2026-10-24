@@ -5,18 +5,17 @@ import type {
   TExportTableRowLabelArgs,
   TMonthlyTableMarker,
 } from "@/types";
-import { escapeXml, getMonthlyTableRowLabel } from "@/utils";
+import { escapeXml, getMarkerPath, getMonthlyTableRowLabel } from "@/utils";
+import { buildHatchPatternDefs, buildHatchSwatch } from "./hatchExport.util";
 import { measureExportText, truncateToWidth } from "./textWrap.util";
 
 const line = (x1: number, y1: number, x2: number, y2: number, colors: TExportChartColors) =>
   `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colors.border}" stroke-width="1" />`;
 
-/** A row's series marker — circle or square in its color, like the screen table's. */
+/** A row's series marker — its shape in graphite, like the screen table's. */
 export function buildMarker({ shape, color }: TMonthlyTableMarker, x: number, cy: number) {
-  const half = M.MARKER_SIZE / 2;
-  return shape === "square"
-    ? `<rect x="${x}" y="${cy - half}" width="${M.MARKER_SIZE}" height="${M.MARKER_SIZE}" rx="1" fill="${color}" />`
-    : `<circle cx="${x + half}" cy="${cy}" r="${half}" fill="${color}" />`;
+  const d = getMarkerPath({ shape, cx: x + M.MARKER_SIZE / 2, cy, size: M.MARKER_SIZE });
+  return `<path d="${d}" fill="${color}" />`;
 }
 
 /**
@@ -69,8 +68,19 @@ export function buildMonthlyTableSvg({
   const body = rows
     .map((row, r) => {
       const cy = rowMid(r + 1);
-      const markerX = left + M.LABEL_PADDING_X;
+      // * a precipitation row: the series' bar hatch before its shape, as on screen
+      const hatch = row.variable === "prec" ? row.marker?.hatch : undefined;
+      const hatchX = left + M.LABEL_PADDING_X;
+      const markerX = hatch ? hatchX + M.MARKER_SIZE + M.MARKER_GAP : hatchX;
       const textX = row.marker ? markerX + M.MARKER_SIZE + M.MARKER_GAP : markerX;
+      const swatch = hatch
+        ? buildHatchSwatch(
+            M.HATCH_PREFIX,
+            hatch,
+            `x="${hatchX}" y="${cy - M.MARKER_SIZE / 2}" width="${M.MARKER_SIZE}" height="${M.MARKER_SIZE}"`,
+            row.marker?.fill,
+          )
+        : "";
       const label = buildRowLabel({
         row,
         maxWidth: left + labelWidth - M.LABEL_PADDING_X - textX,
@@ -82,9 +92,11 @@ export function buildMonthlyTableSvg({
             `<text x="${colX(i) + colWidth / 2}" y="${cy + M.VALUE_BASELINE}" text-anchor="middle" font-size="${M.VALUE_FONT_SIZE}" font-weight="${M.VALUE_FONT_WEIGHT}" fill="${colors.text}">${escapeXml(value)}</text>`,
         )
         .join("");
-      return `${row.marker ? buildMarker(row.marker, markerX, cy) : ""}<text x="${textX}" y="${cy + M.LABEL_BASELINE}" font-size="${M.LABEL_FONT_SIZE}" fill="${colors.textSecondary}">${label}</text>${values}`;
+      return `${swatch}${row.marker ? buildMarker(row.marker, markerX, cy) : ""}<text x="${textX}" y="${cy + M.LABEL_BASELINE}" font-size="${M.LABEL_FONT_SIZE}" fill="${colors.textSecondary}">${label}</text>${values}`;
     })
     .join("");
 
-  return { svg: grid + header + body, bottom: top + height };
+  const hasHatches = rows.some((row) => row.variable === "prec" && row.marker?.hatch);
+  const defs = hasHatches ? `<defs>${buildHatchPatternDefs(M.HATCH_PREFIX, colors.bg)}</defs>` : "";
+  return { svg: defs + grid + header + body, bottom: top + height };
 }

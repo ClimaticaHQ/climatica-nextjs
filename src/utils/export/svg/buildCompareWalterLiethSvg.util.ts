@@ -3,7 +3,6 @@ import {
   COMPARE_WL_EXPORT_LAYOUT as W,
   EXPORT_LEGEND,
   WALTER_LIETH_EXPORT_TEXT as T,
-  WALTER_LIETH_COMPARISON,
   WALTER_LIETH_DASH,
 } from "@/constants";
 import { ECompareLayout } from "@/enums";
@@ -34,7 +33,7 @@ import {
   buildPanelGrid,
   getExportPanels,
   patternIdsOf,
-  seriesColor,
+  seriesShape,
 } from "./splitPanelExport.util";
 import { buildExportLegend, getWalterLiethExportPalette } from "./legendExport.util";
 import {
@@ -66,7 +65,7 @@ function renderWalterLiethPlot(
               patternIds: patternIdsOf(`wl-cmp-${series.id}`),
               paint: getConventionExportPaint(colors),
               isShaded: true,
-              dotShape: WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
+              dotShape: seriesShape(series),
             },
           ],
           domain,
@@ -94,9 +93,7 @@ function buildSplit(
     valuesRows: (series) =>
       isCompleteSeries(series)
         ? buildExportValuesRows({
-            series: [
-              { key: series.id, label: series.label, color: colors.text, data: series.months },
-            ],
+            series: [{ key: series.id, label: series.label, data: series.months }],
             colors,
             locale: wl.labels.locale,
           })
@@ -125,7 +122,8 @@ function buildSplit(
 
 /**
  * One WL overlay diagram of any number of series — Climate A / B, or the shown weather years —
- * as on screen: colour = series, hatching only for the shaded one, their values table below.
+ * as on screen: semantic colours, shape = series, hatching only for the shaded one, their values
+ * table below.
  */
 export function buildWalterLiethOverlay({
   entries,
@@ -136,10 +134,10 @@ export function buildWalterLiethOverlay({
   labels,
 }: TWalterLiethOverlayExportArgs): TCompareWalterLiethBody {
   const layers = orderShadedFirst(
-    entries.map(({ key, series, color, shape, isShaded }) => ({
+    entries.map(({ key, series, shape, isShaded }) => ({
       months: series.months,
       patternIds: patternIdsOf(`wl-ovl-${key}`),
-      paint: getOverlayPaint(color),
+      paint: getOverlayPaint(getConventionExportPaint(colors)),
       isShaded,
       dotShape: shape,
       precDash: WALTER_LIETH_DASH.OVERLAY_PREC,
@@ -155,16 +153,11 @@ export function buildWalterLiethOverlay({
   // * the values table: every series, one above the other
   const table = buildMonthlyValuesSvg({
     rows: buildExportValuesRows({
-      series: entries.map(({ key, series, color }) => ({
-        key,
-        label: series.label,
-        color,
-        data: series.months,
-      })),
+      series: entries.map(({ key, series }) => ({ key, label: series.label, data: series.months })),
       colors,
       locale: labels.locale,
     }),
-    markers: entries.map(({ shape, color }) => ({ shape, color })),
+    markers: entries.map(({ shape }) => ({ shape, color: colors.seriesMarker })),
     span: box,
     // * the table spans the content width: its gutters are the plot margins inside the padding
     gutter: W.overlayPlotMarginX - L.paddingX,
@@ -187,15 +180,10 @@ export function buildWalterLiethOverlay({
     items: getWalterLiethOverlayLegendItems({
       labels,
       // * no chips in an export: the legend names every series
-      series: entries.map(({ key, series, color, shape }) => ({
-        key,
-        label: series.label,
-        color,
-        shape,
-      })),
-      shadeColor: shaded ? shaded.color : null,
-      frost: shaded ? { fill: colors.wlFrost, outline: colors.wlFrostOutline } : null,
-      neutral: colors.textSecondary,
+      series: entries.map(({ key, series, shape }) => ({ key, label: series.label, shape })),
+      palette: getWalterLiethExportPalette(colors),
+      isShaded: shaded !== undefined,
+      markerColor: colors.seriesMarker,
     }),
     y: legendY,
     left: contentLeft,
@@ -228,8 +216,7 @@ export function buildCompareWalterLiethBody(
         entries: pair.map((series) => ({
           key: series.id,
           series,
-          color: seriesColor(series, colors),
-          shape: WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
+          shape: seriesShape(series),
           isShaded: isShadedSeries(series.id, wl.shading),
         })),
         domain,
@@ -257,7 +244,7 @@ function renderYearPlot(
               patternIds: patternIdsOf(prefix),
               paint: getConventionExportPaint(colors),
               isShaded: true,
-              dotShape: WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
+              dotShape: seriesShape(series),
             },
           ],
           domain,
@@ -289,9 +276,7 @@ export function buildWalterLiethYearsBody(
     valuesRows: (series) =>
       isCompleteSeries(series)
         ? buildExportValuesRows({
-            series: [
-              { key: series.label, label: series.label, color: colors.text, data: series.months },
-            ],
+            series: [{ key: series.label, label: series.label, data: series.months }],
             colors,
             locale: years.labels.locale,
           })
@@ -336,8 +321,7 @@ export function buildWeatherYearsWalterLiethBody(
     entries: drawn.filter(isCompleteSeries).map((series) => ({
       key: series.label,
       series,
-      color: series.markerColor ?? colors.text,
-      shape: "circle",
+      shape: seriesShape(series),
       // * as on screen: no hatching with several years
       isShaded: false,
     })),

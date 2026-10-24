@@ -390,7 +390,6 @@ function buildValuesTable(
         {
           key: "single",
           label: payload.location.cityName,
-          color: colors.text,
           data: payload.monthlyData,
         },
       ],

@@ -1,17 +1,21 @@
-import { EXPORT_MONTHLY_VALUES as V } from "@/constants";
+import { EXPORT_MONTHLY_TABLE as M, EXPORT_MONTHLY_VALUES as V } from "@/constants";
 import type {
   TExportChartColors,
   TExportMonthlyValuesArgs,
+  TExportUnitMarkersArgs,
   TExportValuesRowsArgs,
   TMonthlyValuesRow,
 } from "@/types";
-import { buildMonthlyValuesRows, escapeXml, getSeriesTextColor } from "@/utils";
+import { buildMonthlyValuesRows, escapeXml } from "@/utils";
+import { buildHatchSwatch } from "./hatchExport.util";
 import { buildMarker } from "./monthlyTableExport.util";
+import { truncateToWidth } from "./textWrap.util";
 
-/** The export's unit colors — the WL red and blue, as on screen. */
+/** The export's unit colors — the WL red and blue, as on screen — and the values' text colour. */
 export const getValuesExportPalette = (colors: TExportChartColors) => ({
   temp: colors.wlTemp,
   prec: colors.wlPrec,
+  text: colors.text,
 });
 
 /** The export's rows for these series, every value in the text colour, as on screen. */
@@ -21,10 +25,7 @@ export const buildExportValuesRows = ({
   locale,
 }: TExportValuesRowsArgs): TMonthlyValuesRow[] =>
   buildMonthlyValuesRows({
-    series: series.map((entry) => ({
-      ...entry,
-      color: getSeriesTextColor({ color: entry.color, isLargeText: false, textColor: colors.text }),
-    })),
+    series,
     palette: getValuesExportPalette(colors),
     // * screen-reader names only — the export draws the units
     names: { tavg: "", prec: "" },
@@ -70,7 +71,9 @@ const lineCentre = (cy: number, line: number, lines: number) =>
 /**
  * String twin of MonthlyValuesTable: a framed two-row table under a plot — the unit in its
  * color in the left gutter (in overlay with the series' markers beside it), one column per
- * month exactly under that month of the plot, A's value above B's in overlay.
+ * month exactly under that month of the plot, A's value above B's in overlay. With row headers
+ * (the standard overlay): each unit a section label over its row, the row headed by the series'
+ * short labels — the legend holds the markings.
  */
 export function buildMonthlyValuesSvg({
   rows,
@@ -79,7 +82,10 @@ export function buildMonthlyValuesSvg({
   top,
   colors,
   markers = [],
+  hatchPrefix,
+  rowHeaders,
 }: TExportMonthlyValuesArgs) {
+  const hasSections = rowHeaders !== undefined;
   const monthCount = rows[0]?.cells.length ?? 0;
   if (monthCount === 0) return { svg: "", bottom: top };
   const monthWidth = (span.right - span.left) / monthCount;
@@ -94,21 +100,29 @@ export function buildMonthlyValuesSvg({
   let rowTop = top;
   const body = rows
     .map((row, r) => {
-      const height = rowHeight(row);
-      const cy = rowTop + height / 2;
       const divider =
         r > 0
           ? `<line x1="${left}" y1="${rowTop}" x2="${left + width}" y2="${rowTop}" stroke="${colors.border}" stroke-width="1" />`
           : "";
+      const section = hasSections
+        ? `<text x="${left + V.SECTIONS.PADDING_X}" y="${rowTop + V.SECTIONS.BASELINE}" font-size="${V.UNIT_FONT_SIZE}" font-weight="${V.UNIT_FONT_WEIGHT}" fill="${row.unitColor}">${escapeXml(row.unit)}</text>`
+        : "";
+      if (hasSections) rowTop += V.SECTIONS.HEIGHT;
+      const height = rowHeight(row);
+      const cy = rowTop + height / 2;
+      // * the unit centred in the gutter, the overlay's markers beside it; with sections each
+      // * series' short label, level with its value line
       const centre = left + gutter / 2;
       const unitX = markers.length > 0 ? centre - V.UNIT_MARKER_GAP : centre;
       const anchor = markers.length > 0 ? "end" : "middle";
-      const unit = `<text x="${unitX}" y="${cy + V.BASELINE}" text-anchor="${anchor}" font-size="${V.UNIT_FONT_SIZE}" font-weight="${V.UNIT_FONT_WEIGHT}" fill="${row.unitColor}">${escapeXml(row.unit)}</text>`;
-      const unitMarkers = markers
-        .map((marker, m) =>
-          buildMarker(marker, centre + V.UNIT_MARKER_GAP, lineCentre(cy, m, markers.length)),
-        )
-        .join("");
+      const header = rowHeaders
+        ? rowHeaders
+            .map(
+              (label, line) =>
+                `<text x="${left + V.SECTIONS.PADDING_X}" y="${lineCentre(cy, line, rowHeaders.length) + V.BASELINE}" font-size="${fontSize}" fill="${colors.text}" style="font-variant-numeric:tabular-nums">${escapeXml(truncateToWidth(label, gutter - V.SECTIONS.PADDING_X - V.UNIT_MARKER_GAP, fontSize))}</text>`,
+            )
+            .join("")
+        : `<text x="${unitX}" y="${cy + V.BASELINE}" text-anchor="${anchor}" font-size="${V.UNIT_FONT_SIZE}" font-weight="${V.UNIT_FONT_WEIGHT}" fill="${row.unitColor}">${escapeXml(row.unit)}</text>${buildUnitMarkers({ row, markers, x: centre + V.UNIT_MARKER_GAP, cy, hatchPrefix })}`;
       const values = row.cells
         .map((entries, i) =>
           entries
@@ -120,11 +134,31 @@ export function buildMonthlyValuesSvg({
         )
         .join("");
       rowTop += height;
-      return divider + unit + unitMarkers + values;
+      return divider + section + header + values;
     })
     .join("");
 
   const height = rowTop - top;
   const frame = `<rect x="${left}" y="${top}" width="${width}" height="${height}" rx="${V.RADIUS}" fill="${colors.bg}" stroke="${colors.border}" stroke-width="1" />`;
   return { svg: frame + body, bottom: rowTop };
+}
+
+/** An overlay row's markers beside its unit: the shape, the mm row's hatch before it. */
+function buildUnitMarkers({ row, markers, x, cy, hatchPrefix }: TExportUnitMarkersArgs) {
+  const withHatch = row.variable === "prec" && hatchPrefix !== undefined;
+  const hatchWidth = withHatch ? M.MARKER_SIZE + V.UNIT_MARKER_GAP : 0;
+  return markers
+    .map((marker, m) => {
+      const lineY = lineCentre(cy, m, markers.length);
+      const hatch =
+        withHatch && marker.hatch
+          ? buildHatchSwatch(
+              hatchPrefix,
+              marker.hatch,
+              `x="${x}" y="${lineY - M.MARKER_SIZE / 2}" width="${M.MARKER_SIZE}" height="${M.MARKER_SIZE}"`,
+            )
+          : "";
+      return hatch + buildMarker(marker, x + hatchWidth, lineY);
+    })
+    .join("");
 }

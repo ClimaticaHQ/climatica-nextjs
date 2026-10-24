@@ -3,25 +3,14 @@ import {
   EXPORT_COMPARISON_TABLE as C,
   WALTER_LIETH_EXPORT_TEXT as T,
 } from "@/constants";
-import { EWalterLiethSeriesId } from "@/enums";
 import type {
   TComparisonTable,
-  TExportChartColors,
   TExportComparisonTableArgs,
   TExportTableCellArgs,
   TExportTableValueArgs,
 } from "@/types";
-import { escapeXml, getSeriesTextColor } from "@/utils";
+import { escapeXml, getMarkerPath, getPairShape } from "@/utils";
 import { estimateTextWidth } from "./textWrap.util";
-
-const seriesColor = (id: EWalterLiethSeriesId, colors: TExportChartColors) =>
-  id === EWalterLiethSeriesId.A ? colors.wlSeriesA : colors.wlSeriesB;
-const valueColor = (id: EWalterLiethSeriesId, colors: TExportChartColors) =>
-  getSeriesTextColor({
-    color: seriesColor(id, colors),
-    isLargeText: false,
-    textColor: colors.text,
-  });
 
 const text = ({ x, y, value, anchor, size, weight, fill }: TExportTableCellArgs) =>
   `<text x="${x.toFixed(2)}" y="${y}" text-anchor="${anchor}" font-size="${size}"${weight ? ` font-weight="${weight}"` : ""} fill="${fill}">${escapeXml(value)}</text>`;
@@ -71,11 +60,13 @@ export function buildComparisonTableSvg({
     const nameWidth = estimateTextWidth(series.label, C.FONT_SIZE);
     const markerX = colRight(i) - nameWidth - C.MARKER_GAP - C.MARKER_SIZE;
     const half = C.MARKER_SIZE / 2;
-    const color = seriesColor(series.id, colors);
-    const marker =
-      series.id === EWalterLiethSeriesId.A
-        ? `<circle cx="${markerX + half}" cy="${y - half}" r="${half}" fill="${color}" />`
-        : `<rect x="${markerX}" y="${y - C.MARKER_SIZE}" width="${C.MARKER_SIZE}" height="${C.MARKER_SIZE}" rx="1" fill="${color}" />`;
+    const d = getMarkerPath({
+      shape: getPairShape(series.id),
+      cx: markerX + half,
+      cy: y - half,
+      size: C.MARKER_SIZE,
+    });
+    const marker = `<path d="${d}" fill="${colors.seriesMarker}" />`;
     return `${marker}${text({ x: colRight(i), y, value: series.label, anchor: "end", size: C.FONT_SIZE, weight: C.HEAD_FONT_WEIGHT, fill: colors.text })}`;
   };
   const header = [
@@ -123,7 +114,7 @@ export function buildComparisonTableSvg({
             x: colRight(0),
             y,
             weight: C.VALUE_FONT_WEIGHT,
-            fill: valueColor(table.seriesA.id, colors),
+            fill: colors.text,
           },
         }),
         buildValue({
@@ -133,7 +124,7 @@ export function buildComparisonTableSvg({
             x: colRight(1),
             y,
             weight: C.VALUE_FONT_WEIGHT,
-            fill: valueColor(table.seriesB.id, colors),
+            fill: colors.text,
           },
         }),
         row.difference !== null

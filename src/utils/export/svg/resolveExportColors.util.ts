@@ -1,5 +1,4 @@
-import { SERIES_COLOR_TOKENS, WALTER_LIETH_COLOR_VARS } from "@/constants";
-import { EWalterLiethSeriesId } from "@/enums";
+import { WALTER_LIETH_COLOR_VARS } from "@/constants";
 import type { TExportChartColors } from "@/types";
 import { readExportPalette } from "../shared/exportPalette.util";
 
@@ -22,8 +21,7 @@ const CSS_VAR_MAP: Record<keyof TExportChartColors, string> = {
   wlCompressedFill: WALTER_LIETH_COLOR_VARS.COMPRESSED_FILL,
   wlFrost: WALTER_LIETH_COLOR_VARS.FROST,
   wlFrostOutline: WALTER_LIETH_COLOR_VARS.FROST_OUTLINE,
-  wlSeriesA: SERIES_COLOR_TOKENS.PAIR[EWalterLiethSeriesId.A].line,
-  wlSeriesB: SERIES_COLOR_TOKENS.PAIR[EWalterLiethSeriesId.B].line,
+  seriesMarker: "--color-series-marker",
 };
 
 /** Resolves the export colors from the light palette — identical in light and dark mode. */
