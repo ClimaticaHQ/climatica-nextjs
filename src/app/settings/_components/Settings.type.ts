@@ -1,4 +1,4 @@
-import type { TSettings } from "@/types";
+import type { TAridityPalette, TBarStyle, TSeriesHatch, TSettings } from "@/types";
 import type { ReactNode } from "react";
 
 /** What the settings page's hook gives its view. */
@@ -47,8 +47,54 @@ export type TSettingsRowProps = {
   isDisabled?: boolean | undefined;
   /** replaces the description while disabled, in the same space — the row never changes height */
   disabledHint?: string | undefined;
+  /** a wide control: on the right from `sm`, under the label (centred) below it */
+  hasWideControl?: boolean | undefined;
   /** the control, on the right */
   children: ReactNode;
+};
+
+export type TBarStyleOption = {
+  value: TBarStyle;
+  labelKey: string;
+  descriptionKey: string;
+};
+
+/** The bar style cards: one radio group, named by its row's label. */
+export type TBarStylePickerProps = {
+  labelId: string;
+  value: TBarStyle;
+  onChange: (barStyle: TBarStyle) => void;
+};
+
+export type TBarStylePreviewProps = {
+  barStyle: TBarStyle;
+};
+
+/** A preview bar, ready for PrecipBarShape. */
+export type TBarStylePreviewBar = {
+  key: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  month: number;
+  aridityByMonth: Record<number, boolean>;
+  fills: TAridityPalette;
+  hatch: TSeriesHatch;
+};
+
+export type TBarStylePreviewCurve = {
+  variable: string;
+  d: string;
+  stroke: string;
+  dash: string | undefined;
+  points: readonly { x: number; y: number }[];
+};
+
+/** What a bar style's thumbnail draws. */
+export type TBarStylePreview = {
+  bars: readonly TBarStylePreviewBar[];
+  curves: readonly TBarStylePreviewCurve[];
 };
 
 export type TSettingsDependentRowsProps = {
