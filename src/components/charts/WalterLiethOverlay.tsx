@@ -1,7 +1,7 @@
 import { WalterLiethPlot } from "@/components/WalterLiethChart/components";
 import { useWalterLiethCharts } from "@/components/WalterLiethChart/hooks/useWalterLiethCharts";
 import { OVERLAY_DIM_OPACITY, WALTER_LIETH_DIAGRAM } from "@/constants";
-import { getFrostMonths, getSeriesTextColor, orderShadedFirst } from "@/utils";
+import { getFrostMonths, orderShadedFirst } from "@/utils";
 import type { TWalterLiethOverlayProps } from "./charts.type";
 import { toOverlayLayer } from "./charts.util";
 import { OverlayTooltip } from "./OverlayTooltip";
@@ -10,7 +10,8 @@ const { CALENDAR_MONTH_ORDER } = WALTER_LIETH_DIAGRAM;
 
 /**
  * Any number of series in one diagram on the shared domain — Climate A / B, or up to five
- * weather years. Colour = series, line style = variable; hatching only for the shaded series.
+ * weather years. Semantic colours, shape = series, line style = variable; hatching only for the
+ * shaded series.
  */
 export function WalterLiethOverlay({
   entries,
@@ -30,12 +31,10 @@ export function WalterLiethOverlay({
   const [first] = drawn;
   if (!first) return null;
 
-  const layers = orderShadedFirst(drawn).map(
-    ({ key, series, chart, isShaded, color, shape, isDimmed }) => ({
-      ...toOverlayLayer({ key, series, ...chart, isShaded, color, shape }),
-      ...(isDimmed ? { opacity: OVERLAY_DIM_OPACITY } : {}),
-    }),
-  );
+  const layers = orderShadedFirst(drawn).map(({ key, chart, isShaded, shape, isDimmed }) => ({
+    ...toOverlayLayer({ key, ...chart, isShaded, shape }),
+    ...(isDimmed ? { opacity: OVERLAY_DIM_OPACITY } : {}),
+  }));
 
   return (
     <figure
@@ -51,10 +50,9 @@ export function WalterLiethOverlay({
         frost={shaded ? getFrostMonths(shaded.series.months) : null}
         tooltip={
           <OverlayTooltip
-            entries={drawn.map(({ key, series, color, marker, chart }) => ({
+            entries={drawn.map(({ key, series, marker, chart }) => ({
               key,
               label: series.label,
-              color: getSeriesTextColor({ color, isLargeText: false }),
               marker,
               rows: chart.rows,
             }))}

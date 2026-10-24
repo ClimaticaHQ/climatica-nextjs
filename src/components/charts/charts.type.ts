@@ -9,11 +9,13 @@ import type {
 } from "@/enums";
 import type {
   TActiveMonth,
+  TOverlayFocus,
   TChartFeatures,
   TChartMode,
   TChartModel,
   TChartPageResult,
   TChartSeriesModel,
+  TEntityBarSwatch,
   TChartViewState,
   TExpandedPanel,
   TLegendItem,
@@ -34,11 +36,14 @@ import type {
   TWalterLiethDomain,
   TWalterLiethRow,
   TWalterLiethSeries,
+  TSeriesShape,
+  TSeriesHatch,
+  TAridityPalette,
+  TBarStyle,
 } from "@/types";
 import type { TSeriesMarkerProps } from "@/components/SeriesMarker/SeriesMarker.type";
 import type { ComponentType, ReactNode, RefObject } from "react";
 import type {
-  TWalterLiethDotShape,
   TWalterLiethLayerSeries,
   TWalterLiethTooltipProps,
 } from "@/components/WalterLiethChart/WalterLiethChart.type";
@@ -76,11 +81,15 @@ export type TChartBodyProps = {
   body: EChartBody;
   viewState: TChartViewState;
   features: TChartFeatures;
+  /** the bar style setting: how an overlay's bars tell its entities apart */
+  barStyle: TBarStyle;
   visible: TVisibleSeries;
   onVisibleChange: (visible: TVisibleSeries) => void;
   activeMonth: TCardActiveMonth;
   /** Recharts syncId: the card's charts hover in sync */
   syncId: string;
+  /** an entity chip hovered or focused: the overlay focuses that series; null: none */
+  highlightedId: string | null;
 };
 
 /** What a chart block is told about the chart it sits under. */
@@ -98,6 +107,8 @@ export type TChartBlockContext = {
   shadedId: string | null;
   /** split: the panel shown alone; null: both */
   shownPanel: TExpandedPanel;
+  /** the bar style setting: the standard overlay's legend swatches follow it */
+  barStyle: TBarStyle;
 };
 
 export type TChartBlockProps = {
@@ -129,12 +140,28 @@ export type TChartCardHeaderProps = {
   rule: TSeriesKindRule;
   viewState: TChartViewState;
   features: TChartFeatures;
+  /** the body the card draws: whether the chips' series draw bars of their own */
+  body: EChartBody;
+  barStyle: TBarStyle;
   visible: TVisibleSeries;
   onVisibleChange: (visible: TVisibleSeries) => void;
+  /** an entity chip hovered or focused; null: left */
+  onHighlight: (id: string | null) => void;
+};
+
+export type TChartToolbarProps = {
+  /** the entity chips; none: the controls alone, on the right */
+  chips?: ReactNode;
+  /** the view's own controls: the variable chips, or the Walter-Lieth guide */
+  controls: ReactNode;
+  /** an overlay of a shadable pair: room for the shading control over the guide */
+  isStacked: boolean;
 };
 
 export type TSeriesChipsProps = {
   entries: readonly TChartSeriesModel[];
+  /** absent: the default (plain) */
+  barStyle?: TBarStyle | undefined;
   shown: readonly string[];
   onShownChange: (shown: readonly string[]) => void;
   onHighlight: (id: string | null) => void;
@@ -143,7 +170,6 @@ export type TSeriesChipsProps = {
 export type TSidePickerProps = {
   side: EPairSide;
   entries: readonly TChartSeriesModel[];
-  rule: TSeriesKindRule;
   value: string;
   /** the other panel's series — not offered here */
   otherId: string;
@@ -178,13 +204,31 @@ export type TOverlayChartProps = TChartBodyProps & {
 export type TStandardChartEntry = {
   id: string;
   label: string;
-  palette: TStandardChartColors;
-  /** 1, or less while another series is highlighted */
-  emphasis: number;
+  /** month → arid: its bars' fills, by its own aridity */
+  aridityByMonth: Record<number, boolean> | undefined;
+  /** its bars' humid and arid fills (getOverlayBarFills); absent: the semantic ones */
+  barFills?: TAridityPalette | undefined;
+  /** its bars' hatch, knocked out of their fill */
+  hatch: TSeriesHatch;
+  /** its bars beside its shape where it's named (a bar's tooltip): getSwatchBarStyle's */
+  swatch?: TEntityBarSwatch | undefined;
   /** turned off by its chip: kept mounted (its place) but not drawn */
   isHidden: boolean;
-  /** its marker before its rows in the tooltip */
+  /** its shape: its points, its bars' markers, before its rows in the tooltip */
   marker: TSeriesMarkerProps;
+};
+
+/** The overlay tooltip's one line for a hovered curve or bar, after the entity's shape. */
+export type TTooltipFocus = {
+  text: string;
+  marker: TSeriesMarkerProps;
+};
+
+export type TUseOverlayFocusArgs = {
+  entries: readonly TStandardChartEntry[];
+  rows: readonly Record<string, unknown>[];
+  lines: readonly TStandardChartLine[];
+  activeMonthIndex: number | null;
 };
 
 /** A standard chart's tooltip: Recharts passes active, payload and label. */
@@ -198,10 +242,14 @@ export type TStandardTooltipProps = {
   markerOf?: (name: string) => TSeriesMarkerProps | undefined;
   /** a chart of one series: a row's variable swatch, as in its legend, by the row's name */
   swatchOf?: (name: string) => TLegendSwatch | undefined;
+  /** the overlay's hovered curve or bar: the tooltip names only it */
+  focus?: TTooltipFocus | null;
 };
 
 export type TStandardChartProps = {
   entries: readonly TStandardChartEntry[];
+  /** absent: the default (plain) */
+  barStyle?: TBarStyle | undefined;
   /** one row per month, each series' values under seriesDataKey */
   rows: readonly Record<string, unknown>[];
   hasMeanLine: boolean;
@@ -209,6 +257,8 @@ export type TStandardChartProps = {
   rightMax: number;
   visible: TVisibleSeries;
   selectedMonths?: number[] | undefined;
+  /** an entity chip hovered or focused: that entity is focused, the rest turn gray */
+  highlightedId: string | null;
   activeMonth: TActiveMonth;
   footer: ReactNode;
 };
@@ -222,7 +272,6 @@ export type TStandardChartLine = {
 
 /** A stats table column's look: its values' colour and its header's marker. */
 export type TStatsTableColumn = {
-  color: string;
   marker: TSeriesMarkerProps;
 };
 
@@ -256,6 +305,10 @@ export type TBarShape = {
   aridityByMonth?: Record<number, boolean> | undefined;
   /** 0-based chart index, matching recharts' activeTooltipIndex — passed via shape prop */
   activeMonthIndex?: number | null;
+  /** the overlay: the entity's hatch pattern ("url(#…)"), over the semantic fill */
+  hatchFill?: string | undefined;
+  /** the humid and arid fills by aridityByMonth; absent: the semantic ones */
+  fills?: TAridityPalette | undefined;
   yAxis?: { scale?: (v: number) => number };
 };
 
@@ -296,8 +349,6 @@ export type TVariableChipsProps = {
   /** the fetched variables; undefined = all available */
   variables?: readonly TVariable[] | undefined;
   onChange: (visible: TVisibleSeries) => void;
-  /** one line scrolling sideways, from the left — under the year chips */
-  isScrollRow?: boolean;
 };
 
 export type TUseVisibleSeriesArgs = {
@@ -313,6 +364,8 @@ export type TStandardChartAxesProps = {
   isCompact: boolean;
   /** month label format for the chart's measured width (getMonthLabelFormat) */
   monthFormat: TMonthLabelFormat;
+  /** false: °C and mm drawn elsewhere — a scrolling overlay's fixed axes (default true) */
+  shouldShowUnitTitles?: boolean;
 };
 
 export type TChartTitleNamesProps = {
@@ -341,11 +394,8 @@ export type TStandardClimateChartProps = {
   altitude?: number;
   /** the one weather year the stats describe — the Martonne cell names it */
   martonneYear?: number | undefined;
-  showAridity?: boolean;
   activeMonthIndex?: number | null;
   onActiveMonthIndexChange?: (index: number | null) => void;
-  /** line and bar colors; the single-city palette when omitted */
-  colors?: TStandardChartColors;
   /** one panel of a split pair: compact, no own legend, WL-panel axes */
   isPanel?: boolean;
   /** Recharts syncId — split panels hover in sync */
@@ -366,7 +416,6 @@ export type TStandardSplitSeries = {
   series: TWalterLiethSeriesInput;
   chartData: TMonthlyTemperatureWithAvg[];
   aridity: TMonthAridity[] | null;
-  colors: TStandardChartColors;
 };
 
 /** What both panels share: domains, visible variables, month filter, hover. */
@@ -403,8 +452,7 @@ export type TShadingControlProps = TSeriesPair & {
 export type TOverlayEntry = {
   key: string;
   series: TWalterLiethSeries;
-  color: string;
-  shape: TWalterLiethDotShape;
+  shape: TSeriesShape;
   /** hatched (humid / arid) — at most one, so the curves stay readable */
   isShaded: boolean;
   /** another entry is highlighted: this one fades */
@@ -425,22 +473,71 @@ export type TOverlayLayerArgs = Omit<
   TWalterLiethLayerSeries,
   "colors" | "precDash" | "dotShape"
 > & {
-  series: TWalterLiethSeries;
   isShaded: boolean;
-  /** the series' own colour and dot; A / B's when omitted */
-  color?: string;
-  shape?: TWalterLiethDotShape;
+  /** the entity's dots */
+  shape: TSeriesShape;
 };
 
 /** What the overlay tooltip lists for each entry. */
 export type TOverlayTooltipEntry = {
   key: string;
   label: string;
-  color: string;
   marker: TSeriesMarkerProps;
   rows: readonly TWalterLiethRow[];
 };
 
 export type TOverlayTooltipProps = TWalterLiethTooltipProps & {
   entries: readonly TOverlayTooltipEntry[];
+};
+
+export type TFixedYAxesProps = {
+  scales: TWalterLiethScales | null;
+  rightMax: number;
+  /** the plot's rows — the axes' x axis needs them to size its band like the plot's */
+  rows: readonly Record<string, unknown>[];
+};
+
+/** What both overlay layers share: the entities, the visible variables, the month state. */
+type TOverlayLayerShared = {
+  entries: readonly TStandardChartEntry[];
+  visible: TVisibleSeries;
+  selectedMonths?: number[] | undefined;
+  activeMonthIndex: number | null;
+  /** the focused entity (chip, curve or bar); the others are drawn as context */
+  focusedId: string | null;
+  onFocus: (focus: TOverlayFocus | null) => void;
+};
+
+export type TOverlayBarsProps = TOverlayLayerShared & {
+  /** hiding precipitation: the bars fade out before they unmount */
+  isHidden: boolean;
+  /** the bar style knocks each entity's hatch out of its bars */
+  hasHatch: boolean;
+  /** the hatch patterns' id prefix */
+  patternPrefix: string;
+};
+
+export type TOverlayCurvesProps = TOverlayLayerShared & {
+  lines: readonly TStandardChartLine[];
+  /** a variable being hidden: its curves fade out before they unmount */
+  hidden: Record<TStandardChartLine["variable"], boolean>;
+  /** each entity's curve offset from the month's centre, in months — its bar's centre */
+  offsets: Readonly<Record<string, number>>;
+};
+
+export type TMonthTapLayerProps = {
+  activeMonthIndex: number | null;
+  onActiveMonthIndexChange?: ((index: number | null) => void) | undefined;
+  /** each y axis' width, either side of the months (px) */
+  inset: number;
+  /** a horizontal drag scrubs the months; false: the plot scrolls sideways, taps only */
+  canScrub: boolean;
+  monthCount?: number;
+};
+
+/** A touch on a plot, from where it started. */
+export type TMonthGesture = {
+  x: number;
+  y: number;
+  isScrubbing: boolean;
 };

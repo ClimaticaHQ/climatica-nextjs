@@ -1,4 +1,4 @@
-import { CHART_LINE_DASH } from "@/constants";
+import { CHART_LINE_DASH, PRECIP_BAR, WALTER_LIETH_DIAGRAM } from "@/constants";
 import { EChartBlockPlacement, EPairSide } from "@/enums";
 import type { TStandardChartLine, TStandardChartColors } from "./charts.type";
 import type { TPanelExpansion } from "@/types";
@@ -33,6 +33,9 @@ export const BLOCK_PLACEMENTS = {
 
 // * a dot outside the hovered month or the month filter
 export const STANDARD_CHART_DIMMED_DOT_OPACITY = 0.15;
+
+// * an overlay entity's points: its shape at these sizes (px) — a month highlighted, or hovered
+export const SERIES_DOT_SIZE = { DEFAULT: 7, HIGHLIGHTED: 11, ACTIVE: 9 } as const;
 
 // * a bar outside the hovered month: dimmed, its value still readable on the light surface
 export const STANDARD_CHART_HOVER_DIMMED_BAR_OPACITY = 0.35;
@@ -101,41 +104,43 @@ export const STATS_TABLE_METRIC_COL_WIDTH = "36%";
 // * the header is its own size container: whether title and controls fit side by side
 // * depends on the card's width, not the viewport — the same card sits in different layouts.
 // * `@3xl` (48rem) fits a two-line title next to both labelled toggles
+// * the card header: the title, then the switches — beside it on a wide card, under it on a
+// * narrower one. Below `sm` (a phone) one row again: the title on the left (wrapping, never cut),
+// * the switches pushed right and top-aligned, never wrapping under it
 export const CHART_CARD_HEADER_CLASSES = {
-  CONTAINER: "@container mb-4",
-  ROW: "flex flex-col gap-3 @3xl:flex-row @3xl:items-start @3xl:justify-between",
+  CONTAINER: "@container mb-4 max-sm:mb-3",
+  ROW: "flex flex-col gap-3 @3xl:flex-row @3xl:items-start @3xl:justify-between max-sm:flex-row max-sm:items-start max-sm:justify-between",
   // * takes the remaining width and may wrap; min-w-0 lets it shrink instead of pushing the controls
   TITLE: "min-w-0 flex-1",
   // * never shrinks or wraps; under the title as one row when the card is narrow
-  CONTROLS: "flex shrink-0 flex-col items-start gap-2 @3xl:items-end",
+  CONTROLS: "flex shrink-0 flex-col items-start gap-2 @3xl:items-end max-sm:flex-row",
 } as const;
 
 // * a fixed slot under the chart card header, right-aligned: the same place and min-height in
 // * both chart types for a layout, so switching between them moves nothing. The min-height
 // * fits the tallest content — a segmented control (a 44 px touch target below `sm`), or the
 // * chips wrapped into two rows on a phone
-export const CHART_CONTROLS_ROW_CLASSES = {
-  ROW: "mb-3 flex min-h-[5.5rem] flex-wrap content-center items-center justify-end gap-2 sm:min-h-10",
-  // * overlay: WL stacks the shading control over the guide button (both 44 px touch targets
-  // * below `sm`) — the standard chart's chips get the same room
-  STACKED: "mb-3 flex min-h-24 flex-col items-end justify-center gap-1 sm:min-h-[4.5rem]",
-} as const;
-
-// * the overlay with series chips: the chips above the chart, the variable chips beside them
-export const OVERLAY_CHIPS_CLASSES = {
-  // * phones: years, then the chart's chips, each a row from the left; from `sm` both share one
-  // * row — years left, the chart's chips right, centred — and the diagram wraps below
-  ROOT: "flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center",
-  // * from `sm` the years take the row's room and scroll on one line when it runs out (1024 px
-  // * with the sidebar, five years), so the chart's chips never move
-  YEARS: "min-w-0 sm:flex-1",
-  CONTROLS: "min-w-0 sm:shrink-0",
-  DIAGRAM: "min-w-0 basis-full",
+// * the chart toolbar, one row in every view: the entity chips on the left, the view's own
+// * controls on the right (the variable chips, or the Walter-Lieth guide). From `sm` the chips
+// * give way first — scrolling sideways down to 10rem — then the controls wrap below them, still
+// * on the right; below `sm` the controls always sit below the chips. Both slots keep the
+// * controls' height in either view, so switching views moves nothing
+// * Below `sm` the row is as tall as its content in its tallest view — two rows with entity
+// * chips (ROW_WITH_CHIPS), one without — and the controls never wrap (they scroll sideways)
+export const CHART_TOOLBAR_CLASSES = {
+  ROW: "mb-3 flex min-h-11 flex-wrap content-center items-center gap-x-3 gap-y-2 max-sm:mb-2 sm:min-h-10",
+  ROW_WITH_CHIPS: "max-sm:min-h-24",
+  CHIPS: "flex min-h-11 min-w-0 basis-full items-center sm:min-h-10 sm:flex-[1_1_10rem]",
+  CONTROLS: "ml-auto flex min-h-11 max-w-full shrink-0 items-center justify-end sm:min-h-10",
+  // * an overlay of a shadable pair: WL stacks the shading control over the guide (both 44 px
+  // * touch targets below `sm`) — the standard chart's chips get the same room
+  CONTROLS_STACKED:
+    "ml-auto flex min-h-24 max-w-full shrink-0 flex-col items-end justify-center gap-1 sm:min-h-[4.5rem]",
 } as const;
 
 export const CHART_COLORS = {
-  arid: "var(--color-chart-arid)",
-  humid: "var(--color-chart-humid)",
+  arid: PRECIP_BAR.ARID,
+  humid: PRECIP_BAR.HUMID,
   single: {
     tmax: "var(--color-chart-temp-max)",
     tmin: "var(--color-chart-temp-min)",
@@ -161,20 +166,52 @@ export const STANDARD_CHART_SINGLE_COLORS: TStandardChartColors = {
   prec: CHART_COLORS.humid,
 };
 
+// * a pair's name on a phone: wrapping whole, never truncated
+const TITLE_NAME_WRAP =
+  "max-sm:overflow-visible max-sm:whitespace-normal max-sm:break-words max-sm:text-clip";
+
 export const CHART_TITLE_CLASSES = {
   EYEBROW: "text-[12px] font-medium text-[var(--color-text-secondary)]",
   HEADING:
     "font-semibold text-[length:var(--font-md)] md:text-[length:var(--font-lg)] text-[var(--color-text)]",
-  // * one location: may wrap, clamped to two lines
-  SINGLE: "line-clamp-2 break-words",
+  // * one location: may wrap, clamped to two lines — never cut on a phone
+  SINGLE: "line-clamp-2 break-words max-sm:line-clamp-none",
   // * "A vs B" on one line: each name truncates on its own; B keeps up to this share, so
-  // * "vs B" always shows even next to a very long A
-  PAIR: "flex min-w-0 items-baseline gap-1.5",
-  NAME_A: "min-w-0 truncate",
-  NAME_B: "min-w-0 max-w-[45%] shrink-0 truncate",
+  // * "vs B" always shows even next to a very long A. On a phone, beside the switches, the
+  // * names wrap instead — never cut with an ellipsis
+  PAIR: "flex min-w-0 items-baseline gap-1.5 max-sm:flex-wrap max-sm:gap-y-0",
+  NAME_A: `min-w-0 truncate ${TITLE_NAME_WRAP}`,
+  NAME_B: `min-w-0 max-w-[45%] shrink-0 truncate ${TITLE_NAME_WRAP} max-sm:max-w-full`,
   VERSUS: "shrink-0 font-normal text-[var(--color-text-secondary)]",
   SUBTITLE_ROW: "flex flex-wrap items-center gap-2",
-  SUBTITLE: "flex items-center gap-1 text-[12px] text-[var(--color-text-secondary)]",
+  // * a subtitle wrapping onto several lines keeps its icon level with the first one
+  SUBTITLE: "flex items-start gap-1 text-[12px] text-[var(--color-text-secondary)]",
+  SUBTITLE_ICON: "flex h-[1lh] shrink-0 items-center",
   MONTH_BADGE:
     "rounded-full border-[0.5px] border-[var(--color-month-badge-border)] bg-[var(--color-month-badge-bg)] px-2.5 py-0.5 text-[12px] text-[var(--color-month-badge-text)]",
+} as const;
+
+// * a scrolling overlay's fixed y axes: room beside each axis for its unit title (px), the strip
+// * of the card's surface the plot passes under
+export const FIXED_Y_AXES = {
+  TITLE_ROOM: 36,
+  FRAME: "pointer-events-none absolute inset-y-0 z-10",
+  STRIP: "absolute inset-y-0 bg-[var(--color-surface)]",
+} as const;
+
+// * an overflowing overlay: its scroller, and the hint under it
+export const OVERLAY_SCROLL_CLASSES = {
+  ROOT: "relative",
+  SCROLLER: "overflow-x-auto overscroll-x-contain",
+  HINT: "mt-1 text-center text-[length:var(--font-xs)] text-[var(--color-text-secondary)]",
+} as const;
+
+// * an overlay curve's own x axis spans the months like the plot's: January's centre is 0
+export const CURVE_X_DOMAIN = [-0.5, WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR - 0.5];
+
+// * a touch plot's tap layer, over the whole plot: pan-y lets a vertical swipe scroll the page
+// * while a horizontal drag scrubs the months; a plot scrolling sideways keeps every pan
+export const MONTH_TAP_LAYER_CLASSES = {
+  SCRUB: "absolute inset-0 z-10 touch-pan-y",
+  TAP: "absolute inset-0 z-10",
 } as const;

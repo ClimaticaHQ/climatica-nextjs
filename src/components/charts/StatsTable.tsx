@@ -57,11 +57,7 @@ export function StatsTable({ table, columns, martonneLabel, differenceMeaning }:
                       : t(COMPARISON_METRIC_LABEL_KEYS[row.metric])}
                   </th>
                   {row.values.map((value, index) => (
-                    <td
-                      key={ids[index]}
-                      className={C.VALUE_CELL}
-                      style={{ color: columns[index]?.color }}
-                    >
+                    <td key={ids[index]} className={C.VALUE_CELL}>
                       {value === null ? (
                         <div className={C.LOADING_VALUE} />
                       ) : (

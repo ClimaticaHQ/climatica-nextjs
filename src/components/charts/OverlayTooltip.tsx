@@ -15,11 +15,11 @@ export function OverlayTooltip({ active, payload, entries }: TOverlayTooltipProp
   return (
     <div className={C.FRAME}>
       <p className={C.TITLE}>{t(`months.${hovered.monthIndex + 1}`)}</p>
-      {entries.map(({ key, label, color, marker, rows }) => {
+      {entries.map(({ key, label, marker, rows }) => {
         const row = rows[hovered.position];
         if (!row) return null;
         return (
-          <div key={key} className={C.SERIES} style={{ color }}>
+          <div key={key} className={C.SERIES}>
             <p className={C.SERIES_LABEL}>
               <SeriesMarker {...marker} />
               {label}

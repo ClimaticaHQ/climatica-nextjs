@@ -13,7 +13,7 @@ export function ChartSwitches({ chartMode, layout, onLayoutChange }: TChartSwitc
   const t = useTranslations();
 
   return (
-    <div className="flex flex-wrap items-center justify-end gap-2">
+    <div className="flex flex-wrap items-center justify-end gap-2 max-sm:flex-nowrap">
       <ChartModeSwitch value={chartMode} />
       {layout !== undefined && (
         <SegmentedControl

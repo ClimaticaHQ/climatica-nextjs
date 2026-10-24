@@ -2,6 +2,7 @@ import { SegmentedControl, type TSegmentedOption } from "@/components/SegmentedC
 import { SeriesMarker } from "@/components/SeriesMarker";
 import { NoShadingIcon } from "@/components/svg";
 import { EWalterLiethShading } from "@/enums";
+import { getPairShape } from "@/utils/seriesShape.util";
 import { useTranslations } from "next-intl";
 import type { TShadingControlProps } from "./charts.type";
 
@@ -9,8 +10,16 @@ import type { TShadingControlProps } from "./charts.type";
 export function ShadingControl({ seriesA, seriesB, shading, onChange }: TShadingControlProps) {
   const t = useTranslations();
   const options: TSegmentedOption<EWalterLiethShading>[] = [
-    { value: EWalterLiethShading.A, label: seriesA.label, icon: <SeriesMarker id={seriesA.id} /> },
-    { value: EWalterLiethShading.B, label: seriesB.label, icon: <SeriesMarker id={seriesB.id} /> },
+    {
+      value: EWalterLiethShading.A,
+      label: seriesA.label,
+      icon: <SeriesMarker shape={seriesA.shape ?? getPairShape(seriesA.id)} />,
+    },
+    {
+      value: EWalterLiethShading.B,
+      label: seriesB.label,
+      icon: <SeriesMarker shape={seriesB.shape ?? getPairShape(seriesB.id)} />,
+    },
     { value: EWalterLiethShading.NONE, label: t("chart.wlShadingNone"), icon: <NoShadingIcon /> },
   ];
 

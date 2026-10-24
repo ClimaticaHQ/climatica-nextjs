@@ -15,7 +15,7 @@ import { setPairSide, swapPair } from "@/utils/pair.util";
 import { useTranslations } from "next-intl";
 import { ChartBlocks } from "./ChartBlocks";
 import type { TChartBodyProps } from "./charts.type";
-import { getBlockContext, getStandardPalette } from "./charts.util";
+import { getBlockContext } from "./charts.util";
 import { SidePicker } from "./SidePicker";
 
 /**
@@ -24,7 +24,7 @@ import { SidePicker } from "./SidePicker";
  */
 export function SplitBody(props: TChartBodyProps) {
   const t = useTranslations();
-  const { model, rule, viewState, features, visible, activeMonth, syncId } = props;
+  const { model, viewState, features, visible, activeMonth, syncId } = props;
   const pair = getSplitPair(model, viewState);
   if (pair === null) return null;
 
@@ -53,7 +53,6 @@ export function SplitBody(props: TChartBodyProps) {
             <SidePicker
               side={sides[id]}
               entries={model.series}
-              rule={rule}
               value={entry.series.id}
               otherId={other.series.id}
               onChange={(next) => pairState.onChange(setPairSide(pair.ids, sides[id], next))}
@@ -76,7 +75,6 @@ export function SplitBody(props: TChartBodyProps) {
             series: entry.walterLieth,
             chartData: entry.chartData,
             aridity: entry.aridity,
-            colors: getStandardPalette(entry, rule),
           }}
           headerSlots={headerSlots}
           scales={model.scales}
@@ -124,6 +122,10 @@ export function SplitBody(props: TChartBodyProps) {
       labels={{
         [EWalterLiethSeriesId.A]: pair.entries[0].series.label,
         [EWalterLiethSeriesId.B]: pair.entries[1].series.label,
+      }}
+      shapes={{
+        [EWalterLiethSeriesId.A]: pair.entries[0].series.shape,
+        [EWalterLiethSeriesId.B]: pair.entries[1].series.shape,
       }}
       expandable={{
         [EWalterLiethSeriesId.A]: isExpandable(pair.entries[0]),

@@ -1,3 +1,4 @@
+import { getPrecipBarFill } from "@/utils";
 import { CHART_COLORS, STANDARD_CHART_HOVER_DIMMED_BAR_OPACITY } from "./charts.constant";
 import type { TBarShape } from "./charts.type";
 import { buildFillOpacityFadeStyle } from "./charts.util";
@@ -23,14 +24,19 @@ export function PrecipBarShape(props: TBarShape) {
     selectedMonths,
     aridityByMonth,
     activeMonthIndex,
+    hatchFill,
+    fills,
   } = props;
 
+  const isArid = month !== undefined && aridityByMonth?.[month] === true;
   const fill =
-    aridityByMonth !== undefined && month !== undefined
-      ? aridityByMonth[month]
-        ? CHART_COLORS.arid
-        : CHART_COLORS.humid
-      : propFill;
+    aridityByMonth === undefined || month === undefined
+      ? propFill
+      : fills
+        ? isArid
+          ? fills.arid
+          : fills.humid
+        : getPrecipBarFill(isArid);
 
   const isHovering = activeMonthIndex !== undefined && activeMonthIndex !== null;
   const isActive = isHovering && month !== undefined && month === activeMonthIndex + 1;
@@ -45,15 +51,26 @@ export function PrecipBarShape(props: TBarShape) {
         ? 0.8
         : 0.15;
 
+  const style = buildFillOpacityFadeStyle(fillOpacity);
+  const bar = (
+    <rect x={x} y={y} width={width} height={Math.max(0, height)} fill={fill} rx={2} style={style} />
+  );
+  if (hatchFill === undefined || height <= 0) return bar;
+
+  // * the overlay: the entity's hatch knocked out of the semantic fill, in the card's colour
   return (
-    <rect
-      x={x}
-      y={y}
-      width={width}
-      height={Math.max(0, height)}
-      fill={fill}
-      rx={2}
-      style={buildFillOpacityFadeStyle(fillOpacity)}
-    />
+    <g>
+      {bar}
+      <rect
+        data-bar-hatch
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={hatchFill}
+        rx={2}
+        style={style}
+      />
+    </g>
   );
 }

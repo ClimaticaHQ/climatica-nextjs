@@ -22,8 +22,10 @@ export function ChartTitle({
       <div className={C.SUBTITLE_ROW}>
         {!!subtitleText && (
           <span className={C.SUBTITLE}>
-            <DatabaseIcon />
-            {subtitleText}
+            <span aria-hidden className={C.SUBTITLE_ICON}>
+              <DatabaseIcon />
+            </span>
+            <span>{subtitleText}</span>
           </span>
         )}
         {showMonthBadge && <MonthBadge selectedMonths={selectedMonths} />}

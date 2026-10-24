@@ -5,7 +5,7 @@ import { COMPARISON_METRIC_LABEL_KEYS, SERIES_KIND_RULES } from "@/constants";
 import { useStatsTable } from "@/hooks/charts/useStatsTable";
 import { useLegendLabels } from "@/hooks/ui/useLegendLabels";
 import { useWalterLiethLegendItems } from "@/hooks/ui/useWalterLiethLegendItems";
-import { getSeriesTextColor } from "@/utils";
+import { getEntityBarSwatch, getEntityShortLabels } from "@/utils";
 import { useTranslations } from "next-intl";
 import type {
   TChartBlockDefinition,
@@ -13,26 +13,39 @@ import type {
   TChartBlocksProps,
   TSectionBlockProps,
 } from "./charts.type";
-import { getChartLegendItems, getIdentityColor, getSeriesMarker } from "./charts.util";
+import { getChartLegendItems, getContextSwatchStyle, getSeriesMarker } from "./charts.util";
 import { StatsTable } from "./StatsTable";
 
 /**
  * The monthly mean temperature and precipitation: one row per series, in the text colour — an
- * overlay's series show by their markers.
+ * overlay's series show by their shapes.
  */
 function ValuesTableBlock({ context }: TChartBlockProps) {
-  const { entries, body, rule, isCompact, activeMonth } = context;
+  const { entries, body, mode, isCompact, activeMonth } = context;
   const isOverlay = body === EChartBody.OVERLAY;
+  const isStandard = mode === "standard";
+  // * the standard overlay's row headers: 1967, ’70–’00, MAD — the drawn cities told apart
+  const labels = getEntityShortLabels(entries.map(({ series }) => series));
+  // * the mm row's swatches: only where the view draws each entity's bars
+  const swatchStyle = getContextSwatchStyle(context);
 
   return (
     <MonthlyValuesTable
       series={entries.map((entry) => ({
         key: entry.series.id,
         label: entry.series.label,
-        color: getSeriesTextColor({ color: getIdentityColor(entry, rule), isLargeText: false }),
         data: entry.chartData,
       }))}
-      {...(isOverlay ? { markers: entries.map((entry) => getSeriesMarker(entry, rule)) } : {})}
+      {...(isOverlay
+        ? {
+            markers: entries.map((entry, index) => ({
+              ...getSeriesMarker(entry),
+              ...getEntityBarSwatch(swatchStyle, entry.series.hatch, index),
+              ...(isStandard ? { label: labels[index], title: entry.series.label } : {}),
+            })),
+          }
+        : {})}
+      hasSections={isOverlay && isStandard}
       isCompact={isCompact}
       activeMonthIndex={activeMonth.activeMonthIndex}
       onActiveMonthIndexChange={activeMonth.onActiveMonthIndexChange}
@@ -65,10 +78,7 @@ function StatsTableBlock({ model, features }: TSectionBlockProps) {
   return (
     <StatsTable
       table={table}
-      columns={model.series.map((entry) => ({
-        color: getSeriesTextColor({ color: getIdentityColor(entry, rule), isLargeText: false }),
-        marker: getSeriesMarker(entry, rule),
-      }))}
+      columns={model.series.map((entry) => ({ marker: getSeriesMarker(entry) }))}
       martonneLabel={martonneLabel}
       differenceMeaning={features.difference?.meaning ?? null}
     />

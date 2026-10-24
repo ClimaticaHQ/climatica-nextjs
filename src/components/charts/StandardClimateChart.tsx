@@ -2,13 +2,17 @@ import { ClimateStatsBar } from "@/components";
 import { CHART_PLOT, CHART_LINE_DASH, CHART_HOVER_COLOR, MONTH_NAMES } from "@/constants";
 import {
   getAridityBarSwatch,
+  getAridityByMonth,
   getMonthLabelFormat,
   getPlotHeightClass,
+  getPlotMargin,
   getStandardVariableSwatches,
+  getTouchTooltipKey,
+  getTouchTooltipProps,
   resolveActiveTooltipIndex,
 } from "@/utils";
 import { useDelayedHide, useElementWidth } from "@/hooks";
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Bar, ComposedChart, Line, ResponsiveContainer, Tooltip, ReferenceArea } from "recharts";
 import { useSeriesToggleMotion } from "@/hooks/charts/useSeriesToggleMotion";
@@ -19,6 +23,8 @@ import { ARIDITY_BAR_COLORS, STANDARD_CHART_SINGLE_COLORS } from "./charts.const
 import { useStandardChartAxes } from "@/hooks/charts/useStandardChartAxes";
 import type { TDotRendererProps, TStandardClimateChartProps } from "./charts.type";
 import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle } from "./charts.util";
+import { ChartDeviceContext } from "./chartDevice.context";
+import { MonthTapLayer } from "./MonthTapLayer";
 
 export function StandardClimateChart({
   chartData,
@@ -30,18 +36,19 @@ export function StandardClimateChart({
   selectedMonths,
   altitude,
   martonneYear,
-  showAridity = true,
   activeMonthIndex,
   onActiveMonthIndexChange,
-  colors = STANDARD_CHART_SINGLE_COLORS,
   isPanel = false,
   syncId,
   footer,
 }: TStandardClimateChartProps) {
   const t = useTranslations();
   const seriesMotion = useSeriesToggleMotion();
+  const { isTouch, isNarrow } = useContext(ChartDeviceContext);
+  const tooltipState = { isTouch, activeMonthIndex };
+  const curveWidth = isNarrow ? CHART_PLOT.CURVE_WIDTH.NARROW : CHART_PLOT.CURVE_WIDTH.FULL;
   const { ref: plotRef, width: plotWidth } = useElementWidth<HTMLDivElement>();
-  const monthFormat = getMonthLabelFormat(plotWidth);
+  const monthFormat = getMonthLabelFormat(plotWidth, isNarrow);
   // * the tooltip's month names; the axes themselves are StandardChartAxes
   const axes = useStandardChartAxes(isPanel, monthFormat);
   const hidePrecBar = useDelayedHide(!visible.prec, seriesMotion.toggleMs);
@@ -49,17 +56,15 @@ export function StandardClimateChart({
   const hideTminLine = useDelayedHide(!visible.tmin, seriesMotion.toggleMs);
   const hideTavgLine = useDelayedHide(!visible.tavg, seriesMotion.toggleMs);
 
-  const aridityByMonth = useMemo<Record<number, boolean> | undefined>(() => {
-    if (!aridity) return undefined;
-    // * an unknown month (missing value) is not colored arid
-    return Object.fromEntries(aridity.map((m) => [m.month, m.isArid === true]));
-  }, [aridity]);
+  // * the semantic colours on every standard chart; the bars by this series' own aridity
+  const colors = STANDARD_CHART_SINGLE_COLORS;
+  const aridityByMonth = useMemo(() => getAridityByMonth(aridity), [aridity]);
 
   // * the tooltip's rows by their names: each variable's swatch, as in this chart's legend — the
-  // * hovered month's arid / humid bar when the bars are coloured by aridity
+  // * hovered month's arid / humid bar
   const swatches = getStandardVariableSwatches(colors);
   const hoveredMonthIsArid =
-    showAridity && activeMonthIndex !== null && activeMonthIndex !== undefined
+    activeMonthIndex !== null && activeMonthIndex !== undefined
       ? aridityByMonth?.[activeMonthIndex + 1]
       : undefined;
   const swatchByName = {
@@ -109,7 +114,7 @@ export function StandardClimateChart({
           {...(altitude !== undefined ? { altitude } : {})}
         />
       )}
-      <div ref={plotRef} className={getPlotHeightClass({ isCompact: isPanel })}>
+      <div ref={plotRef} className={`relative ${getPlotHeightClass({ isCompact: isPanel })}`}>
         <div className="h-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
@@ -117,7 +122,9 @@ export function StandardClimateChart({
               margin={CHART_PLOT.MARGIN}
               {...(syncId !== undefined ? { syncId } : {})}
               barGap={2}
-              barCategoryGap="30%"
+              barCategoryGap={
+                isNarrow ? CHART_PLOT.BAR_CATEGORY_GAP.NARROW : CHART_PLOT.BAR_CATEGORY_GAP.FULL
+              }
               onMouseMove={(state) =>
                 onActiveMonthIndexChange?.(resolveActiveTooltipIndex(state.activeTooltipIndex))
               }
@@ -141,9 +148,12 @@ export function StandardClimateChart({
                   stroke="none"
                 />
               )}
-              {/* * one series: each row after its variable's legend swatch, not a marker */}
+              {/* * one series: each row after its variable's legend swatch, not a marker; on
+                touch, the tapped month's */}
               <Tooltip
+                key={getTouchTooltipKey(tooltipState)}
                 cursor={false}
+                {...getTouchTooltipProps(tooltipState)}
                 content={
                   <StandardTooltip
                     formatLabel={axes.localMonthName}
@@ -167,7 +177,7 @@ export function StandardClimateChart({
                 shape={
                   <PrecipBarShape
                     selectedMonths={selectedMonths}
-                    aridityByMonth={showAridity ? aridityByMonth : undefined}
+                    aridityByMonth={aridityByMonth}
                     {...(activeMonthIndex !== undefined ? { activeMonthIndex } : {})}
                   />
                 }
@@ -180,7 +190,7 @@ export function StandardClimateChart({
                 dataKey="tmax"
                 name={t("chart.maxTemperature")}
                 stroke={colors.tmax}
-                strokeWidth={2}
+                strokeWidth={curveWidth}
                 dot={makeDot(colors.tmax, visible.tmax)}
                 activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tmax ? 1 : 0) }}
                 hide={hideTmaxLine}
@@ -194,7 +204,7 @@ export function StandardClimateChart({
                 dataKey="tavg"
                 name={t("chart.avgTemperature")}
                 stroke={colors.tavg}
-                strokeWidth={2}
+                strokeWidth={curveWidth}
                 strokeDasharray={CHART_LINE_DASH.STANDARD.tavg}
                 dot={makeDot(colors.tavg, visible.tavg)}
                 activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tavg ? 1 : 0) }}
@@ -209,7 +219,7 @@ export function StandardClimateChart({
                 dataKey="tmin"
                 name={t("chart.minTemperature")}
                 stroke={colors.tmin}
-                strokeWidth={2}
+                strokeWidth={curveWidth}
                 strokeDasharray={CHART_LINE_DASH.STANDARD.tmin}
                 dot={makeDot(colors.tmin, visible.tmin)}
                 activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
@@ -219,6 +229,14 @@ export function StandardClimateChart({
             </ComposedChart>
           </ResponsiveContainer>
         </div>
+        {isTouch && (
+          <MonthTapLayer
+            activeMonthIndex={activeMonthIndex ?? null}
+            onActiveMonthIndexChange={onActiveMonthIndexChange}
+            inset={getPlotMargin(isPanel, isNarrow)}
+            canScrub
+          />
+        )}
       </div>
       {footer}
     </>

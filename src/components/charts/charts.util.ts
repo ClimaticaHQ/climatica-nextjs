@@ -1,15 +1,13 @@
-import { getPairIdentityColor, getPairPalette } from "@/utils/seriesColor.util";
 import { STANDARD_CHART_SINGLE_COLORS, ARIDITY_BAR_COLORS } from "./charts.constant";
-import type {
-  TWalterLiethDotShape,
-  TWalterLiethLayerSeries,
-} from "@/components/WalterLiethChart/WalterLiethChart.type";
+import type { TWalterLiethLayerSeries } from "@/components/WalterLiethChart/WalterLiethChart.type";
 import {
   CHART_BODY_BY_LAYOUT,
-  CHART_LEGEND,
   SERIES_KIND_RULES,
-  WALTER_LIETH_COLORS,
+  SERIES_MARKER_COLOR,
+  SERIES_HATCH_COLOR,
   WALTER_LIETH_COMPARISON,
+  WALTER_LIETH_CONVENTION_COLORS,
+  WALTER_LIETH_LEGEND_PALETTE,
   MOTION_CSS_VAR,
   WALTER_LIETH_DASH,
 } from "@/constants";
@@ -23,15 +21,18 @@ import type {
   TSeriesKey,
   TSeriesKindRule,
   TLegendLabels,
+  TOverlayBarLayout,
 } from "@/types";
 import {
   getSeriesLegendItems,
   getStandardLegendItems,
-  getStandardSplitLegendItems,
   getWalterLiethOverlayLegendItems,
   isCompleteSeries,
   toWalterLiethSeriesId,
   getOverlayPaint,
+  getCurvePointX,
+  getEntityBarSwatch,
+  getSwatchBarStyle,
 } from "@/utils";
 import type {
   TBlockContextPart,
@@ -40,6 +41,7 @@ import type {
   TLegendBuilder,
   TResolveChartBodyArgs,
   TOverlayLayerArgs,
+  TStandardChartEntry,
 } from "./charts.type";
 import type { TSeriesMarkerProps } from "@/components/SeriesMarker/SeriesMarker.type";
 import { motionVar } from "@/utils/motion.util";
@@ -77,43 +79,30 @@ export function getTitleNames(
     : features.title.names;
 }
 
-/** The series' identity colour: its own (a weather year), or A's / B's. */
-export function getIdentityColor({ series }: TChartSeriesModel, rule: TSeriesKindRule): string {
-  return rule.usesOwnColor ? series.color : getPairIdentityColor(toWalterLiethSeriesId(series.id));
+/** An entity's marker: its shape, in graphite — in its panel header, the tooltip, the tables. */
+export function getSeriesMarker({ series }: TChartSeriesModel): TSeriesMarkerProps {
+  return { shape: series.shape };
 }
 
-/** The series' marker (A dot, B square; a weather year a dot in its own colour). */
-export function getSeriesMarker(
-  { series }: TChartSeriesModel,
-  rule: TSeriesKindRule,
-): TSeriesMarkerProps {
-  return {
-    id: toWalterLiethSeriesId(series.id),
-    ...(rule.usesOwnColor ? { color: series.color } : {}),
-  };
-}
+/** The swatch style a block shows its entities in: the view's (getSwatchBarStyle). */
+export const getContextSwatchStyle = ({ mode, body, barStyle, visible }: TChartBlockContext) =>
+  getSwatchBarStyle({ mode, body, barStyle, isPrecVisible: visible.prec });
 
-export function getIdentityShape(
-  { series }: TChartSeriesModel,
-  rule: TSeriesKindRule,
-): TWalterLiethDotShape {
-  return rule.usesOwnColor
-    ? "circle"
-    : WALTER_LIETH_COMPARISON.DOT_SHAPE[toWalterLiethSeriesId(series.id)];
-}
-
-/** A standard chart panel's line and bar colours: A's or B's, or the single-city palette. */
-export function getStandardPalette({ series }: TChartSeriesModel, rule: TSeriesKindRule) {
-  if (rule.usesOwnColor) return STANDARD_CHART_SINGLE_COLORS;
-  return getPairPalette(toWalterLiethSeriesId(series.id));
-}
-
-/** A series' colours in the overlay: its own line colour and bar colour, or A's / B's palette. */
-export function getOverlayPalette(entry: TChartSeriesModel, rule: TSeriesKindRule) {
-  const { color, barColor } = entry.series;
-  return rule.usesOwnColor
-    ? { tmax: color, tmin: color, tavg: color, prec: barColor }
-    : getStandardPalette(entry, rule);
+/**
+ * The legend's entities: by shape, and their bars beside it where the view draws them per
+ * entity (getSwatchBarStyle) — none where the chips above name them.
+ */
+function getLegendSeries(context: TChartBlockContext) {
+  const { entries, rule } = context;
+  const swatchStyle = getContextSwatchStyle(context);
+  return rule.hasSeriesChips
+    ? []
+    : entries.map(({ series }, place) => ({
+        key: series.id,
+        label: series.label,
+        shape: series.shape,
+        ...getEntityBarSwatch(swatchStyle, series.hatch, place),
+      }));
 }
 
 /** The hatched series' id in a Walter-Lieth overlay — none for kinds that can't be shaded. */
@@ -130,73 +119,42 @@ export function getShadedId(
   );
 }
 
+// * every standard chart: the semantic line colours and the bars by aridity — one entity or many
+const standardLegend: TLegendBuilder = ({ visible }, labels) =>
+  getStandardLegendItems({
+    labels,
+    colors: STANDARD_CHART_SINGLE_COLORS,
+    visible,
+    aridity: ARIDITY_BAR_COLORS,
+  });
+
 const STANDARD_LEGENDS = {
-  [EChartBody.SINGLE]: ({ visible }, labels) =>
-    getStandardLegendItems({
-      labels,
-      colors: STANDARD_CHART_SINGLE_COLORS,
-      visible,
-      aridity: ARIDITY_BAR_COLORS,
-    }),
-  [EChartBody.SPLIT]: ({ entries, rule, visible, shownPanel }, labels) => {
-    const [first, second] = entries;
-    // * one shared palette (weather years): one colour per variable
-    if (rule.usesOwnColor || first === undefined || second === undefined) {
-      return getStandardLegendItems({
-        labels,
-        colors: STANDARD_CHART_SINGLE_COLORS,
-        visible,
-        aridity: null,
-      });
-    }
-    return getStandardSplitLegendItems({
-      labels,
-      colorsA: getStandardPalette(first, rule),
-      colorsB: getStandardPalette(second, rule),
-      visible,
-      shown: shownPanel,
-    });
-  },
-  [EChartBody.OVERLAY]: ({ entries, rule, visible }, labels) =>
+  [EChartBody.SINGLE]: standardLegend,
+  [EChartBody.SPLIT]: standardLegend,
+  [EChartBody.OVERLAY]: (context, labels) =>
     getSeriesLegendItems({
       labels,
-      // * series chips above the chart name the series
-      series: rule.hasSeriesChips
-        ? []
-        : entries.map((entry) => ({
-            key: entry.series.id,
-            label: entry.series.label,
-            color: getOverlayPalette(entry, rule).tmax,
-          })),
-      visible,
-      neutral: CHART_LEGEND.NEUTRAL_COLOR,
-      hasTavg: rule.hasMeanLine,
-      aridity: null,
+      series: getLegendSeries(context),
+      visible: context.visible,
+      colors: STANDARD_CHART_SINGLE_COLORS,
+      aridity: ARIDITY_BAR_COLORS,
+      markerColor: SERIES_MARKER_COLOR,
+      hatchColor: SERIES_HATCH_COLOR,
+      hasTavg: context.rule.hasMeanLine,
     }),
 } satisfies Record<EChartBody, TLegendBuilder>;
 
 const WALTER_LIETH_LEGENDS = {
   [EChartBody.SINGLE]: (_context, _labels, walterLieth) => walterLieth,
   [EChartBody.SPLIT]: (_context, _labels, walterLieth) => walterLieth,
-  [EChartBody.OVERLAY]: ({ entries, rule, shadedId }, labels) => {
-    const shaded = entries.find(({ series }) => series.id === shadedId);
-    return getWalterLiethOverlayLegendItems({
+  [EChartBody.OVERLAY]: (context, labels) =>
+    getWalterLiethOverlayLegendItems({
       labels,
-      series: rule.hasSeriesChips
-        ? []
-        : entries.map((entry) => ({
-            key: entry.series.id,
-            label: entry.series.label,
-            color: getIdentityColor(entry, rule),
-            shape: getIdentityShape(entry, rule),
-          })),
-      shadeColor: shaded ? getIdentityColor(shaded, rule) : null,
-      frost: shaded
-        ? { fill: WALTER_LIETH_COLORS.FROST, outline: WALTER_LIETH_COLORS.FROST_OUTLINE }
-        : null,
-      neutral: CHART_LEGEND.NEUTRAL_COLOR,
-    });
-  },
+      series: getLegendSeries(context),
+      palette: WALTER_LIETH_LEGEND_PALETTE,
+      isShaded: context.entries.some(({ series }) => series.id === context.shadedId),
+      markerColor: SERIES_MARKER_COLOR,
+    }),
 } satisfies Record<EChartBody, TLegendBuilder>;
 
 /** The legend under a chart: by chart type and body, from the series it describes. */
@@ -221,9 +179,23 @@ export function getBlockContext(
     visible: props.visible,
     activeMonth: props.activeMonth,
     shadedId: getShadedId(props.model, props.rule, props.viewState.shading?.value),
+    barStyle: props.barStyle,
     ...part,
   };
 }
+
+/** Each shown entity's curve offset, in months: its bar's centre in the month's group. */
+export function getCurveOffsets(
+  shown: readonly Pick<TStandardChartEntry, "id">[],
+  layout: TOverlayBarLayout,
+): Record<string, number> {
+  return Object.fromEntries(
+    shown.map(({ id }, i) => [id, getCurvePointX(0, layout.offsets[i] ?? 0, layout.bandWidth)]),
+  );
+}
+
+/** A React id as an SVG id, usable in url(#…): only letters, digits and dashes. */
+export const toSvgId = (reactId: string) => reactId.replace(/[^a-zA-Z0-9-]/g, "");
 
 /** Where the standard chart reads a series' variable in a month's row. */
 export function seriesDataKey(id: string, variable: TSeriesKey) {
@@ -270,21 +242,19 @@ export function buildFillOpacityFadeStyle(fillOpacity: number): CSSProperties {
 }
 
 /**
- * Overlay: color = series, line style = variable (solid temperature, dashed precipitation).
- * Hatching reuses the same segments and patterns, tinted with the series color.
+ * Overlay: every series in the diagram's semantic colours, told apart by its dots' shape; line
+ * style = variable (solid temperature, dashed precipitation). Only the shaded series is hatched.
  */
 export function toOverlayLayer({
-  series,
   isShaded,
-  color,
   shape,
   ...layer
 }: TOverlayLayerArgs): TWalterLiethLayerSeries {
   return {
     ...layer,
     segments: isShaded ? layer.segments : [],
-    colors: getOverlayPaint(color ?? getPairIdentityColor(series.id)),
+    colors: getOverlayPaint(WALTER_LIETH_CONVENTION_COLORS),
     precDash: WALTER_LIETH_DASH.OVERLAY_PREC,
-    dotShape: shape ?? WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
+    dotShape: shape,
   };
 }

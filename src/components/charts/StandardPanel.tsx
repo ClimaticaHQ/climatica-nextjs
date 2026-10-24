@@ -32,9 +32,6 @@ export function StandardPanel({
           rightMax={chart.rightMax}
           summary={null}
           visible={chart.visible}
-          // * series identity colors on the bars — no arid recoloring
-          showAridity={false}
-          colors={panel.colors}
           isPanel
           syncId={chart.syncId}
           activeMonthIndex={chart.activeMonthIndex}

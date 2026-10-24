@@ -1,29 +1,23 @@
-"use client";
-
-import { VariableChips } from "./VariableChips";
-import { useState } from "react";
 import { ChartBlocks } from "./ChartBlocks";
-import { BLOCK_PLACEMENTS, OVERLAY_CHIPS_CLASSES as C } from "./charts.constant";
+import { BLOCK_PLACEMENTS } from "./charts.constant";
 import type { TChartBodyProps } from "./charts.type";
 import { getDrawnSeries } from "@/utils";
 import { getBlockContext } from "./charts.util";
 import { OverlayChart } from "./OverlayChart";
-import { SeriesChips } from "./SeriesChips";
 
 /**
- * Every drawn series in one chart, its blocks under it. Kinds with series chips put them above
- * the chart (with the variable chips in the standard chart): they toggle and highlight series.
+ * Every drawn series in one chart, its blocks under it. A series chip hovered in the toolbar
+ * (kinds with series chips) highlights its series.
  */
 export function OverlayBody(props: TChartBodyProps) {
-  const { model, rule, viewState, features, visible, onVisibleChange } = props;
-  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const { model, viewState, features, highlightedId } = props;
   const drawn = getDrawnSeries(model, viewState);
   // * a highlight only means something for a series that's drawn
   const highlighted = drawn.some(({ series }) => series.id === highlightedId)
     ? highlightedId
     : null;
 
-  const chart = (
+  return (
     <OverlayChart
       {...props}
       drawn={drawn}
@@ -36,32 +30,5 @@ export function OverlayBody(props: TChartBodyProps) {
         />
       }
     />
-  );
-
-  const shown = viewState.shown;
-  if (!rule.hasSeriesChips || shown === undefined) return chart;
-
-  return (
-    <div className={C.ROOT}>
-      <div className={C.YEARS}>
-        <SeriesChips
-          entries={model.series}
-          shown={shown.value}
-          onShownChange={shown.onChange}
-          onHighlight={setHighlightedId}
-        />
-      </div>
-      {viewState.mode === "standard" && (
-        <div className={C.CONTROLS}>
-          <VariableChips
-            visible={visible}
-            variables={viewState.variables}
-            onChange={onVisibleChange}
-            isScrollRow
-          />
-        </div>
-      )}
-      <div className={C.DIAGRAM}>{chart}</div>
-    </div>
   );
 }

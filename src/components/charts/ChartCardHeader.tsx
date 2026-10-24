@@ -1,35 +1,38 @@
 import { WalterLiethGuide } from "@/components/WalterLiethChart";
 import { ECompareLayout } from "@/enums";
-import { isCompleteSeries } from "@/utils";
-import {
-  CHART_CARD_HEADER_CLASSES as C,
-  CHART_CONTROLS_ROW_CLASSES as ROW,
-} from "./charts.constant";
+import { getSwatchBarStyle, isCompleteSeries } from "@/utils";
+import { CHART_CARD_HEADER_CLASSES as C } from "./charts.constant";
 import type { TChartCardHeaderProps } from "./charts.type";
 import { getTitleNames } from "./charts.util";
 import { ChartSwitches } from "./ChartSwitches";
+import { ChartToolbar } from "./ChartToolbar";
 import { ChartTitle } from "./ChartTitle";
+import { SeriesChips } from "./SeriesChips";
 import { ShadingControl } from "./ShadingControl";
 import { VariableChips } from "./VariableChips";
 
 /**
  * The card's top: the title block with the chart type and layout switches (beside it, or under
- * it when the card is narrow — a container query), then the controls row at a fixed height:
- * variable chips (standard) or the guide (Walter-Lieth), the shading control over it in an
- * overlay of a shadable pair. Series chips put the variable chips in the body instead.
+ * it when the card is narrow — a container query), then the toolbar, the same row in every view:
+ * the series chips (an overlay of a kind with them) on the left, the view's controls on the
+ * right — the variable chips (standard) or the guide (Walter-Lieth), the shading control over it
+ * in an overlay of a shadable pair.
  */
 export function ChartCardHeader({
   model,
   rule,
   viewState,
   features,
+  body,
+  barStyle,
   visible,
   onVisibleChange,
+  onHighlight,
 }: TChartCardHeaderProps) {
-  const { mode, layout, shading } = viewState;
+  const { mode, layout, shading, shown } = viewState;
   const isWalterLieth = mode === "walter-lieth";
   const isOverlay = layout?.value === ECompareLayout.OVERLAY;
-  const hasControlsRow = isWalterLieth || !isOverlay || !rule.hasSeriesChips;
+  const hasChips = isOverlay && rule.hasSeriesChips && shown !== undefined;
   const isStacked = isOverlay && rule.canShade;
   const [first, second] = model.series.map(({ walterLieth }) => walterLieth);
   const canShade =
@@ -61,9 +64,28 @@ export function ChartCardHeader({
           </div>
         </div>
       </div>
-      {hasControlsRow && (
-        <div data-chart-controls className={isStacked ? ROW.STACKED : ROW.ROW}>
-          {isWalterLieth ? (
+      <ChartToolbar
+        isStacked={isStacked}
+        {...(hasChips
+          ? {
+              chips: (
+                <SeriesChips
+                  entries={model.series}
+                  barStyle={getSwatchBarStyle({
+                    mode,
+                    body,
+                    barStyle,
+                    isPrecVisible: visible.prec,
+                  })}
+                  shown={shown.value}
+                  onShownChange={shown.onChange}
+                  onHighlight={onHighlight}
+                />
+              ),
+            }
+          : {})}
+        controls={
+          isWalterLieth ? (
             <>
               {canShade && (
                 <ShadingControl
@@ -81,9 +103,9 @@ export function ChartCardHeader({
               variables={viewState.variables}
               onChange={onVisibleChange}
             />
-          )}
-        </div>
-      )}
+          )
+        }
+      />
     </>
   );
 }

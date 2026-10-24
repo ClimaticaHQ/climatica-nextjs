@@ -1,5 +1,4 @@
 import { Chip } from "@/components/UI/Chip";
-import { ChipScroller } from "@/components/UI/ChipScroller";
 import type { TVisibleSeries } from "@/types";
 import { useTranslations } from "next-intl";
 import type { TVariableChipsProps } from "./charts.type";
@@ -9,12 +8,7 @@ import type { TVariableChipsProps } from "./charts.type";
  * sidebar: not-allowed cursor, announced as disabled; a variable the store didn't fetch is shown
  * off and disabled (tavg is derived, so always available).
  */
-export function VariableChips({
-  visible,
-  variables,
-  onChange,
-  isScrollRow = false,
-}: TVariableChipsProps) {
+export function VariableChips({ visible, variables, onChange }: TVariableChipsProps) {
   const t = useTranslations();
   const activeCount = Object.values(visible).filter(Boolean).length;
   const storeVarSet = new Set<string>(variables ?? []);
@@ -44,9 +38,10 @@ export function VariableChips({
     );
   });
 
-  return isScrollRow ? (
-    <ChipScroller contentKey="variables">{items}</ChipScroller>
-  ) : (
-    <div className="flex flex-wrap justify-end gap-2">{items}</div>
+  // * a phone: one row, scrolling sideways, so the toolbar keeps one height in every view
+  return (
+    <div className="flex flex-wrap justify-end gap-2 max-sm:max-w-full max-sm:flex-nowrap max-sm:justify-start max-sm:overflow-x-auto">
+      {items}
+    </div>
   );
 }

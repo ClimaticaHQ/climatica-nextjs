@@ -1,26 +1,26 @@
 import { WalterLiethOverlay } from "./WalterLiethOverlay";
-import { OVERLAY_DIM_OPACITY } from "@/constants";
-import { isCompleteSeries } from "@/utils";
-import type { TOverlayChartProps } from "./charts.type";
+import { EChartBody } from "@/enums";
 import {
-  buildStandardChartRows,
-  getIdentityColor,
-  getIdentityShape,
-  getOverlayPalette,
-  getSeriesMarker,
-  getShadedId,
-} from "./charts.util";
+  getAridityByMonth,
+  getEntityBarSwatch,
+  getOverlayBarFills,
+  getSwatchBarStyle,
+  isCompleteSeries,
+} from "@/utils";
+import type { TOverlayChartProps } from "./charts.type";
+import { buildStandardChartRows, getSeriesMarker, getShadedId } from "./charts.util";
 import { StandardChart } from "./StandardChart";
 
 /**
- * The overlay's chart: every drawn series in one Walter-Lieth diagram, or in the standard
- * chart (series turned off by their chips keep their place, hidden). A highlighted series dims
- * the others.
+ * The overlay's chart: every drawn series in one Walter-Lieth diagram (a highlighted series
+ * dims the others), or in the standard chart (series turned off by their chips are hidden; a
+ * highlighted one is focused, the rest turn gray).
  */
 export function OverlayChart({
   model,
   rule,
   viewState,
+  barStyle,
   visible,
   activeMonth,
   drawn,
@@ -39,11 +39,10 @@ export function OverlayChart({
                 {
                   key: entry.series.id,
                   series: entry.walterLieth,
-                  color: getIdentityColor(entry, rule),
-                  shape: getIdentityShape(entry, rule),
+                  shape: entry.series.shape,
                   isShaded: entry.series.id === shadedId,
                   isDimmed: isDimmed(entry.series.id),
-                  marker: getSeriesMarker(entry, rule),
+                  marker: getSeriesMarker(entry),
                 },
               ]
             : [],
@@ -56,25 +55,39 @@ export function OverlayChart({
   }
 
   const drawnIds = new Set(drawn.map(({ series }) => series.id));
+  const swatchStyle = getSwatchBarStyle({
+    mode: "standard",
+    body: EChartBody.OVERLAY,
+    barStyle,
+    isPrecVisible: visible.prec,
+  });
   const months = viewState.selectedMonths;
   return (
     <StandardChart
       // * a series still loading takes no place yet: when it lands the chart remounts in order
-      entries={model.series
-        .filter(({ hasData }) => hasData)
-        .map((entry) => ({
-          id: entry.series.id,
-          label: entry.series.label,
-          palette: getOverlayPalette(entry, rule),
-          emphasis: isDimmed(entry.series.id) ? OVERLAY_DIM_OPACITY : 1,
-          isHidden: !drawnIds.has(entry.series.id),
-          marker: getSeriesMarker(entry, rule),
-        }))}
+      entries={model.series.flatMap((entry, place) =>
+        entry.hasData
+          ? [
+              {
+                id: entry.series.id,
+                label: entry.series.label,
+                aridityByMonth: getAridityByMonth(entry.aridity),
+                barFills: getOverlayBarFills(barStyle, place),
+                hatch: entry.series.hatch,
+                swatch: getEntityBarSwatch(swatchStyle, entry.series.hatch, place),
+                isHidden: !drawnIds.has(entry.series.id),
+                marker: getSeriesMarker(entry),
+              },
+            ]
+          : [],
+      )}
+      barStyle={barStyle}
       rows={buildStandardChartRows(model.series)}
       hasMeanLine={rule.hasMeanLine}
       scales={model.scales}
       rightMax={model.rightMax}
       visible={visible}
+      highlightedId={highlightedId}
       selectedMonths={months !== null && months.length > 0 ? months : undefined}
       activeMonth={activeMonth}
       footer={footer}

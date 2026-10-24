@@ -6,17 +6,16 @@ import { useTranslations } from "next-intl";
 import { useId } from "react";
 import { SIDE_PICKER_LABEL_KEYS } from "./charts.constant";
 import type { TSidePickerProps } from "./charts.type";
-import { getIdentityColor } from "./charts.util";
 
 /** Which series a split panel shows — the other panel's series disabled. */
-export function SidePicker({ side, entries, rule, value, otherId, onChange }: TSidePickerProps) {
+export function SidePicker({ side, entries, value, otherId, onChange }: TSidePickerProps) {
   const t = useTranslations();
   const labelId = useId();
   const options = disableOtherSide(
     entries.map((entry) => ({
       value: entry.series.id,
       label: entry.series.label,
-      color: getIdentityColor(entry, rule),
+      markerShape: entry.series.shape,
     })),
     otherId,
   );
