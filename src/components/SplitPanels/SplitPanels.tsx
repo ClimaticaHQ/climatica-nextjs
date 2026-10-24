@@ -21,6 +21,7 @@ import type { TPanelFocusTarget, TSplitPanelsProps } from "./SplitPanels.type";
 export function SplitPanels({
   expansion,
   labels,
+  shapes,
   expandable,
   renderPanel,
   renderLegend,
@@ -64,6 +65,7 @@ export function SplitPanels({
                   <ExpandedPanelControls
                     shown={shown}
                     labels={labels}
+                    shapes={shapes}
                     canSwitch={other !== undefined && expandable[other]}
                     onSwitch={(id) => show(id, "switch")}
                     onCollapse={() => show(null, shown)}

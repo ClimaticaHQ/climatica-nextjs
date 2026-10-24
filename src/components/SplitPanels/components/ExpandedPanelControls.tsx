@@ -7,10 +7,11 @@ import { SPLIT_PANEL_ORDER, SPLIT_PANELS_CLASSES as C } from "../SplitPanels.con
 import type { TExpandedPanelControlsProps } from "../SplitPanels.type";
 import { PanelIconButton } from "./PanelIconButton";
 
-/** The expanded panel's header controls: which series is shown ("● A | ■ B"), and "Show both". */
+/** The expanded panel's header controls: which series is shown (by shape and name), and "Show both". */
 export function ExpandedPanelControls({
   shown,
   labels,
+  shapes,
   canSwitch,
   onSwitch,
   onCollapse,
@@ -21,7 +22,7 @@ export function ExpandedPanelControls({
   const options: TSegmentedOption<EWalterLiethSeriesId>[] = SPLIT_PANEL_ORDER.map((id) => ({
     value: id,
     label: labels[id],
-    icon: <SeriesMarker id={id} />,
+    icon: <SeriesMarker shape={shapes[id]} />,
   }));
 
   return (

@@ -1,11 +1,13 @@
 import type { EWalterLiethSeriesId } from "@/enums";
-import type { TExpandedPanel, TPanelExpansion, TPanelHeaderSlots } from "@/types";
+import type { TExpandedPanel, TPanelExpansion, TPanelHeaderSlots, TSeriesShape } from "@/types";
 import type { ReactNode, RefObject } from "react";
 
 export type TSplitPanelsProps = {
   expansion: TPanelExpansion;
   /** series names — the switch's options and the buttons' accessible names */
   labels: Record<EWalterLiethSeriesId, string>;
+  /** each panel's entity shape — the switch's markers */
+  shapes: Record<EWalterLiethSeriesId, TSeriesShape>;
   /** panels with a header to expand (an incomplete WL series shows only its notice) */
   expandable: Record<EWalterLiethSeriesId, boolean>;
   /** one panel, with the header slots this container gives it */
@@ -42,6 +44,7 @@ export type TPanelIconButtonProps = {
 export type TExpandedPanelControlsProps = {
   shown: EWalterLiethSeriesId;
   labels: Record<EWalterLiethSeriesId, string>;
+  shapes: Record<EWalterLiethSeriesId, TSeriesShape>;
   /** only when the other panel can be shown too */
   canSwitch: boolean;
   onSwitch: (id: EWalterLiethSeriesId) => void;
