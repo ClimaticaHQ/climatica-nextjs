@@ -1,5 +1,12 @@
 import type { ECompareLayout, EWalterLiethShading } from "@/enums";
-import type { TChartMode, TChartPageResult, TCity, TDiffStats, TExpandedPanel } from "@/types";
+import type {
+  TChartMode,
+  TChartPageResult,
+  TCity,
+  TDiffStats,
+  TExpandedPanel,
+  TSeriesShape,
+} from "@/types";
 
 export type TCompareCitiesUrlState = {
   cityA: TCity;
@@ -19,7 +26,7 @@ export type TCityPairSearchProps = {
 
 export type TCitySearchRowProps = {
   label: string;
-  dotColor: string;
+  markerShape: TSeriesShape;
   cityLabel: string;
   onCitySelect: (city: TCity) => void;
 };

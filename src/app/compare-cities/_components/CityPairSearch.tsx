@@ -3,7 +3,7 @@
 import { SearchBar } from "@/components/SearchBar";
 import { DotLabel, MapSkeleton, type TMiniMapLocation } from "@/components/UI";
 import { EWalterLiethSeriesId } from "@/enums";
-import { getPairPalette } from "@/utils/seriesColor.util";
+import { getPairShape } from "@/utils/seriesShape.util";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useState } from "react";
@@ -15,10 +15,10 @@ const MiniMap = dynamic(
   { ssr: false, loading: () => <MapSkeleton variant="mini" /> },
 );
 
-function CitySearchRow({ label, dotColor, cityLabel, onCitySelect }: TCitySearchRowProps) {
+function CitySearchRow({ label, markerShape, cityLabel, onCitySelect }: TCitySearchRowProps) {
   return (
     <div className={C.ROW}>
-      <DotLabel label={label} dotColor={dotColor} />
+      <DotLabel label={label} markerShape={markerShape} />
       <SearchBar cityLabel={cityLabel} onCitySelect={onCitySelect} />
     </div>
   );
@@ -34,10 +34,10 @@ export function CityPairSearch({
   const t = useTranslations();
   const [activeCity, setActiveCity] = useState(0);
   const locations: TMiniMapLocation[] = [
-    { city: cityA, color: getPairPalette(EWalterLiethSeriesId.A).tmax },
-    { city: cityB, color: getPairPalette(EWalterLiethSeriesId.B).tmax },
-  ].flatMap(({ city, color }) =>
-    city.lat && city.lng ? [{ lat: city.lat, lng: city.lng, label: city.label, color }] : [],
+    { city: cityA, shape: getPairShape(EWalterLiethSeriesId.A) },
+    { city: cityB, shape: getPairShape(EWalterLiethSeriesId.B) },
+  ].flatMap(({ city, shape }) =>
+    city.lat && city.lng ? [{ lat: city.lat, lng: city.lng, label: city.label, shape }] : [],
   );
 
   return (
@@ -46,13 +46,13 @@ export function CityPairSearch({
         <div className={C.SEARCH_GRID}>
           <CitySearchRow
             label={t("climateComparison.searchA")}
-            dotColor={getPairPalette(EWalterLiethSeriesId.A).tmax}
+            markerShape={getPairShape(EWalterLiethSeriesId.A)}
             cityLabel={cityA.label}
             onCitySelect={onCityASelect}
           />
           <CitySearchRow
             label={t("climateComparison.searchB")}
-            dotColor={getPairPalette(EWalterLiethSeriesId.B).tmax}
+            markerShape={getPairShape(EWalterLiethSeriesId.B)}
             cityLabel={cityB.label}
             onCitySelect={onCityBSelect}
           />

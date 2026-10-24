@@ -4,7 +4,8 @@ import { EStatValueSize } from "@/enums";
 import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
 import { useMonthName } from "@/hooks/ui/useMonthName";
 import { useTranslations } from "next-intl";
-import { CITY_DIFFERENCE_CARDS_CLASS, CITY_WINNER_COLORS } from "./CompareCities.constant";
+import { CITY_DIFFERENCE_CARDS_CLASS } from "./CompareCities.constant";
+import type { TDiffStats } from "@/types";
 import type { TCityDifferenceCardsProps } from "./CompareCities.type";
 
 /** Under the chart: the warmer and the wetter city, and both cities' hottest and coldest month. */
@@ -15,7 +16,7 @@ export function CityDifferenceCards({ differences }: TCityDifferenceCardsProps) 
   if (!differences) return null;
 
   const { diff, labelA, labelB } = differences;
-  const winner = (side: keyof typeof CITY_WINNER_COLORS) =>
+  const winner = (side: TDiffStats["warmerCity"]) =>
     side === "tie" ? t("climateComparison.diff.tie") : side === "A" ? labelA : labelB;
   const celsius = (value: number) =>
     t("units.celsiusValue", { value: formatNumber(value, { digits: VALUE_DIGITS.TEMP }) });
@@ -41,7 +42,6 @@ export function CityDifferenceCards({ differences }: TCityDifferenceCardsProps) 
                 value: formatNumber(diff.tmaxDiff, { digits: VALUE_DIGITS.TEMP }),
               })
         }
-        valueColor={CITY_WINNER_COLORS[diff.warmerCity]}
       />
       <StatCard
         {...card}
@@ -52,7 +52,6 @@ export function CityDifferenceCards({ differences }: TCityDifferenceCardsProps) 
             ? t("climateComparison.diff.tieSub")
             : t("climateComparison.diff.byMm", { value: formatNumber(diff.precDiff) })
         }
-        valueColor={CITY_WINNER_COLORS[diff.moreRainCity]}
       />
       <StatCard
         {...card}
