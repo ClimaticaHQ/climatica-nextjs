@@ -34,11 +34,15 @@ import {
   toClimatePeriodHandler,
 } from "@/utils/filters.util";
 import { setPairSide, swapPair } from "@/utils/pair.util";
-import { getSeriesTint } from "@/utils/seriesColor.util";
+import { getSeriesShape } from "@/utils/seriesShape.util";
 import { useTranslations } from "next-intl";
 import { useId, useState } from "react";
 import { FilterNote, FilterSection } from "../FilterSection";
-import { COMPARED_PERIODS_CLASSES as C, PERIOD_PAIR_SIDES } from "../filters.constant";
+import {
+  COMPARED_PERIODS_CLASSES as C,
+  PERIOD_PAIR_SIDES,
+  YEAR_BADGE_TONE,
+} from "../filters.constant";
 import type {
   TComparedPeriodsSectionProps,
   TPeriodPairProps,
@@ -105,11 +109,11 @@ function PeriodPair({ periods, availablePeriods, onChange, isCompact }: TPeriodP
   const emit = ([climatePeriodA, climatePeriodB]: TPair<TClimatePeriod>) =>
     onChange({ climatePeriodA, climatePeriodB });
 
-  const [sideA, sideB] = PERIOD_PAIR_SIDES.map(({ side, index, labelKey, color, testId }) => (
+  const [sideA, sideB] = PERIOD_PAIR_SIDES.map(({ side, index, labelKey, shape, testId }) => (
     <div key={side} className={C.SIDE}>
       <div className={C.LABEL_ROW}>
         <div id={`${labelId}-${side}`}>
-          <DotLabel label={t(labelKey)} dotColor={color} />
+          <DotLabel label={t(labelKey)} markerShape={shape} />
         </div>
         {side === EPairSide.B && (
           <SwapButton
@@ -125,7 +129,6 @@ function PeriodPair({ periods, availablePeriods, onChange, isCompact }: TPeriodP
         value={pair[index]}
         onChange={toClimatePeriodHandler((period) => emit(setPairSide(pair, side, period)))}
         ariaLabelledBy={`${labelId}-${side}`}
-        accentColor={color}
         isStretched
         className="w-full"
         data-testid={`${testId}-select`}
@@ -172,9 +175,12 @@ function YearsEditor({ value, onChange, isCompact }: TYearsEditorProps) {
       <div className={isCompact ? C.YEARS_COMPACT : undefined}>
         <div className={C.YEARS}>
           {value.map((period) => {
-            const tint = getSeriesTint(value.indexOf(period));
             return (
-              <Badge key={period} tone={tint} dotColor={tint.dot}>
+              <Badge
+                key={period}
+                tone={YEAR_BADGE_TONE}
+                markerShape={getSeriesShape(value.indexOf(period))}
+              >
                 {period}
                 {canRemove && (
                   <button

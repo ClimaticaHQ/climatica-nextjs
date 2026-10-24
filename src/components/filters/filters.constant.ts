@@ -1,5 +1,5 @@
 import { FORM_CONTROL_CLASSES } from "@/constants";
-import { getPairPalette } from "@/utils/seriesColor.util";
+import { getPairShape } from "@/utils/seriesShape.util";
 import { EFilterAvailability, EFilterNoteVariant, EPairSide, EWalterLiethSeriesId } from "@/enums";
 import { getSwitchToStandardChartLabel } from "@/utils/chartMode.util";
 import type { TFilterUnavailableActionLabels } from "./filters.type";
@@ -59,20 +59,27 @@ export const COMPARED_PERIODS_CLASSES = {
 
 export const YEAR_INPUT_CLASS = `${FORM_CONTROL_CLASSES.INPUT} text-[length:var(--font-base)]`;
 
-// * each side of Compare Periods' pair: its place, label, colour and test ids
+// * a compared year's badge: neutral — its shape names it, never a colour
+export const YEAR_BADGE_TONE = {
+  bg: "var(--color-surface-secondary)",
+  border: "var(--color-border)",
+  text: "var(--color-text)",
+} as const;
+
+// * each side of Compare Periods' pair: its place, label, shape and test ids
 export const PERIOD_PAIR_SIDES = [
   {
     side: EPairSide.A,
     index: 0,
     labelKey: "climateComparison.periodA",
-    color: getPairPalette(EWalterLiethSeriesId.A).tmax,
+    shape: getPairShape(EWalterLiethSeriesId.A),
     testId: "period-a",
   },
   {
     side: EPairSide.B,
     index: 1,
     labelKey: "climateComparison.periodB",
-    color: getPairPalette(EWalterLiethSeriesId.B).tmax,
+    shape: getPairShape(EWalterLiethSeriesId.B),
     testId: "period-b",
   },
 ] as const;
