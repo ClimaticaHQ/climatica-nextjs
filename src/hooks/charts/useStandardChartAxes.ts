@@ -7,10 +7,14 @@ import { useLocale, useTranslations } from "next-intl";
  * The standard chart's axes — the WL diagram's: same widths (so the same plot area), no month
  * axis title. Compact = one panel of a split pair.
  */
-export function useStandardChartAxes(isCompact: boolean, monthFormat: TMonthLabelFormat) {
+export function useStandardChartAxes(
+  isCompact: boolean,
+  monthFormat: TMonthLabelFormat,
+  isNarrow = false,
+) {
   const t = useTranslations();
   const locale = useLocale();
-  const { tick, ...geometry } = getAxisStyle(isCompact);
+  const { tick, ...geometry } = getAxisStyle(isCompact, isNarrow);
 
   const monthIndexOf = (v: unknown) => MONTH_NAMES.findIndex((name) => name === String(v));
   const localMonthName = (v: unknown) => {

@@ -3,6 +3,7 @@ import {
   COMPARE_EXPORT_DEFAULT_VISIBLE,
   COMPARE_EXPORT_SVG_LAYOUT,
   DOCUMENT_TITLE,
+  EXPORT_BAR_STYLE,
   EXPORT_PNG_SCALE,
   MISSING_VALUE_LABEL,
   SERIES_KIND_RULES,
@@ -32,7 +33,8 @@ import { useYearsExportBlock } from "./useYearsExportBlock";
 /**
  * The export menu for compared series — a pair or the weather years: CSV of their stats, PNG /
  * SVG of the chart as shown (chart type, layout, shading, expanded panel or drawn years, chips).
- * The file is titled like the chart and named after the page's place and the exported series.
+ * The file is titled like the chart and named after the page's place and the exported series;
+ * its overlay's bars are always the default bar style (EXPORT_BAR_STYLE), whatever the setting.
  * Disabled while data is replaced.
  */
 export function useComparisonChartExport(args: TUseComparisonChartExportArgs): ExportMenuProps {
@@ -90,6 +92,7 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
         martonneClassLabel: martonneClass(entry.stats.martonneIndex),
         shape: entry.series.shape,
         hatch: entry.series.hatch,
+        place: model.series.indexOf(entry),
       })),
       visibleSeries: visible,
       selectedMonths: viewState.selectedMonths,
@@ -114,6 +117,7 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
         },
       },
       showTavgLine: rule.hasMeanLine,
+      barStyle: EXPORT_BAR_STYLE,
       datasetAttribution: args.datasetAttribution,
       shareUrl: args.shareUrl,
       ...(comparison ? { comparison } : {}),

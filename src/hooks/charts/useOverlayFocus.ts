@@ -33,7 +33,8 @@ export function useOverlayFocus({ entries, rows, lines, activeMonthIndex }: TUse
       const period = t(isArid ? "chart.focusArid" : "chart.focusHumid");
       return {
         text: t("chart.focusBar", { entity: entry.label, month, value, period }),
-        marker: { ...entry.marker, hatch: entry.hatch },
+        // * the bar's swatch beside its shape only where the view draws them per entity
+        marker: { ...entry.marker, ...entry.swatch },
       };
     }
     const line = lines.find(({ variable }) => variable === current.variable);
