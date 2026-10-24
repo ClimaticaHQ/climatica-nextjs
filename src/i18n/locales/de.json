@@ -190,7 +190,12 @@
     "martonneYear": "Martonne-Index (M) für {year}",
     "martonneTooltipYear": "De-Martonne-Trockenheitsindex nur für {year}, aus den Daten dieses Jahres: M = P/(T+10).",
     "martonnePerYear": "Martonne-Index (M), pro Jahr",
-    "yearsShown": "Angezeigte Jahre"
+    "yearsShown": "Angezeigte Jahre",
+    "focusCurve": "{variable} · {entity} — {month} {value}",
+    "focusBar": "{entity} — {month} {value} ({period})",
+    "focusHumid": "humide Periode",
+    "focusArid": "aride Periode",
+    "scrollHint": "Wischen, um alle Monate zu sehen"
   },
   "loading": {
     "dataUpdated": "Daten aktualisiert: {location}, {period}"
@@ -242,7 +247,7 @@
       "allFilters": "Filter",
       "allFiltersLabel": "Filter, {count, plural, =0 {keine geändert} one {# geändert} other {# geändert}}",
       "value": "{name}: {value}",
-      "moreVariables": "{label} +{count}",
+      "variablesCount": "{count, plural, one {# Variable} other {# Variablen}}",
       "allMonths": "Alle Monate",
       "monthsCount": "{count, plural, one {# Monat} other {# Monate}}"
     },
@@ -396,6 +401,7 @@
     },
     "autoScroll": "Automatisch zu Ergebnissen scrollen",
     "syncCity": "Ausgewählte Stadt auf allen Seiten synchronisieren",
+    "syncFilters": "Filter auf allen Seiten synchronisieren",
     "autoApplyFilters": "Filter automatisch anwenden",
     "animations": "Animationen",
     "updateHighlight": "Hervorhebung bei Aktualisierung",
@@ -403,12 +409,25 @@
     "updateHighlightBorder": "Rahmen",
     "reducedMotionNotice": "Ihr System verlangt reduzierte Bewegung, daher sind Animationen aus",
     "appLanguage": "App-Sprache",
+    "chartBarStyle": "Balkenstil für Vergleiche",
+    "barStyleOptions": {
+      "plain": "Einheitlich",
+      "shades": "Farbtöne",
+      "hatch": "Muster"
+    },
+    "barStyleDescriptions": {
+      "plain": "Standard: eine Farbe für jede Stadt und jeden Zeitraum – die klarste Darstellung",
+      "shades": "Ein eigener Farbton für jede Stadt oder jeden Zeitraum",
+      "hatch": "Muster – am besten für den Druck und bei Farbsehschwächen"
+    },
     "descriptions": {
       "animations": "Weiche Übergänge, wenn sich Diagramme und Daten ändern",
       "updateHighlight": "Wie eine Karte markiert wird, wenn sich ihre Daten ändern",
       "autoApplyFilters": "Filteränderungen gelten sofort; ausgeschaltet warten sie auf „Filter anwenden“",
       "syncCity": "Eine auf einer Seite gewählte Stadt öffnet sich auch auf den anderen Seiten",
-      "autoScroll": "Scrollt nach der Wahl einer Stadt zu den Ergebnissen"
+      "syncFilters": "Auf einer Seite gewählte Filter gelten auch auf den anderen Seiten",
+      "autoScroll": "Scrollt nach der Wahl einer Stadt zu den Ergebnissen",
+      "chartBarStyle": "Wie Städte oder Zeiträume in überlagerten Diagrammen unterschieden werden"
     },
     "hints": {
       "turnOnAnimations": "Schalten Sie Animationen ein, um eine Hervorhebung zu wählen"

@@ -190,7 +190,12 @@
     "martonneYear": "Indicele Martonne (M) pentru {year}",
     "martonneTooltipYear": "Indicele de ariditate De Martonne doar pentru {year}, din datele acelui an: M = P/(T+10).",
     "martonnePerYear": "Indicele Martonne (M), pe an",
-    "yearsShown": "Ani afișați"
+    "yearsShown": "Ani afișați",
+    "focusCurve": "{variable} · {entity} — {month} {value}",
+    "focusBar": "{entity} — {month} {value} ({period})",
+    "focusHumid": "perioadă umedă",
+    "focusArid": "perioadă aridă",
+    "scrollHint": "Glisează pentru a vedea toate lunile"
   },
   "loading": {
     "dataUpdated": "Date actualizate: {location}, {period}"
@@ -242,7 +247,7 @@
       "allFilters": "Filtre",
       "allFiltersLabel": "Filtre, {count, plural, =0 {niciunul modificat} one {# modificat} few {# modificate} other {# modificate}}",
       "value": "{name}: {value}",
-      "moreVariables": "{label} +{count}",
+      "variablesCount": "{count, plural, one {# variabilă} few {# variabile} other {# de variabile}}",
       "allMonths": "Toate lunile",
       "monthsCount": "{count, plural, one {# lună} few {# luni} other {# de luni}}"
     },
@@ -396,6 +401,7 @@
     },
     "autoScroll": "Derulare automată la rezultate",
     "syncCity": "Sincronizează orașul selectat pe toate paginile",
+    "syncFilters": "Sincronizează filtrele pe toate paginile",
     "autoApplyFilters": "Aplică filtrele automat",
     "animations": "Animații",
     "updateHighlight": "Evidențiere modificări",
@@ -403,12 +409,25 @@
     "updateHighlightBorder": "Bordură",
     "reducedMotionNotice": "Sistemul tău cere mișcare redusă, așa că animațiile sunt oprite",
     "appLanguage": "Limba aplicației",
+    "chartBarStyle": "Stilul barelor de comparație",
+    "barStyleOptions": {
+      "plain": "Uniform",
+      "shades": "Nuanțe",
+      "hatch": "Modele"
+    },
+    "barStyleDescriptions": {
+      "plain": "Implicit: o singură culoare pentru fiecare oraș sau perioadă, aspectul cel mai curat",
+      "shades": "O nuanță diferită pentru fiecare oraș sau perioadă",
+      "hatch": "Modele: cel mai bun pentru tipărire și pentru diferențe de percepție a culorilor"
+    },
     "descriptions": {
       "animations": "Tranziții line când se schimbă graficele și datele",
       "updateHighlight": "Cum este marcat un card când datele lui se actualizează",
       "autoApplyFilters": "Modificările filtrelor se aplică imediat; dezactivat, așteaptă „Aplică filtrele”",
       "syncCity": "Orașul ales pe o pagină se deschide și pe celelalte pagini",
-      "autoScroll": "Derulează la rezultate după ce alegi un oraș"
+      "syncFilters": "Filtrele alese pe o pagină se aplică și pe celelalte pagini",
+      "autoScroll": "Derulează la rezultate după ce alegi un oraș",
+      "chartBarStyle": "Cum se deosebesc orașele sau perioadele în graficele suprapuse"
     },
     "hints": {
       "turnOnAnimations": "Pornește animațiile ca să alegi o evidențiere"

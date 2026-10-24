@@ -190,7 +190,12 @@
     "martonneYear": "Martonne-indeks (M) for {year}",
     "martonneTooltipYear": "De Martonnes tørkeindeks for {year} alene, ut fra det årets data: M = P/(T+10).",
     "martonnePerYear": "Martonne-indeks (M), per år",
-    "yearsShown": "Viste år"
+    "yearsShown": "Viste år",
+    "focusCurve": "{variable} · {entity} — {month} {value}",
+    "focusBar": "{entity} — {month} {value} ({period})",
+    "focusHumid": "fuktig periode",
+    "focusArid": "tørr periode",
+    "scrollHint": "Sveip for å se alle månedene"
   },
   "loading": {
     "dataUpdated": "Data oppdatert: {location}, {period}"
@@ -242,7 +247,7 @@
       "allFilters": "Filtre",
       "allFiltersLabel": "Filtre, {count, plural, =0 {ingen endret} one {# endret} other {# endret}}",
       "value": "{name}: {value}",
-      "moreVariables": "{label} +{count}",
+      "variablesCount": "{count, plural, one {# variabel} other {# variabler}}",
       "allMonths": "Alle måneder",
       "monthsCount": "{count, plural, one {# måned} other {# måneder}}"
     },
@@ -396,6 +401,7 @@
     },
     "autoScroll": "Rull automatisk til resultater",
     "syncCity": "Synkroniser valgt by på tvers av sider",
+    "syncFilters": "Synkroniser filtre på tvers av sider",
     "autoApplyFilters": "Bruk filtre automatisk",
     "animations": "Animasjoner",
     "updateHighlight": "Fremhev endringer",
@@ -403,12 +409,25 @@
     "updateHighlightBorder": "Ramme",
     "reducedMotionNotice": "Systemet ditt ber om redusert bevegelse, så animasjoner er av",
     "appLanguage": "Appspråk",
+    "chartBarStyle": "Søylestil for sammenligning",
+    "barStyleOptions": {
+      "plain": "Ensfarget",
+      "shades": "Nyanser",
+      "hatch": "Mønstre"
+    },
+    "barStyleDescriptions": {
+      "plain": "Standard: én farge for hver by eller periode – det reneste uttrykket",
+      "shades": "En egen nyanse for hver by eller periode",
+      "hatch": "Mønstre – best for utskrift og ulikt fargesyn"
+    },
     "descriptions": {
       "animations": "Myke overganger når diagrammer og data endres",
       "updateHighlight": "Hvordan et kort markeres når dataene i det oppdateres",
       "autoApplyFilters": "Filterendringer brukes med en gang; når det er av, venter de på «Bruk filtre»",
       "syncCity": "En by du velger på én side, åpnes også på de andre sidene",
-      "autoScroll": "Ruller ned til resultatene når du har valgt en by"
+      "syncFilters": "Filtre du velger på én side, gjelder også på de andre sidene",
+      "autoScroll": "Ruller ned til resultatene når du har valgt en by",
+      "chartBarStyle": "Hvordan byer eller perioder skilles fra hverandre i overlagte diagrammer"
     },
     "hints": {
       "turnOnAnimations": "Slå på animasjoner for å velge fremheving"

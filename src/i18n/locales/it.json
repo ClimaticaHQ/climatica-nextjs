@@ -190,7 +190,12 @@
     "martonneYear": "Indice di Martonne (M) per il {year}",
     "martonneTooltipYear": "Indice di aridità di De Martonne del solo {year}, dai dati di quell’anno: M = P/(T+10).",
     "martonnePerYear": "Indice di Martonne (M), per anno",
-    "yearsShown": "Anni mostrati"
+    "yearsShown": "Anni mostrati",
+    "focusCurve": "{variable} · {entity} — {month} {value}",
+    "focusBar": "{entity} — {month} {value} ({period})",
+    "focusHumid": "periodo umido",
+    "focusArid": "periodo arido",
+    "scrollHint": "Scorri per vedere tutti i mesi"
   },
   "loading": {
     "dataUpdated": "Dati aggiornati: {location}, {period}"
@@ -242,7 +247,7 @@
       "allFilters": "Filtri",
       "allFiltersLabel": "Filtri, {count, plural, =0 {nessuno modificato} one {# modificato} other {# modificati}}",
       "value": "{name}: {value}",
-      "moreVariables": "{label} +{count}",
+      "variablesCount": "{count, plural, one {# variabile} other {# variabili}}",
       "allMonths": "Tutti i mesi",
       "monthsCount": "{count, plural, one {# mese} other {# mesi}}"
     },
@@ -396,6 +401,7 @@
     },
     "autoScroll": "Scorrimento automatico ai risultati",
     "syncCity": "Sincronizza la città selezionata su tutte le pagine",
+    "syncFilters": "Sincronizza i filtri su tutte le pagine",
     "autoApplyFilters": "Applica i filtri automaticamente",
     "animations": "Animazioni",
     "updateHighlight": "Evidenziazione aggiornamenti",
@@ -403,12 +409,25 @@
     "updateHighlightBorder": "Bordo",
     "reducedMotionNotice": "Il sistema chiede di ridurre il movimento, quindi le animazioni sono disattivate",
     "appLanguage": "Lingua dell’app",
+    "chartBarStyle": "Stile delle barre di confronto",
+    "barStyleOptions": {
+      "plain": "Uniforme",
+      "shades": "Tonalità",
+      "hatch": "Trame"
+    },
+    "barStyleDescriptions": {
+      "plain": "Predefinito: un solo colore per ogni città o periodo, l’aspetto più pulito",
+      "shades": "Una tonalità diversa per ogni città o periodo",
+      "hatch": "Trame: ideali per la stampa e per chi percepisce i colori in modo diverso"
+    },
     "descriptions": {
       "animations": "Transizioni fluide quando cambiano grafici e dati",
       "updateHighlight": "Come viene segnalata una scheda quando i suoi dati si aggiornano",
       "autoApplyFilters": "Le modifiche ai filtri valgono subito; se disattivato, attendono «Applica filtri»",
       "syncCity": "La città scelta in una pagina si apre anche nelle altre",
-      "autoScroll": "Scorre fino ai risultati dopo aver scelto una città"
+      "syncFilters": "I filtri scelti in una pagina valgono anche nelle altre",
+      "autoScroll": "Scorre fino ai risultati dopo aver scelto una città",
+      "chartBarStyle": "Come si distinguono città o periodi nei grafici sovrapposti"
     },
     "hints": {
       "turnOnAnimations": "Attiva le animazioni per scegliere un’evidenziazione"

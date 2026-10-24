@@ -190,7 +190,12 @@
     "martonneYear": "Índice de Martonne (M) de {year}",
     "martonneTooltipYear": "Índice de aridez de De Martonne apenas para {year}, com os dados desse ano: M = P/(T+10).",
     "martonnePerYear": "Índice de Martonne (M), por ano",
-    "yearsShown": "Anos exibidos"
+    "yearsShown": "Anos exibidos",
+    "focusCurve": "{variable} · {entity} — {month} {value}",
+    "focusBar": "{entity} — {month} {value} ({period})",
+    "focusHumid": "período húmido",
+    "focusArid": "período árido",
+    "scrollHint": "Deslize para ver todos os meses"
   },
   "loading": {
     "dataUpdated": "Dados atualizados: {location}, {period}"
@@ -242,7 +247,7 @@
       "allFilters": "Filtros",
       "allFiltersLabel": "Filtros, {count, plural, =0 {nenhum alterado} one {# alterado} other {# alterados}}",
       "value": "{name}: {value}",
-      "moreVariables": "{label} +{count}",
+      "variablesCount": "{count, plural, one {# variável} other {# variáveis}}",
       "allMonths": "Todos os meses",
       "monthsCount": "{count, plural, one {# mês} other {# meses}}"
     },
@@ -396,6 +401,7 @@
     },
     "autoScroll": "Deslocamento automático para os resultados",
     "syncCity": "Sincronizar cidade selecionada em todas as páginas",
+    "syncFilters": "Sincronizar filtros em todas as páginas",
     "autoApplyFilters": "Aplicar filtros automaticamente",
     "animations": "Animações",
     "updateHighlight": "Destaque de atualização",
@@ -403,12 +409,25 @@
     "updateHighlightBorder": "Contorno",
     "reducedMotionNotice": "O seu sistema pede movimento reduzido, por isso as animações estão desativadas",
     "appLanguage": "Idioma da aplicação",
+    "chartBarStyle": "Estilo das barras de comparação",
+    "barStyleOptions": {
+      "plain": "Uniforme",
+      "shades": "Tons",
+      "hatch": "Padrões"
+    },
+    "barStyleDescriptions": {
+      "plain": "Predefinido: uma só cor para cada cidade ou período, o aspeto mais limpo",
+      "shades": "Um tom diferente para cada cidade ou período",
+      "hatch": "Padrões: o melhor para imprimir e para diferenças na visão das cores"
+    },
     "descriptions": {
       "animations": "Transições suaves quando os gráficos e os dados mudam",
       "updateHighlight": "Como um cartão é assinalado quando os seus dados são atualizados",
       "autoApplyFilters": "As alterações aos filtros aplicam-se logo; desativado, esperam por «Aplicar filtros»",
       "syncCity": "A cidade que escolhe numa página abre também nas outras",
-      "autoScroll": "Desce até aos resultados depois de escolher uma cidade"
+      "syncFilters": "Os filtros que escolhe numa página aplicam-se também nas outras",
+      "autoScroll": "Desce até aos resultados depois de escolher uma cidade",
+      "chartBarStyle": "Como as cidades ou os períodos se distinguem nos gráficos sobrepostos"
     },
     "hints": {
       "turnOnAnimations": "Ative as animações para escolher um destaque"

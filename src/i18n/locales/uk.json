@@ -190,7 +190,12 @@
     "martonneYear": "Індекс Мартонна (M) за {year} рік",
     "martonneTooltipYear": "Індекс аридності де Мартонна лише за {year} рік, за даними цього року: M = P/(T+10).",
     "martonnePerYear": "Індекс Мартонна (M), за рік",
-    "yearsShown": "Показані роки"
+    "yearsShown": "Показані роки",
+    "focusCurve": "{variable} · {entity} — {month} {value}",
+    "focusBar": "{entity} — {month} {value} ({period})",
+    "focusHumid": "вологий період",
+    "focusArid": "посушливий період",
+    "scrollHint": "Проведіть, щоб побачити всі місяці"
   },
   "loading": {
     "dataUpdated": "Дані оновлено: {location}, {period}"
@@ -242,7 +247,7 @@
       "allFilters": "Фільтри",
       "allFiltersLabel": "Фільтри, {count, plural, =0 {без змін} one {# змінено} few {# змінено} many {# змінено} other {# змінено}}",
       "value": "{name}: {value}",
-      "moreVariables": "{label} +{count}",
+      "variablesCount": "{count, plural, one {# змінна} few {# змінні} many {# змінних} other {# змінної}}",
       "allMonths": "Усі місяці",
       "monthsCount": "{count, plural, one {# місяць} few {# місяці} many {# місяців} other {# місяця}}"
     },
@@ -396,6 +401,7 @@
     },
     "autoScroll": "Автопрокрутка до результатів",
     "syncCity": "Синхронізувати вибране місто на всіх сторінках",
+    "syncFilters": "Синхронізувати фільтри на всіх сторінках",
     "autoApplyFilters": "Автоматично застосовувати фільтри",
     "animations": "Анімації",
     "updateHighlight": "Підсвічування оновлень",
@@ -403,12 +409,25 @@
     "updateHighlightBorder": "Рамка",
     "reducedMotionNotice": "Ваша система просить зменшити рух, тому анімації вимкнено",
     "appLanguage": "Мова застосунку",
+    "chartBarStyle": "Стиль стовпців порівняння",
+    "barStyleOptions": {
+      "plain": "Однотонний",
+      "shades": "Відтінки",
+      "hatch": "Візерунки"
+    },
+    "barStyleDescriptions": {
+      "plain": "Типово: один колір для кожного міста чи періоду — найчистіший вигляд",
+      "shades": "Окремий відтінок для кожного міста чи періоду",
+      "hatch": "Візерунки — найкраще для друку та за особливостей сприйняття кольорів"
+    },
     "descriptions": {
       "animations": "Плавні переходи, коли змінюються графіки та дані",
       "updateHighlight": "Як позначається картка, коли її дані оновлюються",
       "autoApplyFilters": "Зміни фільтрів застосовуються одразу; якщо вимкнено, вони чекають на «Застосувати»",
       "syncCity": "Місто, вибране на одній сторінці, відкривається й на інших",
-      "autoScroll": "Прокручує до результатів після вибору міста"
+      "syncFilters": "Фільтри, вибрані на одній сторінці, діють і на інших",
+      "autoScroll": "Прокручує до результатів після вибору міста",
+      "chartBarStyle": "Як розрізняються міста чи періоди на накладених графіках"
     },
     "hints": {
       "turnOnAnimations": "Увімкніть анімації, щоб вибрати підсвічування"

@@ -190,7 +190,12 @@
     "martonneYear": "Martonne index (M) for {year}",
     "martonneTooltipYear": "De Martonne aridity index for {year} alone, from that year's data: M = P/(T+10).",
     "martonnePerYear": "Martonne index (M), per year",
-    "yearsShown": "Years shown"
+    "yearsShown": "Years shown",
+    "focusCurve": "{variable} · {entity} — {month} {value}",
+    "focusBar": "{entity} — {month} {value} ({period})",
+    "focusHumid": "humid period",
+    "focusArid": "arid period",
+    "scrollHint": "Swipe to see every month"
   },
   "loading": {
     "dataUpdated": "Data updated: {location}, {period}"
@@ -242,7 +247,7 @@
       "allFilters": "Filters",
       "allFiltersLabel": "Filters, {count, plural, =0 {none changed} one {# changed} other {# changed}}",
       "value": "{name}: {value}",
-      "moreVariables": "{label} +{count}",
+      "variablesCount": "{count, plural, one {# variable} other {# variables}}",
       "allMonths": "All months",
       "monthsCount": "{count, plural, one {# month} other {# months}}"
     },
@@ -396,6 +401,7 @@
     },
     "autoScroll": "Auto-scroll to results",
     "syncCity": "Sync selected city across pages",
+    "syncFilters": "Sync filters across pages",
     "autoApplyFilters": "Auto-apply filters",
     "animations": "Animations",
     "updateHighlight": "Update highlight",
@@ -403,12 +409,25 @@
     "updateHighlightBorder": "Border",
     "reducedMotionNotice": "Your system asks to reduce motion, so animations are off",
     "appLanguage": "App language",
+    "chartBarStyle": "Comparison bar style",
+    "barStyleOptions": {
+      "plain": "Uniform",
+      "shades": "Shades",
+      "hatch": "Patterns"
+    },
+    "barStyleDescriptions": {
+      "plain": "The default: one colour for every city or period — the cleanest look",
+      "shades": "A different shade for each city or period",
+      "hatch": "Patterns — best for printing and colour-vision differences"
+    },
     "descriptions": {
       "animations": "Smooth transitions when charts and data change",
       "updateHighlight": "How a card is marked when its data updates",
       "autoApplyFilters": "Filter changes apply at once; when off, they wait for “Apply filters”",
       "syncCity": "A city you pick on one page opens on the other pages too",
-      "autoScroll": "Scrolls down to the results after you pick a city"
+      "syncFilters": "Filters you set on one page apply on the other pages too",
+      "autoScroll": "Scrolls down to the results after you pick a city",
+      "chartBarStyle": "How cities or periods are told apart in overlaid charts"
     },
     "hints": {
       "turnOnAnimations": "Turn on animations to choose a highlight"
