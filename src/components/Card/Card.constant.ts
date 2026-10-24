@@ -22,9 +22,6 @@ export const CARD_PADDING_CLASSES: Record<ECardPadding, string> = {
 
 export const CARD_CLIP_CLASS = "overflow-hidden";
 
-export const CARD_FLAT_BELOW_SM_CLASS =
-  "max-sm:rounded-none max-sm:border-0 max-sm:bg-transparent max-sm:p-0";
-
 export const CARD_DEFAULTS = {
   SIZE: ECardSize.LG,
   PADDING: ECardPadding.DEFAULT,

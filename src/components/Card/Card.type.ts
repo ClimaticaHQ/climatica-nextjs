@@ -10,8 +10,6 @@ export type TCardProps = Omit<ComponentPropsWithoutRef<"div">, "className" | "st
   flashKeys?: TUpdateFlashKeys | undefined;
   /** clip the content to the rounded corners (tables, bars, the map, the progress bar) */
   shouldClip?: boolean | undefined;
-  /** below `sm` the card drops its frame: its content sits on the page background */
-  isFlatBelowSm?: boolean | undefined;
   /** layout only (grid, spacing, positioning) — the card's frame comes from the props above */
   className?: string | undefined;
   children: ReactNode;
@@ -19,5 +17,5 @@ export type TCardProps = Omit<ComponentPropsWithoutRef<"div">, "className" | "st
 
 export type TCardClassArgs = Pick<
   TCardProps,
-  "size" | "padding" | "background" | "shouldClip" | "isFlatBelowSm" | "className"
+  "size" | "padding" | "background" | "shouldClip" | "className"
 >;

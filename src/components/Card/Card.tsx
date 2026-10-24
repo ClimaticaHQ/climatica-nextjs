@@ -17,7 +17,6 @@ export function Card({
   background,
   flashKeys = NO_FLASH_KEYS,
   shouldClip,
-  isFlatBelowSm,
   className,
   children,
   ...rest
@@ -34,7 +33,6 @@ export function Card({
         padding,
         background,
         shouldClip,
-        isFlatBelowSm,
         className,
       })}
     >

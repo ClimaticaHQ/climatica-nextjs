@@ -2,7 +2,6 @@ import {
   CARD_BACKGROUND_CLASSES,
   CARD_CLIP_CLASS,
   CARD_DEFAULTS,
-  CARD_FLAT_BELOW_SM_CLASS,
   CARD_FRAME_CLASS,
   CARD_PADDING_CLASSES,
   CARD_SIZE_CLASSES,
@@ -15,7 +14,6 @@ export function getCardClassName({
   padding = CARD_DEFAULTS.PADDING,
   background = CARD_DEFAULTS.BACKGROUND,
   shouldClip = false,
-  isFlatBelowSm = false,
   className = "",
 }: TCardClassArgs) {
   return [
@@ -24,7 +22,6 @@ export function getCardClassName({
     CARD_SIZE_CLASSES[size],
     CARD_PADDING_CLASSES[padding],
     shouldClip ? CARD_CLIP_CLASS : "",
-    isFlatBelowSm ? CARD_FLAT_BELOW_SM_CLASS : "",
     className,
   ]
     .filter(Boolean)
