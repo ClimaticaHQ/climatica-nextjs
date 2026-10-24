@@ -5,8 +5,8 @@ import type { TSeriesHatchIconProps } from "./svg.type";
 
 const SIZE = 10;
 
-/** An entity's bar hatch as a swatch: the humid fill with the hatch knocked out of it. */
-export function SeriesHatchIcon({ hatch }: TSeriesHatchIconProps) {
+/** An entity's bar hatch as a swatch: the humid fill (or its own) with the hatch knocked out of it. */
+export function SeriesHatchIcon({ hatch, fill = PRECIP_BAR.HUMID }: TSeriesHatchIconProps) {
   const id = useId();
   return (
     <svg
@@ -20,7 +20,7 @@ export function SeriesHatchIcon({ hatch }: TSeriesHatchIconProps) {
       <defs>
         <SeriesHatchPattern id={id} hatch={hatch} />
       </defs>
-      <rect width={SIZE} height={SIZE} rx={1} fill={PRECIP_BAR.HUMID} />
+      <rect width={SIZE} height={SIZE} rx={1} fill={fill} />
       {hatch !== "solid" && <rect width={SIZE} height={SIZE} rx={1} fill={`url(#${id})`} />}
     </svg>
   );

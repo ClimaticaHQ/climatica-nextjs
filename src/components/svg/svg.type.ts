@@ -15,4 +15,6 @@ export type TSeriesHatchPatternProps = {
 
 export type TSeriesHatchIconProps = {
   hatch: TSeriesHatch;
+  /** the bars' fill under the hatch; absent: the humid fill */
+  fill?: string | undefined;
 };
