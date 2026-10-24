@@ -1,5 +1,12 @@
 import type { PathOptions } from "leaflet";
 
+// * a selected place's marker on every map: the brand green, a white outline, a soft shadow
+export const MAP_MARKER = {
+  FILL: "var(--color-brand)",
+  OUTLINE: "var(--color-map-marker-border)",
+  SHADOW: "var(--color-map-marker-shadow)",
+} as const;
+
 export const RASTER_SELECTION_PATH_OPTIONS: PathOptions = {
   color: "var(--color-brand)",
   fillColor: "var(--color-brand)",

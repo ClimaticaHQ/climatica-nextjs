@@ -68,6 +68,11 @@ export const WALTER_LIETH_AXIS = {
   // * monthly values table's unit column, so °C / mm get room beside the months
   WIDTH: 44,
   COMPACT_WIDTH: 30,
+  // * a phone's full-width chart: narrower axes, so the plot gets the width (ticks in --font-xs)
+  NARROW_WIDTH: 34,
+  NARROW_TICK_FONT_SIZE: 12,
+  // * a phone's standard chart: this many ticks per y axis
+  NARROW_TICK_COUNT: 4,
   // * tick labels sit this far from the axis line, with no tick marks
   TICK_GAP: 4,
   // * °C / mm sit above their axis, this far over the plot top
