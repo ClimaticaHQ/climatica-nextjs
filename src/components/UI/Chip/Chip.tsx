@@ -29,6 +29,7 @@ function ToggleChip({
   isLocked = false,
   markerShape,
   markerHatch,
+  markerFill,
   onClick,
 }: TToggleChipProps) {
   const state = disabled
@@ -52,7 +53,7 @@ function ToggleChip({
         label
       ) : (
         <span className={TOGGLE.LABEL_WITH_MARKER}>
-          <OptionMarker shape={markerShape} hatch={markerHatch} />
+          <OptionMarker shape={markerShape} hatch={markerHatch} fill={markerFill} />
           {label}
         </span>
       )}

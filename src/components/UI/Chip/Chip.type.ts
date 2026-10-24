@@ -11,7 +11,9 @@ export type TToggleChipProps = {
   /** an entity's shape before the label — e.g. a compared year's */
   markerShape?: TSeriesShape;
   /** its bars' hatch beside the shape — entity chips that are the chart's legend */
-  markerHatch?: TSeriesHatch;
+  markerHatch?: TSeriesHatch | undefined;
+  /** the hatch swatch's fill; absent: the humid fill */
+  markerFill?: string | undefined;
   onClick: () => void;
 };
 

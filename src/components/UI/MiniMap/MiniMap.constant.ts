@@ -1,10 +1,9 @@
-// * a place's marker: its shape in graphite, outlined in the surface colour so it reads on any
-// * tile — larger while it's the active place (px)
+// * a place's marker: its shape in the main map's green (MAP_MARKER), outlined in white so it
+// * reads on any tile — larger while it's the active place (px)
 export const MINI_MAP_MARKER = {
   SIZE: 14,
   ACTIVE_SIZE: 20,
-  OUTLINE: "var(--color-surface)",
-  OUTLINE_WIDTH: 1.5,
+  OUTLINE_WIDTH: 2,
 } as const;
 
 export const MINI_MAP_TOGGLE_CLASSES = {

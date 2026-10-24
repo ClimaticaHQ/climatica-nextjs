@@ -27,4 +27,6 @@ export type TOptionMarkerProps = {
   shape: TSeriesShape;
   /** its bars' hatch too — an overlay's entity chips are its legend */
   hatch?: TSeriesHatch | undefined;
+  /** the hatch swatch's fill; absent: the humid fill */
+  fill?: string | undefined;
 };
