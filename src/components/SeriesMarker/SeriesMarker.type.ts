@@ -1,7 +1,9 @@
-import type { EWalterLiethSeriesId } from "@/enums";
+import type { TSeriesHatch, TSeriesShape } from "@/types";
 
 export type TSeriesMarkerProps = {
-  id: EWalterLiethSeriesId;
-  /** overrides the series colour — a compared weather year has its own */
-  color?: string | undefined;
+  shape: TSeriesShape;
+  /** its bars' hatch too, beside the shape — where the marker stands for its bars */
+  hatch?: TSeriesHatch | undefined;
+  /** its bars' own fill under the hatch (the shades style); absent: the humid fill */
+  fill?: string | undefined;
 };
