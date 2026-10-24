@@ -1,5 +1,5 @@
 import { CHART_LEGEND } from "@/constants";
-import { getSwatchSize } from "@/utils";
+import { getLegendSwatchWidth, getSwatchSize } from "@/utils";
 import { CHART_LEGEND_CLASSES as C } from "./ChartLegend.constant";
 import type { TChartLegendProps } from "./ChartLegend.type";
 import { LegendSwatch } from "./components";
@@ -19,7 +19,10 @@ export function ChartLegend({ items, fontSize = CHART_LEGEND.FONT_SIZE }: TChart
           className={C.ITEM}
           style={isMuted ? { opacity: CHART_LEGEND.MUTED_OPACITY } : undefined}
         >
-          <LegendSwatch swatch={swatch} size={size} />
+          <LegendSwatch
+            swatch={swatch}
+            size={{ ...size, width: getLegendSwatchWidth(swatch, size) }}
+          />
           {label}
         </li>
       ))}
