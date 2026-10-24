@@ -1,7 +1,9 @@
 import { MONTHLY_TABLE } from "@/constants";
 import { useMonthlyValuesNames } from "@/hooks";
 import { buildMonthlyValuesRows } from "@/utils";
+import { ChartScrollContext } from "@/components/charts/chartScroll.context";
 import { useLocale, useTranslations } from "next-intl";
+import { useContext } from "react";
 import { MONTHLY_VALUES_CLASSES, MONTHLY_VALUES_PALETTE } from "./MonthlyValuesTable.constant";
 import type { TMonthlyValuesTableProps } from "./MonthlyValuesTable.type";
 import { HorizontalValues, VerticalValues } from "./components";
@@ -16,9 +18,11 @@ export function MonthlyValuesTable({
   series,
   isCompact,
   markers = [],
+  hasSections = false,
   ...hover
 }: TMonthlyValuesTableProps) {
   const t = useTranslations();
+  const scroll = useContext(ChartScrollContext);
   const locale = useLocale();
   const names = useMonthlyValuesNames();
   const rows = buildMonthlyValuesRows({
@@ -33,9 +37,19 @@ export function MonthlyValuesTable({
 
   const variant = { rows, caption, markers, flashKeys: series.map(({ key }) => key), ...hover };
 
+  // * under a scrolling overlay the aligned table scrolls with the plot at every width
+  if (scroll)
+    return (
+      <HorizontalValues isCompact={isCompact} hasSections={hasSections} isScrolling {...variant} />
+    );
   return (
     <div className={MONTHLY_VALUES_CLASSES.ROOT}>
-      <HorizontalValues isCompact={isCompact} {...variant} />
+      <HorizontalValues
+        isCompact={isCompact}
+        hasSections={hasSections}
+        isScrolling={false}
+        {...variant}
+      />
       <VerticalValues {...variant} />
     </div>
   );
