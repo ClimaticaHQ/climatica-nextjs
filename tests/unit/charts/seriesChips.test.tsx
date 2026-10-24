@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { SeriesChips } from "@/components/charts/SeriesChips";
 import messages from "@/i18n/locales/en.json";
-import { deriveChartModel } from "@/utils";
+import { SERIES_MARKER_COLOR } from "@/constants";
+import { deriveChartModel, getMarkerPath } from "@/utils";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
@@ -48,11 +49,16 @@ describe("SeriesChips", () => {
     expect(onShownChange).not.toHaveBeenCalled();
   });
 
-  it("draws each chip in its series' tint set, by its place", () => {
+  it("marks each chip with its series' shape in graphite — never a colour", () => {
     renderChips(["2021", "1990", "1967"]);
-    const style = screen.getByRole("button", { name: "1967" }).getAttribute("style") ?? "";
-    expect(style).toContain("--chip-tone-bg: var(--color-series-3-tint-bg)");
-    expect(style).toContain("--chip-tone-text: var(--color-series-3-tint-text)");
+    const chip = screen.getByRole("button", { name: "1967" });
+    expect(chip.getAttribute("style")).toBeNull();
+    const marker = chip.querySelector("[aria-hidden='true']");
+    expect(marker?.getAttribute("style")).toContain(`color: ${SERIES_MARKER_COLOR}`);
+    // * 1967 is third in the list: the triangle
+    expect(marker?.querySelector("svg:not([data-series-hatch]) path")?.getAttribute("d")).toBe(
+      getMarkerPath({ shape: "triangle", cx: 7, cy: 7, size: 9 }),
+    );
   });
 
   it("highlights the hovered or focused series", () => {

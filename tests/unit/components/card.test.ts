@@ -1,7 +1,6 @@
 import {
   CARD_BACKGROUND_CLASSES,
   CARD_CLIP_CLASS,
-  CARD_FLAT_BELOW_SM_CLASS,
   CARD_FRAME_CLASS,
   CARD_PADDING_CLASSES,
   CARD_SIZE_CLASSES,
@@ -60,11 +59,10 @@ describe("Card variants", () => {
     );
   });
 
-  it("clips and goes flat below sm only when asked", () => {
+  it("clips only when asked; its frame at every width", () => {
     expect(classes(getCardClassName({}))).not.toContain(CARD_CLIP_CLASS);
-    expect(getCardClassName({})).not.toContain(CARD_FLAT_BELOW_SM_CLASS);
     expect(classes(getCardClassName({ shouldClip: true }))).toContain(CARD_CLIP_CLASS);
-    expect(getCardClassName({ isFlatBelowSm: true })).toContain(CARD_FLAT_BELOW_SM_CLASS);
+    expect(getCardClassName({})).not.toMatch(/max-sm:(border-0|bg-transparent|p-0)/);
   });
 
   it("puts the caller's layout classes last", () => {

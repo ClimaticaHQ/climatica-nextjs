@@ -16,7 +16,7 @@ import type {
 import { buildComparisonTable } from "@/utils/comparisonTable.util";
 import { buildCompareExportSvg } from "@/utils/export/svg/buildCompareExportSvg.util";
 import { buildExportSvg } from "@/utils/export/svg/buildExportSvg.util";
-import { getStandardSplitLegendItems } from "@/utils/chartLegend.util";
+import { getSeriesHatch, getSeriesShape } from "@/utils/seriesShape.util";
 import {
   computeAridityPeriods,
   getAnnualSummary,
@@ -91,8 +91,7 @@ const COLORS: TExportChartColors = {
   wlCompressedFill: "#1d4ed8",
   wlFrost: "#4682b4",
   wlFrostOutline: "#6b7280",
-  wlSeriesA: "#1d9e75",
-  wlSeriesB: "#d97706",
+  seriesMarker: "#555555",
 };
 
 /** A WL series' months as the page's monthly rows (tmax / tmin around the mean). */
@@ -167,12 +166,12 @@ function buildSvg(overrides: Partial<TComparisonExport>) {
     ...overrides,
   };
   const stats = { avgTmax: 20, avgTmin: 10, totalPrec: 400, aridMonths: 4, martonneIndex: 16 };
-  const seriesColors = { tmax: "#1d9e75", tmin: "#5dcaa5", prec: "#9fe1cb", tavg: "#0f6e56" };
   const payload: TCompareExportPayload = {
     headerTitle: "Madrid vs Mumbai",
     headerSubtitle: "Climate 1970–2000",
-    series: [seriesA, seriesB].map((s) => ({
+    series: [seriesA, seriesB].map((s, i) => ({
       label: s.label,
+      shortLabel: s.label.slice(0, 3).toUpperCase(),
       data: s.months.map(({ tavg, prec }, i) => ({
         month: i + 1,
         monthName: `M${i + 1}`,
@@ -184,7 +183,9 @@ function buildSvg(overrides: Partial<TComparisonExport>) {
       stats,
       altitude: s.altitude ?? null,
       martonneClassLabel: null,
-      colors: seriesColors,
+      shape: getSeriesShape(i),
+      hatch: getSeriesHatch(i),
+      place: i,
     })),
     visibleSeries: { tmax: true, tmin: true, tavg: false, prec: true },
     selectedMonths: null,
@@ -195,6 +196,7 @@ function buildSvg(overrides: Partial<TComparisonExport>) {
       monthNames: Array.from({ length: 12 }, (_, i) => `Mo${i + 1}`),
       tableLabels: { tmax: "Max", tavg: "Avg", tmin: "Min", prec: "Precip" },
       seriesLabels: { tmax: "Max", tmin: "Min", tavg: "Avg", prec: "Prec" },
+      aridityLegend: { humid: "Humid period", arid: "Arid period" },
       statsLabels: {
         avgTmax: "Tmax",
         avgTmin: "Tmin",
@@ -205,6 +207,7 @@ function buildSvg(overrides: Partial<TComparisonExport>) {
       },
     },
     showTavgLine: true,
+    barStyle: "hatch",
     datasetAttribution: null,
     shareUrl: "https://example.test",
     comparison,
@@ -227,7 +230,7 @@ const valuesUnits = (svg: string) =>
 const valuesY = (svg: string) =>
   Number(
     svg.match(
-      /y="([\d.]+)" text-anchor="(?:middle|end)" font-size="11" font-weight="600" fill="#dc2626">°C</,
+      /y="([\d.]+)" text-anchor="(?:middle|end|start)" font-size="11" font-weight="600" fill="#dc2626">°C</,
     )?.[1],
   );
 const plotBottom = (svg: string) =>
@@ -299,15 +302,18 @@ describe("compare export — Walter-Lieth split", () => {
     expect(right.filter((tick) => tick === 100)).toHaveLength(2);
   });
 
-  it("wraps each panel in an equal-height tinted card with a series-colored dot", () => {
+  it("wraps each panel in an equal-height tinted card with the series' shape in graphite", () => {
     const cards = [
       ...svg.matchAll(new RegExp(`<rect [^>]*height="([\\d.]+)" rx="10" fill="${COLORS.bg}"`, "g")),
     ];
     expect(cards).toHaveLength(2);
     expect(cards[0]?.[1]).toBe(cards[1]?.[1]);
-    // * A a dot, B a square — the page's markers
-    expect(svg).toContain(`r="4" fill="${COLORS.wlSeriesA}"`);
-    expect(svg).toMatch(new RegExp(`width="8" height="8" rx="1" fill="${COLORS.wlSeriesB}"`));
+    // * A a circle (an arc), B a square (a polygon) — the page's markers, both graphite
+    const markers = [
+      ...svg.matchAll(new RegExp(`<path d="([^"]+)" fill="${COLORS.seriesMarker}" />`, "g")),
+    ].map(([, d]) => d ?? "");
+    expect(markers.some((d) => d.includes("a"))).toBe(true);
+    expect(markers.some((d) => d.includes("L"))).toBe(true);
   });
 
   it("starts both plots at the same y", () => {
@@ -339,15 +345,15 @@ describe("compare export — Walter-Lieth split", () => {
 });
 
 describe("compare export — Walter-Lieth overlay", () => {
-  it("draws one panel with both series in their colors, precipitation dashed", () => {
+  it("draws one panel with both series in the WL colours, told apart by shape", () => {
     const svg = buildSvg({ layout: ECompareLayout.OVERLAY });
 
     expect(count(svg, 'clipPath id="wl-ovl-clip"')).toBe(1);
     expect(
       count(svg, `stroke-dasharray="${WALTER_LIETH_DASH.OVERLAY_PREC}"`),
     ).toBeGreaterThanOrEqual(2);
-    expect(svg).toContain(`stroke="${COLORS.wlSeriesA}" stroke-width="2"`);
-    expect(svg).toContain(`stroke="${COLORS.wlSeriesB}" stroke-width="2"`);
+    expect(count(svg, `stroke="${COLORS.wlTemp}" stroke-width="2"`)).toBeGreaterThanOrEqual(2);
+    expect(svg).not.toContain(`stroke="${COLORS.seriesMarker}" stroke-width="2"`);
     expect(rightTickLabels(svg)).toEqual(expect.arrayContaining([0, 100]));
   });
 
@@ -404,9 +410,11 @@ describe("compare export — standard chart", () => {
     // * standard plots, not WL ones: no WL clip paths or hatching
     expect(svg).not.toContain('clipPath id="wl-');
     expect(svg).not.toContain("url(#wl-");
-    // * one legend below both panels, by variable
+    // * one legend below both panels, by variable; the bars as humid / arid
     expect(svg).toContain(">Max</text>");
-    expect(svg).toContain(">Prec</text>");
+    expect(svg).toContain(">Humid period</text>");
+    expect(svg).toContain(">Arid period</text>");
+    expect(svg).not.toContain(">Prec</text>");
   });
 
   it("overlay: one standard chart in the WL overlay's geometry — no cards, no month title", () => {
@@ -546,25 +554,6 @@ describe("compare export — one panel expanded", () => {
     );
   });
 
-  it("standard: the legend lists the expanded series' colors only", () => {
-    const colorsA = { tmax: "a1", tmin: "a2", tavg: "a3", prec: "a4" };
-    const colorsB = { tmax: "b1", tmin: "b2", tavg: "b3", prec: "b4" };
-    const labels = { tmax: "Max", tmin: "Min", tavg: "Avg", prec: "Prec" };
-    const visible = { tmax: true, tmin: true, tavg: false, prec: true };
-    const items = getStandardSplitLegendItems({
-      labels,
-      colorsA,
-      colorsB,
-      visible,
-      shown: EWalterLiethSeriesId.B,
-    });
-    expect(items.map(({ swatch }) => ("color" in swatch ? swatch.color : swatch.kind))).toEqual([
-      "b1",
-      "b2",
-      "b4",
-    ]);
-  });
-
   it("overlay ignores the expanded panel", () => {
     const svg = buildSvg({ layout: ECompareLayout.OVERLAY, expanded: EWalterLiethSeriesId.B });
     expect(svg).toContain(">Madrid</text>");
@@ -633,7 +622,7 @@ describe("compare export — comparison table and monthly strips", () => {
     expect(svg).toContain(">Mumbai \u2212 Madrid</text>");
     expect(svg).toContain(">Frost months</text>");
     expect(svg).toMatch(new RegExp(`fill="${COLORS.text}">\\d+ mm</text>`));
-    expect(svg).not.toMatch(new RegExp(`fill="${COLORS.wlSeriesA}">\\d+ mm</text>`));
+    expect(svg).not.toMatch(new RegExp(`fill="${COLORS.seriesMarker}">\\d+ mm</text>`));
     expect(svg).toContain(">Semi-arid</text>");
     // * above the chart
     expect(svg.indexOf(">Difference</text>")).toBeLessThan(svg.indexOf('clipPath id="wl-cmp-a'));
@@ -651,16 +640,26 @@ describe("compare export — comparison table and monthly strips", () => {
     "%s overlay: one two-row table, A's value above B's in the text colour, before the legend",
     (chartMode) => {
       const svg = buildSvg({ chartMode, layout: ECompareLayout.OVERLAY });
-      // * two rows: each unit followed by the series' markers, A's dot above B's square
-      const markedUnits = [
-        ...svg.matchAll(
-          new RegExp(
-            `>(°C|mm)</text><circle [^>]*fill="${COLORS.wlSeriesA}" /><rect [^>]*fill="${COLORS.wlSeriesB}" />`,
-            "g",
+      if (chartMode === "walter-lieth") {
+        // * two rows: each unit followed by the series' shapes in graphite, A's above B's — the
+        // * mm row's each after its hatch swatch
+        const markedUnits = [
+          ...svg.matchAll(
+            new RegExp(
+              `>(°C|mm)</text>(?:<rect [^>]*/>)*<path [^>]*fill="${COLORS.seriesMarker}" />(?:<rect [^>]*/>)*<path [^>]*fill="${COLORS.seriesMarker}" />`,
+              "g",
+            ),
           ),
-        ),
-      ].map((m) => m[1]);
-      expect(markedUnits).toEqual(["°C", "mm"]);
+        ].map((m) => m[1]);
+        expect(markedUnits).toEqual(["°C", "mm"]);
+      } else {
+        // * each unit a section label, then the row headed by the series' short labels as text;
+        // * the legend holds the markings and the names
+        expect(svg).toMatch(/>°C<\/text><text [^>]*>MAD<\/text><text [^>]*>MUM<\/text>/);
+        expect(svg).toMatch(/>mm<\/text><text [^>]*>MAD<\/text><text [^>]*>MUM<\/text>/);
+        expect(svg).toMatch(/>Madrid<\/text>/);
+        expect(svg).toMatch(/>Mumbai<\/text>/);
+      }
       const lines = valueLines(svg);
       // * two rows × (A line + B line)
       expect(lines.map(({ fill }) => fill[0])).toEqual([

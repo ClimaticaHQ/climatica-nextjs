@@ -5,7 +5,7 @@ import { useChartModel } from "@/hooks/charts/useChartModel";
 import { EChartBlock, ECompareLayout, EWalterLiethShading } from "@/enums";
 import messages from "@/i18n/locales/en.json";
 import type { TChartFeatures, TChartMode, TChartSeries, TChartViewState } from "@/types";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { CITY, CITY_PAIR, PERIOD_PAIR, weatherYears } from "./chartFixtures";
@@ -135,6 +135,21 @@ describe("chart blocks: added once, under every chart of every page", () => {
       // * each block drew something, not just its frame
       for (const block of [...tables, ...legends])
         expect(block.childElementCount).toBeGreaterThan(0);
+    },
+  );
+
+  it.each(cases.filter(({ mode }) => mode === "standard"))(
+    "$name: the avg chip adds the avg line to the legend",
+    ({ fixture, mode, layout }) => {
+      const { container } = renderCard(fixture, mode, layout);
+      const [avgChip] = screen.getAllByRole("button", { name: messages.sidebar.variables.tavg });
+      if (!avgChip) throw new Error("no avg chip");
+      fireEvent.click(avgChip);
+      const [legend] = blocks(container, EChartBlock.LEGEND);
+      if (!(legend instanceof HTMLElement)) throw new Error("no legend");
+      expect(within(legend).queryAllByText(messages.chart.avgTemperature).length).toBeGreaterThan(
+        0,
+      );
     },
   );
 

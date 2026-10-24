@@ -1,5 +1,10 @@
 import { EWalterLiethSeriesId } from "@/enums";
-import type { TExportChartColors, TWalterLiethSeriesInput, TWalterLiethYearsExport } from "@/types";
+import type {
+  TExportChartColors,
+  TSeriesShape,
+  TWalterLiethSeriesInput,
+  TWalterLiethYearsExport,
+} from "@/types";
 import { buildWalterLiethYearsBody } from "@/utils/export/svg/buildCompareWalterLiethSvg.util";
 import { describe, expect, it } from "vitest";
 
@@ -22,19 +27,18 @@ const COLORS: TExportChartColors = {
   wlCompressedFill: "#1d4ed8",
   wlFrost: "#4682b4",
   wlFrostOutline: "#6b7280",
-  wlSeriesA: "#1d9e75",
-  wlSeriesB: "#d97706",
+  seriesMarker: "#555555",
 };
 
 const months = (shift: number) =>
   Array.from({ length: 12 }, (_, i) => ({ tavg: 15 + shift + i, prec: 20 + i * 15 }));
 
-const year = (label: string, color: string, isComplete = true): TWalterLiethSeriesInput => ({
+const year = (label: string, shape: TSeriesShape, isComplete = true): TWalterLiethSeriesInput => ({
   id: EWalterLiethSeriesId.A,
   label,
   period: "Weather · single year",
   singleYear: Number(label),
-  markerColor: color,
+  shape,
   months: isComplete ? months(Number(label) % 3) : null,
 });
 
@@ -54,13 +58,15 @@ const yearsExport = (series: readonly TWalterLiethSeriesInput[]): TWalterLiethYe
 });
 
 describe("buildWalterLiethYearsBody", () => {
-  const years = [year("2021", "#0a0"), year("1967", "#f80"), year("1990", "#00f", false)];
+  const years = [year("2021", "circle"), year("1967", "square"), year("1990", "triangle", false)];
   const { body, bottom } = buildWalterLiethYearsBody(yearsExport(years), COLORS, 100);
 
-  it("draws one card per year, named by the year, in its own colour", () => {
+  it("draws one card per year, named by the year and its shape, in graphite", () => {
     for (const label of ["2021", "1967", "1990"]) expect(body).toContain(`>${label}</text>`);
-    expect(body).toContain('fill="#0a0"');
-    expect(body).toContain('fill="#f80"');
+    // * each card's header marker: the year's shape in the markers' graphite
+    expect(
+      body.match(new RegExp(`<path d="[^"]+" fill="${COLORS.seriesMarker}" />`, "g"))?.length,
+    ).toBe(3);
     expect(body.match(/Weather · single year/g)?.length).toBe(3);
   });
 

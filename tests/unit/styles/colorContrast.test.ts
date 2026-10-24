@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { WCAG_CONTRAST } from "@/constants/contrast.constant";
-import { contrastRatio, relativeLuminance } from "@/utils/contrast.util";
+import { contrastRatio } from "@/utils/contrast.util";
 
 // * the semantic tokens of both themes, resolved to their primitives' values (docs/colors.md)
 const css = readFileSync(join(process.cwd(), "src/styles/tokens.css"), "utf8");
@@ -44,7 +44,6 @@ const MARTONNE_CLASSES = [
   "extremely-humid",
 ];
 const CELL_COUNT_LEVELS = ["fast", "moderate", "slow", "too-many"];
-const SERIES_POSITIONS = [1, 2, 3, 4, 5];
 const badge = (name: string): [string, string] => [`--color-${name}-text`, `--color-${name}-bg`];
 
 // * [foreground, background]
@@ -59,16 +58,12 @@ const TEXT_PAIRS: [string, string][] = [
   ...CELL_COUNT_LEVELS.map((level) => badge(`cell-count-${level}`)),
   badge("month-badge"),
   badge("chip-active"),
-  ...SERIES_POSITIONS.map((n): [string, string] => [
-    `--color-series-${n}-tint-text`,
-    `--color-series-${n}-tint-bg`,
-  ]),
 ];
-// * data marks a reader tells apart on the chart card: each series' line colour (lines, markers;
-// * a pair's A and B are series 1 and 2), the single chart's lines, the Walter-Lieth frost band.
-// * Bar fills need no 3:1: their values are in the monthly values table and the tooltip
+// * data marks a reader tells apart on the chart card: the lines' semantic colours, the entities'
+// * graphite shapes, the Walter-Lieth frost band. Bar fills need no 3:1: their values are in the
+// * monthly values table and the tooltip
 const DATA_MARKS = [
-  ...SERIES_POSITIONS.map((n) => `--color-series-${n}`),
+  "--color-series-marker",
   "--color-chart-temp-max",
   "--color-chart-temp-min",
   "--color-chart-temp-avg",
@@ -77,14 +72,11 @@ const DATA_MARKS = [
 const GRAPHIC_PAIRS: [string, string][] = [
   ["--color-brand", "--color-surface"],
   ...DATA_MARKS.map((mark): [string, string] => [mark, "--color-surface"]),
-  // * a year badge's dot on the badge's tint
-  ...SERIES_POSITIONS.map((n): [string, string] => [
-    `--color-series-${n}-tint-dot`,
-    `--color-series-${n}-tint-bg`,
-  ]),
+  // * an entity's shape on a neutral year badge
+  ["--color-series-marker", "--color-surface-secondary"],
 ];
 
-// * every tint set's text on its background, used by a token or not (the series hues' sets too):
+// * every tint set's text on its background, used by a token or not:
 // * light text (tone 34) on light background (95), dark text (85) on dark background (20)
 const TINT_SET_TEXT = /^--tint-(?:light-(.+)-34|dark-(.+)-85)$/;
 const TINT_SET_PAIRS: [string, string][] = [...primitives.keys()]
@@ -128,21 +120,7 @@ describe("colour contrast (WCAG 2.x), both themes", () => {
     expect(failures(TINT_SET_PAIRS, WCAG_CONTRAST.TEXT, ["light"])).toEqual([]);
   });
 
-  it("the brand and the data marks on the surface, each series dot on its tint reach 3:1", () => {
+  it("the brand, the data marks and the entity shapes reach 3:1", () => {
     expect(failures(GRAPHIC_PAIRS, WCAG_CONTRAST.LARGE_TEXT_OR_GRAPHIC)).toEqual([]);
-  });
-});
-
-describe("series bars, both themes", () => {
-  // * a bar is quieter than its line: lighter on the light surface, darker on the dark one
-  it("each series' bar is lighter than its line in light, darker in dark", () => {
-    const louder = THEME_NAMES.flatMap((theme) =>
-      SERIES_POSITIONS.filter((n) => {
-        const line = relativeLuminance(resolve(theme, `--color-series-${n}`));
-        const bar = relativeLuminance(resolve(theme, `--color-series-${n}-bar`));
-        return theme === "light" ? !(bar > line) : !(bar < line);
-      }).map((n) => `${theme}: --color-series-${n}-bar`),
-    );
-    expect(louder).toEqual([]);
   });
 });

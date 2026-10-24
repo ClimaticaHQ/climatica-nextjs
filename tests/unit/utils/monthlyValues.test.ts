@@ -2,7 +2,7 @@ import { MISSING_VALUE_LABEL } from "@/constants";
 import { buildMonthlyValuesRows, formatMonthlyValuesValue } from "@/utils/monthlyValues.util";
 import { describe, expect, it } from "vitest";
 
-const palette = { temp: "red", prec: "blue" };
+const palette = { temp: "red", prec: "blue", text: "ink" };
 const names = { tavg: "Mean temperature", prec: "Precipitation" };
 const months = (tavg: number, prec: number) =>
   Array.from({ length: 12 }, (_, i) => ({ tavg: tavg - i, prec: prec + i }));
@@ -10,7 +10,7 @@ const months = (tavg: number, prec: number) =>
 describe("monthly values rows", () => {
   it("has exactly two rows — °C (red) and mm (blue) — twelve cells each", () => {
     const rows = buildMonthlyValuesRows({
-      series: [{ key: "a", label: "Lviv", color: "ink", data: months(4, 36) }],
+      series: [{ key: "a", label: "Lviv", data: months(4, 36) }],
       palette,
       names,
       locale: "en",
@@ -33,19 +33,19 @@ describe("monthly values rows", () => {
     expect(format("tavg", -3.64, "es")).toBe("−3,6");
   });
 
-  it("overlay: stacks A's value above B's in each cell, in their colors, each named", () => {
+  it("overlay: stacks A's value above B's in each cell, in the text colour, each named", () => {
     const [temp] = buildMonthlyValuesRows({
       series: [
-        { key: "a", label: "Valladolid", color: "green", data: months(4, 44) },
-        { key: "b", label: "Lviv", color: "orange", data: months(-3.6, 37) },
+        { key: "a", label: "Valladolid", data: months(4, 44) },
+        { key: "b", label: "Lviv", data: months(-3.6, 37) },
       ],
       palette,
       names,
       locale: "en",
     });
     expect(temp?.cells[0]).toEqual([
-      { text: "4.0", color: "green", srText: "Valladolid: 4.0" },
-      { text: "−3.6", color: "orange", srText: "Lviv: −3.6" },
+      { key: "a", text: "4.0", color: "ink", srText: "Valladolid: 4.0" },
+      { key: "b", text: "−3.6", color: "ink", srText: "Lviv: −3.6" },
     ]);
   });
 });

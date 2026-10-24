@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { Badge } from "@/components/UI/Badge";
+import { SERIES_MARKER_COLOR } from "@/constants";
 import { EBadgeSize } from "@/enums";
-import { getSeriesTint } from "@/utils/seriesColor.util";
+import { getMarkerPath } from "@/utils/seriesShape.util";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -29,16 +30,19 @@ describe("Badge", () => {
     expect(badge?.getAttribute("style")).toContain("color: var(--color-cell-count-fast-text)");
   });
 
-  it("shows a dot only when given a dot colour", () => {
+  it("shows an entity's shape only when given one, in graphite", () => {
     const { container, rerender } = render(<Badge tone={TONE}>2001</Badge>);
     expect(container.querySelector("[aria-hidden='true']")).toBeNull();
     rerender(
-      <Badge tone={TONE} dotColor="var(--color-series-3)">
+      <Badge tone={TONE} markerShape="triangle">
         2001
       </Badge>,
     );
-    const dot = container.querySelector("[aria-hidden='true']");
-    expect(dot?.getAttribute("style")).toContain("background-color: var(--color-series-3)");
+    const marker = container.querySelector("[aria-hidden='true']");
+    expect(marker?.getAttribute("style")).toContain(`color: ${SERIES_MARKER_COLOR}`);
+    expect(marker?.querySelector("path")?.getAttribute("d")).toBe(
+      getMarkerPath({ shape: "triangle", cx: 7, cy: 7, size: 9 }),
+    );
   });
 
   it("truncates its content in one line and keeps the full text as its title", () => {
@@ -56,18 +60,5 @@ describe("Badge", () => {
   it("is medium by default", () => {
     render(<Badge tone={TONE}>Fast</Badge>);
     expect(badgeOf("Fast")?.className).toContain("text-[length:var(--font-xs)]");
-  });
-});
-
-describe("getSeriesTint", () => {
-  it("gives a listed series its tint set and dot by place, wrapping like its colour", () => {
-    expect(getSeriesTint(0)).toEqual({
-      bg: "var(--color-series-1-tint-bg)",
-      border: "var(--color-series-1-tint-border)",
-      text: "var(--color-series-1-tint-text)",
-      dot: "var(--color-series-1-tint-dot)",
-    });
-    expect(getSeriesTint(6).bg).toBe("var(--color-series-2-tint-bg)");
-    expect(getSeriesTint(-1).bg).toBe("var(--color-series-1-tint-bg)");
   });
 });

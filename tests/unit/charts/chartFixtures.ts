@@ -1,9 +1,9 @@
 import {
-  getPairIdentityColor,
-  getPairPalette,
-  getSeriesBarColor,
-  getSeriesColor,
-} from "@/utils/seriesColor.util";
+  getPairHatch,
+  getPairShape,
+  getSeriesHatch,
+  getSeriesShape,
+} from "@/utils/seriesShape.util";
 import { DATA_UPDATE_SINGLE_SERIES, MONTH_NAMES } from "@/constants";
 import { EDataStatus, ESeriesKind, EWalterLiethSeriesId } from "@/enums";
 import type { TChartSeries, TMonthlyTemperature } from "@/types";
@@ -26,8 +26,8 @@ export const CITY: TChartSeries = {
   kind: ESeriesKind.CITY,
   label: "Valladolid",
   context: "Climate 1970–2000",
-  color: getPairIdentityColor(EWalterLiethSeriesId.A),
-  barColor: getPairPalette(EWalterLiethSeriesId.A).prec,
+  shape: getPairShape(EWalterLiethSeriesId.A),
+  hatch: getPairHatch(EWalterLiethSeriesId.A),
   data: months(0),
   altitude: 690,
   year: null,
@@ -40,8 +40,8 @@ export const CITY_PAIR: TChartSeries[] = [
     ...CITY,
     id: EWalterLiethSeriesId.B,
     label: "Lviv",
-    color: getPairIdentityColor(EWalterLiethSeriesId.B),
-    barColor: getPairPalette(EWalterLiethSeriesId.B).prec,
+    shape: getPairShape(EWalterLiethSeriesId.B),
+    hatch: getPairHatch(EWalterLiethSeriesId.B),
     data: months(-3),
     altitude: 296,
   },
@@ -61,8 +61,8 @@ export function weatherYears(years: readonly number[]): TChartSeries[] {
     kind: ESeriesKind.WEATHER_YEAR,
     label: String(year),
     context: "Valladolid",
-    color: getSeriesColor(i),
-    barColor: getSeriesBarColor(i),
+    shape: getSeriesShape(i),
+    hatch: getSeriesHatch(i),
     data: months(i),
     altitude: 690,
     year,

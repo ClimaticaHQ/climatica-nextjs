@@ -132,7 +132,7 @@ describe("fitValueFontSize (export values strip)", () => {
     unit: "°C",
     unitColor: "red",
     name: "Mean temperature",
-    cells: Array.from({ length: 12 }, () => [{ text, color: "black", srText: text }]),
+    cells: Array.from({ length: 12 }, () => [{ key: "a", text, color: "black", srText: text }]),
   });
 
   it("keeps the preferred size where values fit", () => {

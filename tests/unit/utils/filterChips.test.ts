@@ -31,11 +31,16 @@ const value = (key: EFilterKey, overrides: Partial<TFilters>, t = tEn) =>
   getFilterChipValue(key, filtersWith(overrides), t);
 
 describe("chip values", () => {
-  it("variables: the first one, then how many more", () => {
+  it("variables: one by its name, two or more by their count", () => {
     expect(value(EFilterKey.VARIABLES, { variables: ["tmax"] })).toBe("Max temp");
+    expect(value(EFilterKey.VARIABLES, { variables: ["tmax", "prec"] })).toBe("2 variables");
     expect(value(EFilterKey.VARIABLES, { variables: ["tmax", "tmin", "prec"] })).toBe(
-      "Max temp +2",
+      "3 variables",
     );
+  });
+
+  it("variables: the count uses the locale's plural forms", () => {
+    expect(value(EFilterKey.VARIABLES, { variables: ["tmax", "prec"] }, tUk)).toBe("2 змінні");
   });
 
   it("months: all, one month's name, or a count", () => {

@@ -76,8 +76,9 @@ const SCALES: Readonly<Record<string, readonly number[]>> = {
   green: TONAL_STEPS,
   grey: [50, 200, 300, 500, 900],
   red: [300, 700],
-  orange: [300, 800, 900],
-  blue: [200, 300, 400, 700, 800, 900],
+  orange: [200, 300, 400, 500, 600, 700, 800, 900],
+  "deep-orange": [900],
+  blue: [100, 200, 300, 400, 600, 700, 800, 900],
 };
 
 /** Relative luminance of "#rrggbb" — the order of a scale's steps. */

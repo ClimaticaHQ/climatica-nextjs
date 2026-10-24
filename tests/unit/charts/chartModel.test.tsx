@@ -51,14 +51,12 @@ describe("deriveChartModel", () => {
     ]);
   });
 
-  it("weather years: one series per year, named by it, in its own colour, as a single year", () => {
+  it("weather years: one series per year, named by it, in its own shape, as a single year", () => {
     const years = weatherYears([2021, 1990, 1967]);
     const walterLieth = model(years).series.map((entry) => entry.walterLieth);
     expect(walterLieth.map(({ label }) => label)).toEqual(["2021", "1990", "1967"]);
     expect(walterLieth.map(({ singleYear }) => singleYear)).toEqual([2021, 1990, 1967]);
-    expect(walterLieth.map(({ markerColor }) => markerColor)).toEqual(
-      years.map(({ color }) => color),
-    );
+    expect(walterLieth.map(({ shape }) => shape)).toEqual(["circle", "square", "triangle"]);
   });
 
   it("the Walter-Lieth domain spans every complete series and leaves an incomplete one out", () => {

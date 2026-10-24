@@ -148,7 +148,7 @@ test.describe("Mobile filters", () => {
 
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(page).toHaveURL(/chart=standard/);
-    await expect(page.getByRole("button", { name: "Variables: Max temp +2" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Variables: 3 variables" })).toBeVisible();
     await expect(disabledVariables).toHaveCount(0);
   });
 

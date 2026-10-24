@@ -50,7 +50,9 @@ describe("settings store", () => {
       updateFlashVariant: EUpdateFlashVariant.GLOW,
       autoApplyFilters: true,
       syncCity: true,
+      syncFilters: true,
       autoScroll: false,
+      chartBarStyle: "plain",
       hasHydrated: true,
     });
   });
@@ -66,7 +68,9 @@ describe("settings store", () => {
       updateFlashVariant: EUpdateFlashVariant.BORDER,
       autoApplyFilters: true,
       syncCity: true,
+      syncFilters: true,
       autoScroll: false,
+      chartBarStyle: "plain",
     });
     expect(JSON.parse(storage.getItem(LOCAL_STORAGE_KEYS.SETTINGS) ?? "{}").version).toBe(1);
   });
@@ -88,6 +92,48 @@ describe("settings store", () => {
       animationsEnabled: true,
       updateFlashVariant: EUpdateFlashVariant.GLOW,
     });
+  });
+});
+
+describe("syncFilters", () => {
+  it("an entry saved before it existed keeps filters synced; a saved off stays off", async () => {
+    saveEntry({ syncCity: false }, 1);
+    expect((await loadStore()).getState().syncFilters).toBe(true);
+    saveEntry({ syncFilters: false }, 1);
+    expect((await loadStore()).getState().syncFilters).toBe(false);
+    saveEntry({ syncFilters: "no" }, 1);
+    expect((await loadStore()).getState().syncFilters).toBe(true);
+  });
+});
+
+describe("chartBarStyle", () => {
+  it("is saved with the rest and restored on the next load", async () => {
+    const first = await loadStore();
+    first.getState().setSetting("chartBarStyle", "shades");
+    expect(saved().chartBarStyle).toBe("shades");
+    expect((await loadStore()).getState().chartBarStyle).toBe("shades");
+  });
+
+  it("an entry saved before it existed loads with plain", async () => {
+    saveEntry({ theme: ETheme.DARK, autoScroll: true }, 1);
+    const store = await loadStore();
+    expect(store.getState()).toMatchObject({ theme: ETheme.DARK, chartBarStyle: "plain" });
+  });
+
+  it("an invalid saved value falls back to plain; each valid one is kept", async () => {
+    for (const invalid of ["stripes", 3, null, true]) {
+      saveEntry({ chartBarStyle: invalid }, 1);
+      expect((await loadStore()).getState().chartBarStyle).toBe("plain");
+    }
+    for (const barStyle of ["plain", "shades", "hatch"]) {
+      saveEntry({ chartBarStyle: barStyle }, 1);
+      expect((await loadStore()).getState().chartBarStyle).toBe(barStyle);
+    }
+  });
+
+  it("a version 0 entry (before the theme moved in) loads with plain too", async () => {
+    saveEntry({ autoScroll: true }, 0);
+    expect((await loadStore()).getState().chartBarStyle).toBe("plain");
   });
 });
 

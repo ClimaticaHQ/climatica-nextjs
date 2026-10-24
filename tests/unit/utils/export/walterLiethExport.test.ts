@@ -51,8 +51,7 @@ const COLORS: TExportChartColors = {
   wlCompressedFill: "#1d4ed8",
   wlFrost: "#4682b4",
   wlFrostOutline: "#6b7280",
-  wlSeriesA: "#1d9e75",
-  wlSeriesB: "#d97706",
+  seriesMarker: "#555555",
 };
 
 const PATTERN_IDS = { humid: "t-humid", arid: "t-arid" };
@@ -101,12 +100,10 @@ describe("buildWalterLiethPanel", () => {
 
   it("places month i at the centre of its band, like the live chart's [-0.5, 11.5] x axis", () => {
     // * 860 px / 12 bands → January's dot at 70 + 35.83, December's at 930 − 35.83
-    // * temperature dots only — the arid pattern's own <circle> comes first in <defs>
-    const dotPattern = new RegExp(
-      `<circle cx="([\\d.]+)" cy="[\\d.]+" r="${WALTER_LIETH_DOT.RADIUS}"`,
-      "g",
-    );
-    const dots = [...buildPlot().matchAll(dotPattern)].map((m) => Number(m[1]));
+    // * a circle's path starts at its left edge: cx − r
+    const r = WALTER_LIETH_DOT.RADIUS;
+    const dotPattern = new RegExp(`<path d="M([\\d.]+) [\\d.]+a${r} ${r} 0 1 0`, "g");
+    const dots = [...buildPlot().matchAll(dotPattern)].map((m) => Number(m[1]) + r);
 
     expect(dots[0]).toBeCloseTo(70 + 860 / 24, 1);
     expect(dots.at(-1)).toBeCloseTo(930 - 860 / 24, 1);
