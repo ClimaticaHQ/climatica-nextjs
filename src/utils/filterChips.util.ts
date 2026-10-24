@@ -13,7 +13,7 @@ import { getChipFilterKeys, getFilterAvailability, isFilterDefault } from "./fil
 const formatClimatePeriod = (period: keyof typeof CLIMATE_PERIOD_LABELS) =>
   CLIMATE_PERIOD_LABELS[period];
 
-// * a chip shows the value short: the first variable and how many more, a month or a count
+// * a chip shows the value short: one variable by name, several by their count, a month or a count
 const CHIP_FORMATTERS: TFilterChipFormatters = {
   dataset: (dataset, t) => t(`sidebar.datasets.${dataset}`),
   climatePeriod: formatClimatePeriod,
@@ -21,11 +21,12 @@ const CHIP_FORMATTERS: TFilterChipFormatters = {
   climatePeriodB: formatClimatePeriod,
   weatherYear: (year) => String(year),
   weatherPeriods: (years) => years.join(", "),
-  variables: ([first, ...rest], t) => {
-    const label = first === undefined ? "" : t(`sidebar.variables.${first}`);
-    return rest.length === 0
-      ? label
-      : t("filters.chips.moreVariables", { label, count: rest.length });
+  variables: (variables, t) => {
+    const [first] = variables;
+    if (first === undefined) return "";
+    return variables.length === 1
+      ? t(`sidebar.variables.${first}`)
+      : t("filters.chips.variablesCount", { count: variables.length });
   },
   gridSize: (gridSize, t) => t(`cellSizesShort.${gridSize.replace(".", "_")}`),
   months: (months, t) => {

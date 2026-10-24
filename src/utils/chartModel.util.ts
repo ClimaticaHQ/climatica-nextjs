@@ -1,4 +1,3 @@
-import { SERIES_KIND_RULES } from "@/constants";
 import { EWalterLiethSeriesId } from "@/enums";
 import type {
   TChartModel,
@@ -31,7 +30,6 @@ function deriveSeries(series: TChartSeries): TChartSeriesModel {
   const hasData = data.length > 0;
   const chartData = withMonthlyMean(data);
   const aridity = hasData ? computeAridityPeriods(data) : null;
-  const rule = SERIES_KIND_RULES[series.kind];
 
   return {
     series,
@@ -45,7 +43,7 @@ function deriveSeries(series: TChartSeries): TChartSeriesModel {
       period: series.context,
       data: chartData,
       ...(series.year !== null ? { singleYear: series.year } : {}),
-      ...(rule.usesOwnColor ? { markerColor: series.color } : {}),
+      shape: series.shape,
       ...(series.altitude !== null ? { altitude: series.altitude } : {}),
     }),
     hasData,

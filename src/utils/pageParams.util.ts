@@ -39,14 +39,14 @@ const pickPagePlacedParams = (route: TPageRoute, params: URLSearchParams) =>
   pickParams(params, pagePlacedFilterParams(route));
 
 /**
- * A page's own params in its URL — its URL state (but the city) and its page-placed filters,
- * canonical; anything invalid is dropped.
+ * A page's own params in its URL — its URL state (but the city), its page-placed filters and
+ * its shared filters (for when filters aren't synced), canonical; anything invalid is dropped.
  */
 export function extractPageParams(route: TPageRoute, params: URLSearchParams): URLSearchParams {
   const pageParams = REMEMBERED_PAGE_PARAMS[route](params);
-  pickPagePlacedParams(route, pickFilterParams(params)).forEach((value, name) =>
-    pageParams.set(name, value),
-  );
+  const filterParams = pickFilterParams(params);
+  pickPagePlacedParams(route, filterParams).forEach((value, name) => pageParams.set(name, value));
+  pickSharedFilterParams(filterParams).forEach((value, name) => pageParams.set(name, value));
   return pageParams;
 }
 
@@ -61,15 +61,22 @@ export function toRouteHref(route: string, params: URLSearchParams) {
 }
 
 /**
- * Where a navbar link goes: the page's remembered params (re-validated) with the current
- * shared filters — which win — normalized together, so a remembered value the current
+ * Where a navbar link goes: the page's remembered params (re-validated) with the shared
+ * filters — the current ones while filters are synced, else the page's own (the current ones
+ * on a page with nothing remembered) — normalized together, so a remembered value those
  * filters rule out (weather years under Climate) is dropped.
  */
-export function buildNavbarHref({ route, current, remembered }: TBuildNavbarHrefArgs) {
+export function buildNavbarHref({
+  route,
+  current,
+  remembered,
+  isSyncingFilters,
+}: TBuildNavbarHrefArgs) {
   const stored = new URLSearchParams(remembered ?? "");
   const merged = REMEMBERED_PAGE_PARAMS[route](stored);
-  // * the remembered page-placed filters and the current shared ones, validated together below
+  const filterSource = isSyncingFilters || remembered === undefined ? current : stored;
+  // * the remembered page-placed filters and the shared ones, validated together below
   pickPagePlacedParams(route, stored).forEach((value, name) => merged.set(name, value));
-  pickSharedFilterParams(current).forEach((value, name) => merged.set(name, value));
+  pickSharedFilterParams(filterSource).forEach((value, name) => merged.set(name, value));
   return toRouteHref(route, serializeFilters(parseFilters(merged), omitFilterParams(merged)));
 }

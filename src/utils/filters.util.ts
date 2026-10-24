@@ -143,9 +143,13 @@ export function normalizeFilters(filters: TFilters): TFilters {
   };
 }
 
-export function isFilterDefault<K extends EFilterKey>(key: K, value: TFilters[K]) {
+export function isSameFilterValue<K extends EFilterKey>(key: K, a: TFilters[K], b: TFilters[K]) {
   const codec = FILTER_CODECS[key];
-  return codec.encode(value) === codec.encode(FILTERS_CONFIG[key].defaultValue);
+  return codec.encode(a) === codec.encode(b);
+}
+
+export function isFilterDefault<K extends EFilterKey>(key: K, value: TFilters[K]) {
+  return isSameFilterValue(key, value, FILTERS_CONFIG[key].defaultValue);
 }
 
 /** Hidden (not part of this view or dataset), disabled with a reason, or available. */

@@ -1,8 +1,13 @@
 import { FILTER_DEFAULTS, FILTER_ORDER, FILTERS_CONFIG } from "@/constants";
 import type { EFilterKey } from "@/enums";
-import type { TFilters } from "@/types";
+import type { TFilters, TRestoreDatasetSelectionArgs, TRestoreFilterSources } from "@/types";
 import { FILTER_CODECS } from "./filterCodecs.util";
-import { isFilterDefault, isFilterRelevant, normalizeFilters } from "./filters.util";
+import {
+  isFilterDefault,
+  isFilterRelevant,
+  normalizeFilters,
+  isSameFilterValue,
+} from "./filters.util";
 
 /** Every param a filter is read from — current and legacy. */
 const FILTER_PARAM_NAMES: readonly string[] = FILTER_ORDER.flatMap((key) => [
@@ -88,4 +93,64 @@ export function getCanonicalFilterUrlParams(params: URLSearchParams): URLSearchP
 /** Whether two filter sets put the same filters in the URL. */
 export function areFiltersEqual(a: TFilters, b: TFilters) {
   return serializeFilters(a).toString() === serializeFilters(b).toString();
+}
+
+/** A remembered value, re-read through the filter's codec: null when it's no longer valid. */
+function readRemembered<K extends EFilterKey>(key: K, remembered: TFilters) {
+  const codec = FILTER_CODECS[key];
+  const params = new URLSearchParams({
+    [FILTERS_CONFIG[key].param]: codec.encode(remembered[key]),
+  });
+  return codec.parse(params);
+}
+
+/**
+ * Whether the switch away is all that changed the value since: the dataset's own values (the
+ * URL dropped them), or a shared one the switch narrowed (a Climate-only variable, 30″) that the
+ * reader hasn't changed since.
+ */
+function isDroppedBySwitch<K extends EFilterKey>(
+  key: K,
+  { applied, remembered, leftAs }: TRestoreFilterSources,
+) {
+  const filterDataset = FILTERS_CONFIG[key].dataset;
+  if (filterDataset !== undefined) return filterDataset === remembered.dataset;
+  return (
+    isSameFilterValue(key, applied[key], leftAs[key]) &&
+    !isSameFilterValue(key, leftAs[key], remembered[key])
+  );
+}
+
+function restoreFilter<K extends EFilterKey>(
+  target: TFilters,
+  key: K,
+  sources: TRestoreFilterSources,
+) {
+  // * a value the reader changed in the draft since the URL's is theirs
+  if (!isSameFilterValue(key, target[key], sources.applied[key])) return;
+  if (!isDroppedBySwitch(key, sources)) return;
+  const value = readRemembered(key, sources.remembered);
+  if (value !== null) target[key] = value;
+}
+
+/**
+ * Switching to a dataset the URL doesn't hold brings back what the last switch away dropped
+ * (the URL keeps only the active dataset's values): its own periods or years, and a variable or
+ * resolution only it offers. Values no longer valid stay at their default; the result is
+ * normalized, so a restored value the restored period doesn't offer drops out again.
+ */
+export function restoreDatasetSelection({
+  next,
+  previousDataset,
+  applied,
+  selections,
+}: TRestoreDatasetSelectionArgs): TFilters {
+  const remembered = selections[next.dataset];
+  const isSwitchAway = next.dataset !== previousDataset && next.dataset !== applied.dataset;
+  if (!isSwitchAway || remembered === undefined) return next;
+  // * what the switch away made of the remembered filters
+  const leftAs = normalizeFilters({ ...remembered, dataset: applied.dataset });
+  const restored = { ...next };
+  FILTER_ORDER.forEach((key) => restoreFilter(restored, key, { applied, remembered, leftAs }));
+  return normalizeFilters(restored);
 }

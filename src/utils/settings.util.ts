@@ -1,6 +1,7 @@
 import { LEGACY_THEME_STORAGE_KEYS } from "@/constants";
 import type { TKeyValueStorage, TSettings, TSettingsState, TSettingsStorage } from "@/types";
 import { isUpdateFlashVariant } from "./motion.util";
+import { isBarStyle } from "./overlayBars.util";
 import { isTheme } from "./theme.util";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -23,7 +24,11 @@ export function mergePersistedSettings(
       : current.updateFlashVariant,
     autoApplyFilters: pickBoolean(persisted["autoApplyFilters"], current.autoApplyFilters),
     syncCity: pickBoolean(persisted["syncCity"], current.syncCity),
+    syncFilters: pickBoolean(persisted["syncFilters"], current.syncFilters),
     autoScroll: pickBoolean(persisted["autoScroll"], current.autoScroll),
+    chartBarStyle: isBarStyle(persisted["chartBarStyle"])
+      ? persisted["chartBarStyle"]
+      : current.chartBarStyle,
   };
   return { ...current, ...settings };
 }
@@ -36,7 +41,9 @@ export function getPersistedSettings(state: TSettingsState): TSettings {
     updateFlashVariant: state.updateFlashVariant,
     autoApplyFilters: state.autoApplyFilters,
     syncCity: state.syncCity,
+    syncFilters: state.syncFilters,
     autoScroll: state.autoScroll,
+    chartBarStyle: state.chartBarStyle,
   };
 }
 
