@@ -18,8 +18,14 @@ import {
   getMonthLabelFormat,
   resolveActiveTooltipIndex,
   getPlotHeightClass,
+  getPlotMargin,
+  getTouchTooltipKey,
+  getTouchTooltipProps,
   getXAxisProps,
 } from "@/utils";
+import { ChartDeviceContext } from "@/components/charts/chartDevice.context";
+import { MonthTapLayer } from "@/components/charts/MonthTapLayer";
+import { useContext } from "react";
 import { WalterLiethFrostBand } from "./WalterLiethFrostBand";
 import { WalterLiethHoverBand } from "./WalterLiethHoverBand";
 import { WalterLiethLayer } from "./WalterLiethLayer";
@@ -37,8 +43,14 @@ export function WalterLiethPlot({
   onActiveMonthIndexChange,
 }: TWalterLiethPlotProps) {
   const { ref, width } = useElementWidth<HTMLDivElement>();
-  const axes = useWalterLiethAxes({ rows, domain, monthFormat: getMonthLabelFormat(width) });
-  const { tick, ...axisGeometry } = getAxisStyle(isCompact);
+  const { isTouch, isNarrow } = useContext(ChartDeviceContext);
+  const tooltipState = { isTouch, activeMonthIndex };
+  const axes = useWalterLiethAxes({
+    rows,
+    domain,
+    monthFormat: getMonthLabelFormat(width, isNarrow),
+  });
+  const { tick, ...axisGeometry } = getAxisStyle(isCompact, isNarrow);
   // * both axes share the domain: precipitation is plotted through the °C scale
   const yAxisBase = {
     domain: [domain.tempMin, domain.plotMax],
@@ -48,7 +60,7 @@ export function WalterLiethPlot({
   };
 
   return (
-    <div ref={ref} className={getPlotHeightClass({ isCompact })}>
+    <div ref={ref} className={`relative ${getPlotHeightClass({ isCompact })}`}>
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={rows}
@@ -101,8 +113,14 @@ export function WalterLiethPlot({
             yMin={domain.tempMin}
             yMax={domain.plotMax}
           />
-          <ChartUnitTitles isCompact={isCompact} />
-          <Tooltip content={tooltip} cursor={false} />
+          <ChartUnitTitles isCompact={isCompact} isNarrow={isNarrow} />
+          {/* * on touch, the tapped month's */}
+          <Tooltip
+            key={getTouchTooltipKey(tooltipState)}
+            content={tooltip}
+            cursor={false}
+            {...getTouchTooltipProps(tooltipState)}
+          />
           {/* * invisible: they only register the rows with each axis for tooltip and sync */}
           <Line yAxisId="left" dataKey="tavg" stroke="none" dot={false} activeDot={false} />
           <Line yAxisId="right" dataKey="precAxis" stroke="none" dot={false} activeDot={false} />
@@ -124,6 +142,15 @@ export function WalterLiethPlot({
           )}
         </ComposedChart>
       </ResponsiveContainer>
+      {isTouch && (
+        <MonthTapLayer
+          activeMonthIndex={activeMonthIndex ?? null}
+          onActiveMonthIndexChange={onActiveMonthIndexChange}
+          inset={getPlotMargin(isCompact, isNarrow)}
+          monthCount={rows.length}
+          canScrub
+        />
+      )}
     </div>
   );
 }

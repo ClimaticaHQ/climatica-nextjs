@@ -1,7 +1,8 @@
 import { WALTER_LIETH_DOT } from "@/constants";
+import { getMarkerPath } from "@/utils/seriesShape.util";
 import type { TWalterLiethDotProps } from "../WalterLiethChart.type";
 
-/** Temperature marker; the shape tells overlay series apart without relying on color. */
+/** Temperature marker; its shape tells the series apart — charts never use colour for that. */
 export function WalterLiethDot({
   x,
   y,
@@ -22,9 +23,5 @@ export function WalterLiethDot({
     opacity: isDimmed ? WALTER_LIETH_DOT.DIMMED_OPACITY : 1,
   };
 
-  return shape === "square" ? (
-    <rect x={x - radius} y={y - radius} width={radius * 2} height={radius * 2} {...common} />
-  ) : (
-    <circle cx={x} cy={y} r={radius} {...common} />
-  );
+  return <path d={getMarkerPath({ shape, cx: x, cy: y, size: radius * 2 })} {...common} />;
 }

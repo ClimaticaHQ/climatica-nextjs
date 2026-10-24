@@ -1,11 +1,11 @@
 import { SeriesPanelHeader, SplitPanelHeader } from "@/components/SeriesPanelHeader";
 import {
   SPLIT_PANEL_ROWS_CLASS,
-  WALTER_LIETH_COMPARISON,
   WALTER_LIETH_CONVENTION_COLORS,
   WALTER_LIETH_DIAGRAM,
 } from "@/constants";
 import type { TWalterLiethChartProps } from "@/types";
+import { getPairShape } from "@/utils/seriesShape.util";
 import { WalterLiethPlot, WalterLiethTooltip } from "./components";
 import { useWalterLiethChart } from "./hooks/useWalterLiethChart";
 
@@ -53,7 +53,7 @@ export function WalterLiethChart({
             segments: chart.segments,
             patternIds: chart.patternIds,
             colors: WALTER_LIETH_CONVENTION_COLORS,
-            dotShape: WALTER_LIETH_COMPARISON.DOT_SHAPE[series.id],
+            dotShape: series.shape ?? getPairShape(series.id),
           },
         ]}
       />

@@ -7,6 +7,7 @@ import type {
   TWalterLiethRow,
   TWalterLiethSegment,
   TWalterLiethSeries,
+  TSeriesShape,
 } from "@/types";
 import type { EWalterLiethFrost } from "@/enums";
 import type { ReactElement } from "react";
@@ -27,8 +28,6 @@ export type TWalterLiethPatternIds = {
   arid: string;
 };
 
-export type TWalterLiethDotShape = "circle" | "square";
-
 /** One series drawn by WalterLiethLayer. */
 export type TWalterLiethLayerSeries = {
   key: string;
@@ -40,7 +39,7 @@ export type TWalterLiethLayerSeries = {
   /** dash pattern for the precipitation curve; solid when omitted */
   precDash?: string;
   /** second visual cue besides color, so overlay series never rely on color alone */
-  dotShape: TWalterLiethDotShape;
+  dotShape: TSeriesShape;
   /** below 1 while another series is highlighted (an overlay year chip hovered) */
   opacity?: number;
 };
@@ -99,7 +98,7 @@ export type TWalterLiethSeriesLayerProps = TWalterLiethProjection & {
 export type TWalterLiethDotProps = {
   x: number;
   y: number;
-  shape: TWalterLiethDotShape;
+  shape: TSeriesShape;
   color: string;
   isActive: boolean;
   isDimmed: boolean;
