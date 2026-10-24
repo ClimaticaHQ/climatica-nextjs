@@ -1,6 +1,4 @@
 import { SIDEBAR_PARAMS } from "@/constants";
-import { EWalterLiethSeriesId } from "@/enums";
-import { getPairIdentityColor, getSeriesTextColor } from "@/utils/seriesColor.util";
 import type { TUrlSchema } from "@/types";
 import {
   cityUrlField,
@@ -45,14 +43,3 @@ export const PERIOD_TREND_CARDS_CLASS = "grid grid-cols-2 gap-3";
 
 // * a picked city scrolls the chart's bottom into view
 export const COMPARE_PERIODS_SCROLL_OPTIONS = { toBottom: true } as const;
-
-// * a trend card's value (large text): B's colour when it rose, A's when it fell, the text colour
-// * unchanged
-export const PERIOD_TREND_COLORS: Readonly<Record<number, string | undefined>> = {
-  1: getSeriesTextColor({ color: getPairIdentityColor(EWalterLiethSeriesId.B), isLargeText: true }),
-  [-1]: getSeriesTextColor({
-    color: getPairIdentityColor(EWalterLiethSeriesId.A),
-    isLargeText: true,
-  }),
-  0: undefined,
-};
