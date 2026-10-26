@@ -18,3 +18,4 @@ export * from "./statusMessage.enum";
 export * from "./citySlot.enum";
 export * from "./badge.enum";
 export * from "./popover.enum";
+export * from "./sortOrder.enum";
