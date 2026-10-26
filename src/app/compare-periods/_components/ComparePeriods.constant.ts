@@ -4,7 +4,9 @@ import {
   cityUrlField,
   chartModeUrlField,
   expandedPanelUrlField,
+  markerSlotsUrlField,
   shownYearsUrlField,
+  sortOrderUrlField,
   weatherYearPairUrlField,
   compareLayoutUrlField,
   walterLiethShadingUrlField,
@@ -22,6 +24,8 @@ export const COMPARE_PERIODS_REMEMBERED_URL_SCHEMA: TUrlSchema<
   expanded: expandedPanelUrlField,
   yearPair: weatherYearPairUrlField,
   shownYears: shownYearsUrlField,
+  sortOrder: sortOrderUrlField,
+  markerSlots: markerSlotsUrlField,
 };
 
 export const COMPARE_PERIODS_URL_SCHEMA: TUrlSchema<TComparePeriodsUrlState> = {
