@@ -64,6 +64,8 @@ export const UPDATE_FLASH_TOKENS = {
 // * set on a card while it flashes — `data-update-flash="active"` — for tests and styling
 export const UPDATE_FLASH_ATTRIBUTE = "updateFlash";
 export const UPDATE_FLASH_ACTIVE = "active";
+// * an entity's element that flashes when it arrives (useArrivalFlash): `data-arrival-key="1990"`
+export const ARRIVAL_FLASH_ATTRIBUTE = "data-arrival-key";
 // * and its variant — `data-update-flash-variant="glow" | "border"`
 export const UPDATE_FLASH_VARIANT_ATTRIBUTE = "updateFlashVariant";
 

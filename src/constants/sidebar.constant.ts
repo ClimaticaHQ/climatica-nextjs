@@ -58,6 +58,10 @@ export const SIDEBAR_PARAMS = {
   // * Compare Periods with weather years, overlay: the years drawn ("2021,1990"); omitted
   // * when every compared year is, the default
   SHOWN_YEARS: "shownYears",
+  // * Compare Periods: the order its years / periods are listed in (desc only — asc is the default)
+  SORT_ORDER: "order",
+  // * Compare Periods: each year's marker slot ("2021:0,1999:2"), when it isn't the list's order
+  MARKER_SLOTS: "markers",
   CHART_MODE_STANDARD: "standard",
   // * old links wrote chart=wl when standard was the default — still accepted
   CHART_MODE_WALTER_LIETH: "wl",
