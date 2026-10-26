@@ -38,7 +38,7 @@ Before reporting a task as done: `npm run check`, `npm run test`, `npm run build
   - docs/testing.md — Vitest, Playwright, test conventions
   - docs/pages.md — the page hook, PageLayout, the four pages, adding a page or a page block
   - docs/charts.md — series, kind rules, the chart model, chart section and blocks, exports
-  - docs/colors.md — colour layers, series colours, contrast, adding a colour
+  - docs/colors.md — colour layers, entities by shape, bars by aridity, contrast, adding a colour
   - docs/climate-indices.md — Walter-Lieth geometry and rules, arid / frost months, De Martonne
   - docs/export.md — export menu, SVG builders, export palette, PNG, raw data, heat map image
   - docs/city-search.md — city search: labels vs search names, analysis, the two clauses, ranking, limits
@@ -84,7 +84,7 @@ All env vars are validated in `src/libs/Env.ts`. Never read `process.env` or `im
   - The last-page-params store is written only by useLastPageParamsSync and read only by useNavbarNavigation at click time. Pages read the URL, never the store.
 - **State (docs/architecture.md, docs/settings.md)**
   - TanStack Query for server state; the URL for filters and page view state; useState for UI-only state (open, hover, drafts).
-  - Zustand (src/stores/) only for client state that isn't page state: settingsStore (every preference but the language), lastPageParamsStore, navigationIntentStore. Persisted cities use persistedLocationStores.
+  - Zustand (src/stores/) only for client state that isn't page state: settingsStore (every preference but the language), lastPageParamsStore, navigationIntentStore, datasetSelectionStore (the inactive dataset's selection per scope, written only by useFilterNavigation, read only by useFiltersDraft). Persisted cities use persistedLocationStores.
   - Never store derived data in state.
 - **Page pattern (docs/pages.md, docs/charts.md)**
   - A page is a page hook in src/hooks/pages/ (everything that differs between pages), a one-line container calling it, and a view filling PageLayout.
@@ -117,8 +117,8 @@ Search these first; the code is the reference for their props. In src/components
 - Button — `UI/Button` — the app's button.
 - Chip — `UI/Chip` — every chip: toggle, filter value, all filters.
 - ChipScroller — `UI/ChipScroller` — a row of chips scrolling sideways with faded ends.
-- DotLabel — `UI/DotLabel` — a label with a colour dot.
-- Dropdown — `UI/Dropdown` — the app's select; OptionDot (`UI/Dropdown/OptionDot`) is its dot.
+- DotLabel — `UI/DotLabel` — a label, with an entity's shape when it names one.
+- Dropdown — `UI/Dropdown` — the app's select; OptionMarker (`UI/Dropdown/OptionMarker`) is an entity's shape before a label.
 - ExportMenu — `UI/ExportMenu` — the CSV / PNG / SVG / raw export menu.
 - MiniMap — `UI/MiniMap` — a small Leaflet map of one or more locations.
 - PageWrapper — `UI/PageWrapper` — a page's content width and padding.
@@ -141,7 +141,7 @@ Outside UI/:
 - PageLayout — `components/page` — every page's frame.
 - ScrollEdgeFades — `components/ScrollEdgeFades` — faded ends of a horizontal scroller.
 - SegmentedControl — `components/SegmentedControl` — a one-of-n switch with a sliding pill.
-- SeriesMarker — `components/SeriesMarker` — a series' marker (A dot, B square).
+- SeriesMarker — `components/SeriesMarker` — an entity's shape in graphite (circle, square, triangle, diamond, cross).
 - ThemeRoot — `components/ThemeRoot` — keeps the `dark` class in step; mounted once in AppLayout.
 
 ## Glossary
@@ -221,8 +221,7 @@ Tailwind v4. Components are styled with Tailwind classes; CSS custom properties 
 
 - Colour values live only in src/styles/tokens.css.
 - Components use semantic tokens (`--color-*`) only: never a primitive, a hex / rgb() / hsl() / oklch() value, a Tailwind palette class (`bg-green-100`, `text-white`) or a named colour. TS passes tokens as `"var(--color-…)"` strings.
-- A series' colour comes from seriesColor.util (by position).
-- Text below large-text size never takes a series colour (getSeriesTextColor).
+- Charts use semantic colours only; an entity is told apart by its shape (seriesShape.util, by position), never a colour.
 - Files that can't read CSS (favicon, static logo, OG image, global-error) are an explicit allowlist, and their values must be primitives.
 - tests/unit/styles/colorTokens.test.ts enforces these.
 

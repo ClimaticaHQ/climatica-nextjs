@@ -1,113 +1,73 @@
 # Localization
 
-The app is translated into 10 languages with [next-intl](https://next-intl.dev). The list of
-languages lives in one file and drives the app and the city search index.
+10 languages with [next-intl](https://next-intl.dev). One list of locales drives the app and the
+city search index.
 
 ## Locales
 
-[`src/configs/locales.json`](../src/configs/locales.json) is the single list of locale codes
-(`de`, `el`, `en`, `es`, `fr`, `it`, `nb`, `pt`, `ro`, `uk`). Everything else reads it:
-
-- [`LOCALES`](../src/constants/locales.constant.ts) in the app, and through it the locale
-  resolution, the language dropdown on the settings page and the Solr query builder.
-- [`generate_schema.py`](../docker/solr/scripts/generate_schema.py), which writes a
-  `label_<lang>` field per locale into `docker/solr/schema.json`.
-- [`prepare_data.py`](../docker/solr/scripts/prepare_data.py), which writes a
-  `label_<lang>` column per locale into the cities CSV, from GeoNames' alternate names, and
-  takes the locales' alternate names into each city's search names
-  ([backend.md](city-search.md#display-labels-and-search-names)).
-
-The language dropdown shows each language by its own name (`Українська`, `Español`), from
-`LANGUAGE_NATIVE_NAMES` in [`language.constant.ts`](../src/constants/language.constant.ts); a
-locale without an entry shows its code in capitals.
+[`src/configs/locales.json`](../src/configs/locales.json) is the single list (`de`, `el`, `en`, `es`,
+`fr`, `it`, `nb`, `pt`, `ro`, `uk`). It feeds [`LOCALES`](../src/constants/locales.constant.ts)
+(locale resolution, the language dropdown, the Solr query), `generate_schema.py` (a `label_<lang>`
+field per locale) and `prepare_data.py` (a label column per locale and the search names —
+[city-search.md](city-search.md#index)). The dropdown shows each language by its own name
+(`LANGUAGE_NATIVE_NAMES`).
 
 ## Choosing the locale
 
-The language is a user preference, not part of the URL: every route has one path
-(`/heat-map`) whatever the language.
+The language is a preference, not part of the URL: every route has one path.
 
-- [`I18n.ts`](../src/libs/I18n.ts) is next-intl's request config, without locale routing:
-  [`resolveRequestLocale`](../src/utils/locale.util.ts) takes the `NEXT_LOCALE` cookie if it
-  names a supported locale, else the best supported match in `Accept-Language` (by q weight,
-  then order; `nn` and `no` map to `nb`), else English. It then loads
-  `src/i18n/locales/<locale>.json`. [`next.config.ts`](../next.config.ts) points the plugin at
-  it. The server renders in that locale, so there's no flash.
-- The settings page's language dropdown calls
-  [`useLocaleSwitch`](../src/hooks/url/useLocaleSwitch.ts): the server action
-  [`setLocale`](../src/libs/actions/setLocale.action.ts) writes the cookie
-  ([`LOCALE_COOKIE`](../src/constants/locales.constant.ts): a year, path `/`, `SameSite=Lax`),
-  then `router.refresh()` re-renders the same page in the new language.
-- [`src/proxy.ts`](../src/proxy.ts) redirects old links with a locale prefix (`/es/heat-map?…`)
-  with a 308 to the same path and query without it (`stripLocalePrefix`). It doesn't touch the
-  cookie: the reader's own language applies.
-- Links and navigation use `next/link` and `next/navigation` directly.
+1. [`I18n.ts`](../src/libs/I18n.ts) (next-intl's request config, no locale routing) resolves the
+   locale ([`resolveRequestLocale`](../src/utils/locale.util.ts)): the `NEXT_LOCALE` cookie if
+   supported, else the best `Accept-Language` match (`no` and `nn` → `nb`), else English. The
+   server renders in it, so there's no flash.
+2. The settings page's dropdown ([`useLocaleSwitch`](../src/hooks/url/useLocaleSwitch.ts)) calls the
+   server action [`setLocale`](../src/libs/actions/setLocale.action.ts) (a year-long cookie), then
+   `router.refresh()`.
+3. [`src/proxy.ts`](../src/proxy.ts) redirects old prefixed links (`/es/heat-map?…`) to the same
+   path without the prefix (308), leaving the cookie alone.
 
-### SEO
-
-Every page's canonical URL has no prefix (`alternates.canonical`, from
-[`buildCanonicalPath`](../src/utils/metadata.util.ts)) and there's no hreflang. A crawler sends
-no cookie and usually no `Accept-Language`, so it indexes the English pages. Next.js sets its
-own `Vary` on rendered pages and overwrites any other value, so `Vary: Cookie, Accept-Language`
-can't be set from the app. It isn't needed for correctness: every page is
-rendered per request and sent with `Cache-Control: private, no-cache, no-store`, so no shared
-cache stores one language's page for another reader.
+**SEO:** canonical URLs have no prefix and there's no hreflang; crawlers send no cookie, so they
+index English. `Vary: Cookie, Accept-Language` can't be set (Next.js overwrites `Vary`) and isn't
+needed: pages are rendered per request with `Cache-Control: private, no-cache, no-store`.
 
 ## Using translations
 
-- Client components: `const t = useTranslations();` then `t("pages.heatMap.title")`.
-- Server code and metadata: `getLocale()` and `getTranslations({ locale, namespace })`, as in
-  [`metadata.util.ts`](../src/utils/metadata.util.ts).
-- Values use ICU message syntax: placeholders (`"Weather {year}"`) and plurals
-  (`"{count, plural, one {# changed} other {# changed}}"`).
-- Code that needs a translator outside React takes a `TTranslate` function (e.g.
-  [`filterChips.util.ts`](../src/utils/filterChips.util.ts)), so tests can pass a stub.
+- Client: `useTranslations()`; server and metadata: `getTranslations({ locale, namespace })`.
+- ICU syntax for placeholders and plurals.
+- Code outside React takes a `TTranslate` (e.g. [`filterChips.util.ts`](../src/utils/filterChips.util.ts)),
+  so tests can pass a real translator.
 
 ## Key conventions
 
-- Keys are grouped by namespace: `pages` (each page's title and description, also the
-  navbar labels), `sidebar` and `filters` (filter UI), `settings` (the settings page), `chart`, `meta` (page metadata),
-  `months`, `units`, `errors` and others. See the top level of
-  [`en.json`](../src/i18n/locales/en.json).
-- Every locale file has the same keys. A change to keys updates all 10 files in the same
-  change, with natural phrasing in each language; keys that become unused are removed.
-- Never hard-code user-facing text.
-- [`localeParity.test.ts`](../tests/unit/utils/localeParity.test.ts) (`npm run test`)
-  checks every file in `src/i18n/locales/`: one file per locale in `locales.json`, every
-  message a string, exactly the keys of `en.json` (it lists the missing and extra ones), and
-  the same placeholder names (`{city}`, `{count, plural, …}`) as `en.json`. A new locale
-  file is picked up without changing the test.
+- Keys are grouped by namespace (`pages`, `sidebar`, `filters`, `settings`, `chart`, `meta`,
+  `months`, `units`, `errors`, …; see [`en.json`](../src/i18n/locales/en.json)).
+- Every locale file has the same keys; a key change updates all 10 with natural phrasing, and
+  unused keys are removed. No hard-coded user-facing text.
+- [`localeParity.test.ts`](../tests/unit/utils/localeParity.test.ts) checks one file per locale,
+  string values, exactly `en.json`'s keys, and the same placeholder names.
 
-## How to add a new language
+## Adding a new locale
 
-Use the ISO 639-1 code GeoNames uses for the language's alternate names (e.g. `pl`).
+`src/configs/locales.json` is the single source of truth for supported
+locales — the frontend (`src/constants/locales.constant.ts`), the CSV
+generator (`prepare_data.py`), and the Solr schema generator
+(`generate_schema.py`) all read from it. Adding a language means touching
+this one file plus regenerating two derived artifacts:
 
-1. **Add the code** to [`src/configs/locales.json`](../src/configs/locales.json), keeping
-   alphabetical order. The CSV columns follow this order.
-2. **Add the messages:** copy [`en.json`](../src/i18n/locales/en.json) to
-   `src/i18n/locales/<code>.json` and translate every value. Keep the keys and placeholders
-   unchanged.
-3. **Add the language's own name** to `LANGUAGE_NATIVE_NAMES` in
-   [`language.constant.ts`](../src/constants/language.constant.ts) (e.g. `pl: "Polski"`).
-4. **Regenerate the Solr schema:**
-   ```bash
-   python3 docker/solr/scripts/generate_schema.py
-   git diff docker/solr/schema.json   # should only add label_<code>
-   ```
-   `schema.json` is committed; don't edit its per-language fields by hand.
-5. **Regenerate the cities CSV** (needs the GeoNames files in `docker/solr/data/`, see
-   [operations.md](operations.md)):
-   ```bash
-   python3 docker/solr/scripts/prepare_data.py
-   ```
-6. **Apply the schema and reimport the cities:**
-   ```bash
-   npm run solr:reindex
-   ```
-   `solrconfig.xml` needs no change: the app sends its own `qf` and `pf`, with the reader's
-   locale's label ([`buildSolrQueryParams`](../src/utils/solr.util.ts)).
-7. **Check it:** run `npm run test` (the parity test fails on a missing or extra key), run the app, pick the new language in Settings, and search a city whose name has
-   a translation in it. Run the Python tests (`npm run test:python`) if you changed
-   `prepare_data.py`.
+```bash
+# 1. Add the locale code to src/configs/locales.json
 
-Other developers then update their environment as described in
-[operations.md](operations.md).
+# 2. Regenerate the Solr schema (adds the label_<lang> field)
+python3 docker/solr/scripts/generate_schema.py
+
+# 3. Regenerate the cities CSV (adds the label_<lang> column)
+python3 docker/solr/scripts/prepare_data.py
+
+# 4. Push the new schema to Solr and reimport the data
+npm run solr:reindex
+```
+
+`schema.json` is committed to the repo but treated as a build artifact of
+`generate_schema.py` — don't hand-edit the per-locale fields directly, since
+the next regeneration will overwrite them. Run `git diff docker/solr/schema.json`
+after step 2 to confirm the change is only additive before reindexing.

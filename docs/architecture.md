@@ -1,152 +1,148 @@
 # Architecture
 
-How the app is put together: where code lives, how data reaches a component, and how pages
-are split. How a page is built is in [pages.md](pages.md); how its chart is built, in
-[charts.md](charts.md).
+Where code lives, how data reaches a component, and where state is kept. Pages are in
+[pages.md](pages.md), charts in [charts.md](charts.md).
+
+## Overview
+
+```mermaid
+flowchart TB
+  subgraph browser["Browser"]
+    direction LR
+    pages["Pages<br/>City Climate · Compare · Heat map"]
+    hooks["Hooks · TanStack Query<br/>client cache"]
+    url["URL params<br/>filters · years · view"]
+    storage["localStorage · cookie<br/>settings · cities · page params · locale"]
+    zustand["Zustand<br/>settings · page params · navigation intent · dataset selection"]
+  end
+
+  subgraph server["Next.js server · systemd"]
+    direction LR
+    limiter["Rate limiter<br/>per IP · not /api/og"] --> handlers["Route handlers<br/>/api/cities · /api/worldclim/* · /api/og"]
+  end
+
+  subgraph infra["Docker Compose"]
+    direction LR
+    redis[("Redis<br/>search · nearest city · region strips · resources")]
+    solr[("Solr<br/>cities core")]
+  end
+
+  subgraph external["External services"]
+    direction LR
+    scrapi["WorldClim SCRAPI<br/>bearer token, server only"]
+    wikidata["Wikidata<br/>reverse geocoding"]
+  end
+
+  osm["OpenStreetMap<br/>map tiles"]
+  prep["One-time data preparation<br/>GeoNames → prepare_data.py → cities.csv → Solr"]
+
+  browser -->|"fetch /api/*"| server
+  browser -.->|"map tiles, direct"| osm
+  server --> infra
+  server --> external
+  external ~~~ prep
+```
+
+The browser keeps filters and view state in the URL; settings, cities and the navbar's last page
+params in localStorage; the locale in a cookie ([State](#state)). Every API route but `/api/og`
+starts with a per-IP rate limiter; a route handler answers from Redis or asks Solr, Wikidata or
+WorldClim. Map tiles (on screen and in the heat map export) come straight from OpenStreetMap. The Next.js app runs under systemd; Redis and Solr run in Docker Compose
+([operations.md](operations.md)).
 
 ## Folder structure
 
-| Path                                                       | What lives there                                                                                                                                                                                                                |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`src/app/`](../src/app)                                   | Next.js routes, without a locale prefix ([localization-i18n.md](localization-i18n.md)). Each `page.tsx` renders its page container inside `Suspense`. `/` redirects to `/climate-statistics`; `/settings` is the settings page. |
-| `src/app/<page>/_components/`                              | A page's container, view and their type / constant / util files (e.g. [`climate-statistics/_components`](../src/app/climate-statistics/_components)).                                                                           |
-| [`src/app/api/`](../src/app/api)                           | Route handlers: `cities`, `worldclim/[queryId]`, `worldclim/resource`, `og`. See [backend.md](backend.md).                                                                                                                      |
-| [`src/app/providers.tsx`](../src/app/providers.tsx)        | TanStack Query client.                                                                                                                                                                                                          |
-| [`src/layouts/`](../src/layouts)                           | The app shell: [`AppLayout`](../src/layouts/AppLayout.tsx) (topbar, the filters sidebar on filter pages, main, [`ThemeRoot`](../src/components/ThemeRoot/ThemeRoot.tsx)) and [`UrlSync`](../src/layouts/UrlSync.tsx).           |
-| [`src/components/`](../src/components)                     | Components. Shared primitives in `UI/`, features in their own folder (`filters/`, `charts/`, `page/`), shared non-UI components (Card, ChartLegend…) in their own folders.                                                      |
-| [`src/hooks/`](../src/hooks)                               | `data/` (queries), `filters/`, `url/`, `ui/`, `persisted/`, `charts/` (the chart model, its exports and chart hooks), `pages/` (each page's hook and the logic pages share).                                                    |
-| [`src/libs/`](../src/libs)                                 | `api/` (axios `apiClient`), `services/` (WorldClim, Solr, Wikidata), `redis/` (client, strategies, rate limit), `Env.ts`, i18n setup.                                                                                           |
-| [`src/stores/`](../src/stores)                             | Zustand stores and the persisted location stores.                                                                                                                                                                               |
-| `src/constants/`, `src/enums/`, `src/types/`, `src/utils/` | Shared constants, enums, types and pure functions.                                                                                                                                                                              |
-| [`src/i18n/locales/`](../src/i18n/locales)                 | Message files, one per locale. See [localization-i18n.md](localization-i18n.md).                                                                                                                                                |
-| [`src/styles/`](../src/styles)                             | Global CSS, split by concern and imported by `global.css`; every colour value is in `tokens.css` (see [colors.md](colors.md)).                                                                                                  |
-| [`docker/`](../docker)                                     | Solr and Redis for local development. See [operations.md](operations.md).                                                                                                                                                       |
-| [`tests/`](../tests)                                       | `unit/` (Vitest) and `e2e/` (Playwright). See [testing.md](testing.md).                                                                                                                                                         |
+| Path                                                       | What lives there                                                                                                            |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| [`src/app/`](../src/app)                                   | routes without a locale prefix; each `page.tsx` renders its container in `Suspense`; `/` redirects to `/climate-statistics` |
+| `src/app/<page>/_components/`                              | a page's container, view and their type / constant / util files                                                             |
+| [`src/app/api/`](../src/app/api)                           | route handlers: `cities`, `worldclim/[queryId]`, `worldclim/resource`, `og` ([backend.md](backend.md))                      |
+| [`src/layouts/`](../src/layouts)                           | the shell: [`AppLayout`](../src/layouts/AppLayout.tsx) (topbar, filters sidebar, main) and its host components (`UrlSync`)  |
+| [`src/components/`](../src/components)                     | shared primitives in `UI/`, features in their own folder (`charts/`, `filters/`, `page/`), other shared components          |
+| [`src/hooks/`](../src/hooks)                               | `data/` (queries), `filters/`, `url/`, `ui/`, `persisted/`, `charts/`, `pages/` (page hooks)                                |
+| [`src/libs/`](../src/libs)                                 | `api/` (`apiClient`), `services/` (WorldClim, Solr, Wikidata), `redis/`, `Env.ts`, i18n setup                               |
+| [`src/stores/`](../src/stores)                             | Zustand stores and the persisted location stores                                                                            |
+| `src/constants/`, `src/enums/`, `src/types/`, `src/utils/` | shared constants, enums, types, pure functions                                                                              |
+| [`src/i18n/locales/`](../src/i18n/locales)                 | one message file per locale                                                                                                 |
+| [`src/styles/`](../src/styles)                             | global CSS by concern; every colour in `tokens.css` ([colors.md](colors.md))                                                |
+| [`docker/`](../docker), [`tests/`](../tests)               | Solr and Redis ([operations.md](operations.md)); Vitest and Playwright ([testing.md](testing.md))                           |
 
 ## Data flow
 
-```
-Component → hook (src/hooks/) → apiClient (src/libs/api/)
-          [→ client service, e.g. WorldClimService]
-          → /api route handler (src/app/api/)
-          → Redis cache → Solr / WorldClim / Wikidata
-```
+- **Components never call the network**; queries live in [`src/hooks/data/`](../src/hooks/data)
+  (TanStack Query; WorldClim data with `staleTime: Infinity`, since a period's values never change;
+  city searches with 30 s).
+- **Hooks reach external data only through `/api` routes** via
+  [`apiClient`](../src/libs/api/apiClient.ts) (same origin, 50 s timeout).
+  [`WorldClimService`](../src/libs/services/worldClimService.ts) builds WorldClim queries and
+  validates responses.
+- **The server keeps secrets and cache:** route handlers add the API key, rate-limit and cache in
+  Redis; Solr and Wikidata services are `server-only`.
+- **A city search and its climate data are two separate requests**, each cached by TanStack Query
+  in the browser. On the server Redis caches the search, but not a city's climate data: of
+  WorldClim's answers it keeps only region strips and resource lookups
+  ([backend.md](backend.md#redis-caching)).
 
-- **Components never call the network.** They use hooks; queries live in
-  [`src/hooks/data/`](../src/hooks/data) and use TanStack Query (WorldClim data with
-  `staleTime: Infinity`, since a period's values never change).
-- **Hooks reach external data only through `/api` routes**, with the shared axios instance
-  [`apiClient`](../src/libs/api/apiClient.ts) (same-origin base URL, 50 s timeout). City
-  lookups call `/api/cities` directly from the hook
-  ([`useSearchCity`](../src/hooks/data/useSearchCity.ts)); WorldClim calls go through
-  [`WorldClimService`](../src/libs/services/worldClimService.ts), which builds the query
-  parameters and validates responses.
-- **The server keeps the secrets and the cache.** Route handlers add the WorldClim API key,
-  rate-limit per IP and cache in Redis; Solr and Wikidata are reached only from the server
-  ([`solrService`](../src/libs/services/solrService.ts) and
-  [`wikidataService`](../src/libs/services/wikidataService.ts) import `server-only`).
-
-### End to end: from a city search to the chart
-
-What happens between typing a city and seeing its chart, on City Climate (the comparison pages
-run the same steps per series):
+### City search
 
 ```mermaid
 flowchart TD
-  search["LocationSearch → SearchBar<br/>typing, debounced 400 ms"] --> citiesHook["useSearchCity<br/>queryKey citySearch, query, locale"]
-  citiesHook --> citiesRoute["GET /api/cities<br/>rate limit · Redis city-search cache"]
-  citiesRoute --> solr["Solr cities core<br/>or Wikidata for coordinates"]
-  citiesHook -->|picked city| pick["useCitySelection → persisted city store<br/>pushUrlState: city, lat, lng"]
-  pick --> pageHook["useCityClimatePage<br/>city from the store, filters from useFilters"]
-  pageHook --> dataHook["useGetClimateData<br/>queryKey climate, lat, lng, grid, dataset"]
-  dataHook --> service["WorldClimService.getClimateDataForPoint<br/>apiClient → /api/worldclim/pixelvaluesofapoint"]
-  service --> proxy["WorldClim route handler<br/>adds the bearer key"]
-  proxy --> scrapi["SCRAPI WorldClim API<br/>scrapi.gsic.uva.es"]
-  dataHook --> rows["filterPointBindingsByPeriod ·<br/>buildMonthlyTemperaturesFromPointValues<br/>12 rows of tmax, tmin, prec"]
-  rows --> series["TChartSeries<br/>label, context, colour, data, state"]
-  series --> model["useChartModel → deriveChartModel<br/>months, aridity, stats, scales, domain"]
-  model --> view["page view → PageLayout → ChartSection"]
-  view --> card["ChartCard: header, body for the layout, chart blocks"]
+  type["Reader types a city"] --> browser{"TanStack Query cache?"}
+  browser -- hit --> results["Results"]
+  browser -- miss --> route["GET /api/cities"]
+  route --> redis{"Redis cache?<br/>search or nearest-city key"}
+  redis -- hit --> results
+  redis -- miss --> coords{"Coordinates?"}
+  coords -- no --> solr["Solr"]
+  coords -- yes --> wikidata["Wikidata"]
+  solr --> store["Store in Redis"]
+  wikidata --> store
+  store --> results
 ```
 
-1. **Search.** [`LocationSearch`](../src/components/LocationSearch/LocationSearch.tsx)'s
-   [`SearchBar`](../src/components/SearchBar/SearchBar.tsx) asks
-   [`useSearchCity`](../src/hooks/data/useSearchCity.ts) 400 ms after the last keystroke,
-   from two characters on;
-   [`/api/cities`](../src/app/api/cities/route.ts) answers from Redis or Solr, or reverse-geocodes
-   coordinates with Wikidata ([backend.md](backend.md)).
-2. **Pick.** [`useCitySelection`](../src/hooks/pages/useCitySelection.ts) writes the persisted
-   city and, with sync city on, the slots that follow it (refetching their pages' queries); the
-   page hook pushes it to the URL ([url-state.md](url-state.md)).
-3. **Fetch.** The data hook's key changes, so TanStack Query fetches through
-   `WorldClimService` and the proxy route, which adds the API key and forwards the query to
-   SCRAPI's WorldClim API. A point's Climate answer holds every normals period at once, so a
-   period change is filtered from the cached answer without a request.
-4. **Shape.** The bindings become twelve monthly rows; missing values stay `null`
-   ([climate-indices.md](climate-indices.md)).
-5. **Model.** The page hook wraps the rows in a `TChartSeries` and derives the chart model
-   ([charts.md](charts.md)).
-6. **Draw.** The view passes the hook's result to `ChartSection`, which draws the export menu,
-   the stats table and the chart card ([pages.md](pages.md)).
+[`SearchBar`](../src/components/SearchBar/SearchBar.tsx) asks
+[`useSearchCity`](../src/hooks/data/useSearchCity.ts) 400 ms after the last keystroke, from two
+characters (the route also answers `[]` below two). Text like `40.41, -3.70` is reverse-geocoded by
+Wikidata and cached under `nearest-city:`; anything else goes to Solr under `city-search:`. Only
+non-empty results are stored. How Solr ranks the results is in [city-search.md](city-search.md).
 
-## Pages
+### Climate data
 
-Every page is a one-line container and a short view: the container calls the page's hook in
-[`src/hooks/pages/`](../src/hooks/pages) and passes the result to the view, which fills the
-shared [`PageLayout`](../src/components/page/PageLayout.tsx) (header, controls, the results'
-status, then summary, main content and details). Every difference between pages lives in the
-hook; the chart pages' main content is the shared
-[`ChartSection`](../src/components/charts/ChartSection.tsx), drawn from a list of series and
-the model derived from them.
+```mermaid
+flowchart TD
+  pick["Reader picks a city"] --> browser{"TanStack Query cache?"}
+  browser -- hit --> chart["Chart"]
+  browser -- miss --> route["GET /api/worldclim/pixelvaluesofapoint<br/>adds the bearer token"]
+  route --> scrapi["WorldClim SCRAPI"]
+  scrapi --> rows["12 monthly rows"]
+  rows --> chart
+```
 
-- [pages.md](pages.md): the three layers, the four pages, `PageLayout` and its spacing, data
-  states and errors, the shared page hooks, and how to add a block on every page or a new
-  chart page.
-- [charts.md](charts.md): series and kind rules, the model, view state and features, the chart
-  section, card and bodies, the chart block registry (and how to add a block under every
-  chart), exports and data updates.
-- [colors.md](colors.md): the colour layers (primitives, semantic tokens, components), series
-  colours, colours in exports, the allowlist and how to add a colour.
-- [climate-indices.md](climate-indices.md): the Walter-Lieth diagram's geometry and rules, and
-  the derived values (arid and frost months, the De Martonne index).
-- [export.md](export.md): CSV, PNG, SVG and raw exports, and the heat map image.
-- [heat-map.md](heat-map.md): the heat map page, its region, requests and colour scales.
+1. **Pick:** [`useCitySelection`](../src/hooks/pages/useCitySelection.ts) writes the persisted city
+   (and, with `syncCity`, the slots that follow it); the page hook pushes it to the URL.
+2. **Fetch:** the data hook's key changes and the query goes through `WorldClimService`. A point's
+   Climate answer holds every normals period, so a period change needs no request.
+3. **Shape:** twelve monthly rows, missing values `null` ([climate-indices.md](climate-indices.md)).
+4. **Model and draw:** the page hook builds a `TChartSeries`, derives the chart model
+   ([charts.md](charts.md)) and the view passes it to `ChartSection` ([pages.md](pages.md)).
 
-Filters and page view state live in the URL, not in component state. See
-[url-state.md](url-state.md).
+The comparison pages run the same steps per series.
 
 ## State
 
-| Kind                                                          | Where                                                                                                                                                                                                                                                           |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Server data                                                   | TanStack Query                                                                                                                                                                                                                                                  |
-| Filters and page view state (chart mode, layout, years, city) | URL search params                                                                                                                                                                                                                                               |
-| Client-only, not page state                                   | Zustand: [`settingsStore`](../src/stores/settingsStore.ts) (persisted preferences), [`lastPageParamsStore`](../src/stores/lastPageParamsStore.ts) (navbar cache), [`navigationIntentStore`](../src/stores/navigationIntentStore.ts) (in-flight link navigation) |
-| Persisted cities                                              | [`persistedLocationStores`](../src/stores/persistedLocationStores.ts) (small `useSyncExternalStore` stores, not Zustand)                                                                                                                                        |
-| UI-only (open, hover, drafts)                                 | `useState`                                                                                                                                                                                                                                                      |
+| Kind                               | Where                                                                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Server data                        | TanStack Query                                                                                                                 |
+| Filters and page view state        | the URL ([url-state.md](url-state.md))                                                                                         |
+| Client state that isn't page state | Zustand: `settingsStore`, `lastPageParamsStore`, `navigationIntentStore`, `datasetSelectionStore` ([settings.md](settings.md)) |
+| Persisted cities                   | [`persistedLocationStores`](../src/stores/persistedLocationStores.ts) (`useSyncExternalStore`, not Zustand)                    |
+| UI only (open, hover, drafts)      | `useState`                                                                                                                     |
 
-## Settings
+## Shared UI
 
-The reader's preferences are one persisted Zustand store,
-[`settingsStore`](../src/stores/settingsStore.ts), under the single localStorage key
-`climatica:settings`; the language is the `NEXT_LOCALE` cookie. The store, its migration, the
-theme, the animations, the settings page and what is kept in the URL, localStorage and the
-cookie are in [settings.md](settings.md).
-
-## Where shared UI lives
-
-- **Primitives** in [`src/components/UI/`](../src/components/UI): Badge, Button, Chip, Dropdown,
-  BottomSheet, StatusMessage, StatCell, PairLayout, ChipScroller, skeletons and others.
-- **Shared components outside UI** in their own folders: Card, ChartLegend, PageHeader,
-  SegmentedControl, ScrollEdgeFades, SeriesMarker, ThemeRoot.
-- **Features** in one folder each, flat: `charts/` (the chart section, card, bodies, blocks),
-  `page/` (`PageLayout`), `filters/`.
-- The full list, one line per component with its purpose, is the "Shared UI components"
-  catalog in [AGENTS.md](../AGENTS.md); each component's props are in its `.type.ts`. Search the
-  catalog before creating a component.
-- **Surfaces and controls:** every in-flow framed block (tables, stat cards, the heat map and
-  the mini map) is a Card — a border, no shadow; only floating layers (popovers, dropdowns,
-  menus, sheets) cast one. Every outlined control — the search and year inputs, outline
-  buttons, the export menu, the map toolbar — takes its frame, height, hover and focus from
-  [`FORM_CONTROL_CLASSES`](../src/constants/formControl.constant.ts). Leaflet's zoom buttons are
-  restyled to the same border in [`leaflet.css`](../src/styles/leaflet.css).
+- **Primitives** in [`src/components/UI/`](../src/components/UI); the catalog, one line per
+  component, is in [AGENTS.md](../AGENTS.md). Search it before creating a component.
+- **Surfaces:** every in-flow framed block is a [`Card`](../src/components/Card/Card.tsx) — a
+  border, no shadow; only floating layers (popovers, menus, sheets) cast one.
+- **Controls:** every outlined control takes its frame, height, hover and focus from
+  [`FORM_CONTROL_CLASSES`](../src/constants/formControl.constant.ts); Leaflet's zoom buttons match
+  in [`leaflet.css`](../src/styles/leaflet.css).

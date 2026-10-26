@@ -2,16 +2,9 @@
 
 How a typed name becomes a ranked list of cities. Route, cache and errors: [backend.md](backend.md). Rebuilding the index: [operations.md](operations.md).
 
-## Flow
-
-```
-search box (≥ 2 chars, 400 ms debounce)
-  → GET /api/cities?q=…&lang=…
-  → Redis hit? → return
-  → SolrService.searchCities → buildSolrQueryParams → Solr cities core, /cities handler
-  → de-duplicate by geonameid → TCity (label in the reader's language)
-  → cache in Redis → return
-```
+The request's path (debounce, Redis, Wikidata for coordinates) is in
+[architecture.md](architecture.md#city-search); `SolrService.searchCities` de-duplicates the
+results by `geonameid` and returns each city's label in the reader's language.
 
 ## Index
 
@@ -55,19 +48,25 @@ Hyphens are split because a fuzzy term isn't tokenized: `sant-denis~2` never mat
 
 ## Score
 
+```mermaid
+flowchart TD
+  query["buildSolrQueryParams"] --> exact{"cityExact matches?<br/>exact / prefix clause"}
+  exact -- yes --> exactScore["E + 100 000<br/>+ 20 · log10(population + 1)"]
+  exact -- no --> fuzzy{"cityFuzzy matches?<br/>typo clause"}
+  fuzzy -- yes --> fuzzyScore["F + 5 · log10(population + 1)"]
+  fuzzy -- no --> dropped["not returned<br/>cityMatch filter"]
+  exactScore --> sort["sort: score, population, geonameid"]
+  fuzzyScore --> sort
 ```
-q = {!bool filter=$cityMatch should=$cityExact should=$cityRank}
-```
 
-| Matched by     | Score                                    |
-| -------------- | ---------------------------------------- |
-| Exact / prefix | E + 100 000 + 20 · log10(population + 1) |
-| Typo only      | F + 5 · log10(population + 1)            |
+`q = {!bool filter=$cityMatch should=$cityExact should=$cityRank}`: `cityMatch` keeps a city when
+either clause matches; `cityRank` adds the tier and the population boost (E, F: each clause's own
+score).
 
-Ties: population desc, then geonameid asc.
-
-- **100 000** puts every exact hit above every typo hit; a unit test checks it against the largest possible typo score (`SOLR_SCORE_BOUNDS`).
-- **Population 20** keeps the established exact order (Paris, France first). **5** in the typo tier makes closeness matter more than size.
+- **100 000** puts every exact hit above every typo hit; a unit test checks it against the largest
+  possible typo score (`SOLR_SCORE_BOUNDS`).
+- **Population 20** keeps the established exact order (Paris, France first); **5** in the typo
+  tier makes closeness matter more than size.
 
 ## Where ranking lives
 
@@ -79,5 +78,3 @@ All weights, tiers, `mm` and sort are in [`solr.constant.ts`](../src/constants/s
 - No phonetic matching: "Kiev" works only because it's a GeoNames name of Kyiv.
 - An exact hit beats a closer typo: "lvov" lists L’vov (RU) before Lviv.
 - In the typo tier, a larger city slightly further away can outrank a closer small one.
-
-Latency (4.78 M cities, uncached typo queries): median 11 ms, p90 69 ms.

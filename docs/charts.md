@@ -1,224 +1,280 @@
 # Charts
 
 How a chart page's chart is built: the series a page hands over, the model derived from them,
-and the chart section that draws it. Every chart page goes through these; the page side is in
-[pages.md](pages.md).
+and the chart section that draws them. The page side is in [pages.md](pages.md).
 
 ## Series
 
-A chart draws a list of [`TChartSeries`](../src/types/charts/series.type.ts): one monthly
-dataset each — a city, a climate period or a weather year — with its label, its context line,
-its colour, its altitude and its own data state (weather years load one by one).
+A chart draws a list of [`TChartSeries`](../src/types/charts/series.type.ts): one monthly dataset
+each, with its label, context line, marker, altitude and own data state (weather years load one by
+one).
 
-| Page                      | Series                                   | Kind            |
-| ------------------------- | ---------------------------------------- | --------------- |
-| City Climate              | one city                                 | `city`          |
-| Compare Cities            | two cities, A and B                      | `city`          |
-| Compare Periods (Climate) | two climate periods of one city, A and B | `climatePeriod` |
-| Compare Periods (Weather) | 2–5 weather years of one city            | `weatherYear`   |
+| Page                      | Series                        | Kind            |
+| ------------------------- | ----------------------------- | --------------- |
+| City Climate              | one city                      | `city`          |
+| Compare Cities            | cities A and B                | `city`          |
+| Compare Periods (Climate) | periods A and B of one city   | `climatePeriod` |
+| Compare Periods (Weather) | 2–5 weather years of one city | `weatherYear`   |
 
-What a kind always means is in [`SERIES_KIND_RULES`](../src/constants/series.constant.ts):
+What a kind means is in [`SERIES_KIND_RULES`](../src/constants/series.constant.ts) (`canShade`,
+`titleSource`, `isSingleYear`, `hasSeriesChips`, `hasMeanLine`). The chart decides from these
+rules and the page's features, never from the page or the number of series.
 
-| Rule             | `city`        | `climatePeriod` | `weatherYear` |
-| ---------------- | ------------- | --------------- | ------------- |
-| `canShade`       | yes           | yes             | no            |
-| `titleSource`    | series labels | the page        | the page      |
-| `isSingleYear`   | no            | no              | yes           |
-| `hasSeriesChips` | no            | no              | yes           |
-| `hasMeanLine`    | yes           | yes             | no            |
-| `usesOwnColor`   | no (A / B)    | no (A / B)      | yes           |
+### Marker identity
 
-The chart decides from these rules and the page's features — never from the page or the
-number of series.
+An entity's marker — its curves' shape, its bars' hatch, its shades step — is one slot
+(`markerSlot`, [`getEntityMarker`](../src/utils/seriesShape.util.ts)). Everything that draws an
+entity reads the series' marker, never its place in a list. A and B are slots 0 and 1
+(`getPairMarker`).
+
+Compare Periods' years get a slot when added (`useMarkerSlots`, `assignMarkerSlots`) and keep it
+through sorting and through other years being added or removed; a removed year frees its slot for
+the next one. Markers are tied to the year so a year never changes its look while the reader
+compares. The slots are in the URL (`markers`, written only when they differ from the list's
+order), so the sidebar's chips ([`useComparedYears`](../src/hooks/filters/useComparedYears.ts))
+show the same markers.
+
+### Sort order (Compare Periods)
+
+One page-level direction, oldest first by default (`order`,
+[`sortYears`](../src/utils/periodSort.util.ts); climate periods by start year). The series are
+built in it, so every list follows: the stats table's columns, both sets of chips, the bars in a
+month, the values table, the legend, the export. The stats table's corner cell toggles it
+(`features.seriesSort`). The `periods` filter keeps the order years were added in — the default
+side-by-side pair is its first two. A year just added flashes once where it lands
+(`useArrivalFlash`). Compare Cities keeps A, B.
 
 ## Model
 
-[`deriveChartModel`](../src/utils/chartModel.util.ts) (through
-[`useChartModel`](../src/hooks/charts/useChartModel.ts), which adds the translated texts)
-derives, per series, the months with their mean temperature, the aridity, the annual summary
-(null while a month is missing), the stats and the Walter-Lieth series; and, shared by all,
-the scales, the precipitation axis' top and the Walter-Lieth domain. The page's hook derives
-it once; the chart card, the stats table and the export all draw from it.
+[`deriveChartModel`](../src/utils/chartModel.util.ts) (via `useChartModel`) derives per series
+the months with their mean, the aridity, the annual summary (null while a month is missing), the
+stats and the Walter-Lieth series; and, shared by all, the scales, the precipitation axis' top and
+the Walter-Lieth domain. The page derives it once; the card, the stats table and the export all
+read it.
 
 ## View state and features
 
-A page also hands over:
-
-- **View state** (`TChartViewState`, from the URL): chart mode, layout, shading, the expanded
-  panel, the side-by-side pair, the series shown in the overlay, the variable filter and the
-  month filter. An absent part isn't offered (no layout: no layout switch).
-- **Features** (`TChartFeatures`, what the page enables): the title text, the stats table's
-  difference (`minuendId`, and `meaning` — `EDifferenceMeaning`, cities or periods — which picks
-  the header popover's wording), side pickers, the month badge, the raw export, and the chart
-  blocks it leaves out (`hiddenBlocks`).
-
 Both types are in [`chartPage.type.ts`](../src/types/charts/chartPage.type.ts).
+
+- **View state** (`TChartViewState`, from the URL): chart mode, layout, shading, expanded panel,
+  side-by-side pair, the overlay's shown series, variables and months. An absent part isn't
+  offered (no layout: no layout switch).
+- **Features** (`TChartFeatures`, what the page enables): title, the stats table's difference
+  (`minuendId`, `meaning`), side pickers, month badge, raw export, `hiddenBlocks`, `seriesSort`.
 
 ## Chart section and card
 
+```mermaid
+flowchart TD
+  hook["page hook<br/>TChartSeries list"] --> model["useChartModel<br/>deriveChartModel"]
+  model --> section["ChartSection"]
+  section --> above["SectionBlocks<br/>the stats table"]
+  section --> card["ChartCard"]
+  card --> body{"resolveChartBody: which body?"}
+  body -- one series --> single["SingleBody"]
+  body -- side by side --> split["SplitBody<br/>two expandable panels"]
+  body -- overlay --> overlay["OverlayBody"]
+  single --> blocks["ChartBlocks<br/>values table · legend"]
+  split --> blocks
+  overlay --> blocks
+```
+
 [`ChartSection`](../src/components/charts/ChartSection.tsx) — the only export of
-`components/charts` — draws the export menu, the blocks above the card, and the chart card;
-their skeletons while loading. Empty and error messages are the page layout's.
+`components/charts` — also draws the export menu and, while loading, the skeletons; empty and
+error messages are the page layout's. [`ChartCard`](../src/components/charts/ChartCard.tsx) draws
+the header (title, switches, toolbar) above the body and crossfades when chart type, layout or
+data changes. Every page uses the same card and frame, with the `PANEL` padding (smaller below
+`sm`). A Walter-Lieth overlay of a shadable pair needs both series complete; otherwise the side by side
+shows the diagram next to the other's notice.
 
-[`ChartCard`](../src/components/charts/ChartCard.tsx) draws the header
-([`ChartCardHeader`](../src/components/charts/ChartCardHeader.tsx): title, chart type and
-layout switches, the controls row) and the body for the layout
-([`resolveChartBody`](../src/components/charts/charts.util.ts)), crossfading when the chart
-type, layout or data changes:
+**Toolbar** ([`ChartToolbar`](../src/components/charts/ChartToolbar.tsx)): one row outside the
+crossfade — entity chips on the left, the view's controls on the right (variable chips in
+standard; the guide, under the shading control for a shadable pair, in Walter-Lieth). Both slots
+keep one height across views, so switching views never moves the chart. From `sm` the chips give
+way first (scrolling down to 10rem), then the controls wrap below; below `sm` the controls sit
+under the chips in one sideways-scrolling row.
 
-| Body                                                      | When                   | Draws                                                                                           |
-| --------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------- |
-| [`SingleBody`](../src/components/charts/SingleBody.tsx)   | no layout (one series) | one Walter-Lieth diagram or standard chart                                                      |
-| [`SplitBody`](../src/components/charts/SplitBody.tsx)     | side by side           | two panels, each expandable; with side pickers each panel picks its series, a swap between them |
-| [`OverlayBody`](../src/components/charts/OverlayBody.tsx) | overlay                | every drawn series in one chart; series chips above for kinds that have them                    |
+### Phone (below `sm`)
 
-Every standard chart with several series is one
-[`StandardChart`](../src/components/charts/StandardChart.tsx); every Walter-Lieth overlay is
-one [`WalterLiethOverlay`](../src/components/charts/WalterLiethOverlay.tsx). A Walter-Lieth
-overlay of a shadable pair needs both series complete; otherwise the side by side shows the
-diagram next to the other's notice.
+- **Header:** title on the left, wrapping (a pair's names wrap whole, never cut); switches on the
+  right, top-aligned.
+- **Plot:** about 1 : 1.1, narrow axes (`getAxisStyle(…, isNarrow)`), four round ticks per
+  standard axis whose span is the domain (`getStandardYAxes`), one-letter month initials from the
+  locale (`formatMonthLabel`), single-series bars 55 % of the month, curves 2.2 px. One series
+  never scrolls.
+- **Comparison bars** (`PHONE_OVERLAY_BARS`): fixed widths instead of squeezing the year — 14 px
+  up to three entities, 12 px from four, 3 px apart, 20 px between months. A year that doesn't fit
+  scrolls sideways from January (`getFixedOverlayBarLayout`).
+
+### Touch
+
+Touch is the input, not the width: `TOUCH_MEDIA_QUERY` (`(hover: none) and (pointer: coarse)`,
+`useIsTouch`), passed to the plots by `ChartDeviceContext`.
+
+1. [`MonthTapLayer`](../src/components/charts/MonthTapLayer.tsx) covers each plot. A tap in a
+   month's column selects it; another month moves it; the same month or a tap outside the plot
+   clears it.
+2. The selected month shows its band and the normal tooltip, pinned to the plot's top
+   (`getTouchTooltipProps`; in a scrolling plot, at its visible left).
+3. A horizontal drag scrubs months (`touch-pan-y` keeps vertical page scroll); a sideways-scrolling
+   plot keeps its own drag and takes taps only.
+4. Entity chips only toggle visibility — a tap must not leave a series focused.
+
+With a mouse: tooltips, hover focus and the month band, as usual.
 
 ## Inside the card
 
 ### Standard chart
 
-The standard chart is a Recharts `ComposedChart` with two y axes
-([`StandardChartAxes`](../src/components/charts/StandardChartAxes.tsx)): °C on the left, on the
-model's `scales` (rounded outward to 5 °C), and mm on the right from 0 to `rightMax` (the
-wettest month rounded up to 10 mm, 100 mm without data). Unlike the Walter-Lieth diagram the two
-axes aren't tied to each other.
+A Recharts `ComposedChart` with °C left (the model's scales) and mm right (0 to `rightMax`). The
+two axes aren't tied, unlike Walter-Lieth's ([climate-indices.md](climate-indices.md)).
 
-- **One series** ([`StandardClimateChart`](../src/components/charts/StandardClimateChart.tsx)):
-  precipitation bars coloured by the month's aridity (arid or humid, `CHART_COLORS`), and the
-  max, mean and min temperature lines in the variable colours.
-- **Several series** ([`StandardChart`](../src/components/charts/StandardChart.tsx)): per series
-  its bars side by side in its bar colour, and its lines in its line colour. Line style tells the
-  variables apart: max solid, mean dashed, min dotted (`CHART_LINE_DASH` in
-  [`legend.constant.ts`](../src/constants/legend.constant.ts)). Kinds without `hasMeanLine`
-  (weather years) draw no mean line.
-- **Variable chips** ([`VariableChips`](../src/components/charts/VariableChips.tsx)) toggle max,
-  mean, min and precipitation. They start from the variables filter and follow it
-  ([`useVisibleSeries`](../src/hooks/charts/useVisibleSeries.ts)); the last one on stays on
-  (locked). A toggled series fades over `MOTION.CHART_SERIES_TOGGLE_MS`.
-- **Month filter.** Months outside the filter are dimmed, not removed, so the year's shape
-  stays readable.
-
-The Walter-Lieth diagram's own rules (scale, regimes, frost band, when it's drawn) are in
-[climate-indices.md](climate-indices.md).
+- **Colours:** semantic only; an entity is told apart by its shape
+  ([colors.md](colors.md#entities-shapes-and-hatches-not-colours)).
+- **One series** ([`StandardClimateChart`](../src/components/charts/StandardClimateChart.tsx), also
+  each split panel): bars by aridity, max / mean / min lines.
+- **Several series** ([`StandardChart`](../src/components/charts/StandardChart.tsx), the overlay):
+  per entity its bars side by side and its lines with points in its shape. Line style tells the
+  variables apart (`CHART_LINE_DASH`).
+- **Variable chips** ([`useVisibleSeries`](../src/hooks/charts/useVisibleSeries.ts)): start from
+  the variables filter and follow it; the last one on is locked. Card-level UI state, kept across
+  layouts and chart types; Walter-Lieth ignores it.
+- **Month filter:** months outside it are dimmed, not removed.
 
 ### Overlay and side by side
 
-- **Overlay** ([`OverlayChart`](../src/components/charts/OverlayChart.tsx)): every drawn series
-  in one chart on shared scales. For weather years, series chips
-  ([`SeriesChips`](../src/components/charts/SeriesChips.tsx)) above the chart toggle a year
-  (the URL's `shownYears`) and highlight it on hover or focus: the other series dim to
-  `OVERLAY_DIM_OPACITY`. A year turned off keeps its place and colour.
-- **Side by side** ([`SplitBody`](../src/components/charts/SplitBody.tsx),
-  [`SplitPanels`](../src/components/SplitPanels/SplitPanels.tsx)): two panels on the same
-  scales or Walter-Lieth domain, so they compare at a glance. The pair is the page's (with more
-  than two weather years, picked with the side pickers: the URL's `pair`) or the first two series
+- **Overlay** ([`OverlayChart`](../src/components/charts/OverlayChart.tsx)): every drawn series on
+  shared scales. Weather years get series chips
+  ([`SeriesChips`](../src/components/charts/SeriesChips.tsx), the URL's `shownYears`); a hidden
+  year keeps its marker.
+- **Side by side** ([`SplitPanels`](../src/components/SplitPanels/SplitPanels.tsx)): two panels on
+  the same scales or domain. The pair is the URL's `pair` (side pickers) or the first two
   (`getSplitPair`).
-- **Expand.** Each panel's header has an expand button: the expanded panel fills the card,
-  its plot as tall as in the split and on the same shared domain, with a switch to the other
-  series and "Show both". The state is the URL's `expanded`. A Walter-Lieth panel can expand
-  only when its series is complete. Exports draw only the expanded panel's chart, but the full
-  stats table ([export.md](export.md)).
+- **Expand:** a panel can fill the card, with a switch to the other series (the URL's `expanded`).
+  A Walter-Lieth panel expands only when its series is complete. Exports draw the expanded panel
+  with the full stats table.
+
+### Overlay: layout, focus and scroll
+
+[`StandardChart`](../src/components/charts/StandardChart.tsx) holds layout and focus;
+`OverlayBars` and `OverlayCurves` draw the layers.
+
+- **Bar layout** ([`getOverlayBarLayout`](../src/utils/overlayBars.util.ts)): one source for the
+  bars, the curve points, the export and the settings preview. Each month's group is centred, bars
+  in entity order at the bar style's gap; hidden entities take no place. The visible bars share
+  70 % of the band up to 28 px each; below that the gap between groups gives way down to 8 px bars;
+  below that the plot scrolls.
+- **Anchored points:** each entity's points sit over its own bar (its own hidden x axis, offset by
+  `getCurveOffsets`).
+- **Focus** (`getEntityRole`): hovering or focusing a chip, a curve, a bar or a values-table row
+  header focuses its entity. The others become context — thin gray curves without points, gray
+  bars without swatch, muted table values. Never in exports.
+- **Tooltip:** a hovered curve or bar names its variable, entity, month and value
+  ([`useOverlayFocus`](../src/hooks/charts/useOverlayFocus.ts)).
+- **Scroll:** see [Fit or scroll](#fit-or-scroll).
+- **Margins and the values table:** the plot's side margins are its axes' widths
+  (`getPlotMargin`), and the values table's header column takes the left one's width. That keeps
+  every value under its month, including when the table scrolls with the plot (`useScrollSync`).
+
+### Fit or scroll
+
+```mermaid
+flowchart TD
+  chart["StandardChart"] --> phone{"Below sm?"}
+  phone -- yes --> fixed["getPhoneOverlayBars<br/>fixed bars and band"]
+  phone -- no --> min["getMinOverlayBand<br/>minimum bars, the gap's floor"]
+  fixed --> fits{"getOverlayScroll: band × 12 + axes fits?"}
+  min --> fits
+  fits -- yes --> wide["plot at the card's width"]
+  fits -- no --> scroll["plot exactly that wide<br/>scrolls under FixedYAxes"]
+```
+
+Purely by width; an overflow within `FIT_TOLERANCE` (subpixel layout) still fits. The bars are then laid
+out by `getOverlayBarLayout` (or `getFixedOverlayBarLayout` on a phone); a scrolling plot shows a
+swipe hint and its values table scrolls with it.
+
+### Bar styles
+
+The reader's `chartBarStyle` setting ([settings.md](settings.md)) decides how a comparison
+overlay's bars tell entities apart (`OVERLAY_BAR_STYLES`):
+
+| Style             | Fill                      | Hatch | Gap               |
+| ----------------- | ------------------------- | ----- | ----------------- |
+| `plain` (default) | humid / arid              | no    | 3 px, down to 1.5 |
+| `shades`          | the entity's step of each | no    | 2 px              |
+| `hatch`           | humid / arid              | yes   | 1 px              |
+
+`ChartCard` reads the setting, so open charts redraw at once. Side by side, single-city charts and
+Walter-Lieth ignore it. Exports are always plain (`EXPORT_BAR_STYLE`), the best for print.
+
+- **Plain's gap** (`getOverlayGap`) shrinks toward its floor as the bars near their minimum
+  width, so plain never forces a scroll that a smaller gap would avoid.
+- **Swatches** follow one rule, `getSwatchBarStyle`: an entity shows its bars' swatch beside its
+  shape only where the view draws per-entity bars — the standard overlay, precipitation shown,
+  `shades` or `hatch`. Elsewhere the shape alone. Chips, legend, values table, bar tooltip and
+  export all ask it.
 
 ### Hover sync
 
-The hovered month is one state per card: `activeMonthIndex` in
-[`ChartCard`](../src/components/charts/ChartCard.tsx), passed down to every chart, panel and
-monthly values table it holds. Hovering or focusing a month anywhere in the card highlights it
-everywhere: a band in `--color-state-hover` on each plot, its dots standing out, the other months'
-bars dimmed to `STANDARD_CHART_HOVER_DIMMED_BAR_OPACITY` (35%), and its column in the values
-table. The card's charts also share one Recharts `syncId`, so both split panels show their
-tooltip for the same month.
+One hovered month per card (`activeMonthIndex` in `ChartCard`; on touch, the tapped one). It shows
+as a band on every plot, the month's dots standing out, other months' bars dimmed, and its column
+in the values table. The card's charts share a Recharts `syncId`.
 
 ### Tooltips
 
-Every tooltip writes values in the text colour; the series shows by its marker or swatch, never
-by coloured small text ([colors.md](colors.md#text-in-a-series-colour)).
+Values in the text colour; series by shape or swatch, never colour.
 
-| Tooltip                                                                                      | Chart                    | Shows                                                                                                             |
-| -------------------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| [`StandardTooltip`](../src/components/charts/StandardTooltip.tsx)                            | standard                 | the month, then each drawn line and bar: its series marker (several series) or its variable's legend swatch (one) |
-| [`WalterLiethTooltip`](../src/components/WalterLiethChart/components/WalterLiethTooltip.tsx) | one Walter-Lieth diagram | the month's temperature and precipitation and its period, after their legend swatches                             |
-| [`OverlayTooltip`](../src/components/charts/OverlayTooltip.tsx)                              | Walter-Lieth overlay     | per series its marker and name, then its values                                                                   |
+| Tooltip              | Chart                    | Shows                                                                   |
+| -------------------- | ------------------------ | ----------------------------------------------------------------------- |
+| `StandardTooltip`    | standard                 | the month's lines and bars; in an overlay, a hovered curve or bar alone |
+| `WalterLiethTooltip` | one Walter-Lieth diagram | temperature, precipitation and the month's period                       |
+| `OverlayTooltip`     | Walter-Lieth overlay     | per series its marker, name and values                                  |
 
 ### Monthly values table
 
-[`MonthlyValuesTable`](../src/components/MonthlyValuesTable/MonthlyValuesTable.tsx), the
-`VALUES_TABLE` block, shows each month's mean temperature and precipitation under every chart,
-one column exactly under each month of the plot (in an overlay, each series' value stacked, with
-its marker beside the unit). Its layout follows the width the chart gives it, not the viewport
-(a container query): below 30rem — a phone, a split panel — twelve columns can't fit a value
-each, so a disclosure reveals a vertical table instead. It has no row hover: it highlights the
-hovered month's column, in step with the chart. The export draws the same rows
-(`buildMonthlyValuesRows`).
+[`MonthlyValuesTable`](../src/components/MonthlyValuesTable/MonthlyValuesTable.tsx) shows each
+month's mean temperature and precipitation, one column under each month of the plot. Its layout
+follows the width the chart gives it (a container query): below 30rem a disclosure opens a
+vertical table instead. It has no row hover: it highlights the hovered month's column.
+
+In the standard overlay (`hasSections`) each unit is a section, and rows are headed by short
+labels (`getEntityShortLabels`: 1967, ’70–’00, MAD). The header column is the plot's left axis
+width, so longer labels are cut, with the full name in the title. Hovering a header focuses its
+entity. The Walter-Lieth overlay keeps the unit in each row, with the entities' markers.
 
 ## Chart blocks
 
-Everything drawn under or around a chart is a block in the registry `CHART_BLOCKS` in
-[`ChartBlocks.tsx`](../src/components/charts/ChartBlocks.tsx), typed with
-`satisfies Record<EChartBlock, …>` so every `EChartBlock` member needs an entry:
+Everything drawn under or around a chart is a block in `CHART_BLOCKS`
+([`ChartBlocks.tsx`](../src/components/charts/ChartBlocks.tsx)), typed so every `EChartBlock`
+member needs an entry:
 
-| Block          | Placement | Where                                                                   |
-| -------------- | --------- | ----------------------------------------------------------------------- |
-| `VALUES_TABLE` | `PANEL`   | under every chart: each split panel gets its own                        |
-| `LEGEND`       | `BODY`    | once under the body: split panels share it                              |
-| `STATS_TABLE`  | `SECTION` | above the chart card, in the chart section (with the difference column) |
+| Block          | Placement | Where                                      |
+| -------------- | --------- | ------------------------------------------ |
+| `VALUES_TABLE` | `PANEL`   | under every chart, one per split panel     |
+| `LEGEND`       | `BODY`    | once under the body                        |
+| `STATS_TABLE`  | `SECTION` | above the card, with the difference column |
 
-Every body places `<ChartBlocks>` for its spots; none renders a block itself. A `PANEL` or
-`BODY` block gets the block context (`TChartBlockContext`: the chart mode, the body, the
-kind's rules, the series drawn there, the variable chips, the hovered month, whether it's
-compact, the shaded series, the panel shown); a `SECTION` block gets the
-whole model and the page's features. A page leaves a block out through `hiddenBlocks` (City
-Climate: the stats table — its stat cards and the chart's stats bar say the same).
+Bodies place `<ChartBlocks>`; none renders a block itself. `PANEL` and `BODY` blocks get the block
+context (`TChartBlockContext`); `SECTION` blocks get the model and features. A page leaves a block
+out via `hiddenBlocks` (City Climate: the stats table).
 
-The stats table's header ([`StatsTableHead`](../src/components/charts/StatsTableHead.tsx))
-bottom-aligns every title on one line height. Its Difference title carries an info popover
-explaining the formula and sign from the pair's labels (`DIFFERENCE_NOTE_KEYS` by `meaning`). A
-series name stays on one line; only when it's clipped
-([`useIsTruncated`](../src/hooks/ui/useIsTruncated.ts)) does it become a popover trigger showing
-the full name.
+The stats table's Difference header explains its formula in a popover (`DIFFERENCE_NOTE_KEYS`). A
+clipped series name opens its full name ([`useIsTruncated`](../src/hooks/ui/useIsTruncated.ts)).
 
-A hovered body row takes the hover state layer (`--color-state-hover`, `STATS_TABLE_CLASSES.ROW`):
-an inset shadow on each cell, so the pinned metric cell tints over its opaque background. It
-fades over `MOTION.STATE_HOVER_MS` (off with the Animations setting and under reduced motion),
-only where the device can hover (Tailwind's `hover:`), and keeps the default cursor: rows aren't
-clickable. The monthly values table has no row hover: it highlights the hovered month's column.
-
-### Adding a block under every chart
-
-1. Add a member to `EChartBlock` in [`chart.enum.ts`](../src/enums/chart.enum.ts).
-2. Write its component in `ChartBlocks.tsx` (`TChartBlockProps` for under a chart,
-   `TSectionBlockProps` above the card), reading only the context or the model.
-3. Add its entry, with its placement, to `CHART_BLOCKS` — the build fails until you do.
-
-It then appears under every chart of every page, in every layout and both chart types. A page
-that shouldn't show it adds it to its `hiddenBlocks`. The exports have their own builders
-(below): a block that belongs in the exported image is added there too.
+**Adding a block:** add an `EChartBlock` member, write its component in `ChartBlocks.tsx`, add its
+`CHART_BLOCKS` entry (the build fails until you do). It then appears under every chart; a page
+opts out with `hiddenBlocks`. Exports have their own builders ([export.md](export.md)).
 
 ## Exports
 
-The export menu comes from [`useSingleChartExport`](../src/hooks/charts/useSingleChartExport.ts)
-(one series: CSV of the monthly values, PNG / SVG, and the raw CSV / JSON where the page offers
-it) or [`useComparisonChartExport`](../src/hooks/charts/useComparisonChartExport.ts)
-(compared series: CSV of their stats, PNG / SVG titled like the chart and named after the
-page's place and the exported series). Both build from the same model and stats table as the
-screen and follow it — chart type, layout, shading, expanded panel or drawn years, chips. The
-SVG builders are in [`src/utils/export/svg/`](../src/utils/export/svg); a PNG is that SVG
-rasterized, so the two never differ. Exports read colours from the light palette in either
-theme, and every `var(--token)` in the SVG is replaced by its value before it is saved
-([colors.md](colors.md)). Both menus are disabled while data is being replaced. The whole
-pipeline — builders, token resolution, PNG rendering, the heat map's tiles — is in
-[export.md](export.md).
+The export menus ([`useSingleChartExport`](../src/hooks/charts/useSingleChartExport.ts),
+[`useComparisonChartExport`](../src/hooks/charts/useComparisonChartExport.ts)) build from the same
+model as the screen and follow its view. The pipeline is in [export.md](export.md).
 
 ## Data updates
 
-The page's `update` (series data by key, whether it's fetching, the announcement) goes to the
-[`DataUpdateProvider`](../src/components/DataUpdate/DataUpdateProvider.tsx) around the results.
-New data replacing shown data is an update — a first load or an unchanged refetch isn't. A card
-flashes when an update changed one of its series (`flashKeys`), the chart card dims and its
-progress bar runs while an update takes longer than `MOTION.UPDATE_LOADING_DELAY_MS`, and
-each update is announced once in a polite live region. Split panels flash on their own.
+The page's `update` goes to [`DataUpdateProvider`](../src/components/DataUpdate/DataUpdateProvider.tsx).
+New data replacing shown data is an update; a first load or an unchanged refetch isn't. A card
+flashes when an update changed one of its series (`flashKeys`); the chart card dims with a
+progress bar while an update takes longer than `MOTION.UPDATE_LOADING_DELAY_MS`; each update is
+announced once in a polite live region.

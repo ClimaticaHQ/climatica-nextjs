@@ -1,302 +1,248 @@
 # URL state
 
-The URL is the single source of truth for everything a page shows: filters (dataset,
-period, variables, resolution, months, Compare Periods' periods and years) and page view
-state (city, chart mode, layout, shading, expanded panel, the side-by-side pair, the
-overlay's shown years, the heat-map selection). Components read it; only a few hooks write
-it. A shared link therefore opens exactly what was on screen.
+The URL is the single source of truth for everything a page shows: filters (dataset, period,
+variables, resolution, months, Compare Periods' periods and years) and page view state (city,
+chart mode, layout, shading, expanded panel, pair, shown years, Compare Periods' order and
+markers, the heat map's selection). A shared link opens exactly what was on screen.
 
 ## Who writes the URL
 
 Router calls happen only in these hooks:
 
-| Hook                                                                     | Owns                                                                                                                                                      | Writes                                                                                                                                                              |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`useFilterNavigation`](../src/hooks/filters/useFilterNavigation.ts)     | filter params                                                                                                                                             | `applyFilters(next, mode)`: replace for quick changes, push for an Apply ([`FILTER_NAVIGATION_MODES`](../src/constants/filters.constant.ts)). Page params are kept. |
-| [`useUrlStateSync`](../src/hooks/ui/useUrlStateSync.ts)                  | a page's own params, described by its URL schema (e.g. [`COMPARE_PERIODS_URL_SCHEMA`](../src/app/compare-periods/_components/ComparePeriods.constant.ts)) | Replaces the URL when page state drifts from it; `pushUrlState` for explicit actions. Filter params are carried along untouched.                                    |
-| [`useChartModeUrl`](../src/hooks/url/useChartModeUrl.ts)                 | `chart`                                                                                                                                                   | Replace, keeping every other param.                                                                                                                                 |
-| [`useNavbarNavigation`](../src/hooks/url/useNavbarNavigation.ts)         | navbar, logo and settings links                                                                                                                           | Push to another page (see the last-page-params cache below). The settings link carries the shared filters.                                                          |
-| [`useCanonicalFilterUrl`](../src/hooks/filters/useCanonicalFilterUrl.ts) | canonical filter params                                                                                                                                   | Replaces once when the URL isn't canonical (see below).                                                                                                             |
-| [`useLocaleSwitch`](../src/hooks/url/useLocaleSwitch.ts)                 | the language (the `NEXT_LOCALE` cookie)                                                                                                                   | Doesn't navigate: saves the cookie, then `router.refresh()` renders the same URL in the new language.                                                               |
+| Hook                                                                     | Owns                                   | Writes                                                                                       |
+| ------------------------------------------------------------------------ | -------------------------------------- | -------------------------------------------------------------------------------------------- |
+| [`useFilterNavigation`](../src/hooks/filters/useFilterNavigation.ts)     | filter params                          | `applyFilters(next, mode)`: replace (`QUICK`) or push (`APPLY`); page params kept            |
+| [`useUrlStateSync`](../src/hooks/ui/useUrlStateSync.ts)                  | a page's own params, by its URL schema | replace when page state drifts; `pushUrlState` for explicit actions; filter params untouched |
+| [`useChartModeUrl`](../src/hooks/url/useChartModeUrl.ts)                 | `chart`                                | replace                                                                                      |
+| [`useNavbarNavigation`](../src/hooks/url/useNavbarNavigation.ts)         | navbar, logo and settings links        | push to another page                                                                         |
+| [`useCanonicalFilterUrl`](../src/hooks/filters/useCanonicalFilterUrl.ts) | canonical filter params                | replace once when the URL isn't canonical                                                    |
+| [`useLocaleSwitch`](../src/hooks/url/useLocaleSwitch.ts)                 | the `NEXT_LOCALE` cookie               | saves the cookie, then `router.refresh()`                                                    |
 
-Reading is simpler: [`useFilters`](../src/hooks/filters/useFilters.ts) parses the filters
-from `useSearchParams`, and each page's schema parses its own params.
+Reading: [`useFilters`](../src/hooks/filters/useFilters.ts) parses the filters; each page's schema
+parses its own params. Components outside a page that need a page param (the sidebar reading
+Compare Periods' `order` and `markers`) parse it read-only.
 
 ## How a page keeps its state in the URL
 
-[`useUrlStateSync`](../src/hooks/ui/useUrlStateSync.ts) compares the page params in the URL
-with the ones its state would write ([`decideUrlSyncAction`](../src/utils/urlParams.util.ts)):
+`useUrlStateSync` compares the page params in the URL with those its state would write
+([`decideUrlSyncAction`](../src/utils/urlParams.util.ts)):
 
-- **external** — the URL changed to something this hook didn't write (load, Back/Forward,
-  an edited address): the page restores its state from it (`onRestore`).
-- **stateChange** — the state changed: the URL is replaced with the new params.
-- **ownWrite** — the URL just caught up with the hook's own write: nothing to do.
+- **external** (load, Back/Forward, an edited address): the page restores its state (`onRestore`);
+- **stateChange**: the URL is replaced with the new params;
+- **ownWrite**: the URL caught up with the hook's own write; nothing to do.
 
-Nothing is read or written before the first client render, when the persisted cities are
-loaded. Then every field the URL carries wins, and the rest keep their persisted value or
-default.
+Nothing is read or written before the first client render (the persisted cities load then).
+Fields the URL carries win; the rest keep their persisted value or default.
 
 Writes are scheduled and re-checked when they run
-([`canWriteUrlState`](../src/utils/urlStateGuard.util.ts)). A write is dropped if the page
-is no longer the current route, if a link navigation is on its way elsewhere, or if the URL
-changed since it was scheduled. Otherwise a late `replace` on the page being left would
-cancel the navigation. [`NavigationIntentTracker`](../src/components/NavigationIntentTracker/NavigationIntentTracker.tsx)
-records a link click's target in [`navigationIntentStore`](../src/stores/navigationIntentStore.ts)
-before the router acts, and clears it when the route changes.
+([`canWriteUrlState`](../src/utils/urlStateGuard.util.ts)): a write is dropped if the page is no
+longer current, a link navigation is on its way, or the URL changed since. Otherwise a late
+`replace` on the page being left would cancel the navigation.
+[`NavigationIntentTracker`](../src/components/NavigationIntentTracker/NavigationIntentTracker.tsx)
+records a link click's target before the router acts.
 
 ## Canonical filter params
 
-[`getCanonicalFilterUrlParams`](../src/utils/filtersUrl.util.ts) turns any URL into its
-canonical form: defaults are left out, invalid values are dropped, legacy params are
-rewritten, values the dataset doesn't use (a climate period with Weather) are removed, and
-the filters are normalized ([`normalizeFilters`](../src/utils/filters.util.ts)).
-`useCanonicalFilterUrl` replaces the URL with that form once. The canonical form is a fixed
-point, so this never loops.
+[`getCanonicalFilterUrlParams`](../src/utils/filtersUrl.util.ts) drops defaults and invalid
+values, rewrites legacy params, removes values the dataset doesn't use, and normalizes
+([`normalizeFilters`](../src/utils/filters.util.ts)). `useCanonicalFilterUrl` replaces the URL with
+it once; the canonical form is a fixed point, so this never loops. Filter encodings are codecs in
+[`filterCodecs.util.ts`](../src/utils/filterCodecs.util.ts); page params are `TUrlField`s in
+[`urlFields.util.ts`](../src/utils/urlFields.util.ts), which leave defaults out.
 
-Each filter's URL encoding is its codec in [`filterCodecs.util.ts`](../src/utils/filterCodecs.util.ts):
-`parse` returns `null` for an absent or invalid value, `encode` writes it. Page params use
-`TUrlField`s ([`urlFields.util.ts`](../src/utils/urlFields.util.ts)) that leave defaults out
-of the URL.
-
-## Legacy params
-
-Old links keep working. These are read but never written:
-
-| Old              | Now                                                                                                                     |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `year1`, `year2` | `periods` (Compare Periods' weather years) — `legacyParams` in [`FILTERS_CONFIG`](../src/constants/filters.constant.ts) |
-| `wlLayout`       | `layout`                                                                                                                |
-| `wlYears`        | `pair`                                                                                                                  |
-| `chart=wl`       | Walter-Lieth (the default, written as no `chart` param)                                                                 |
-
-The names are in [`SIDEBAR_PARAMS`](../src/constants/sidebar.constant.ts). Filters older
-versions kept in localStorage are removed on load
-([`useLegacyStorageCleanup`](../src/hooks/persisted/useLegacyStorageCleanup.ts)). What else is
-kept in localStorage and the cookie is in [settings.md](settings.md#what-is-stored-where).
+**Legacy params** (read, never written): `year1` + `year2` → `periods`, `wlLayout` → `layout`,
+`wlYears` → `pair`, `chart=wl` → Walter-Lieth. Names are in
+[`SIDEBAR_PARAMS`](../src/constants/sidebar.constant.ts).
 
 ## The last-page-params cache
 
-Navbar links bring back each page's own params, for example Compare Periods' five years
-and its layout, after a trip to another page.
+Navbar links bring back each page's own params (e.g. Compare Periods' years and layout) after a
+trip elsewhere.
 
-- **Store:** [`lastPageParamsStore`](../src/stores/lastPageParamsStore.ts), persisted under
-  `climatica:lastPageParams`. It's a cache, never a source of truth.
-- **Single writer:** [`useLastPageParamsSync`](../src/hooks/url/useLastPageParamsSync.ts)
-  records a page's own params whenever its URL changes. That means its URL state minus the
-  city (the persisted city stores and the sync-city setting own that) plus its page-placed
-  filters. See [`extractPageParams`](../src/utils/pageParams.util.ts).
-- **Single reader:** [`useNavbarNavigation`](../src/hooks/url/useNavbarNavigation.ts), at
-  click time. The rendered `href` carries only the shared filters, so the server and client
-  render the same link and a new tab opens a plain, shareable URL. A plain click builds the
-  full target with [`buildNavbarHref`](../src/utils/pageParams.util.ts): the remembered
-  params plus the current shared filters (which win), re-validated through the page's own
-  URL fields ([`REMEMBERED_PAGE_PARAMS`](../src/constants/pageParams.constant.ts)).
-- Pages never read the store. A URL opened directly or from a shared link shows exactly
-  what it says.
+- **Store:** [`lastPageParamsStore`](../src/stores/lastPageParamsStore.ts) (`climatica:lastPageParams`),
+  a cache, never a source of truth. Pages never read it.
+- **Single writer:** [`useLastPageParamsSync`](../src/hooks/url/useLastPageParamsSync.ts) records a
+  page's URL state minus the city, its page-placed filters and its shared filters
+  ([`extractPageParams`](../src/utils/pageParams.util.ts)).
+- **Single reader:** `useNavbarNavigation`, at click time. The rendered `href` carries only the
+  shared filters, so server and client render the same link and a new tab opens a plain URL. A
+  plain click builds the target with [`buildNavbarHref`](../src/utils/pageParams.util.ts),
+  re-validated through the page's URL fields
+  ([`REMEMBERED_PAGE_PARAMS`](../src/constants/pageParams.constant.ts)).
+
+## Filters across pages
+
+The `syncFilters` setting ([settings.md](settings.md)) picks whose shared filters a page gets:
+
+|                                    | On (default)                         | Off                                                       |
+| ---------------------------------- | ------------------------------------ | --------------------------------------------------------- |
+| Navbar click                       | the current page's                   | the target's remembered ones (the current if it has none) |
+| Dataset switch                     | restores the last selection anywhere | restores this page's last selection                       |
+| Scope (`getDatasetSelectionScope`) | `allPages`                           | the page's route                                          |
+
+A URL with explicit filters always shows them. The rendered `href` always carries the current
+filters (the setting is client-only, read at click time). The city has its own setting
+(`syncCity`); page state is per page in both modes.
 
 ## UrlSync
 
-App-wide URL upkeep runs once, in [`useFilterUrlSync`](../src/hooks/filters/useFilterUrlSync.ts):
-canonical filter params, the last-page-params writer and the legacy storage cleanup. It
-reads `useSearchParams`, so it needs a component inside a Suspense boundary, and
-`AppLayout` sits above them all. [`UrlSync`](../src/layouts/UrlSync.tsx) is that host: it
-only calls the hook and renders nothing, inside its own `Suspense` in
-[`AppLayout`](../src/layouts/AppLayout.tsx).
+App-wide URL upkeep — canonical params, the last-page-params writer, the legacy storage cleanup —
+runs once in [`useFilterUrlSync`](../src/hooks/filters/useFilterUrlSync.ts). It reads
+`useSearchParams`, so it needs a host inside a Suspense boundary: [`UrlSync`](../src/layouts/UrlSync.tsx)
+in `AppLayout`.
 
 ## Why sheets close before navigating
 
-A bottom sheet adds a same-URL history entry while it's open, so the system Back button
-closes the sheet instead of leaving the page
-([`useSheetHistory`](../src/hooks/ui/useSheetHistory.ts)).
-
-Next's `router.replace` and `router.push` rewrite `history.state`. A router call while a
-sheet is open would drop the sheet entry's marker, leaving a history entry that can't be
-popped any more: a Back press that does nothing. So every write from the filters sheet goes
-through [`useFiltersSheet`](../src/hooks/filters/useFiltersSheet.ts): `await closeSheet()`
-first (the entry is popped and the popstate has arrived), then the router call.
+An open bottom sheet adds a same-URL history entry, so system Back closes it
+([`useSheetHistory`](../src/hooks/ui/useSheetHistory.ts)). Next's router calls rewrite
+`history.state`; one made while a sheet is open would orphan that entry, leaving a Back press that
+does nothing. So every write from the filters sheet goes through
+[`useFiltersSheet`](../src/hooks/filters/useFiltersSheet.ts): `await closeSheet()` first, then the
+router call.
 
 ## Flows
 
 ### Page load from a shared link
 
-1. **Locale.** Paths have no locale prefix. [`src/proxy.ts`](../src/proxy.ts) redirects an
-   old prefixed link (`/es/…`) to the same path and query without it (308); the locale comes
-   from the `NEXT_LOCALE` cookie, then `Accept-Language`, else English ([localization-i18n.md](localization-i18n.md)).
-2. **Server render.** The root [`layout.tsx`](../src/app/layout.tsx) sets the theme before
-   the first paint, loads the locale's messages, the providers and
-   [`AppLayout`](../src/layouts/AppLayout.tsx). The route's `page.tsx` builds the metadata and
-   its canonical URL from the search params (`createPageMetadata` +
-   `resolve…Meta` in [`metadata.util.ts`](../src/utils/metadata.util.ts)) and renders the
-   page container inside `Suspense`.
-3. **Reading the URL.** Client components render on the server too:
-   - `useFilters` → `parseFilters(searchParams)` gives the filters. Absent or invalid
-     values become defaults, and the result is normalized.
-   - Data hooks don't fetch on the server (no prefetching), so the page renders its
-     loading state.
-4. **Hydration and canonical replace.** On the client, `UrlSync` → `useFilterUrlSync` runs:
-   - `useCanonicalFilterUrl` checks `getCanonicalFilterUrlParams`. If the link had a
-     default written out, an invalid or legacy value, it replaces the URL once (guarded by
-     `canWriteUrlState`).
-   - `useLastPageParamsSync` records the page's params.
-5. **Page state restore.** After the first client render (`useIsClient`), the container's
-   `useUrlStateSync` sees page params it didn't write ("external") and calls `onRestore`
-   with `parseUrlState(schema, searchParams)`. The link's city, layout, chart mode and so
-   on become the page state. Fields the link lacks keep their persisted value (the city)
-   or default. If that state writes params the link lacked (e.g. the persisted city), the
-   next pass is a "stateChange" and `replaceUrlParams` adds them.
-6. **Data requests.** The data hooks run their queries with keys built from the city and
-   the filters, through `apiClient` to `/api/worldclim/…` (see [Data](#data) below).
+1. **Locale:** [`src/proxy.ts`](../src/proxy.ts) redirects an old prefixed path (`/es/…`) without
+   the prefix (308); the locale comes from the cookie, then `Accept-Language`
+   ([localization-i18n.md](localization-i18n.md)).
+2. **Server render:** the root layout sets the theme before first paint and loads messages and
+   providers; `page.tsx` builds metadata from the search params and renders the container in
+   `Suspense`. Data hooks don't fetch on the server: the page renders its loading state.
+3. **Hydration:** `UrlSync` replaces a non-canonical URL once and records the page's params.
+4. **Restore:** after the first client render, `useUrlStateSync` sees params it didn't write and
+   calls `onRestore`. If the restored state writes params the link lacked (the persisted city),
+   the next pass replaces them in.
+5. **Data:** queries run with keys from the city and filters ([Data](#data)).
 
-### A filter change on desktop (sidebar)
+### A filter change (sidebar)
 
-1. **Edit.** A section calls `onChange(key, value)` → `useFiltersDraft().setFilter`, which
-   normalizes the draft (`normalizeFilters`). The URL doesn't change yet.
-2. **Apply.** Either way, `FiltersSidebar`'s `commit` → `filtersDraft.submit()` (returns
-   `null` while the typed year is invalid) → `useFilterNavigation().applyFilters(next, mode)`:
-   - Auto-apply on (default): `useAutoApply` waits until the serialized draft has been
-     unchanged for 200 ms, then commits as `QUICK`.
-   - The Apply button commits as `APPLY`.
-3. **URL.** `applyFilters` → `serializeFilters(next, searchParams)`: canonical filter
-   params, page params kept. Then `replaceUrlParams` (`QUICK`) or `pushUrlParams` (`APPLY`),
-   per `FILTER_NAVIGATION_MODES`, with `scroll: false`.
-4. **Read back.** `useSearchParams` changes → `useFilters` re-parses. The draft follows the
-   applied filters, so it isn't dirty any more. `useCanonicalFilterUrl` finds the URL
-   already canonical, and `useUrlStateSync` finds the page params unchanged: neither
-   writes.
-5. **Data.** Hooks whose query key changed fetch, keeping the previous data on screen
-   (`keepPreviousData`) while the progress bar shows. Changes outside the keys (variables,
-   months, the climate period) are applied to the data already loaded.
+```mermaid
+flowchart TD
+  edit["section onChange"] --> draft["useFiltersDraft.setFilter<br/>normalizeFilters"]
+  draft --> auto{"autoApplyFilters on?"}
+  auto -- yes --> wait["useAutoApply<br/>200 ms unchanged"]
+  auto -- no --> button["Apply button"]
+  wait --> quick["applyFilters QUICK<br/>replace"]
+  button --> push["applyFilters APPLY<br/>push"]
+  quick --> parse["useFilters re-parses"]
+  push --> parse
+  parse --> key{"Query key changed?"}
+  key -- yes --> fetch["data hook fetches<br/>keepPreviousData"]
+```
 
-### A filter change on mobile (filter bar and sheet)
+`applyFilters` writes canonical filter params and keeps page params. The draft follows the applied
+filters, and neither `useCanonicalFilterUrl` nor `useUrlStateSync` writes again. A change outside
+the keys (variables, months, the climate period) is applied to the data already loaded.
 
-1. **Chip.** A tap calls `useFiltersSheet().openFilter(key)` (a value chip), `openAll()`
-   (the "Filters" chip) or `openUnavailableInfo()` (a chip disabled by Walter-Lieth).
-2. **Sheet entry.** The sheet opens; `useSheetHistory` pushes a same-URL history entry with
-   a marker, so system Back closes the sheet. `FiltersSheet` resets its draft
-   (`discard()`).
-3. **Edit.**
-   - In one filter's sheet, a single-choice filter (dataset, period, resolution) applies on
-     pick, unless it would exceed the heat map's cell limit. Other filters edit the draft
-     until Apply.
-   - In the all-filters sheet, everything edits the draft, and Reset goes back to the
-     defaults.
-4. **Apply.** `onApply(next, mode)` → `useFiltersSheet().applyAndClose(next, mode)`:
-   - `await closeSheet()` goes `history.back()` off the sheet entry and resolves on the
-     popstate, once the sheet has closed.
-   - Then `applyFilters(next, mode)`: `QUICK` (replace) from one filter's sheet, `APPLY`
-     (push) from the all-filters sheet.
-5. **Read back and data:** as on desktop, steps 4–5. Closing without Apply (Back, the
-   backdrop, a swipe, Escape) drops the draft.
+### A filter change (mobile sheet)
 
-### Back / Forward after an Apply
+1. A chip opens one filter's sheet, all filters, or why a chip is disabled
+   (`useFiltersSheet`); the sheet pushes its history entry and resets its draft.
+2. In one filter's sheet a single-choice filter applies on pick; others wait for Apply. The
+   all-filters sheet edits the draft until Apply (Reset: defaults).
+3. Apply: `await closeSheet()`, then `applyFilters` — `QUICK` from one filter's sheet, `APPLY` from
+   all filters. Closing without Apply drops the draft.
 
-1. An Apply pushed a new entry. Back pops it: the router renders the previous entry's URL.
-2. `useFilters` re-parses the previous filters, and the sidebar's draft follows them.
-3. `useUrlStateSync` restores page state only if the page params differ ("external");
-   after a filter-only Apply they don't.
-4. Any URL write scheduled just before the popstate is dropped by `canWriteUrlState`,
-   because the URL changed since it was scheduled.
-5. The previous query keys are still in TanStack Query's cache, so the page shows their
-   data at once, with no request (see [Data](#data)). Forward works the same way.
+### A dataset switch
 
-If a sheet is open, Back first closes the sheet (its own history entry), and only the next
-Back leaves the current filters.
+```mermaid
+flowchart TD
+  leave["applyFilters"] --> changed{"Dataset changed?"}
+  changed -- yes --> remember["datasetSelectionStore.remember<br/>under the dataset left"]
+  remember --> drop["URL drops the other dataset's values"]
+  drop --> pick["The draft picks that dataset again"]
+  pick --> missing{"Dataset not in the URL?"}
+  missing -- yes --> restore["restoreDatasetSelection<br/>re-read through codecs, normalized"]
+  restore --> apply["applyFilters"]
+```
 
-### Navbar navigation with the last-page-params cache
+What's remembered is the other dataset's periods or years and the Climate-only values a switch
+narrows (`srad`, `wind`, `vapr`, `30s`), per scope ([filters across pages](#filters-across-pages)).
+Values the reader changed since are kept. Memory only: a reload keeps just the URL's dataset, and
+a URL's own selection is never replaced.
 
-1. **Render.** Each navbar link's `href` is the route plus the current shared filters
-   (`getHref` → `pickSharedFilterParams`). It's the same on the server and the client, and
-   it's what a middle-click or "open in new tab" opens.
-2. **Intent.** On click, `NavigationIntentTracker` (capture phase) records the target in
-   `navigationIntentStore`, so late writes on the page being left are dropped.
-3. **Target.** `useNavbarNavigation().navigate` (a plain left click only) prevents the
-   default and reads the target's entry in `lastPageParamsStore`. `buildNavbarHref` merges:
-   - the remembered page params, re-read through the page's URL fields;
-   - the remembered page-placed filters (Compare Periods' periods and years);
-   - the current shared filters, which win.
-     `parseFilters` and `serializeFilters` then validate them together, so years remembered
-     under Weather are dropped if the current dataset is Climate.
-4. **Navigate.** `router.push(target)`. The new page then follows the page-load flow from
-   step 4 (client-side, no server HTML).
-5. **Record.** The route change clears the intent, and `useLastPageParamsSync` records the
-   new page's params.
+### Back / Forward
+
+Back pops the entry; `useFilters` re-parses and the draft follows; `useUrlStateSync` restores page
+state only if page params differ. A write scheduled just before the popstate is dropped. Previous
+query keys are still cached, so their data shows at once. With a sheet open, Back first closes it.
+
+### Navbar navigation
+
+1. Each link's `href` is the route plus the current shared filters.
+2. On click, the intent is recorded so late writes on the old page are dropped.
+3. A plain left click builds the target: remembered page params and page-placed filters, plus the
+   shared filters, which win; validated together (years remembered under Weather drop under
+   Climate).
+4. `router.push`; the new page follows the load flow from step 3 and records its params.
 
 ## Data
 
-Data hooks ([`src/hooks/data/`](../src/hooks/data)) take the city from the page and the
-filters from `useFilters()`, and build TanStack Query keys from what decides the request:
+Data hooks ([`src/hooks/data/`](../src/hooks/data)) build TanStack Query keys from what decides
+the request:
 
-| Hook                                                                                                                 | Query key                                                                          |
-| -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| [`useGetClimateData`](../src/hooks/data/useGetClimateData.ts)                                                        | `["climate", lat, lng, gridSize, "climate" or weatherYear]`                        |
-| [`useGetCompareData`](../src/hooks/data/useGetCompareData.ts)                                                        | `["compare", latA, lngA, latB, lngB, gridSize, "climate" or weatherYear]`          |
-| [`useGetComparePeriods`](../src/hooks/data/useGetComparePeriods.ts)                                                  | `["compare-periods", lat, lng, gridSize, "climate" or [yearA, yearB]]`             |
-| [`useGetMultiPeriodData`](../src/hooks/data/useGetMultiPeriodData.ts)                                                | one query per year: `["compare-period", lat, lng, gridSize, year]`                 |
-| [`useGetHeatmapData`](../src/hooks/data/useGetHeatmapData.ts)                                                        | `["heatmap", area (box or polygon), gridSize, variable, dataset (period or year)]` |
-| [`useGetRegionalProfile`](../src/hooks/data/useGetRegionalProfile.ts)                                                | `["regional-profile", area, gridSize, dataset]`                                    |
-| [`useGetAltitude`](../src/hooks/data/useGetAltitude.ts), [`useGetCellBounds`](../src/hooks/data/useGetCellBounds.ts) | `["altitude" / "cellBounds", lat, lng, gridSize]`                                  |
+| Hook                                 | Query key                                                     |
+| ------------------------------------ | ------------------------------------------------------------- |
+| `useGetClimateData`                  | `["climate", lat, lng, gridSize, "climate" \| weatherYear]`   |
+| `useGetCompareData`                  | `["compare", latA, lngA, latB, lngB, gridSize, …]`            |
+| `useGetComparePeriods`               | `["compare-periods", lat, lng, gridSize, "climate" \| years]` |
+| `useGetMultiPeriodData`              | one per year: `["compare-period", lat, lng, gridSize, year]`  |
+| `useGetHeatmapData`                  | `["heatmap", area, gridSize, variable, dataset]`              |
+| `useGetRegionalProfile`              | `["regional-profile", area, gridSize, dataset]`               |
+| `useGetAltitude`, `useGetCellBounds` | `["altitude" / "cellBounds", lat, lng, gridSize]`             |
 
-- **Why a change refetches:** a filter that's part of a key (location, resolution,
-  dataset, weather year, the heat map's variable and period) gives a new key, so TanStack
-  Query runs the request. `keepPreviousData` keeps the old data on screen meanwhile.
-- **Why some changes don't:**
-  - Climate normals for a point come in one request for every period, so the climate
-    period is applied to the loaded data (`filterPointBindingsByPeriod`).
-  - Point requests always ask for the same variables (`WEATHER_VARIABLES`), so variables
-    and months only change what's drawn.
-- **Why Back is served from the cache:** WorldClim values never change, so the data hooks
-  use `staleTime: Infinity`: a cached key is never refetched. An unused key stays in the
-  cache for TanStack Query v4's default 5 minutes. Back or Forward within that time
-  re-renders from the cache with no request; after it, the request runs again. The server
-  adds its own Redis cache for WorldClim resource lookups (see [backend.md](backend.md)).
+- A filter in a key refetches (`keepPreviousData` keeps the old data meanwhile).
+- Climate normals for a point come in one request for every period, so the period is applied to
+  loaded data; point requests always ask for the same variables, so variables and months only
+  change what's drawn.
+- WorldClim values never change, so data hooks use `staleTime: Infinity`; Back within the cache
+  time (TanStack Query v4's default 5 minutes) re-renders with no request. The server adds a Redis
+  cache ([backend.md](backend.md)).
 
 ## Parameter reference
 
-Filter params are written by `useFilterNavigation` and kept canonical by
-`useCanonicalFilterUrl`. Page params are written by each page's `useUrlStateSync` (and
-`chart` also by `useChartModeUrl`). A param at its default is left out of the URL.
+A param at its default is left out.
 
-| Param                                            | Owner                   | Pages                                            | Default                                          | Allowed values                                                                                                                                   | Legacy            |
-| ------------------------------------------------ | ----------------------- | ------------------------------------------------ | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- |
-| `dataset`                                        | filters                 | all                                              | `climate`                                        | `climate`, `weather`                                                                                                                             |                   |
-| `period`                                         | filters                 | City Climate, Compare Cities, Heat map (Climate) | `c1970-2000`                                     | a climate period (`CLIMATE_PERIODS` in [`worldclim.constant.ts`](../src/constants/worldclim.constant.ts))                                        |                   |
-| `year`                                           | filters                 | City Climate, Compare Cities, Heat map (Weather) | the latest year (`WEATHER_MAX_YEAR`)             | `WEATHER_MIN_YEAR`–`WEATHER_MAX_YEAR`                                                                                                            |                   |
-| `var`                                            | filters                 | all                                              | `tmax,tmin,prec`                                 | comma list of `tmax`, `tmin`, `prec`, `srad`, `wind`, `vapr`. `srad`, `wind` and `vapr` only with Climate 1970–2000; Weather has the first three |                   |
-| `grid`                                           | filters                 | all                                              | `2.5m`                                           | `10m`, `5m`, `2.5m`, `30s` (`30s` only with Climate 1970–2000)                                                                                   |                   |
-| `months`                                         | filters                 | all (disabled on the heat map)                   | `all`                                            | `all` or a comma list of 1–12                                                                                                                    |                   |
-| `period1`, `period2`                             | filters                 | Compare Periods (Climate)                        | `c1970-2000`, `c1991-2020`                       | climate periods; never equal                                                                                                                     |                   |
-| `periods`                                        | filters                 | Compare Periods (Weather)                        | `2021,1967`                                      | 2–5 weather years                                                                                                                                | `year1` + `year2` |
-| `city`, `lat`, `lng`                             | page                    | City Climate, Compare Periods                    | the persisted city (first visit: Madrid)         | name; coordinates with 4 decimals                                                                                                                |                   |
-| `cityA`, `latA`, `lngA`, `cityB`, `latB`, `lngB` | page                    | Compare Cities                                   | the persisted cities (first visit: Madrid, Rome) | as above                                                                                                                                         |                   |
-| `chart`                                          | page, `useChartModeUrl` | City Climate, Compare Cities, Compare Periods    | Walter-Lieth (absent)                            | `standard`                                                                                                                                       | `chart=wl`        |
-| `layout`                                         | page                    | Compare Cities, Compare Periods                  | `split` (absent)                                 | `overlay`                                                                                                                                        | `wlLayout`        |
-| `wlShading`                                      | page                    | Compare Cities, Compare Periods                  | `a`                                              | `b`, `none`                                                                                                                                      |                   |
-| `expanded`                                       | page                    | Compare Cities, Compare Periods                  | both panels (absent)                             | `a`, `b`                                                                                                                                         |                   |
-| `pair`                                           | page                    | Compare Periods (Weather, side by side)          | the first two years                              | two different compared years, `y1,y2`                                                                                                            | `wlYears`         |
-| `shownYears`                                     | page                    | Compare Periods (Weather, overlay)               | Walter-Lieth: the pair; standard: every year     | compared years, comma list                                                                                                                       |                   |
-| `north`, `south`, `west`, `east`                 | page                    | Heat map                                         | no selection                                     | a drawn box                                                                                                                                      |                   |
-| `polygon`                                        | page                    | Heat map                                         | no selection                                     | a drawn polygon (WKT)                                                                                                                            |                   |
+| Param                            | Owner   | Pages                                            | Default                                      | Allowed values                                       | Legacy            |
+| -------------------------------- | ------- | ------------------------------------------------ | -------------------------------------------- | ---------------------------------------------------- | ----------------- |
+| `dataset`                        | filters | all                                              | `climate`                                    | `climate`, `weather`                                 |                   |
+| `period`                         | filters | City Climate, Compare Cities, Heat map (Climate) | `c1970-2000`                                 | a climate period (`CLIMATE_PERIODS`)                 |                   |
+| `year`                           | filters | City Climate, Compare Cities, Heat map (Weather) | `WEATHER_MAX_YEAR`                           | `WEATHER_MIN_YEAR`–`WEATHER_MAX_YEAR`                |                   |
+| `var`                            | filters | all                                              | `tmax,tmin,prec`                             | also `srad`, `wind`, `vapr` (Climate 1970–2000 only) |                   |
+| `grid`                           | filters | all                                              | `2.5m`                                       | `10m`, `5m`, `2.5m`, `30s` (Climate 1970–2000 only)  |                   |
+| `months`                         | filters | all (disabled on the heat map)                   | `all`                                        | `all` or 1–12, comma list                            |                   |
+| `period1`, `period2`             | filters | Compare Periods (Climate)                        | `c1970-2000`, `c1991-2020`                   | climate periods, never equal                         |                   |
+| `periods`                        | filters | Compare Periods (Weather)                        | `2021,1967`                                  | 2–5 weather years, in the order added                | `year1` + `year2` |
+| `city`, `lat`, `lng`             | page    | City Climate, Compare Periods                    | the persisted city                           | name; coordinates to 4 decimals                      |                   |
+| `cityA`…`lngB`                   | page    | Compare Cities                                   | the persisted cities                         | as above                                             |                   |
+| `chart`                          | page    | City Climate, Compare Cities, Compare Periods    | Walter-Lieth                                 | `standard`                                           | `chart=wl`        |
+| `layout`                         | page    | Compare Cities, Compare Periods                  | `split`                                      | `overlay`                                            | `wlLayout`        |
+| `wlShading`                      | page    | Compare Cities, Compare Periods                  | `a`                                          | `b`, `none`                                          |                   |
+| `expanded`                       | page    | Compare Cities, Compare Periods                  | both panels                                  | `a`, `b`                                             |                   |
+| `pair`                           | page    | Compare Periods (Weather, side by side)          | the first two years                          | two years, `y1,y2`                                   | `wlYears`         |
+| `shownYears`                     | page    | Compare Periods (Weather, overlay)               | Walter-Lieth: the pair; standard: every year | years, comma list                                    |                   |
+| `order`                          | page    | Compare Periods                                  | oldest first                                 | `desc`                                               |                   |
+| `markers`                        | page    | Compare Periods (Weather)                        | each year its place in `periods`             | `year:slot` pairs, unique                            |                   |
+| `north`, `south`, `west`, `east` | page    | Heat map                                         | no selection                                 | a drawn box                                          |                   |
+| `polygon`                        | page    | Heat map                                         | no selection                                 | a drawn polygon (WKT)                                |                   |
 
-The locale isn't in the URL: it's the `NEXT_LOCALE` cookie, changed by `useLocaleSwitch` on the settings page.
+The locale isn't in the URL: it's the `NEXT_LOCALE` cookie.
 
 ## Push or replace
 
-| Action                                                                  | Hook → call                                        | History | Back afterwards                                  |
-| ----------------------------------------------------------------------- | -------------------------------------------------- | ------- | ------------------------------------------------ |
-| Sidebar Apply button                                                    | `useFilterNavigation` → `pushUrlParams`            | push    | the filters before the Apply                     |
-| Sidebar auto-apply                                                      | `useFilterNavigation` → `replaceUrlParams`         | replace | skips the change: the entry before the last push |
-| Sheet with every filter: Apply                                          | `useFiltersSheet` → `applyFilters(…, APPLY)`       | push    | the filters before the Apply                     |
-| One filter's sheet: pick or Apply                                       | `useFiltersSheet` → `applyFilters(…, QUICK)`       | replace | skips the change                                 |
-| Compare Periods' selectors on the page (below lg)                       | `useFilterNavigation` (`QUICK`)                    | replace | skips the change                                 |
-| Canonicalising a URL                                                    | `useCanonicalFilterUrl`                            | replace | — (the non-canonical address is gone)            |
-| Picking a city (search, "use my location", a map click on City Climate) | `useUrlStateSync().pushUrlState`                   | push    | the previous city                                |
-| The city name resolved after a map click                                | `useUrlStateSync` (state change)                   | replace | the city before the click                        |
-| Drawing or clearing a heat-map selection                                | `pushUrlState`                                     | push    | the previous selection                           |
-| Layout, shading, expanded panel, the pair, shown years                  | `useUrlStateSync` (state change)                   | replace | skips the change                                 |
-| Chart type (header switch, "Switch to standard chart")                  | `useChartModeUrl` → `replaceUrlParams`             | replace | skips the change                                 |
-| Navbar, logo or settings link                                           | `useNavbarNavigation` → `router.push`              | push    | the previous page as it was                      |
-| Language switch (settings page)                                         | `useLocaleSwitch` → `router.refresh`               | none    | the page before settings, in the new language    |
-| Opening a filters sheet                                                 | `useSheetHistory` → `history.pushState` (same URL) | push    | closes the sheet                                 |
+| Action                                                                         | History         | Back afterwards              |
+| ------------------------------------------------------------------------------ | --------------- | ---------------------------- |
+| Sidebar Apply; all-filters sheet Apply                                         | push            | the filters before the Apply |
+| Sidebar auto-apply; one filter's sheet; Compare Periods' on-page selectors     | replace         | skips the change             |
+| Canonicalising a URL                                                           | replace         | —                            |
+| Picking a city (search, location, a map click)                                 | push            | the previous city            |
+| The city name resolved after a map click                                       | replace         | the city before the click    |
+| Drawing or clearing a heat map selection                                       | push            | the previous selection       |
+| Layout, shading, expanded panel, pair, shown years, order, markers, chart type | replace         | skips the change             |
+| Navbar, logo or settings link                                                  | push            | the previous page            |
+| Language switch                                                                | none            | —                            |
+| Opening a filters sheet                                                        | push (same URL) | closes the sheet             |
 
-"Skips the change" means Back goes to the entry before the last push. A replaced change
-disappears together with everything else since that push.
+"Skips the change": Back goes to the entry before the last push.
