@@ -1,10 +1,14 @@
-import { getPairHatch, getPairShape } from "@/utils/seriesShape.util";
+import { getPairMarker } from "@/utils/seriesShape.util";
 import type { TPeriodTrend } from "@/app/compare-periods/_components/ComparePeriods.type";
 import { getLaterPeriodSeries } from "@/app/compare-periods/_components/ComparePeriods.util";
-import { CLIMATE_PERIOD_LABELS, DATA_UPDATE_NAMES_SEPARATOR } from "@/constants";
+import {
+  CLIMATE_PERIOD_LABELS,
+  CLIMATE_PERIOD_START_YEAR,
+  DATA_UPDATE_NAMES_SEPARATOR,
+} from "@/constants";
 import { EDifferenceMeaning, ESeriesKind, EWalterLiethSeriesId } from "@/enums";
 import type { TChartSeries, TPeriodsChart, TUseClimatePeriodsChartArgs } from "@/types";
-import { computeCompareStats, resolveDataState } from "@/utils";
+import { computeCompareStats, resolveDataState, sortByYear } from "@/utils";
 import { differenceOf } from "@/utils/monthlyClimate.util";
 import { useTranslations } from "next-intl";
 import { useNoPeriodDataMessage } from "./useNoPeriodDataMessage";
@@ -32,16 +36,21 @@ export function useClimatePeriodsChart(
     emptyMessages: missing.length > 0 ? missing : [t("climateComparison.noDataPeriods")],
   });
 
-  const series: TChartSeries[] = [
-    { id: EWalterLiethSeriesId.A, label: labelA, data: dataA },
-    { id: EWalterLiethSeriesId.B, label: labelB, data: dataB },
-  ].map(({ id, label, data }) => ({
+  // * in the page's order, by each period's start year; A and B keep their own markers
+  const sides = sortByYear(
+    [
+      { id: EWalterLiethSeriesId.A, label: labelA, data: dataA, period: periodA },
+      { id: EWalterLiethSeriesId.B, label: labelB, data: dataB, period: periodB },
+    ],
+    ({ period }) => CLIMATE_PERIOD_START_YEAR[period],
+    args.order,
+  );
+  const series: TChartSeries[] = sides.map(({ id, label, data }) => ({
     id,
     kind: ESeriesKind.CLIMATE_PERIOD,
     label,
     context: city.label,
-    shape: getPairShape(id),
-    hatch: getPairHatch(id),
+    ...getPairMarker(id),
     data: data ?? [],
     altitude,
     year: null,

@@ -92,7 +92,7 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
         martonneClassLabel: martonneClass(entry.stats.martonneIndex),
         shape: entry.series.shape,
         hatch: entry.series.hatch,
-        place: model.series.indexOf(entry),
+        place: entry.series.markerSlot,
       })),
       visibleSeries: visible,
       selectedMonths: viewState.selectedMonths,

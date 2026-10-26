@@ -6,15 +6,19 @@ import type { TComparePeriodsPage } from "@/app/compare-periods/_components/Comp
 import {
   DATASETS,
   DEFAULT_CHART_MODE,
+  DEFAULT_SORT_ORDER,
   DEFAULT_COMPARE_LAYOUT,
   VARIABLE_LABELS,
   WALTER_LIETH_COMPARISON,
   WEATHER_MAX_YEAR,
   WEATHER_MIN_YEAR,
 } from "@/constants";
-import { ECitySlot, ECompareLayout } from "@/enums";
+import { ECitySlot, ECompareLayout, type ESortOrder } from "@/enums";
 import type { EWalterLiethShading } from "@/enums";
 import { useChartModel, useComparisonChartExport } from "@/hooks/charts";
+import { useMarkerSlots } from "@/hooks/charts/useMarkerSlots";
+import { flipSortOrder } from "@/utils";
+import { isListOrder } from "@/utils/seriesShape.util";
 import {
   useGetAltitude,
   useGetComparePeriods,
@@ -56,6 +60,9 @@ export function useComparePeriodsPage(): TComparePeriodsPage {
   const [visible, setVisible] = useState<TVisibleSeries | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const years = useWeatherYearsViewState({ years: periods, isWeather: !isClimate, chartMode });
+  const [sortOrder, setSortOrder] = useState<ESortOrder>(DEFAULT_SORT_ORDER);
+  // * each year's marker, kept through sorting, additions and removals
+  const markers = useMarkerSlots(periods.map(String));
 
   const { pushUrlState, shareUrl } = useUrlStateSync({
     schema: COMPARE_PERIODS_URL_SCHEMA,
@@ -67,6 +74,9 @@ export function useComparePeriodsPage(): TComparePeriodsPage {
       city,
       yearPair: years.urlPair,
       shownYears: years.urlShown,
+      sortOrder,
+      markerSlots:
+        isClimate || isListOrder(markers.slots, periods.map(String)) ? null : markers.slots,
     },
     onRestore(parsed) {
       if (parsed.city) selectCity(parsed.city);
@@ -77,6 +87,8 @@ export function useComparePeriodsPage(): TComparePeriodsPage {
       setExpanded(parsed.expanded ?? null);
       years.setRequestedPair(parsed.yearPair ?? null);
       years.setRequestedShown(parsed.shownYears ?? null);
+      setSortOrder(parsed.sortOrder ?? DEFAULT_SORT_ORDER);
+      markers.restore(parsed.markerSlots ?? null);
     },
   });
 
@@ -104,10 +116,13 @@ export function useComparePeriodsPage(): TComparePeriodsPage {
     isLoading: climateData.isLoading,
     isFetching: climateData.isFetching,
     error: climateData.error,
+    order: sortOrder,
   });
   const weather = useWeatherYearsChart({
     city,
     years: periods,
+    order: sortOrder,
+    markerSlots: markers.slots,
     periodsData: weatherData.data,
     loadingYears: weatherData.loadingPeriods,
     altitude,
@@ -115,6 +130,10 @@ export function useComparePeriodsPage(): TComparePeriodsPage {
     error: weatherData.error,
   });
   const chart = isClimate ? climate : weather;
+  const features = {
+    ...chart.features,
+    seriesSort: { order: sortOrder, onToggle: () => setSortOrder(flipSortOrder(sortOrder)) },
+  };
 
   const scroll = useScrollToResults({
     targetRef: resultsRef,
@@ -156,14 +175,14 @@ export function useComparePeriodsPage(): TComparePeriodsPage {
     series: chart.series,
     model,
     viewState,
-    features: chart.features,
+    features,
     state: chart.state,
     update: chart.update,
     resultsRef,
     exportMenu: useComparisonChartExport({
       model,
       viewState,
-      features: chart.features,
+      features,
       visible,
       fileStem: "compare-periods",
       datasetAttribution,

@@ -1,4 +1,4 @@
-import { getPairHatch, getPairShape } from "@/utils/seriesShape.util";
+import { getPairMarker } from "@/utils/seriesShape.util";
 import {
   COMPARE_CITIES_SCROLL_OPTIONS,
   COMPARE_CITIES_URL_SCHEMA,
@@ -121,8 +121,7 @@ export function useCompareCitiesPage(): TCompareCitiesPage {
     kind: ESeriesKind.CITY,
     label: city.label,
     context: periodLabel,
-    shape: getPairShape(id),
-    hatch: getPairHatch(id),
+    ...getPairMarker(id),
     data: data ?? [],
     altitude,
     year: dataset === DATASETS.WEATHER ? weatherYear : null,

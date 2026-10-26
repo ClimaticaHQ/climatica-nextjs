@@ -3,6 +3,7 @@ export { useDelayedHide } from "./useDelayedHide";
 export { useGeolocation } from "./useGeolocation";
 export { useMediaQuery } from "./useMediaQuery";
 export { useIsTouch } from "./useIsTouch";
+export { useArrivalFlash } from "./useArrivalFlash";
 export { useUrlStateSync } from "./useUrlStateSync";
 export { useLegendLabels } from "./useLegendLabels";
 export { useMonthlyValuesNames } from "./useMonthlyValuesNames";
