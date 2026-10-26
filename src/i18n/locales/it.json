@@ -59,7 +59,12 @@
       "periodsCount": "{count} / {max} periodi",
       "noData": "Nessun dato meteo per {years} in questo luogo e con questa risoluzione."
     },
-    "swapPeriods": "Scambia i periodi"
+    "swapPeriods": "Scambia i periodi",
+    "sort": {
+      "year": "Anno",
+      "ascending": "Ordina per anno, crescente",
+      "descending": "Ordina per anno, decrescente"
+    }
   },
   "climateComparison": {
     "searchA": "Città A",

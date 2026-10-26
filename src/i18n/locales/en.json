@@ -59,7 +59,12 @@
       "periodsCount": "{count} / {max} periods",
       "noData": "No weather data for {years} at this place and resolution."
     },
-    "swapPeriods": "Swap periods"
+    "swapPeriods": "Swap periods",
+    "sort": {
+      "year": "Year",
+      "ascending": "Sort by year, ascending",
+      "descending": "Sort by year, descending"
+    }
   },
   "climateComparison": {
     "searchA": "City A",

@@ -59,7 +59,12 @@
       "periodsCount": "{count} / {max} perioade",
       "noData": "Nu există date meteo pentru {years} în acest loc și la această rezoluție."
     },
-    "swapPeriods": "Inversează perioadele"
+    "swapPeriods": "Inversează perioadele",
+    "sort": {
+      "year": "An",
+      "ascending": "Sortează după an, crescător",
+      "descending": "Sortează după an, descrescător"
+    }
   },
   "climateComparison": {
     "searchA": "Orașul A",

@@ -59,7 +59,12 @@
       "periodsCount": "{count} / {max} perioder",
       "noData": "Ingen værdata for {years} for dette stedet og denne oppløsningen."
     },
-    "swapPeriods": "Bytt perioder"
+    "swapPeriods": "Bytt perioder",
+    "sort": {
+      "year": "År",
+      "ascending": "Sorter etter år, stigende",
+      "descending": "Sorter etter år, synkende"
+    }
   },
   "climateComparison": {
     "searchA": "By A",
