@@ -6,7 +6,14 @@ import {
   SERIES_SHAPES,
 } from "@/constants";
 import type { EWalterLiethSeriesId } from "@/enums";
-import type { THatchTile, TMarkerPathArgs, TSeriesHatch, TSeriesShape } from "@/types";
+import type {
+  TEntityMarker,
+  THatchTile,
+  TMarkerPathArgs,
+  TMarkerSlots,
+  TSeriesHatch,
+  TSeriesShape,
+} from "@/types";
 
 /** An entity's shape by its place in the list, wrapping past the last; a missing place (-1) gets the first. */
 export function getSeriesShape(position: number): TSeriesShape {
@@ -27,6 +34,47 @@ export function getSeriesHatch(position: number): TSeriesHatch {
 export function getPairHatch(side: EWalterLiethSeriesId): TSeriesHatch {
   return getSeriesHatch(PAIR_SHAPE_POSITION[side]);
 }
+
+/**
+ * The one mapping from an entity's marker slot to what it draws — chart, chips, tables, legend
+ * and export all read the series' marker, never its place in a list.
+ */
+export function getEntityMarker(markerSlot: number): TEntityMarker {
+  return { markerSlot, shape: getSeriesShape(markerSlot), hatch: getSeriesHatch(markerSlot) };
+}
+
+/** A pair side's marker: A the first slot's, B the second's. */
+export const getPairMarker = (side: EWalterLiethSeriesId) =>
+  getEntityMarker(PAIR_SHAPE_POSITION[side]);
+
+/**
+ * Each entity's slot, kept as the list changes: an entity that stays keeps its slot whatever the
+ * order; one added takes the lowest slot no one holds (one removed frees its own). With nothing
+ * saved, the list's order.
+ */
+export function assignMarkerSlots(saved: TMarkerSlots, keys: readonly string[]): TMarkerSlots {
+  const kept = keys.filter((key) => saved[key] !== undefined);
+  const slots: Record<string, number> = {};
+  const taken = new Set<number>();
+  for (const key of kept) {
+    const slot = saved[key] ?? 0;
+    if (taken.has(slot)) continue;
+    slots[key] = slot;
+    taken.add(slot);
+  }
+  let next = 0;
+  for (const key of keys) {
+    if (slots[key] !== undefined) continue;
+    while (taken.has(next)) next += 1;
+    slots[key] = next;
+    taken.add(next);
+  }
+  return slots;
+}
+
+/** Whether every entity holds its place in the list as its slot — what no saved slots means. */
+export const isListOrder = (slots: TMarkerSlots, keys: readonly string[]) =>
+  keys.every((key, index) => slots[key] === index);
 
 const polygon = (points: readonly (readonly [number, number])[]) =>
   `M${points.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join("L")}Z`;

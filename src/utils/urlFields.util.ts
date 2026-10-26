@@ -1,11 +1,13 @@
 import {
   CHART_MODE_BY_PARAM,
   DEFAULT_COMPARE_LAYOUT,
+  DEFAULT_SORT_ORDER,
+  MARKER_SLOT_SEPARATOR,
   SIDEBAR_PARAMS,
   WALTER_LIETH_COMPARISON,
 } from "@/constants";
-import { ECompareLayout, EWalterLiethSeriesId, EWalterLiethShading } from "@/enums";
-import type { TChartMode, TCity, TExpandedPanel, TUrlField, TPair } from "@/types";
+import { ECompareLayout, ESortOrder, EWalterLiethSeriesId, EWalterLiethShading } from "@/enums";
+import type { TChartMode, TCity, TExpandedPanel, TMarkerSlots, TPair, TUrlField } from "@/types";
 import { parseCoord } from "./urlParams.util";
 
 /** Same factory for every city — only the param names differ per page/slot. */
@@ -115,5 +117,42 @@ export const expandedPanelUrlField: TUrlField<TExpandedPanel> = {
   parse(params) {
     const raw = params.get(SIDEBAR_PARAMS.EXPANDED);
     return Object.values(EWalterLiethSeriesId).find((id) => id === raw);
+  },
+};
+
+/** Compare Periods' list order — `order=desc`; oldest first (the default) writes nothing. */
+export const sortOrderUrlField: TUrlField<ESortOrder> = {
+  serialize(value, params) {
+    if (value !== DEFAULT_SORT_ORDER) params.set(SIDEBAR_PARAMS.SORT_ORDER, value);
+  },
+  parse(params) {
+    const raw = params.get(SIDEBAR_PARAMS.SORT_ORDER);
+    return Object.values(ESortOrder).find((order) => order === raw);
+  },
+};
+
+/**
+ * Compare Periods' marker slots — "2021:0,1999:2"; null (each year its place in the list) is
+ * omitted. An invalid or repeated entry drops the whole value: the list's order then.
+ */
+export const markerSlotsUrlField: TUrlField<TMarkerSlots | null> = {
+  serialize(value, params) {
+    if (value === null) return;
+    // * by slot — year keys would otherwise come out in numeric order
+    const entries = Object.entries(value)
+      .sort(([, a], [, b]) => a - b)
+      .map(([key, slot]) => `${key}${MARKER_SLOT_SEPARATOR}${slot}`);
+    params.set(SIDEBAR_PARAMS.MARKER_SLOTS, entries.join(","));
+  },
+  parse(params) {
+    const raw = params.get(SIDEBAR_PARAMS.MARKER_SLOTS);
+    if (!raw) return undefined;
+    const entries = raw.split(",").map((entry) => entry.split(MARKER_SLOT_SEPARATOR));
+    const slots = entries.map(([key, slot]) => [key ?? "", Number(slot)] as const);
+    const isValid = slots.every(([key, slot]) => key !== "" && Number.isInteger(slot) && slot >= 0);
+    const isUnique =
+      new Set(slots.map(([key]) => key)).size === slots.length &&
+      new Set(slots.map(([, slot]) => slot)).size === slots.length;
+    return isValid && isUnique ? Object.fromEntries(slots) : undefined;
   },
 };

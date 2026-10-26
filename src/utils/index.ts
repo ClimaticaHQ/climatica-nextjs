@@ -17,6 +17,7 @@ export * from "./redis.util";
 export * from "./scroll.util";
 export * from "./radioGroup.util";
 export * from "./monthTap.util";
+export * from "./periodSort.util";
 export * from "./solr.util";
 export * from "./urlFields.util";
 export * from "./urlParams.util";
