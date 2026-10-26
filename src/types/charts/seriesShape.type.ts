@@ -26,3 +26,14 @@ export type TSeriesIdentity = {
   shape: TSeriesShape;
   hatch: TSeriesHatch;
 };
+
+/**
+ * An entity's marker, assigned once (getEntityMarker): its slot and what the slot draws — its
+ * curves' shape, its bars' hatch and, in the shades style, its bars' step.
+ */
+export type TEntityMarker = TSeriesIdentity & {
+  markerSlot: number;
+};
+
+/** Each entity's marker slot by its key (a year): kept while it stays, freed when it goes. */
+export type TMarkerSlots = Readonly<Record<string, number>>;

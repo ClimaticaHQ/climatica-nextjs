@@ -1,3 +1,5 @@
+import type { ESortOrder } from "@/enums";
+import type { TMarkerSlots } from "./seriesShape.type";
 import type { TClimatePeriod } from "@/constants/worldclim.constant";
 import type { TCellSize, TCity, TMonthlyTemperature, TMultiPeriodEntry } from "../index";
 import type { TPageUpdate, TChartFeatures } from "./chartPage.type";
@@ -26,12 +28,18 @@ export type TUseClimatePeriodsChartArgs = {
   isLoading: boolean;
   isFetching: boolean;
   error: Error | null;
+  /** the page's order: the periods by their start year */
+  order: ESortOrder;
 };
 
 export type TUseWeatherYearsChartArgs = {
   city: TCity;
-  /** every compared year, in order */
+  /** every compared year, in the order they were added */
   years: readonly number[];
+  /** the page's order: the years listed by year */
+  order: ESortOrder;
+  /** each year's marker slot (useMarkerSlots), by the year */
+  markerSlots: TMarkerSlots;
   periodsData: readonly TMultiPeriodEntry[];
   loadingYears: readonly number[];
   altitude: number | null;

@@ -1,4 +1,10 @@
-import type { ECompareLayout, EChartBlock, EDifferenceMeaning, EWalterLiethShading } from "@/enums";
+import type {
+  ECompareLayout,
+  EChartBlock,
+  EDifferenceMeaning,
+  ESortOrder,
+  EWalterLiethShading,
+} from "@/enums";
 import type { ExportMenuProps } from "@/components/UI";
 import type {
   TChartMode,
@@ -59,6 +65,14 @@ export type TChartFeatures = {
   hasRawExport: boolean;
   /** chart blocks this page leaves out */
   hiddenBlocks: readonly EChartBlock[];
+  /** the page lists its series by year: the stats table's corner toggles the order */
+  seriesSort?: TSeriesSort | undefined;
+};
+
+/** A page's list order and its toggle (Compare Periods). */
+export type TSeriesSort = {
+  order: ESortOrder;
+  onToggle: () => void;
 };
 
 /** The data updates a page's results flash and announce. */

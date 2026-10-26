@@ -15,9 +15,11 @@ export type TChartSeries = {
   label: string;
   /** the second line under the name: dataset and period (cities) or the city (periods) */
   context: string;
-  /** its marker shape, by its place (getSeriesShape, getPairShape): entities never differ by colour */
+  /** its marker's slot, assigned once (getEntityMarker): the shape, hatch and shade are its */
+  markerSlot: number;
+  /** its marker shape, by its slot: entities never differ by colour */
   shape: TSeriesShape;
-  /** its overlay bars' hatch, by the same place (getSeriesHatch, getPairHatch) */
+  /** its overlay bars' hatch, by the same slot */
   hatch: TSeriesHatch;
   data: readonly TMonthlyTemperature[];
   altitude: number | null;
