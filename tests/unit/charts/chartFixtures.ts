@@ -1,9 +1,4 @@
-import {
-  getPairHatch,
-  getPairShape,
-  getSeriesHatch,
-  getSeriesShape,
-} from "@/utils/seriesShape.util";
+import { getEntityMarker, getPairMarker } from "@/utils/seriesShape.util";
 import { DATA_UPDATE_SINGLE_SERIES, MONTH_NAMES } from "@/constants";
 import { EDataStatus, ESeriesKind, EWalterLiethSeriesId } from "@/enums";
 import type { TChartSeries, TMonthlyTemperature } from "@/types";
@@ -26,8 +21,7 @@ export const CITY: TChartSeries = {
   kind: ESeriesKind.CITY,
   label: "Valladolid",
   context: "Climate 1970–2000",
-  shape: getPairShape(EWalterLiethSeriesId.A),
-  hatch: getPairHatch(EWalterLiethSeriesId.A),
+  ...getPairMarker(EWalterLiethSeriesId.A),
   data: months(0),
   altitude: 690,
   year: null,
@@ -40,8 +34,7 @@ export const CITY_PAIR: TChartSeries[] = [
     ...CITY,
     id: EWalterLiethSeriesId.B,
     label: "Lviv",
-    shape: getPairShape(EWalterLiethSeriesId.B),
-    hatch: getPairHatch(EWalterLiethSeriesId.B),
+    ...getPairMarker(EWalterLiethSeriesId.B),
     data: months(-3),
     altitude: 296,
   },
@@ -61,8 +54,7 @@ export function weatherYears(years: readonly number[]): TChartSeries[] {
     kind: ESeriesKind.WEATHER_YEAR,
     label: String(year),
     context: "Valladolid",
-    shape: getSeriesShape(i),
-    hatch: getSeriesHatch(i),
+    ...getEntityMarker(i),
     data: months(i),
     altitude: 690,
     year,

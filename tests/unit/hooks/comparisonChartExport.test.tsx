@@ -101,4 +101,18 @@ describe("the comparison export: always the default bar style, the best for prin
     result.current.onExportSVG?.();
     expect(built.payloads.at(-1)?.series.map(({ place }) => place)).toEqual([0, 1, 2]);
   });
+
+  it("the page's order, each series with its own marker slot (not its place in the order)", () => {
+    // * newest first, as the page lists them; 1967 keeps the slot it was added with
+    const [y2021, y1967, y1981] = weatherYears([2021, 1967, 1981]);
+    const { result } = renderExport([y2021!, y1981!, y1967!]);
+    result.current.onExportSVG?.();
+    expect(
+      built.payloads.at(-1)?.series.map(({ label, place, shape }) => [label, place, shape]),
+    ).toEqual([
+      ["2021", 0, "circle"],
+      ["1981", 2, "triangle"],
+      ["1967", 1, "square"],
+    ]);
+  });
 });

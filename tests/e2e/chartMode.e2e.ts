@@ -30,7 +30,8 @@ const OVERLAY_URLS = {
 // * each page's values-table row headers (the °C section): short labels, the full name in the title
 const OVERLAY_HEADERS = {
   "climate periods": { texts: ["’70–’00", "’91–’20"], title: "1970–2000" },
-  "five weather years": { texts: ["2021", "1967", "1990", "2010", "2000"], title: "2021" },
+  // * Compare Periods lists its years oldest first
+  "five weather years": { texts: ["1967", "1990", "2000", "2010", "2021"], title: "1967" },
   cities: { texts: ["PAR", "OSL"], title: "Paris" },
 };
 
@@ -247,7 +248,8 @@ test.describe("Compare Periods: weather years overlaid", () => {
     await expect(page).toHaveURL(/layout=overlay/);
     // * one diagram: the side-by-side pair, not all five — the readable default
     await expect(walterLiethFigures(page)).toHaveCount(1);
-    await expect(walterLiethFigures(page)).toHaveAttribute("aria-label", /2021.*1967/);
+    // * the pair (the first two added), drawn oldest first
+    await expect(walterLiethFigures(page)).toHaveAttribute("aria-label", /1967.*2021/);
     await expect(walterLiethFigures(page)).not.toHaveAttribute("aria-label", /1990/);
     await expectShown(page, ["2021", "1967"], ["1990"]);
     await expect(page).not.toHaveURL(/shownYears=/);
@@ -292,15 +294,14 @@ test.describe("Compare Periods: weather years overlaid", () => {
     await expect(page).toHaveURL(/shownYears=1967%2C1990/);
   });
 
-  test("bars sit in the year list's order, also after chips hide and show a year", async ({
-    page,
-  }) => {
+  test("bars sit in the page's order, also after chips hide and show a year", async ({ page }) => {
     await saveHatchStyle(page);
     await page.goto(`${WEATHER}&layout=overlay&chart=standard`);
     await expect(page.locator(".recharts-bar")).toHaveCount(3, { timeout: 30_000 });
-    // * each year's hatch, by its place in the list (2021, 1967, 1990); fills by aridity; nothing
-    // * drawn above the bars
-    const listOrder = SERIES_HATCHES.slice(0, 3);
+    // * oldest first (1967, 1990, 2021), each with the hatch it was added with (2021 the first,
+    // * 1967 the second, 1990 the third); fills by aridity; nothing drawn above the bars
+    const [solid, diagonal, dots] = SERIES_HATCHES;
+    const listOrder = [diagonal, dots, solid];
     await expect.poll(() => barHatches(page)).toEqual(listOrder);
     await expectAridityFills(page);
     expect(await hasBarMarkers(page)).toBe(false);
@@ -308,7 +309,7 @@ test.describe("Compare Periods: weather years overlaid", () => {
     // * the pointer leaves the chips after each click: a hovered chip focuses its year
     await chip(page, "2021").click();
     await page.mouse.move(0, 0);
-    await expect.poll(() => barHatches(page)).toEqual(listOrder.slice(1));
+    await expect.poll(() => barHatches(page)).toEqual([diagonal, dots]);
     await chip(page, "2021").click();
     await page.mouse.move(0, 0);
     await expect.poll(() => barHatches(page)).toEqual(listOrder);
@@ -376,16 +377,16 @@ test("a middle year loading last never shifts the other years' colours", async (
   await page.goto(
     `${PERIODS_URL}&dataset=weather&periods=2021,1990,2010&layout=overlay&chart=standard&grid=10m`,
   );
-  // * by place in the list: 2021 first, 1990 second (held back), 2010 third — the bars' hatches
-  // * and the table's header shapes alike
+  // * each year's marker from the order it was added in: 2021 first, 1990 second (held back),
+  // * 2010 third — the bars' hatches and the table's header shapes alike; listed oldest first
   const [first, second, third] = SERIES_HATCHES;
-  // * 1990 still loading: 2021 and 2010 keep the first and third places — chart and table
-  await expect.poll(() => barHatches(page), { timeout: 30_000 }).toEqual([first, third]);
+  // * 1990 still loading: 2010 and 2021 keep their own markers — chart and table
+  await expect.poll(() => barHatches(page), { timeout: 30_000 }).toEqual([third, first]);
   expect(await headerShape("2010")).toBe(SERIES_SHAPES[2]);
 
   release();
   // * the set remounts, its bars growing from 0: the hatches show once they have height
-  await expect.poll(() => barHatches(page), { timeout: 30_000 }).toEqual([first, second, third]);
+  await expect.poll(() => barHatches(page), { timeout: 30_000 }).toEqual([second, third, first]);
 });
 
 test.describe("precipitation bars on the comparison charts", () => {
@@ -467,7 +468,8 @@ test.describe("overlay: hover and sideways scroll", () => {
     const axis = await page.locator('[data-fixed-axis="left"] > div').first().boundingBox();
     if (!header || !axis) throw new Error("no header");
     expect(Math.abs(header.width + 1 - axis.width)).toBeLessThan(1.5);
-    await expect(table.locator("tbody th [title]").first()).toHaveAttribute("title", "2021");
+    // * oldest first: 1967 heads the rows
+    await expect(table.locator("tbody th [title]").first()).toHaveAttribute("title", "1967");
     // * only the fixed axes draw °C: the plot's own would slide out under them
     await expect(page.locator("svg text").getByText("°C", { exact: true })).toHaveCount(1);
   });
@@ -712,7 +714,7 @@ test.describe("overlay: hover and sideways scroll", () => {
     }
     await expect.poll(barWidth).toBeGreaterThan(fiveWide * 2);
     await page.waitForTimeout(1500);
-    // * 1967 (the squares): July's point over July's 1967 bar
+    // * 1967 (the squares), first of the two left (oldest first): July's point over its bar
     const centres = await page.evaluate(() => {
       const centreOf = (element: Element | undefined) => {
         const box = element?.getBoundingClientRect();
@@ -726,7 +728,7 @@ test.describe("overlay: hover and sideways scroll", () => {
         .sort((a, b) => centreOf(a[0]) - centreOf(b[0]));
       return {
         layers: layers.length,
-        bar: centreOf(layers[1]?.[6]),
+        bar: centreOf(layers[0]?.[6]),
         point: centreOf(document.querySelectorAll('path[data-series-dot="square"]')[6]),
       };
     });

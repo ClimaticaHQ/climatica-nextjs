@@ -23,6 +23,8 @@ const page = vi.hoisted(() => {
   return state;
 });
 
+// * the page's own params (order, markers) — none: oldest first, each year its place in the list
+vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams() }));
 vi.mock("@/hooks/filters/useFilters", () => ({
   useFilters: () => page.filters,
 }));
