@@ -18,6 +18,7 @@ export { ClimaticaLogo } from "./logos";
 export { SeriesMarkerIcon } from "./SeriesMarkerIcon";
 export { SeriesHatchIcon } from "./SeriesHatchIcon";
 export { SeriesHatchPattern } from "./SeriesHatchPattern";
+export { SortArrowIcon } from "./SortArrowIcon";
 export { SpinnerIcon } from "./SpinnerIcon";
 export { SwapIcon } from "./SwapIcon";
 export { SplitLayoutIcon } from "./SplitLayoutIcon";

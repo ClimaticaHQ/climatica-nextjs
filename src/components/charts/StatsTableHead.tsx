@@ -1,12 +1,35 @@
 import { SeriesMarker } from "@/components/SeriesMarker";
-import { InfoIcon } from "@/components/svg";
+import { InfoIcon, SortArrowIcon } from "@/components/svg";
 import { Popover } from "@/components/UI/Popover";
-import { DIFFERENCE_NOTE_KEYS } from "@/constants";
-import { EPopoverVariant } from "@/enums";
+import { ARRIVAL_FLASH_ATTRIBUTE, DIFFERENCE_NOTE_KEYS } from "@/constants";
+import { EPopoverVariant, ESortOrder } from "@/enums";
 import { useIsTruncated } from "@/hooks/ui/useIsTruncated";
 import { useTranslations } from "next-intl";
 import { STATS_TABLE_CLASSES as C } from "./charts.constant";
-import type { TSeriesHeadLabelProps, TStatsTableHeadProps } from "./charts.type";
+import type { TSeriesHeadLabelProps, TSortButtonProps, TStatsTableHeadProps } from "./charts.type";
+
+const SORT_LABEL_KEYS = {
+  [ESortOrder.ASC]: "comparePeriods.sort.ascending",
+  [ESortOrder.DESC]: "comparePeriods.sort.descending",
+} as const satisfies Record<ESortOrder, string>;
+
+/** The corner's sort toggle: "Year" and its direction, flipping the whole page's order. */
+function SortButton({ sort }: TSortButtonProps) {
+  const t = useTranslations();
+  const isDescending = sort.order === ESortOrder.DESC;
+  return (
+    <button
+      type="button"
+      data-sort-order={sort.order}
+      aria-label={t(SORT_LABEL_KEYS[sort.order])}
+      onClick={sort.onToggle}
+      className={C.SORT_BUTTON}
+    >
+      {t("comparePeriods.sort.year")}
+      <SortArrowIcon isDescending={isDescending} />
+    </button>
+  );
+}
 
 /** A series' name on one line; only when it's clipped it opens its full name. */
 function SeriesHeadLabel({ label }: TSeriesHeadLabelProps) {
@@ -26,7 +49,7 @@ function SeriesHeadLabel({ label }: TSeriesHeadLabelProps) {
 }
 
 /** The stats table's header row: the metric, each series by name, and a pair's difference. */
-export function StatsTableHead({ table, columns, differenceMeaning }: TStatsTableHeadProps) {
+export function StatsTableHead({ table, columns, differenceMeaning, sort }: TStatsTableHeadProps) {
   const t = useTranslations();
   const { difference } = table;
 
@@ -34,10 +57,14 @@ export function StatsTableHead({ table, columns, differenceMeaning }: TStatsTabl
     <thead>
       <tr className={C.HEAD_ROW}>
         <th scope="col" className={C.METRIC_HEAD}>
-          <span className={C.CAPTION}>{t("climateComparison.metric")}</span>
+          {sort ? (
+            <SortButton sort={sort} />
+          ) : (
+            <span className={C.CAPTION}>{t("climateComparison.metric")}</span>
+          )}
         </th>
         {table.columns.map(({ id, label }, index) => (
-          <th key={id} scope="col" className={C.HEAD_CELL}>
+          <th key={id} scope="col" className={C.HEAD_CELL} {...{ [ARRIVAL_FLASH_ATTRIBUTE]: id }}>
             <div className={C.SERIES_NAME}>
               {columns[index] && <SeriesMarker {...columns[index].marker} />}
               <SeriesHeadLabel label={label} />

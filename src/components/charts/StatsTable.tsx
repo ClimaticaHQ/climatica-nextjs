@@ -5,6 +5,7 @@ import { MartonneBadge } from "@/components/MartonneBadge";
 import { ScrollEdgeFades } from "@/components/ScrollEdgeFades";
 import { COMPARISON_METRIC_LABEL_KEYS } from "@/constants";
 import { ECardPadding } from "@/enums";
+import { useArrivalFlash } from "@/hooks/ui/useArrivalFlash";
 import { useScrollEdges } from "@/hooks/ui/useScrollEdges";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
@@ -21,11 +22,19 @@ import { StatsTableHead } from "./StatsTableHead";
  * formula in the header's popover; below `sm` a line under the second value). A loading series' cells
  * wait; more series than fit scroll sideways, the metrics pinned. Flashes when a series updates.
  */
-export function StatsTable({ table, columns, martonneLabel, differenceMeaning }: TStatsTableProps) {
+export function StatsTable({
+  table,
+  columns,
+  martonneLabel,
+  differenceMeaning,
+  sort,
+}: TStatsTableProps) {
   const t = useTranslations();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const ids = table.columns.map(({ id }) => id);
   const edges = useScrollEdges(scrollerRef, ids.join("|"));
+  // * a column just added flashes where it landed in the order
+  const arrivalRef = useArrivalFlash<HTMLTableElement>(ids);
   const { difference } = table;
   const labels = table.columns.map(({ label }) => label);
   const minWidth = `${STATS_TABLE_MIN_REM.METRIC + table.columns.length * STATS_TABLE_MIN_REM.VALUE}rem`;
@@ -34,7 +43,7 @@ export function StatsTable({ table, columns, martonneLabel, differenceMeaning }:
     <Card padding={ECardPadding.NONE} flashKeys={ids} shouldClip>
       <div className={C.FRAME}>
         <div ref={scrollerRef} className={C.SCROLLER}>
-          <table className={C.TABLE} style={{ minWidth }}>
+          <table ref={arrivalRef} className={C.TABLE} style={{ minWidth }}>
             <caption className={C.CAPTION}>
               {difference
                 ? t("climateComparison.tableCaption", { a: labels[0], b: labels[1] })
@@ -47,7 +56,12 @@ export function StatsTable({ table, columns, martonneLabel, differenceMeaning }:
               ))}
               {difference && <col className={C.DIFFERENCE} />}
             </colgroup>
-            <StatsTableHead table={table} columns={columns} differenceMeaning={differenceMeaning} />
+            <StatsTableHead
+              table={table}
+              columns={columns}
+              differenceMeaning={differenceMeaning}
+              sort={sort}
+            />
             <tbody>
               {table.rows.map((row) => (
                 <tr key={row.metric} className={C.ROW}>

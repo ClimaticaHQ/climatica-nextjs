@@ -40,7 +40,7 @@ function ValuesTableBlock({ context }: TChartBlockProps) {
         ? {
             markers: entries.map((entry, index) => ({
               ...getSeriesMarker(entry),
-              ...getEntityBarSwatch(swatchStyle, entry.series.hatch, index),
+              ...getEntityBarSwatch(swatchStyle, entry.series.hatch, entry.series.markerSlot),
               ...(isStandard ? { label: labels[index], title: entry.series.label } : {}),
             })),
           }
@@ -81,6 +81,7 @@ function StatsTableBlock({ model, features }: TSectionBlockProps) {
       columns={model.series.map((entry) => ({ marker: getSeriesMarker(entry) }))}
       martonneLabel={martonneLabel}
       differenceMeaning={features.difference?.meaning ?? null}
+      sort={features.seriesSort}
     />
   );
 }

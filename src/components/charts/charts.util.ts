@@ -97,11 +97,11 @@ function getLegendSeries(context: TChartBlockContext) {
   const swatchStyle = getContextSwatchStyle(context);
   return rule.hasSeriesChips
     ? []
-    : entries.map(({ series }, place) => ({
+    : entries.map(({ series }) => ({
         key: series.id,
         label: series.label,
         shape: series.shape,
-        ...getEntityBarSwatch(swatchStyle, series.hatch, place),
+        ...getEntityBarSwatch(swatchStyle, series.hatch, series.markerSlot),
       }));
 }
 

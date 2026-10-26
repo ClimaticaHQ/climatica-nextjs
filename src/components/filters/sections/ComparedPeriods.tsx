@@ -7,6 +7,7 @@ import { PairLayout } from "@/components/UI/PairLayout";
 import { Dropdown } from "@/components/UI/Dropdown";
 import { SwapButton } from "@/components/UI/SwapButton";
 import {
+  ARRIVAL_FLASH_ATTRIBUTE,
   DATASETS,
   FILTER_WEATHER_PERIODS_LIMITS,
   LG_MEDIA_QUERY,
@@ -24,6 +25,8 @@ import {
 import { useCityClimatePeriods } from "@/hooks/filters/useCityClimatePeriods";
 import { useFilterNavigation } from "@/hooks/filters/useFilterNavigation";
 import { useFilters } from "@/hooks/filters/useFilters";
+import { useComparedYears } from "@/hooks/filters/useComparedYears";
+import { useArrivalFlash } from "@/hooks/ui/useArrivalFlash";
 import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 import type { TClimatePeriod } from "@/constants";
 import type { TFilterChangeHandler, TPair } from "@/types";
@@ -34,7 +37,6 @@ import {
   toClimatePeriodHandler,
 } from "@/utils/filters.util";
 import { setPairSide, swapPair } from "@/utils/pair.util";
-import { getSeriesShape } from "@/utils/seriesShape.util";
 import { useTranslations } from "next-intl";
 import { useId, useState } from "react";
 import { FilterNote, FilterSection } from "../FilterSection";
@@ -158,6 +160,9 @@ function YearsEditor({ value, onChange, isCompact }: TYearsEditorProps) {
   const t = useTranslations();
   const [year, setYear] = useState<number | undefined>(undefined);
   const [errorKey, setErrorKey] = useState<string | null>(null);
+  // * in the page's order, each year its own marker; one just added flashes where it landed
+  const compared = useComparedYears(value);
+  const arrivalRef = useArrivalFlash<HTMLDivElement>(compared.years.map(String));
   const isFull = value.length >= FILTER_WEATHER_PERIODS_LIMITS.MAX;
   const canRemove = value.length > FILTER_WEATHER_PERIODS_LIMITS.MIN;
 
@@ -173,26 +178,28 @@ function YearsEditor({ value, onChange, isCompact }: TYearsEditorProps) {
   return (
     <FilterSection title={t("sidebar.sections.yearRange")} className={C.EDITOR}>
       <div className={isCompact ? C.YEARS_COMPACT : undefined}>
-        <div className={C.YEARS}>
-          {value.map((period) => {
+        <div ref={arrivalRef} className={C.YEARS}>
+          {compared.years.map((period) => {
             return (
-              <Badge
+              <span
                 key={period}
-                tone={YEAR_BADGE_TONE}
-                markerShape={getSeriesShape(value.indexOf(period))}
+                className={C.YEAR_FRAME}
+                {...{ [ARRIVAL_FLASH_ATTRIBUTE]: String(period) }}
               >
-                {period}
-                {canRemove && (
-                  <button
-                    type="button"
-                    onClick={() => onChange(value.filter((kept) => kept !== period))}
-                    className={C.YEAR_REMOVE}
-                    aria-label={t("comparePeriods.weather.removePeriod", { year: period })}
-                  >
-                    ×
-                  </button>
-                )}
-              </Badge>
+                <Badge tone={YEAR_BADGE_TONE} markerShape={compared.markerOf(period).shape}>
+                  {period}
+                  {canRemove && (
+                    <button
+                      type="button"
+                      onClick={() => onChange(value.filter((kept) => kept !== period))}
+                      className={C.YEAR_REMOVE}
+                      aria-label={t("comparePeriods.weather.removePeriod", { year: period })}
+                    >
+                      ×
+                    </button>
+                  )}
+                </Badge>
+              </span>
             );
           })}
         </div>

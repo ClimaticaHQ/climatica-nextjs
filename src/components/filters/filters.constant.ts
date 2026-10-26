@@ -37,6 +37,8 @@ export const RESOLUTION_LABEL_CLASS =
   "mb-2 text-xs font-semibold uppercase tracking-widest text-[var(--color-text-secondary)]";
 
 export const COMPARED_PERIODS_CLASSES = {
+  // * a year's badge frame: rounded like the badge, so its arrival flash follows its outline
+  YEAR_FRAME: "inline-flex rounded-[var(--radius-full)]",
   // * on the page below lg; hidden from lg by CSS too, so the server render (no viewport yet)
   // * never flashes it on a desktop, where the sidebar has it as a section
   PAGE: "w-full max-w-xl lg:hidden",

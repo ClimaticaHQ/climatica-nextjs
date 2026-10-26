@@ -65,16 +65,21 @@ export function OverlayChart({
   return (
     <StandardChart
       // * a series still loading takes no place yet: when it lands the chart remounts in order
-      entries={model.series.flatMap((entry, place) =>
+      entries={model.series.flatMap((entry) =>
         entry.hasData
           ? [
               {
                 id: entry.series.id,
                 label: entry.series.label,
                 aridityByMonth: getAridityByMonth(entry.aridity),
-                barFills: getOverlayBarFills(barStyle, place),
+                // * its own slot's shade, never its place in the list
+                barFills: getOverlayBarFills(barStyle, entry.series.markerSlot),
                 hatch: entry.series.hatch,
-                swatch: getEntityBarSwatch(swatchStyle, entry.series.hatch, place),
+                swatch: getEntityBarSwatch(
+                  swatchStyle,
+                  entry.series.hatch,
+                  entry.series.markerSlot,
+                ),
                 isHidden: !drawnIds.has(entry.series.id),
                 marker: getSeriesMarker(entry),
               },

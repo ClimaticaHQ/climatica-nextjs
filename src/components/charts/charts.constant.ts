@@ -1,4 +1,4 @@
-import { CHART_LINE_DASH, PRECIP_BAR, WALTER_LIETH_DIAGRAM } from "@/constants";
+import { CHART_LINE_DASH, FOCUS_RING_CLASS, PRECIP_BAR, WALTER_LIETH_DIAGRAM } from "@/constants";
 import { EChartBlockPlacement, EPairSide } from "@/enums";
 import type { TStandardChartLine, TStandardChartColors } from "./charts.type";
 import type { TPanelExpansion } from "@/types";
@@ -77,6 +77,8 @@ export const STATS_TABLE_CLASSES = {
   // * every header bottom-aligned on one line height: the titles share a baseline
   HEAD_CELL: "px-3 py-2.5 text-right align-bottom font-semibold leading-5 sm:px-4",
   METRIC_HEAD: "sticky left-0 z-10 bg-inherit px-3 py-2.5 text-left align-bottom leading-5 sm:px-4",
+  // * the corner's sort toggle: "Year" and its direction, a quiet button in the header's type
+  SORT_BUTTON: `${FOCUS_RING_CLASS} -mx-1 inline-flex items-center gap-1 rounded-[var(--radius-xs)] px-1 font-semibold text-[var(--color-text-secondary)] transition-colors duration-150 hover:text-[var(--color-text)]`,
   SERIES_NAME: "inline-flex max-w-full items-center justify-end gap-1.5",
   SERIES_LABEL: "truncate",
   DIFFERENCE: "max-sm:hidden",
@@ -215,3 +217,6 @@ export const MONTH_TAP_LAYER_CLASSES = {
   SCRUB: "absolute inset-0 z-10 touch-pan-y",
   TAP: "absolute inset-0 z-10",
 } as const;
+
+// * a series chip's frame: rounded like the chip, so its arrival flash follows its outline
+export const SERIES_CHIP_FRAME_CLASS = "shrink-0 rounded-[var(--radius-full)]";

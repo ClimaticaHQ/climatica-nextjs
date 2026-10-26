@@ -18,3 +18,7 @@ export type TSeriesHatchIconProps = {
   /** the bars' fill under the hatch; absent: the humid fill */
   fill?: string | undefined;
 };
+
+export type TSortArrowIconProps = {
+  isDescending: boolean;
+};

@@ -11,6 +11,7 @@ import type {
   TActiveMonth,
   TOverlayFocus,
   TChartFeatures,
+  TSeriesSort,
   TChartMode,
   TChartModel,
   TChartPageResult,
@@ -282,9 +283,15 @@ export type TStatsTableProps = {
   martonneLabel: string;
   /** what the pair's difference compares; null without the difference feature */
   differenceMeaning: EDifferenceMeaning | null;
+  /** the page lists its series by year: the corner cell toggles the order */
+  sort?: TSeriesSort | undefined;
 };
 
 export type TStatsTableHeadProps = Omit<TStatsTableProps, "martonneLabel">;
+
+export type TSortButtonProps = {
+  sort: TSeriesSort;
+};
 
 export type TSeriesHeadLabelProps = {
   label: string;

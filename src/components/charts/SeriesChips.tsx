@@ -2,10 +2,12 @@
 
 import { ChipScroller } from "@/components/UI/ChipScroller";
 import { Chip } from "@/components/UI";
-import { DEFAULT_BAR_STYLE } from "@/constants";
+import { ARRIVAL_FLASH_ATTRIBUTE, DEFAULT_BAR_STYLE } from "@/constants";
+import { useArrivalFlash } from "@/hooks/ui/useArrivalFlash";
 import { getEntityBarSwatch } from "@/utils";
 import { toggleFilterOption } from "@/utils/filters.util";
 import { useTranslations } from "next-intl";
+import { SERIES_CHIP_FRAME_CLASS } from "./charts.constant";
 import type { TSeriesChipsProps } from "./charts.type";
 
 /**
@@ -23,17 +25,25 @@ export function SeriesChips({
 }: TSeriesChipsProps) {
   const t = useTranslations();
   const [lockedId] = shown.length === 1 ? shown : [];
+  // * a year just added flashes where it landed in the order
+  const arrivalRef = useArrivalFlash<HTMLDivElement>(entries.map(({ series }) => series.id));
 
   return (
-    <div role="group" aria-label={t("chart.yearsShown")} className="flex min-w-0 flex-1 flex-col">
+    <div
+      ref={arrivalRef}
+      role="group"
+      aria-label={t("chart.yearsShown")}
+      className="flex min-w-0 flex-1 flex-col"
+    >
       <ChipScroller contentKey={entries.map(({ series }) => series.id).join("|")}>
-        {entries.map((entry, place) => {
-          const { id, label, shape, hatch } = entry.series;
-          const bars = getEntityBarSwatch(barStyle, hatch, place);
+        {entries.map((entry) => {
+          const { id, label, shape, hatch, markerSlot } = entry.series;
+          const bars = getEntityBarSwatch(barStyle, hatch, markerSlot);
           return (
             <span
               key={id}
-              className="shrink-0"
+              {...{ [ARRIVAL_FLASH_ATTRIBUTE]: id }}
+              className={SERIES_CHIP_FRAME_CLASS}
               onMouseEnter={() => onHighlight(id)}
               onMouseLeave={() => onHighlight(null)}
               onFocus={() => onHighlight(id)}
