@@ -5,7 +5,6 @@ import {
   formatMonthLabel,
   fromPrecipAxisValue,
   getHatchGeometry,
-  getSummaryDeltas,
   getAnnualSummary,
   getAridHumidSegments,
   getFrostBand,
@@ -311,23 +310,6 @@ describe("getHatchGeometry", () => {
     const { dotRadius, dotRowHeight } = getHatchGeometry(72);
     expect(dotRadius).toBe(ARID_DOT_RADIUS);
     expect(dotRowHeight).toBeCloseTo(2 * ARID_DOT_RADIUS * (1 + ARID_ROW_GAP_FACTOR), 9);
-  });
-});
-
-describe("getSummaryDeltas", () => {
-  const a = { annualAvgTemp: 14.3, totalPrec: 405, aridCount: 4, martonne: 16.6 };
-  const b = { annualAvgTemp: 7.4, totalPrec: 679, aridCount: 0, martonne: 39.0 };
-
-  it("returns series B minus series A", () => {
-    const deltas = getSummaryDeltas(a, b);
-    expect(deltas.meanTemp).toBeCloseTo(-6.9, 9);
-    expect(deltas.totalPrec).toBe(274);
-    expect(deltas.aridCount).toBe(-4);
-    expect(deltas.martonne).toBeCloseTo(22.4, 9);
-  });
-
-  it("skips the Martonne delta when either index is unknown", () => {
-    expect(getSummaryDeltas(a, { ...b, martonne: null }).martonne).toBeNull();
   });
 });
 

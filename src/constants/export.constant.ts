@@ -1,13 +1,7 @@
 import type { TVisibleSeries } from "@/types";
 import { WALTER_LIETH_AXIS, WALTER_LIETH_FROST } from "./walterLieth.constant";
 import type { TGridAxesStyle } from "@/types";
-/**
- * every drawn svg export (single-city, compare-cities/periods, heat-map)
- * shares the same main setting obj
- *
- * and each page-specific export settings obj spread this obj
- * and adds only the geometry unique to its own content (stats table, chart, etc).
- */
+/** What every SVG export shares; each export's own layout spreads it and adds its own geometry. */
 export const EXPORT_SVG_SHARED_LAYOUT = {
   width: 1000,
   paddingX: 40,
@@ -27,10 +21,7 @@ export const EXPORT_SVG_SHARED_LAYOUT = {
 // * heat-map tiles are fetched at fittedZoom + log2(scale) to match
 export const EXPORT_PNG_SCALE = 2;
 
-/**
- * single-city climate-statistics export — the only one with a monthly data
- * table and aridity legend, since it's the only mode with a per-month breakdown.
- **/
+/** The single-city export: one chart with its monthly values and aridity legend. */
 export const EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,
   statsY: 92,
@@ -44,18 +35,24 @@ export const EXPORT_SVG_LAYOUT = {
   footerGap: 44,
 } as const;
 
-// * shared settings obj by compare-cities, compare-periods pages
+// * the comparison exports (Compare Cities, Compare Periods)
 export const COMPARE_EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,
   statsY: 92,
   statsHeaderRowHeight: 32,
   statsRowHeight: 26,
+  // * the overlay's hatch patterns' id prefix
+  hatchPrefix: "cmp-hatch",
+  statsHeaderFontSize: 13,
+  // * a stats column head's shape, before its name
+  statsMarkerSize: 8,
+  statsMarkerGap: 8,
   // * where the chart body starts under the stats table (overlay, weather years); each body
   // * (WL or standard, split or overlay) sets its own height
   chartTop: 310,
 } as const;
 
-// * heat-map export with NO fixed height
+// * the heat map export: its height follows its content
 export const HEATMAP_EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,
   statsY: 96,
@@ -128,14 +125,22 @@ export const EXPORT_MONTHLY_VALUES = {
   // * the values' size follows the table's width, as on screen: a split panel's is smaller
   WIDE_MIN_WIDTH: 576,
   VALUE_FONT_SIZE: { WIDE: 13, NARROW: 11 },
+  // * a static file can't switch layout: where a column is too narrow for its longest value
+  // * ("−44.0"), the strip's values shrink to fit — the gap kept, never below the floor
+  FIT: { CHAR_WIDTH_EM: 0.6, CELL_GAP: 4, MIN_FONT_SIZE: 8 },
   VALUE_FONT_WEIGHT: 500,
   UNIT_FONT_SIZE: 11,
   UNIT_FONT_WEIGHT: 600,
+  // * an overlay's markers beside the unit: the unit ends this far left of the gutter's centre,
+  // * the markers start this far right of it
+  UNIT_MARKER_GAP: 2,
+  // * the standard overlay's table: a section label (the unit, in the unit's type) over each row
+  SECTIONS: { PADDING_X: 6, HEIGHT: 14, BASELINE: 11 },
   // * a line's baseline below its centre
   BASELINE: 4,
 } as const;
 
-// * the compare exports' comparison table, on top — the page's ComparisonTable
+// * the comparison exports' stats table, on top — as on the page
 export const EXPORT_COMPARISON_TABLE = {
   HEADER_HEIGHT: 46,
   ROW_HEIGHT: 28,
@@ -159,6 +164,8 @@ export const EXPORT_COMPARISON_TABLE = {
 
 // * the exports' monthly table: the city page's two rows, or a row per variable and series
 export const EXPORT_MONTHLY_TABLE = {
+  // * the table's own hatch patterns' id prefix: it's drawn under charts that define none
+  HATCH_PREFIX: "tbl-hatch",
   ROW_HEIGHT: 26,
   // * px — the label column: variable only (one series), or variable — series (compare)
   LABEL_WIDTH: { SINGLE: 110, MULTI: 250 },
@@ -226,3 +233,6 @@ export const EXPORT_LEGEND = {
 
 // * attribute that makes an element re-declare the light (:root) tokens — see global.css
 export const EXPORT_PALETTE_ATTRIBUTE = "data-export-palette";
+
+// * a colour token reference in an export's markup — resolved before the file is saved
+export const CSS_VAR_REFERENCE_PATTERN = /var\((--[\w-]+)\)/g;

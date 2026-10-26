@@ -1,5 +1,5 @@
 import { MOTION, NO_DATA_UPDATE } from "@/constants";
-import { useDelayedFlag } from "@/hooks";
+import { useDelayedFlag } from "@/hooks/ui/useDelayedFlag";
 import type { TDataUpdateState } from "@/types";
 import { reduceDataUpdate } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -12,7 +12,7 @@ import { DataUpdateContext } from "./DataUpdateContext";
  * first load and unchanged refetches don't count), and whether an update is loading — the
  * query's own isFetching, shown only past MOTION.UPDATE_LOADING_DELAY_MS. Announces each
  * update once in a polite live region. With motion off the loading state still shows, without
- * moving (motion.css).
+ * moving (animations.css).
  */
 export function DataUpdateProvider({
   series,

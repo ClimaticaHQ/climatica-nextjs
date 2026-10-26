@@ -5,9 +5,10 @@ import { FillSwatch } from "./FillSwatch";
 import { FrostSwatch } from "./FrostSwatch";
 import { HatchSwatch } from "./HatchSwatch";
 import { LineSwatch } from "./LineSwatch";
+import { EntitySwatch } from "./EntitySwatch";
 import { MarkerSwatch } from "./MarkerSwatch";
 
-/** One swatch's shape inside its box; a pair is split by LegendSwatch first. */
+/** One swatch's shape inside its box. */
 export function SwatchShape({ swatch, size }: TLegendSwatchProps) {
   // * a switch narrows the descriptor union without casts
   switch (swatch.kind) {
@@ -27,10 +28,18 @@ export function SwatchShape({ swatch, size }: TLegendSwatchProps) {
       return <FrostSwatch color={swatch.color} outline={swatch.outline} size={size} />;
     case ELegendSwatch.MARKER:
       return <MarkerSwatch color={swatch.color} shape={swatch.shape} size={size} />;
+    case ELegendSwatch.ENTITY:
+      return (
+        <EntitySwatch
+          color={swatch.color}
+          shape={swatch.shape}
+          hatch={swatch.hatch}
+          fill={swatch.fill}
+          size={size}
+        />
+      );
     case ELegendSwatch.HUMID:
     case ELegendSwatch.ARID:
       return <HatchSwatch color={swatch.color} regime={swatch.kind} size={size} />;
-    case ELegendSwatch.PAIR:
-      return null;
   }
 }

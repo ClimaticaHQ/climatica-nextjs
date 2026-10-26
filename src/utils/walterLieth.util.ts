@@ -3,7 +3,8 @@ import {
   MARTONNE_TEMP_OFFSET,
   MONTH_LABEL_REFERENCE_DATE,
   MONTH_LABEL_TRAILING_PERIOD,
-  WALTER_LIETH_COLORS,
+  WALTER_LIETH_MONTH_FORMAT,
+  PRECIP_BAR,
   WALTER_LIETH_COMPARISON,
   WALTER_LIETH_DIAGRAM,
   WALTER_LIETH_FROST,
@@ -21,7 +22,6 @@ import type {
   TFormatMonthLabelArgs,
   TGetAridHumidSegmentsArgs,
   TMonthAridity,
-  TMonthlyTableMarker,
   TMonthlyTemperature,
   TWalterLiethBandBounds,
   TWalterLiethDomain,
@@ -38,7 +38,6 @@ import type {
   TWalterLiethRow,
   TWalterLiethSeries,
   TWalterLiethSeriesInput,
-  TSummaryDeltas,
   TToSvgPathArgs,
   TToWalterLiethSeriesArgs,
 } from "@/types";
@@ -90,6 +89,19 @@ export function computeAridityPeriods(data: TMonthlyTemperature[]): TMonthAridit
       tmin: d.tmin,
     };
   });
+}
+
+/** Month (1–12) → arid, for colouring a series' bars; an unknown month (a missing value) is humid. */
+export function getAridityByMonth(
+  aridity: readonly TMonthAridity[] | null,
+): Record<number, boolean> | undefined {
+  if (!aridity) return undefined;
+  return Object.fromEntries(aridity.map((m) => [m.month, m.isArid === true]));
+}
+
+/** A precipitation bar's fill: its month's aridity for its own series — on every chart and export. */
+export function getPrecipBarFill(isArid: boolean): string {
+  return isArid ? PRECIP_BAR.ARID : PRECIP_BAR.HUMID;
 }
 
 /** The one annual-summary implementation — used by the charts and the WL header alike. */
@@ -346,11 +358,6 @@ export function toSvgPath({ points, scaleX, scaleY, isClosed = true }: TToSvgPat
   return isClosed ? `${commands.join(" ")} Z` : commands.join(" ");
 }
 
-/** A series' marker on screen: A a dot, B a square, in its series color. */
-export function getSeriesMarker(id: EWalterLiethSeriesId): TMonthlyTableMarker {
-  return { shape: WALTER_LIETH_COMPARISON.DOT_SHAPE[id], color: WALTER_LIETH_COLORS.SERIES[id] };
-}
-
 /**
  * The frost band, one state per calendar month: frost when the mean minimum temperature is
  * below WALTER_LIETH_FROST.THRESHOLD (WL's "certain frost" — there are no absolute minima for
@@ -444,22 +451,21 @@ export function formatMonthLabel({ locale, monthIndex, format }: TFormatMonthLab
   const formatter = new Intl.DateTimeFormat(locale, { month: format, timeZone: "UTC" });
   const { YEAR, DAY } = MONTH_LABEL_REFERENCE_DATE;
   const label = formatter.format(Date.UTC(YEAR, monthIndex, DAY));
-  return label.replace(MONTH_LABEL_TRAILING_PERIOD, "");
+  if (format !== WALTER_LIETH_MONTH_FORMAT.NARROW) {
+    return label.replace(MONTH_LABEL_TRAILING_PERIOD, "");
+  }
+  // * the locale's own narrow name, as one capital letter (es E F M…, uk С Л Б…): some locales'
+  // * narrow names are lowercase or longer than a letter
+  const [initial = label] = Array.from(label);
+  return initial.toLocaleUpperCase(locale);
 }
 
 /**
- * Overlay paint: one series color for curves and hatching (line style tells the variables
- * apart), the >100 mm region translucent so the other series stays visible.
+ * A series' paint in an overlay: the diagram's semantic colours (entities differ by their dots'
+ * shape), the >100 mm region translucent so the other series stays visible.
  */
-export function getOverlayPaint(color: string): TWalterLiethLayerPaint {
-  return {
-    temp: color,
-    prec: color,
-    humidHatch: color,
-    aridHatch: color,
-    perhumid: color,
-    perhumidOpacity: WALTER_LIETH_COMPARISON.OVERLAY_PERHUMID_OPACITY,
-  };
+export function getOverlayPaint(paint: TWalterLiethLayerPaint): TWalterLiethLayerPaint {
+  return { ...paint, perhumidOpacity: WALTER_LIETH_COMPARISON.OVERLAY_PERHUMID_OPACITY };
 }
 
 export function isShadedSeries(id: EWalterLiethSeriesId, shading: EWalterLiethShading): boolean {
@@ -469,16 +475,6 @@ export function isShadedSeries(id: EWalterLiethSeriesId, shading: EWalterLiethSh
 /** The shaded series is drawn first, so its fill never covers the other series' curves. */
 export function orderShadedFirst<T extends { isShaded: boolean }>(layers: readonly T[]): T[] {
   return [...layers].sort((a, b) => Number(b.isShaded) - Number(a.isShaded));
-}
-
-/** Series B minus series A for each annual statistic (null when either Martonne is). */
-export function getSummaryDeltas(a: TChartSummary, b: TChartSummary): TSummaryDeltas {
-  return {
-    meanTemp: b.annualAvgTemp - a.annualAvgTemp,
-    totalPrec: b.totalPrec - a.totalPrec,
-    aridCount: b.aridCount - a.aridCount,
-    martonne: a.martonne !== null && b.martonne !== null ? b.martonne - a.martonne : null,
-  };
 }
 
 /**

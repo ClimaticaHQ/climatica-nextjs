@@ -68,6 +68,11 @@ export const WALTER_LIETH_AXIS = {
   // * monthly values table's unit column, so °C / mm get room beside the months
   WIDTH: 44,
   COMPACT_WIDTH: 30,
+  // * a phone's full-width chart: narrower axes, so the plot gets the width (ticks in --font-xs)
+  NARROW_WIDTH: 34,
+  NARROW_TICK_FONT_SIZE: 12,
+  // * a phone's standard chart: this many ticks per y axis
+  NARROW_TICK_COUNT: 4,
   // * tick labels sit this far from the axis line, with no tick marks
   TICK_GAP: 4,
   // * °C / mm sit above their axis, this far over the plot top
@@ -95,8 +100,6 @@ export const WALTER_LIETH_COLOR_VARS = {
   COMPRESSED_FILL: "--color-wl-compressed-fill",
   FROST: "--color-wl-frost",
   FROST_OUTLINE: "--color-wl-frost-outline",
-  SERIES_A: "--color-wl-series-a",
-  SERIES_B: "--color-wl-series-b",
 } as const;
 
 export const WALTER_LIETH_COLORS = {
@@ -107,10 +110,6 @@ export const WALTER_LIETH_COLORS = {
   COMPRESSED_FILL: `var(${WALTER_LIETH_COLOR_VARS.COMPRESSED_FILL})`,
   FROST: `var(${WALTER_LIETH_COLOR_VARS.FROST})`,
   FROST_OUTLINE: `var(${WALTER_LIETH_COLOR_VARS.FROST_OUTLINE})`,
-  SERIES: {
-    [EWalterLiethSeriesId.A]: `var(${WALTER_LIETH_COLOR_VARS.SERIES_A})`,
-    [EWalterLiethSeriesId.B]: `var(${WALTER_LIETH_COLOR_VARS.SERIES_B})`,
-  },
 } as const;
 
 // * the WL legend's colors on screen (CSS vars); the export resolves the same vars
@@ -162,7 +161,6 @@ export const WALTER_LIETH_COMPARISON = {
   DEFAULT_SHADING: EWalterLiethShading.A,
   // * the shaded series' solid >100 mm region, translucent so the other series stays visible
   OVERLAY_PERHUMID_OPACITY: 0.3,
-  DOT_SHAPE: { [EWalterLiethSeriesId.A]: "circle", [EWalterLiethSeriesId.B]: "square" },
   // * which series each shading option hatches
   SHADED_SERIES: {
     [EWalterLiethShading.A]: EWalterLiethSeriesId.A,

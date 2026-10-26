@@ -1,11 +1,15 @@
 import type { TMonthlyTemperatureWithAvg } from "../domain";
 import type { TChartMode, TSeriesKey, TVisibleSeries } from "./chart";
-import type { TLegendMarkerShape } from "./legend";
+import type { TSeriesHatch, TSeriesShape } from "../charts/seriesShape.type";
 
-/** A series' marker in the table: its dot (circle) or square, in its color. */
+/** A series' marker in the table: its shape, in graphite. */
 export type TMonthlyTableMarker = {
-  shape: TLegendMarkerShape;
+  shape: TSeriesShape;
   color: string;
+  /** its bars' hatch — shown in the values table's mm row */
+  hatch?: TSeriesHatch;
+  /** its bars' own fill under the hatch; absent: the humid fill */
+  fill?: string;
 };
 
 /** One series of the monthly table — the only one on a city page, two or more on compare. */

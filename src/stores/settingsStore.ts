@@ -1,29 +1,32 @@
 "use client";
 
-import { DEFAULT_UPDATE_FLASH_VARIANT, LOCAL_STORAGE_KEYS } from "@/constants";
+import { LOCAL_STORAGE_KEYS, SETTINGS_DEFAULTS, SETTINGS_STORE_VERSION } from "@/constants";
 import type { TSettingsState } from "@/types";
-import { getPersistedSettings, mergePersistedSettings } from "@/utils/settings.util";
+import {
+  createSettingsStorage,
+  getPersistedSettings,
+  mergePersistedSettings,
+  migrateSettings,
+  readLegacyTheme,
+} from "@/utils/settings.util";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
+/** Every user setting but the language, saved as one object. */
 export const useSettingsStore = create<TSettingsState>()(
   persist(
-    (set, get) => ({
-      autoScroll: false,
-      autoApplyFilters: true,
-      syncCity: true,
-      animationsEnabled: true,
-      updateFlashVariant: DEFAULT_UPDATE_FLASH_VARIANT,
+    (set) => ({
+      ...SETTINGS_DEFAULTS,
       hasHydrated: false,
-      toggleAutoScroll: () => set({ autoScroll: !get().autoScroll }),
-      toggleAutoApplyFilters: () => set({ autoApplyFilters: !get().autoApplyFilters }),
-      toggleSyncCity: () => set({ syncCity: !get().syncCity }),
-      toggleAnimations: () => set({ animationsEnabled: !get().animationsEnabled }),
-      setUpdateFlashVariant: (variant) => set({ updateFlashVariant: variant }),
+      setSetting: (key, value) => set({ [key]: value }),
       setHasHydrated: (hydrated) => set({ hasHydrated: hydrated }),
     }),
     {
       name: LOCAL_STORAGE_KEYS.SETTINGS,
+      version: SETTINGS_STORE_VERSION,
+      storage: createJSONStorage(() => createSettingsStorage(() => window.localStorage)),
+      migrate: (persisted, version) =>
+        migrateSettings(persisted, version, readLegacyTheme(window.localStorage)),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },

@@ -1,5 +1,5 @@
 import { Card } from "@/components/Card";
-import { ECardBackground, ECardElevation, ECardPadding } from "@/enums";
+import { ECardBackground, ECardPadding } from "@/enums";
 import { MAP_SKELETON_LAYOUT } from "./MapSkeleton.constant";
 import type { TMapSkeletonProps } from "./MapSkeleton.type";
 
@@ -13,12 +13,11 @@ export function MapSkeleton({ variant = "full", heightClassName }: TMapSkeletonP
     <Card
       padding={ECardPadding.NONE}
       background={ECardBackground.MUTED}
-      elevation={isMini ? ECardElevation.FLAT : ECardElevation.RAISED}
       shouldClip
       className={`animate-pulse ${isMini ? MAP_SKELETON_LAYOUT.MINI : `${MAP_SKELETON_LAYOUT.FULL} ${height}`}`}
     >
       {/* Tile grid */}
-      <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-px bg-[var(--color-bg)]">
+      <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-px bg-[var(--color-surface)]">
         {TILE_OPACITIES.map((opacity, i) => (
           <div key={i} className="bg-[var(--color-border)]" style={{ opacity: opacity / 100 }} />
         ))}
@@ -26,7 +25,7 @@ export function MapSkeleton({ variant = "full", heightClassName }: TMapSkeletonP
 
       {/* City marker pin */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="h-3 w-3 rounded-full bg-[var(--color-primary)]" />
+        <div className="h-3 w-3 rounded-full bg-[var(--color-brand)]" />
       </div>
 
       {/* Zoom controls — full variant only */}

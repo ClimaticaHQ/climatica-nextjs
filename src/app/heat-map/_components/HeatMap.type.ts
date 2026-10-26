@@ -1,24 +1,21 @@
+import type { TLocationSearchProps } from "@/components/LocationSearch/LocationSearch.type";
 import type {
   TBbox,
   TCellSize,
-  TCity,
   TColorScale,
+  TDataState,
   TDatasetAttribution,
-  TDatasetPeriodUrlValue,
   TNumberFormatter,
+  TPageUpdate,
   TPolygon,
   TVariable,
   TWorldClimBoxBinding,
-  TWorldClimBoxResponse,
 } from "@/types";
 
 export type THeatMapSelectionValue =
   { kind: "bbox"; bbox: TBbox } | { kind: "polygon"; polygon: TPolygon } | { kind: "none" };
 
 export type THeatMapUrlState = {
-  datasetPeriod: TDatasetPeriodUrlValue;
-  variables: TVariable[];
-  gridSize: TCellSize;
   selection: THeatMapSelectionValue;
 };
 
@@ -49,39 +46,47 @@ export type THeatmapStats = {
   count: number;
 };
 
-export type TRegionHeatmapViewProps = {
+/** The region the page shows: a box or a polygon (never both), and the shape being drawn. */
+export type THeatMapSelection = {
   bbox: TBbox | null;
   polygon: TPolygon | null;
-  pixels: TWorldClimBoxResponse | null;
+  drawMode: TDrawMode;
+};
+
+export type THeatMapExportHandlers = Pick<
+  TToolbarProps,
+  "onExportCSV" | "onExportPNG" | "onExportSVG"
+>;
+
+export type TUseHeatMapExportArgs = {
+  selection: THeatMapSelection;
+  bindings: TWorldClimBoxBinding[];
+  stats: THeatmapStats;
   gridSize: TCellSize;
   activeVariable: TVariable;
   colorScale: TColorScale;
-  drawMode: TDrawMode;
-  /** the first load of a selection — no cells to show yet */
-  isLoading: boolean;
-  /** any load, also while the previous selection's cells are still shown */
-  isFetching: boolean;
-  isLocating: boolean;
-  isClimate: boolean;
-  error: Error | null;
-  locationError: string | null;
-  mapTarget: TMapTarget | null;
   selectedMonths: number[];
   periodLabel: string;
-  profile: TRegionalProfile | null;
-  isProfileLoading: boolean;
+  statSubtitle: string;
+  unit: string;
   datasetAttribution: TDatasetAttribution | null;
   shareUrl: string;
-  onDrawModeChange: (mode: TDrawMode) => void;
-  onBboxChange: (bbox: TBbox | null) => void;
-  onPolygonChange: (polygon: TPolygon | null) => void;
-  onClear: () => void;
-  onCitySelect: (city: TCity) => void;
-  onLocate: () => void;
-  onClearLocationError: () => void;
 };
 
-// Sub-component prop types
+export type THeatMapPage = {
+  state: TDataState;
+  update: TPageUpdate;
+  hasSelection: boolean;
+  search: TLocationSearchProps;
+  toolbar: TToolbarProps;
+  map: TMapCanvasProps;
+  stats: TStatsLegendBarProps;
+  profile: TRegionalClimateProfileProps;
+};
+
+export type THeatMapViewProps = {
+  page: THeatMapPage;
+};
 
 export type THeatmapLayerProps = {
   bindings: TWorldClimBoxBinding[];
@@ -99,12 +104,22 @@ export type TMapFitterProps = { bbox: TBbox | null };
 
 export type TBboxDrawerProps = {
   isDrawMode: boolean;
+  gridSize: TCellSize;
   onBboxComplete: (bbox: TBbox) => void;
 };
 
 export type TBboxOutlineProps = { bbox: TBbox };
 
-export type TPolygonDrawerProps = { onPolygonComplete: (v: TPolygon) => void };
+export type TPolygonDrawerProps = {
+  gridSize: TCellSize;
+  onPolygonComplete: (v: TPolygon) => void;
+};
+
+export type TDrawingCellCountProps = {
+  /** the shape so far, [lat, lng] */
+  vertices: TPolygon;
+  gridSize: TCellSize;
+};
 
 export type TPolygonOutlineProps = { vertices: TPolygon };
 
@@ -120,6 +135,8 @@ export type TToolbarProps = {
 };
 
 export type TStatsLegendBarProps = {
+  /** the region's cells are loading: the stats wait in their places */
+  isLoading: boolean;
   hasData: boolean;
   stats: THeatmapStats;
   unit: string;
@@ -132,7 +149,7 @@ export type TMapCanvasProps = {
   bbox: TBbox | null;
   polygon: TPolygon | null;
   drawMode: TDrawMode;
-  gridSize: string;
+  gridSize: TCellSize;
   colorScale: TColorScale;
   unit: string;
   mapTarget: TMapTarget | null;

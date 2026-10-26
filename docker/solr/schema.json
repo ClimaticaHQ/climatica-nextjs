@@ -1,68 +1,84 @@
 {
   "add-field-type": [
     {
-      "name": "suggestType",
+      "name": "nameText",
       "class": "solr.TextField",
       "positionIncrementGap": "100",
       "indexAnalyzer": {
+        "charFilters": [
+          {
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "['\u2019\u02bc`\u00b4]",
+            "replacement": ""
+          }
+        ],
         "tokenizer": {
           "class": "solr.StandardTokenizerFactory"
         },
         "filters": [
           {
-            "class": "solr.LowerCaseFilterFactory"
-          },
-          {
-            "class": "solr.ASCIIFoldingFilterFactory"
+            "class": "solr.ICUFoldingFilterFactory"
           }
         ]
       },
       "queryAnalyzer": {
+        "charFilters": [
+          {
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "['\u2019\u02bc`\u00b4]",
+            "replacement": ""
+          }
+        ],
         "tokenizer": {
           "class": "solr.StandardTokenizerFactory"
         },
         "filters": [
           {
-            "class": "solr.LowerCaseFilterFactory"
-          },
-          {
-            "class": "solr.ASCIIFoldingFilterFactory"
+            "class": "solr.ICUFoldingFilterFactory"
           }
         ]
       }
     },
     {
-      "name": "trigramType",
+      "name": "namePrefix",
       "class": "solr.TextField",
       "positionIncrementGap": "100",
       "indexAnalyzer": {
+        "charFilters": [
+          {
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "['\u2019\u02bc`\u00b4]",
+            "replacement": ""
+          }
+        ],
         "tokenizer": {
           "class": "solr.StandardTokenizerFactory"
         },
         "filters": [
           {
-            "class": "solr.LowerCaseFilterFactory"
+            "class": "solr.ICUFoldingFilterFactory"
           },
           {
-            "class": "solr.ASCIIFoldingFilterFactory"
-          },
-          {
-            "class": "solr.NGramFilterFactory",
-            "minGramSize": "3",
-            "maxGramSize": "10"
+            "class": "solr.EdgeNGramFilterFactory",
+            "minGramSize": "2",
+            "maxGramSize": "25"
           }
         ]
       },
       "queryAnalyzer": {
+        "charFilters": [
+          {
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "['\u2019\u02bc`\u00b4]",
+            "replacement": ""
+          }
+        ],
         "tokenizer": {
           "class": "solr.StandardTokenizerFactory"
         },
         "filters": [
           {
-            "class": "solr.LowerCaseFilterFactory"
-          },
-          {
-            "class": "solr.ASCIIFoldingFilterFactory"
+            "class": "solr.ICUFoldingFilterFactory"
           }
         ]
       }
@@ -78,113 +94,85 @@
     },
     {
       "name": "label_de",
-      "type": "suggestType",
+      "type": "nameText",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
       "name": "label_el",
-      "type": "suggestType",
+      "type": "nameText",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
       "name": "label_en",
-      "type": "suggestType",
+      "type": "nameText",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
       "name": "label_es",
-      "type": "suggestType",
+      "type": "nameText",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
       "name": "label_fr",
-      "type": "suggestType",
+      "type": "nameText",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
       "name": "label_it",
-      "type": "suggestType",
+      "type": "nameText",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_nb",
+      "type": "nameText",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
       "name": "label_pt",
-      "type": "suggestType",
+      "type": "nameText",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_ro",
+      "type": "nameText",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
       "name": "label_uk",
-      "type": "suggestType",
+      "type": "nameText",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
-      "name": "label_de_ngram",
-      "type": "trigramType",
-      "multiValued": false,
+      "name": "names",
+      "type": "nameText",
+      "multiValued": true,
       "indexed": true,
       "stored": false
     },
     {
-      "name": "label_el_ngram",
-      "type": "trigramType",
-      "multiValued": false,
-      "indexed": true,
-      "stored": false
-    },
-    {
-      "name": "label_en_ngram",
-      "type": "trigramType",
-      "multiValued": false,
-      "indexed": true,
-      "stored": false
-    },
-    {
-      "name": "label_es_ngram",
-      "type": "trigramType",
-      "multiValued": false,
-      "indexed": true,
-      "stored": false
-    },
-    {
-      "name": "label_fr_ngram",
-      "type": "trigramType",
-      "multiValued": false,
-      "indexed": true,
-      "stored": false
-    },
-    {
-      "name": "label_it_ngram",
-      "type": "trigramType",
-      "multiValued": false,
-      "indexed": true,
-      "stored": false
-    },
-    {
-      "name": "label_pt_ngram",
-      "type": "trigramType",
-      "multiValued": false,
-      "indexed": true,
-      "stored": false
-    },
-    {
-      "name": "label_uk_ngram",
-      "type": "trigramType",
-      "multiValued": false,
+      "name": "names_prefix",
+      "type": "namePrefix",
+      "multiValued": true,
       "indexed": true,
       "stored": false
     },
@@ -226,36 +214,8 @@
   ],
   "add-copy-field": [
     {
-      "source": "label_de",
-      "dest": "label_de_ngram"
-    },
-    {
-      "source": "label_el",
-      "dest": "label_el_ngram"
-    },
-    {
-      "source": "label_en",
-      "dest": "label_en_ngram"
-    },
-    {
-      "source": "label_es",
-      "dest": "label_es_ngram"
-    },
-    {
-      "source": "label_fr",
-      "dest": "label_fr_ngram"
-    },
-    {
-      "source": "label_it",
-      "dest": "label_it_ngram"
-    },
-    {
-      "source": "label_pt",
-      "dest": "label_pt_ngram"
-    },
-    {
-      "source": "label_uk",
-      "dest": "label_uk_ngram"
+      "source": "names",
+      "dest": "names_prefix"
     }
   ]
 }

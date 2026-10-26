@@ -2,7 +2,7 @@ import { EUpdateFlashVariant } from "@/enums";
 import type { TMotionCssVariables } from "@/types";
 
 // * UI motion — every duration here is skipped under prefers-reduced-motion. The CSS in
-// * src/styles/motion.css reads these through MOTION_CSS_VARIABLES, set once on <html>
+// * src/styles/animations.css reads these through MOTION_CSS_VARIABLES, set once on <html>
 export const MOTION = {
   // * a SegmentedControl's active pill sliding to the selected option
   CONTROL_SLIDE_MS: 200,
@@ -21,16 +21,6 @@ export const MOTION = {
   // * size over the same time, and the series leaves the tooltip once it's done)
   CHART_SERIES_TOGGLE_MS: 400,
   CHART_SERIES_TOGGLE_EASING: "ease",
-  // * the multi-period table's columns resizing when a period is added or removed
-  TABLE_COLUMN_RESIZE_MS: 150,
-  TABLE_COLUMN_RESIZE_EASING: "ease",
-  // * the city page's filters tab opening / closing: the panel's height, then its content
-  // * fading and sliding in slightly after it starts
-  FILTERS_COLLAPSE_MS: 320,
-  FILTERS_COLLAPSE_EASING: "cubic-bezier(0.4, 0, 0.2, 1)",
-  FILTERS_CONTENT_FADE_MS: 250,
-  FILTERS_CONTENT_DELAY_MS: 60,
-  FILTERS_CONTENT_EASING: "cubic-bezier(0.4, 0, 0.2, 1)",
   // * filters auto-applying: only a fetch longer than the delay fades the chart card's
   // * content and runs the progress bar along its top edge — fast responses never flicker
   UPDATE_LOADING_DELAY_MS: 300,
@@ -45,6 +35,12 @@ export const MOTION = {
   // * then fades back — the glow's spread per variant is UPDATE_FLASH_GLOW_PX
   UPDATE_FLASH_MS: 800,
   UPDATE_FLASH_EASING: "ease-out",
+  // * a bottom sheet sliding up from / down off the screen edge, its backdrop fading with it
+  SHEET_SLIDE_MS: 280,
+  SHEET_SLIDE_EASING: "cubic-bezier(0.32, 0.72, 0, 1)",
+  // * a hover state layer fading in and out (a stats table row)
+  STATE_HOVER_MS: 120,
+  STATE_HOVER_EASING: "ease-out",
   REDUCED_MOTION_QUERY: "(prefers-reduced-motion: reduce)",
 } as const;
 
@@ -68,14 +64,16 @@ export const UPDATE_FLASH_TOKENS = {
 // * set on a card while it flashes — `data-update-flash="active"` — for tests and styling
 export const UPDATE_FLASH_ATTRIBUTE = "updateFlash";
 export const UPDATE_FLASH_ACTIVE = "active";
+// * an entity's element that flashes when it arrives (useArrivalFlash): `data-arrival-key="1990"`
+export const ARRIVAL_FLASH_ATTRIBUTE = "data-arrival-key";
 // * and its variant — `data-update-flash-variant="glow" | "border"`
 export const UPDATE_FLASH_VARIANT_ATTRIBUTE = "updateFlashVariant";
 
-// * on <html> while motion is off — `data-motion="off"` — set by MotionRoot, read by motion.css
+// * on <html> while motion is off — `data-motion="off"` — set by MotionRoot, read by animations.css
 export const MOTION_ROOT_ATTRIBUTE = "motion";
 export const MOTION_OFF = "off";
 
-// * the names motion.css reads
+// * the names animations.css reads
 export const MOTION_CSS_VAR = {
   CONTROL_SLIDE: "--motion-control-slide",
   CONTROL_SLIDE_EASING: "--motion-control-slide-easing",
@@ -87,13 +85,6 @@ export const MOTION_CSS_VAR = {
   PANEL_EXPAND_SCALE_FROM: "--motion-panel-expand-scale-from",
   CHART_SERIES_TOGGLE: "--motion-chart-series-toggle",
   CHART_SERIES_TOGGLE_EASING: "--motion-chart-series-toggle-easing",
-  TABLE_COLUMN_RESIZE: "--motion-table-column-resize",
-  TABLE_COLUMN_RESIZE_EASING: "--motion-table-column-resize-easing",
-  FILTERS_COLLAPSE: "--motion-filters-collapse",
-  FILTERS_COLLAPSE_EASING: "--motion-filters-collapse-easing",
-  FILTERS_CONTENT_FADE: "--motion-filters-content-fade",
-  FILTERS_CONTENT_DELAY: "--motion-filters-content-delay",
-  FILTERS_CONTENT_EASING: "--motion-filters-content-easing",
   UPDATE_FADE: "--motion-update-fade",
   UPDATE_FADE_EASING: "--motion-update-fade-easing",
   UPDATE_FADE_OPACITY: "--motion-update-fade-opacity",
@@ -101,6 +92,10 @@ export const MOTION_CSS_VAR = {
   UPDATE_PROGRESS_CYCLE: "--motion-update-progress-cycle",
   UPDATE_PROGRESS_SEGMENT: "--motion-update-progress-segment",
   UPDATE_PROGRESS_TRAVEL: "--motion-update-progress-travel",
+  SHEET_SLIDE: "--motion-sheet-slide",
+  SHEET_SLIDE_EASING: "--motion-sheet-slide-easing",
+  STATE_HOVER: "--motion-state-hover",
+  STATE_HOVER_EASING: "--motion-state-hover-easing",
 } as const;
 
 const ms = (value: number) => `${value}ms`;
@@ -119,13 +114,6 @@ export const MOTION_CSS_VARIABLES: TMotionCssVariables = {
   [MOTION_CSS_VAR.PANEL_EXPAND_SCALE_FROM]: String(MOTION.PANEL_EXPAND_SCALE_FROM),
   [MOTION_CSS_VAR.CHART_SERIES_TOGGLE]: ms(MOTION.CHART_SERIES_TOGGLE_MS),
   [MOTION_CSS_VAR.CHART_SERIES_TOGGLE_EASING]: MOTION.CHART_SERIES_TOGGLE_EASING,
-  [MOTION_CSS_VAR.TABLE_COLUMN_RESIZE]: ms(MOTION.TABLE_COLUMN_RESIZE_MS),
-  [MOTION_CSS_VAR.TABLE_COLUMN_RESIZE_EASING]: MOTION.TABLE_COLUMN_RESIZE_EASING,
-  [MOTION_CSS_VAR.FILTERS_COLLAPSE]: ms(MOTION.FILTERS_COLLAPSE_MS),
-  [MOTION_CSS_VAR.FILTERS_COLLAPSE_EASING]: MOTION.FILTERS_COLLAPSE_EASING,
-  [MOTION_CSS_VAR.FILTERS_CONTENT_FADE]: ms(MOTION.FILTERS_CONTENT_FADE_MS),
-  [MOTION_CSS_VAR.FILTERS_CONTENT_DELAY]: ms(MOTION.FILTERS_CONTENT_DELAY_MS),
-  [MOTION_CSS_VAR.FILTERS_CONTENT_EASING]: MOTION.FILTERS_CONTENT_EASING,
   [MOTION_CSS_VAR.UPDATE_FADE]: ms(MOTION.UPDATE_FADE_MS),
   [MOTION_CSS_VAR.UPDATE_FADE_EASING]: MOTION.UPDATE_FADE_EASING,
   [MOTION_CSS_VAR.UPDATE_FADE_OPACITY]: String(MOTION.UPDATE_FADE_OPACITY),
@@ -134,4 +122,8 @@ export const MOTION_CSS_VARIABLES: TMotionCssVariables = {
   [MOTION_CSS_VAR.UPDATE_PROGRESS_SEGMENT]: percent(MOTION.UPDATE_PROGRESS_SEGMENT),
   // * the segment crosses the whole track: its own width times this
   [MOTION_CSS_VAR.UPDATE_PROGRESS_TRAVEL]: percent(1 / MOTION.UPDATE_PROGRESS_SEGMENT),
+  [MOTION_CSS_VAR.SHEET_SLIDE]: ms(MOTION.SHEET_SLIDE_MS),
+  [MOTION_CSS_VAR.SHEET_SLIDE_EASING]: MOTION.SHEET_SLIDE_EASING,
+  [MOTION_CSS_VAR.STATE_HOVER]: ms(MOTION.STATE_HOVER_MS),
+  [MOTION_CSS_VAR.STATE_HOVER_EASING]: MOTION.STATE_HOVER_EASING,
 };

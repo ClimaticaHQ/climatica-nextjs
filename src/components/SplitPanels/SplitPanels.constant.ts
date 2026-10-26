@@ -15,11 +15,9 @@ export const PANEL_ORIGIN: Record<EWalterLiethSeriesId, TTransformOrigin> = {
 };
 
 export const SPLIT_PANELS_CLASSES = {
-  // * side by side from `sm`, stacked below; each panel Card spans the rows (header, plot)
-  SPLIT: "grid grid-cols-1 gap-4 sm:grid-cols-2",
   // * one panel across the card, on the split's two rows (header, plot) — as tall as the split
   EXPANDED: "grid grid-cols-1",
   CONTROLS: "flex shrink-0 items-center gap-1.5",
-  ICON_BUTTON: `${FOCUS_RING_CLASS} inline-flex size-7 shrink-0 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]`,
+  ICON_BUTTON: `${FOCUS_RING_CLASS} inline-flex size-7 shrink-0 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]`,
   HIDDEN_BELOW_SM: "max-sm:hidden",
 } as const;

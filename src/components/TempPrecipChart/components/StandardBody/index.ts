@@ -1,1 +1,0 @@
-export { StandardBody } from "./StandardBody";

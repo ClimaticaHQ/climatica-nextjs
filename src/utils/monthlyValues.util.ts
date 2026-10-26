@@ -22,8 +22,8 @@ export function formatMonthlyValuesValue({
 
 /**
  * The monthly values table's two rows — mean temperature and precipitation — with, per month,
- * one entry per series (overlay: A above B, in their colors). The screen and the export draw
- * these rows.
+ * one entry per series (overlay: A above B), each in the text colour — the series show by shape. The screen
+ * and the export draw these rows.
  */
 export function buildMonthlyValuesRows({
   series,
@@ -38,9 +38,14 @@ export function buildMonthlyValuesRows({
     unitColor: variable === "prec" ? palette.prec : palette.temp,
     name: names[variable],
     cells: Array.from({ length: monthCount }, (_, month) =>
-      series.map(({ label, color, data }) => {
+      series.map(({ key, label, data }) => {
         const text = formatMonthlyValuesValue({ variable, value: data[month]?.[variable], locale });
-        return { text, color, srText: `${label}${MONTHLY_VALUES.SR_SEPARATOR}${text}` };
+        return {
+          key,
+          text,
+          color: palette.text,
+          srText: `${label}${MONTHLY_VALUES.SR_SEPARATOR}${text}`,
+        };
       }),
     ),
   }));

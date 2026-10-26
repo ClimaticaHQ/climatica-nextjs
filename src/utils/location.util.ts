@@ -1,6 +1,11 @@
 import { COORDINATE_DECIMALS, WIKIDATA_ID_PATTERN } from "@/constants";
 import type { TCity } from "@/types";
 
+/** One coordinate as the map's point label shows it: "49.8397". */
+export function formatCoordinate(value: number) {
+  return value.toFixed(COORDINATE_DECIMALS);
+}
+
 /** "49.8397°N, 24.0297°E" — hemispheres as letters, never signs. */
 export function formatLatLng(lat: number, lng: number) {
   const latDir = lat >= 0 ? "N" : "S";

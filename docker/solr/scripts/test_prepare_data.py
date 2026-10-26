@@ -76,24 +76,24 @@ class TestBuildLabels:
 
 class TestShouldUpdateName:
     def test_first_entry_always_updates(self):
-        current = {"name": None, "alt_id": 0, "preferred": False}
+        current = {"name": None, "preferred": False}
         assert prepare_data.should_update_name(current, is_preferred=False) is True
         assert prepare_data.should_update_name(current, is_preferred=True) is True
 
     def test_preferred_upgrades_non_preferred_current(self):
-        current = {"name": "Existing", "alt_id": 1, "preferred": False}
+        current = {"name": "Existing", "preferred": False}
         assert prepare_data.should_update_name(current, is_preferred=True) is True
 
     def test_non_preferred_does_not_overwrite_preferred_current(self):
-        current = {"name": "Existing", "alt_id": 1, "preferred": True}
+        current = {"name": "Existing", "preferred": True}
         assert prepare_data.should_update_name(current, is_preferred=False) is False
 
     def test_non_preferred_does_not_overwrite_non_preferred_current(self):
-        current = {"name": "Existing", "alt_id": 1, "preferred": False}
+        current = {"name": "Existing", "preferred": False}
         assert prepare_data.should_update_name(current, is_preferred=False) is False
 
     def test_preferred_does_not_overwrite_already_preferred_current(self):
-        current = {"name": "Existing", "alt_id": 1, "preferred": True}
+        current = {"name": "Existing", "preferred": True}
         assert prepare_data.should_update_name(current, is_preferred=True) is False
 
 
@@ -120,3 +120,72 @@ class TestLoadLangOrder:
         path.write_text("{not valid json", encoding="utf-8")
         with pytest.raises(ValueError):
             prepare_data.load_lang_order(str(path))
+
+
+def alt_row(geonameid, lang, name, preferred="", short="", colloquial="", historic=""):
+    return "\t".join(["1", geonameid, lang, name, preferred, short, colloquial, historic, "", ""])
+
+
+class TestFlag:
+    def test_set_column(self):
+        assert prepare_data.flag(["a", "b", "1"], 2) is True
+
+    def test_empty_or_missing_column(self):
+        assert prepare_data.flag(["a", "b", ""], 2) is False
+        assert prepare_data.flag(["a"], 2) is False
+
+
+class TestLoadAlternateNames:
+    def load(self, tmp_path, monkeypatch, rows, city_ids=("1",)):
+        path = tmp_path / "alternateNamesV2.txt"
+        path.write_text("".join(row + "\n" for row in rows), encoding="utf-8")
+        monkeypatch.setattr(prepare_data, "ALTERNATE_NAMES", str(path))
+        return prepare_data.load_alternate_names(set(city_ids))
+
+    def test_short_name_column_is_not_preferred(self, tmp_path, monkeypatch):
+        labels, _ = self.load(tmp_path, monkeypatch, [
+            alt_row("1", "en", "First"),
+            alt_row("1", "en", "Short", short="1"),
+        ])
+        assert labels["1"]["en"] == "First"
+
+    def test_preferred_upgrades_label(self, tmp_path, monkeypatch):
+        labels, _ = self.load(tmp_path, monkeypatch, [
+            alt_row("1", "en", "First"),
+            alt_row("1", "en", "Preferred", preferred="1"),
+        ])
+        assert labels["1"]["en"] == "Preferred"
+
+    def test_colloquial_and_historic_never_label(self, tmp_path, monkeypatch):
+        labels, _ = self.load(tmp_path, monkeypatch, [
+            alt_row("1", "en", "Peter", preferred="1", colloquial="1"),
+            alt_row("1", "en", "Leningrad", preferred="1", historic="1"),
+            alt_row("1", "en", "Saint Petersburg"),
+        ])
+        assert labels["1"]["en"] == "Saint Petersburg"
+
+    def test_search_names_keep_historic_drop_colloquial(self, tmp_path, monkeypatch):
+        _, names = self.load(tmp_path, monkeypatch, [
+            alt_row("1", "en", "Saint Petersburg"),
+            alt_row("1", "en", "Leningrad", historic="1"),
+            alt_row("1", "en", "Peter", colloquial="1"),
+        ])
+        assert names["1"] == {"Saint Petersburg", "Leningrad"}
+
+    def test_only_target_languages_and_kept_cities(self, tmp_path, monkeypatch):
+        labels, names = self.load(tmp_path, monkeypatch, [
+            alt_row("1", "link", "https://example.org"),
+            alt_row("2", "en", "Not a city"),
+        ])
+        assert "2" not in names and "2" not in labels
+        assert "1" not in names
+
+
+class TestBuildSearchNames:
+    def test_deduplicates_and_includes_default_and_ascii(self):
+        value = prepare_data.build_search_names({"Kyiv", "Kiev", "Kyiv"}, "Kyiv", "Kyiv")
+        assert value.split(prepare_data.NAMES_SEPARATOR) == ["Kiev", "Kyiv"]
+
+    def test_skips_names_with_the_separator(self):
+        value = prepare_data.build_search_names({"A|B"}, "Default", "Ascii")
+        assert value.split(prepare_data.NAMES_SEPARATOR) == ["Ascii", "Default"]

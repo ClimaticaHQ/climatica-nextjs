@@ -1,14 +1,10 @@
 import { CHART_LEGEND } from "@/constants";
+import { getMarkerPath } from "@/utils/seriesShape.util";
 import type { TMarkerSwatchProps } from "../ChartLegend.type";
 
-/** A series marker — the WL overlay tells A (circle) from B (square) by shape too. */
+/** An entity's marker: its shape — the legend names entities by shape, never by colour. */
 export function MarkerSwatch({ color, shape, size }: TMarkerSwatchProps) {
-  const r = size.height * CHART_LEGEND.MARKER_RADIUS_RATIO;
-  const cx = size.width / 2;
-  const cy = size.height / 2;
-  return shape === "circle" ? (
-    <circle cx={cx} cy={cy} r={r} fill={color} />
-  ) : (
-    <rect x={cx - r} y={cy - r} width={r * 2} height={r * 2} fill={color} />
-  );
+  const markerSize = size.height * CHART_LEGEND.MARKER_RADIUS_RATIO * 2;
+  const d = getMarkerPath({ shape, cx: size.width / 2, cy: size.height / 2, size: markerSize });
+  return <path d={d} fill={color} />;
 }

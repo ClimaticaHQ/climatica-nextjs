@@ -18,6 +18,12 @@ async function applySidebarOption(page: Page, label: string | RegExp, value: str
   await page.getByRole("button", { name: "Apply filters" }).click();
 }
 
+/** Picks a period in Compare Periods' own selector (side "a" or "b") — it applies at once. */
+async function selectPagePeriod(page: Page, side: "a" | "b", value: string) {
+  await page.getByTestId(`period-${side}-select`).click();
+  await page.getByTestId(`period-${side}-option-${value}`).click();
+}
+
 test.describe("Data update feedback", () => {
   test("disables export while loading, then announces the update", async ({ page }) => {
     await page.goto(CITY_URL);
@@ -46,7 +52,7 @@ test.describe("Data update feedback", () => {
     const panelB = page.locator('[data-panel-series="b"]:not([inert] *)');
     await expect(panelB).toBeVisible({ timeout: 30_000 });
 
-    await applySidebarOption(page, "Period B", "c1981-2010");
+    await selectPagePeriod(page, "b", "c1981-2010");
 
     await expect(panelB).toHaveAttribute("data-update-flash", "active");
     await expect(panelA).not.toHaveAttribute("data-update-flash");
@@ -56,9 +62,10 @@ test.describe("Data update feedback", () => {
   });
 });
 
-/** Opens the sidebar's Settings section. */
+/** Opens the settings page — settings are saved as they change, then apply on every page. */
 async function openSettings(page: Page) {
-  await page.locator("aside").getByRole("button", { name: "Settings" }).click();
+  await page.goto("/settings");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Settings");
 }
 
 /** Records every card that starts an update flash from now on. */
@@ -84,14 +91,16 @@ test.describe("Animation settings", () => {
   test("animations off: the update still loads and announces, but nothing flashes", async ({
     page,
   }) => {
+    await openSettings(page);
+    await page.getByText("Animations", { exact: true }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
+    // * the highlight choice needs animations: still shown, but disabled, saying why
+    await expect(page.getByRole("button", { name: "Border", exact: true })).toBeDisabled();
+    await expect(page.getByText("Turn on animations to choose a highlight")).toBeVisible();
+
     await page.goto(CITY_URL);
     await expect(page.getByTestId("stat-cards")).toBeVisible({ timeout: 30_000 });
-
-    await openSettings(page);
-    await page.locator("aside").getByText("Animations", { exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
-    // * the highlight choice only shows while animations are on
-    await expect(page.getByRole("button", { name: "Border", exact: true })).toHaveCount(0);
 
     await recordFlashes(page);
     await page.route(DATA_ROUTE, async (route) => {
@@ -111,10 +120,6 @@ test.describe("Animation settings", () => {
   });
 
   test("Border highlight: the changed panel flashes with the border only", async ({ page }) => {
-    await page.goto(PERIODS_URL);
-    const panelB = page.locator('[data-panel-series="b"]:not([inert] *)');
-    await expect(panelB).toBeVisible({ timeout: 30_000 });
-
     await openSettings(page);
     await page.getByRole("button", { name: "Border", exact: true }).click();
     await expect(page.getByRole("button", { name: "Border", exact: true })).toHaveAttribute(
@@ -122,7 +127,11 @@ test.describe("Animation settings", () => {
       "true",
     );
 
-    await applySidebarOption(page, "Period B", "c1981-2010");
+    await page.goto(PERIODS_URL);
+    const panelB = page.locator('[data-panel-series="b"]:not([inert] *)');
+    await expect(panelB).toBeVisible({ timeout: 30_000 });
+
+    await selectPagePeriod(page, "b", "c1981-2010");
 
     await expect(panelB).toHaveAttribute("data-update-flash", "active");
     await expect(panelB).toHaveAttribute("data-update-flash-variant", "border");

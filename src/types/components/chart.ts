@@ -33,31 +33,9 @@ export type TPanelExpansion = {
   onExpandedChange: (expanded: TExpandedPanel) => void;
 };
 
-export type TShownChartModeArgs = {
-  chartMode: TChartMode;
-  dataset: TDataset;
-};
-
 export type TWalterLiethShownArgs = {
   pathname: string;
   searchParams: URLSearchParams;
-  dataset: TDataset;
-};
-
-export type TCompareMode = "cities" | "periods";
-
-/** Missing values are null — the chart draws a gap there, never a 0. */
-export type TComparePoint = {
-  month: number;
-  monthName: string;
-  tmaxA: number | null;
-  tminA: number | null;
-  tavgA: number | null;
-  precA: number | null;
-  tmaxB: number | null;
-  tminB: number | null;
-  tavgB: number | null;
-  precB: number | null;
 };
 
 export type TChartSummary = {
@@ -79,6 +57,8 @@ export type TPlotHeightArgs = {
 export type TPanelHeaderSlots = {
   /** top-right of the header, beside the name */
   actions?: ReactNode;
+  /** in place of the name — e.g. a picker choosing which year the panel shows */
+  name?: ReactNode;
 };
 
 /** Which axis a unit title (°C / mm) belongs to. */
@@ -89,4 +69,6 @@ export type TUnitTitlePlacementArgs = {
   chartWidth: number;
   /** one panel of a split pair — the compact margins */
   isCompact: boolean;
+  /** a phone: the narrow axes */
+  isNarrow?: boolean;
 };

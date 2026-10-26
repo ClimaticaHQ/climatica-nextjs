@@ -1,46 +1,36 @@
 "use client";
 
-import { MotionRoot, NavigationIntentTracker, Sidebar, Topbar } from "@/components";
+import { MotionRoot, NavigationIntentTracker, ThemeRoot, Topbar } from "@/components";
+import { FiltersSidebar } from "@/components/filters";
 import { SidebarSkeleton, TopbarSkeleton } from "@/components/UI";
-import { Suspense, useEffect, useState } from "react";
+import { useFilterView } from "@/hooks/filters/useFilterView";
+import { Suspense } from "react";
+import { UrlSync } from "./UrlSync";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  function closeSidebar() {
-    setIsSidebarOpen(false);
-  }
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) closeSidebar();
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  // * the filters column only where a page has filters (not on settings, nor a missing page)
+  const hasFilters = useFilterView() !== null;
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
+    <div className="flex h-dvh flex-col overflow-hidden">
+      <ThemeRoot />
       <MotionRoot />
       <NavigationIntentTracker />
+      <Suspense fallback={null}>
+        <UrlSync />
+      </Suspense>
       <Suspense fallback={<TopbarSkeleton />}>
-        <Topbar
-          isSidebarOpen={isSidebarOpen}
-          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-        />
+        <Topbar />
       </Suspense>
       <div className="relative flex flex-1 overflow-hidden">
-        {isSidebarOpen && (
-          <div
-            className="absolute inset-0 z-30 bg-black/30 lg:hidden"
-            onClick={closeSidebar}
-            aria-hidden="true"
-          />
+        {hasFilters && (
+          <Suspense fallback={<SidebarSkeleton />}>
+            <FiltersSidebar />
+          </Suspense>
         )}
-        <Suspense fallback={<SidebarSkeleton isOpen={isSidebarOpen} />}>
-          <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-        </Suspense>
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+          {children}
+        </main>
       </div>
     </div>
   );

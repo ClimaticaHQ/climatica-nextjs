@@ -9,7 +9,8 @@ import type {
   TLegendItem,
   TWalterLiethLegendPalette,
 } from "@/types";
-import { getHatchGeometry, getSwatchSize } from "@/utils";
+import { getHatchGeometry, getLegendSwatchWidth, getMarkerPath, getSwatchSize } from "@/utils";
+import { buildHatchPattern } from "./hatchExport.util";
 import { escapeXml } from "./buildExportSvg.util";
 import { measureExportText } from "./textWrap.util";
 import { buildWalterLiethPatterns } from "./walterLiethExport.util";
@@ -55,14 +56,24 @@ export function buildSwatch({ swatch, x, top, size, id }: TExportSwatchArgs): TE
         defs: "",
       };
     case ELegendSwatch.MARKER: {
-      const r = h * CHART_LEGEND.MARKER_RADIUS_RATIO;
-      const [cx, cy] = [x + w / 2, top + h / 2];
+      const size = h * CHART_LEGEND.MARKER_RADIUS_RATIO * 2;
+      const d = getMarkerPath({ shape: swatch.shape, cx: x + w / 2, cy: top + h / 2, size });
+      return { svg: `<path d="${d}" fill="${swatch.color}" />`, defs: "" };
+    }
+    case ELegendSwatch.ENTITY: {
+      // * the hatch square (its own pattern), then the shape square
+      const patternId = `${id}-hatch`;
+      const square = `x="${x}" y="${top}" width="${h}" height="${h}" rx="${R}"`;
+      const hatch = swatch.hatch === "solid" ? "" : `<rect ${square} fill="url(#${patternId})" />`;
+      const d = getMarkerPath({
+        shape: swatch.shape,
+        cx: x + h + CHART_LEGEND.ENTITY_GAP + h / 2,
+        cy: top + h / 2,
+        size: h * CHART_LEGEND.MARKER_RADIUS_RATIO * 2,
+      });
       return {
-        svg:
-          swatch.shape === "circle"
-            ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${swatch.color}" />`
-            : `<rect x="${cx - r}" y="${cy - r}" width="${r * 2}" height="${r * 2}" fill="${swatch.color}" />`,
-        defs: "",
+        svg: `<rect ${square} fill="${swatch.fill}" />${hatch}<path d="${d}" fill="${swatch.color}" />`,
+        defs: buildHatchPattern(patternId, swatch.hatch, swatch.hatchColor),
       };
     }
     case ELegendSwatch.HUMID:
@@ -74,18 +85,6 @@ export function buildSwatch({ swatch, x, top, size, id }: TExportSwatchArgs): TE
         svg: `<rect x="${x}" y="${top}" width="${w}" height="${h}" rx="${R}" fill="url(#${fill})" />`,
         defs: buildWalterLiethPatterns(ids, paint, getHatchGeometry(w), x),
       };
-    }
-    case ELegendSwatch.PAIR: {
-      const half = { width: (w - CHART_LEGEND.PAIR_GAP) / 2, height: h };
-      const a = buildSwatch({ swatch: swatch.a, x, top, size: half, id: `${id}-a` });
-      const b = buildSwatch({
-        swatch: swatch.b,
-        x: x + half.width + CHART_LEGEND.PAIR_GAP,
-        top,
-        size: half,
-        id: `${id}-b`,
-      });
-      return { svg: a.svg + b.svg, defs: a.defs + b.defs };
     }
   }
 }
@@ -105,41 +104,47 @@ export function buildExportLegend({
 }: TExportLegendArgs): TExportLegendResult {
   const fontSize = CHART_LEGEND.FONT_SIZE;
   const size = getSwatchSize(fontSize);
-  const textOffset = size.width + EXPORT_LEGEND.SWATCH_TEXT_GAP;
-  const itemWidth = (label: string) => textOffset + measureText(label, fontSize);
+  const swatchWidth = (item: TLegendItem) => getLegendSwatchWidth(item.swatch, size);
+  const textOffset = (item: TLegendItem) => swatchWidth(item) + EXPORT_LEGEND.SWATCH_TEXT_GAP;
+  const itemWidth = (item: TLegendItem) => textOffset(item) + measureText(item.label, fontSize);
 
-  // * first pass: split the items into rows that fit the width
   const rows = items.reduce<TLegendItem[][]>(
     (acc, item) => {
       const row = acc.at(-1);
       const rowWidth = row
-        ? row.reduce((sum, { label }) => sum + itemWidth(label) + EXPORT_LEGEND.ITEM_GAP, 0)
+        ? row.reduce((sum, known) => sum + itemWidth(known) + EXPORT_LEGEND.ITEM_GAP, 0)
         : 0;
-      if (row && (row.length === 0 || rowWidth + itemWidth(item.label) <= width)) row.push(item);
+      if (row && (row.length === 0 || rowWidth + itemWidth(item) <= width)) row.push(item);
       else acc.push([item]);
       return acc;
     },
     [[]],
   );
 
-  // * second pass: draw each row centered
   let defs = "";
   const svg = rows
     .map((row, rowIndex) => {
       const rowY = y + rowIndex * EXPORT_LEGEND.ROW_HEIGHT;
       const rowWidth =
-        row.reduce((sum, { label }) => sum + itemWidth(label), 0) +
+        row.reduce((sum, item) => sum + itemWidth(item), 0) +
         EXPORT_LEGEND.ITEM_GAP * (row.length - 1);
       let x = left + (width - rowWidth) / 2;
       return row
-        .map(({ key, label, swatch, isMuted }) => {
+        .map((item) => {
+          const { key, label, swatch, isMuted } = item;
           const top = rowY - size.height + EXPORT_LEGEND.SWATCH_BASELINE_DROP;
-          const drawn = buildSwatch({ swatch, x, top, size, id: `${idPrefix}-${rowIndex}-${key}` });
+          const drawn = buildSwatch({
+            swatch,
+            x,
+            top,
+            size: { ...size, width: swatchWidth(item) },
+            id: `${idPrefix}-${rowIndex}-${key}`,
+          });
           defs += drawn.defs;
           const opacity = isMuted ? ` opacity="${CHART_LEGEND.MUTED_OPACITY}"` : "";
-          const item = `<g${opacity}>${drawn.svg}<text x="${(x + textOffset).toFixed(2)}" y="${rowY}" font-size="${fontSize}" fill="${textColor}">${escapeXml(label)}</text></g>`;
-          x += itemWidth(label) + EXPORT_LEGEND.ITEM_GAP;
-          return item;
+          const markup = `<g${opacity}>${drawn.svg}<text x="${(x + textOffset(item)).toFixed(2)}" y="${rowY}" font-size="${fontSize}" fill="${textColor}">${escapeXml(label)}</text></g>`;
+          x += itemWidth(item) + EXPORT_LEGEND.ITEM_GAP;
+          return markup;
         })
         .join("");
     })

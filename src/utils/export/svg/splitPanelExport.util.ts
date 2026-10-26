@@ -14,12 +14,13 @@ import type {
   TExportChartColors,
   TExportPosition,
   TMonthlyValuesRow,
+  TPanelGridArgs,
   TPlotWithValuesArgs,
   TSplitPanelArgs,
   TWalterLiethExportPatternIds,
   TWalterLiethSeriesInput,
 } from "@/types";
-import { escapeXml, getPanelSubtitle } from "@/utils";
+import { escapeXml, getMarkerPath, getPairShape, getPanelSubtitle } from "@/utils";
 import { getSingleExportPlotBox } from "./exportPlotBox.util";
 import {
   buildMonthlyValuesSvg,
@@ -34,8 +35,9 @@ export const patternIdsOf = (prefix: string): TWalterLiethExportPatternIds => ({
   arid: `${prefix}-arid`,
 });
 
-export const seriesColor = (series: TWalterLiethSeriesInput, colors: TExportChartColors) =>
-  series.id === EWalterLiethSeriesId.A ? colors.wlSeriesA : colors.wlSeriesB;
+/** A series' shape: its own (a compared entity), or its pair side's. */
+export const seriesShape = (series: TWalterLiethSeriesInput) =>
+  series.shape ?? getPairShape(series.id);
 
 /** The series the split export draws, left to right: the expanded one alone, or both. */
 export function getExportPanels({ expanded, seriesA, seriesB }: TComparisonExport) {
@@ -43,18 +45,20 @@ export function getExportPanels({ expanded, seriesA, seriesB }: TComparisonExpor
   return [expanded === EWalterLiethSeriesId.A ? seriesA : seriesB];
 }
 
-/** A panel's header, as on the page: marker (A dot, B square) and name, then its subtitle. */
+/** A panel's header, as on the page: its shape in graphite and name, then its subtitle. */
 function buildPanelHeader(
   series: TWalterLiethSeriesInput,
   colors: TExportChartColors,
   { x, y }: TExportPosition,
 ) {
   const r = T.PANEL_DOT_RADIUS;
-  const color = seriesColor(series, colors);
-  const marker =
-    series.id === EWalterLiethSeriesId.A
-      ? `<circle cx="${x + r}" cy="${y + T.PANEL_DOT_Y}" r="${r}" fill="${color}" />`
-      : `<rect x="${x}" y="${y + T.PANEL_DOT_Y - r}" width="${r * 2}" height="${r * 2}" rx="1" fill="${color}" />`;
+  const d = getMarkerPath({
+    shape: seriesShape(series),
+    cx: x + r,
+    cy: y + T.PANEL_DOT_Y,
+    size: r * 2,
+  });
+  const marker = `<path d="${d}" fill="${colors.seriesMarker}" />`;
   return `${marker}
     <text x="${x + T.PANEL_NAME_X}" y="${y + T.PANEL_NAME_Y}" font-size="${T.PANEL_NAME_FONT_SIZE}" font-weight="${T.PANEL_NAME_FONT_WEIGHT}" fill="${colors.text}">${escapeXml(series.label)}</text>
     <text x="${x}" y="${y + T.PANEL_SUBTITLE_Y}" font-size="${T.PANEL_TEXT_FONT_SIZE}" fill="${colors.textSecondary}">${escapeXml(getPanelSubtitle(series))}</text>`;
@@ -163,4 +167,45 @@ export function buildComparisonPanels({
     )
     .join("");
   return { body, bottom: top + panelHeight };
+}
+
+/**
+ * Any number of panels, two to a row as on the page (Compare Periods' weather years); each
+ * row's cards as tall as its tallest, so the plots and strips line up across the row.
+ */
+export function buildPanelGrid({
+  series,
+  colors,
+  top,
+  renderPlot,
+  valuesRows,
+}: TPanelGridArgs): TCompareWalterLiethBody {
+  const panelWidth = (CONTENT_WIDTH - W.splitGap) / 2;
+  const rows = Array.from({ length: Math.ceil(series.length / 2) }, (_, i) =>
+    series.slice(i * 2, i * 2 + 2),
+  );
+  return rows.reduce<TCompareWalterLiethBody>(
+    ({ body, bottom }, row, i) => {
+      const rowTop = i === 0 ? top : bottom + W.splitGap;
+      const tallest = row.map(valuesRows).reduce((a, b) => (b.length > a.length ? b : a));
+      const panelHeight =
+        W.panelPadding * 2 + W.panelHeaderHeight + W.splitPlotHeight + getBelowPlotHeight(tallest);
+      const cards = row.map((panel, j) =>
+        buildSplitPanel({
+          series: panel,
+          context: {
+            colors,
+            left: CL.paddingX + (panelWidth + W.splitGap) * j,
+            top: rowTop,
+            panelWidth,
+            panelHeight,
+          },
+          renderPlot: renderPlot(panel),
+          valuesRows: valuesRows(panel),
+        }),
+      );
+      return { body: body + cards.join(""), bottom: rowTop + panelHeight };
+    },
+    { body: "", bottom: top },
+  );
 }

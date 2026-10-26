@@ -1,8 +1,14 @@
 import {
   DATA_UPDATE_ALL_SERIES,
+  MOTION,
+  UPDATE_FLASH_ACTIVE,
+  UPDATE_FLASH_ATTRIBUTE,
+  UPDATE_FLASH_TOKENS,
+  UPDATE_FLASH_VARIANT_ATTRIBUTE,
   UPDATE_FLASH_GLOW_BLUR_RATIO,
   UPDATE_FLASH_GLOW_PX,
 } from "@/constants";
+import type { EUpdateFlashVariant } from "@/enums";
 import type {
   TDataUpdateInput,
   TDataUpdateSeries,
@@ -76,4 +82,27 @@ export function getUpdateFlashKeyframe({
   const glowPx = UPDATE_FLASH_GLOW_PX[variant];
   const glowShadow = `0 0 ${glowPx * UPDATE_FLASH_GLOW_BLUR_RATIO}px ${glowPx}px ${glow}`;
   return { offset: 0, borderColor: border, ...(glowPx > 0 ? { boxShadow: glowShadow } : {}) };
+}
+
+/** The update flash on one element — a card, or an entity that just arrived (useArrivalFlash). */
+export function playUpdateFlash(element: HTMLElement, variant: EUpdateFlashVariant) {
+  const style = getComputedStyle(element);
+  const keyframe = getUpdateFlashKeyframe({
+    border: style.getPropertyValue(UPDATE_FLASH_TOKENS.BORDER).trim(),
+    glow: style.getPropertyValue(UPDATE_FLASH_TOKENS.GLOW).trim(),
+    variant,
+  });
+  element.dataset[UPDATE_FLASH_ATTRIBUTE] = UPDATE_FLASH_ACTIVE;
+  element.dataset[UPDATE_FLASH_VARIANT_ATTRIBUTE] = variant;
+  // * from the flash colors back to the card's own border, without a shadow
+  const animation = element.animate([keyframe], {
+    duration: MOTION.UPDATE_FLASH_MS,
+    easing: MOTION.UPDATE_FLASH_EASING,
+  });
+  const end = () => {
+    delete element.dataset[UPDATE_FLASH_ATTRIBUTE];
+    delete element.dataset[UPDATE_FLASH_VARIANT_ATTRIBUTE];
+  };
+  animation.onfinish = end;
+  animation.oncancel = end;
 }

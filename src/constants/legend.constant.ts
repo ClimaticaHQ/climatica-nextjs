@@ -8,10 +8,10 @@ export const CHART_LEGEND = {
   // * a bar is drawn narrower than the box, like a chart's precipitation bar
   BAR_WIDTH_RATIO: 0.6,
   LINE_WIDTH: 2,
-  // * WL overlay markers: radius as a share of the swatch height
+  // * an entity's marker: its half-size as a share of the swatch height
   MARKER_RADIUS_RATIO: 0.35,
-  // * a series A|B pair: the gap between the two halves, px
-  PAIR_GAP: 2,
+  // * an overlay entity's swatch: its hatch square, this gap (px), its shape square
+  ENTITY_GAP: 3,
   MUTED_OPACITY: 0.35,
   // * the gap between the plot area (or the split panels) and the legend — the same everywhere
   GAP_CLASS: "mt-4",
@@ -20,10 +20,10 @@ export const CHART_LEGEND = {
 } as const;
 
 /**
- * Line dash per variable (tmax is always solid). The single-city chart and its split panels
- * tell tmin from tmax by color; the multi-series charts (overlay, multi-period) also dash it.
+ * Line dash per variable: tmax solid, tavg dashed, tmin dotted — on every standard chart, since
+ * a pair draws all three of a side's lines in one colour.
  */
 export const CHART_LINE_DASH = {
-  STANDARD: { tavg: "5 3" },
-  SERIES: { tavg: "5 3", tmin: "4 2" },
+  STANDARD: { tavg: "5 3", tmin: "2 3" },
+  SERIES: { tavg: "5 3", tmin: "2 3" },
 } as const;

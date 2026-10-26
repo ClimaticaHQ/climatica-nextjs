@@ -1,5 +1,5 @@
 import { CHART_LEGEND, CHART_LINE_DASH, CHART_VARIABLE_ORDER } from "@/constants";
-import { ELegendSwatch, EWalterLiethSeriesId } from "@/enums";
+import { ELegendSwatch } from "@/enums";
 import type {
   TAridityPalette,
   TLegendFrostColors,
@@ -11,7 +11,7 @@ import type {
   TSeriesKey,
   TSeriesLegendItemsArgs,
   TStandardLegendItemsArgs,
-  TStandardSplitLegendItemsArgs,
+  TLegendSeries,
   TSwatchSize,
   TVisibleSeries,
   TWalterLiethLegendItemsArgs,
@@ -28,11 +28,6 @@ const line = (color: string, dash?: string): TLegendSwatch => ({
   dash,
 });
 const bar = (color: string): TLegendSwatch => ({ kind: ELegendSwatch.BAR, color });
-const pair = (a: TLegendSwatch, b: TLegendSwatch): TLegendSwatch => ({
-  kind: ELegendSwatch.PAIR,
-  a,
-  b,
-});
 
 /** Variable entries (tmax, tavg, tmin, prec) the chart shows — hidden ones drop out. */
 function variableItems(
@@ -46,16 +41,40 @@ function variableItems(
   });
 }
 
-function aridityItems(
-  labels: TAridityLegendLabels,
-  aridity: TAridityPalette | null,
-): TLegendItem[] {
-  if (!aridity) return [];
+/** A month's bar swatch when bars are coloured by aridity: its legend entry's (arid / humid). */
+export const getAridityBarSwatch = (palette: TAridityPalette, isArid: boolean) =>
+  bar(isArid ? palette.arid : palette.humid);
+
+// * the bars by aridity — humid first: they stand for precipitation, so it has no entry of its own
+function aridityItems(labels: TAridityLegendLabels, aridity: TAridityPalette): TLegendItem[] {
   return [
-    { key: "arid", label: labels.arid, swatch: bar(aridity.arid) },
     { key: "humid", label: labels.humid, swatch: bar(aridity.humid) },
+    { key: "arid", label: labels.arid, swatch: bar(aridity.arid) },
   ];
 }
+
+/** Entities by shape — and by hatch beside it where the chart draws their bars. */
+const markerItems = (
+  series: readonly TLegendSeries[],
+  markerColor: string,
+  bars?: { fill: string; hatchColor: string },
+) =>
+  series.map(({ key, label, shape, hatch, fill, isHidden }): TLegendItem => ({
+    key,
+    label,
+    swatch:
+      hatch && bars
+        ? {
+            kind: ELegendSwatch.ENTITY,
+            color: markerColor,
+            shape,
+            hatch,
+            ...bars,
+            ...(fill !== undefined ? { fill } : {}),
+          }
+        : { kind: ELegendSwatch.MARKER, color: markerColor, shape },
+    isMuted: isHidden === true,
+  }));
 
 /** The WL frost band's entry: a cell like the band's — frost-filled, outlined. */
 const frostItem = (
@@ -94,43 +113,23 @@ export function getWalterLiethLegendItems({
   ];
 }
 
-/** WL overlay: series by color and marker, variables by line style, regimes when shaded. */
+/**
+ * WL overlay: the entities by shape, the curves in the diagram's semantic colours, and the
+ * regimes and frost band of the hatched series when there is one.
+ */
 export function getWalterLiethOverlayLegendItems({
   labels,
   series,
-  shadeColor,
-  frost,
-  neutral,
+  palette,
+  isShaded,
+  markerColor,
 }: TWalterLiethOverlayLegendItemsArgs): TLegendItem[] {
-  const regimes: TLegendItem[] = shadeColor
-    ? [
-        {
-          key: "humid",
-          label: labels.humid,
-          swatch: { kind: ELegendSwatch.HUMID, color: shadeColor },
-        },
-        {
-          key: "arid",
-          label: labels.arid,
-          swatch: { kind: ELegendSwatch.ARID, color: shadeColor },
-        },
-        {
-          key: "perhumid",
-          label: labels.perhumid,
-          swatch: { kind: ELegendSwatch.PERHUMID, color: shadeColor },
-        },
-      ]
-    : [];
+  const [temp, prec, ...shaded] = getWalterLiethLegendItems({ labels, palette });
   return [
-    ...series.map(({ key, label, color, shape = "circle" }): TLegendItem => ({
-      key,
-      label,
-      swatch: { kind: ELegendSwatch.MARKER, color, shape },
-    })),
-    { key: "temp", label: labels.temp, swatch: line(neutral) },
-    { key: "prec", label: labels.prec, swatch: line(neutral, CHART_LINE_DASH.SERIES.tavg) },
-    ...regimes,
-    ...(frost !== null ? [frostItem(labels, frost)] : []),
+    ...markerItems(series, markerColor),
+    ...(temp ? [temp] : []),
+    ...(prec ? [{ ...prec, swatch: line(palette.prec, CHART_LINE_DASH.SERIES.tavg) }] : []),
+    ...(isShaded ? shaded : []),
   ];
 }
 
@@ -138,79 +137,55 @@ export function getWalterLiethOverlayLegendItems({
 export const getStandardVariableSwatches = (colors: TLegendSeriesColors) => ({
   tmax: line(colors.tmax),
   tavg: line(colors.tavg, CHART_LINE_DASH.STANDARD.tavg),
-  tmin: line(colors.tmin),
+  tmin: line(colors.tmin, CHART_LINE_DASH.STANDARD.tmin),
   prec: bar(colors.prec),
 });
 
-/** Standard single-city chart: its visible variables, then the arid / humid bar colors. */
+/**
+ * Standard chart, one entity or side by side (every panel in the same semantic colours): its
+ * visible lines, then the bars' humid / arid fills.
+ */
 export function getStandardLegendItems({
   labels,
   colors,
   visible,
   aridity,
 }: TStandardLegendItemsArgs): TLegendItem[] {
-  const shown = variableItems(labels, visible, getStandardVariableSwatches(colors));
+  const { tmax, tavg, tmin } = getStandardVariableSwatches(colors);
+  const shown = variableItems(labels, visible, { tmax, tavg, tmin });
   return [...shown, ...(visible.prec ? aridityItems(labels, aridity) : [])];
 }
 
 /**
- * Standard split: each visible variable once, with its A and B color side by side — or, with
- * one panel expanded, in that panel's colors only.
- */
-export function getStandardSplitLegendItems({
-  labels,
-  colorsA,
-  colorsB,
-  visible,
-  shown,
-}: TStandardSplitLegendItemsArgs): TLegendItem[] {
-  if (shown) {
-    return variableItems(
-      labels,
-      visible,
-      getStandardVariableSwatches(shown === EWalterLiethSeriesId.A ? colorsA : colorsB),
-    );
-  }
-  const { tavg } = CHART_LINE_DASH.STANDARD;
-  return variableItems(labels, visible, {
-    tmax: pair(line(colorsA.tmax), line(colorsB.tmax)),
-    tavg: pair(line(colorsA.tavg, tavg), line(colorsB.tavg, tavg)),
-    tmin: pair(line(colorsA.tmin), line(colorsB.tmin)),
-    prec: pair(bar(colorsA.prec), bar(colorsB.prec)),
-  });
-}
-
-/**
- * Multi-series standard charts (overlay compare, multi-period): each series by its dot, then
- * the variables by line style in a neutral color, then the arid / humid bar colors.
+ * Overlay: each entity by its bars' hatch and its points' shape, then the lines in their
+ * semantic colours and the overlay's dashes, then the bars' humid / arid fills.
  */
 export function getSeriesLegendItems({
   labels,
   series,
   visible,
-  neutral,
-  hasTavg,
+  colors,
   aridity,
+  markerColor,
+  hatchColor,
+  hasTavg,
 }: TSeriesLegendItemsArgs): TLegendItem[] {
   const { tavg, tmin } = CHART_LINE_DASH.SERIES;
-  const variables = variableItems(labels, visible, {
-    tmax: line(neutral),
-    ...(hasTavg ? { tavg: line(neutral, tavg) } : {}),
-    tmin: line(neutral, tmin),
-    prec: bar(neutral),
+  const lines = variableItems(labels, visible, {
+    tmax: line(colors.tmax),
+    ...(hasTavg ? { tavg: line(colors.tavg, tavg) } : {}),
+    tmin: line(colors.tmin, tmin),
   });
   return [
-    ...series.map(({ key, label, color, isHidden }): TLegendItem => ({
-      key,
-      label,
-      // * a dot, like the markers on the series' lines — the series' identity entry
-      swatch: { kind: ELegendSwatch.MARKER, color, shape: "circle" },
-      isMuted: isHidden === true,
-    })),
-    ...variables,
-    ...(visible.prec && aridity ? aridityItems(aridity.labels, aridity.palette) : []),
+    ...markerItems(series, markerColor, { fill: aridity.humid, hatchColor }),
+    ...lines,
+    ...(visible.prec ? aridityItems(labels, aridity) : []),
   ];
 }
+
+/** A swatch's own width: an entity's is two squares (hatch, shape) side by side. */
+export const getLegendSwatchWidth = (swatch: TLegendSwatch, size: TSwatchSize) =>
+  swatch.kind === ELegendSwatch.ENTITY ? size.height * 2 + CHART_LEGEND.ENTITY_GAP : size.width;
 
 /** The swatch box for a legend font size — swatches scale with the text (screen and export). */
 export const getSwatchSize = (fontSize: number): TSwatchSize => ({

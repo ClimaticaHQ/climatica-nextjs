@@ -1,9 +1,10 @@
-import { CHART_LEGEND, EXPORT_LEGEND } from "@/constants";
+import { CHART_LEGEND, CHART_LINE_DASH, EXPORT_LEGEND } from "@/constants";
 import { ELegendSwatch } from "@/enums";
 import de from "@/i18n/locales/de.json";
 import el from "@/i18n/locales/el.json";
 import {
-  getStandardSplitLegendItems,
+  getSeriesLegendItems,
+  getStandardLegendItems,
   getWalterLiethLegendItems,
   getWalterLiethOverlayLegendItems,
 } from "@/utils/chartLegend.util";
@@ -85,12 +86,12 @@ describe.each([
       getWalterLiethOverlayLegendItems({
         labels: legendLabels(chart),
         series: [
-          { key: "a", label: "Санкт-Петербург (Ленинградская область)", color: "#1d9e75" },
-          { key: "b", label: "Rio de Janeiro (Região Metropolitana)", color: "#d97706" },
+          { key: "a", label: "Санкт-Петербург (Ленинградская область)", shape: "circle" },
+          { key: "b", label: "Rio de Janeiro (Região Metropolitana)", shape: "square" },
         ],
-        shadeColor: "#1d9e75",
-        frost: { fill: "#4682b4", outline: "#6b7280" },
-        neutral: "#666",
+        palette: PALETTE,
+        isShaded: true,
+        markerColor: "#555",
       }),
     );
 
@@ -103,15 +104,51 @@ describe("shared legend items", () => {
   const labels = legendLabels(de.chart);
   const visible = { tmax: true, tmin: true, tavg: false, prec: true };
 
-  it("list only the visible variables, in chart order", () => {
-    const items = getStandardSplitLegendItems({
+  it("list only the visible lines in chart order, then the bars as humid and arid", () => {
+    const items = getStandardLegendItems({
       labels,
-      colorsA: { tmax: "a1", tmin: "a2", tavg: "a3", prec: "a4" },
-      colorsB: { tmax: "b1", tmin: "b2", tavg: "b3", prec: "b4" },
+      colors: { tmax: "red", tmin: "blue", tavg: "orange", prec: "humid" },
       visible,
+      aridity: { humid: "humid", arid: "amber" },
     });
-    expect(items.map(({ key }) => key)).toEqual(["tmax", "tmin", "prec"]);
-    expect(items.every(({ swatch }) => swatch.kind === ELegendSwatch.PAIR)).toBe(true);
+    // * the humid fill stands for precipitation: no separate precipitation entry
+    expect(items.map(({ key }) => key)).toEqual(["tmax", "tmin", "humid", "arid"]);
+    expect(items.map(({ label }) => label)).toEqual([
+      labels.tmax,
+      labels.tmin,
+      labels.humid,
+      labels.arid,
+    ]);
+  });
+
+  it("overlay: each entity by its hatch and shape, the lines in their semantic colours", () => {
+    const items = getSeriesLegendItems({
+      labels,
+      series: [
+        { key: "a", label: "Paris", shape: "circle", hatch: "solid" },
+        { key: "b", label: "Oslo", shape: "square", hatch: "diagonal" },
+      ],
+      visible,
+      colors: { tmax: "red", tmin: "blue", tavg: "orange", prec: "humid" },
+      aridity: { humid: "humid", arid: "amber" },
+      markerColor: "graphite",
+      hatchColor: "card",
+      hasTavg: true,
+    });
+    const entity = {
+      kind: ELegendSwatch.ENTITY,
+      color: "graphite",
+      fill: "humid",
+      hatchColor: "card",
+    };
+    expect(items.map(({ swatch }) => swatch)).toEqual([
+      { ...entity, shape: "circle", hatch: "solid" },
+      { ...entity, shape: "square", hatch: "diagonal" },
+      { kind: ELegendSwatch.LINE, color: "red", dash: undefined },
+      { kind: ELegendSwatch.LINE, color: "blue", dash: CHART_LINE_DASH.SERIES.tmin },
+      { kind: ELegendSwatch.BAR, color: "humid" },
+      { kind: ELegendSwatch.BAR, color: "amber" },
+    ]);
   });
 
   it("draw hatch swatches with their own pattern defs in the export", () => {

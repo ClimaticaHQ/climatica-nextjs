@@ -9,6 +9,7 @@ vi.mock("@/libs/redis", async (importOriginal) => importOriginal());
 vi.mock("@/libs/Env", () => ({ env: { WORLDCLIM_API_KEY: "test-key" } }));
 
 import { GET } from "@/app/api/worldclim/resource/route";
+import { API_ERRORS } from "@/constants";
 import { REDIS_STRATEGIES } from "@/libs/redis";
 import { RedisClient } from "@/libs/redis/client";
 import { NextRequest } from "next/server";
@@ -17,8 +18,10 @@ function makeRequest(searchParams: string): NextRequest {
   return new NextRequest(`http://localhost:3000/api/worldclim/resource?${searchParams}`);
 }
 
-function stubFetch(body: unknown): ReturnType<typeof vi.fn> {
+function stubFetch(body: unknown, status = 200): ReturnType<typeof vi.fn> {
   const mock = vi.fn().mockResolvedValue({
+    ok: status >= 200 && status < 300,
+    status,
     json: () => Promise.resolve(body),
   });
   vi.stubGlobal("fetch", mock);
@@ -89,7 +92,7 @@ describe("GET /api/worldclim/resource — cache miss", () => {
     expect(RedisClient.set).toHaveBeenCalledWith(
       expect.any(String),
       expect.anything(),
-      REDIS_STRATEGIES.climateData.ttl,
+      REDIS_STRATEGIES.worldclimResource.ttl,
     );
   });
 });
@@ -98,7 +101,7 @@ describe("GET /api/worldclim/resource — popular resource", () => {
   it("uses popularTtl when counter reaches popularThreshold", async () => {
     vi.mocked(RedisClient.get).mockResolvedValue(null);
     vi.mocked(RedisClient.incrementCounter).mockResolvedValue(
-      REDIS_STRATEGIES.climateData.popularThreshold,
+      REDIS_STRATEGIES.worldclimResource.popularThreshold,
     );
     stubFetch({ result: "popular-data" });
 
@@ -106,7 +109,47 @@ describe("GET /api/worldclim/resource — popular resource", () => {
     expect(RedisClient.set).toHaveBeenCalledWith(
       expect.any(String),
       expect.anything(),
-      REDIS_STRATEGIES.climateData.popularTtl,
+      REDIS_STRATEGIES.worldclimResource.popularTtl,
     );
+  });
+});
+
+describe("GET /api/worldclim/resource — upstream failure", () => {
+  beforeEach(() => vi.mocked(RedisClient.get).mockResolvedValue(null));
+
+  it.each([400, 401, 404, 500, 503])(
+    "answers 502 and caches nothing when WorldClim responds %i",
+    async (status) => {
+      stubFetch({ error: "upstream says no" }, status);
+
+      const res = await GET(makeRequest("id=Cell"));
+      expect(res.status).toBe(API_ERRORS.WORLDCLIM_UNAVAILABLE.status);
+      expect(await res.json()).toEqual({ error: API_ERRORS.WORLDCLIM_UNAVAILABLE.message });
+      expect(RedisClient.set).not.toHaveBeenCalled();
+      expect(RedisClient.incrementCounter).not.toHaveBeenCalled();
+    },
+  );
+
+  it("answers 502 and caches nothing when the request itself fails", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("fetch failed")));
+
+    const res = await GET(makeRequest("id=Cell"));
+    expect(res.status).toBe(API_ERRORS.WORLDCLIM_UNAVAILABLE.status);
+    expect(RedisClient.set).not.toHaveBeenCalled();
+  });
+
+  it("answers 502 and caches nothing when the body is not JSON", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () => Promise.reject(new SyntaxError("Unexpected token <")),
+      }),
+    );
+
+    const res = await GET(makeRequest("id=Cell"));
+    expect(res.status).toBe(API_ERRORS.WORLDCLIM_UNAVAILABLE.status);
+    expect(RedisClient.set).not.toHaveBeenCalled();
   });
 });

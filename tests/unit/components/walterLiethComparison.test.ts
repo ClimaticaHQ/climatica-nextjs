@@ -1,5 +1,6 @@
-import { toOverlayLayer } from "@/components/WalterLiethComparison/WalterLiethComparison.util";
-import { WALTER_LIETH_COLORS, WALTER_LIETH_DASH } from "@/constants";
+import { toOverlayLayer } from "@/components/charts/charts.util";
+import { WALTER_LIETH_CONVENTION_COLORS, WALTER_LIETH_DASH } from "@/constants";
+import { getPairShape } from "@/utils/seriesShape.util";
 import { EWalterLiethSeriesId, EWalterLiethShading } from "@/enums";
 import type { TWalterLiethSeries } from "@/types";
 import {
@@ -20,24 +21,23 @@ const series = (id: EWalterLiethSeriesId): TWalterLiethSeries => ({
 const layerOf = (id: EWalterLiethSeriesId, isShaded: boolean) =>
   toOverlayLayer({
     key: id,
-    series: series(id),
     rows: buildWalterLiethRows(months),
     segments: getAridHumidSegments({ months }),
     patternIds: { humid: `${id}-h`, arid: `${id}-a` },
     isShaded,
+    shape: getPairShape(id),
   });
 
 describe("toOverlayLayer", () => {
-  it("paints everything in the series color and dashes precipitation", () => {
+  it("paints in the diagram's semantic colours, never the series', and dashes precipitation", () => {
     const layer = layerOf(EWalterLiethSeriesId.B, true);
-    const color = WALTER_LIETH_COLORS.SERIES[EWalterLiethSeriesId.B];
-
     expect(layer.colors).toMatchObject({
-      temp: color,
-      prec: color,
-      humidHatch: color,
-      aridHatch: color,
+      temp: WALTER_LIETH_CONVENTION_COLORS.temp,
+      prec: WALTER_LIETH_CONVENTION_COLORS.prec,
+      humidHatch: WALTER_LIETH_CONVENTION_COLORS.humidHatch,
+      aridHatch: WALTER_LIETH_CONVENTION_COLORS.aridHatch,
     });
+    expect(layerOf(EWalterLiethSeriesId.A, true).colors).toEqual(layer.colors);
     expect(layer.precDash).toBe(WALTER_LIETH_DASH.OVERLAY_PREC);
   });
 
@@ -48,7 +48,7 @@ describe("toOverlayLayer", () => {
     expect(layerOf(EWalterLiethSeriesId.A, false).segments).toEqual([]);
   });
 
-  it("gives the two series different dot shapes, so they never rely on color alone", () => {
+  it("tells the two series apart by their dots' shape alone", () => {
     expect(layerOf(EWalterLiethSeriesId.A, false).dotShape).not.toBe(
       layerOf(EWalterLiethSeriesId.B, false).dotShape,
     );

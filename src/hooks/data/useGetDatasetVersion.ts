@@ -7,7 +7,7 @@ import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 // Creator/version are dataset-wide constants (verified identical across every
 // grid/year/period), not tied to what the user currently has selected -- so any
 // working grid/variable/year fetches the same values. 2024 matches WEATHER_RASTERS'
-// latest ingested year (filtersStore's default weatherYear); 10m supports both the
+// latest ingested year (FILTER_DEFAULTS' weatherYear); 10m supports both the
 // WorldClim climate baseline and CRU-TS weather rasters.
 const REPRESENTATIVE_GRID: TCellSize = "10m";
 const REPRESENTATIVE_VARIABLE = WEATHER_VARIABLES[0];

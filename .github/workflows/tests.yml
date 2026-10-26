@@ -17,8 +17,6 @@ jobs:
 
       - name: Setup project
         uses: ./.github/actions/setup-project
-        with:
-          node-version: 20
 
       - name: Run tests with coverage
         run: npm run test:coverage
@@ -58,8 +56,6 @@ jobs:
 
       - name: Setup project
         uses: ./.github/actions/setup-project
-        with:
-          node-version: 20
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -75,6 +71,10 @@ jobs:
             echo "Attempt $i/30..."
             sleep 3
           done
+
+      # * the project's solrconfig.xml loads ICU, which the schema's name fields need
+      - name: Use the project's Solr config
+        run: docker cp docker/solr/solrconfig.xml ${{ job.services.solr.id }}:/opt/solr/server/solr/configsets/_default/conf/solrconfig.xml
 
       - name: Create Solr core
         run: |
@@ -109,6 +109,6 @@ jobs:
 
       - name: Import cities to Solr
         run: |
-          curl "http://localhost:8983/solr/cities/update?commit=true" \
+          curl "http://localhost:8983/solr/cities/update?commit=true&f.names.split=true&f.names.separator=%7C" \
             -X POST -H 'Content-type:application/csv' \
             --data-binary @docker/solr/data/cities.csv

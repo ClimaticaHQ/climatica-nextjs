@@ -1,18 +1,10 @@
-/** A card with a soft outer glow — the "Glow" update highlight. Sized to the segmented icons. */
+/** A card in a soft halo — the "Glow" update highlight. Sized to the segmented icons. */
 export function FlashGlowIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <rect
-        x="0.75"
-        y="0.75"
-        width="12.5"
-        height="12.5"
-        rx="3"
-        stroke="currentColor"
-        strokeWidth="1"
-        strokeOpacity="0.4"
-      />
-      <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
+      <rect width="14" height="14" rx="4.5" fill="currentColor" fillOpacity="0.15" />
+      <rect x="1.5" y="1.5" width="11" height="11" rx="3.5" fill="currentColor" fillOpacity="0.2" />
+      <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
     </svg>
   );
 }

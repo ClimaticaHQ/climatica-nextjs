@@ -1,2 +1,1 @@
-export { climatePeriodSchema, sidebarFiltersSchema, weatherYearSchema } from "./filters.validator";
-export type { TSidebarFiltersSchema } from "./filters.validator";
+export { weatherYearSchema } from "./filters.validator";

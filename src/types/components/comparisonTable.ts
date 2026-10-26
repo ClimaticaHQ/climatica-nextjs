@@ -13,10 +13,13 @@ export type TComparisonMetric =
   | "altitude"
   | "martonne";
 
+/** The units the comparison table's values carry — translated by the caller. */
+export type TComparisonUnit = "celsius" | "mm" | "meters";
+
 /** How a row's numbers read: unit (none for counts and Martonne) and decimals. */
 export type TComparisonMetricFormat = {
   metric: TComparisonMetric;
-  unit: string;
+  unit: TComparisonUnit | null;
   digits: number;
 };
 
@@ -50,6 +53,8 @@ export type TComparisonTable = {
   minuend: string;
   subtrahend: string;
   rows: TComparisonTableRow[];
+  /** both series are this one weather year — the Martonne row names it */
+  martonneYear?: number;
 };
 
 export type TBuildComparisonTableArgs = {
@@ -59,6 +64,10 @@ export type TBuildComparisonTableArgs = {
   minuend: EWalterLiethSeriesId;
   /** the UI's locale — the values' decimal separator */
   locale: string;
+  /** both series are this one weather year (Compare Cities with Weather) */
+  martonneYear?: number | undefined;
+  /** each unit as the locale writes it */
+  units: Record<TComparisonUnit, string>;
 };
 
 /** The table's translated texts, as the export carries them (the page uses its hooks). */
@@ -67,4 +76,39 @@ export type TComparisonTableLabels = {
   difference: string;
   /** each series' translated Martonne class (its badge); null when unknown */
   martonneClasses: { a: string | null; b: string | null };
+};
+
+export type TFormatComparisonValueOptions = {
+  locale: string;
+  /** the row's unit as the locale writes it; null: none */
+  unit: string | null;
+};
+
+/** One series of the stats table. */
+export type TStatsTableSeries = Pick<TComparisonTableSeries, "label" | "data" | "altitude"> & {
+  id: string;
+  /** its data is still loading: its cells wait */
+  isLoading: boolean;
+};
+
+export type TBuildStatsTableArgs = {
+  series: readonly TStatsTableSeries[];
+  /** a pair's difference starts from this series; null: no difference */
+  minuendId: string | null;
+  locale: string;
+  units: Record<TComparisonUnit, string>;
+};
+
+export type TStatsTableRow = {
+  metric: TComparisonMetric;
+  /** per series, in column order; null while that series loads */
+  values: (TComparisonTableValue | null)[];
+  difference: string | null;
+};
+
+export type TStatsTable = {
+  columns: { id: string; label: string; isLoading: boolean }[];
+  /** the pair's labels the difference reads minuend − subtrahend by; null without one */
+  difference: { minuend: string; subtrahend: string } | null;
+  rows: TStatsTableRow[];
 };

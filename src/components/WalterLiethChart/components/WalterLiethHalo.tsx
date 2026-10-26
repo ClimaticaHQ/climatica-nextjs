@@ -10,7 +10,7 @@ export function WalterLiethHalo({ d, width }: TWalterLiethHaloProps) {
     <path
       d={d}
       fill="none"
-      stroke="var(--color-plot-bg)"
+      stroke="var(--color-surface)"
       strokeWidth={width + WALTER_LIETH_STROKE.HALO_EXTRA_WIDTH}
       strokeLinejoin="round"
     />

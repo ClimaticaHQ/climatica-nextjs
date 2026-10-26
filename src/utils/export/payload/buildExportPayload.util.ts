@@ -1,4 +1,4 @@
-import { DEFAULT_VISIBLE_SERIES } from "@/components/TempPrecipChart/TempPrecipChart.constant";
+import { DEFAULT_VISIBLE_SERIES } from "@/constants";
 import type { TBuildExportPayloadParams, TExportPayload } from "@/types";
 
 export function buildExportPayload(params: TBuildExportPayloadParams): TExportPayload | null {

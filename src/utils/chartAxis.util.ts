@@ -7,9 +7,10 @@ import {
   WALTER_LIETH_MONTH_FORMAT,
 } from "@/constants";
 import type {
+  TAxisTicksArgs,
   TMonthLabelFormat,
-  TMonthlyValuesColumnsArgs,
   TPlotHeightArgs,
+  TStandardYAxesArgs,
   TUnitTitlePlacementArgs,
 } from "@/types";
 import { getFrostBandHeight } from "./walterLieth.util";
@@ -36,14 +37,28 @@ export function getPlotHeightClass({ isCompact }: TPlotHeightArgs) {
   return isCompact ? CHART_PLOT.HEIGHT.COMPACT : CHART_PLOT.HEIGHT.FULL;
 }
 
-/** Tick text and y-axis geometry: compact diagrams get narrower margins and smaller text. */
-export function getAxisStyle(isCompact: boolean) {
+const AXIS_SIZES = {
+  compact: {
+    width: WALTER_LIETH_AXIS.COMPACT_WIDTH,
+    font: WALTER_LIETH_AXIS.COMPACT_TICK_FONT_SIZE,
+  },
+  narrow: { width: WALTER_LIETH_AXIS.NARROW_WIDTH, font: WALTER_LIETH_AXIS.NARROW_TICK_FONT_SIZE },
+  full: { width: WALTER_LIETH_AXIS.WIDTH, font: WALTER_LIETH_AXIS.TICK_FONT_SIZE },
+} as const;
+
+const axisSize = (isCompact: boolean, isNarrow: boolean) =>
+  AXIS_SIZES[isCompact ? "compact" : isNarrow ? "narrow" : "full"];
+
+/**
+ * Tick text and y-axis geometry: compact diagrams (a split panel) get narrower margins and
+ * smaller text; a phone's full-width chart narrower margins (isNarrow).
+ */
+export function getAxisStyle(isCompact: boolean, isNarrow = false) {
+  const size = axisSize(isCompact, isNarrow);
   return {
-    width: isCompact ? WALTER_LIETH_AXIS.COMPACT_WIDTH : WALTER_LIETH_AXIS.WIDTH,
+    width: size.width,
     tick: {
-      fontSize: isCompact
-        ? WALTER_LIETH_AXIS.COMPACT_TICK_FONT_SIZE
-        : WALTER_LIETH_AXIS.TICK_FONT_SIZE,
+      fontSize: size.font,
       fill: "var(--color-text-secondary)",
     },
     tickLine: false,
@@ -53,16 +68,23 @@ export function getAxisStyle(isCompact: boolean) {
 }
 
 /** Unit title (°C / mm) font size: a step above the axis' tick text. */
-export function getUnitTitleFontSize(isCompact: boolean) {
-  return getAxisStyle(isCompact).tick.fontSize + WALTER_LIETH_AXIS.UNIT_LABEL_SIZE_INCREMENT;
+export function getUnitTitleFontSize(isCompact: boolean, isNarrow = false) {
+  return (
+    getAxisStyle(isCompact, isNarrow).tick.fontSize + WALTER_LIETH_AXIS.UNIT_LABEL_SIZE_INCREMENT
+  );
 }
 
 /**
  * A unit title's anchor, from the plot geometry: °C starts at the left axis (the plot's left
  * edge), mm ends at the right one — both over the plot box, never past the chart's edges.
  */
-export function getUnitTitlePlacement({ side, chartWidth, isCompact }: TUnitTitlePlacementArgs) {
-  const margin = getPlotMargin(isCompact);
+export function getUnitTitlePlacement({
+  side,
+  chartWidth,
+  isCompact,
+  isNarrow = false,
+}: TUnitTitlePlacementArgs) {
+  const margin = getPlotMargin(isCompact, isNarrow);
   const placements = {
     left: { x: margin, textAnchor: "start" },
     right: { x: chartWidth - margin, textAnchor: "end" },
@@ -82,30 +104,69 @@ export function resolveActiveTooltipIndex(
   return null;
 }
 
-/** Short month labels while the chart is wide enough for them, one letter otherwise. */
-export function getMonthLabelFormat(chartWidth: number | null): TMonthLabelFormat {
+/**
+ * Short month labels while the chart is wide enough for them, one letter otherwise — always one
+ * letter on a phone (isNarrow), where the full names live in the tooltip.
+ */
+export function getMonthLabelFormat(
+  chartWidth: number | null,
+  isNarrow = false,
+): TMonthLabelFormat {
   const isWide =
-    chartWidth === null ||
-    chartWidth / WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR >= CHART_MONTH_LABEL_MIN_WIDE_SLOT_PX;
+    !isNarrow &&
+    (chartWidth === null ||
+      chartWidth / WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR >= CHART_MONTH_LABEL_MIN_WIDE_SLOT_PX);
   return isWide ? WALTER_LIETH_MONTH_FORMAT.WIDE : WALTER_LIETH_MONTH_FORMAT.NARROW;
 }
 
 /** A plot's side margin: its y axis' width (no chart margin beside it) — the same both sides. */
-export function getPlotMargin(isCompact: boolean) {
-  return getAxisStyle(isCompact).width + CHART_PLOT.MARGIN.left;
+export function getPlotMargin(isCompact: boolean, isNarrow = false) {
+  return getAxisStyle(isCompact, isNarrow).width + CHART_PLOT.MARGIN.left;
+}
+
+// * a tick step's mantissas, smallest first (× a power of ten): fine enough that four ticks hug
+// * the values (0–35 °C: 0, 12, 24, 36), never a step with decimals at the usual magnitudes
+const NICE_STEPS = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10] as const;
+
+/**
+ * `count` evenly spaced ticks on round numbers whose span covers [min, max] — the domain is the
+ * first and last tick, so no value ever falls outside the axis.
+ */
+export function getAxisTicks({ min, max, count }: TAxisTicksArgs): number[] {
+  const steps = Math.max(count - 1, 1);
+  const span = Math.max(max - min, Number.EPSILON);
+  const magnitude = 10 ** Math.floor(Math.log10(span / steps));
+  for (const scale of [magnitude, magnitude * 10]) {
+    for (const mantissa of NICE_STEPS) {
+      const step = mantissa * scale;
+      // * the ticks are written as whole numbers: no fractional step (unless the span is tiny)
+      if (!Number.isInteger(step) && scale >= 1) continue;
+      const low = Math.floor(min / step) * step;
+      if (low + step * steps >= max) {
+        return Array.from({ length: count }, (_, i) => low + step * i);
+      }
+    }
+  }
+  return [min, max];
 }
 
 /**
- * The monthly values table's columns under a plot of this width: the label column is the
- * plot's left margin, a spacer its right one, the months share the rest — so each column's
- * centre is exactly that month's position in the plot above.
+ * The standard chart's y axes: °C over the scales, mm from 0 — on a phone exactly
+ * NARROW_TICK_COUNT round ticks each, the domain their span; otherwise Recharts' own ticks.
  */
-export function getMonthlyValuesColumns({ tableWidth, isCompact }: TMonthlyValuesColumnsArgs) {
-  const margin = getPlotMargin(isCompact);
-  const monthWidth = (tableWidth - margin * 2) / WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR;
-  const centers = Array.from(
-    { length: WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR },
-    (_, i) => margin + monthWidth * (i + WALTER_LIETH_DIAGRAM.MONTH_EDGE_PADDING),
-  );
-  return { margin, monthWidth, centers };
+export function getStandardYAxes({ scales, rightMax, isNarrow }: TStandardYAxesArgs) {
+  const temp = scales ? ([scales.tempMin, scales.tempMax] as const) : null;
+  const ticks = (min: number, max: number) =>
+    getAxisTicks({ min, max, count: WALTER_LIETH_AXIS.NARROW_TICK_COUNT });
+  const tempTicks = isNarrow && temp ? ticks(...temp) : null;
+  const precTicks = isNarrow ? ticks(0, rightMax) : null;
+  const edges = (values: readonly number[]) => [values[0] ?? 0, values.at(-1) ?? 0] as const;
+  return {
+    temp: tempTicks
+      ? { domain: edges(tempTicks), ticks: tempTicks }
+      : { domain: temp ?? (["auto", "auto"] as const) },
+    prec: precTicks
+      ? { domain: edges(precTicks), ticks: precTicks }
+      : { domain: [0, rightMax] as const },
+  };
 }

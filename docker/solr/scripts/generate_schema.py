@@ -6,10 +6,13 @@ the locale list changes. Run this script after editing locales.json:
 
     python3 docker/solr/scripts/generate_schema.py
 
-Every locale gets identical treatment: a label_<lang> field (suggestType) and
-a label_<lang>_ngram field (trigramType), plus a copy-field wiring the first
-into the second -- the same pattern prepare_data.py's LANG_ORDER already
-mirrors for the CSV columns
+Every locale gets a label_<lang> field (nameText): the city's display name in
+that language, the same columns prepare_data.py's LANG_ORDER writes. Search runs
+mainly on `names`, every name of the city in every locale (multi-valued, not
+stored), and on its edge n-grams in `names_prefix` for typing a name's start.
+
+Both field types need ICU (ICUFoldingFilter), loaded from Solr's analysis-extras
+contrib by the <lib> entries in solrconfig.xml.
 """
 import json
 import os
@@ -17,6 +20,11 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOCALES_JSON = os.path.join(BASE_DIR, "../../../src/configs/locales.json")
 SCHEMA_JSON = os.path.join(BASE_DIR, "../schema.json")
+
+# * ' ’ ʼ ` ´ — the apostrophes place names are written with
+APOSTROPHES = "['’ʼ`´]"
+PREFIX_MIN_GRAM = "2"
+PREFIX_MAX_GRAM = "25"
 
 
 def load_locales():
@@ -30,49 +38,42 @@ def load_locales():
 
 
 def build_schema(locales):
+    # * apostrophe variants are removed before tokenising, so "Kam'yanets", "Kam’yanets" and
+    # * "Kamyanets" index alike; ICU folding lowercases and strips diacritics in every script
+    name_chain = [
+        {"class": "solr.PatternReplaceCharFilterFactory", "pattern": APOSTROPHES, "replacement": ""},
+    ]
+    name_filters = [{"class": "solr.ICUFoldingFilterFactory"}]
+    tokenizer = {"class": "solr.StandardTokenizerFactory"}
+
+    def analyzer(filters):
+        return {"charFilters": name_chain, "tokenizer": tokenizer, "filters": filters}
+
     add_field_type = [
         {
-            "name": "suggestType",
+            "name": "nameText",
             "class": "solr.TextField",
             "positionIncrementGap": "100",
-            "indexAnalyzer": {
-                "tokenizer": {"class": "solr.StandardTokenizerFactory"},
-                "filters": [
-                    {"class": "solr.LowerCaseFilterFactory"},
-                    {"class": "solr.ASCIIFoldingFilterFactory"},
-                ],
-            },
-            "queryAnalyzer": {
-                "tokenizer": {"class": "solr.StandardTokenizerFactory"},
-                "filters": [
-                    {"class": "solr.LowerCaseFilterFactory"},
-                    {"class": "solr.ASCIIFoldingFilterFactory"},
-                ],
-            },
+            "indexAnalyzer": analyzer(name_filters),
+            "queryAnalyzer": analyzer(name_filters),
         },
         {
-            "name": "trigramType",
+            # * a word's beginnings at index time only, so "kyi" finds "Kyiv" while the query
+            # * itself stays whole
+            "name": "namePrefix",
             "class": "solr.TextField",
             "positionIncrementGap": "100",
-            "indexAnalyzer": {
-                "tokenizer": {"class": "solr.StandardTokenizerFactory"},
-                "filters": [
-                    {"class": "solr.LowerCaseFilterFactory"},
-                    {"class": "solr.ASCIIFoldingFilterFactory"},
+            "indexAnalyzer": analyzer(
+                name_filters
+                + [
                     {
-                        "class": "solr.NGramFilterFactory",
-                        "minGramSize": "3",
-                        "maxGramSize": "10",
-                    },
-                ],
-            },
-            "queryAnalyzer": {
-                "tokenizer": {"class": "solr.StandardTokenizerFactory"},
-                "filters": [
-                    {"class": "solr.LowerCaseFilterFactory"},
-                    {"class": "solr.ASCIIFoldingFilterFactory"},
-                ],
-            },
+                        "class": "solr.EdgeNGramFilterFactory",
+                        "minGramSize": PREFIX_MIN_GRAM,
+                        "maxGramSize": PREFIX_MAX_GRAM,
+                    }
+                ]
+            ),
+            "queryAnalyzer": analyzer(name_filters),
         },
     ]
 
@@ -90,23 +91,29 @@ def build_schema(locales):
         add_field.append(
             {
                 "name": f"label_{lang}",
-                "type": "suggestType",
+                "type": "nameText",
                 "multiValued": False,
                 "indexed": True,
                 "stored": True,
             }
         )
 
-    for lang in locales:
-        add_field.append(
-            {
-                "name": f"label_{lang}_ngram",
-                "type": "trigramType",
-                "multiValued": False,
-                "indexed": True,
-                "stored": False,
-            }
-        )
+    add_field += [
+        {
+            "name": "names",
+            "type": "nameText",
+            "multiValued": True,
+            "indexed": True,
+            "stored": False,
+        },
+        {
+            "name": "names_prefix",
+            "type": "namePrefix",
+            "multiValued": True,
+            "indexed": True,
+            "stored": False,
+        },
+    ]
 
     add_field += [
         {
@@ -146,9 +153,7 @@ def build_schema(locales):
         },
     ]
 
-    add_copy_field = [
-        {"source": f"label_{lang}", "dest": f"label_{lang}_ngram"} for lang in locales
-    ]
+    add_copy_field = [{"source": "names", "dest": "names_prefix"}]
 
     return {
         "add-field-type": add_field_type,

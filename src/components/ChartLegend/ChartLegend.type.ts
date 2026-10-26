@@ -1,5 +1,5 @@
 import type { ELegendSwatch } from "@/enums";
-import type { TLegendItem, TLegendMarkerShape, TLegendSwatch, TSwatchSize } from "@/types";
+import type { TLegendItem, TSeriesHatch, TSeriesShape, TLegendSwatch, TSwatchSize } from "@/types";
 
 export type TChartLegendProps = {
   items: readonly TLegendItem[];
@@ -17,6 +17,12 @@ export type TSwatchShapeProps = {
   size: TSwatchSize;
 };
 
+export type TEntitySwatchProps = TSwatchShapeProps & {
+  shape: TSeriesShape;
+  hatch: TSeriesHatch;
+  fill: string;
+};
+
 export type TLineSwatchProps = TSwatchShapeProps & {
   dash?: string | undefined;
 };
@@ -27,7 +33,7 @@ export type TFillSwatchProps = TSwatchShapeProps & {
 };
 
 export type TMarkerSwatchProps = TSwatchShapeProps & {
-  shape: TLegendMarkerShape;
+  shape: TSeriesShape;
 };
 
 export type TFrostSwatchProps = TSwatchShapeProps & {

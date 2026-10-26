@@ -13,6 +13,8 @@ export type TSegmentedControlProps<TValue extends string> = {
   options: readonly TSegmentedOption<TValue>[];
   value: TValue;
   onChange: (value: TValue) => void;
+  /** every option inert and dimmed — e.g. a setting that depends on another one that's off */
+  isDisabled?: boolean | undefined;
 };
 
 /** The active pill's box inside the track, in px. */

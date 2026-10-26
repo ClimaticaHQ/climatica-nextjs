@@ -1,6 +1,6 @@
 import { DATASETS, WEATHER_VARIABLES } from "@/constants";
 import { WorldClimService } from "@/libs/services/worldClimService";
-import { useFiltersStore } from "@/stores";
+import { useFilters } from "@/hooks/filters";
 import type { TCellSize, TUseGetClimateDataReturn, TWorldClimPointValueBinding } from "@/types";
 import {
   buildMonthlyTemperaturesFromPointValues,
@@ -15,7 +15,7 @@ export function useGetClimateData(
   lng: number,
   gridSize: TCellSize,
 ): TUseGetClimateDataReturn {
-  const { dataset, climatePeriod, weatherYear } = useFiltersStore();
+  const { dataset, climatePeriod, weatherYear } = useFilters();
   const isClimate = dataset === DATASETS.CLIMATE;
 
   const {
@@ -60,5 +60,6 @@ export function useGetClimateData(
     isLoading,
     isFetching,
     isError: error !== null,
+    error,
   };
 }

@@ -44,26 +44,22 @@ describe("REDIS_STRATEGIES.citySearch", () => {
   });
 });
 
-describe("REDIS_STRATEGIES.climateData", () => {
-  describe("buildKey", () => {
-    it("includes dataset, resolution, and lat/lng with 4 decimal places", () => {
-      const key = REDIS_STRATEGIES.climateData.buildKey({
-        dataset: "climate",
-        resolution: "10m",
-        lat: 48.1234,
-        lng: 16.5432,
-      });
-      expect(key).toContain("climate");
-      expect(key).toContain("10m");
-      expect(key).toContain("48.1234");
-      expect(key).toContain("16.5432");
+describe("REDIS_STRATEGIES.worldclimResource", () => {
+  describe("buildKey / buildCounterKey", () => {
+    it("keys the cache and the counter by the resource's search params, apart", () => {
+      const params = "id=Cell&iri=http%3A%2F%2Fexample.com%2FCell";
+      const key = REDIS_STRATEGIES.worldclimResource.buildKey(params);
+      const counterKey = REDIS_STRATEGIES.worldclimResource.buildCounterKey(params);
+      expect(key).toContain(params);
+      expect(counterKey).toContain(params);
+      expect(key).not.toBe(counterKey);
     });
   });
 
   describe("TTLs", () => {
     it("popularTtl is greater than ttl", () => {
-      expect(REDIS_STRATEGIES.climateData.popularTtl).toBeGreaterThan(
-        REDIS_STRATEGIES.climateData.ttl,
+      expect(REDIS_STRATEGIES.worldclimResource.popularTtl).toBeGreaterThan(
+        REDIS_STRATEGIES.worldclimResource.ttl,
       );
     });
   });

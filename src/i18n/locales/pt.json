@@ -1,16 +1,28 @@
 {
-  "topbar": {
-    "toggleFilters": "Alternar filtros",
-    "toggleTheme": "Alternar tema"
-  },
   "navbar": {
     "toggleMenu": "Abrir ou fechar o menu",
-    "links": {
-      "climateStatistics": "Clima da Cidade",
-      "climateComparison": "Comparar Cidades",
-      "compareCities": "Comparar Cidades",
-      "comparePeriods": "Comparar Períodos",
-      "heatMap": "Mapa de Calor Regional"
+    "settings": "Definições"
+  },
+  "pages": {
+    "climateStatistics": {
+      "title": "Clima da Cidade",
+      "description": "Procure uma cidade para explorar os seus dados climáticos"
+    },
+    "compareCities": {
+      "title": "Comparar Cidades",
+      "description": "Compare o clima de duas cidades lado a lado"
+    },
+    "comparePeriods": {
+      "title": "Comparar Períodos",
+      "description": "Veja como o clima de uma cidade muda ao longo de períodos e anos"
+    },
+    "heatMap": {
+      "title": "Mapa de Calor Regional",
+      "description": "Desenhe uma área no mapa para ver como o seu clima varia"
+    },
+    "settings": {
+      "title": "Definições",
+      "description": "Idioma, aparência e comportamento da aplicação"
     }
   },
   "search": {
@@ -18,12 +30,7 @@
     "coordsResult": "Ir para as coordenadas"
   },
   "climateStatistics": {
-    "title": "Estatísticas Climáticas",
-    "subtitle": "Procure uma cidade para explorar os seus dados climáticos",
     "cellResolution": "Resolução da célula:",
-    "filtersTab": "Filtros",
-    "useMyLocation": "Usar a minha localização",
-    "locating": "A localizar...",
     "stats": {
       "avgTmax": "Temp. máx. média",
       "avgTmin": "Temp. mín. média",
@@ -31,19 +38,13 @@
       "tmin": "Temp. mín.",
       "totalPrec": "Precipitação total",
       "mmThisMonth": "mm este mês",
-      "resolution": "Resolução",
-      "autoResolutionTooltip": "A resolução é definida automaticamente de acordo com o conjunto de dados selecionado",
       "altitude": "Altitude",
       "filteredMonths": "Filtrado: {months}"
     },
     "noPeriodData": "Não há dados de {period} na resolução {grid}"
   },
-  "compareCities": {
-    "title": "Comparar Cidades",
-    "selectSecondCity": "Selecione uma segunda cidade para comparar"
-  },
+  "compareCities": {},
   "comparePeriods": {
-    "title": "Comparar Períodos",
     "trend": {
       "tempTitle": "Tendência de temperatura",
       "precipTitle": "Tendência de precipitação",
@@ -51,19 +52,21 @@
       "comparedTo": "{b} vs {a}"
     },
     "weather": {
-      "periods": "Anos",
       "addPeriod": "Adicionar período",
-      "maxPeriods": "Máximo de {max} períodos",
       "removePeriod": "Remover {year}",
       "invalidYear": "Introduza um ano entre {min} e {max}",
       "duplicateYear": "Este ano já está na lista",
-      "periodsCount": "{count} / {max} períodos"
+      "periodsCount": "{count} / {max} períodos",
+      "noData": "Não há dados meteorológicos de {years} para este local e resolução."
+    },
+    "swapPeriods": "Trocar períodos",
+    "sort": {
+      "year": "Ano",
+      "ascending": "Ordenar por ano, ascendente",
+      "descending": "Ordenar por ano, descendente"
     }
   },
   "climateComparison": {
-    "title": "Comparação Climática",
-    "modeCities": "Comparar cidades",
-    "modePeriods": "Comparar períodos",
     "searchA": "Cidade A",
     "searchB": "Cidade B",
     "searchCity": "Cidade",
@@ -89,15 +92,18 @@
       "tieSub": "=",
       "monthTemps": "{a}: {tempA} / {b}: {tempB}"
     },
-    "autoResolution": "Resolução automática: {resolution}",
     "noPeriodData": "Não há dados de {period} na resolução {grid}",
     "difference": "Diferença",
+    "differenceInfo": "Como a diferença é calculada",
+    "differenceNote": {
+      "cities": "Diferença = {b} − {a}. Um valor positivo significa que a métrica é maior em {b}.",
+      "periods": "Diferença = {b} − {a}. Um valor positivo significa que a métrica aumentou no período mais recente."
+    },
     "metric": "Indicador",
-    "tableCaption": "Comparação de {a} e {b}"
+    "tableCaption": "Comparação de {a} e {b}",
+    "statsCaption": "Estatísticas de {names}"
   },
   "heatMap": {
-    "title": "Mapa de Calor Regional",
-    "placeholder": "Marcador de posição do mapa de calor. Mais adiante poderemos mostrar aqui a intensidade climática num mapa mundial.",
     "drawBbox": "Desenhar caixa delimitadora",
     "drawPolygon": "Desenhar polígono",
     "clearSelection": "Limpar seleção",
@@ -106,6 +112,10 @@
     "noSelection": "Desenhe uma caixa ou polígono no mapa para analisar os dados climáticos dessa região",
     "noData": "Não há dados disponíveis para esta região",
     "noPeriodData": "Não há dados de {period} na resolução {grid}",
+    "tooManyCells": "Esta região tem {count, number} células a {grid}, mais do que as {max, number} que o mapa consegue carregar. Escolha {suggestion} ou uma resolução mais grosseira.",
+    "tooManyCellsAnyGrid": "Esta região tem mais de {max, number} células mesmo a {coarsest}. Desenhe uma região menor.",
+    "tooManyCellsPolygon": "Este polígono cobre {count, number} células a {grid}, mas carregá-lo lê todas as {boxCount, number} células do retângulo à sua volta, mais do que as {max, number} que o mapa consegue carregar. Escolha {suggestion} ou uma resolução mais grosseira, ou desenhe um polígono mais compacto.",
+    "tooManyCellsPolygonAnyGrid": "Este polígono cobre {count, number} células a {grid}, mas carregá-lo lê o retângulo à sua volta, que tem mais de {max, number} células mesmo a {coarsest}. Desenhe um polígono menor ou mais compacto.",
     "stats": {
       "minValue": "Mín.",
       "maxValue": "Máx.",
@@ -120,13 +130,6 @@
       "avgTooltipWeatherAnnual": "Média anual: média das 12 médias mensais em todas as células",
       "avgTooltipWeatherMonth": "Média mensal: média de {variable} para {month} {year} em todas as células"
     },
-    "showingVariable": "A mostrar: {variable}",
-    "useMyLocation": "Usar a minha localização",
-    "locating": "A localizar...",
-    "summaryLine": "{count} células analisadas · {period} · {variable} · grelha {grid}",
-    "summaryLineClimate": "{count} células · Média 30 anos {variable} · {period} · {grid}",
-    "summaryLineWeatherAnnual": "{count} células · Média anual {variable} · {year} · {grid}",
-    "summaryLineWeatherMonth": "{count} células · {variable} em {period} · {grid}",
     "profile": {
       "subtitle": "Perfil climático regional · {count} células · {period}",
       "subtitleWeather": "Perfil climático regional · {count} células · {year} · não é uma normal climática"
@@ -134,7 +137,6 @@
   },
   "chart": {
     "versus": "vs",
-    "temperatureAxis": "Temperatura (graus C)",
     "precipitation": "Precipitação",
     "maxTemperature": "Temperatura Máxima",
     "minTemperature": "Temperatura Mínima",
@@ -146,7 +148,7 @@
     "aridMonths": "Meses áridos",
     "martonne": "Índice de Martonne (M)",
     "martonneShort": "Martonne (M)",
-    "martonneTooltip": "Índice de aridez de De Martonne: M = P/(T+10). <5 Hiperárido | 5–10 Árido | 10–20 Semiárido | 20–30 Subúmido | >30 Húmido",
+    "martonneTooltip": "Índice de aridez de De Martonne: M = P/(T+10).",
     "aridPeriod": "Período árido",
     "humidPeriod": "Período húmido",
     "perhumidPeriod": "Muito úmido (> 100 mm)",
@@ -169,12 +171,12 @@
     "modeStandard": "Gráfico padrão",
     "modeWalterLieth": "Diagrama de Walter-Lieth",
     "walterLiethTabUnavailable": "Não disponível na vista Walter-Lieth",
-    "selectedMonth": "valores de {month}",
     "selectedMonthsCount": "{count, plural, one {# mês} other {# meses}}",
     "altitude": "Altitude",
     "subtitle": {
       "climate": "Clima {period}",
-      "weather": "Tempo {year}"
+      "weather": "Tempo {year} · um único ano",
+      "weatherYears": "Tempo {years} · cada um, um único ano"
     },
     "expandPanel": "Expandir {name}",
     "showBoth": "Mostrar ambos",
@@ -185,17 +187,31 @@
     "monthlyTableCaption": "Valores mensais: {names}",
     "month": "Mês",
     "showMonthlyValues": "Mostrar valores mensais",
-    "hideMonthlyValues": "Ocultar valores mensais"
+    "hideMonthlyValues": "Ocultar valores mensais",
+    "switchToStandard": "Mudar para o gráfico padrão",
+    "walterLiethFiltersExplanation": "O diagrama de Walter-Lieth mostra sempre a temperatura média e a precipitação dos 12 meses, por isso não é possível escolher variáveis nem meses enquanto é apresentado.",
+    "weatherSingleYear": "Tempo · um único ano",
+    "martonneShortYear": "Martonne (M) · {year}",
+    "martonneYear": "Índice de Martonne (M) de {year}",
+    "martonneTooltipYear": "Índice de aridez de De Martonne apenas para {year}, com os dados desse ano: M = P/(T+10).",
+    "martonnePerYear": "Índice de Martonne (M), por ano",
+    "yearsShown": "Anos exibidos",
+    "focusCurve": "{variable} · {entity} — {month} {value}",
+    "focusBar": "{entity} — {month} {value} ({period})",
+    "focusHumid": "período húmido",
+    "focusArid": "período árido",
+    "scrollHint": "Deslize para ver todos os meses"
   },
   "loading": {
-    "fetchingClimateData": "A obter dados climáticos...",
-    "updating": "A atualizar...",
     "dataUpdated": "Dados atualizados: {location}, {period}"
   },
   "errors": {
     "fetchClimateData": "Não foi possível obter os dados climáticos",
-    "geolocationDenied": "Acesso à localização negado. Permita a localização no seu navegador.",
-    "geolocationUnavailable": "Não foi possível determinar a sua localização."
+    "tooManyRequests": "Demasiados pedidos. Aguarde um momento e tente novamente.",
+    "searchUnavailable": "A pesquisa de cidades não está disponível de momento. Tente novamente daqui a pouco.",
+    "dataSourceUnavailable": "O serviço de dados climáticos não está a responder. Tente novamente daqui a pouco.",
+    "connection": "Não foi possível contactar o servidor. Verifique a sua ligação e tente novamente.",
+    "placeLookupFailed": "Não foi possível obter o nome do local para este ponto — são mostradas as suas coordenadas."
   },
   "geolocation": {
     "notSupported": "O seu navegador não suporta geolocalização",
@@ -214,10 +230,36 @@
     "10m": "10 min (~324 km2)",
     "5m": "5 min (~81 km2)",
     "2_5m": "2.5 min (~20.25 km2)",
-    "30s": "30 seg (~1 km2)"
+    "30s": "30 seg (~1 km2)",
+    "onlyForPeriod": "Apenas para Clima {period}"
+  },
+  "cellSizesShort": {
+    "10m": "10 min",
+    "5m": "5 min",
+    "2_5m": "2,5 min",
+    "30s": "30 s"
   },
   "filters": {
-    "period": "Período"
+    "names": {
+      "dataset": "Conjunto de dados",
+      "climatePeriod": "Período climático",
+      "weatherYear": "Ano",
+      "variables": "Variáveis",
+      "gridSize": "Resolução",
+      "months": "Meses"
+    },
+    "chips": {
+      "allFilters": "Filtros",
+      "allFiltersLabel": "Filtros, {count, plural, =0 {nenhum alterado} one {# alterado} other {# alterados}}",
+      "value": "{name}: {value}",
+      "variablesCount": "{count, plural, one {# variável} other {# variáveis}}",
+      "allMonths": "Todos os meses",
+      "monthsCount": "{count, plural, one {# mês} other {# meses}}"
+    },
+    "sheet": {
+      "apply": "Aplicar",
+      "reset": "Repor"
+    }
   },
   "validation": {
     "year": {
@@ -264,8 +306,7 @@
       "climatePeriod": "Período climático",
       "yearRange": "Ano",
       "variables": "Variáveis",
-      "months": "Mês",
-      "filters": "Filtros"
+      "months": "Mês"
     },
     "datasets": {
       "climate": "Clima",
@@ -283,22 +324,16 @@
     "months": {
       "all": "Todos"
     },
-    "yearRange": {
-      "from": "De",
-      "to": "Até"
-    },
-    "autoScroll": "Deslocamento automático para os resultados",
-    "syncCity": "Sincronizar cidade selecionada em todas as páginas",
-    "autoApplyFilters": "Aplicar filtros automaticamente",
-    "animations": "Animações",
-    "updateHighlight": "Destaque de atualização",
-    "updateHighlightGlow": "Brilho",
-    "updateHighlightBorder": "Contorno",
-    "reducedMotionNotice": "O movimento reduzido está ativado neste dispositivo",
     "filters": "Filtros",
-    "settings": "Definições",
     "applyFilters": "Aplicar filtros",
-    "cellCount": "({count} células)",
+    "cellCount": {
+      "label": "({count} células)",
+      "fast": "Rápido",
+      "moderate": "Moderado",
+      "slow": "Lento",
+      "tooMany": "Demasiadas células",
+      "tooManyError": "Demasiadas células para carregar. Aproxime o mapa ou escolha uma resolução menor."
+    },
     "notes": {
       "climateNormals": "Normais climáticas de 30 anos",
       "weatherData": "Dados meteorológicos anuais (CRU-TS-4.09)",
@@ -308,7 +343,8 @@
   },
   "common": {
     "useMyLocation": "Usar a minha localização",
-    "locating": "A localizar..."
+    "locating": "A localizar...",
+    "close": "Fechar"
   },
   "error": {
     "title": "Algo correu mal",
@@ -332,7 +368,7 @@
   },
   "meta": {
     "climateStatistics": {
-      "title": "Estatísticas climáticas de {city}",
+      "title": "{city} · {page}",
       "description": "{variables} de {city} ({period})"
     },
     "compareCities": {
@@ -341,11 +377,10 @@
     },
     "comparePeriods": {
       "title": "{city} — comparação de períodos climáticos",
-      "description": "{variables} de {city} — {periods}",
-      "descriptionGeneric": "Compare os dados climáticos de uma cidade em diferentes períodos"
+      "description": "{variables} de {city} — {periods}"
     },
     "heatMap": {
-      "title": "Mapa de calor regional — {variables} ({period})",
+      "title": "{page} · {variables} ({period})",
       "description": "Intensidade climática de {variables} na região selecionada ({period})"
     }
   },
@@ -356,5 +391,51 @@
     "celsiusValue": "{value}°C",
     "mmValue": "{value} mm",
     "metersValue": "{value} m"
+  },
+  "settings": {
+    "sections": {
+      "language": "Idioma",
+      "appearance": "Aparência",
+      "chartsAndFilters": "Gráficos e filtros"
+    },
+    "theme": "Tema",
+    "themeOptions": {
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
+    },
+    "autoScroll": "Deslocamento automático para os resultados",
+    "syncCity": "Sincronizar cidade selecionada em todas as páginas",
+    "syncFilters": "Sincronizar filtros em todas as páginas",
+    "autoApplyFilters": "Aplicar filtros automaticamente",
+    "animations": "Animações",
+    "updateHighlight": "Destaque de atualização",
+    "updateHighlightGlow": "Brilho",
+    "updateHighlightBorder": "Contorno",
+    "reducedMotionNotice": "O seu sistema pede movimento reduzido, por isso as animações estão desativadas",
+    "appLanguage": "Idioma da aplicação",
+    "chartBarStyle": "Estilo das barras de comparação",
+    "barStyleOptions": {
+      "plain": "Uniforme",
+      "shades": "Tons",
+      "hatch": "Padrões"
+    },
+    "barStyleDescriptions": {
+      "plain": "Predefinido: uma só cor para cada cidade ou período, o aspeto mais limpo",
+      "shades": "Um tom diferente para cada cidade ou período",
+      "hatch": "Padrões: o melhor para imprimir e para diferenças na visão das cores"
+    },
+    "descriptions": {
+      "animations": "Transições suaves quando os gráficos e os dados mudam",
+      "updateHighlight": "Como um cartão é assinalado quando os seus dados são atualizados",
+      "autoApplyFilters": "As alterações aos filtros aplicam-se logo; desativado, esperam por «Aplicar filtros»",
+      "syncCity": "A cidade que escolhe numa página abre também nas outras",
+      "syncFilters": "Os filtros que escolhe numa página aplicam-se também nas outras",
+      "autoScroll": "Desce até aos resultados depois de escolher uma cidade",
+      "chartBarStyle": "Como as cidades ou os períodos se distinguem nos gráficos sobrepostos"
+    },
+    "hints": {
+      "turnOnAnimations": "Ative as animações para escolher um destaque"
+    }
   }
 }

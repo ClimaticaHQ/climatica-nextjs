@@ -7,7 +7,7 @@ export function TableSkeleton({ rows = 5, cols = 2 }: TTableSkeletonProps) {
     <Card padding={ECardPadding.NONE} shouldClip className="animate-pulse">
       <table className="w-full table-fixed text-[length:var(--font-sm)]">
         <thead>
-          <tr className="border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)]">
+          <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface-secondary)]">
             <th className="px-4 py-2.5" />
             {Array.from({ length: cols }).map((_, i) => (
               <th key={i} className="px-4 py-2.5">
@@ -23,7 +23,7 @@ export function TableSkeleton({ rows = 5, cols = 2 }: TTableSkeletonProps) {
           {Array.from({ length: rows }).map((_, i) => (
             <tr
               key={i}
-              className={`border-b border-[var(--color-border)] last:border-b-0 ${i % 2 === 0 ? "bg-[var(--color-bg)]" : "bg-[var(--color-bg-secondary)]"}`}
+              className={`border-b border-[var(--color-border)] last:border-b-0 ${i % 2 === 0 ? "bg-[var(--color-surface)]" : "bg-[var(--color-surface-secondary)]"}`}
             >
               <td className="px-4 py-2.5">
                 <div className="h-5 w-24 rounded bg-[var(--color-border)]" />

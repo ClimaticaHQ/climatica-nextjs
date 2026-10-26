@@ -1,40 +1,11 @@
-import {
-  MOTION,
-  UPDATE_FLASH_ACTIVE,
-  UPDATE_FLASH_ATTRIBUTE,
-  UPDATE_FLASH_TOKENS,
-  UPDATE_FLASH_VARIANT_ATTRIBUTE,
-} from "@/constants";
 import type { EUpdateFlashVariant } from "@/enums";
-import { useMotionPreference } from "@/hooks";
+import { useMotionPreference } from "@/hooks/ui/useMotionPreference";
 import type { TUpdateFlashKeys } from "@/types";
-import { getUpdateFlashKeyframe, shouldFlash } from "@/utils";
+import { playUpdateFlash, shouldFlash } from "@/utils";
 import { useEffect, useRef } from "react";
 import { useDataUpdate } from "./useDataUpdate";
 
 const INERT_SELECTOR = "[inert]";
-
-function playUpdateFlash(element: HTMLElement, variant: EUpdateFlashVariant) {
-  const style = getComputedStyle(element);
-  const keyframe = getUpdateFlashKeyframe({
-    border: style.getPropertyValue(UPDATE_FLASH_TOKENS.BORDER).trim(),
-    glow: style.getPropertyValue(UPDATE_FLASH_TOKENS.GLOW).trim(),
-    variant,
-  });
-  element.dataset[UPDATE_FLASH_ATTRIBUTE] = UPDATE_FLASH_ACTIVE;
-  element.dataset[UPDATE_FLASH_VARIANT_ATTRIBUTE] = variant;
-  // * from the flash colors back to the card's own border and shadow
-  const animation = element.animate([keyframe], {
-    duration: MOTION.UPDATE_FLASH_MS,
-    easing: MOTION.UPDATE_FLASH_EASING,
-  });
-  const end = () => {
-    delete element.dataset[UPDATE_FLASH_ATTRIBUTE];
-    delete element.dataset[UPDATE_FLASH_VARIANT_ATTRIBUTE];
-  };
-  animation.onfinish = end;
-  animation.oncancel = end;
-}
 
 /**
  * A card's update flash: put the ref on the bordered element. It flashes when a fresh update

@@ -12,11 +12,18 @@ export function SegmentedControl<TValue extends string>({
   options,
   value,
   onChange,
+  isDisabled = false,
 }: TSegmentedControlProps<TValue>) {
   const { trackRef, rect } = useIndicatorRect(value);
 
   return (
-    <div ref={trackRef} role="group" aria-label={label} className={C.TRACK}>
+    <div
+      ref={trackRef}
+      role="group"
+      aria-label={label}
+      aria-disabled={isDisabled || undefined}
+      className={`${C.TRACK} ${isDisabled ? C.DISABLED : ""}`}
+    >
       {/* * drawn once measured, so it never slides in from the track's edge on mount */}
       {rect && (
         <span
@@ -32,6 +39,7 @@ export function SegmentedControl<TValue extends string>({
             key={option.value}
             type="button"
             aria-pressed={isActive}
+            disabled={isDisabled}
             aria-label={option.label}
             title={option.label}
             onClick={() => onChange(option.value)}

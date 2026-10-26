@@ -4,16 +4,17 @@ export type TMonthlyValuesVariable = "tavg" | "prec";
 /** One month of a series: its mean temperature and precipitation (null / absent = missing). */
 export type TMonthlyValuesMonth = Partial<Record<TMonthlyValuesVariable, number | null>>;
 
-/** A series under a chart: its name, its text color (one series: the text color), its months. */
+/** A series under a chart: its name and its months (its values in the text colour). */
 export type TMonthlyValuesSeries = {
   key: string;
   label: string;
-  color: string;
   data: readonly TMonthlyValuesMonth[];
 };
 
 /** One series' value in a cell — overlay cells stack A's above B's. */
 export type TMonthlyValuesEntry = {
+  /** its series' key — the overlay's focus mutes the other series' values */
+  key: string;
   text: string;
   color: string;
   /** "Madrid: 4.0" — what a screen reader hears for this value */
@@ -30,8 +31,8 @@ export type TMonthlyValuesRow = {
   cells: TMonthlyValuesEntry[][];
 };
 
-/** The unit labels' colors: temperature red, precipitation blue (WL convention). */
-export type TMonthlyValuesPalette = Record<"temp" | "prec", string>;
+/** The unit labels' colors (temperature red, precipitation blue: WL convention) and the values'. */
+export type TMonthlyValuesPalette = Record<"temp" | "prec" | "text", string>;
 
 export type TMonthlyValuesRowsArgs = {
   series: readonly TMonthlyValuesSeries[];
@@ -45,11 +46,4 @@ export type TFormatMonthlyValuesValueArgs = {
   variable: TMonthlyValuesVariable;
   value: number | null | undefined;
   locale: string;
-};
-
-/** A monthly values table's column geometry under a plot of the same width. */
-export type TMonthlyValuesColumnsArgs = {
-  tableWidth: number;
-  /** one panel of a split pair: the plot's compact margins */
-  isCompact: boolean;
 };

@@ -15,7 +15,7 @@ export const CHART_MODE_BY_PARAM: Partial<Record<string, TChartMode>> = {
   [SIDEBAR_PARAMS.CHART_MODE_WALTER_LIETH]: "walter-lieth",
 };
 
-// * pages whose chart offers Walter-Lieth — with the Climate dataset only (see getShownChartMode)
+// * pages whose chart offers Walter-Lieth — for both datasets (Weather as a single year)
 export const WALTER_LIETH_ROUTES = [
   ROUTES.CLIMATE_STATISTICS,
   ROUTES.COMPARE_CITIES,

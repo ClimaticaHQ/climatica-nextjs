@@ -8,12 +8,13 @@ import { UnitLabel } from "./UnitLabel";
 import { ValueStack } from "./ValueStack";
 
 /**
- * Below `sm` twelve columns don't fit: a "Show monthly values" button (closed by default)
+ * Where twelve columns don't fit (phones, split panels): a "Show monthly values" button (closed by default)
  * reveals the same table on its side — Month | °C | mm, the same cells.
  */
 export function VerticalValues({
   rows,
   caption,
+  markers,
   flashKeys,
   activeMonthIndex,
   onActiveMonthIndexChange,
@@ -51,7 +52,7 @@ export function VerticalValues({
                 </th>
                 {rows.map((row) => (
                   <th key={row.variable} scope="col" className={C.VERTICAL_HEAD}>
-                    <UnitLabel row={row} />
+                    <UnitLabel row={row} markers={[]} />
                   </th>
                 ))}
               </tr>
@@ -76,7 +77,11 @@ export function VerticalValues({
                       onFocus={() => onActiveMonthIndexChange?.(i)}
                       onBlur={() => onActiveMonthIndexChange?.(null)}
                     >
-                      <ValueStack entries={row.cells[i] ?? []} className={C.VERTICAL_STACK} />
+                      <ValueStack
+                        entries={row.cells[i] ?? []}
+                        markers={markers}
+                        className={C.VERTICAL_STACK}
+                      />
                     </td>
                   ))}
                 </tr>

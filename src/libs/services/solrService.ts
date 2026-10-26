@@ -4,11 +4,12 @@ import { LOCALES } from "@/constants";
 import { env } from "@/libs/Env";
 import { logger } from "@/libs/Logger";
 import type { TCity, TSolrCityDoc, TSolrResponse } from "@/types";
-import { buildSolrQueryParams, getCityDescription } from "@/utils"; // removed buildQueryParams
+import { buildSolrQueryParams, getCityDescription } from "@/utils";
 
 const SOLR_BASE_URL = env.SOLR_URL;
 
 export const SolrService = {
+  /** Throws when Solr is unreachable or answers with an error — an outage is not "no results" */
   async searchCities(query: string, lang: string): Promise<TCity[]> {
     const params = buildSolrQueryParams(query, lang);
 
@@ -45,7 +46,7 @@ export const SolrService = {
       logger.error(
         `[Solr] searchCities error: ${error instanceof Error ? error.message : String(error)}`,
       );
-      return [];
+      throw error;
     }
   },
 

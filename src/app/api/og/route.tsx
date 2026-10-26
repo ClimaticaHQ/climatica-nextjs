@@ -1,6 +1,5 @@
 import { OG_IMAGE_COLORS, OG_IMAGE_SIZE } from "@/constants";
-import { parseLocale } from "@/libs/I18nRouting";
-import { resolveOgMeta } from "@/utils";
+import { parseLocale, resolveOgMeta } from "@/utils";
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
 import fs from "node:fs";

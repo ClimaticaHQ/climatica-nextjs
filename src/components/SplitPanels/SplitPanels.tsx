@@ -1,9 +1,9 @@
 import { ChartTransition } from "@/components/ChartTransition";
 import { ExpandIcon } from "@/components/svg";
-import { EWalterLiethSeriesId } from "@/enums";
+import { PairLayout } from "@/components/UI/PairLayout";
+import { EPairLayoutVariant, EWalterLiethSeriesId } from "@/enums";
 import { getShownPanel } from "@/utils";
 import { useTranslations } from "next-intl";
-import { Fragment } from "react";
 import { ExpandedPanelControls, PanelIconButton } from "./components";
 import { usePanelFocus, usePanelOrigin } from "./hooks";
 import {
@@ -21,15 +21,18 @@ import type { TPanelFocusTarget, TSplitPanelsProps } from "./SplitPanels.type";
 export function SplitPanels({
   expansion,
   labels,
+  shapes,
   expandable,
   renderPanel,
   renderLegend,
+  between,
 }: TSplitPanelsProps) {
   const t = useTranslations();
   const shown = getShownPanel(expansion.expanded, expandable);
   const origin = usePanelOrigin(shown);
   const { collapseRef, switchRef, expandRefs, requestFocus } = usePanelFocus(shown);
   const other = SPLIT_PANEL_ORDER.find((id) => id !== shown);
+  const [first, second] = SPLIT_PANEL_ORDER;
 
   const show = (id: EWalterLiethSeriesId | null, focus: TPanelFocusTarget) => {
     requestFocus(focus);
@@ -48,6 +51,9 @@ export function SplitPanels({
     />
   );
 
+  const panelSlots = (id: EWalterLiethSeriesId) =>
+    expandable[id] ? { actions: expandButton(id) } : {};
+
   return (
     <div>
       <ChartTransition transitionKey={shown ?? SPLIT_TRANSITION_KEY} enterOrigin={origin}>
@@ -59,6 +65,7 @@ export function SplitPanels({
                   <ExpandedPanelControls
                     shown={shown}
                     labels={labels}
+                    shapes={shapes}
                     canSwitch={other !== undefined && expandable[other]}
                     onSwitch={(id) => show(id, "switch")}
                     onCollapse={() => show(null, shown)}
@@ -70,15 +77,12 @@ export function SplitPanels({
             })}
           </div>
         ) : (
-          <div className={C.SPLIT}>
-            {SPLIT_PANEL_ORDER.map((id) => (
-              <Fragment key={id}>
-                {renderPanel(id, {
-                  slots: expandable[id] ? { actions: expandButton(id) } : {},
-                })}
-              </Fragment>
-            ))}
-          </div>
+          <PairLayout
+            variant={EPairLayoutVariant.PANELS}
+            first={renderPanel(first, { slots: panelSlots(first) })}
+            between={between}
+            second={renderPanel(second, { slots: panelSlots(second) })}
+          />
         )}
       </ChartTransition>
       {renderLegend(shown)}

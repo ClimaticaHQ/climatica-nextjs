@@ -33,7 +33,8 @@ test.describe("Navigation", () => {
     await page.getByRole("button", { name: "Jul", exact: true }).click();
     await page.getByRole("button", { name: "Apply filters" }).click();
     await expect(page).toHaveURL(/chart=standard/);
-    await expect(page).not.toHaveURL(/months=all/);
+    // * defaults are omitted from the URL, so wait for the picked month itself
+    await expect(page).toHaveURL(/months=7(&|$)/);
     const filteredUrl = page.url();
 
     await page.getByRole("link", { name: "Compare Cities" }).click();
@@ -66,13 +67,13 @@ test.describe("Navigation", () => {
   });
 
   test("shows 404 page for unknown route", async ({ page }) => {
-    await page.goto("/uk/this-page-does-not-exist");
+    await page.goto("/this-page-does-not-exist");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("404");
     await expect(page.getByTestId("not-found-home-link")).toBeVisible();
   });
 
   test("404 page has working link to home", async ({ page }) => {
-    await page.goto("/uk/this-page-does-not-exist");
+    await page.goto("/this-page-does-not-exist");
     await page.getByTestId("not-found-home-link").click();
     await expect(page).toHaveURL(/climate-statistics/);
   });

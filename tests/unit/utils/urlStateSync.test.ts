@@ -1,6 +1,4 @@
 import type { TCity, TKeyValueStorage } from "@/types";
-import { useNavigationIntentStore } from "@/stores/navigationIntentStore";
-import { navigateWithIntent } from "@/utils/navigation.util";
 import { decideUrlSyncAction } from "@/utils/urlParams.util";
 import { createPersistedJsonStore, isCity } from "@/utils/persistedJsonStore.util";
 import { canWriteUrlState, getLinkNavigationTarget } from "@/utils/urlStateGuard.util";
@@ -77,37 +75,6 @@ describe("canWriteUrlState", () => {
         pendingPathname: page,
       }),
     ).toBe(true);
-  });
-});
-
-describe("navigateWithIntent", () => {
-  it("registers the intent before the router starts the navigation", () => {
-    useNavigationIntentStore.getState().setPendingPathname(null);
-    const pendingAtPush: (string | null)[] = [];
-    const push = vi.fn(() => {
-      pendingAtPush.push(useNavigationIntentStore.getState().pendingPathname);
-    });
-
-    navigateWithIntent({
-      router: {
-        push,
-        replace: vi.fn(),
-        back: vi.fn(),
-        forward: vi.fn(),
-        refresh: vi.fn(),
-        prefetch: vi.fn(),
-        bfcacheId: "",
-      },
-      pathname: "/compare-cities",
-      query: { cityA: "Paris" },
-      locale: "de",
-    });
-
-    expect(pendingAtPush).toEqual(["/de/compare-cities"]);
-    expect(push).toHaveBeenCalledWith(
-      { pathname: "/compare-cities", query: { cityA: "Paris" } },
-      { locale: "de", scroll: false },
-    );
   });
 });
 

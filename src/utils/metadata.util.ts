@@ -6,20 +6,20 @@ import {
   SIDEBAR_PARAMS,
   VARIABLE_LABELS,
 } from "@/constants";
-import { parseLocale } from "@/libs/I18nRouting";
+import { parseLocale } from "./locale.util";
 import type {
   TCommonClimateParams,
   TFormatPeriodLabelParams,
   TFormatPeriodsComparisonParams,
-  TLocalePageProps,
   TMetaResolver,
+  TPageProps,
   TResolveMetaArgs,
   TResolveOgMetaArgs,
   TRouteMeta,
   TSearchParams,
 } from "@/types";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 export function getSearchParam(searchParams: TSearchParams, key: string): string | undefined {
   const value = searchParams[key];
@@ -113,16 +113,18 @@ export async function resolveClimateStatisticsMeta({
 }: TResolveMetaArgs): Promise<TRouteMeta> {
   const [t, tPage] = await Promise.all([
     getTranslations({ locale, namespace: "meta.climateStatistics" }),
-    getTranslations({ locale, namespace: "climateStatistics" }),
+    getTranslations({ locale, namespace: "pages.climateStatistics" }),
   ]);
 
   const { city } = extractParams(searchParams, { city: SIDEBAR_PARAMS.CITY });
   const { dataset, varParam, periodParam, yearParam, variables, period } =
     resolveCommonClimateParams(searchParams);
 
-  const title = city ? t("title", { city }) : tPage("title");
+  const title = city ? t("title", { city, page: tPage("title") }) : tPage("title");
   const description =
-    city && variables && period ? t("description", { city, variables, period }) : tPage("subtitle");
+    city && variables && period
+      ? t("description", { city, variables, period })
+      : tPage("description");
 
   const imagePath = buildOgImagePath({
     route: ROUTES.CLIMATE_STATISTICS,
@@ -143,7 +145,7 @@ export async function resolveCompareCitiesMeta({
 }: TResolveMetaArgs): Promise<TRouteMeta> {
   const [t, tPage] = await Promise.all([
     getTranslations({ locale, namespace: "meta.compareCities" }),
-    getTranslations({ locale, namespace: "compareCities" }),
+    getTranslations({ locale, namespace: "pages.compareCities" }),
   ]);
 
   const { cityA, cityB } = extractParams(searchParams, {
@@ -157,7 +159,7 @@ export async function resolveCompareCitiesMeta({
   const description =
     cityA && cityB && variables && period
       ? t("description", { cityA, cityB, variables, period })
-      : tPage("selectSecondCity");
+      : tPage("description");
 
   const imagePath = buildOgImagePath({
     route: ROUTES.COMPARE_CITIES,
@@ -179,7 +181,7 @@ export async function resolveComparePeriodsMeta({
 }: TResolveMetaArgs): Promise<TRouteMeta> {
   const [t, tPage] = await Promise.all([
     getTranslations({ locale, namespace: "meta.comparePeriods" }),
-    getTranslations({ locale, namespace: "comparePeriods" }),
+    getTranslations({ locale, namespace: "pages.comparePeriods" }),
   ]);
 
   const { city, dataset, varParam, periodAParam, periodBParam, periodsParam } = extractParams(
@@ -205,7 +207,7 @@ export async function resolveComparePeriodsMeta({
   const description =
     city && variables && periods
       ? t("description", { city, variables, periods })
-      : t("descriptionGeneric");
+      : tPage("description");
 
   const imagePath = buildOgImagePath({
     route: ROUTES.COMPARE_PERIODS,
@@ -227,7 +229,7 @@ export async function resolveHeatMapMeta({
 }: TResolveMetaArgs): Promise<TRouteMeta> {
   const [t, tPage] = await Promise.all([
     getTranslations({ locale, namespace: "meta.heatMap" }),
-    getTranslations({ locale, namespace: "heatMap" }),
+    getTranslations({ locale, namespace: "pages.heatMap" }),
   ]);
 
   const { polygon, north, south, west, east } = extractParams(searchParams, {
@@ -243,11 +245,14 @@ export async function resolveHeatMapMeta({
   const { dataset, varParam, periodParam, yearParam, variables, period } =
     resolveCommonClimateParams(searchParams);
 
-  const title = hasSelection && variables ? t("title", { variables, period }) : tPage("title");
+  const title =
+    hasSelection && variables
+      ? t("title", { page: tPage("title"), variables, period })
+      : tPage("title");
   const description =
     hasSelection && variables && period
       ? t("description", { variables, period })
-      : tPage("noSelection");
+      : tPage("description");
 
   const imagePath = buildOgImagePath({
     route: ROUTES.HEAT_MAP,
@@ -278,20 +283,32 @@ export async function resolveOgMeta({
   return resolver({ locale, searchParams });
 }
 
-export function createLocaleMetadata(resolver: TMetaResolver) {
-  return async function generateMetadata({
-    params,
-    searchParams,
-  }: TLocalePageProps): Promise<Metadata> {
-    const locale = parseLocale((await params).locale);
-    const { title, description, imagePath } = await resolver({
-      locale,
-      searchParams: await searchParams,
-    });
+/** The page's own URL — no locale prefix: one URL per page, whatever the visitor's language. */
+export function buildCanonicalPath(route: string, searchParams: TSearchParams) {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(searchParams)) {
+    for (const item of Array.isArray(value) ? value : [value]) {
+      if (item !== undefined) query.append(key, item);
+    }
+  }
+  const search = query.toString();
+  return search ? `${route}?${search}` : route;
+}
+
+/**
+ * A page's metadata in the visitor's language: its title and description, the share image,
+ * and the canonical URL. No hreflang: every language shares the one URL.
+ */
+export function createPageMetadata(resolver: TMetaResolver, route: string) {
+  return async function generateMetadata({ searchParams }: TPageProps): Promise<Metadata> {
+    const locale = parseLocale(await getLocale());
+    const params = await searchParams;
+    const { title, description, imagePath } = await resolver({ locale, searchParams: params });
 
     return {
       title,
       description,
+      alternates: { canonical: buildCanonicalPath(route, params) },
       openGraph: {
         title,
         description,

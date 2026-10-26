@@ -1,17 +1,12 @@
 import {
   cityUrlField,
-  datasetPeriodUrlField,
-  gridSizeUrlField,
-  monthsUrlField,
-  variablesUrlField,
   chartModeUrlField,
   compareLayoutUrlField,
   walterLiethShadingUrlField,
   expandedPanelUrlField,
 } from "@/utils/urlFields.util";
-import { DATASETS } from "@/constants";
 import { ECompareLayout, EWalterLiethSeriesId, EWalterLiethShading } from "@/enums";
-import { getShownChartMode, isWalterLiethShown } from "@/utils/chartMode.util";
+import { isWalterLiethShown } from "@/utils/chartMode.util";
 import { describe, expect, it } from "vitest";
 
 describe("cityUrlField", () => {
@@ -58,98 +53,6 @@ describe("cityUrlField", () => {
     );
     expect(params.get("cityB")).toBe("Oslo");
     expect(params.has("city")).toBe(false);
-  });
-});
-
-describe("datasetPeriodUrlField", () => {
-  it("climate mode writes dataset + period, not year", () => {
-    const params = new URLSearchParams();
-    datasetPeriodUrlField.serialize({ dataset: "climate", climatePeriod: "c1970-2000" }, params);
-    expect(params.get("dataset")).toBe("climate");
-    expect(params.get("period")).toBe("c1970-2000");
-    expect(params.has("year")).toBe(false);
-  });
-
-  it("weather mode writes dataset + year, not period", () => {
-    const params = new URLSearchParams();
-    datasetPeriodUrlField.serialize({ dataset: "weather", weatherYear: 2020 }, params);
-    expect(params.get("dataset")).toBe("weather");
-    expect(params.get("year")).toBe("2020");
-    expect(params.has("period")).toBe(false);
-  });
-
-  it("round-trips climate mode", () => {
-    const params = new URLSearchParams();
-    datasetPeriodUrlField.serialize({ dataset: "climate", climatePeriod: "c1991-2020" }, params);
-    expect(datasetPeriodUrlField.parse(params)).toEqual({
-      dataset: "climate",
-      climatePeriod: "c1991-2020",
-    });
-  });
-
-  it("round-trips weather mode", () => {
-    const params = new URLSearchParams();
-    datasetPeriodUrlField.serialize({ dataset: "weather", weatherYear: 2015 }, params);
-    expect(datasetPeriodUrlField.parse(params)).toEqual({ dataset: "weather", weatherYear: 2015 });
-  });
-
-  it("returns undefined when dataset is missing or invalid", () => {
-    expect(datasetPeriodUrlField.parse(new URLSearchParams())).toBeUndefined();
-  });
-});
-
-describe("variablesUrlField", () => {
-  it("round-trips a variable list", () => {
-    const params = new URLSearchParams();
-    variablesUrlField.serialize(["tmax", "tmin"], params);
-    expect(params.get("var")).toBe("tmax,tmin");
-    expect(variablesUrlField.parse(params)).toEqual(["tmax", "tmin"]);
-  });
-
-  it("returns undefined when var is missing", () => {
-    expect(variablesUrlField.parse(new URLSearchParams())).toBeUndefined();
-  });
-});
-
-describe("gridSizeUrlField", () => {
-  it("round-trips a grid size", () => {
-    const params = new URLSearchParams();
-    gridSizeUrlField.serialize("10m", params);
-    expect(gridSizeUrlField.parse(params)).toBe("10m");
-  });
-
-  it("returns undefined for an invalid grid size", () => {
-    const params = new URLSearchParams("grid=bogus");
-    expect(gridSizeUrlField.parse(params)).toBeUndefined();
-  });
-});
-
-describe("monthsUrlField", () => {
-  it('round-trips "all"', () => {
-    const params = new URLSearchParams();
-    monthsUrlField.serialize("all", params);
-    expect(monthsUrlField.parse(params)).toBe("all");
-  });
-
-  it("round-trips a partial month list", () => {
-    const params = new URLSearchParams();
-    monthsUrlField.serialize([6, 7, 8], params);
-    expect(monthsUrlField.parse(params)).toEqual([6, 7, 8]);
-  });
-
-  it("canonicalizes an empty array to all", () => {
-    const params = new URLSearchParams();
-    monthsUrlField.serialize([], params);
-    expect(params.get("months")).toBe("all");
-  });
-
-  it("canonicalizes a full 12-month list to all", () => {
-    const params = new URLSearchParams();
-    monthsUrlField.serialize(
-      Array.from({ length: 12 }, (_, i) => i + 1),
-      params,
-    );
-    expect(params.get("months")).toBe("all");
   });
 });
 
@@ -201,34 +104,23 @@ describe("chartModeUrlField", () => {
 });
 
 describe("chart mode shown", () => {
-  const climate = DATASETS.CLIMATE;
-  const weather = DATASETS.WEATHER;
-
   it("shows Walter-Lieth by default on the pages that offer it", () => {
     for (const pathname of ["/climate-statistics", "/compare-cities", "/compare-periods"]) {
-      expect(
-        isWalterLiethShown({ pathname, searchParams: new URLSearchParams(), dataset: climate }),
-      ).toBe(true);
+      expect(isWalterLiethShown({ pathname, searchParams: new URLSearchParams() })).toBe(true);
     }
-    expect(
-      isWalterLiethShown({
-        pathname: "/heat-map",
-        searchParams: new URLSearchParams(),
-        dataset: climate,
-      }),
-    ).toBe(false);
+    expect(isWalterLiethShown({ pathname: "/heat-map", searchParams: new URLSearchParams() })).toBe(
+      false,
+    );
   });
 
-  it("never shows Walter-Lieth with Weather data, whatever chart= says", () => {
-    expect(getShownChartMode({ chartMode: "walter-lieth", dataset: weather })).toBe("standard");
-    for (const query of ["", "chart=wl"]) {
+  it("follows chart= alone — Weather data draws Walter-Lieth too (a single year)", () => {
+    for (const query of ["", "chart=wl", "dataset=weather", "dataset=weather&year=2024"]) {
       expect(
         isWalterLiethShown({
           pathname: "/compare-cities",
           searchParams: new URLSearchParams(query),
-          dataset: weather,
         }),
-      ).toBe(false);
+      ).toBe(true);
     }
   });
 
@@ -236,8 +128,7 @@ describe("chart mode shown", () => {
     expect(
       isWalterLiethShown({
         pathname: "/climate-statistics",
-        searchParams: new URLSearchParams("chart=standard"),
-        dataset: climate,
+        searchParams: new URLSearchParams("chart=standard&dataset=weather"),
       }),
     ).toBe(false);
   });

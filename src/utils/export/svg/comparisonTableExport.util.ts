@@ -3,31 +3,26 @@ import {
   EXPORT_COMPARISON_TABLE as C,
   WALTER_LIETH_EXPORT_TEXT as T,
 } from "@/constants";
-import { EWalterLiethSeriesId } from "@/enums";
 import type {
   TComparisonTable,
-  TExportChartColors,
   TExportComparisonTableArgs,
   TExportTableCellArgs,
   TExportTableValueArgs,
 } from "@/types";
-import { escapeXml } from "@/utils";
+import { escapeXml, getMarkerPath, getPairShape } from "@/utils";
 import { estimateTextWidth } from "./textWrap.util";
-
-const seriesColor = (id: EWalterLiethSeriesId, colors: TExportChartColors) =>
-  id === EWalterLiethSeriesId.A ? colors.wlSeriesA : colors.wlSeriesB;
 
 const text = ({ x, y, value, anchor, size, weight, fill }: TExportTableCellArgs) =>
   `<text x="${x.toFixed(2)}" y="${y}" text-anchor="${anchor}" font-size="${size}"${weight ? ` font-weight="${weight}"` : ""} fill="${fill}">${escapeXml(value)}</text>`;
 
-/** A value right-aligned at `right`, its Martonne badge (text on its class colors) before it. */
+/** A value right-aligned at `right`, its Martonne badge in its class colours before it. */
 function buildValue({ value, badgeText, cell }: TExportTableValueArgs) {
   const valueSvg = text({ ...cell, value: value.text, anchor: "end", size: C.FONT_SIZE });
   if (!value.badge || badgeText === null) return valueSvg;
   const badgeWidth = estimateTextWidth(badgeText, T.BADGE_FONT_SIZE) + T.BADGE_PADDING_X * 2;
   const badgeX = cell.x - estimateTextWidth(value.text, C.FONT_SIZE) - C.MARKER_GAP - badgeWidth;
   const top = cell.y - T.BADGE_RISE;
-  return `<rect x="${badgeX.toFixed(2)}" y="${top}" width="${badgeWidth.toFixed(2)}" height="${T.BADGE_HEIGHT}" rx="${T.BADGE_RADIUS}" fill="${value.badge.bg}" />${text(
+  return `<rect x="${badgeX.toFixed(2)}" y="${top}" width="${badgeWidth.toFixed(2)}" height="${T.BADGE_HEIGHT}" rx="${T.BADGE_RADIUS}" fill="${value.badge.tone.bg}" stroke="${value.badge.tone.border}" />${text(
     {
       x: badgeX + T.BADGE_PADDING_X,
       y: top + T.BADGE_TEXT_Y,
@@ -35,15 +30,15 @@ function buildValue({ value, badgeText, cell }: TExportTableValueArgs) {
       anchor: "start",
       size: T.BADGE_FONT_SIZE,
       weight: T.BADGE_FONT_WEIGHT,
-      fill: value.badge.color,
+      fill: value.badge.tone.text,
     },
   )}${valueSvg}`;
 }
 
 /**
- * String twin of the page's ComparisonTable: metric | A | B | Difference in a framed card,
- * a light header row with the series markers and the difference's direction, thin dividers,
- * values right-aligned in their series colors, the difference muted.
+ * String twin of the page's stats table for a pair: metric | A | B | Difference in a framed
+ * card, a light header row with the series markers and the difference's direction, thin
+ * dividers, values right-aligned in the text colour, the difference muted.
  */
 export function buildComparisonTableSvg({
   table,
@@ -65,11 +60,13 @@ export function buildComparisonTableSvg({
     const nameWidth = estimateTextWidth(series.label, C.FONT_SIZE);
     const markerX = colRight(i) - nameWidth - C.MARKER_GAP - C.MARKER_SIZE;
     const half = C.MARKER_SIZE / 2;
-    const color = seriesColor(series.id, colors);
-    const marker =
-      series.id === EWalterLiethSeriesId.A
-        ? `<circle cx="${markerX + half}" cy="${y - half}" r="${half}" fill="${color}" />`
-        : `<rect x="${markerX}" y="${y - C.MARKER_SIZE}" width="${C.MARKER_SIZE}" height="${C.MARKER_SIZE}" rx="1" fill="${color}" />`;
+    const d = getMarkerPath({
+      shape: getPairShape(series.id),
+      cx: markerX + half,
+      cy: y - half,
+      size: C.MARKER_SIZE,
+    });
+    const marker = `<path d="${d}" fill="${colors.seriesMarker}" />`;
     return `${marker}${text({ x: colRight(i), y, value: series.label, anchor: "end", size: C.FONT_SIZE, weight: C.HEAD_FONT_WEIGHT, fill: colors.text })}`;
   };
   const header = [
@@ -117,7 +114,7 @@ export function buildComparisonTableSvg({
             x: colRight(0),
             y,
             weight: C.VALUE_FONT_WEIGHT,
-            fill: seriesColor(table.seriesA.id, colors),
+            fill: colors.text,
           },
         }),
         buildValue({
@@ -127,7 +124,7 @@ export function buildComparisonTableSvg({
             x: colRight(1),
             y,
             weight: C.VALUE_FONT_WEIGHT,
-            fill: seriesColor(table.seriesB.id, colors),
+            fill: colors.text,
           },
         }),
         row.difference !== null

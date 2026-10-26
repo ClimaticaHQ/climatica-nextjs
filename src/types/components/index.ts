@@ -6,3 +6,4 @@ export type * from "./comparisonTable";
 export type * from "./monthlyValues";
 export type * from "./dataUpdate";
 export type * from "./motion";
+export type * from "./badge.type";

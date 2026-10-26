@@ -42,17 +42,6 @@ export function computeTileRangeFromPixelBounds(
   };
 }
 
-/** Inclusive tile index range covering `bbox` at `zoom`. */
-export function computeTileRange(
-  bbox: TCellBounds,
-  zoom: number,
-  tileSizePx: number = SLIPPY_MAP_TILE_CONFIG.tileSizePx,
-): TTileRange {
-  const topLeft = projectLatLngToPixel(bbox.north, bbox.west, zoom, tileSizePx);
-  const bottomRight = projectLatLngToPixel(bbox.south, bbox.east, zoom, tileSizePx);
-  return computeTileRangeFromPixelBounds(topLeft, bottomRight, zoom, tileSizePx);
-}
-
 /**
  * Highest integer zoom (0..maxZoom) at which `bbox`, expanded by `paddingRatio`
  * on every side, still fits inside a `viewportWidth` × `viewportHeight` box —

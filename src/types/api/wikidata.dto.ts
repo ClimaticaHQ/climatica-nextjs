@@ -1,14 +1,3 @@
-export type TWikidataSearchItem = {
-  id: string;
-  concepturi: string;
-  label?: string;
-  description?: string;
-};
-
-export type TWikidataSearchResult = {
-  search: TWikidataSearchItem[];
-};
-
 export type TWikidataGeoSearchItem = {
   title: string;
   lat: number;
@@ -42,26 +31,4 @@ export type TWikidataEntity = {
 
 export type TWikidataEntitiesResult = {
   entities: Record<string, TWikidataEntity>;
-};
-
-export type TWikidataSparqlBinding = {
-  settlement: { value: string };
-  point: { value: string };
-  sitelinks: { value: string };
-  statements: { value: string };
-};
-
-export type TWikidataSparqlResult = {
-  results: {
-    bindings: TWikidataSparqlBinding[];
-  };
-};
-
-export type TPopulationBinding = {
-  settlement: { value: string };
-  population?: { value: string };
-};
-
-export type TPopulationResult = {
-  results: { bindings: TPopulationBinding[] };
 };

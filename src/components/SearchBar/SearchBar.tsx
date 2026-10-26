@@ -1,9 +1,10 @@
-import { useDebounce, useSearchCity } from "@/hooks";
+import { useDebounce, useErrorMessage, useSearchCity } from "@/hooks";
 import type { TCity, TCoordinates } from "@/types";
 import { getScrollBehavior } from "@/utils/motion.util";
 import { useTranslations } from "next-intl";
 import { FocusEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { TSearchBarProps } from "./SearchBar.type";
+import { SEARCH_ERROR_CLASS, SEARCH_INPUT_CLASS } from "./SearchBar.constant";
 import { tryParseCoords } from "./SearchBar.util";
 
 export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
@@ -27,7 +28,19 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
 
   const debouncedQuery = useDebounce(query, 400);
   const searchQuery = !dirty || coordResult !== null ? "" : debouncedQuery;
-  const { data: results = [], isLoading } = useSearchCity(searchQuery);
+  const { data, isLoading, error } = useSearchCity(searchQuery);
+  const errorMessage = useErrorMessage();
+  // * the typed text isn't searched yet: until it is, the results (or the error) belong to the
+  // * previous text — never shown, never picked; the search shows it's loading instead
+  const isStale = dirty && coordResult === null && query.trim() !== debouncedQuery.trim();
+  const results = isStale ? [] : (data ?? []);
+  const isSearching =
+    dirty && coordResult === null && query.trim().length >= 2 && (isStale || isLoading);
+  // * the search failed (not "no cities found"): the dropdown says why, by cause
+  const searchError =
+    error && !isStale && !dismissed && coordResult === null && debouncedQuery.length >= 2
+      ? errorMessage(error, "errors.searchUnavailable")
+      : null;
 
   const dropdownItems = coordResult ? ["COORDS", ...results] : results;
   const isOpen =
@@ -52,13 +65,13 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
 
   useEffect(() => {
     if (activeIndex !== -1 && containerRef.current) {
-      // * finding all list items and scrolling the active one into view
+      // * scroll the active result into view
       const listItems = containerRef.current.querySelectorAll("li");
       const activeElement = listItems[activeIndex];
 
       if (activeElement) {
         activeElement.scrollIntoView({
-          block: "nearest", // * only scrolls if the element is not fully visible
+          block: "nearest",
           behavior: getScrollBehavior(),
         });
       }
@@ -146,7 +159,7 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
     text-left text-[length:var(--font-sm)] md:text-[length:var(--font-md)]
     cursor-pointer 
     transition-colors duration-150
-    ${activeIndex === index ? "bg-[var(--color-bg-secondary)]" : "hover:bg-[var(--color-bg-secondary)]"}
+    ${activeIndex === index ? "bg-[var(--color-surface-secondary)]" : "hover:bg-[var(--color-surface-secondary)]"}
   `;
 
   return (
@@ -159,26 +172,26 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         placeholder={t("search.placeholder")}
-        className={`
-          w-full px-3 md:px-4 py-2
-          text-[length:var(--font-sm)] md:text-[length:var(--font-md)]
-          placeholder:text-[var(--color-text-secondary)]
-          border-2 border-[var(--color-border)] rounded-[var(--radius-md)] outline-none
-          focus:border-[var(--color-primary)]
-          transition-colors duration-200
-        `}
+        className={SEARCH_INPUT_CLASS}
       />
 
-      {isLoading && dirty && debouncedQuery.length >= 2 && (
+      {isSearching && (
         <span
+          data-testid="city-search-loading"
           className={`
             absolute right-3 top-1/2 -translate-y-1/2 
             w-[18px] h-[18px] 
-            border-2 border-[var(--color-border)] border-t-[var(--color-primary)] 
+            border-2 border-[var(--color-border)] border-t-[var(--color-brand)] 
             rounded-[var(--radius-md)] 
             animate-spin
           `}
         />
+      )}
+
+      {searchError !== null && (
+        <p role="alert" data-testid="city-search-error" className={SEARCH_ERROR_CLASS}>
+          {searchError}
+        </p>
       )}
 
       {isOpen && (
@@ -186,7 +199,7 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
           data-testid="city-search-results"
           className={`
             absolute top-[calc(100%+4px)] left-0 right-0 max-h-[280px] 
-            bg-[var(--color-bg)] 
+            bg-[var(--color-surface)] 
             border border-[var(--color-border)] 
             rounded-[var(--radius-lg)] 
             shadow-md 

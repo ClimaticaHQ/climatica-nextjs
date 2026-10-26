@@ -1,1 +1,0 @@
-export { StandardPanel } from "./StandardPanel";

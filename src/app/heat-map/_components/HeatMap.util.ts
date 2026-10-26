@@ -1,6 +1,6 @@
 import type { TPolygon, TUrlField, TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
-import { GRID_DELTA, MONTH_NAMES, SIDEBAR_PARAMS } from "@/constants";
-import { iriToCellBounds } from "@/utils";
+import { GRID_DELTA, MONTH_NAMES, MONTHS_IN_YEAR, SIDEBAR_PARAMS } from "@/constants";
+import { getMonthlyMean, iriToCellBounds, polygonToWkt, summarizeMonths } from "@/utils";
 import { parseCoord } from "@/utils/urlParams.util";
 import type { TCellBounds, TCellSize } from "@/types";
 import type {
@@ -40,16 +40,16 @@ export function resolveCellBounds(
 
 /** Candidate key sets — SPARQL variable names are API-defined; fallbacks cover naming variants */
 const KEY_SETS = [
-  Array.from({ length: 12 }, (_, i) => `valueMonth${String(i + 1).padStart(2, "0")}`), // valueMonth01..12
-  Array.from({ length: 12 }, (_, i) => `valueMonth${i + 1}`), // valueMonth1..12
-  Array.from({ length: 12 }, (_, i) => `value${String(i + 1).padStart(2, "0")}`), // value01..12
-  Array.from({ length: 12 }, (_, i) => `value${i + 1}`), // value1..12
-  Array.from({ length: 12 }, (_, i) => `vm${String(i + 1).padStart(2, "0")}`), // vm01..12
-  Array.from({ length: 12 }, (_, i) => `vm${i + 1}`), // vm1..12
-  Array.from({ length: 12 }, (_, i) => `v${String(i + 1).padStart(2, "0")}`), // v01..12
-  Array.from({ length: 12 }, (_, i) => `v${i + 1}`), // v1..12
-  Array.from({ length: 12 }, (_, i) => `month${String(i + 1).padStart(2, "0")}`), // month01..12
-  Array.from({ length: 12 }, (_, i) => `month${i + 1}`), // month1..12
+  Array.from({ length: 12 }, (_, i) => `valueMonth${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `valueMonth${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `value${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `value${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `vm${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `vm${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `v${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `v${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `month${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `month${i + 1}`),
 ];
 
 function extractNumber(raw: unknown): number {
@@ -124,64 +124,43 @@ export function computeHeatmapStats(pixelBindings: TWorldClimBoxBinding[]): THea
   return { min, max, avg, median, stdDev, count: values.length };
 }
 
-function extractMonthlyNums(binding: TWorldClimAvgBoxBinding | null): number[] {
-  if (!binding) return Array.from({ length: 12 }, () => NaN);
-  return Array.from({ length: 12 }, (_, i) => {
-    const key = `valueMonth${String(i + 1).padStart(2, "0")}`;
-    return extractNumber((binding as Record<string, unknown>)[key]);
+function extractMonthlyValues(binding: TWorldClimAvgBoxBinding | null): (number | null)[] {
+  const fields = new Map<string, unknown>(binding ? Object.entries(binding) : []);
+  return Array.from({ length: MONTHS_IN_YEAR }, (_, i) => {
+    const value = extractNumber(fields.get(`valueMonth${String(i + 1).padStart(2, "0")}`));
+    return isNaN(value) ? null : value;
   });
 }
 
+/** The shared annual summary — null while any month lacks a value, as on every other page. */
 export function computeRegionalProfile(
   tmax: TWorldClimAvgBoxBinding | null,
   tmin: TWorldClimAvgBoxBinding | null,
   prec: TWorldClimAvgBoxBinding | null,
 ): TRegionalProfile | null {
-  const tmaxVals = extractMonthlyNums(tmax);
-  const tminVals = extractMonthlyNums(tmin);
-  const precVals = extractMonthlyNums(prec);
+  const tmaxValues = extractMonthlyValues(tmax);
+  const tminValues = extractMonthlyValues(tmin);
+  const precValues = extractMonthlyValues(prec);
 
-  const tavgVals = tmaxVals.map((mx, i) => {
-    const mn = tminVals[i];
-    return !isNaN(mx) && mn !== undefined && !isNaN(mn) ? (mx + mn) / 2 : NaN;
-  });
+  const summary = summarizeMonths(
+    precValues.map((monthPrec, i) => ({
+      tavg: getMonthlyMean({ tmax: tmaxValues[i], tmin: tminValues[i] }),
+      prec: monthPrec,
+    })),
+  );
 
-  const validTavg = tavgVals.filter((v) => !isNaN(v));
-  const validPrec = precVals.filter((v) => !isNaN(v));
-
-  if (validTavg.length === 0 || validPrec.length === 0) return null;
-
-  const meanTemp = validTavg.reduce((s, v) => s + v, 0) / validTavg.length;
-  const annualPrecip = Math.round(validPrec.reduce((s, v) => s + v, 0));
-
-  const aridMonths = tavgVals.filter((tavg, i) => {
-    const p = precVals[i];
-    return !isNaN(tavg) && p !== undefined && !isNaN(p) && p < 2 * tavg;
-  }).length;
-
-  const martonneIndex = meanTemp + 10 > 0 ? annualPrecip / (meanTemp + 10) : null;
-
-  return { meanTemp, annualPrecip, aridMonths, martonneIndex };
+  return (
+    summary && {
+      meanTemp: summary.annualAvgTemp,
+      annualPrecip: summary.totalPrec,
+      aridMonths: summary.aridCount,
+      martonneIndex: summary.martonne,
+    }
+  );
 }
 
 export function gridDelta(gridSize: string): number {
   return GRID_DELTA[gridSize] ?? GRID_DELTA["10m"];
-}
-
-// 5 decimal places is ~1m of precision at the equator -- far finer than any
-// WorldClim grid cell -- and keeps the polygon short in query/share URLs.
-const WKT_COORDINATE_PRECISION = 5;
-
-/** lng lat order in WKT spec — note the inversion from the [lat, lng] input */
-export function polygonToWkt(vertices: [number, number][]): string {
-  const ring = [...vertices, vertices[0]];
-  const coords = ring
-    .map(
-      ([lat, lng]) =>
-        `${lng.toFixed(WKT_COORDINATE_PRECISION)} ${lat.toFixed(WKT_COORDINATE_PRECISION)}`,
-    )
-    .join(", ");
-  return `POLYGON((${coords}))`;
 }
 
 /** Inverse of polygonToWkt — returns null for invalid WKT */
@@ -229,10 +208,7 @@ export const selectionUrlField: TUrlField<THeatMapSelectionValue> = {
   },
 };
 
-/**
- * Returns a short month string for the summary bar.
- * [] → ""   [2] → "Feb"   [1,2,3] → "Jan, Feb, Mar"   [1..6] → "6 months"
- */
+/** A short list of the selected months: [] → "", [2] → "Feb", [1,2,3] → "Jan, Feb, Mar", six or more → "6 months". */
 export function formatSelectedMonths(selectedMonths: number[]): string {
   if (selectedMonths.length === 0) return "";
   if (selectedMonths.length <= 3)

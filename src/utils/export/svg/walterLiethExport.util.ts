@@ -30,6 +30,7 @@ import {
   getAridHumidSegments,
   getFrostBand,
   getHatchGeometry,
+  getMarkerPath,
   getRegimeFill,
   getWalterLiethPrecTicks,
   getWalterLiethTempTicks,
@@ -70,8 +71,8 @@ export function getConventionExportPaint(colors: TExportChartColors): TWalterLie
 }
 
 /**
- * String twin of WalterLiethPatterns.tsx — the same getHatchGeometry output, so screen and
- * PNG hatch identically. originX starts the tiles at the plot's left edge.
+ * String twin of HatchPatterns.tsx — the same getHatchGeometry output, so screen and PNG hatch
+ * identically. originX starts the tiles at the plot's left edge.
  */
 export function buildWalterLiethPatterns(
   { humid, arid }: TWalterLiethExportPatternIds,
@@ -90,7 +91,7 @@ export function buildWalterLiethPatterns(
     </pattern>`;
 }
 
-/** String twin of WalterLiethDot.tsx — circle for series A, square for series B. */
+/** String twin of WalterLiethDot.tsx — the series' shape. */
 function buildDot(
   x: number,
   y: number,
@@ -98,11 +99,8 @@ function buildDot(
   color: string,
   bg: string,
 ) {
-  const r = WALTER_LIETH_DOT.RADIUS;
-  const common = `fill="${color}" stroke="${bg}" stroke-width="${WALTER_LIETH_DOT.STROKE_WIDTH}"`;
-  return shape === "square"
-    ? `<rect x="${(x - r).toFixed(2)}" y="${(y - r).toFixed(2)}" width="${r * 2}" height="${r * 2}" ${common} />`
-    : `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${r}" ${common} />`;
+  const d = getMarkerPath({ shape, cx: x, cy: y, size: WALTER_LIETH_DOT.RADIUS * 2 });
+  return `<path d="${d}" fill="${color}" stroke="${bg}" stroke-width="${WALTER_LIETH_DOT.STROKE_WIDTH}" />`;
 }
 
 /** String twin of WalterLiethHalo.tsx: the background-colored band under a curve. */
