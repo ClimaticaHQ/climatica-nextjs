@@ -1,7 +1,7 @@
-import type { routing } from "@/libs/I18nRouting";
+import type { TLocale } from "@/types";
 
 declare module "next-intl" {
   interface AppConfig {
-    Locale: (typeof routing.locales)[number];
+    Locale: TLocale;
   }
 }

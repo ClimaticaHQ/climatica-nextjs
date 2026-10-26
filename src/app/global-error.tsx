@@ -12,8 +12,8 @@ export default function GlobalError({ reset }: TGlobalErrorProps) {
         style={{
           margin: 0,
           fontFamily: "sans-serif",
-          background: "#0f172a",
-          color: "#f1f5f9",
+          background: "#fafafa",
+          color: "#212121",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -24,7 +24,7 @@ export default function GlobalError({ reset }: TGlobalErrorProps) {
           textAlign: "center",
         }}
       >
-        <span style={{ fontSize: "2rem", fontWeight: "bold", color: "#3b82f6" }}>Climatica</span>
+        <span style={{ fontSize: "2rem", fontWeight: "bold", color: "#10835b" }}>Climatica</span>
         <p style={{ opacity: 0.7, maxWidth: "400px", margin: 0 }}>
           Something went wrong with the application. Please reload the page.
         </p>
@@ -33,7 +33,7 @@ export default function GlobalError({ reset }: TGlobalErrorProps) {
           style={{
             padding: "0.5rem 1.5rem",
             borderRadius: "0.375rem",
-            background: "#3b82f6",
+            background: "#10835b",
             color: "white",
             border: "none",
             cursor: "pointer",

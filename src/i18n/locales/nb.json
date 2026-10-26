@@ -1,0 +1,441 @@
+{
+  "navbar": {
+    "toggleMenu": "Veksle meny",
+    "settings": "Innstillinger"
+  },
+  "pages": {
+    "climateStatistics": {
+      "title": "Byklima",
+      "description": "Søk etter en by for å utforske klimadata"
+    },
+    "compareCities": {
+      "title": "Sammenlign byer",
+      "description": "Sammenlign klimaet i to byer side om side"
+    },
+    "comparePeriods": {
+      "title": "Sammenlign perioder",
+      "description": "Se hvordan klimaet i en by endrer seg over perioder og år"
+    },
+    "heatMap": {
+      "title": "Varmekart for region",
+      "description": "Tegn et område på kartet for å se hvordan klimaet varierer"
+    },
+    "settings": {
+      "title": "Innstillinger",
+      "description": "Språk, utseende og hvordan appen oppfører seg"
+    }
+  },
+  "search": {
+    "placeholder": "Søk etter by eller skriv inn koordinater (lat, lng)...",
+    "coordsResult": "Gå til koordinater"
+  },
+  "climateStatistics": {
+    "cellResolution": "Celleoppløsning:",
+    "stats": {
+      "avgTmax": "Gjennomsnittlig maks.temp.",
+      "avgTmin": "Gjennomsnittlig min.temp.",
+      "tmax": "Maks.temp.",
+      "tmin": "Min.temp.",
+      "totalPrec": "Total nedbør",
+      "mmThisMonth": "mm denne måneden",
+      "altitude": "Høyde over havet",
+      "filteredMonths": "Filtrert: {months}"
+    },
+    "noPeriodData": "Ingen data for {period} ved oppløsningen {grid}"
+  },
+  "compareCities": {},
+  "comparePeriods": {
+    "trend": {
+      "tempTitle": "Temperaturtrend",
+      "precipTitle": "Nedbørtrend",
+      "noChange": "Ingen endring",
+      "comparedTo": "{b} mot {a}"
+    },
+    "weather": {
+      "addPeriod": "Legg til periode",
+      "removePeriod": "Fjern {year}",
+      "invalidYear": "Skriv inn et år mellom {min} og {max}",
+      "duplicateYear": "Dette året er allerede i listen",
+      "periodsCount": "{count} / {max} perioder",
+      "noData": "Ingen værdata for {years} for dette stedet og denne oppløsningen."
+    },
+    "swapPeriods": "Bytt perioder",
+    "sort": {
+      "year": "År",
+      "ascending": "Sorter etter år, stigende",
+      "descending": "Sorter etter år, synkende"
+    }
+  },
+  "climateComparison": {
+    "searchA": "By A",
+    "searchB": "By B",
+    "searchCity": "By",
+    "periodA": "Periode A",
+    "periodB": "Periode B",
+    "noData": "Velg to byer ovenfor for å sammenligne klimadata",
+    "noDataPeriods": "Velg en by og to tidsperioder for å sammenligne klimadata",
+    "stats": {
+      "avgTmax": "Gjennomsnittlig maks.temp.",
+      "avgTmin": "Gjennomsnittlig min.temp.",
+      "totalPrec": "Total nedbør",
+      "aridMonths": "Tørre måneder",
+      "frostMonths": "Frostmåneder"
+    },
+    "diff": {
+      "warmerCity": "Varmere by",
+      "moreRain": "Mer nedbør",
+      "hottestMonth": "Varmeste måned",
+      "coldestMonth": "Kaldeste måned",
+      "byDegrees": "med {value} °C",
+      "byMm": "med {value} mm",
+      "tie": "Uavgjort",
+      "tieSub": "=",
+      "monthTemps": "{a}: {tempA} / {b}: {tempB}"
+    },
+    "noPeriodData": "Ingen data for {period} ved oppløsningen {grid}",
+    "difference": "Forskjell",
+    "differenceInfo": "Slik beregnes forskjellen",
+    "differenceNote": {
+      "cities": "Forskjell = {b} − {a}. En positiv verdi betyr at målet er høyere i {b}.",
+      "periods": "Forskjell = {b} − {a}. En positiv verdi betyr at målet har økt i den senere perioden."
+    },
+    "metric": "Måling",
+    "tableCaption": "Sammenligning av {a} og {b}",
+    "statsCaption": "Statistikk for {names}"
+  },
+  "heatMap": {
+    "drawBbox": "Tegn avgrensningsboks",
+    "drawPolygon": "Tegn polygon",
+    "clearSelection": "Tøm valg",
+    "drawing": "Klikk og dra på kartet for å velge et område",
+    "drawingPolygon": "Klikk for å legge til punkter — klikk på det første punktet for å lukke polygonen",
+    "noSelection": "Tegn en avgrensningsboks eller polygon på kartet for å analysere klimadata for det området",
+    "noData": "Ingen data tilgjengelig for dette området",
+    "noPeriodData": "Ingen data for {period} ved oppløsningen {grid}",
+    "tooManyCells": "Denne regionen har {count, number} celler ved {grid}, flere enn de {max, number} kartet kan laste inn. Velg {suggestion} eller en grovere oppløsning.",
+    "tooManyCellsAnyGrid": "Denne regionen har flere enn {max, number} celler selv ved {coarsest}. Tegn en mindre region.",
+    "tooManyCellsPolygon": "Dette polygonet dekker {count, number} celler ved {grid}, men for å laste det leses alle {boxCount, number} cellene i rektangelet rundt, flere enn de {max, number} kartet kan laste inn. Velg {suggestion} eller en grovere oppløsning, eller tegn et mer kompakt polygon.",
+    "tooManyCellsPolygonAnyGrid": "Dette polygonet dekker {count, number} celler ved {grid}, men for å laste det leses rektangelet rundt, som har flere enn {max, number} celler selv ved {coarsest}. Tegn et mindre eller mer kompakt polygon.",
+    "stats": {
+      "minValue": "Min.",
+      "maxValue": "Maks.",
+      "avgValue": "Gjennomsnitt",
+      "median": "Median",
+      "stdDev": "Standardavvik",
+      "cellsAnalyzed": "Celler",
+      "contextClimate": "30-års snitt · {period}",
+      "contextWeatherAnnual": "Årlig snitt · {year}",
+      "contextWeatherMonth": "{month} {year} snitt",
+      "avgTooltipClimate": "30-års klimatologisk gjennomsnitt ({period}) over alle celler",
+      "avgTooltipWeatherAnnual": "Årlig gjennomsnitt: middelverdi av alle 12 månedlige gjennomsnitt over alle celler",
+      "avgTooltipWeatherMonth": "Månedlig gjennomsnitt: middelverdi for {variable} for {month} {year} over alle celler"
+    },
+    "profile": {
+      "subtitle": "Regional klimaprofil · {count} celler · {period}",
+      "subtitleWeather": "Regional klimaprofil · {count} celler · {year} · ikke en normalverdi"
+    }
+  },
+  "chart": {
+    "versus": "mot",
+    "precipitation": "Nedbør",
+    "maxTemperature": "Maksimal temperatur",
+    "minTemperature": "Minimal temperatur",
+    "avgTemperature": "Gjennomsnittstemperatur",
+    "avgTempShort": "Gj.snittstemp.",
+    "precipShort": "Nedbør",
+    "meanTemp": "Middeltemperatur",
+    "annualPrec": "Årlig nedbør",
+    "aridMonths": "Tørre måneder",
+    "martonne": "Martonne-indeks (M)",
+    "martonneShort": "Martonne (M)",
+    "martonneTooltip": "De Martonnes tørkeindeks: M = P/(T+10).",
+    "aridPeriod": "Tørr periode",
+    "humidPeriod": "Fuktig periode",
+    "perhumidPeriod": "Svært fuktig (> 100 mm)",
+    "wlAriaSummary": "Walter-Lieth-diagram, {location}, {period}: middeltemperatur {temp} °C, årlig nedbør {prec} mm, tørre måneder: {arid}",
+    "wlIncomplete": "Ufullstendige data for {label}: Walter-Lieth-diagrammet krever temperatur og nedbør for alle 12 måneder.",
+    "layout": "Oppsett",
+    "layoutSplit": "Side om side",
+    "layoutOverlay": "Overlapping",
+    "wlGuideButton": "Slik leser du diagrammet",
+    "wlGuide": {
+      "scale": "Skala: 10 °C = 20 mm",
+      "humid": "Fuktig periode (vertikale linjer): nedbør over temperatur",
+      "arid": "Tørr periode (prikker): temperatur over nedbør",
+      "veryHumid": "Svært fuktig (farget felt): over 100 mm, skala komprimert 1:10",
+      "frost": "Frostsone: måneder med gjennomsnittlig minimum under 0 °C"
+    },
+    "wlShading": "Skyggelegging",
+    "wlShadingNone": "Ingen",
+    "mode": "Diagramtype",
+    "modeStandard": "Standard diagram",
+    "modeWalterLieth": "Walter-Lieth-diagram",
+    "walterLiethTabUnavailable": "Ikke tilgjengelig i Walter-Lieth-visning",
+    "selectedMonthsCount": "{count, plural, one {# måned} other {# måneder}}",
+    "altitude": "Høyde over havet",
+    "subtitle": {
+      "climate": "Klima {period}",
+      "weather": "Vær {year} · ett enkelt år",
+      "weatherYears": "Vær {years} · hvert ett enkelt år"
+    },
+    "expandPanel": "Utvid {name}",
+    "showBoth": "Vis begge",
+    "expandedPanel": "Utvidet panel",
+    "frostLegend": "Frost (gj.snittlig min. < 0 °C)",
+    "maxTempShort": "Maks.temp.",
+    "minTempShort": "Min.temp.",
+    "monthlyTableCaption": "Månedlige verdier: {names}",
+    "month": "Måned",
+    "showMonthlyValues": "Vis månedlige verdier",
+    "hideMonthlyValues": "Skjul månedlige verdier",
+    "switchToStandard": "Bytt til standarddiagram",
+    "walterLiethFiltersExplanation": "Walter-Lieth-diagrammet viser alltid middeltemperatur og nedbør for alle 12 måneder, så variabler og måneder kan ikke velges mens det vises.",
+    "weatherSingleYear": "Vær · ett enkelt år",
+    "martonneShortYear": "Martonne (M) · {year}",
+    "martonneYear": "Martonne-indeks (M) for {year}",
+    "martonneTooltipYear": "De Martonnes tørkeindeks for {year} alene, ut fra det årets data: M = P/(T+10).",
+    "martonnePerYear": "Martonne-indeks (M), per år",
+    "yearsShown": "Viste år",
+    "focusCurve": "{variable} · {entity} — {month} {value}",
+    "focusBar": "{entity} — {month} {value} ({period})",
+    "focusHumid": "fuktig periode",
+    "focusArid": "tørr periode",
+    "scrollHint": "Sveip for å se alle månedene"
+  },
+  "loading": {
+    "dataUpdated": "Data oppdatert: {location}, {period}"
+  },
+  "errors": {
+    "fetchClimateData": "Kunne ikke hente klimadata",
+    "tooManyRequests": "For mange forespørsler. Vent litt og prøv igjen.",
+    "searchUnavailable": "Bysøket er ikke tilgjengelig akkurat nå. Prøv igjen om litt.",
+    "dataSourceUnavailable": "Klimadatatjenesten svarer ikke. Prøv igjen om litt.",
+    "connection": "Kunne ikke nå serveren. Sjekk tilkoblingen og prøv igjen.",
+    "placeLookupFailed": "Kunne ikke hente et stedsnavn for dette punktet – viser koordinatene i stedet."
+  },
+  "geolocation": {
+    "notSupported": "Geolokalisering støttes ikke av nettleseren din",
+    "httpsRequired": "Posisjon krever en sikker tilkobling (HTTPS)",
+    "permissionDenied": "Tilgang til posisjon avslått. Vennligst gi tillatelse i nettleserinnstillingene",
+    "unavailable": "Kunne ikke fastslå posisjonen din",
+    "timeout": "Forespørsel om posisjon utløp på tid. Vennligst prøv igjen",
+    "unknown": "Det oppsto en ukjent feil"
+  },
+  "map": {
+    "selectedFromMap": "Valgt fra kartet",
+    "pointLabel": "Kartpunkt {lat}, {lng}",
+    "gridCell": "Rutenettcelle: {size}"
+  },
+  "cellSizes": {
+    "10m": "10 min (~324 km²)",
+    "5m": "5 min (~81 km²)",
+    "2_5m": "2,5 min (~20,25 km²)",
+    "30s": "30 sek (~1 km²)",
+    "onlyForPeriod": "Bare for Klima {period}"
+  },
+  "cellSizesShort": {
+    "10m": "10 min",
+    "5m": "5 min",
+    "2_5m": "2,5 min",
+    "30s": "30 s"
+  },
+  "filters": {
+    "names": {
+      "dataset": "Datasett",
+      "climatePeriod": "Klimaperiode",
+      "weatherYear": "År",
+      "variables": "Variabler",
+      "gridSize": "Oppløsning",
+      "months": "Måneder"
+    },
+    "chips": {
+      "allFilters": "Filtre",
+      "allFiltersLabel": "Filtre, {count, plural, =0 {ingen endret} one {# endret} other {# endret}}",
+      "value": "{name}: {value}",
+      "variablesCount": "{count, plural, one {# variabel} other {# variabler}}",
+      "allMonths": "Alle måneder",
+      "monthsCount": "{count, plural, one {# måned} other {# måneder}}"
+    },
+    "sheet": {
+      "apply": "Bruk",
+      "reset": "Tilbakestill"
+    }
+  },
+  "validation": {
+    "year": {
+      "required": "Årstall er påkrevd",
+      "invalid": "Skriv inn et gyldig tall",
+      "integer": "Året må være et heltall",
+      "tooSmall": "Året må være minst {min}",
+      "tooBig": "Året kan ikke overstige {max}"
+    },
+    "period": {
+      "invalid": "Velg en gyldig klimaperiode"
+    }
+  },
+  "exportMenu": {
+    "button": "Eksporter data",
+    "png": "PNG-bilde",
+    "svg": "SVG-vektor",
+    "csv": "CSV-data",
+    "rawCsv": "Alle data (CSV)",
+    "rawJson": "Alle data (JSON)",
+    "rawDataUnavailable": "Kun tilgjengelig for Klima 1970–2000",
+    "incompleteData": "Eksport utilgjengelig: enkelte måneder mangler temperatur- eller nedbørdata",
+    "updating": "Eksport utilgjengelig mens data oppdateres",
+    "failed": "Eksport mislyktes — prøv igjen",
+    "metricColumn": "Måling"
+  },
+  "months": {
+    "1": "Jan",
+    "2": "Feb",
+    "3": "Mar",
+    "4": "Apr",
+    "5": "Mai",
+    "6": "Jun",
+    "7": "Jul",
+    "8": "Aug",
+    "9": "Sep",
+    "10": "Okt",
+    "11": "Nov",
+    "12": "Des"
+  },
+  "sidebar": {
+    "sections": {
+      "dataset": "Datasett",
+      "climatePeriod": "Klimaperiode",
+      "yearRange": "År",
+      "variables": "Variabler",
+      "months": "Måned"
+    },
+    "datasets": {
+      "climate": "Klima",
+      "weather": "Vær"
+    },
+    "variables": {
+      "tmax": "Maks.temp.",
+      "tmin": "Min.temp.",
+      "prec": "Nedbør",
+      "tavg": "Gj.snittstemp.",
+      "srad": "Solstråling",
+      "wind": "Vind",
+      "vapr": "Damptrykk"
+    },
+    "months": {
+      "all": "Alle"
+    },
+    "filters": "Filtre",
+    "applyFilters": "Bruk filtre",
+    "cellCount": {
+      "label": "({count} celler)",
+      "fast": "Rask",
+      "moderate": "Moderat",
+      "slow": "Treg",
+      "tooMany": "For mange celler",
+      "tooManyError": "For mange celler å laste inn. Zoom inn eller velg en grovere oppløsning."
+    },
+    "notes": {
+      "climateNormals": "30-års klimanormaler",
+      "weatherData": "Årlige værdata (CRU-TS-4.09)",
+      "weatherVariables": "Værdata inkluderer kun temperatur og nedbør",
+      "notAvailableHeatmap": "Ikke tilgjengelig for varmekart for region"
+    }
+  },
+  "common": {
+    "useMyLocation": "Bruk min posisjon",
+    "locating": "Finner posisjon...",
+    "close": "Lukk"
+  },
+  "error": {
+    "title": "Noe gikk galt",
+    "subtitle": "Det oppsto en uventet feil. Vennligst prøv igjen.",
+    "tryAgain": "Prøv igjen",
+    "goHome": "Gå til forsiden"
+  },
+  "notFound": {
+    "title": "Siden ble ikke funnet",
+    "subtitle": "Siden du leter etter eksisterer ikke eller har blitt flyttet.",
+    "goHome": "Gå til Klimastatistikk"
+  },
+  "martonne": {
+    "arid": "Tørt",
+    "semiArid": "Halvtørt",
+    "mediterranean": "Middelhavsklima",
+    "semiHumid": "Halvfuktig",
+    "humid": "Fuktig",
+    "veryHumid": "Svært fuktig",
+    "extremelyHumid": "Ekstremt fuktig"
+  },
+  "meta": {
+    "climateStatistics": {
+      "title": "{city} · {page}",
+      "description": "{variables} for {city} ({period})"
+    },
+    "compareCities": {
+      "title": "Sammenligner {cityA} og {cityB}",
+      "description": "{variables} for {cityA} mot {cityB} ({period})"
+    },
+    "comparePeriods": {
+      "title": "{city} — klimaperiode-sammenligning",
+      "description": "{variables} for {city} — {periods}"
+    },
+    "heatMap": {
+      "title": "{page} · {variables} ({period})",
+      "description": "Klimaintensitet for {variables} over det valgte området ({period})"
+    }
+  },
+  "units": {
+    "celsius": "°C",
+    "mm": "mm",
+    "meters": "m",
+    "celsiusValue": "{value} °C",
+    "mmValue": "{value} mm",
+    "metersValue": "{value} m"
+  },
+  "settings": {
+    "sections": {
+      "language": "Språk",
+      "appearance": "Utseende",
+      "chartsAndFilters": "Diagrammer og filtre"
+    },
+    "theme": "Tema",
+    "themeOptions": {
+      "light": "Lyst",
+      "dark": "Mørkt",
+      "system": "System"
+    },
+    "autoScroll": "Rull automatisk til resultater",
+    "syncCity": "Synkroniser valgt by på tvers av sider",
+    "syncFilters": "Synkroniser filtre på tvers av sider",
+    "autoApplyFilters": "Bruk filtre automatisk",
+    "animations": "Animasjoner",
+    "updateHighlight": "Fremhev endringer",
+    "updateHighlightGlow": "Glød",
+    "updateHighlightBorder": "Ramme",
+    "reducedMotionNotice": "Systemet ditt ber om redusert bevegelse, så animasjoner er av",
+    "appLanguage": "Appspråk",
+    "chartBarStyle": "Søylestil for sammenligning",
+    "barStyleOptions": {
+      "plain": "Ensfarget",
+      "shades": "Nyanser",
+      "hatch": "Mønstre"
+    },
+    "barStyleDescriptions": {
+      "plain": "Standard: én farge for hver by eller periode – det reneste uttrykket",
+      "shades": "En egen nyanse for hver by eller periode",
+      "hatch": "Mønstre – best for utskrift og ulikt fargesyn"
+    },
+    "descriptions": {
+      "animations": "Myke overganger når diagrammer og data endres",
+      "updateHighlight": "Hvordan et kort markeres når dataene i det oppdateres",
+      "autoApplyFilters": "Filterendringer brukes med en gang; når det er av, venter de på «Bruk filtre»",
+      "syncCity": "En by du velger på én side, åpnes også på de andre sidene",
+      "syncFilters": "Filtre du velger på én side, gjelder også på de andre sidene",
+      "autoScroll": "Ruller ned til resultatene når du har valgt en by",
+      "chartBarStyle": "Hvordan byer eller perioder skilles fra hverandre i overlagte diagrammer"
+    },
+    "hints": {
+      "turnOnAnimations": "Slå på animasjoner for å velge fremheving"
+    }
+  }
+}

@@ -1,11 +1,12 @@
-import type { TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
-import { CELL_SIZE_OPTIONS, GRID_DELTA, MONTH_NAMES } from "@/constants";
-import { iriToCellBounds } from "@/utils";
+import type { TPolygon, TUrlField, TWorldClimAvgBoxBinding, TWorldClimBoxBinding } from "@/types";
+import { GRID_DELTA, MONTH_NAMES, MONTHS_IN_YEAR, SIDEBAR_PARAMS } from "@/constants";
+import { getMonthlyMean, iriToCellBounds, polygonToWkt, summarizeMonths } from "@/utils";
+import { parseCoord } from "@/utils/urlParams.util";
 import type { TCellBounds, TCellSize } from "@/types";
 import type {
   THeatmapStats,
+  THeatMapSelectionValue,
   TLooseBinding,
-  TPolygon,
   TRegionalProfile,
   TSumAndCount,
 } from "./HeatMap.type";
@@ -13,18 +14,42 @@ import type {
 export { GRID_DELTA, iriToCellBounds };
 export type { TCellBounds, TCellSize };
 
+/** A cell's bounds either come straight off the binding's own lat/lng (± half a
+ * cell), or — when those aren't present — get derived from its cell IRI. Shared
+ * by the live HeatmapLayer and the SVG export, so both draw the exact same
+ * rectangles from the exact same bindings. */
+export function resolveCellBounds(
+  binding: TWorldClimBoxBinding,
+  cellSize: number,
+): TCellBounds | null {
+  const lat = parseFloat(binding.lat?.value ?? "");
+  const lng = parseFloat(binding.lng?.value ?? "");
+
+  if (!isNaN(lat) && !isNaN(lng)) {
+    return {
+      north: lat + cellSize / 2,
+      south: lat - cellSize / 2,
+      west: lng - cellSize / 2,
+      east: lng + cellSize / 2,
+    };
+  }
+
+  const iri = binding.cell?.value;
+  return iri ? iriToCellBounds(iri, cellSize) : null;
+}
+
 /** Candidate key sets — SPARQL variable names are API-defined; fallbacks cover naming variants */
 const KEY_SETS = [
-  Array.from({ length: 12 }, (_, i) => `valueMonth${String(i + 1).padStart(2, "0")}`), // valueMonth01..12
-  Array.from({ length: 12 }, (_, i) => `valueMonth${i + 1}`), // valueMonth1..12
-  Array.from({ length: 12 }, (_, i) => `value${String(i + 1).padStart(2, "0")}`), // value01..12
-  Array.from({ length: 12 }, (_, i) => `value${i + 1}`), // value1..12
-  Array.from({ length: 12 }, (_, i) => `vm${String(i + 1).padStart(2, "0")}`), // vm01..12
-  Array.from({ length: 12 }, (_, i) => `vm${i + 1}`), // vm1..12
-  Array.from({ length: 12 }, (_, i) => `v${String(i + 1).padStart(2, "0")}`), // v01..12
-  Array.from({ length: 12 }, (_, i) => `v${i + 1}`), // v1..12
-  Array.from({ length: 12 }, (_, i) => `month${String(i + 1).padStart(2, "0")}`), // month01..12
-  Array.from({ length: 12 }, (_, i) => `month${i + 1}`), // month1..12
+  Array.from({ length: 12 }, (_, i) => `valueMonth${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `valueMonth${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `value${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `value${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `vm${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `vm${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `v${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `v${i + 1}`),
+  Array.from({ length: 12 }, (_, i) => `month${String(i + 1).padStart(2, "0")}`),
+  Array.from({ length: 12 }, (_, i) => `month${i + 1}`),
 ];
 
 function extractNumber(raw: unknown): number {
@@ -99,55 +124,43 @@ export function computeHeatmapStats(pixelBindings: TWorldClimBoxBinding[]): THea
   return { min, max, avg, median, stdDev, count: values.length };
 }
 
-function extractMonthlyNums(binding: TWorldClimAvgBoxBinding | null): number[] {
-  if (!binding) return Array.from({ length: 12 }, () => NaN);
-  return Array.from({ length: 12 }, (_, i) => {
-    const key = `valueMonth${String(i + 1).padStart(2, "0")}`;
-    return extractNumber((binding as Record<string, unknown>)[key]);
+function extractMonthlyValues(binding: TWorldClimAvgBoxBinding | null): (number | null)[] {
+  const fields = new Map<string, unknown>(binding ? Object.entries(binding) : []);
+  return Array.from({ length: MONTHS_IN_YEAR }, (_, i) => {
+    const value = extractNumber(fields.get(`valueMonth${String(i + 1).padStart(2, "0")}`));
+    return isNaN(value) ? null : value;
   });
 }
 
+/** The shared annual summary — null while any month lacks a value, as on every other page. */
 export function computeRegionalProfile(
   tmax: TWorldClimAvgBoxBinding | null,
   tmin: TWorldClimAvgBoxBinding | null,
   prec: TWorldClimAvgBoxBinding | null,
 ): TRegionalProfile | null {
-  const tmaxVals = extractMonthlyNums(tmax);
-  const tminVals = extractMonthlyNums(tmin);
-  const precVals = extractMonthlyNums(prec);
+  const tmaxValues = extractMonthlyValues(tmax);
+  const tminValues = extractMonthlyValues(tmin);
+  const precValues = extractMonthlyValues(prec);
 
-  const tavgVals = tmaxVals.map((mx, i) => {
-    const mn = tminVals[i];
-    return !isNaN(mx) && mn !== undefined && !isNaN(mn) ? (mx + mn) / 2 : NaN;
-  });
+  const summary = summarizeMonths(
+    precValues.map((monthPrec, i) => ({
+      tavg: getMonthlyMean({ tmax: tmaxValues[i], tmin: tminValues[i] }),
+      prec: monthPrec,
+    })),
+  );
 
-  const validTavg = tavgVals.filter((v) => !isNaN(v));
-  const validPrec = precVals.filter((v) => !isNaN(v));
-
-  if (validTavg.length === 0 || validPrec.length === 0) return null;
-
-  const meanTemp = validTavg.reduce((s, v) => s + v, 0) / validTavg.length;
-  const annualPrecip = Math.round(validPrec.reduce((s, v) => s + v, 0));
-
-  const aridMonths = tavgVals.filter((tavg, i) => {
-    const p = precVals[i];
-    return !isNaN(tavg) && p !== undefined && !isNaN(p) && p < 2 * tavg;
-  }).length;
-
-  const martonneIndex = meanTemp + 10 > 0 ? annualPrecip / (meanTemp + 10) : null;
-
-  return { meanTemp, annualPrecip, aridMonths, martonneIndex };
+  return (
+    summary && {
+      meanTemp: summary.annualAvgTemp,
+      annualPrecip: summary.totalPrec,
+      aridMonths: summary.aridCount,
+      martonneIndex: summary.martonne,
+    }
+  );
 }
 
 export function gridDelta(gridSize: string): number {
   return GRID_DELTA[gridSize] ?? GRID_DELTA["10m"];
-}
-
-/** lng lat order in WKT spec — note the inversion from the [lat, lng] input */
-export function polygonToWkt(vertices: [number, number][]): string {
-  const ring = [...vertices, vertices[0]];
-  const coords = ring.map(([lat, lng]) => `${lng} ${lat}`).join(", ");
-  return `POLYGON((${coords}))`;
 }
 
 /** Inverse of polygonToWkt — returns null for invalid WKT */
@@ -164,15 +177,38 @@ export function wktToPolygon(wkt: string): TPolygon | null {
   return vertices;
 }
 
-/** "2.5 min" from "2.5 min (~20.25 km²)" */
-export function shortGridLabel(gridSize: TCellSize): string {
-  return CELL_SIZE_OPTIONS[gridSize]?.split(" (~")[0] ?? gridSize;
-}
+/** Polygon and bbox are mutually exclusive — polygon (if present) always wins on parse. */
+export const selectionUrlField: TUrlField<THeatMapSelectionValue> = {
+  serialize(value, params) {
+    if (value.kind === "polygon") {
+      params.set(SIDEBAR_PARAMS.POLYGON, polygonToWkt(value.polygon));
+    } else if (value.kind === "bbox") {
+      params.set(SIDEBAR_PARAMS.BBOX_NORTH, String(value.bbox.north));
+      params.set(SIDEBAR_PARAMS.BBOX_SOUTH, String(value.bbox.south));
+      params.set(SIDEBAR_PARAMS.BBOX_WEST, String(value.bbox.west));
+      params.set(SIDEBAR_PARAMS.BBOX_EAST, String(value.bbox.east));
+    }
+  },
+  parse(params) {
+    const polygonRaw = params.get(SIDEBAR_PARAMS.POLYGON);
+    if (polygonRaw !== null) {
+      const polygon = wktToPolygon(polygonRaw);
+      return polygon ? { kind: "polygon", polygon } : { kind: "none" };
+    }
 
-/**
- * Returns a short month string for the summary bar.
- * [] → ""   [2] → "Feb"   [1,2,3] → "Jan, Feb, Mar"   [1..6] → "6 months"
- */
+    const north = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_NORTH));
+    const south = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_SOUTH));
+    const west = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_WEST));
+    const east = parseCoord(params.get(SIDEBAR_PARAMS.BBOX_EAST));
+    if (north !== null && south !== null && west !== null && east !== null) {
+      return { kind: "bbox", bbox: { north, south, west, east } };
+    }
+
+    return { kind: "none" };
+  },
+};
+
+/** A short list of the selected months: [] → "", [2] → "Feb", [1,2,3] → "Jan, Feb, Mar", six or more → "6 months". */
 export function formatSelectedMonths(selectedMonths: number[]): string {
   if (selectedMonths.length === 0) return "";
   if (selectedMonths.length <= 3)

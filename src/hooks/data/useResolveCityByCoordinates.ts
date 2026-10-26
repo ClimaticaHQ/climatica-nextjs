@@ -1,15 +1,15 @@
 import { apiClient } from "@/libs/api";
-import type { TCoordinates, TWikidataCity } from "@/types";
+import type { TCity, TCoordinates } from "@/types";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 
 export function useResolveCityByCoordinates(): UseMutationResult<
-  TWikidataCity | null,
+  TCity | null,
   Error,
   TCoordinates
 > {
-  return useMutation<TWikidataCity | null, Error, TCoordinates>({
+  return useMutation<TCity | null, Error, TCoordinates>({
     mutationFn: async ({ lat, lng }) => {
-      const { data: cities } = await apiClient.get<TWikidataCity[]>("/api/cities", {
+      const { data: cities } = await apiClient.get<TCity[]>("/api/cities", {
         params: { q: `${lat},${lng}` },
       });
       return cities[0] ?? null;

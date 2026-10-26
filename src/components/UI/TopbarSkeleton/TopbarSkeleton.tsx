@@ -1,11 +1,11 @@
 export function TopbarSkeleton() {
   return (
-    <header className="h-16 w-full shrink-0 animate-pulse border-b border-[var(--color-border)] bg-[var(--color-bg)]">
-      <div className="flex h-full items-center px-4">
+    <header className="box-content h-16 w-full shrink-0 animate-pulse border-b pt-[env(safe-area-inset-top)] border-[var(--color-border)] bg-[var(--color-surface)]">
+      <div className="flex h-full items-center pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
         {/* Logo */}
         <div className="flex flex-1 items-center gap-2.5">
           <div className="h-8 w-8 shrink-0 rounded-full bg-[var(--color-border)] md:h-9 md:w-9 lg:h-10 lg:w-10" />
-          <div className="h-4 w-24 rounded bg-[var(--color-border)] md:h-[18px] md:w-28 lg:h-5 lg:w-32" />
+          <div className="h-[18px] w-28 rounded bg-[var(--color-border)] lg:h-5 lg:w-32" />
         </div>
 
         {/* Desktop center nav */}

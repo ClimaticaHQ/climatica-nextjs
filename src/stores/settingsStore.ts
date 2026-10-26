@@ -1,32 +1,38 @@
 "use client";
 
-import { LOCAL_STORAGE_KEYS } from "@/constants";
+import { LOCAL_STORAGE_KEYS, SETTINGS_DEFAULTS, SETTINGS_STORE_VERSION } from "@/constants";
 import type { TSettingsState } from "@/types";
+import {
+  createSettingsStorage,
+  getPersistedSettings,
+  mergePersistedSettings,
+  migrateSettings,
+  readLegacyTheme,
+} from "@/utils/settings.util";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
+/** Every user setting but the language, saved as one object. */
 export const useSettingsStore = create<TSettingsState>()(
   persist(
-    (set, get) => ({
-      autoScroll: false,
-      autoApplyFilters: true,
-      syncCity: true,
+    (set) => ({
+      ...SETTINGS_DEFAULTS,
       hasHydrated: false,
-      toggleAutoScroll: () => set({ autoScroll: !get().autoScroll }),
-      toggleAutoApplyFilters: () => set({ autoApplyFilters: !get().autoApplyFilters }),
-      toggleSyncCity: () => set({ syncCity: !get().syncCity }),
+      setSetting: (key, value) => set({ [key]: value }),
       setHasHydrated: (hydrated) => set({ hasHydrated: hydrated }),
     }),
     {
       name: LOCAL_STORAGE_KEYS.SETTINGS,
+      version: SETTINGS_STORE_VERSION,
+      storage: createJSONStorage(() => createSettingsStorage(() => window.localStorage)),
+      migrate: (persisted, version) =>
+        migrateSettings(persisted, version, readLegacyTheme(window.localStorage)),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
-      partialize: (state) => ({
-        autoScroll: state.autoScroll,
-        autoApplyFilters: state.autoApplyFilters,
-        syncCity: state.syncCity,
-      }),
+      partialize: getPersistedSettings,
+      // * a stale or hand-edited entry never puts an invalid value in the store
+      merge: mergePersistedSettings,
     },
   ),
 );

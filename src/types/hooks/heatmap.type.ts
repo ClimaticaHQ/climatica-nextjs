@@ -1,4 +1,6 @@
-import { TWorldClimAvgBoxBinding, TWorldClimAvgBoxResponse, TWorldClimBoxResponse } from "../api";
+import type { TWorldClimAvgBoxBinding } from "../api";
+import type { TCellSize, TVariable } from "../domain";
+import type { TRegionArea, TRegionDataset } from "../utils/cellCount.type";
 
 export type TBbox = {
   north: number;
@@ -7,14 +9,22 @@ export type TBbox = {
   east: number;
 };
 
-export type THeatmapResult = {
-  pixels: TWorldClimBoxResponse;
-  avg: TWorldClimAvgBoxResponse;
+export type TPolygon = [number, number][];
+
+export type TUseRegionDataArgs = {
+  /** null: no region, nothing to load */
+  area: TRegionArea | null;
+  gridSize: TCellSize;
+  dataset: TRegionDataset;
 };
 
-export type TPolygonResult = {
-  pixels: TWorldClimBoxResponse;
-  avg: TWorldClimAvgBoxResponse;
+export type TUseGetHeatmapDataArgs = TUseRegionDataArgs & {
+  variable: TVariable;
+};
+
+export type TUseGetRegionalProfileArgs = TUseRegionDataArgs & {
+  /** the profile waits for the region's cells */
+  isEnabled: boolean;
 };
 
 export type TProfileResult = {

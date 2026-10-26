@@ -1,81 +1,35 @@
 import { WorldClimService } from "@/libs/services/worldClimService";
-import type {
-  TBbox,
-  TCellSize,
-  TClimatePeriod,
-  THeatmapResult,
-  TRawAvgValueResponse,
-  TRawPixelValueResponse,
-  TVariable,
-} from "@/types";
-import { buildHeatmapResults } from "@/utils";
+import type { TUseGetHeatmapDataArgs, TWorldClimBoxResponse } from "@/types";
+import { groupPixelBindings } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 
-export function useGetHeatmapData(
-  bbox: TBbox | null,
-  gridSize: TCellSize,
-  variable: TVariable,
-  isClimate: boolean,
-  climatePeriod: TClimatePeriod,
-  year?: number,
-) {
-  const enabled = bbox !== null;
+/** A region's cells for one variable, from a box or a polygon. */
+export function useGetHeatmapData({ area, gridSize, variable, dataset }: TUseGetHeatmapDataArgs) {
+  const enabled = area !== null;
 
-  const { data, isLoading, error } = useQuery<THeatmapResult, Error>({
-    queryKey: [
-      "heatmap",
-      bbox?.north,
-      bbox?.south,
-      bbox?.west,
-      bbox?.east,
-      gridSize,
-      variable,
-      isClimate ? climatePeriod : year,
-    ],
-    queryFn: async (): Promise<THeatmapResult> => {
-      const { north, south, west, east } = bbox!;
-
-      const [rawPixels, rawAvg] = await Promise.all([
-        WorldClimService.getPixelValuesInBox(
-          north,
-          south,
-          west,
-          east,
-          gridSize,
-          [variable],
-          isClimate,
-          year,
-          false,
-        ),
-        WorldClimService.getPixelValuesInBox(
-          north,
-          south,
-          west,
-          east,
-          gridSize,
-          [variable],
-          isClimate,
-          year,
-          true,
-        ),
-      ]);
-
-      return buildHeatmapResults(
-        rawPixels as TRawPixelValueResponse,
-        rawAvg as TRawAvgValueResponse,
-        isClimate,
-        climatePeriod,
-      );
+  const { data, isLoading, isFetching, error } = useQuery<TWorldClimBoxResponse, Error>({
+    queryKey: ["heatmap", area, gridSize, variable, dataset],
+    queryFn: async () => {
+      const raw = await WorldClimService.getRegionPixelValues({
+        area: area!,
+        gridSize,
+        variables: [variable],
+        dataset,
+      });
+      return { results: { bindings: groupPixelBindings(raw.results.bindings) } };
     },
     enabled,
     staleTime: Infinity,
     retry: 1,
+    // * the old region's cells stay on the map while the new ones load
+    keepPreviousData: true,
   });
 
   return {
-    pixels: data?.pixels ?? null,
-    avg: data?.avg ?? null,
+    // * none once the selection is cleared — the kept data belongs to the old one
+    pixels: enabled ? (data ?? null) : null,
     isLoading: enabled && isLoading,
+    isFetching: enabled && isFetching,
     error: error instanceof Error ? error : null,
   };
 }

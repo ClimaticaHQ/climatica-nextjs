@@ -1,14 +1,16 @@
 import "server-only";
 
+import { LOCALES } from "@/constants";
 import { env } from "@/libs/Env";
 import { logger } from "@/libs/Logger";
-import type { TSolrCityDoc, TSolrResponse, TWikidataCity } from "@/types";
-import { buildSolrQueryParams, getCityDescription } from "@/utils"; // removed buildQueryParams
+import type { TCity, TSolrCityDoc, TSolrResponse } from "@/types";
+import { buildSolrQueryParams, getCityDescription } from "@/utils";
 
 const SOLR_BASE_URL = env.SOLR_URL;
 
 export const SolrService = {
-  async searchCities(query: string, lang: string): Promise<TWikidataCity[]> {
+  /** Throws when Solr is unreachable or answers with an error — an outage is not "no results" */
+  async searchCities(query: string, lang: string): Promise<TCity[]> {
     const params = buildSolrQueryParams(query, lang);
 
     const url = `${SOLR_BASE_URL}/solr/cities/cities?${params}`;
@@ -44,20 +46,15 @@ export const SolrService = {
       logger.error(
         `[Solr] searchCities error: ${error instanceof Error ? error.message : String(error)}`,
       );
-      return [];
+      throw error;
     }
   },
 
   getLabelField(lang: string): string {
-    const map: Record<string, string> = {
-      uk: "label_uk",
-      es: "label_es",
-      en: "label_en",
-    };
-    return map[lang] ?? "label_en";
+    return LOCALES.includes(lang) ? `label_${lang}` : "label_en";
   },
 
-  mapToCity(doc: TSolrCityDoc, lang: string): TWikidataCity {
+  mapToCity(doc: TSolrCityDoc, lang: string): TCity {
     const labelField = SolrService.getLabelField(lang);
     const label = (doc[labelField as keyof TSolrCityDoc] as string) ?? doc.label_en;
 

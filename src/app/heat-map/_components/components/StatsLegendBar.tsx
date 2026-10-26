@@ -1,51 +1,25 @@
+import { Card } from "@/components/Card";
+import { StatCell } from "@/components/UI/StatCell";
+import { DATA_UPDATE_ALL_SERIES, DIFFERENCE_SIGN } from "@/constants";
+import { ECardPadding, ECardSize } from "@/enums";
+import { useColorScale } from "@/hooks/ui/useColorScale";
+import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
 import { interpolateColor } from "@/utils";
 import { useTranslations } from "next-intl";
+import {
+  HEATMAP_VALUE_DIGITS,
+  STATS_LEGEND_BAR_CLASSES as C,
+  STATS_LEGEND_GRADIENT_STOPS,
+} from "../HeatMap.constant";
 import type { TStatsLegendBarProps } from "../HeatMap.type";
-import type { TSkeletonBlockProps, TStatBlockProps } from "./StatsLegendBar.type";
 
-function StatBlock({ label, value, subtitle, tooltip, className = "" }: TStatBlockProps) {
-  return (
-    <div
-      className={`flex flex-col gap-0.5 px-3 py-2.5 border-[var(--color-border)] ${className}`}
-      title={tooltip}
-    >
-      <span className="text-[10px] leading-none text-[var(--color-text-secondary)]">{label}</span>
-      <span className="text-[length:var(--font-base)] sm:text-[18px] font-medium leading-snug text-[var(--color-text)]">
-        {value}
-      </span>
-      {subtitle && (
-        <span className="truncate text-[10px] leading-none text-[var(--color-text-secondary)] opacity-70">
-          {subtitle}
-        </span>
-      )}
-    </div>
-  );
-}
-
-function SkeletonBlock({ className = "" }: TSkeletonBlockProps) {
-  return (
-    <div className={`flex flex-col gap-1.5 px-3 py-2.5 border-[var(--color-border)] ${className}`}>
-      <div className="h-2.5 w-10 animate-pulse rounded bg-[var(--color-border)]" />
-      <div className="h-4 w-14 animate-pulse rounded bg-[var(--color-border)]" />
-      <div className="h-2 w-16 animate-pulse rounded bg-[var(--color-border)]" />
-    </div>
-  );
-}
-
-// Mobile (3-col): row 1 = Min/Max/Avg, row 2 = Median/StdDev/Cells
-// Desktop (6-col): single row, right border between all cells
-// border-r on positions 1,2,4,5; sm:border-r also on position 3 (last in mobile row 1 → no border-r)
-// border-b on positions 1,2,3 (mobile row 1); removed at sm+
-const CELL_BORDERS = [
-  "border-r border-b sm:border-b-0", // 1 Min
-  "border-r border-b sm:border-b-0", // 2 Max
-  "border-b sm:border-b-0 sm:border-r", // 3 Avg — no border-r on mobile (last in 3-col row)
-  "border-r", // 4 Median
-  "border-r", // 5 Std dev
-  "", // 6 Cells — last in both layouts
-] as const;
-
+/**
+ * The region's stats — min, max, average, median, spread, cells — and the colour scale's
+ * gradient. While the cells load the values wait in their places; a region without data has
+ * no bar (the page says why).
+ */
 export function StatsLegendBar({
+  isLoading,
   hasData,
   stats,
   unit,
@@ -54,93 +28,74 @@ export function StatsLegendBar({
   avgTooltip,
 }: TStatsLegendBarProps) {
   const t = useTranslations();
+  const formatNumber = useFormatNumber();
+  const stops = useColorScale(scale);
+  if (!isLoading && !hasData) return null;
 
-  const gradientColors = Array.from({ length: 10 }, (_, i) =>
-    interpolateColor(stats.min + (stats.max - stats.min) * (i / 9), stats.min, stats.max, scale),
-  );
-  const gradient = `linear-gradient(to right, ${gradientColors.join(", ")})`;
-
-  const fmt = (v: number) => `${v.toFixed(1)} ${unit}`;
+  const fmt = (value: number) => `${formatNumber(value, { digits: HEATMAP_VALUE_DIGITS })} ${unit}`;
+  const gradient =
+    stops &&
+    `linear-gradient(to right, ${Array.from({ length: STATS_LEGEND_GRADIENT_STOPS }, (_, i) =>
+      interpolateColor(
+        stats.min + (stats.max - stats.min) * (i / (STATS_LEGEND_GRADIENT_STOPS - 1)),
+        stats.min,
+        stats.max,
+        stops,
+      ),
+    ).join(", ")})`;
+  const subtitle = <span className={C.SUBTITLE}>{statSubtitle}</span>;
+  const cells = [
+    { label: t("heatMap.stats.minValue"), value: fmt(stats.min), meta: subtitle },
+    { label: t("heatMap.stats.maxValue"), value: fmt(stats.max), meta: subtitle },
+    {
+      label: t("heatMap.stats.avgValue"),
+      value: fmt(stats.avg),
+      meta: subtitle,
+      title: avgTooltip,
+    },
+    { label: t("heatMap.stats.median"), value: fmt(stats.median), meta: subtitle },
+    {
+      label: t("heatMap.stats.stdDev"),
+      value: `${DIFFERENCE_SIGN.NONE}${fmt(stats.stdDev)}`,
+      meta: subtitle,
+    },
+    {
+      label: t("heatMap.stats.cellsAnalyzed"),
+      value: formatNumber(stats.count, { hasGrouping: true }),
+    },
+  ];
 
   return (
-    <div className="overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg)]">
-      {/* Stats grid — 3 cols on mobile, 6 on sm+ */}
-      <div className="grid grid-cols-3 sm:grid-cols-6">
-        {hasData ? (
-          <>
-            <StatBlock
-              label={t("heatMap.stats.minValue")}
-              value={fmt(stats.min)}
-              subtitle={statSubtitle}
-              className={CELL_BORDERS[0]}
+    <Card
+      size={ECardSize.MD}
+      padding={ECardPadding.NONE}
+      flashKeys={DATA_UPDATE_ALL_SERIES}
+      shouldClip
+    >
+      <div className={C.FRAME} data-testid="region-stats">
+        <div className={C.GRID}>
+          {cells.map(({ label, value, meta, title }) => (
+            <StatCell
+              key={label}
+              label={label}
+              value={hasData ? value : <span className={C.VALUE_SKELETON} />}
+              hasMetaRow
+              meta={hasData ? meta : null}
+              cellClassName={C.CELL}
+              {...(title !== undefined ? { title } : {})}
             />
-            <StatBlock
-              label={t("heatMap.stats.maxValue")}
-              value={fmt(stats.max)}
-              subtitle={statSubtitle}
-              className={CELL_BORDERS[1]}
-            />
-            <StatBlock
-              label={t("heatMap.stats.avgValue")}
-              value={fmt(stats.avg)}
-              subtitle={statSubtitle}
-              tooltip={avgTooltip}
-              className={CELL_BORDERS[2]}
-            />
-            <StatBlock
-              label={t("heatMap.stats.median")}
-              value={fmt(stats.median)}
-              subtitle={statSubtitle}
-              className={CELL_BORDERS[3]}
-            />
-            <StatBlock
-              label={t("heatMap.stats.stdDev")}
-              value={`±${stats.stdDev.toFixed(1)} ${unit}`}
-              subtitle={statSubtitle}
-              className={CELL_BORDERS[4]}
-            />
-            <StatBlock
-              label={t("heatMap.stats.cellsAnalyzed")}
-              value={String(stats.count)}
-              className={CELL_BORDERS[5]}
-            />
-          </>
-        ) : (
-          <>
-            <SkeletonBlock className={CELL_BORDERS[0]} />
-            <SkeletonBlock className={CELL_BORDERS[1]} />
-            <SkeletonBlock className={CELL_BORDERS[2]} />
-            <SkeletonBlock className={CELL_BORDERS[3]} />
-            <SkeletonBlock className={CELL_BORDERS[4]} />
-            <SkeletonBlock className={CELL_BORDERS[5]} />
-          </>
-        )}
+          ))}
+        </div>
       </div>
-
-      {/* Gradient legend */}
-      <div className="border-t border-[var(--color-border)] px-[14px] py-[8px]">
-        {hasData ? (
-          <>
-            <div className="h-[10px] sm:h-[12px] w-full rounded" style={{ background: gradient }} />
-            <div className="mt-1 flex justify-between">
-              <span className="text-[11px] text-[var(--color-text-secondary)]">
-                {fmt(stats.min)}
-              </span>
-              <span className="text-[11px] text-[var(--color-text-secondary)]">
-                {fmt(stats.max)}
-              </span>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="h-[10px] sm:h-[12px] w-full animate-pulse rounded bg-[var(--color-border)]" />
-            <div className="mt-1 flex justify-between">
-              <div className="h-3 w-10 animate-pulse rounded bg-[var(--color-border)]" />
-              <div className="h-3 w-10 animate-pulse rounded bg-[var(--color-border)]" />
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+      {hasData && (
+        <div className={C.LEGEND}>
+          <div className={C.GRADIENT} style={gradient ? { background: gradient } : undefined} />
+          <div className={C.GRADIENT_LABELS}>
+            <span className={C.GRADIENT_LABEL}>{fmt(stats.min)}</span>
+            <span className={C.GRADIENT_LABEL}>{fmt(stats.max)}</span>
+          </div>
+        </div>
+      )}
+    </Card>
   );
 }

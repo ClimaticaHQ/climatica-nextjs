@@ -7,22 +7,29 @@
 
 ## Table of Contents
 
+- [Table of Contents](#table-of-contents)
 - [Features](#features)
 - [Quick Start](#quick-start)
+  - [Requirements](#requirements)
+  - [Steps](#steps)
+  - [Useful commands](#useful-commands)
+  - [Tests](#tests)
 - [Developer Setup](#developer-setup)
+- [Tech Stack](#tech-stack)
+  - [External APIs](#external-apis)
+- [Documentation](#documentation)
 - [License](#license)
 
 ---
 
 ## Features
 
-- **City Climate** — search any city and see temperature/precipitation charts, key stats, and an interactive map
-- **Compare Cities** — compare two cities side-by-side with overlaid charts
-- **Compare Periods** — compare climate across different 30-year baselines for the same city
+- **City Climate** — search any city and see its climate as a Walter-Lieth diagram or a standard climograph, with an interactive map and key stats
+- **Compare Cities / Compare Periods** — compare two cities, or one city across two periods, in side-by-side or overlaid charts, with a table of metrics showing the differences
 - **Regional Heatmap** — draw a region on the map and analyze its climate distribution
 - **Flexible Controls** — switch datasets (climate/weather), variables, grid resolution, and month filters
-- **Multilingual** — English, Spanish, Ukrainian
-- **Export** — save charts as PNG or download data as CSV
+- **Multilingual** — English, French, German, Greek, Italian, Norwegian Bokmål, Portuguese, Romanian, Spanish, Ukrainian
+- **Export** — save charts with stats information as SVG, PNG and download raw data as CSV or JSON
 
 ---
 
@@ -30,9 +37,10 @@
 
 ### Requirements
 
-- [Node.js LTS](https://nodejs.org/) (v18+)
+- [Node.js](https://nodejs.org/) 22.13.1, the version in [`.nvmrc`](.nvmrc) (`nvm use` picks it up)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Python 3](https://www.python.org/downloads/) (for one-time data preparation)
+- [Python 3](https://www.python.org/downloads/) (for one-time data preparation and running Python unit tests)
+  - On macOS/Homebrew Python, installing packages requires a virtual environment — `pip install` directly into the system Python will fail with `externally-managed-environment`. See the [Tests](#tests) section for the exact setup.
 
 ### Steps
 
@@ -97,115 +105,89 @@ npm run docker:up       # Start Docker services
 npm run docker:down     # Stop Docker services
 npm run docker:reboot   # Reset and restart Docker services
 npm run solr:reindex    # Re-import city data into Solr
+npm run solr:recreate-core # recreate the Solr core from the repository's solrconfig.xml
 npm run docker:logs     # View Docker logs
 ```
+
+**Updating an existing Solr setup** (after pulling changes to the Solr files):
+
+| When                                                                                | Run                                                            |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `docker/solr/solrconfig.xml` changed, or the `cities` core fails to load            | `npm run docker:reboot` (recreates the core; also wipes Redis) |
+| `src/configs/locales.json` or `prepare_data.py` changed (`cities.csv` isn't in git) | `python3 docker/solr/scripts/prepare_data.py`                  |
+| `docker/solr/schema.json` changed, or after any of the above                        | `npm run solr:reindex`                                         |
+
+Solr copies `solrconfig.xml` into the core only when the core is first created, so a
+config change needs the reboot; `solr:reindex` applies `schema.json` and reimports the
+CSV. `generate_schema.py` is only needed by whoever edits `locales.json` (see
+[Adding a new locale](#adding-a-new-locale)) — its output is committed.
 
 ---
 
 ### Tests
 
 ```bash
-npm run test              # run unit tests
-npm run test:coverage     # unit tests with coverage report
-npm run test:e2e          # E2E tests (requires Docker running + dev server)
-npm run test:e2e:ui       # E2E tests with Playwright UI
+npm run test          # unit tests (Vitest)
+npm run test:coverage # unit tests with coverage
+npm run test:e2e      # e2e tests (Playwright; needs Solr and Redis running)
+npm run test:python   # Python tests for the data preparation (needs .venv, see below)
 ```
 
-Unit tests cover: Redis client, caching strategies, cities route,
-WorldClim route, SolrService, WorldClimService, URL utils, city descriptions.
+First-time setup for the Python tests:
 
-E2E tests cover: city search, climate data loading, i18n switching,
-navigation, 404 page.
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r docker/solr/scripts/requirements-dev.txt
+```
+
+What each suite covers and how to write tests is in [docs/testing.md](docs/testing.md).
 
 ---
 
 ## Developer Setup
 
-### Tech Stack
+## Tech Stack
 
 | Technology        | Purpose                           |
 | ----------------- | --------------------------------- |
 | Next.js 16        | Full-stack framework (App Router) |
 | React 19          | UI framework                      |
 | TypeScript        | Type safety                       |
-| TanStack Query v4 | Data fetching & caching           |
+| TanStack Query v4 | Data fetching and caching         |
 | Zustand v5        | Client state                      |
 | Tailwind CSS v4   | Styling                           |
 | Leaflet           | Interactive maps                  |
 | Recharts          | Charts                            |
 | next-intl         | Multilingual support              |
-| Solr 8            | City search database              |
+| Solr 8            | City search                       |
 | Redis 7           | Server-side caching               |
-| ioredis           | Redis client                      |
-
-### Project Structure
-
-```
-climatica-next-app/
-├── docker/
-│   ├── solr/
-│   │   ├── data/           # GeoNames data files (gitignored)
-│   │   ├── scripts/        # prepare_data.py
-│   │   ├── schema.json     # Solr schema
-│   │   └── solrconfig.xml  # Solr configuration
-│   └── docker-compose.yml
-├── src/
-│   ├── app/
-│   │   ├── api/            # Next.js Route Handlers (server proxy)
-│   │   │   ├── cities/     # City search → Redis → Solr
-│   │   │   └── worldclim/  # WorldClim API proxy
-│   │   ├── climate-statistics/
-│   │   ├── compare-cities/
-│   │   ├── compare-periods/
-│   │   └── heat-map/
-│   ├── components/         # Shared UI components
-│   ├── hooks/              # Custom React hooks
-│   ├── libs/
-│   │   ├── api/            # Axios client
-│   │   ├── redis/          # Redis client + caching strategies
-│   │   └── services/       # Solr, Wikidata, WorldClim services
-│   ├── constants/
-│   ├── types/
-│   └── utils/
-```
-
-### Data Flow
-
-```
-Component → Hook → fetch /api/* → Route Handler → Redis → Solr/WorldClim
-```
-
-- Hooks never call services directly — always via `/api/` routes
-- Redis caches city search results (7 days) and climate data (30 days)
-- Popular queries get extended TTL automatically
-- WorldClim API key stays server-side only
-
-### Code Standards
-
-- Types: `T` prefix — `TClimatePeriod`
-- Enums: `E` prefix — `EDataset`
-- Constants: `*.constant.ts`
-- Types: `*.type.ts`
-- Utils: `*.util.ts`
-
-```bash
-npm run check   # type-check + lint + format
-```
 
 ### External APIs
 
-**WorldClim** — `https://scrapi.gsic.uva.es/apis/worldclim`
+- **WorldClim** (`https://scrapi.gsic.uva.es/apis/worldclim`): global climate and weather grids;
+  bearer token `WORLDCLIM_API_KEY`, server-side only.
+- **Wikidata**: reverse geocoding (coordinates → nearest place).
+- **GeoNames**: the one-time city import into Solr.
 
-- Auth: Bearer token (`WORLDCLIM_API_KEY`)
-- Global climate & weather grids (1951–2024)
+Code rules are in [AGENTS.md](AGENTS.md); `npm run check` runs type-check, lint and format.
 
-**Wikidata** — `https://www.wikidata.org/w/api.php`
+---
 
-- Used only for reverse geocoding (coordinate → nearest city)
+## Documentation
 
-**GeoNames** — one-time data import into local Solr
+Developer documentation is in [`docs/`](docs); [docs/README.md](docs/README.md) lists every
+document. Good places to start:
 
-- Source: [geonames.org](https://www.geonames.org/)
+| Document                                          | What it covers                |
+| ------------------------------------------------- | ----------------------------- |
+| [architecture.md](docs/architecture.md)           | app architecture and flow     |
+| [pages.md](docs/pages.md)                         | how pages are built           |
+| [charts.md](docs/charts.md)                       | how charts are built          |
+| [url-state.md](docs/url-state.md)                 | shareable URLs and filters    |
+| [localization-i18n.md](docs/localization-i18n.md) | locales and adding a language |
+| [operations.md](docs/operations.md)               | Docker, Solr, deploy          |
+
+Code rules for contributors and AI agents are in [AGENTS.md](AGENTS.md).
 
 ---
 

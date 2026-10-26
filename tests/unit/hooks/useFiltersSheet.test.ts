@@ -1,0 +1,96 @@
+// @vitest-environment jsdom
+import { FILTER_DEFAULTS } from "@/constants";
+import { EFilterApplyMode, EFilterKey, EFiltersSheetMode } from "@/enums";
+import { useFiltersSheet } from "@/hooks/filters/useFiltersSheet";
+import type { TFilters } from "@/types";
+import { getCurrentSheetMarker } from "@/utils/bottomSheet.util";
+import { act, cleanup, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// * the router seam: records each navigation, and whether a sheet's entry was still current then
+const navigation = vi.hoisted(() => {
+  const calls: { mode: string; markerAtCall: string | null }[] = [];
+  return { calls };
+});
+
+vi.mock("@/hooks/url/useChartModeUrl", () => ({
+  useChartModeUrl: () => ({
+    chartMode: "walter-lieth",
+    setChartMode: (mode: string) => {
+      navigation.calls.push({ mode: `chart:${mode}`, markerAtCall: getCurrentSheetMarker() });
+    },
+  }),
+}));
+
+vi.mock("@/hooks/filters/useFilterNavigation", () => ({
+  useFilterNavigation: () => ({
+    applyFilters: (_next: TFilters, mode: string) => {
+      navigation.calls.push({ mode, markerAtCall: getCurrentSheetMarker() });
+    },
+    updateFilters: vi.fn(),
+  }),
+}));
+
+const NEXT: TFilters = { ...FILTER_DEFAULTS, months: [7] };
+
+beforeEach(() => {
+  navigation.calls.length = 0;
+  window.history.replaceState({ page: "base" }, "");
+});
+
+afterEach(cleanup);
+
+describe("useFiltersSheet", () => {
+  it("opens every filter, or one filter's — remembering which", () => {
+    const { result } = renderHook(() => useFiltersSheet());
+    act(() => result.current.openFilter(EFilterKey.MONTHS));
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.mode).toBe(EFiltersSheetMode.SINGLE);
+    expect(result.current.filterKey).toBe(EFilterKey.MONTHS);
+    act(() => result.current.openAll());
+    expect(result.current.mode).toBe(EFiltersSheetMode.ALL);
+  });
+
+  it("closes the sheet (its history entry popped) before it navigates", async () => {
+    const { result } = renderHook(() => useFiltersSheet());
+    act(() => result.current.openAll());
+    expect(getCurrentSheetMarker()).not.toBeNull();
+
+    let applying: Promise<void> = Promise.resolve();
+    act(() => {
+      applying = result.current.applyAndClose(NEXT, EFilterApplyMode.APPLY);
+    });
+    // * the sheet is still waiting for its popstate — nothing has navigated yet
+    expect(navigation.calls).toEqual([]);
+
+    await act(() => applying);
+    expect(result.current.isOpen).toBe(false);
+    expect(navigation.calls).toEqual([{ mode: EFilterApplyMode.APPLY, markerAtCall: null }]);
+  });
+
+  it("keeps its mode and filter while it slides out", async () => {
+    const { result } = renderHook(() => useFiltersSheet());
+    act(() => result.current.openFilter(EFilterKey.GRID_SIZE));
+    await act(() => result.current.applyAndClose(NEXT, EFilterApplyMode.QUICK));
+    expect(result.current.isOpen).toBe(false);
+    expect(result.current.mode).toBe(EFiltersSheetMode.SINGLE);
+    expect(result.current.filterKey).toBe(EFilterKey.GRID_SIZE);
+    expect(navigation.calls[0]?.mode).toBe(EFilterApplyMode.QUICK);
+  });
+
+  it("switches to the standard chart only after the info sheet has closed", async () => {
+    const { result } = renderHook(() => useFiltersSheet());
+    act(() => result.current.openUnavailableInfo());
+    expect(result.current.mode).toBe(EFiltersSheetMode.UNAVAILABLE_INFO);
+
+    let switching: Promise<void> = Promise.resolve();
+    act(() => {
+      switching = result.current.switchToStandardChart();
+    });
+    expect(navigation.calls).toEqual([]);
+
+    await act(() => switching);
+    expect(result.current.isOpen).toBe(false);
+    expect(navigation.calls).toEqual([{ mode: "chart:standard", markerAtCall: null }]);
+  });
+});

@@ -1,15 +1,18 @@
 "use client";
 
-import { CELL_SIZE_OPTIONS, CLIMATE_MAP_CONFIG, RASTER_SELECTION_PATH_OPTIONS } from "@/constants";
+import { Card } from "@/components/Card";
+import { CLIMATE_MAP_CONFIG, MAP_MARKER, RASTER_SELECTION_PATH_OPTIONS } from "@/constants";
+import { ECardPadding } from "@/enums";
 import type { Map as LMap, Marker as LMarker, Rectangle as LRectangle } from "leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import type { TLeafletMapProps } from "./LeafletMap.type";
 
 const MARKER_ICON = L.divIcon({
   className: "",
-  html: `<div style="width:16px;height:16px;border-radius:50%;background:var(--color-primary);border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.35)"></div>`,
+  html: `<div style="width:16px;height:16px;border-radius:50%;background:${MAP_MARKER.FILL};border:2px solid ${MAP_MARKER.OUTLINE};box-shadow:0 1px 4px ${MAP_MARKER.SHADOW}"></div>`,
   iconSize: [16, 16],
   iconAnchor: [8, 8],
   popupAnchor: [0, -10],
@@ -24,6 +27,7 @@ export function LeafletMap({
   cellBounds,
   gridSize,
 }: TLeafletMapProps) {
+  const t = useTranslations();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LMap | null>(null);
   const markerRef = useRef<LMarker | null>(null);
@@ -89,20 +93,18 @@ export function LeafletMap({
       [cellBounds.south, cellBounds.west],
       [cellBounds.north, cellBounds.east],
     ];
-    const areaMatch = gridSize ? /\(~[^)]+\)/.exec(CELL_SIZE_OPTIONS[gridSize]) : null;
-    const area = areaMatch ? ` ${areaMatch[0]}` : "";
+    const cellSizeKey = gridSize === "2.5m" ? "2_5m" : gridSize;
+    const cellSizeLabel = cellSizeKey ? t(`cellSizes.${cellSizeKey}`) : "";
 
     const rect = L.rectangle(bounds, RASTER_SELECTION_PATH_OPTIONS);
-    rect.bindTooltip(`Grid cell: ${gridSize ?? ""}${area}`, { sticky: true });
+    rect.bindTooltip(t("map.gridCell", { size: cellSizeLabel }), { sticky: true });
     rect.addTo(mapRef.current);
     rectRef.current = rect;
-  }, [cellBounds, gridSize]);
+  }, [cellBounds, gridSize, t]);
 
   return (
-    <div
-      className={`relative z-0 overflow-hidden border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-md ${className}`}
-    >
+    <Card padding={ECardPadding.NONE} shouldClip className={`relative z-0 ${className}`}>
       <div ref={containerRef} className="w-full h-[400px]" />
-    </div>
+    </Card>
   );
 }

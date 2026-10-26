@@ -1,18 +1,11 @@
-import type { TWikidataCity } from "@/types";
-
-export const DEFAULT_HEATMAP_BBOX = {
-  north: -20.87,
-  south: -21.39,
-  west: 55.21,
-  east: 55.84,
-} as const;
+import type { TCity } from "@/types";
 
 export const DEFAULT_HEATMAP_LOCATION = {
   lat: 51.5074,
   lng: -0.1278,
 } as const;
 
-export const DEFAULT_CITY: TWikidataCity = {
+export const DEFAULT_CITY: TCity = {
   id: "Q2807",
   label: "Madrid",
   description: "capital of Spain",
@@ -20,7 +13,7 @@ export const DEFAULT_CITY: TWikidataCity = {
   lng: -3.7038,
 };
 
-export const DEFAULT_COMPARE_CITY_A: TWikidataCity = {
+export const DEFAULT_COMPARE_CITY_A: TCity = {
   id: "Q2807",
   label: "Madrid",
   description: "capital of Spain",
@@ -28,7 +21,7 @@ export const DEFAULT_COMPARE_CITY_A: TWikidataCity = {
   lng: -3.7038,
 };
 
-export const DEFAULT_COMPARE_CITY_B: TWikidataCity = {
+export const DEFAULT_COMPARE_CITY_B: TCity = {
   id: "Q220",
   label: "Rome",
   description: "capital of Italy",

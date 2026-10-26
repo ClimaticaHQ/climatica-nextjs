@@ -1,0 +1,171 @@
+/* * All UI motion: keyframes, transitions, and the motion-off / reduced-motion rules. Durations,
+   easings and sizes come from MOTION (src/constants/motion.constant.ts)
+   as --motion-* custom properties, set once on <html> by the root layout. The update flash is
+   played from JS (useUpdateFlash), and chart series fades set inline through motionVar(), with
+   the same constants. */
+
+/* * SegmentedControl: the active pill sliding to the selected option */
+.segmented-indicator {
+  transition-property: transform, width;
+  transition-duration: var(--motion-control-slide);
+  transition-timing-function: var(--motion-control-slide-easing);
+}
+
+/* * SwapButton: the icon turning half a turn on each press */
+.swap-icon-turn {
+  transition: transform var(--motion-control-slide) var(--motion-control-slide-easing);
+}
+
+/* * ChartTransition: a chart card's old content fades out while the new one fades in */
+@keyframes chart-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-chart-crossfade-offset));
+  }
+}
+
+@keyframes chart-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* * a split panel expanding: fade plus a slight scale-up from its side */
+@keyframes chart-expand-in {
+  from {
+    opacity: 0;
+    transform: scale(var(--motion-panel-expand-scale-from));
+  }
+}
+
+.chart-fade-in {
+  animation: chart-fade-in var(--motion-chart-crossfade) var(--motion-chart-crossfade-easing) both;
+}
+
+.chart-fade-out {
+  animation: chart-fade-out var(--motion-chart-crossfade) var(--motion-chart-crossfade-easing) both;
+}
+
+.chart-expand-in {
+  animation: chart-expand-in var(--motion-panel-expand) var(--motion-panel-expand-easing) both;
+}
+
+/* * the content a panel expansion replaces: fades out over the expansion's time */
+.chart-expand-out {
+  animation: chart-fade-out var(--motion-panel-expand) var(--motion-panel-expand-easing) both;
+}
+
+/* * a hover state layer fading in and out on each cell of a row (StatsTable) */
+.state-hover-row > * {
+  transition: box-shadow var(--motion-state-hover) var(--motion-state-hover-easing);
+}
+
+/* * DataUpdateFade: content dimmed while an update loads */
+.update-fade {
+  transition: opacity var(--motion-update-fade) var(--motion-update-fade-easing);
+}
+
+.update-fade[aria-busy="true"] {
+  opacity: var(--motion-update-fade-opacity);
+}
+
+/* * DataUpdateProgress: a segment crossing the chart card's top edge while data loads */
+@keyframes update-progress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(var(--motion-update-progress-travel));
+  }
+}
+
+.update-progress-track {
+  height: var(--motion-update-progress-height);
+}
+
+.update-progress {
+  width: var(--motion-update-progress-segment);
+  animation: update-progress var(--motion-update-progress-cycle) linear infinite;
+}
+
+/* * Motion off — the Animations setting (MotionRoot's data-motion="off" on <html>, also set
+   under reduced motion) or the device's prefers-reduced-motion: nothing in the UI moves. The
+   loading state stays visible as a static bar across the card's top edge. */
+:root[data-motion="off"] *,
+:root[data-motion="off"] *::before,
+:root[data-motion="off"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+:root[data-motion="off"] {
+  scroll-behavior: auto;
+}
+
+:root[data-motion="off"] .update-progress {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .update-progress {
+    width: 100%;
+  }
+}
+
+/* * BottomSheet: the panel slides up from the screen edge and back down, the backdrop fades with
+   it. Fill modes leave the panel's inline drag transform in charge once it has slid in. */
+@keyframes sheet-slide-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheet-slide-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheet-backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-backdrop-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.sheet-slide-in {
+  animation: sheet-slide-in var(--motion-sheet-slide) var(--motion-sheet-slide-easing) backwards;
+}
+
+.sheet-slide-out {
+  animation: sheet-slide-out var(--motion-sheet-slide) var(--motion-sheet-slide-easing) forwards;
+}
+
+/* * released short of the close threshold: the panel settles back up */
+.sheet-snap-back {
+  transition: transform var(--motion-sheet-slide) var(--motion-sheet-slide-easing);
+}
+
+.sheet-backdrop-in {
+  animation: sheet-backdrop-in var(--motion-sheet-slide) ease-out backwards;
+}
+
+.sheet-backdrop-out {
+  animation: sheet-backdrop-out var(--motion-sheet-slide) ease-in forwards;
+}

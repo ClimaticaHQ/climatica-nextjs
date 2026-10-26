@@ -18,8 +18,6 @@ jobs:
 
       - name: Setup project
         uses: ./.github/actions/setup-project
-        with:
-          node-version: 22
 
       - name: Type check
         run: npm run type-check

@@ -1,4 +1,5 @@
-import { TScrollOptions } from "@/types";
+import type { TScrollEdges, TScrollOptions } from "@/types";
+import { getScrollBehavior } from "./motion.util";
 
 const SCROLL_OFFSET_PX = 54;
 
@@ -12,27 +13,39 @@ export function scrollToSection(el: HTMLElement, options: TScrollOptions = {}) {
       ? document.documentElement.scrollHeight
       : el.getBoundingClientRect().top + window.scrollY - offset;
 
-    window.scrollTo({ top: targetY, behavior: "smooth" });
+    window.scrollTo({ top: targetY, behavior: getScrollBehavior() });
     return;
   }
 
   if (toBottom) {
     container.scrollTo({
       top: container.scrollHeight,
-      behavior: "smooth",
+      behavior: getScrollBehavior(),
     });
     return;
   }
 
-  /**
-   * calculate the top position of the element
-   * relative to the container, then scroll
-   */
   const top =
     el.getBoundingClientRect().top -
     container.getBoundingClientRect().top +
     container.scrollTop -
     offset;
 
-  container.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  container.scrollTo({ top: Math.max(0, top), behavior: getScrollBehavior() });
+}
+
+// * px of slack, so subpixel scroll positions don't count as hidden content
+const SCROLL_EDGE_TOLERANCE_PX = 1;
+
+/** Which ends of a horizontal scroller have content hidden past them. */
+export function getScrollEdges(element: HTMLElement): TScrollEdges {
+  const { scrollLeft, clientWidth, scrollWidth } = element;
+  return {
+    isStartHidden: scrollLeft > SCROLL_EDGE_TOLERANCE_PX,
+    isEndHidden: scrollLeft + clientWidth < scrollWidth - SCROLL_EDGE_TOLERANCE_PX,
+  };
+}
+
+export function areScrollEdgesEqual(a: TScrollEdges, b: TScrollEdges) {
+  return a.isStartHidden === b.isStartHidden && a.isEndHidden === b.isEndHidden;
 }

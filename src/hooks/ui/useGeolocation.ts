@@ -1,6 +1,6 @@
 import { GEOLOCATION_ERRORS } from "@/constants";
 import { apiClient } from "@/libs/api";
-import type { TGeolocationError, TUseGeolocationReturn, TWikidataCity } from "@/types";
+import type { TCity, TGeolocationError, TUseGeolocationReturn } from "@/types";
 import { useState } from "react";
 
 function getGeolocationErrorMessage(code: GeolocationPositionError["code"]): TGeolocationError {
@@ -17,7 +17,7 @@ export function useGeolocation(): TUseGeolocationReturn {
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<TGeolocationError>(null);
 
-  function locate(onSuccess: (city: TWikidataCity) => void) {
+  function locate(onSuccess: (city: TCity) => void) {
     if (!navigator.geolocation) {
       setLocationError(GEOLOCATION_ERRORS.NOT_SUPPORTED);
       return;
@@ -36,7 +36,7 @@ export function useGeolocation(): TUseGeolocationReturn {
         void (async () => {
           try {
             const { latitude, longitude } = position.coords;
-            const { data: cities } = await apiClient.get<TWikidataCity[]>("/api/cities", {
+            const { data: cities } = await apiClient.get<TCity[]>("/api/cities", {
               params: { q: `${latitude},${longitude}` },
             });
             const city = cities[0] ?? null;

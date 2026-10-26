@@ -2,6 +2,11 @@
 <config>
   <luceneMatchVersion>8.0.0</luceneMatchVersion>
 
+  <!-- ICU (ICUFoldingFilter in the nameText and namePrefix field types) from the
+       analysis-extras contrib that ships with Solr 8 -->
+  <lib dir="${solr.install.dir:../../../..}/contrib/analysis-extras/lib" regex="icu4j-.*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/contrib/analysis-extras/lucene-libs" regex="lucene-analyzers-icu-.*\.jar" />
+
   <dataDir>${solr.data.dir:}</dataDir>
 
   <directoryFactory name="DirectoryFactory"
@@ -43,20 +48,18 @@
   </requestHandler>
 
   <requestHandler name="/cities" class="solr.SearchHandler">
+    <!-- Only neutral defaults. The app sends every ranking rule with each query
+         (buildSolrQueryParams, solr.constant.ts): its clauses, minimum match, population
+         boost and sort. Nested query parsers inherit whatever is set here, so a ranking
+         default here would silently change the app's order. -->
     <lst name="defaults">
       <str name="echoParams">explicit</str>
       <int name="rows">10</int>
+      <!-- for hand-written queries; df only for those without qf -->
       <str name="defType">edismax</str>
-      <str name="qf">
-        label_en^10 label_uk^8 label_es^8
-        label_en_ngram^1 label_uk_ngram^1 label_es_ngram^1
-      </str>
-      <str name="pf">label_en^20 label_uk^15 label_es^15</str>
-      <str name="fl">geonameid,label_en,label_uk,label_es,latitude,longitude,population,feature_code,country_code</str>
-      <str name="sort">score desc, population desc</str>
-      <str name="bf">log(sum(population,1))^20</str> <!-- ! Boost factor for population -->
-      <str name="q.op">OR</str>
-      <str name="mm">1</str>
+      <str name="df">label_en</str>
+      <!-- No fl: returning all stored fields includes every label_<lang>
+           automatically when a language is added. -->
     </lst>
   </requestHandler>
 

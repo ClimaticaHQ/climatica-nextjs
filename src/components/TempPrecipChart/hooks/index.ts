@@ -1,1 +1,0 @@
-export { useTempPrecipChart } from "./useTempPrecipChart";

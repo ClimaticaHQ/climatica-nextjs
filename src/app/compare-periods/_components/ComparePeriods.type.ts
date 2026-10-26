@@ -1,48 +1,53 @@
-import type { TClimatePeriod } from "@/constants/worldclim.constant";
+import type { TLocationSearchProps } from "@/components/LocationSearch/LocationSearch.type";
+import type { ECompareLayout, ESortOrder, EWalterLiethShading } from "@/enums";
 import type {
-  TCellSize,
-  TDataset,
-  TMonthlyTemperature,
-  TMultiPeriodEntry,
-  TVariable,
-  TWikidataCity,
+  TChartMode,
+  TChartPageResult,
+  TCity,
+  TExpandedPanel,
+  TMarkerSlots,
+  TPair,
 } from "@/types";
-import type { RefObject } from "react";
 
-export type TComparePeriodsViewProps = {
-  chartSectionRef?: RefObject<HTMLDivElement | null>;
-  city: TWikidataCity;
-  dataset: TDataset;
-  isHydrated: boolean;
-  selectedMonths: number[] | null;
-  variables: readonly TVariable[];
-  altitude: number | null;
-  autoGrid: TCellSize;
-  isLoading: boolean;
-  isLocating: boolean;
-  error: Error | null;
-  locationError: string | null;
-  onCitySelect: (city: TWikidataCity) => void;
-  onLocate: () => void;
-  onClearLocationError: () => void;
-
-  // * climate-only
-  climatePeriodA: TClimatePeriod;
-  climatePeriodB: TClimatePeriod;
-  dataA: TMonthlyTemperature[];
-  dataB: TMonthlyTemperature[];
-  onClimatePeriodAChange: (period: TClimatePeriod) => void;
-  onClimatePeriodBChange: (period: TClimatePeriod) => void;
-
-  // * weather multi-period
-  periods: number[];
-  periodsData: TMultiPeriodEntry[];
-  loadingPeriods: number[];
+export type TComparePeriodsUrlState = {
+  city: TCity;
+  layout: ECompareLayout;
+  wlShading: EWalterLiethShading;
+  chartMode: TChartMode;
+  expanded: TExpandedPanel;
+  /** weather years, side by side: the two drawn — null for the first two, the default */
+  yearPair: TPair<number> | null;
+  /** weather years, overlay: the years drawn — null for all of them, the default */
+  shownYears: readonly number[] | null;
+  /** the order every list of the page follows, by year */
+  sortOrder: ESortOrder;
+  /** weather years: each one's marker slot — null when it's the list's order, the default */
+  markerSlots: TMarkerSlots | null;
 };
 
-export type TClimatePeriodRowProps = {
-  label: string;
-  dotColor: string;
-  value: TClimatePeriod;
-  onChange: (period: TClimatePeriod) => void;
+/** The city search with its period-coloured label, and the mini map. */
+export type TPeriodCitySearchProps = TLocationSearchProps & {
+  city: TCity;
+};
+
+/** The trend cards under a climate comparison: how temperature and precipitation changed. */
+export type TPeriodTrend = {
+  /** later minus earlier, °C; 0: no change */
+  tmaxDiff: number;
+  /** later minus earlier, mm */
+  precDiff: number;
+  labelA: string;
+  labelB: string;
+};
+
+export type TPeriodTrendCardsProps = {
+  trend: TPeriodTrend | null;
+};
+
+export type TComparePeriodsPage = TChartPageResult<null, TPeriodTrend | null> & {
+  search: TPeriodCitySearchProps;
+};
+
+export type TComparePeriodsViewProps = {
+  page: TComparePeriodsPage;
 };

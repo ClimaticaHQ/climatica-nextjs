@@ -1,6 +1,7 @@
 import { Button, ExportMenu } from "@/components/UI";
 import { EButtonVariant } from "@/enums";
 import { useTranslations } from "next-intl";
+import { TOOLBAR_CLASSES as C } from "../HeatMap.constant";
 import type { TToolbarProps } from "../HeatMap.type";
 
 function BoxIcon({ active }: { active: boolean }) {
@@ -55,19 +56,16 @@ export function Toolbar({
   onClear,
   onExportCSV,
   onExportPNG,
+  onExportSVG,
 }: TToolbarProps) {
   const t = useTranslations();
-  const activeClass =
-    "border-[var(--color-primary)] bg-[var(--color-chip-active-bg)] text-[var(--color-chip-active-text)]";
-  const inactiveClass =
-    "border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]";
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <button
         type="button"
         onClick={onBboxModeToggle}
-        className={`flex items-center gap-2 rounded-[var(--radius-sm)] border px-3 py-2 text-[length:var(--font-sm)] font-medium transition-colors duration-150 ${drawMode === "bbox" ? activeClass : inactiveClass}`}
+        className={`${C.DRAW_BUTTON} ${drawMode === "bbox" ? C.DRAW_ACTIVE : C.DRAW_IDLE}`}
       >
         <BoxIcon active={drawMode === "bbox"} />
         {t("heatMap.drawBbox")}
@@ -76,18 +74,14 @@ export function Toolbar({
       <button
         type="button"
         onClick={onPolygonModeToggle}
-        className={`flex items-center gap-2 rounded-[var(--radius-sm)] border px-3 py-2 text-[length:var(--font-sm)] font-medium transition-colors duration-150 ${drawMode === "polygon" ? activeClass : inactiveClass}`}
+        className={`${C.DRAW_BUTTON} ${drawMode === "polygon" ? C.DRAW_ACTIVE : C.DRAW_IDLE}`}
       >
         <PolygonIcon active={drawMode === "polygon"} />
         {t("heatMap.drawPolygon")}
       </button>
 
       {hasSelection && (
-        <Button
-          variant={EButtonVariant.SECONDARY}
-          onClick={onClear}
-          className="flex items-center gap-2 px-3 py-2 text-[length:var(--font-sm)]"
-        >
+        <Button variant={EButtonVariant.SECONDARY} onClick={onClear} className={C.CLEAR_BUTTON}>
           <ClearIcon />
           {t("heatMap.clearSelection")}
         </Button>
@@ -101,7 +95,11 @@ export function Toolbar({
 
       {onExportCSV !== undefined && onExportPNG !== undefined && (
         <div className="ml-auto">
-          <ExportMenu onExportCSV={onExportCSV} onExportPNG={onExportPNG} />
+          <ExportMenu
+            onExportCSV={onExportCSV}
+            onExportPNG={onExportPNG}
+            {...(onExportSVG !== undefined ? { onExportSVG } : {})}
+          />
         </div>
       )}
     </div>

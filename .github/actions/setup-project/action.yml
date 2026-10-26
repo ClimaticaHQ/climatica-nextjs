@@ -1,26 +1,28 @@
 name: Setup Node.js and dependencies
-description: Setup Node.js environment with npm dependencies
-
-inputs:
-  node-version:
-    description: Node.js version
-    required: true
+description: Setup Node.js environment with npm dependencies, at the version in .nvmrc
 
 runs:
   using: composite
   steps:
-    - name: Use Node.js ${{ inputs.node-version }}
+    - name: Use Node.js from .nvmrc
+      id: setup-node
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ inputs.node-version }}
+        node-version-file: .nvmrc
         cache: npm
+
+    # * the npm that writes package-lock.json (package.json's packageManager): npm 10, bundled with
+    # * the .nvmrc Node, rejects a lock written by npm 11 that leaves an optional peer out
+    - name: Use npm from package.json
+      shell: bash
+      run: npm install -g "$(node -p "require('./package.json').packageManager")" && npm -v
 
     - name: Restore or cache node_modules
       id: cache-node-modules
       uses: actions/cache@v4
       with:
         path: node_modules
-        key: node-modules-${{ inputs.node-version }}-${{ hashFiles('package-lock.json') }}
+        key: node-modules-${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('package-lock.json') }}
 
     - name: Install dependencies
       if: steps.cache-node-modules.outputs.cache-hit != 'true'

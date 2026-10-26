@@ -23,7 +23,6 @@ export const SIDEBAR_PARAMS = {
   COMPARE_CITY_A: "cityA",
   COMPARE_CITY_B: "cityB",
 
-  // * shareable URL params
   CITY: "city",
   LAT: "lat",
   LNG: "lng",
@@ -40,4 +39,30 @@ export const SIDEBAR_PARAMS = {
   VAR: "var",
   POLYGON: "polygon",
   PERIODS: "periods",
+
+  // * comparison layout (split | overlay), for both chart types; omitted when split, the default
+  LAYOUT: "layout",
+  // * legacy name of LAYOUT, from when only Walter-Lieth had layouts — still read from old links
+  WL_LAYOUT: "wlLayout",
+  // * chart mode: "standard"; omitted for Walter-Lieth, the default
+  CHART: "chart",
+  // * overlay hatching (b | none); omitted when it's series A, the default
+  WL_SHADING: "wlShading",
+  // * split: the panel shown across the card (a | b); omitted when both are shown, the default
+  EXPANDED: "expanded",
+  // * Compare Periods with weather years, side by side: the two years drawn ("2021,1990");
+  // * omitted for the first two compared years, the default
+  PAIR_YEARS: "pair",
+  // * legacy name of PAIR_YEARS, from when only Walter-Lieth drew a pair — still read
+  WL_YEARS: "wlYears",
+  // * Compare Periods with weather years, overlay: the years drawn ("2021,1990"); omitted
+  // * when every compared year is, the default
+  SHOWN_YEARS: "shownYears",
+  // * Compare Periods: the order its years / periods are listed in (desc only — asc is the default)
+  SORT_ORDER: "order",
+  // * Compare Periods: each year's marker slot ("2021:0,1999:2"), when it isn't the list's order
+  MARKER_SLOTS: "markers",
+  CHART_MODE_STANDARD: "standard",
+  // * old links wrote chart=wl when standard was the default — still accepted
+  CHART_MODE_WALTER_LIETH: "wl",
 } as const;

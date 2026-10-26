@@ -4,6 +4,7 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/libs/Env", () => ({ env: { SOLR_URL: "http://localhost:8983" } }));
 vi.mock("@/libs/Logger", () => ({ logger: { info: vi.fn(), error: vi.fn() } }));
 
+import { SOLR_QUERY_PARAMS } from "@/constants";
 import { SolrService } from "@/libs/services/solrService";
 import type { TSolrCityDoc, TSolrResponse } from "@/types";
 
@@ -45,7 +46,7 @@ beforeEach(() => {
 });
 
 describe("SolrService.searchCities", () => {
-  it("returns mapped TWikidataCity[] on successful response", async () => {
+  it("returns mapped TCity[] on successful response", async () => {
     stubFetch(makeSolrResponse([makeSolrDoc()]));
     const results = await SolrService.searchCities("rome", "en");
     expect(results).toHaveLength(1);
@@ -63,16 +64,20 @@ describe("SolrService.searchCities", () => {
     expect(results).toEqual([]);
   });
 
-  it("returns [] when fetch throws an error", async () => {
+  // * an outage must not look like "no cities found"
+  it("rejects when fetch throws an error", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network error")));
-    const results = await SolrService.searchCities("rome", "en");
-    expect(results).toEqual([]);
+    await expect(SolrService.searchCities("rome", "en")).rejects.toThrow("network error");
   });
 
-  it("returns [] when Solr responds with non-ok HTTP status", async () => {
+  it("rejects when Solr responds with non-ok HTTP status", async () => {
     stubFetch({}, false);
-    const results = await SolrService.searchCities("rome", "en");
-    expect(results).toEqual([]);
+    await expect(SolrService.searchCities("rome", "en")).rejects.toThrow(/status/);
+  });
+
+  it("rejects when Solr reports a non-zero responseHeader status", async () => {
+    stubFetch({ ...makeSolrResponse([]), responseHeader: { status: 400, QTime: 1 } });
+    await expect(SolrService.searchCities("rome", "en")).rejects.toThrow(/Solr error status/);
   });
 
   it("uses label_en when lang is en", async () => {
@@ -93,6 +98,21 @@ describe("SolrService.searchCities", () => {
     expect(results[0].label).toBe("Roma");
   });
 
+  // Regression test: a hardcoded per-language config (Solr's solrconfig.xml "fl"
+  // request-handler default) once stripped label_<lang> for any locale beyond
+  // en/uk/es out of the Solr response entirely, so doc.label_el was always
+  // undefined and this fell through to label_en regardless of lang. This test
+  // proves mapToCity actually reads label_el when the doc has one, not just
+  // that getLabelField *resolves* to the right field name.
+  it("uses label_el when lang is el and the doc has a distinct Greek label", async () => {
+    stubFetch(
+      makeSolrResponse([makeSolrDoc({ label_en: "Andorra la Vella", label_el: "Ανδόρρα" })]),
+    );
+    const results = await SolrService.searchCities("Ανδόρρα", "el");
+    expect(results[0].label).toBe("Ανδόρρα");
+    expect(results[0].label).not.toBe("Andorra la Vella");
+  });
+
   it("deduplicates results by geonameid", async () => {
     const doc = makeSolrDoc({ geonameid: 3169070 });
     stubFetch(makeSolrResponse([doc, doc, { ...doc, label_en: "Rome duplicate" }]));
@@ -101,7 +121,7 @@ describe("SolrService.searchCities", () => {
     expect(results[0].id).toBe("3169070");
   });
 
-  it("builds a Solr URL containing required edismax params for multi-word query", async () => {
+  it("builds a Solr URL with the exact and fuzzy clauses for a multi-word query", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -111,9 +131,11 @@ describe("SolrService.searchCities", () => {
 
     await SolrService.searchCities("new york", "en");
 
-    const calledUrl: string = fetchMock.mock.calls[0][0];
-    expect(calledUrl).toContain("qf=");
-    expect(calledUrl).toContain("pf=");
+    const params = new URL(fetchMock.mock.calls[0][0]).searchParams;
+    expect(params.get(SOLR_QUERY_PARAMS.EXACT_TEXT)).toBe("new york");
+    expect(params.get(SOLR_QUERY_PARAMS.FUZZY_TEXT)).toBe("new york~1");
+    expect(params.get(SOLR_QUERY_PARAMS.EXACT_QF)).toContain("names");
+    expect(params.get(SOLR_QUERY_PARAMS.EXACT_PF)).toBe("names^10");
   });
 });
 
@@ -130,7 +152,15 @@ describe("SolrService.getLabelField", () => {
     expect(SolrService.getLabelField("es")).toBe("label_es");
   });
 
-  it("falls back to label_en for unknown lang", () => {
-    expect(SolrService.getLabelField("fr")).toBe("label_en");
+  it("returns label_el for lang el", () => {
+    expect(SolrService.getLabelField("el")).toBe("label_el");
+  });
+
+  it("returns label_fr for lang fr (a locale added after es/uk/en)", () => {
+    expect(SolrService.getLabelField("fr")).toBe("label_fr");
+  });
+
+  it("falls back to label_en for a lang outside the supported locale list", () => {
+    expect(SolrService.getLabelField("xx")).toBe("label_en");
   });
 });

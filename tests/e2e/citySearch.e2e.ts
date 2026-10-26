@@ -35,6 +35,21 @@ test.describe("City search", () => {
     await expect(results).not.toBeVisible();
   });
 
+  test("never lists the previous text's results while the new text is searched", async ({
+    page,
+  }) => {
+    const input = page.getByTestId("city-search-input").first();
+    const results = page.getByTestId("city-search-results").first();
+    await input.fill("Paris");
+    await expect(results.getByRole("button").first()).toContainText("Paris");
+
+    await input.fill("Lisbon");
+    // * at once: Paris is gone and the search shows it's loading
+    await expect(results).toBeHidden({ timeout: 100 });
+    await expect(page.getByTestId("city-search-loading").first()).toBeVisible({ timeout: 100 });
+    await expect(results.getByRole("button").first()).toContainText("Lisbon");
+  });
+
   test("selecting a result updates the URL with lat and lng params", async ({ page }) => {
     const input = page.getByTestId("city-search-input").first();
     await input.fill("Paris");

@@ -1,32 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import type { TPersistedJsonStore } from "@/types";
+import { useSyncExternalStore } from "react";
 
-export function usePersistedJson<T>(key: string, defaultValue: T): [T, (value: T) => void] {
-  const [state, setState] = useState<T>(defaultValue);
-
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(key);
-      if (raw !== null) setState(JSON.parse(raw) as T);
-    } catch {
-      // ignore malformed JSON
-    }
-  }, [key]);
-  /* eslint-enable react-hooks/set-state-in-effect */
-
-  const save = useCallback(
-    (value: T) => {
-      setState(value);
-      try {
-        localStorage.setItem(key, JSON.stringify(value));
-      } catch {
-        // ignore storage errors
-      }
-    },
-    [key],
-  );
-
-  return [state, save];
+/**
+ * A persisted value and its setter. Every reader of the same store sees the same value, from
+ * the first client render on (the server renders the default, so hydration matches).
+ */
+export function usePersistedJson<T>(store: TPersistedJsonStore<T>): [T, (value: T) => void] {
+  const value = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
+  return [value, store.set];
 }

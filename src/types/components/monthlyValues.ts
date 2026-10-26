@@ -1,0 +1,49 @@
+/** The two variables every monthly values table shows, whatever the chart type or chips. */
+export type TMonthlyValuesVariable = "tavg" | "prec";
+
+/** One month of a series: its mean temperature and precipitation (null / absent = missing). */
+export type TMonthlyValuesMonth = Partial<Record<TMonthlyValuesVariable, number | null>>;
+
+/** A series under a chart: its name and its months (its values in the text colour). */
+export type TMonthlyValuesSeries = {
+  key: string;
+  label: string;
+  data: readonly TMonthlyValuesMonth[];
+};
+
+/** One series' value in a cell — overlay cells stack A's above B's. */
+export type TMonthlyValuesEntry = {
+  /** its series' key — the overlay's focus mutes the other series' values */
+  key: string;
+  text: string;
+  color: string;
+  /** "Madrid: 4.0" — what a screen reader hears for this value */
+  srText: string;
+};
+
+/** A row: its unit ("°C" red, "mm" blue) and, per month, one entry per series. */
+export type TMonthlyValuesRow = {
+  variable: TMonthlyValuesVariable;
+  unit: string;
+  unitColor: string;
+  /** the variable's full name, for screen readers ("Mean temperature") */
+  name: string;
+  cells: TMonthlyValuesEntry[][];
+};
+
+/** The unit labels' colors (temperature red, precipitation blue: WL convention) and the values'. */
+export type TMonthlyValuesPalette = Record<"temp" | "prec" | "text", string>;
+
+export type TMonthlyValuesRowsArgs = {
+  series: readonly TMonthlyValuesSeries[];
+  palette: TMonthlyValuesPalette;
+  names: Record<TMonthlyValuesVariable, string>;
+  /** the UI's locale — the values' decimal separator */
+  locale: string;
+};
+
+export type TFormatMonthlyValuesValueArgs = {
+  variable: TMonthlyValuesVariable;
+  value: number | null | undefined;
+  locale: string;
+};

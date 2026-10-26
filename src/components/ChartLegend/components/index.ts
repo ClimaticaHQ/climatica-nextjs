@@ -1,0 +1,1 @@
+export { LegendSwatch } from "./LegendSwatch";

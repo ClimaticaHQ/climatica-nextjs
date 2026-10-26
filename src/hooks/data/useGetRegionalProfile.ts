@@ -1,65 +1,44 @@
+import { REGIONAL_PROFILE_VARIABLES } from "@/constants";
 import { WorldClimService } from "@/libs/services/worldClimService";
-import type {
-  TBbox,
-  TCellSize,
-  TClimatePeriod,
-  TProfileResult,
-  TVariable,
-  TWorldClimAvgBoxBinding,
-} from "@/types";
+import type { TProfileResult, TUseGetRegionalProfileArgs } from "@/types";
+import { extractPixelIri } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 
-export function useGetRegionalProfile(
-  bbox: TBbox | null,
-  wkt: string | null,
-  gridSize: TCellSize,
-  isClimate: boolean,
-  climatePeriod: TClimatePeriod,
-  year: number | undefined,
-  enabled: boolean,
-) {
-  const hasSelection = bbox !== null || wkt !== null;
+export function useGetRegionalProfile({
+  area,
+  gridSize,
+  dataset,
+  isEnabled,
+}: TUseGetRegionalProfileArgs) {
+  const hasSelection = area !== null;
 
-  const { data, isLoading } = useQuery<TProfileResult, Error>({
-    queryKey: [
-      "regional-profile",
-      bbox?.north,
-      bbox?.south,
-      bbox?.west,
-      bbox?.east,
-      wkt,
-      gridSize,
-      isClimate ? climatePeriod : year,
-    ],
+  const { data, isLoading, error } = useQuery<TProfileResult, Error>({
+    queryKey: ["regional-profile", area, gridSize, dataset],
     queryFn: async (): Promise<TProfileResult> => {
-      const fetchAvg = (varName: TVariable): Promise<TWorldClimAvgBoxBinding | null> => {
-        const area = bbox ? { bbox } : { wkt: wkt! };
-
-        return WorldClimService.getRegionalAverage(
-          [varName],
-          gridSize,
-          area,
-          isClimate,
-          climatePeriod,
-          year,
+      const averages = await WorldClimService.getRegionAverages({
+        area: area!,
+        gridSize,
+        variables: REGIONAL_PROFILE_VARIABLES,
+        dataset,
+      });
+      const byVariable = (variable: string) => {
+        const raster = extractPixelIri(
+          averages.map((average) => average.raster?.value ?? ""),
+          variable,
         );
+        return averages.find((average) => average.raster?.value === raster) ?? null;
       };
-
-      const [tmax, tmin, prec] = await Promise.all([
-        fetchAvg("tmax"),
-        fetchAvg("tmin"),
-        fetchAvg("prec"),
-      ]);
-
-      return { tmax, tmin, prec };
+      return { tmax: byVariable("tmax"), tmin: byVariable("tmin"), prec: byVariable("prec") };
     },
-    enabled: hasSelection && enabled,
+    enabled: hasSelection && isEnabled,
     staleTime: Infinity,
     retry: 1,
   });
 
   return {
     profileData: data ?? null,
-    isProfileLoading: hasSelection && enabled && isLoading,
+    isProfileLoading: hasSelection && isEnabled && isLoading,
+    // * a failed request is an error, never a profile — the panel isn't drawn from it
+    profileError: error ?? null,
   };
 }

@@ -1,6 +1,7 @@
 {
   "name": "Climatica",
   "version": "1.0.0",
+  "packageManager": "npm@11.11.1",
   "description": "Web application for exploring, comparing, and analyzing climate and weather metrics using WorldClim data",
   "author": {
     "name": "Andrii Kononenko [wastxrq]",
@@ -21,9 +22,12 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "solr:schema": "curl -X POST -H 'Content-type:application/json' --data-binary @docker/solr/schema.json http://localhost:8983/api/cores/cities/schema",
-    "solr:import": "docker cp docker/solr/data/cities.csv climatica-solr:/var/solr/data/cities.csv && docker exec climatica-solr post -c cities /var/solr/data/cities.csv",
+    "solr:schema": "node docker/solr/scripts/apply-schema.mjs",
+    "solr:import": "docker cp docker/solr/data/cities.csv climatica-solr:/var/solr/data/cities.csv && docker exec climatica-solr post -c cities -params 'f.names.split=true&f.names.separator=%7C' /var/solr/data/cities.csv",
     "solr:reindex": "npm run solr:schema && npm run solr:import",
+    "solr:recreate-core": "sh docker/solr/scripts/recreate-core.sh",
+    "cache:clear-city-search": "docker exec climatica-redis sh -c \"redis-cli --scan --pattern 'city-search:*' | xargs -r redis-cli DEL\"",
+    "cache:clear-nearest-city": "docker exec climatica-redis sh -c \"redis-cli --scan --pattern 'nearest-city:*' | xargs -r redis-cli DEL\"",
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -31,6 +35,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
+    "test:python": "./.venv/bin/pytest docker/solr/scripts/",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -38,7 +43,6 @@
     "@t3-oss/env-nextjs": "^0.13.11",
     "@tanstack/react-query": "^4.43.0",
     "axios": "^1.13.6",
-    "dom-to-image-more": "^3.10.0",
     "ioredis": "^5.10.1",
     "leaflet": "^1.9.4",
     "next": "16.2.6",
@@ -53,6 +57,8 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -60,6 +66,7 @@
     "@vitest/coverage-v8": "^4.1.7",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "jsdom": "^29.1.1",
     "prettier": "^3.8.1",
     "tailwindcss": "^4",
     "typescript": "^5",

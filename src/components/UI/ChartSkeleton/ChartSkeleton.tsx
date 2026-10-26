@@ -1,8 +1,10 @@
+import { Card } from "@/components/Card";
+
 const BAR_HEIGHTS = [60, 80, 45, 70, 90, 85, 95, 88, 75, 55, 50, 65] as const;
 
 export function ChartSkeleton() {
   return (
-    <div className="w-full animate-pulse rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4 shadow-sm">
+    <Card className="w-full animate-pulse">
       <div className="mb-4 flex gap-2">
         <div className="h-7 w-20 rounded-full bg-[var(--color-border)]" />
         <div className="h-7 w-24 rounded-full bg-[var(--color-border)]" />
@@ -23,6 +25,6 @@ export function ChartSkeleton() {
           <div key={i} className="h-3 w-6 rounded bg-[var(--color-border)]" />
         ))}
       </div>
-    </div>
+    </Card>
   );
 }

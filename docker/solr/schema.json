@@ -1,49 +1,85 @@
 {
   "add-field-type": [
     {
-      "name": "suggestType",
+      "name": "nameText",
       "class": "solr.TextField",
       "positionIncrementGap": "100",
       "indexAnalyzer": {
-        "tokenizer": {
-          "class": "solr.StandardTokenizerFactory"
-        },
-        "filters": [
-          { "class": "solr.LowerCaseFilterFactory" },
-          { "class": "solr.ASCIIFoldingFilterFactory" }
-        ]
-      },
-      "queryAnalyzer": {
-        "tokenizer": {
-          "class": "solr.StandardTokenizerFactory"
-        },
-        "filters": [
-          { "class": "solr.LowerCaseFilterFactory" },
-          { "class": "solr.ASCIIFoldingFilterFactory" }
-        ]
-      }
-    },
-    {
-      "name": "trigramType",
-      "class": "solr.TextField",
-      "positionIncrementGap": "100",
-      "indexAnalyzer": {
-        "tokenizer": { "class": "solr.StandardTokenizerFactory" },
-        "filters": [
-          { "class": "solr.LowerCaseFilterFactory" },
-          { "class": "solr.ASCIIFoldingFilterFactory" },
+        "charFilters": [
           {
-            "class": "solr.NGramFilterFactory",
-            "minGramSize": "3",
-            "maxGramSize": "10"
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "['\u2019\u02bc`\u00b4]",
+            "replacement": ""
+          }
+        ],
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.ICUFoldingFilterFactory"
           }
         ]
       },
       "queryAnalyzer": {
-        "tokenizer": { "class": "solr.StandardTokenizerFactory" },
+        "charFilters": [
+          {
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "['\u2019\u02bc`\u00b4]",
+            "replacement": ""
+          }
+        ],
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
         "filters": [
-          { "class": "solr.LowerCaseFilterFactory" },
-          { "class": "solr.ASCIIFoldingFilterFactory" }
+          {
+            "class": "solr.ICUFoldingFilterFactory"
+          }
+        ]
+      }
+    },
+    {
+      "name": "namePrefix",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "indexAnalyzer": {
+        "charFilters": [
+          {
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "['\u2019\u02bc`\u00b4]",
+            "replacement": ""
+          }
+        ],
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.ICUFoldingFilterFactory"
+          },
+          {
+            "class": "solr.EdgeNGramFilterFactory",
+            "minGramSize": "2",
+            "maxGramSize": "25"
+          }
+        ]
+      },
+      "queryAnalyzer": {
+        "charFilters": [
+          {
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "['\u2019\u02bc`\u00b4]",
+            "replacement": ""
+          }
+        ],
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.ICUFoldingFilterFactory"
+          }
         ]
       }
     }
@@ -57,44 +93,86 @@
       "stored": true
     },
     {
-      "name": "label_en",
-      "type": "suggestType",
+      "name": "label_de",
+      "type": "nameText",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
-      "name": "label_uk",
-      "type": "suggestType",
+      "name": "label_el",
+      "type": "nameText",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_en",
+      "type": "nameText",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
       "name": "label_es",
-      "type": "suggestType",
+      "type": "nameText",
       "multiValued": false,
       "indexed": true,
       "stored": true
     },
     {
-      "name": "label_en_ngram",
-      "type": "trigramType",
+      "name": "label_fr",
+      "type": "nameText",
       "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_it",
+      "type": "nameText",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_nb",
+      "type": "nameText",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_pt",
+      "type": "nameText",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_ro",
+      "type": "nameText",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "label_uk",
+      "type": "nameText",
+      "multiValued": false,
+      "indexed": true,
+      "stored": true
+    },
+    {
+      "name": "names",
+      "type": "nameText",
+      "multiValued": true,
       "indexed": true,
       "stored": false
     },
     {
-      "name": "label_uk_ngram",
-      "type": "trigramType",
-      "multiValued": false,
-      "indexed": true,
-      "stored": false
-    },
-    {
-      "name": "label_es_ngram",
-      "type": "trigramType",
-      "multiValued": false,
+      "name": "names_prefix",
+      "type": "namePrefix",
+      "multiValued": true,
       "indexed": true,
       "stored": false
     },
@@ -135,8 +213,9 @@
     }
   ],
   "add-copy-field": [
-    { "source": "label_en", "dest": "label_en_ngram" },
-    { "source": "label_uk", "dest": "label_uk_ngram" },
-    { "source": "label_es", "dest": "label_es_ngram" }
+    {
+      "source": "names",
+      "dest": "names_prefix"
+    }
   ]
 }

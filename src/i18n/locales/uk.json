@@ -1,16 +1,28 @@
 {
-  "topbar": {
-    "toggleFilters": "Фільтри",
-    "toggleTheme": "Змінити тему"
-  },
   "navbar": {
     "toggleMenu": "Перемкнути меню",
-    "links": {
-      "climateStatistics": "Клімат міста",
-      "climateComparison": "Порівняти міста",
-      "compareCities": "Порівняти міста",
-      "comparePeriods": "Порівняти періоди",
-      "heatMap": "Теплова мапа регіону"
+    "settings": "Налаштування"
+  },
+  "pages": {
+    "climateStatistics": {
+      "title": "Клімат міста",
+      "description": "Знайдіть місто, щоб переглянути його кліматичні дані"
+    },
+    "compareCities": {
+      "title": "Порівняти міста",
+      "description": "Порівняйте клімат двох міст поруч"
+    },
+    "comparePeriods": {
+      "title": "Порівняти періоди",
+      "description": "Подивіться, як змінюється клімат міста в різні періоди та роки"
+    },
+    "heatMap": {
+      "title": "Теплова мапа регіону",
+      "description": "Намалюйте ділянку на мапі, щоб побачити, як змінюється її клімат"
+    },
+    "settings": {
+      "title": "Налаштування",
+      "description": "Мова, вигляд і поведінка застосунку"
     }
   },
   "search": {
@@ -18,12 +30,7 @@
     "coordsResult": "Перейти до координат"
   },
   "climateStatistics": {
-    "title": "Кліматична статистика",
-    "subtitle": "Знайдіть місто, щоб переглянути його кліматичні дані",
     "cellResolution": "Роздільність сітки:",
-    "filtersTab": "Фільтри",
-    "useMyLocation": "Моє місцезнаходження",
-    "locating": "Визначення...",
     "stats": {
       "avgTmax": "Серед. макс. темп",
       "avgTmin": "Серед. мін. темп",
@@ -31,37 +38,35 @@
       "tmin": "Мін. темп",
       "totalPrec": "Заг. опади",
       "mmThisMonth": "мм цього місяця",
-      "resolution": "Роздільність",
-      "autoResolutionTooltip": "Роздільність встановлюється автоматично на основі обраного датасету",
       "altitude": "Висота",
       "filteredMonths": "Фільтр: {months}"
-    }
+    },
+    "noPeriodData": "Немає даних за {period} для роздільної здатності {grid}"
   },
-  "compareCities": {
-    "title": "Порівняти міста",
-    "selectSecondCity": "Оберіть друге місто для порівняння"
-  },
+  "compareCities": {},
   "comparePeriods": {
-    "title": "Порівняти періоди",
     "trend": {
       "tempTitle": "Тенденція температури",
       "precipTitle": "Тенденція опадів",
-      "noChange": "Без змін"
+      "noChange": "Без змін",
+      "comparedTo": "{b} проти {a}"
     },
     "weather": {
-      "periods": "Роки",
       "addPeriod": "Додати період",
-      "maxPeriods": "Максимум {max} періодів",
       "removePeriod": "Видалити {year}",
       "invalidYear": "Введіть рік між {min} та {max}",
       "duplicateYear": "Цей рік вже є у списку",
-      "periodsCount": "{count} / {max} періодів"
+      "periodsCount": "{count} / {max} періодів",
+      "noData": "Немає даних про погоду за {years} для цього місця та роздільності."
+    },
+    "swapPeriods": "Поміняти періоди місцями",
+    "sort": {
+      "year": "Рік",
+      "ascending": "Сортувати за роком, за зростанням",
+      "descending": "Сортувати за роком, за спаданням"
     }
   },
   "climateComparison": {
-    "title": "Порівняння клімату",
-    "modeCities": "Порівняти міста",
-    "modePeriods": "Порівняти періоди",
     "searchA": "Місто A",
     "searchB": "Місто B",
     "searchCity": "Місто",
@@ -74,7 +79,7 @@
       "avgTmin": "Серед. мін. темп",
       "totalPrec": "Заг. опади",
       "aridMonths": "Посушливі місяці",
-      "martonne": "Мартон (M)"
+      "frostMonths": "Місяці із заморозками"
     },
     "diff": {
       "warmerCity": "Тепліше місто",
@@ -83,21 +88,22 @@
       "coldestMonth": "Найхолодніший місяць",
       "byDegrees": "на {value}°C",
       "byMm": "на {value} мм",
-      "tie": "Нічия"
+      "tie": "Нічия",
+      "tieSub": "=",
+      "monthTemps": "{a}: {tempA} / {b}: {tempB}"
     },
-    "autoResolution": "Авторозрядність: {resolution}",
-    "wlCompare": {
-      "warmerBy": "{label} тепліше на {value}°C",
-      "coolerBy": "{label} холодніше на {value}°C",
-      "sameTemp": "Однакова середня температура",
-      "moreArid": "{label} має {value} більше посушливих місяців",
-      "fewerArid": "{label} має {value} менше посушливих місяців",
-      "sameArid": "Однакова кількість посушливих місяців"
-    }
+    "noPeriodData": "Немає даних за {period} для роздільної здатності {grid}",
+    "difference": "Різниця",
+    "differenceInfo": "Як обчислюється різниця",
+    "differenceNote": {
+      "cities": "Різниця = {b} − {a}. Додатне значення означає, що показник вищий у {b}.",
+      "periods": "Різниця = {b} − {a}. Додатне значення означає, що показник зріс у пізнішому періоді."
+    },
+    "metric": "Показник",
+    "tableCaption": "Порівняння {a} і {b}",
+    "statsCaption": "Статистика для {names}"
   },
   "heatMap": {
-    "title": "Теплова мапа регіону",
-    "placeholder": "Плейсхолдер сторінки теплової мапи. Пізніше тут можна показати інтенсивність клімату на карті світу.",
     "drawBbox": "Намалювати прямокутник",
     "drawPolygon": "Намалювати полігон",
     "clearSelection": "Очистити вибір",
@@ -105,6 +111,11 @@
     "drawingPolygon": "Клікайте для додавання вершин — клікніть на першу точку, щоб замкнути полігон",
     "noSelection": "Намалюйте прямокутник або полігон на мапі, щоб проаналізувати кліматичні дані регіону",
     "noData": "Для цього регіону дані відсутні",
+    "noPeriodData": "Немає даних за {period} для роздільної здатності {grid}",
+    "tooManyCells": "Цей регіон містить {count, number} клітинок при {grid} — більше, ніж {max, number}, які може завантажити мапа. Оберіть {suggestion} або грубішу роздільність.",
+    "tooManyCellsAnyGrid": "Цей регіон містить понад {max, number} клітинок навіть при {coarsest}. Намалюйте менший регіон.",
+    "tooManyCellsPolygon": "Цей полігон охоплює {count, number} клітинок при {grid}, але для завантаження читаються всі {boxCount, number} клітинок прямокутника навколо нього — більше, ніж {max, number}, які може завантажити мапа. Оберіть {suggestion} або грубішу роздільність чи намалюйте компактніший полігон.",
+    "tooManyCellsPolygonAnyGrid": "Цей полігон охоплює {count, number} клітинок при {grid}, але для завантаження читається прямокутник навколо нього, що містить понад {max, number} клітинок навіть при {coarsest}. Намалюйте менший або компактніший полігон.",
     "stats": {
       "minValue": "Мін",
       "maxValue": "Макс",
@@ -119,22 +130,13 @@
       "avgTooltipWeatherAnnual": "Річне середнє: середнє з 12 місячних значень по всіх клітинках",
       "avgTooltipWeatherMonth": "Місячне середнє: середнє {variable} за {month} {year} по всіх клітинках"
     },
-    "showingVariable": "Показується: {variable}",
-    "useMyLocation": "Моє місцезнаходження",
-    "locating": "Визначення...",
-    "summaryLine": "{count} комірок проаналізовано · {period} · {variable} · сітка {grid}",
-    "summaryLineClimate": "{count} клітинок · Сер. 30 р. {variable} · {period} · {grid}",
-    "summaryLineWeatherAnnual": "{count} клітинок · Річне сер. {variable} · {year} · {grid}",
-    "summaryLineWeatherMonth": "{count} клітинок · {variable} за {period} · {grid}",
     "profile": {
       "subtitle": "Кліматичний профіль регіону · {count} клітинок · {period}",
       "subtitleWeather": "Кліматичний профіль регіону · {count} клітинок · {year} · не є кліматичною нормою"
     }
   },
   "chart": {
-    "title": "Температура",
-    "monthAxis": "Місяць",
-    "temperatureAxis": "Температура (град C)",
+    "versus": "проти",
     "precipitation": "Опади",
     "maxTemperature": "Макс. температура",
     "minTemperature": "Мін. температура",
@@ -144,32 +146,72 @@
     "meanTemp": "Сер. темп",
     "annualPrec": "Річні опади",
     "aridMonths": "Посушливих місяців",
-    "martonne": "Аридність (M)",
-    "martonneTooltip": "Індекс аридності де Мартонна: M = P/(T+10). <5 Гіпераридний | 5–10 Аридний | 10–20 Напіваридний | 20–30 Напівгумідний | >30 Гумідний",
+    "martonne": "Індекс Мартонна (M)",
+    "martonneShort": "Мартонн (M)",
+    "martonneTooltip": "Індекс аридності де Мартонна: M = P/(T+10).",
     "aridPeriod": "Посушливий період",
     "humidPeriod": "Вологий період",
+    "perhumidPeriod": "Дуже вологий (> 100 мм)",
+    "wlAriaSummary": "Діаграма Вальтера-Лієта, {location}, {period}: середня температура {temp} °C, річні опади {prec} мм, посушливі місяці: {arid}",
+    "wlIncomplete": "Неповні дані для {label}: діаграмі Вальтера-Лієта потрібні температура й опади за всі 12 місяців.",
+    "layout": "Макет",
+    "layoutSplit": "Поруч",
+    "layoutOverlay": "Накладання",
+    "wlGuideButton": "Як читати цю діаграму",
+    "wlGuide": {
+      "scale": "Масштаб: 10 °C = 20 мм",
+      "humid": "Вологий період (вертикальні лінії): опади вище за температуру",
+      "arid": "Посушливий період (крапки): температура вище за опади",
+      "veryHumid": "Дуже вологий (суцільна заливка): понад 100 мм, масштаб стиснуто 1:10",
+      "frost": "Смуга заморозків: місяці із середнім мінімумом нижче 0 °C"
+    },
+    "wlShading": "Штрихування",
+    "wlShadingNone": "Немає",
+    "mode": "Тип діаграми",
     "modeStandard": "Стандартний графік",
     "modeWalterLieth": "Діаграма Вальтера-Лієта",
     "walterLiethTabUnavailable": "Недоступно у вигляді Вальтера-Лієта",
-    "selectedMonth": "значення за {month}",
     "selectedMonthsCount": "{count, plural, one {# місяць} few {# місяці} many {# місяців} other {# місяців}}",
     "altitude": "Висота",
     "subtitle": {
       "climate": "Клімат {period}",
-      "weather": "Погода {year}"
+      "weather": "Погода {year} · один рік",
+      "weatherYears": "Погода {years} · кожен — один рік"
     },
-    "legend": {
-      "seriesNote": "Суцільна = tmax · Пунктир = tmin · Стовпці = precip"
-    }
+    "expandPanel": "Розгорнути {name}",
+    "showBoth": "Показати обидва",
+    "expandedPanel": "Розгорнута панель",
+    "frostLegend": "Заморозки (сер. мін. < 0 °C)",
+    "maxTempShort": "Макс. темп.",
+    "minTempShort": "Мін. темп.",
+    "monthlyTableCaption": "Місячні значення: {names}",
+    "month": "Місяць",
+    "showMonthlyValues": "Показати місячні значення",
+    "hideMonthlyValues": "Сховати місячні значення",
+    "switchToStandard": "Перейти до стандартного графіка",
+    "walterLiethFiltersExplanation": "Діаграма Вальтера-Літа завжди показує середню температуру й опади за всі 12 місяців, тому змінні та місяці не можна вибрати, поки вона відображається.",
+    "weatherSingleYear": "Погода · один рік",
+    "martonneShortYear": "Мартонн (M) · {year}",
+    "martonneYear": "Індекс Мартонна (M) за {year} рік",
+    "martonneTooltipYear": "Індекс аридності де Мартонна лише за {year} рік, за даними цього року: M = P/(T+10).",
+    "martonnePerYear": "Індекс Мартонна (M), за рік",
+    "yearsShown": "Показані роки",
+    "focusCurve": "{variable} · {entity} — {month} {value}",
+    "focusBar": "{entity} — {month} {value} ({period})",
+    "focusHumid": "вологий період",
+    "focusArid": "посушливий період",
+    "scrollHint": "Проведіть, щоб побачити всі місяці"
   },
   "loading": {
-    "fetchingClimateData": "Завантаження кліматичних даних...",
-    "updating": "Оновлення..."
+    "dataUpdated": "Дані оновлено: {location}, {period}"
   },
   "errors": {
     "fetchClimateData": "Не вдалося завантажити кліматичні дані",
-    "geolocationDenied": "Доступ до геолокації заборонено. Дозвольте доступ у браузері.",
-    "geolocationUnavailable": "Не вдалося визначити ваше місцезнаходження."
+    "tooManyRequests": "Забагато запитів. Зачекайте трохи й спробуйте ще раз.",
+    "searchUnavailable": "Пошук міст зараз недоступний. Спробуйте ще раз за мить.",
+    "dataSourceUnavailable": "Сервіс кліматичних даних не відповідає. Спробуйте ще раз за мить.",
+    "connection": "Не вдалося зв'язатися із сервером. Перевірте з'єднання й спробуйте ще раз.",
+    "placeLookupFailed": "Не вдалося отримати назву місця для цієї точки — показано її координати."
   },
   "geolocation": {
     "notSupported": "Ваш браузер не підтримує геолокацію",
@@ -181,16 +223,43 @@
   },
   "map": {
     "selectedFromMap": "Вибрано з мапи",
-    "pointLabel": "Точка на мапі {lat}, {lng}"
+    "pointLabel": "Точка на мапі {lat}, {lng}",
+    "gridCell": "Комірка сітки: {size}"
   },
   "cellSizes": {
     "10m": "10 хв (~324 км2)",
     "5m": "5 хв (~81 км2)",
     "2_5m": "2.5 хв (~20.25 км2)",
-    "30s": "30 с (~1 км2)"
+    "30s": "30 с (~1 км2)",
+    "onlyForPeriod": "Лише для Клімату {period}"
+  },
+  "cellSizesShort": {
+    "10m": "10 хв",
+    "5m": "5 хв",
+    "2_5m": "2,5 хв",
+    "30s": "30 с"
   },
   "filters": {
-    "period": "Період"
+    "names": {
+      "dataset": "Набір даних",
+      "climatePeriod": "Кліматичний період",
+      "weatherYear": "Рік",
+      "variables": "Змінні",
+      "gridSize": "Роздільна здатність",
+      "months": "Місяці"
+    },
+    "chips": {
+      "allFilters": "Фільтри",
+      "allFiltersLabel": "Фільтри, {count, plural, =0 {без змін} one {# змінено} few {# змінено} many {# змінено} other {# змінено}}",
+      "value": "{name}: {value}",
+      "variablesCount": "{count, plural, one {# змінна} few {# змінні} many {# змінних} other {# змінної}}",
+      "allMonths": "Усі місяці",
+      "monthsCount": "{count, plural, one {# місяць} few {# місяці} many {# місяців} other {# місяця}}"
+    },
+    "sheet": {
+      "apply": "Застосувати",
+      "reset": "Скинути"
+    }
   },
   "validation": {
     "year": {
@@ -212,6 +281,8 @@
     "rawCsv": "Повні дані (CSV)",
     "rawJson": "Повні дані (JSON)",
     "rawDataUnavailable": "Доступно лише для клімату 1970–2000",
+    "incompleteData": "Експорт недоступний: для деяких місяців бракує даних про температуру чи опади",
+    "updating": "Експорт недоступний, поки дані оновлюються",
     "failed": "Не вдалося експортувати — спробуйте ще раз",
     "metricColumn": "Метрика"
   },
@@ -235,8 +306,7 @@
       "climatePeriod": "Кліматичний період",
       "yearRange": "Рік",
       "variables": "Змінні",
-      "months": "Місяць",
-      "filters": "Фільтри"
+      "months": "Місяць"
     },
     "datasets": {
       "climate": "Клімат",
@@ -254,22 +324,15 @@
     "months": {
       "all": "Усі"
     },
-    "yearRange": {
-      "from": "Від",
-      "to": "До"
-    },
-    "autoScroll": "Автопрокрутка до результатів",
-    "syncCity": "Синхронізувати вибране місто на всіх сторінках",
-    "autoApplyFilters": "Автоматично застосовувати фільтри",
     "filters": "Фільтри",
-    "settings": "Налаштування",
     "applyFilters": "Застосувати",
     "cellCount": {
+      "label": "({count} клітинок)",
       "fast": "Швидко",
       "moderate": "Помірно",
       "slow": "Повільно",
       "tooMany": "Забагато клітинок",
-      "tooManyError": "Зменшіть область або роздільність для застосування"
+      "tooManyError": "Забагато клітинок для завантаження. Наблизьте карту або оберіть нижчу роздільну здатність."
     },
     "notes": {
       "climateNormals": "30-річні кліматичні норми",
@@ -280,7 +343,8 @@
   },
   "common": {
     "useMyLocation": "Моє місцезнаходження",
-    "locating": "Визначення..."
+    "locating": "Визначення...",
+    "close": "Закрити"
   },
   "error": {
     "title": "Щось пішло не так",
@@ -304,7 +368,7 @@
   },
   "meta": {
     "climateStatistics": {
-      "title": "Кліматична статистика для {city}",
+      "title": "{city} · {page}",
       "description": "{variables} для {city} ({period})"
     },
     "compareCities": {
@@ -313,12 +377,65 @@
     },
     "comparePeriods": {
       "title": "{city} — порівняння кліматичних періодів",
-      "description": "{variables} для {city} — {periods}",
-      "descriptionGeneric": "Порівняйте кліматичні дані міста за різні періоди часу"
+      "description": "{variables} для {city} — {periods}"
     },
     "heatMap": {
-      "title": "Теплова карта регіону — {variables} ({period})",
+      "title": "{page} · {variables} ({period})",
       "description": "Інтенсивність клімату {variables} для обраної області ({period})"
+    }
+  },
+  "units": {
+    "celsius": "°C",
+    "mm": "mm",
+    "meters": "m",
+    "celsiusValue": "{value}°C",
+    "mmValue": "{value} mm",
+    "metersValue": "{value} m"
+  },
+  "settings": {
+    "sections": {
+      "language": "Мова",
+      "appearance": "Вигляд",
+      "chartsAndFilters": "Графіки та фільтри"
+    },
+    "theme": "Тема",
+    "themeOptions": {
+      "light": "Світла",
+      "dark": "Темна",
+      "system": "Системна"
+    },
+    "autoScroll": "Автопрокрутка до результатів",
+    "syncCity": "Синхронізувати вибране місто на всіх сторінках",
+    "syncFilters": "Синхронізувати фільтри на всіх сторінках",
+    "autoApplyFilters": "Автоматично застосовувати фільтри",
+    "animations": "Анімації",
+    "updateHighlight": "Підсвічування оновлень",
+    "updateHighlightGlow": "Сяйво",
+    "updateHighlightBorder": "Рамка",
+    "reducedMotionNotice": "Ваша система просить зменшити рух, тому анімації вимкнено",
+    "appLanguage": "Мова застосунку",
+    "chartBarStyle": "Стиль стовпців порівняння",
+    "barStyleOptions": {
+      "plain": "Однотонний",
+      "shades": "Відтінки",
+      "hatch": "Візерунки"
+    },
+    "barStyleDescriptions": {
+      "plain": "Типово: один колір для кожного міста чи періоду — найчистіший вигляд",
+      "shades": "Окремий відтінок для кожного міста чи періоду",
+      "hatch": "Візерунки — найкраще для друку та за особливостей сприйняття кольорів"
+    },
+    "descriptions": {
+      "animations": "Плавні переходи, коли змінюються графіки та дані",
+      "updateHighlight": "Як позначається картка, коли її дані оновлюються",
+      "autoApplyFilters": "Зміни фільтрів застосовуються одразу; якщо вимкнено, вони чекають на «Застосувати»",
+      "syncCity": "Місто, вибране на одній сторінці, відкривається й на інших",
+      "syncFilters": "Фільтри, вибрані на одній сторінці, діють і на інших",
+      "autoScroll": "Прокручує до результатів після вибору міста",
+      "chartBarStyle": "Як розрізняються міста чи періоди на накладених графіках"
+    },
+    "hints": {
+      "turnOnAnimations": "Увімкніть анімації, щоб вибрати підсвічування"
     }
   }
 }

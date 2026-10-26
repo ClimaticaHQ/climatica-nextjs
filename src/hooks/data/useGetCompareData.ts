@@ -1,32 +1,29 @@
 import { DATASETS, WEATHER_VARIABLES } from "@/constants";
 import { WorldClimService } from "@/libs/services/worldClimService";
-import { useFiltersStore } from "@/stores";
+import { useFilters } from "@/hooks/filters";
 import type {
   TCellSize,
-  TClimatePeriod,
-  TCompareData,
-  TMonthlyTemperature,
+  TCompareBindings,
   TUseGetCompareDataReturn,
+  TWorldClimPointValueBinding,
 } from "@/types";
-import { buildMonthlyTemperaturesFromPointValues } from "@/utils";
+import {
+  buildMonthlyTemperaturesFromPointValues,
+  extractAvailableClimatePeriods,
+  filterPointBindingsByPeriod,
+} from "@/utils";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 
-export async function fetchCityData(
+export async function fetchCityBindings(
   lat: number,
   lng: number,
   gridSize: TCellSize,
   isClimate: boolean,
-  climatePeriod: TClimatePeriod,
   year?: number,
-): Promise<TMonthlyTemperature[]> {
+): Promise<TWorldClimPointValueBinding[]> {
   const response = isClimate
-    ? await WorldClimService.getClimateDataForPoint(
-        lat,
-        lng,
-        gridSize,
-        WEATHER_VARIABLES,
-        climatePeriod,
-      )
+    ? await WorldClimService.getClimateDataForPoint(lat, lng, gridSize, WEATHER_VARIABLES)
     : await WorldClimService.getWeatherDataForPoint(
         lat,
         lng,
@@ -35,7 +32,7 @@ export async function fetchCityData(
         year ?? new Date().getFullYear(),
       );
 
-  return buildMonthlyTemperaturesFromPointValues(response.results.bindings);
+  return response.results.bindings;
 }
 
 export function useGetCompareData(
@@ -45,29 +42,21 @@ export function useGetCompareData(
   lngB: number | null,
   gridSize: TCellSize,
 ): TUseGetCompareDataReturn {
-  const { dataset, climatePeriod, weatherYear } = useFiltersStore();
+  const { dataset, climatePeriod, weatherYear } = useFilters();
   const isClimate = dataset === DATASETS.CLIMATE;
   const year = isClimate ? undefined : weatherYear;
 
   const enabled = latA !== null && lngA !== null && latB !== null && lngB !== null;
 
-  const { data, isLoading, error } = useQuery<TCompareData, Error>({
-    queryKey: [
-      "compare",
-      latA,
-      lngA,
-      latB,
-      lngB,
-      gridSize,
-      isClimate ? climatePeriod : weatherYear,
-    ],
-    queryFn: async (): Promise<TCompareData> => {
+  const { data, isLoading, isFetching, error } = useQuery<TCompareBindings, Error>({
+    queryKey: ["compare", latA, lngA, latB, lngB, gridSize, isClimate ? "climate" : weatherYear],
+    queryFn: async (): Promise<TCompareBindings> => {
       if (latA === null || lngA === null || latB === null || lngB === null) {
         throw new Error("No locations selected");
       }
       const [cityA, cityB] = await Promise.all([
-        fetchCityData(latA, lngA, gridSize, isClimate, climatePeriod, year),
-        fetchCityData(latB, lngB, gridSize, isClimate, climatePeriod, year),
+        fetchCityBindings(latA, lngA, gridSize, isClimate, year),
+        fetchCityBindings(latB, lngB, gridSize, isClimate, year),
       ]);
       return { cityA, cityB };
     },
@@ -77,10 +66,34 @@ export function useGetCompareData(
     keepPreviousData: true,
   });
 
+  const availablePeriods = useMemo(
+    () =>
+      isClimate && data ? extractAvailableClimatePeriods([...data.cityA, ...data.cityB]) : null,
+    [isClimate, data],
+  );
+
+  const cityA = useMemo(() => {
+    if (!data) return null;
+    const bindings = isClimate
+      ? filterPointBindingsByPeriod(data.cityA, climatePeriod)
+      : data.cityA;
+    return buildMonthlyTemperaturesFromPointValues(bindings);
+  }, [data, isClimate, climatePeriod]);
+
+  const cityB = useMemo(() => {
+    if (!data) return null;
+    const bindings = isClimate
+      ? filterPointBindingsByPeriod(data.cityB, climatePeriod)
+      : data.cityB;
+    return buildMonthlyTemperaturesFromPointValues(bindings);
+  }, [data, isClimate, climatePeriod]);
+
   return {
-    cityA: data?.cityA ?? [],
-    cityB: data?.cityB ?? [],
+    cityA,
+    cityB,
+    availablePeriods,
     isLoading: enabled && isLoading,
+    isFetching: enabled && isFetching,
     error: error ?? null,
   };
 }

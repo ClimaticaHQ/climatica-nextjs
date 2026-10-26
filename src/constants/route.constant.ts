@@ -4,4 +4,5 @@ export const ROUTES = {
   COMPARE_CITIES: "/compare-cities",
   COMPARE_PERIODS: "/compare-periods",
   HEAT_MAP: "/heat-map",
+  SETTINGS: "/settings",
 } as const;

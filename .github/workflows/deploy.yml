@@ -11,9 +11,17 @@ concurrency:
   group: deploy-climatica
   cancel-in-progress: false
 
+permissions:
+  actions: read
+  contents: read
+
 jobs:
   deploy:
     runs-on: self-hosted
+    # * the longest deploy (data, core and code all changed), measured locally: cities CSV 37 s
+    # * (2.1 GB peak memory), core recreate 2 s, reindex 2 min 17 s, build 7 s with a warm cache;
+    # * npm ci not measured. 40 leaves room for a slower server and a cold build.
+    timeout-minutes: 40
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
@@ -22,6 +30,22 @@ jobs:
     env:
       PATH: /home/guiveg/.nvm/versions/node/v25.1.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       REPO_DIR: /home/guiveg/climatica-nextjs
+      DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      # * (a) core: the schema and the core's config — the core is recreated and reindexed
+      SOLR_SCHEMA: docker/solr/schema.json
+      SOLR_SCHEMA_SCRIPT: docker/solr/scripts/generate_schema.py
+      SOLR_CONFIG: docker/solr/solrconfig.xml
+      # * (b) data: what cities.csv is built from — it's regenerated and reindexed
+      DATA_SCRIPT: docker/solr/scripts/prepare_data.py
+      LOCALES_JSON: src/configs/locales.json
+      CITIES_CSV: docker/solr/data/cities.csv
+      # * (c) search logic: the query the app sends and the code that runs it — cached searches
+      # * are dropped
+      SEARCH_QUERY_UTIL: src/utils/solr.util.ts
+      SEARCH_QUERY_CONSTANTS: src/constants/solr.constant.ts
+      SEARCH_SERVICE: src/libs/services/solrService.ts
+      SEARCH_ROUTE: src/app/api/cities/route.ts
+      SOLR_CONTAINER: climatica-solr
 
     steps:
       - name: Ensure Tests and Validation passed for this commit
@@ -39,22 +63,155 @@ jobs:
             fi
           done
 
+      - name: Skip if this commit is already deployed
+        id: guard
+        run: |
+          MARKER="$REPO_DIR/.deployed_sha"
+          if [ -f "$MARKER" ]; then
+            OLD_SHA="$(cat "$MARKER")"
+          else
+            OLD_SHA=""
+          fi
+          echo "old_sha=$OLD_SHA" >> "$GITHUB_OUTPUT"
+
+          if [ "$OLD_SHA" == "$DEPLOY_SHA" ]; then
+            echo "Commit $DEPLOY_SHA already deployed — skipping remaining steps."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Mark repository as safe
+        if: steps.guard.outputs.skip != 'true'
         run: git config --global --add safe.directory "$REPO_DIR"
 
       - name: Update repository
-        run: git -C "$REPO_DIR" pull origin main
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          git -C "$REPO_DIR" fetch origin main
+          git -C "$REPO_DIR" reset --hard origin/main
+
+      - name: Detect what changed since the last deploy
+        id: changes
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          OLD_SHA="${{ steps.guard.outputs.old_sha }}"
+          if [ -z "$OLD_SHA" ]; then
+            echo "No previous deploy recorded — treating every group as changed."
+            KNOWN=false
+          elif ! git -C "$REPO_DIR" cat-file -e "$OLD_SHA" 2>/dev/null; then
+            echo "Previous commit $OLD_SHA not found in local history — treating every group as changed."
+            KNOWN=false
+          else
+            KNOWN=true
+          fi
+
+          changed() {
+            if [ "$KNOWN" != "true" ]; then echo true; return; fi
+            if [ -n "$(git -C "$REPO_DIR" diff --name-only "$OLD_SHA" "$DEPLOY_SHA" -- "$@")" ]; then
+              echo true
+            else
+              echo false
+            fi
+          }
+
+          core=$(changed "$SOLR_SCHEMA" "$SOLR_SCHEMA_SCRIPT" "$SOLR_CONFIG")
+          data=$(changed "$DATA_SCRIPT" "$LOCALES_JSON")
+          search=$(changed "$SEARCH_QUERY_UTIL" "$SEARCH_QUERY_CONSTANTS" "$SEARCH_SERVICE" "$SEARCH_ROUTE")
+          echo "Solr core: $core · city data: $data · search logic: $search"
+          {
+            echo "core=$core"
+            echo "data=$data"
+            echo "search=$search"
+          } >> "$GITHUB_OUTPUT"
+
+      # * cities.csv isn't in git: it's also built when it's missing from the server
+      - name: Generate cities CSV if the data inputs changed
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          cd "$REPO_DIR"
+          if [ "${{ steps.changes.outputs.data }}" = "true" ] || [ ! -f "$CITIES_CSV" ]; then
+            python3 "$DATA_SCRIPT"
+          else
+            echo "Data inputs unchanged and $CITIES_CSV present — not regenerating."
+          fi
+
+      - name: Ensure Docker services are running
+        if: steps.guard.outputs.skip != 'true'
+        run: cd "$REPO_DIR/docker" && docker compose up -d
+
+      - name: Wait for Solr to answer
+        id: solr
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          for i in $(seq 1 24); do
+            if docker exec "$SOLR_CONTAINER" curl -sf "http://localhost:8983/solr/admin/info/system" > /dev/null 2>&1; then
+              echo "Solr is up"
+              # * a core lost to an earlier failed deploy is recreated like a changed one
+              status=$(docker exec "$SOLR_CONTAINER" curl -s "http://localhost:8983/solr/admin/cores?action=STATUS&core=cities")
+              if echo "$status" | jq -e '.status.cities.name' > /dev/null 2>&1; then
+                echo "core_missing=false" >> "$GITHUB_OUTPUT"
+              else
+                echo "::warning::The 'cities' core is missing — it will be recreated."
+                echo "core_missing=true" >> "$GITHUB_OUTPUT"
+              fi
+              exit 0
+            fi
+            echo "Waiting for Solr to answer ($i/24)..."
+            sleep 5
+          done
+          echo "Solr did not answer in time"
+          exit 1
+
+      # * a core keeps the copy of solrconfig.xml it was created with, so RELOAD can't apply a
+      # * change: the core is recreated from the repository's config (empty, reindexed below)
+      - name: Recreate the Solr core if its schema or config changed
+        if: >
+          steps.guard.outputs.skip != 'true' &&
+          (steps.changes.outputs.core == 'true' || steps.solr.outputs.core_missing == 'true')
+        run: cd "$REPO_DIR" && npm run solr:recreate-core
+
+      - name: Reindex Solr if the core or the data changed, or the core is empty
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          get_count() {
+            docker exec "$SOLR_CONTAINER" curl -s "http://localhost:8983/solr/cities/select?q=*:*&rows=0" | jq -r '.response.numFound'
+          }
+
+          count=$(get_count)
+          echo "Solr 'cities' core has $count documents"
+
+          if [ "$count" = "0" ] || [ "${{ steps.changes.outputs.core }}" = "true" ] ||
+             [ "${{ steps.changes.outputs.data }}" = "true" ] || [ "${{ steps.solr.outputs.core_missing }}" = "true" ]; then
+            echo "::notice::Reindexing: core changed=${{ steps.changes.outputs.core }}, data changed=${{ steps.changes.outputs.data }}, documents before=$count."
+
+            (cd "$REPO_DIR" && npm run solr:reindex)
+
+            count=$(get_count)
+            echo "After reindex: $count documents"
+            if [ -z "$count" ] || [ "$count" = "null" ] || [ "$count" -eq 0 ]; then
+              echo "::error::Solr 'cities' core is still empty after reindex — aborting deploy."
+              exit 1
+            fi
+          fi
 
       - name: Install dependencies
+        if: steps.guard.outputs.skip != 'true'
         run: cd "$REPO_DIR" && npm ci
 
+      # * last before the restart: `next build` rewrites .next/ while the running `next start` still
+      # * serves from it, so the site is broken from here until the restart. Building after the
+      # * Solr recreate and reindex keeps that window to the build itself
       - name: Build application
+        if: steps.guard.outputs.skip != 'true'
         run: cd "$REPO_DIR" && npm run build
 
       - name: Restart application
+        if: steps.guard.outputs.skip != 'true'
         run: script -qc "sudo systemctl restart climatica" /dev/null
 
       - name: Verify service is active
+        if: steps.guard.outputs.skip != 'true'
         run: |
           for i in $(seq 1 10); do
             if script -qc "sudo systemctl is-active --quiet climatica" /dev/null; then
@@ -67,3 +224,22 @@ jobs:
           echo "climatica did not become active in time"
           script -qc "sudo systemctl status climatica --no-pager" /dev/null || true
           exit 1
+
+      # * after the new app is serving, so nothing re-caches an old result; only the results —
+      # * never the city-search-counter:* popularity counts or the climate data
+      - name: Drop cached city searches if search, its data or its core changed
+        if: >
+          steps.guard.outputs.skip != 'true' &&
+          (steps.changes.outputs.core == 'true' || steps.changes.outputs.data == 'true' ||
+           steps.changes.outputs.search == 'true')
+        run: cd "$REPO_DIR" && npm run cache:clear-city-search
+
+      - name: Drop cached nearest cities if the city core or data changed
+        if: >
+          steps.guard.outputs.skip != 'true' &&
+          (steps.changes.outputs.core == 'true' || steps.changes.outputs.data == 'true')
+        run: cd "$REPO_DIR" && npm run cache:clear-nearest-city
+
+      - name: Record deployed commit
+        if: steps.guard.outputs.skip != 'true'
+        run: echo "$DEPLOY_SHA" > "$REPO_DIR/.deployed_sha"

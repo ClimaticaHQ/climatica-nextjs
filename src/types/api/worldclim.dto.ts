@@ -10,47 +10,11 @@ export type TSparqlUriValue = {
   value: string;
 };
 
-export type TWorldClimCellBinding = {
-  cell: TSparqlUriValue;
-  grid: TSparqlUriValue;
-};
-
-export type TWorldClimCellResponseResults = {
-  distinct: boolean;
-  ordered: boolean;
-  bindings: TWorldClimCellBinding[];
-};
-
-export type TWorldClimTemperatureBinding = {
-  month: TSparqlValue;
-  tmin: TSparqlValue;
-  tmax: TSparqlValue;
-};
-
-export type TWorldClimTemperatureResponse = {
-  head: { vars: string[] };
-  results: TWorldClimTemperatureResponseResults;
-};
-
-export type TWorldClimTemperatureResponseResults = {
-  distinct: boolean;
-  ordered: boolean;
-  bindings: TWorldClimTemperatureBinding[];
-};
-
 export interface TWorldClimCellResponse {
   results: {
     bindings: {
       cell: TSparqlUriValue;
       grid: TSparqlUriValue;
-    }[];
-  };
-}
-
-export interface TWorldClimPixelsResponse {
-  results: {
-    bindings: {
-      pixel: TSparqlUriValue;
     }[];
   };
 }
@@ -157,12 +121,6 @@ export type TWorldClimAvgBoxBinding = {
   valueMonth12?: TSparqlValue;
 };
 
-export type TWorldClimAvgBoxResponse = {
-  results: {
-    bindings: TWorldClimAvgBoxBinding[];
-  };
-};
-
 export type TWorldClimPointValueBinding = {
   value: TSparqlValue;
   month: TSparqlValue;
@@ -182,6 +140,22 @@ export type TWorldClimPointValueResponse = {
 export type TWorldClimCellResource = {
   iri: string;
   elevation?: number;
+};
+
+/** Returned by GET /resource?id=Raster&iri=... — carries the raster's real
+ * source-dataset provenance (creator/version), which is what backs the export
+ * footer's attribution line instead of a hardcoded app-config value. */
+export type TWorldClimRasterResource = {
+  iri: string;
+  isClimate?: boolean;
+  isWeather?: boolean;
+  creator: { nolang: string };
+  version: number;
+  start: string | number;
+  end: string | number;
+  temporalResolution: string;
+  grid: string;
+  variable: string;
 };
 
 export type { TClimatePeriod };
