@@ -48,6 +48,8 @@ jobs:
       SOLR_CONTAINER: climatica-solr
       # * the core's instance directory inside the Solr container (solr:8 image default SOLR_HOME)
       SOLR_CORE_DIR: /var/solr/data/cities
+      # * where `next start` listens on the server, for the post-restart health check
+      APP_URL: http://localhost:3000/
 
     steps:
       - name: Ensure Tests and Validation passed for this commit
@@ -85,7 +87,9 @@ jobs:
 
       - name: Mark repository as safe
         if: steps.guard.outputs.skip != 'true'
-        run: git config --global --add safe.directory "$REPO_DIR"
+        run: |
+          git config --global --get-all safe.directory | grep -qxF "$REPO_DIR" ||
+            git config --global --add safe.directory "$REPO_DIR"
 
       - name: Update repository
         if: steps.guard.outputs.skip != 'true'
@@ -223,34 +227,61 @@ jobs:
             fi
           fi
 
+      # * last before the restart: `npm ci` wipes node_modules/ and `next build` rewrites .next/ while
+      # * the running `next start` still serves from them, so the site is broken from `npm ci` until
+      # * the restart. Doing both after the Solr recreate and reindex keeps that window short
       - name: Install dependencies
         if: steps.guard.outputs.skip != 'true'
         run: cd "$REPO_DIR" && npm ci
 
-      # * last before the restart: `next build` rewrites .next/ while the running `next start` still
-      # * serves from it, so the site is broken from here until the restart. Building after the
-      # * Solr recreate and reindex keeps that window to the build itself
       - name: Build application
         if: steps.guard.outputs.skip != 'true'
         run: cd "$REPO_DIR" && npm run build
 
+      # * only the restart needs root: sudoers allows it word for word, and `script -e` passes on its
+      # * exit code (plain `script` always exits 0)
       - name: Restart application
         if: steps.guard.outputs.skip != 'true'
-        run: script -qc "sudo systemctl restart climatica" /dev/null
+        run: script -qec "sudo systemctl restart climatica" /dev/null
 
+      # * is-active and status need no root, so no sudo and no `script`: under `script`'s terminal,
+      # * status would open a pager and hang the job
       - name: Verify service is active
         if: steps.guard.outputs.skip != 'true'
         run: |
           for i in $(seq 1 10); do
-            if script -qc "sudo systemctl is-active --quiet climatica" /dev/null; then
+            if systemctl is-active --quiet climatica; then
               echo "climatica is active"
               exit 0
             fi
             echo "Waiting for climatica to become active ($i/10)..."
             sleep 2
           done
-          echo "climatica did not become active in time"
-          script -qc "sudo systemctl status climatica --no-pager" /dev/null || true
+          echo "::error::climatica did not become active in time"
+          systemctl status climatica --no-pager || true
+          exit 1
+
+      # * `active` only means the process started: an app that crashes on its first request (a bad
+      # * next.config, a missing native binding) restarts in a loop while systemd still reports it
+      # * active. Three answers in a row, a few seconds apart, rule that out
+      - name: Verify the app answers over HTTP
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          ok=0
+          for i in $(seq 1 20); do
+            code=$(curl -s --max-time 10 -o /dev/null -w '%{http_code}' "$APP_URL" || true)
+            if [ "$code" -ge 200 ] && [ "$code" -lt 400 ]; then
+              ok=$((ok + 1))
+              echo "The app answered HTTP $code ($ok/3)"
+              if [ "$ok" -ge 3 ]; then exit 0; fi
+            else
+              ok=0
+              echo "Waiting for the app to answer (HTTP $code, $i/20)..."
+            fi
+            sleep 3
+          done
+          echo "::error::The app did not answer over HTTP at $APP_URL"
+          systemctl status climatica --no-pager || true
           exit 1
 
       # * after the new app is serving, so nothing re-caches an old result; only the results —
