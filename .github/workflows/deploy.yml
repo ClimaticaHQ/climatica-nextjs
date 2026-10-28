@@ -46,6 +46,8 @@ jobs:
       SEARCH_SERVICE: src/libs/services/solrService.ts
       SEARCH_ROUTE: src/app/api/cities/route.ts
       SOLR_CONTAINER: climatica-solr
+      # * the core's instance directory inside the Solr container (solr:8 image default SOLR_HOME)
+      SOLR_CORE_DIR: /var/solr/data/cities
 
     steps:
       - name: Ensure Tests and Validation passed for this commit
@@ -140,27 +142,50 @@ jobs:
         if: steps.guard.outputs.skip != 'true'
         run: cd "$REPO_DIR/docker" && docker compose up -d
 
-      - name: Wait for Solr to answer
+      # * Solr answers before its cores finish loading, and a core on disk that isn't loaded yet
+      # * looks missing to STATUS: only a core absent from disk counts as missing, otherwise the
+      # * step waits until the core is loaded or has failed to load
+      - name: Wait for Solr and the cities core
         id: solr
         if: steps.guard.outputs.skip != 'true'
         run: |
           for i in $(seq 1 24); do
             if docker exec "$SOLR_CONTAINER" curl -sf "http://localhost:8983/solr/admin/info/system" > /dev/null 2>&1; then
-              echo "Solr is up"
-              # * a core lost to an earlier failed deploy is recreated like a changed one
-              status=$(docker exec "$SOLR_CONTAINER" curl -s "http://localhost:8983/solr/admin/cores?action=STATUS&core=cities")
-              if echo "$status" | jq -e '.status.cities.name' > /dev/null 2>&1; then
-                echo "core_missing=false" >> "$GITHUB_OUTPUT"
-              else
-                echo "::warning::The 'cities' core is missing — it will be recreated."
-                echo "core_missing=true" >> "$GITHUB_OUTPUT"
-              fi
-              exit 0
+              break
+            fi
+            if [ "$i" -eq 24 ]; then
+              echo "::error::Solr did not answer in time"
+              exit 1
             fi
             echo "Waiting for Solr to answer ($i/24)..."
             sleep 5
           done
-          echo "Solr did not answer in time"
+          echo "Solr is up"
+
+          # * a core lost to an earlier failed deploy is recreated like a changed one
+          if ! docker exec "$SOLR_CONTAINER" test -f "$SOLR_CORE_DIR/core.properties"; then
+            echo "::warning::The 'cities' core is not on disk — it will be recreated."
+            echo "core_missing=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          for i in $(seq 1 24); do
+            status=$(docker exec "$SOLR_CONTAINER" curl -s "http://localhost:8983/solr/admin/cores?action=STATUS&core=cities")
+            if echo "$status" | jq -e '.status.cities.uptime' > /dev/null 2>&1; then
+              echo "The 'cities' core is loaded"
+              echo "core_missing=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            if echo "$status" | jq -e '.initFailures.cities' > /dev/null 2>&1; then
+              echo "::warning::The 'cities' core failed to load — it will be recreated."
+              echo "$status" | jq -r '.initFailures.cities'
+              echo "core_missing=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Waiting for the 'cities' core to load ($i/24)..."
+            sleep 5
+          done
+          echo "::error::The 'cities' core is on disk but did not load in time"
           exit 1
 
       # * a core keeps the copy of solrconfig.xml it was created with, so RELOAD can't apply a
@@ -181,8 +206,11 @@ jobs:
           count=$(get_count)
           echo "Solr 'cities' core has $count documents"
 
-          if [ "$count" = "0" ] || [ "${{ steps.changes.outputs.core }}" = "true" ] ||
-             [ "${{ steps.changes.outputs.data }}" = "true" ] || [ "${{ steps.solr.outputs.core_missing }}" = "true" ]; then
+          # * an unreadable count (empty or null) means the core didn't answer: reindex as if empty
+          if [ -z "$count" ] || [ "$count" = "null" ] || [ "$count" = "0" ] ||
+             [ "${{ steps.changes.outputs.core }}" = "true" ] ||
+             [ "${{ steps.changes.outputs.data }}" = "true" ] ||
+             [ "${{ steps.solr.outputs.core_missing }}" = "true" ]; then
             echo "::notice::Reindexing: core changed=${{ steps.changes.outputs.core }}, data changed=${{ steps.changes.outputs.data }}, documents before=$count."
 
             (cd "$REPO_DIR" && npm run solr:reindex)
