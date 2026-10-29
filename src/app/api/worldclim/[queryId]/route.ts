@@ -1,9 +1,22 @@
-import { API_ERRORS, TIME, WORLDCLIM_CACHED_QUERY_IDS, WORLDCLIM_UPSTREAM_BASE } from "@/constants";
+import {
+  API_ERRORS,
+  CACHE_STATUS,
+  TIME,
+  UPSTREAM_SOURCES,
+  WORLDCLIM_CACHED_QUERY_IDS,
+  WORLDCLIM_UPSTREAM_BASE,
+} from "@/constants";
 import { logger } from "@/libs/Logger";
 import { checkRateLimit, REDIS_STRATEGIES } from "@/libs/redis";
 import { RedisClient } from "@/libs/redis/client";
-import { apiErrorResponse, getClientIp, rateLimitResponse } from "@/utils";
-import { type NextRequest, NextResponse } from "next/server";
+import {
+  apiErrorResponse,
+  cachedJsonResponse,
+  getClientIp,
+  rateLimitResponse,
+  timeUpstream,
+} from "@/utils";
+import type { NextRequest } from "next/server";
 import { fetchWorldClimJson } from "../../@utils";
 
 export async function GET(
@@ -23,10 +36,12 @@ export async function GET(
   const cacheKey = strategy.buildKey(queryId, searchParams);
   if (isCached) {
     const cached = await RedisClient.get<unknown>(cacheKey);
-    if (cached) return NextResponse.json(cached);
+    if (cached) return cachedJsonResponse(cached, { status: CACHE_STATUS.HIT });
   }
 
-  const result = await fetchWorldClimJson(url);
+  const { result, timing } = await timeUpstream(UPSTREAM_SOURCES.WORLDCLIM, () =>
+    fetchWorldClimJson(url),
+  );
   // * a failure is answered but never cached, so the next request tries upstream again
   if (!result.ok) {
     logger.error(`[WorldClim] query ${queryId} failed: ${result.reason}`);
@@ -42,5 +57,6 @@ export async function GET(
     await RedisClient.set(cacheKey, result.data, ttl);
   }
 
-  return NextResponse.json(result.data);
+  const status = isCached ? CACHE_STATUS.MISS : CACHE_STATUS.BYPASS;
+  return cachedJsonResponse(result.data, { status, upstream: timing });
 }

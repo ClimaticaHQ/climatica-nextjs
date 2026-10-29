@@ -1,11 +1,17 @@
-import { API_ERRORS, CACHE_TTL, TIME } from "@/constants";
+import { API_ERRORS, CACHE_STATUS, CACHE_TTL, TIME, UPSTREAM_SOURCES } from "@/constants";
 import { logger } from "@/libs/Logger";
 import { checkRateLimit, REDIS_STRATEGIES } from "@/libs/redis";
 import { RedisClient } from "@/libs/redis/client";
 import { SolrService, WikidataService } from "@/libs/services";
-import type { TCity, TCoordinates } from "@/types";
-import { apiErrorResponse, getClientIp, rateLimitResponse } from "@/utils";
-import { type NextRequest, NextResponse } from "next/server";
+import type { TCity, TCoordinates, TTimedUpstream } from "@/types";
+import {
+  apiErrorResponse,
+  cachedJsonResponse,
+  getClientIp,
+  rateLimitResponse,
+  timeUpstream,
+} from "@/utils";
+import type { NextRequest } from "next/server";
 import { parseCoordinates } from "../@utils";
 
 export async function GET(request: NextRequest) {
@@ -17,7 +23,7 @@ export async function GET(request: NextRequest) {
 
   logger.info(`[Cities] GET called: q="${q}", lang="${lang}"`);
 
-  if (!q || q.length < 2) return NextResponse.json([]);
+  if (!q || q.length < 2) return cachedJsonResponse([], { status: CACHE_STATUS.BYPASS });
 
   const coords = parseCoordinates(q);
   return coords ? searchByCoordinates(coords) : searchByText(q, lang);
@@ -28,23 +34,25 @@ async function searchByCoordinates(coords: TCoordinates) {
   const cached = await RedisClient.get(cacheKey);
   if (cached) {
     logger.info(`[Cities] Cache HIT for key: ${cacheKey}`);
-    return NextResponse.json(cached);
+    return cachedJsonResponse(cached, { status: CACHE_STATUS.HIT });
   }
   logger.info(`[Cities] Cache MISS for key: ${cacheKey}`);
 
-  let city: TCity | null;
+  let lookup: TTimedUpstream<TCity | null>;
   try {
-    city = await WikidataService.findNearestCityByCoordinates(coords.lat, coords.lng);
+    lookup = await timeUpstream(UPSTREAM_SOURCES.WIKIDATA, () =>
+      WikidataService.findNearestCityByCoordinates(coords.lat, coords.lng),
+    );
   } catch (error) {
     logger.error(`[Cities] Reverse geocoding failed: ${String(error)}`);
     return apiErrorResponse(API_ERRORS.REVERSE_GEOCODING_UNAVAILABLE);
   }
 
-  const result = city ? [city] : [];
+  const result = lookup.result ? [lookup.result] : [];
   if (result.length > 0) {
     await RedisClient.set(cacheKey, result, REDIS_STRATEGIES.nearestCity.ttl);
   }
-  return NextResponse.json(result);
+  return cachedJsonResponse(result, { status: CACHE_STATUS.MISS, upstream: lookup.timing });
 }
 
 async function searchByText(q: string, lang: string) {
@@ -54,17 +62,18 @@ async function searchByText(q: string, lang: string) {
   const cached = await RedisClient.get(cacheKey);
   if (cached) {
     logger.info(`[Cities] Cache HIT for key: ${cacheKey}`);
-    return NextResponse.json(cached);
+    return cachedJsonResponse(cached, { status: CACHE_STATUS.HIT });
   }
   logger.info(`[Cities] Cache MISS for key: ${cacheKey}`);
 
-  let results: TCity[];
+  let search: TTimedUpstream<TCity[]>;
   try {
-    results = await SolrService.searchCities(q, lang);
+    search = await timeUpstream(UPSTREAM_SOURCES.SOLR, () => SolrService.searchCities(q, lang));
   } catch {
     // * SolrService has logged the cause; an outage is an error, not an empty list
     return apiErrorResponse(API_ERRORS.CITY_SEARCH_UNAVAILABLE);
   }
+  const results = search.result;
   logger.info(`[Cities] Solr returned ${results.length} results`);
 
   if (results.length > 0) {
@@ -84,5 +93,5 @@ async function searchByText(q: string, lang: string) {
     }
   }
 
-  return NextResponse.json(results);
+  return cachedJsonResponse(results, { status: CACHE_STATUS.MISS, upstream: search.timing });
 }
