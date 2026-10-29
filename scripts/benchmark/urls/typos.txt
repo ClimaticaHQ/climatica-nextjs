@@ -1,0 +1,2 @@
+# One URL per line: a path (/api/cities?q=rome&lang=en) or a full URL, whose host --base replaces.
+# Empty lines and lines starting with # are ignored.

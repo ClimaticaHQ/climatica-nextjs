@@ -58,6 +58,9 @@ next-env.d.ts
 /playwright-report/
 /playwright/.cache/
 
+# benchmark output
+scripts/benchmark/results/
+
 # Docker
 docker/solr/data/
 docker/solr/scripts/cities.csv

@@ -1,0 +1,27 @@
+# One URL per line: a path (/api/cities?q=rome&lang=en) or a full URL, whose host --base replaces.
+# Empty lines and lines starting with # are ignored.
+http://localhost:3000/api/cities?q=Kharkiv&lang=en
+http://localhost:3000/api/cities?q=%D0%9B%D1%8C%D0%B2%D1%96%D0%B2&lang=en
+http://localhost:3000/api/cities?q=C%C3%B3rdoba&lang=en
+http://localhost:3000/api/cities?q=Helsinki&lang=en
+http://localhost:3000/api/cities?q=Madrid&lang=en
+http://localhost:3000/api/cities?q=Barcelona&lang=en
+http://localhost:3000/api/cities?q=New+York&lang=en
+http://localhost:3000/api/cities?q=London&lang=en
+http://localhost:3000/api/cities?q=Paris&lang=en
+http://localhost:3000/api/cities?q=Seattle&lang=en
+http://localhost:3000/api/cities?q=San+Francisco&lang=en
+http://localhost:3000/api/cities?q=Dublin&lang=en
+http://localhost:3000/api/cities?q=Tokyo&lang=en
+http://localhost:3000/api/cities?q=Zurich&lang=en
+http://localhost:3000/api/cities?q=%D0%A0%D0%B8%D0%BC&lang=en
+http://localhost:3000/api/cities?q=Berlin&lang=en
+http://localhost:3000/api/cities?q=Lisboa&lang=en
+http://localhost:3000/api/cities?q=G%C3%B6teborg&lang=en
+http://localhost:3000/api/cities?q=Cairo&lang=en
+http://localhost:3000/api/cities?q=Warszawa&lang=en
+http://localhost:3000/api/cities?q=Istanbul&lang=en
+http://localhost:3000/api/cities?q=Seoul&lang=en
+http://localhost:3000/api/cities?q=Shanghai&lang=en
+http://localhost:3000/api/cities?q=Valladolid&lang=en
+http://localhost:3000/api/cities?q=Mumbai&lang=en
