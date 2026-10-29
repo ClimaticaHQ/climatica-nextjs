@@ -51,6 +51,8 @@ describe("GET /api/cities — empty queries", () => {
   it("returns [] for empty query without any cache or Solr calls", async () => {
     const res = await GET(makeRequest(""));
     expect(await res.json()).toEqual([]);
+    expect(res.headers.get("X-Cache")).toBe("BYPASS");
+    expect(res.headers.get("Server-Timing")).toBeNull();
     expect(RedisClient.get).not.toHaveBeenCalled();
   });
 
@@ -68,6 +70,8 @@ describe("GET /api/cities — text search cache hit", () => {
     const res = await GET(makeRequest("rome"));
 
     expect(await res.json()).toEqual([mockCity]);
+    expect(res.headers.get("X-Cache")).toBe("HIT");
+    expect(res.headers.get("Server-Timing")).toBeNull();
     expect(SolrService.searchCities).not.toHaveBeenCalled();
     expect(RedisClient.set).not.toHaveBeenCalled();
   });
@@ -81,6 +85,8 @@ describe("GET /api/cities — text search cache miss", () => {
     const res = await GET(makeRequest("rome"));
 
     expect(await res.json()).toEqual([mockCity]);
+    expect(res.headers.get("X-Cache")).toBe("MISS");
+    expect(res.headers.get("Server-Timing")).toMatch(/^solr;dur=\d+\.\d$/);
     expect(SolrService.searchCities).toHaveBeenCalledWith("rome", "en");
     expect(RedisClient.set).toHaveBeenCalled();
   });
@@ -151,6 +157,8 @@ describe("GET /api/cities — coordinate queries", () => {
     const res = await GET(makeRequest("48.8566,2.3522"));
 
     expect(await res.json()).toEqual([mockCity]);
+    expect(res.headers.get("X-Cache")).toBe("MISS");
+    expect(res.headers.get("Server-Timing")).toMatch(/^wikidata;dur=\d+\.\d$/);
     expect(WikidataService.findNearestCityByCoordinates).toHaveBeenCalledWith(48.8566, 2.3522);
     expect(SolrService.searchCities).not.toHaveBeenCalled();
   });
@@ -174,6 +182,7 @@ describe("GET /api/cities — coordinate queries", () => {
     const res = await GET(makeRequest("48.8566,2.3522"));
 
     expect(await res.json()).toEqual([mockCity]);
+    expect(res.headers.get("X-Cache")).toBe("HIT");
     expect(WikidataService.findNearestCityByCoordinates).not.toHaveBeenCalled();
   });
 
@@ -214,6 +223,8 @@ describe("GET /api/cities — upstream failure", () => {
 
     expect(res.status).toBe(API_ERRORS.CITY_SEARCH_UNAVAILABLE.status);
     expect(await res.json()).toEqual({ error: API_ERRORS.CITY_SEARCH_UNAVAILABLE.message });
+    expect(res.headers.get("X-Cache")).toBeNull();
+    expect(res.headers.get("Server-Timing")).toBeNull();
     expect(RedisClient.set).not.toHaveBeenCalled();
     expect(RedisClient.incrementCounter).not.toHaveBeenCalled();
   });

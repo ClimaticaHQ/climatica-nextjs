@@ -40,6 +40,8 @@ describe("GET /api/worldclim/[queryId] — success", () => {
     const res = await callRoute("pixelValue", "lat=1&lng=2");
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual(body);
+    expect(res.headers.get("X-Cache")).toBe("BYPASS");
+    expect(res.headers.get("Server-Timing")).toMatch(/^worldclim;dur=\d+\.\d$/);
   });
 
   it("calls the query endpoint with the id, the search params and the server key", async () => {
@@ -63,6 +65,7 @@ describe("GET /api/worldclim/[queryId] — upstream failure", () => {
     const res = await callRoute("pixelValue", "lat=1&lng=2");
     expect(res.status).toBe(API_ERRORS.WORLDCLIM_UNAVAILABLE.status);
     expect(await res.json()).toEqual({ error: API_ERRORS.WORLDCLIM_UNAVAILABLE.message });
+    expect(res.headers.get("X-Cache")).toBeNull();
   });
 
   it("answers 502 when the request itself fails", async () => {
@@ -97,6 +100,7 @@ describe("GET /api/worldclim/[queryId] — Redis cache for region strips", () =>
 
     const res = await callRoute("pixelvaluesinbox", STRIP);
     expect(await res.json()).toEqual(cached);
+    expect(res.headers.get("X-Cache")).toBe("HIT");
     expect(fetchMock).not.toHaveBeenCalled();
     expect(RedisClient.get).toHaveBeenCalledWith(`worldclim-query:pixelvaluesinbox:${STRIP}`);
   });
@@ -106,7 +110,8 @@ describe("GET /api/worldclim/[queryId] — Redis cache for region strips", () =>
     vi.mocked(RedisClient.incrementCounter).mockResolvedValue(1);
     stubFetch({ results: { bindings: [] } });
 
-    await callRoute("pixelvaluesinbox", STRIP);
+    const res = await callRoute("pixelvaluesinbox", STRIP);
+    expect(res.headers.get("X-Cache")).toBe("MISS");
     await callRoute("pixelvaluesinbox", "north=47.5&south=45&west=20&east=26&limit=3600");
     const keys = vi.mocked(RedisClient.set).mock.calls.map(([key]) => key);
     expect(keys).toEqual([

@@ -42,6 +42,8 @@ describe("GET /api/worldclim/resource — cache hit", () => {
 
     const res = await GET(makeRequest("id=Cell&iri=http%3A%2F%2Fexample.com%2FCell"));
     expect(await res.json()).toEqual(cached);
+    expect(res.headers.get("X-Cache")).toBe("HIT");
+    expect(res.headers.get("Server-Timing")).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
     expect(RedisClient.set).not.toHaveBeenCalled();
   });
@@ -55,6 +57,8 @@ describe("GET /api/worldclim/resource — cache miss", () => {
 
     const res = await GET(makeRequest("id=Cell&iri=http%3A%2F%2Fexample.com%2FCell"));
     expect(await res.json()).toEqual(apiData);
+    expect(res.headers.get("X-Cache")).toBe("MISS");
+    expect(res.headers.get("Server-Timing")).toMatch(/^worldclim;dur=\d+\.\d$/);
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(RedisClient.set).toHaveBeenCalled();
   });
@@ -125,6 +129,8 @@ describe("GET /api/worldclim/resource — upstream failure", () => {
       const res = await GET(makeRequest("id=Cell"));
       expect(res.status).toBe(API_ERRORS.WORLDCLIM_UNAVAILABLE.status);
       expect(await res.json()).toEqual({ error: API_ERRORS.WORLDCLIM_UNAVAILABLE.message });
+      expect(res.headers.get("X-Cache")).toBeNull();
+      expect(res.headers.get("Server-Timing")).toBeNull();
       expect(RedisClient.set).not.toHaveBeenCalled();
       expect(RedisClient.incrementCounter).not.toHaveBeenCalled();
     },
