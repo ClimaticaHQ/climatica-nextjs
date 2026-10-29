@@ -12,6 +12,7 @@ export * from "./martonne.util";
 export * from "./metadata.util";
 export * from "./navigation.util";
 export * from "./apiErrorResponse.util";
+export * from "./cachedJsonResponse.util";
 export * from "./rateLimitResponse.util";
 export * from "./redis.util";
 export * from "./scroll.util";
