@@ -1,8 +1,2 @@
-export { API_ERRORS, ENDPOINTS, WORLDCLIM_UPSTREAM_BASE } from "./api.constant";
-export {
-  MONTH_NAMES,
-  WORLDCLIM_GRID_BASE,
-  WORLDCLIM_PROXY_BASE,
-  WORLDCLIM_RASTER_BASE,
-  WORLDCLIM_VARIABLE_BASE,
-} from "./worldclim.constants";
+export * from "./api.constant";
+export * from "./worldclim.constants";
