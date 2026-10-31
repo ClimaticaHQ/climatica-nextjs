@@ -1,4 +1,4 @@
-import type { EWalterLiethSeriesId } from "@/enums";
+import type { EDisplayMetric, EWalterLiethSeriesId } from "@/enums";
 import type { TMonthlyTemperature } from "../domain";
 import type { TMartonneBadge } from "../utils/martonne.type";
 
@@ -20,7 +20,8 @@ export type TComparisonUnit = "celsius" | "mm" | "meters";
 export type TComparisonMetricFormat = {
   metric: TComparisonMetric;
   unit: TComparisonUnit | null;
-  digits: number;
+  /** how the row's values and difference are rounded and printed */
+  display: EDisplayMetric;
 };
 
 /** One compared series: its identity (marker, color), name, monthly data and altitude. */
