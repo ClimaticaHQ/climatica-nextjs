@@ -11,9 +11,8 @@ import {
   EXPORT_UNITS,
   MISSING_VALUE_LABEL,
   OVERLAY_BAR_STYLES,
-  VALUE_DIGITS,
 } from "@/constants";
-import { EChartBody, ECompareLayout, EWalterLiethSeriesId } from "@/enums";
+import { EChartBody, ECompareLayout, EDisplayMetric, EWalterLiethSeriesId } from "@/enums";
 import type {
   TCompareExportPayload,
   TCompareWalterLiethBody,
@@ -33,7 +32,7 @@ import {
 } from "@/utils";
 import { estimateTextWidth } from "./textWrap.util";
 import { buildHatchPatternDefs } from "./hatchExport.util";
-import { formatNumber } from "../../numberFormat.util";
+import { formatValue } from "../../displayFormat.util";
 import { buildFooterTextLines } from "../shared/footerLines.util";
 import { buildGridAndAxes, computeNiceAxisTicks, escapeXml } from "./buildExportSvg.util";
 import {
@@ -83,40 +82,40 @@ function buildStatsTable(payload: TCompareExportPayload, colors: TExportChartCol
   const hasAltitude = series.some((s) => s.altitude !== null);
   const { locale } = labels;
   // * a value in the locale's digits with its unit, "—" when unknown
-  const withUnit = (value: number | null, unit: string, digits = 0) =>
-    value === null ? MISSING_VALUE_LABEL : `${formatNumber(value, { locale, digits })} ${unit}`;
+  const withUnit = (value: number | null, unit: string, metric: EDisplayMetric) =>
+    value === null ? MISSING_VALUE_LABEL : `${formatValue(value, { metric, locale })} ${unit}`;
 
   const rows: TCompareExportStatsRow[] = [
     {
       label: labels.statsLabels.avgTmax,
-      format: (s) => withUnit(s.stats.avgTmax, EXPORT_UNITS.TEMP, VALUE_DIGITS.TEMP),
+      format: (s) => withUnit(s.stats.avgTmax, EXPORT_UNITS.TEMP, EDisplayMetric.TEMPERATURE),
     },
     {
       label: labels.statsLabels.avgTmin,
-      format: (s) => withUnit(s.stats.avgTmin, EXPORT_UNITS.TEMP, VALUE_DIGITS.TEMP),
+      format: (s) => withUnit(s.stats.avgTmin, EXPORT_UNITS.TEMP, EDisplayMetric.TEMPERATURE),
     },
     {
       label: labels.statsLabels.totalPrec,
-      format: (s) => withUnit(s.stats.totalPrec, EXPORT_UNITS.PREC),
+      format: (s) => withUnit(s.stats.totalPrec, EXPORT_UNITS.PREC, EDisplayMetric.PRECIPITATION),
     },
     {
       label: labels.statsLabels.aridMonths,
-      format: (s) => formatNumber(s.stats.aridMonths, { locale }),
+      format: (s) =>
+        formatValue(s.stats.aridMonths, { metric: EDisplayMetric.MONTH_COUNT, locale }),
     },
   ];
   if (hasAltitude) {
     rows.push({
       label: labels.statsLabels.altitude,
-      format: (s) =>
-        withUnit(s.altitude !== null ? Math.round(s.altitude) : null, EXPORT_UNITS.ALTITUDE),
+      format: (s) => withUnit(s.altitude, EXPORT_UNITS.ALTITUDE, EDisplayMetric.ELEVATION),
     });
   }
   rows.push({
     label: labels.statsLabels.martonne,
     format: (s) => {
-      const value = formatNumber(s.stats.martonneIndex, {
+      const value = formatValue(s.stats.martonneIndex, {
+        metric: EDisplayMetric.MARTONNE,
         locale,
-        digits: VALUE_DIGITS.MARTONNE,
       });
       const suffix = s.martonneClassLabel ? ` (${s.martonneClassLabel})` : "";
       return `${value}${suffix}`;

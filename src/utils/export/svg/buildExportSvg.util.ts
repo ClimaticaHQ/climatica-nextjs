@@ -5,9 +5,9 @@ import {
   EXPORT_FONT_FAMILY,
   EXPORT_LEGEND,
   EXPORT_UNITS,
-  VALUE_DIGITS,
   WALTER_LIETH_EXPORT_TEXT,
 } from "@/constants";
+import { EDisplayMetric } from "@/enums";
 import type {
   TGridAxesStyle,
   TUnitTitlesArgs,
@@ -26,7 +26,8 @@ import {
   toWalterLiethMonths,
   getFrostMonths,
   formatLatLng,
-  formatNumber,
+  formatValue,
+  roundForDisplay,
 } from "@/utils";
 import { buildExportLegend, getWalterLiethExportPalette } from "./legendExport.util";
 import { buildFooterTextLines } from "../shared/footerLines.util";
@@ -86,7 +87,11 @@ export function computeNiceAxisTicks(max: number, targetCount = 6): number[] {
 function buildHeader(payload: TExportPayload, colors: TExportChartColors): string {
   const { location } = payload;
   const coords = formatLatLng(location.lat, location.lng);
-  const altitudeText = location.altitude !== null ? ` · ${Math.round(location.altitude)} m` : "";
+  const altitude = formatValue(location.altitude, {
+    metric: EDisplayMetric.ELEVATION,
+    locale: payload.labels.locale,
+  });
+  const altitudeText = location.altitude !== null ? ` · ${altitude} m` : "";
   const subtitle = `${coords}${altitudeText} · ${payload.labels.periodLabel}`;
 
   return `
@@ -99,22 +104,26 @@ function buildHeader(payload: TExportPayload, colors: TExportChartColors): strin
 function buildStatsTable(payload: TExportPayload, colors: TExportChartColors): string {
   const { summary, location, labels } = payload;
   const { locale } = labels;
-  const number = (value: number | null, digits = 0) => formatNumber(value, { locale, digits });
+  const number = (value: number | null, metric: EDisplayMetric) =>
+    formatValue(value, { metric, locale });
   const cells: [string, string][] = [
     [
       labels.statsLabels.meanTemp,
-      `${number(summary.annualAvgTemp, VALUE_DIGITS.TEMP)}${EXPORT_UNITS.TEMP}`,
+      `${number(summary.annualAvgTemp, EDisplayMetric.TEMPERATURE)}${EXPORT_UNITS.TEMP}`,
     ],
-    [labels.statsLabels.annualPrec, `${number(summary.totalPrec)} ${EXPORT_UNITS.PREC}`],
-    [labels.statsLabels.aridMonths, number(summary.aridCount)],
+    [
+      labels.statsLabels.annualPrec,
+      `${number(summary.totalPrec, EDisplayMetric.PRECIPITATION)} ${EXPORT_UNITS.PREC}`,
+    ],
+    [labels.statsLabels.aridMonths, number(summary.aridCount, EDisplayMetric.MONTH_COUNT)],
   ];
   if (location.altitude !== null) {
     cells.push([
       labels.statsLabels.altitude,
-      `${number(Math.round(location.altitude))} ${EXPORT_UNITS.ALTITUDE}`,
+      `${number(location.altitude, EDisplayMetric.ELEVATION)} ${EXPORT_UNITS.ALTITUDE}`,
     ]);
   }
-  const martonneValue = number(summary.martonne, VALUE_DIGITS.MARTONNE);
+  const martonneValue = number(summary.martonne, EDisplayMetric.MARTONNE);
   const martonneSuffix = labels.martonneClassLabel ? ` (${labels.martonneClassLabel})` : "";
   cells.push([labels.statsLabels.martonne, `${martonneValue}${martonneSuffix}`]);
 
@@ -176,14 +185,14 @@ export function buildGridAndAxes(
   const tempLabels = tempTicks
     .map((tick) => {
       const y = tempScale(tick);
-      return `<text x="${plotLeft - tickGap}" y="${y + 4}" text-anchor="end" font-size="11" fill="${colors.textSecondary}">${Math.round(tick)}</text>`;
+      return `<text x="${plotLeft - tickGap}" y="${y + 4}" text-anchor="end" font-size="11" fill="${colors.textSecondary}">${roundForDisplay(tick, EDisplayMetric.AXIS_TICK)}</text>`;
     })
     .join("");
 
   const precLabels = precTicks
     .map((tick) => {
       const y = precScale(toScalePos(tick));
-      return `<text x="${plotRight + tickGap}" y="${y + 4}" text-anchor="start" font-size="11" fill="${colors.textSecondary}">${Math.round(tick)}</text>`;
+      return `<text x="${plotRight + tickGap}" y="${y + 4}" text-anchor="start" font-size="11" fill="${colors.textSecondary}">${roundForDisplay(tick, EDisplayMetric.AXIS_TICK)}</text>`;
     })
     .join("");
 

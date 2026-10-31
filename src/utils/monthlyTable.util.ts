@@ -1,4 +1,4 @@
-import { CHART_VARIABLE_ORDER, MONTHLY_TABLE } from "@/constants";
+import { CHART_VARIABLE_ORDER, MONTHLY_TABLE, SERIES_DISPLAY_METRIC } from "@/constants";
 import type {
   TFormatMonthlyValueArgs,
   TMonthlyTableRow,
@@ -6,11 +6,11 @@ import type {
   TMonthlyTableVariablesArgs,
   TSeriesKey,
 } from "@/types";
-import { formatNumber } from "./numberFormat.util";
+import { formatValue } from "./displayFormat.util";
 
-/** A monthly value as the table shows it: fixed decimals per variable, "—" when missing. */
+/** A monthly value as the table shows it: its variable's display metric, "—" when missing. */
 export function formatMonthlyValue({ variable, value, locale }: TFormatMonthlyValueArgs) {
-  return formatNumber(value, { locale, digits: MONTHLY_TABLE.DECIMALS[variable] });
+  return formatValue(value, { metric: SERIES_DISPLAY_METRIC[variable], locale });
 }
 
 /** The variables the table lists: WL's mean temperature and precipitation, or the chips. */

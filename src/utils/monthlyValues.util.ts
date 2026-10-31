@@ -1,11 +1,11 @@
-import { MONTHLY_VALUES } from "@/constants";
+import { MONTHLY_VALUES, SERIES_DISPLAY_METRIC } from "@/constants";
 import { ENumberSign } from "@/enums";
 import type {
   TFormatMonthlyValuesValueArgs,
   TMonthlyValuesRow,
   TMonthlyValuesRowsArgs,
 } from "@/types";
-import { formatNumber } from "./numberFormat.util";
+import { formatValue } from "./displayFormat.util";
 
 /** A table value: temperature to one decimal with a real minus, precipitation whole, or "—". */
 export function formatMonthlyValuesValue({
@@ -13,9 +13,9 @@ export function formatMonthlyValuesValue({
   value,
   locale,
 }: TFormatMonthlyValuesValueArgs) {
-  return formatNumber(value, {
+  return formatValue(value, {
+    metric: SERIES_DISPLAY_METRIC[variable],
     locale,
-    digits: MONTHLY_VALUES.DECIMALS[variable],
     sign: ENumberSign.MINUS,
   });
 }

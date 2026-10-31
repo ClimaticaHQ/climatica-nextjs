@@ -36,9 +36,6 @@ export function computeDiffStats(
     return null;
   }
 
-  const tmaxDiff = Math.abs(statsA.avgTmax - statsB.avgTmax);
-  const precDiff = Math.abs(statsA.totalPrec - statsB.totalPrec);
-
   const warmerCity: TDiffStats["warmerCity"] =
     statsA.avgTmax > statsB.avgTmax ? "A" : statsA.avgTmax < statsB.avgTmax ? "B" : "tie";
   const moreRainCity: TDiffStats["moreRainCity"] =
@@ -49,9 +46,9 @@ export function computeDiffStats(
 
   return {
     warmerCity,
-    tmaxDiff,
+    avgTmax: { minuend: statsA.avgTmax, subtrahend: statsB.avgTmax },
     moreRainCity,
-    precDiff,
+    totalPrec: { minuend: statsA.totalPrec, subtrahend: statsB.totalPrec },
     hottestMonthIndex: (dataA[hottestIdx]?.month ?? hottestIdx + 1) - 1,
     hottestTempA: tmaxA[hottestIdx],
     hottestTempB: tmaxB[hottestIdx],

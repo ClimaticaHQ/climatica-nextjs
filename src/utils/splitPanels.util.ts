@@ -1,5 +1,5 @@
 import { PANEL_SUBTITLE_SEPARATOR } from "@/constants";
-import { ECompareLayout, EWalterLiethSeriesId } from "@/enums";
+import { ECompareLayout, EDisplayMetric, EWalterLiethSeriesId } from "@/enums";
 import type {
   TExpandablePanels,
   TExpandedPanel,
@@ -7,6 +7,7 @@ import type {
   TExportedSeriesLabelsArgs,
   TWalterLiethSeriesInput,
 } from "@/types";
+import { roundForDisplay } from "./displayFormat.util";
 import { isCompleteSeries } from "./walterLieth.util";
 
 /** The expanded panel as shown: none when it has nothing to expand (an incomplete series). */
@@ -58,7 +59,10 @@ export function getPanelSubtitle({
   period,
   altitude,
 }: Pick<TWalterLiethSeriesInput, "period" | "altitude">) {
-  return joinSubtitle(period, altitude !== undefined ? `${Math.round(altitude)} m` : undefined);
+  // * no locale reaches the export's panels: rounded like every elevation, printed plainly
+  const shownAltitude =
+    altitude !== undefined ? `${roundForDisplay(altitude, EDisplayMetric.ELEVATION)} m` : undefined;
+  return joinSubtitle(period, shownAltitude);
 }
 
 /** A panel's period line from its parts, the empty ones left out. */

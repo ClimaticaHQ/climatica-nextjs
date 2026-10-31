@@ -27,6 +27,7 @@ export * from "./walterLieth.util";
 export * from "./chartAxis.util";
 export * from "./chartLegend.util";
 export * from "./regionQuery.util";
+export * from "./pointCache.util";
 export * from "./worldclim.util";
 export * from "./urlStateGuard.util";
 export * from "./splitPanels.util";
@@ -39,7 +40,12 @@ export * from "./delayedFlag.util";
 export { getScrollBehavior, isMotionEnabled, isUpdateFlashVariant, motionVar } from "./motion.util";
 export { getPersistedSettings, mergePersistedSettings } from "./settings.util";
 export { formatMonthName } from "./monthName.util";
-export { formatNumber } from "./numberFormat.util";
+export {
+  displayDifference,
+  formatDifference,
+  formatValue,
+  roundForDisplay,
+} from "./displayFormat.util";
 export * from "./filterCodecs.util";
 export * from "./filters.util";
 export * from "./filtersUrl.util";

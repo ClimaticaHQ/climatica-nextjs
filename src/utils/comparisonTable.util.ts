@@ -14,7 +14,7 @@ import type {
 import { computeCompareStats } from "./climateComparison.util";
 import { getMartonneBadge } from "./martonne.util";
 import { meanOf, toWalterLiethMonths, withMonthlyMean } from "./monthlyClimate.util";
-import { formatNumber } from "./numberFormat.util";
+import { formatDifference, formatValue as formatDisplayValue } from "./displayFormat.util";
 import { getFrostMonths } from "./walterLieth.util";
 
 const withUnit = (text: string, unit: string | null) => (unit ? `${text} ${unit}` : text);
@@ -47,13 +47,31 @@ function getMetricValues({
 
 function formatValue(
   value: number | null,
-  { metric, digits }: TComparisonMetricFormat,
+  { metric, display }: TComparisonMetricFormat,
   { locale, unit }: TFormatComparisonValueOptions,
 ): TComparisonTableValue {
   if (value === null) return { text: MISSING_VALUE_LABEL };
   // * every value with a real minus sign ("−3,6"), in the locale's decimals
-  const text = withUnit(formatNumber(value, { locale, digits, sign: ENumberSign.MINUS }), unit);
+  const formatted = formatDisplayValue(value, { metric: display, locale, sign: ENumberSign.MINUS });
+  const text = withUnit(formatted, unit);
   return metric === "martonne" ? { text, badge: getMartonneBadge(value) } : { text };
+}
+
+/** The row's difference of the displayed values, minuend − subtrahend; null when either is unknown. */
+function formatRowDifference(
+  [minuend, subtrahend]: readonly [number | null | undefined, number | null | undefined],
+  { display }: TComparisonMetricFormat,
+  { locale, unit }: TFormatComparisonValueOptions,
+): string | null {
+  if (
+    minuend === null ||
+    minuend === undefined ||
+    subtrahend === null ||
+    subtrahend === undefined
+  ) {
+    return null;
+  }
+  return withUnit(formatDifference({ minuend, subtrahend, metric: display, locale }), unit);
 }
 
 /**
@@ -87,13 +105,7 @@ export function buildComparisonTable({
         metric: format.metric,
         a: formatValue(valuesA[format.metric], format, { locale, unit }),
         b: formatValue(valuesB[format.metric], format, { locale, unit }),
-        difference:
-          x !== null && y !== null
-            ? withUnit(
-                formatNumber(x - y, { locale, digits: format.digits, sign: ENumberSign.SIGNED }),
-                unit,
-              )
-            : null,
+        difference: formatRowDifference([x, y], format, { locale, unit }),
       };
     }),
   };
@@ -129,13 +141,7 @@ export function buildStatsTable({
         values: values.map((entry, index) =>
           entry === null ? null : formatValue(raw[index] ?? null, format, { locale, unit }),
         ),
-        difference:
-          x !== null && x !== undefined && y !== null && y !== undefined
-            ? withUnit(
-                formatNumber(x - y, { locale, digits: format.digits, sign: ENumberSign.SIGNED }),
-                unit,
-              )
-            : null,
+        difference: formatRowDifference([x, y], format, { locale, unit }),
       };
     }),
   };

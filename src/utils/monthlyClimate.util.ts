@@ -48,17 +48,16 @@ export function toWalterLiethMonths(
   return months.length === rows.length ? months : null;
 }
 
-/** "12.3 °C", or "—" when unknown — for CSV files: always "." (the screen uses formatNumber). */
+/** A number for a CSV file: always "." and fixed decimals, never the locale's digits. */
+export const formatCsvNumber = (value: number, decimals: number) => value.toFixed(decimals);
+
+/** "12.3 °C", or "—" when unknown — for CSV files: always "." (the screen uses formatValue). */
 export const formatTemp = (value: number | null) =>
   value !== null ? `${value.toFixed(1)} °C` : MISSING_VALUE_LABEL;
 
 /** "405 mm", or "—" when unknown — for CSV files, like formatTemp. */
 export const formatPrec = (value: number | null) =>
   value !== null ? `${value.toFixed(0)} mm` : MISSING_VALUE_LABEL;
-
-/** a − b, or null when either is unknown. */
-export const differenceOf = (a: number | null, b: number | null) =>
-  a !== null && b !== null ? a - b : null;
 
 export const formatCount = (value: number | null) =>
   value !== null ? String(value) : MISSING_VALUE_LABEL;
