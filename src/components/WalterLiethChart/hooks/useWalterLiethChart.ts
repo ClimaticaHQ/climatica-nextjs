@@ -4,8 +4,8 @@ import {
   getAridHumidSegments,
   getFrostMonths,
 } from "@/utils";
-import { VALUE_DIGITS } from "@/constants";
-import { useFormatNumber } from "@/hooks";
+import { EDisplayMetric } from "@/enums";
+import { useDisplayFormat } from "@/hooks";
 import { useTranslations } from "next-intl";
 import { useId, useMemo } from "react";
 import type { TUseWalterLiethChartArgs } from "../WalterLiethChart.type";
@@ -13,7 +13,7 @@ import type { TUseWalterLiethChartArgs } from "../WalterLiethChart.type";
 /** Everything derived from one series: rows, segments, summary, aria label, pattern ids. */
 export function useWalterLiethChart({ series, monthOrder }: TUseWalterLiethChartArgs) {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
+  const { formatValue } = useDisplayFormat();
   const id = useId();
 
   const rows = useMemo(
@@ -30,9 +30,9 @@ export function useWalterLiethChart({ series, monthOrder }: TUseWalterLiethChart
   const ariaLabel = t("chart.wlAriaSummary", {
     location: series.label,
     period: series.period,
-    temp: formatNumber(summary.annualAvgTemp, { digits: VALUE_DIGITS.TEMP }),
-    prec: summary.totalPrec,
-    arid: summary.aridCount,
+    temp: formatValue(summary.annualAvgTemp, { metric: EDisplayMetric.TEMPERATURE }),
+    prec: formatValue(summary.totalPrec, { metric: EDisplayMetric.PRECIPITATION }),
+    arid: formatValue(summary.aridCount, { metric: EDisplayMetric.MONTH_COUNT }),
   });
 
   return {

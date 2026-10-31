@@ -1,5 +1,5 @@
-import { VALUE_DIGITS } from "@/constants";
-import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
+import { EDisplayMetric } from "@/enums";
+import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
 import { buildWalterLiethRows, getAnnualSummary, getAridHumidSegments } from "@/utils";
 import { useTranslations } from "next-intl";
 import { useId, useMemo } from "react";
@@ -11,7 +11,7 @@ import type { TUseWalterLiethChartsArgs } from "../WalterLiethChart.type";
  */
 export function useWalterLiethCharts({ series, monthOrder }: TUseWalterLiethChartsArgs) {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
+  const { formatValue } = useDisplayFormat();
   const id = useId();
   const derived = useMemo(
     () =>
@@ -28,9 +28,9 @@ export function useWalterLiethCharts({ series, monthOrder }: TUseWalterLiethChar
     ariaLabel: t("chart.wlAriaSummary", {
       location: series[i]?.label ?? "",
       period: series[i]?.period ?? "",
-      temp: formatNumber(summary.annualAvgTemp, { digits: VALUE_DIGITS.TEMP }),
-      prec: summary.totalPrec,
-      arid: summary.aridCount,
+      temp: formatValue(summary.annualAvgTemp, { metric: EDisplayMetric.TEMPERATURE }),
+      prec: formatValue(summary.totalPrec, { metric: EDisplayMetric.PRECIPITATION }),
+      arid: formatValue(summary.aridCount, { metric: EDisplayMetric.MONTH_COUNT }),
     }),
     patternIds: { humid: `${id}-${i}-humid`, arid: `${id}-${i}-arid` },
   }));

@@ -1,5 +1,6 @@
 import { ChartUnitTitles } from "@/components/ChartUnitTitles";
-import { useFormatNumber } from "@/hooks";
+import { EDisplayMetric } from "@/enums";
+import { useDisplayFormat } from "@/hooks";
 import { getStandardYAxes, getXAxisProps } from "@/utils";
 import { useContext } from "react";
 import { CartesianGrid, XAxis, YAxis } from "recharts";
@@ -22,9 +23,9 @@ export function StandardChartAxes({
   const { isNarrow } = useContext(ChartDeviceContext);
   const axes = useStandardChartAxes(isCompact, monthFormat, isNarrow);
   const y = getStandardYAxes({ scales, rightMax, isNarrow: isNarrow && !isCompact });
-  const formatNumber = useFormatNumber();
+  const { formatValue } = useDisplayFormat();
   // * whole degrees and millimetres, in the locale's digits
-  const roundTick = (v: unknown) => formatNumber(Math.round(Number(v)));
+  const roundTick = (v: unknown) => formatValue(Number(v), { metric: EDisplayMetric.AXIS_TICK });
 
   return (
     <>

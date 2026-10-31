@@ -1,7 +1,8 @@
 import { LegendSwatch } from "@/components/ChartLegend";
 import { SeriesMarker } from "@/components/SeriesMarker";
-import { MISSING_VALUE_LABEL, OVERLAY_FOCUS, TOOLTIP_DIGITS } from "@/constants";
-import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
+import { MISSING_VALUE_LABEL, OVERLAY_FOCUS } from "@/constants";
+import { EDisplayMetric } from "@/enums";
+import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
 import { getSwatchSize } from "@/utils";
 import { useTranslations } from "next-intl";
 import { TOOLTIP_CLASSES as C, TOOLTIP_FONT_SIZE } from "./charts.constant";
@@ -23,7 +24,7 @@ export function StandardTooltip({
   focus,
 }: TStandardTooltipProps) {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
+  const { formatValue: formatDisplayValue } = useDisplayFormat();
   if (!active || !payload || payload.length === 0) return null;
 
   // * a hovered curve or bar of the overlay: only it, named by variable, entity and month
@@ -44,7 +45,7 @@ export function StandardTooltip({
     const num = Number(value);
     if (isNaN(num)) return String(value);
     const unit = name.includes(t("chart.precipitation")) ? "units.mm" : "units.celsius";
-    return `${formatNumber(num, { digits: TOOLTIP_DIGITS.STANDARD })} ${t(unit)}`;
+    return `${formatDisplayValue(num, { metric: EDisplayMetric.CHART_TOOLTIP_VALUE })} ${t(unit)}`;
   };
 
   return (

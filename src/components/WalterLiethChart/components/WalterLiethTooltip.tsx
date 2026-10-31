@@ -1,7 +1,7 @@
 import { LegendSwatch } from "@/components/ChartLegend";
 import { TOOLTIP_CLASSES as C, TOOLTIP_FONT_SIZE } from "@/components/charts/charts.constant";
-import { TOOLTIP_DIGITS } from "@/constants";
-import { useFormatNumber, useWalterLiethLegendItems } from "@/hooks";
+import { EDisplayMetric } from "@/enums";
+import { useDisplayFormat, useWalterLiethLegendItems } from "@/hooks";
 import { getSwatchSize, isAridMonth } from "@/utils";
 import { useTranslations } from "next-intl";
 import type { TWalterLiethTooltipProps } from "../WalterLiethChart.type";
@@ -12,7 +12,8 @@ import type { TWalterLiethTooltipProps } from "../WalterLiethChart.type";
  */
 export function WalterLiethTooltip({ active, payload }: TWalterLiethTooltipProps) {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
+  const { formatValue } = useDisplayFormat();
+  const metric = EDisplayMetric.WALTER_LIETH_TOOLTIP_VALUE;
   const legendItems = useWalterLiethLegendItems();
   const row = payload?.[0]?.payload;
   if (!active || !row) return null;
@@ -30,12 +31,12 @@ export function WalterLiethTooltip({ active, payload }: TWalterLiethTooltipProps
       <p className={C.ROW}>
         {swatch("temp")}
         {t("chart.avgTemperature")}:{" "}
-        {t("units.celsiusValue", { value: formatNumber(row.tavg, { digits: TOOLTIP_DIGITS.WL }) })}
+        {t("units.celsiusValue", { value: formatValue(row.tavg, { metric }) })}
       </p>
       <p className={C.ROW}>
         {swatch("prec")}
         {t("chart.precipitation")}:{" "}
-        {t("units.mmValue", { value: formatNumber(row.prec, { digits: TOOLTIP_DIGITS.WL }) })}
+        {t("units.mmValue", { value: formatValue(row.prec, { metric }) })}
       </p>
       <p className={`${C.ROW} mt-1`}>
         {swatch(isArid ? "arid" : "humid")}

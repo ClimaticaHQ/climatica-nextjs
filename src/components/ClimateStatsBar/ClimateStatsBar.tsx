@@ -1,8 +1,7 @@
 import { Card } from "@/components/Card";
 import { MartonneBadge } from "@/components/MartonneBadge";
-import { VALUE_DIGITS } from "@/constants";
-import { ECardPadding, ECardSize } from "@/enums";
-import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
+import { ECardPadding, ECardSize, EDisplayMetric } from "@/enums";
+import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
 import { buildMartonneTooltip, getMartonneBadge } from "@/utils";
 import { useTranslations } from "next-intl";
 import {
@@ -23,7 +22,7 @@ export function ClimateStatsBar({
   martonneYear,
 }: TClimateStatsBarProps) {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
+  const { formatValue } = useDisplayFormat();
   const showAltitude = altitude !== undefined;
   const badge = martonneIndex !== null ? getMartonneBadge(martonneIndex) : null;
   // * a single weather year: the index describes that year alone, and says so
@@ -56,27 +55,35 @@ export function ClimateStatsBar({
           {...cell}
           label={t("chart.meanTemp")}
           value={t("units.celsiusValue", {
-            value: formatNumber(meanTemp, { digits: VALUE_DIGITS.TEMP }),
+            value: formatValue(meanTemp, { metric: EDisplayMetric.TEMPERATURE }),
           })}
         />
         <StatCell
           {...cell}
           label={t("chart.annualPrec")}
-          value={t("units.mmValue", { value: formatNumber(annualPrecip) })}
+          value={t("units.mmValue", {
+            value: formatValue(annualPrecip, { metric: EDisplayMetric.PRECIPITATION }),
+          })}
         />
-        <StatCell {...cell} label={t("chart.aridMonths")} value={String(aridMonths)} />
+        <StatCell
+          {...cell}
+          label={t("chart.aridMonths")}
+          value={formatValue(aridMonths, { metric: EDisplayMetric.MONTH_COUNT })}
+        />
         {showAltitude && (
           <StatCell
             {...cell}
             label={t("chart.altitude")}
-            value={t("units.metersValue", { value: formatNumber(altitude) })}
+            value={t("units.metersValue", {
+              value: formatValue(altitude, { metric: EDisplayMetric.ELEVATION }),
+            })}
           />
         )}
         <StatCell
           {...cell}
           {...martonneLabels}
           meta={badge && <MartonneBadge badge={badge} />}
-          value={formatNumber(martonneIndex, { digits: VALUE_DIGITS.MARTONNE })}
+          value={formatValue(martonneIndex, { metric: EDisplayMetric.MARTONNE })}
         />
       </div>
     </Card>

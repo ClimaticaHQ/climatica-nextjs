@@ -1,6 +1,6 @@
 import { SeriesMarker } from "@/components/SeriesMarker";
-import { TOOLTIP_DIGITS } from "@/constants";
-import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
+import { EDisplayMetric } from "@/enums";
+import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
 import { useTranslations } from "next-intl";
 import { TOOLTIP_CLASSES as C } from "./charts.constant";
 import type { TOverlayTooltipProps } from "./charts.type";
@@ -8,7 +8,8 @@ import type { TOverlayTooltipProps } from "./charts.type";
 /** The hovered month for every overlaid series: its marker and name, then its values. */
 export function OverlayTooltip({ active, payload, entries }: TOverlayTooltipProps) {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
+  const { formatValue } = useDisplayFormat();
+  const metric = EDisplayMetric.WALTER_LIETH_TOOLTIP_VALUE;
   const hovered = payload?.[0]?.payload;
   if (!active || !hovered) return null;
 
@@ -27,10 +28,10 @@ export function OverlayTooltip({ active, payload, entries }: TOverlayTooltipProp
             <p>
               {t("chart.avgTemperature")}:{" "}
               {t("units.celsiusValue", {
-                value: formatNumber(row.tavg, { digits: TOOLTIP_DIGITS.WL }),
+                value: formatValue(row.tavg, { metric }),
               })}{" "}
               · {t("chart.precipitation")}:{" "}
-              {t("units.mmValue", { value: formatNumber(row.prec, { digits: TOOLTIP_DIGITS.WL }) })}
+              {t("units.mmValue", { value: formatValue(row.prec, { metric }) })}
             </p>
           </div>
         );

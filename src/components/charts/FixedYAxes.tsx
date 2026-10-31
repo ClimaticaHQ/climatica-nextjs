@@ -1,6 +1,7 @@
 import { ChartUnitTitles } from "@/components/ChartUnitTitles";
 import { CHART_PLOT } from "@/constants";
-import { useFormatNumber } from "@/hooks";
+import { EDisplayMetric } from "@/enums";
+import { useDisplayFormat } from "@/hooks";
 import { getAxisStyle, getPlotMargin, getStandardYAxes, getXAxisProps } from "@/utils";
 import { useContext } from "react";
 import { ComposedChart, Line, ResponsiveContainer, XAxis, YAxis } from "recharts";
@@ -14,8 +15,8 @@ import { ChartDeviceContext } from "./chartDevice.context";
  * card's surface that hides the plot passing under it. Pointers go through to the plot.
  */
 export function FixedYAxes({ scales, rightMax, rows }: TFixedYAxesProps) {
-  const formatNumber = useFormatNumber();
-  const roundTick = (v: unknown) => formatNumber(Math.round(Number(v)));
+  const { formatValue } = useDisplayFormat();
+  const roundTick = (v: unknown) => formatValue(Number(v), { metric: EDisplayMetric.AXIS_TICK });
   const { isNarrow } = useContext(ChartDeviceContext);
   const margin = getPlotMargin(false, isNarrow);
   const axis = getAxisStyle(false, isNarrow);
