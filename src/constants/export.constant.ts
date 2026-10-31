@@ -21,6 +21,9 @@ export const EXPORT_SVG_SHARED_LAYOUT = {
 // * heat-map tiles are fetched at fittedZoom + log2(scale) to match
 export const EXPORT_PNG_SCALE = 2;
 
+// * CSV decimals, with "." whatever the locale: these files are for machines, not readers
+export const CSV_DECIMALS = { COORDINATE: 4, HEATMAP_VALUE: 2, MARTONNE: 1 } as const;
+
 /** The single-city export: one chart with its monthly values and aridity legend. */
 export const EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,

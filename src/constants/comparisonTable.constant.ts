@@ -1,16 +1,16 @@
-import { EDifferenceMeaning } from "@/enums";
+import { EDifferenceMeaning, EDisplayMetric } from "@/enums";
 import type { TComparisonMetric, TComparisonMetricFormat } from "@/types";
 
-/** The rows in order, each with its unit and decimals; the Martonne row gets its class badge. */
+/** The rows in order, each with its unit and display metric; the Martonne row gets its badge. */
 export const COMPARISON_METRICS: readonly TComparisonMetricFormat[] = [
-  { metric: "meanTemp", unit: "celsius", digits: 1 },
-  { metric: "avgTmax", unit: "celsius", digits: 1 },
-  { metric: "avgTmin", unit: "celsius", digits: 1 },
-  { metric: "annualPrec", unit: "mm", digits: 0 },
-  { metric: "aridMonths", unit: null, digits: 0 },
-  { metric: "frostMonths", unit: null, digits: 0 },
-  { metric: "altitude", unit: "meters", digits: 0 },
-  { metric: "martonne", unit: null, digits: 1 },
+  { metric: "meanTemp", unit: "celsius", display: EDisplayMetric.TEMPERATURE },
+  { metric: "avgTmax", unit: "celsius", display: EDisplayMetric.TEMPERATURE },
+  { metric: "avgTmin", unit: "celsius", display: EDisplayMetric.TEMPERATURE },
+  { metric: "annualPrec", unit: "mm", display: EDisplayMetric.PRECIPITATION },
+  { metric: "aridMonths", unit: null, display: EDisplayMetric.MONTH_COUNT },
+  { metric: "frostMonths", unit: null, display: EDisplayMetric.MONTH_COUNT },
+  { metric: "altitude", unit: "meters", display: EDisplayMetric.ELEVATION },
+  { metric: "martonne", unit: null, display: EDisplayMetric.MARTONNE },
 ];
 
 // * the i18n key of each row's label
