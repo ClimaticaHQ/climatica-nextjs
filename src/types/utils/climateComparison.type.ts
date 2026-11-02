@@ -1,3 +1,5 @@
+import type { TValuePair } from "./numberFormat.type";
+
 /** Each statistic is null when any month it depends on is missing (shown as "—"). */
 export type TCompareStats = {
   avgTmax: number | null;
@@ -8,10 +10,13 @@ export type TCompareStats = {
 };
 
 export type TDiffStats = {
+  /** by the exact mean max temperatures */
   warmerCity: "A" | "B" | "tie";
-  tmaxDiff: number;
+  /** A's and B's mean max temperature: the card shows how far apart the displayed values are */
+  avgTmax: TValuePair;
+  /** by the exact annual totals */
   moreRainCity: "A" | "B" | "tie";
-  precDiff: number;
+  totalPrec: TValuePair;
   /** 0 = January — named in the UI's locale where shown */
   hottestMonthIndex: number;
   hottestTempA: number;

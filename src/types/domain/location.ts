@@ -8,6 +8,9 @@ export type TCitySearchParams = {
   query: string;
 };
 
+/** A reverse-geocoding lookup: the point, and the language its place name is wanted in */
+export type TNearestCityParams = TCoordinates & { lang: string };
+
 export type TCity = {
   id: string;
   label: string;
