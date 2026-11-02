@@ -17,7 +17,6 @@ import {
   buildGridIri,
   buildRegionQueryParams,
   buildVariableIris,
-  extractCellBySize,
   getPolygonBounds,
   getRowsPerCell,
   getStripRowLimit,
@@ -37,15 +36,6 @@ export const WorldClimService = {
     );
     validateResponseData(response);
     return response.data;
-  },
-
-  async getCellForPoint(lat: number, lng: number, gridSize: TCellSize): Promise<string | null> {
-    const response = await apiClient.get<TWorldClimCellResponse>(
-      `${WORLDCLIM_PROXY_BASE}/cellofpoint`,
-      { params: { lat, lng } },
-    );
-    validateResponseData(response);
-    return extractCellBySize(response.data, gridSize);
   },
 
   async getCellResource(cellIri: string): Promise<TWorldClimCellResource> {

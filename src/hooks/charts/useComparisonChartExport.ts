@@ -2,6 +2,7 @@ import type { ExportMenuProps } from "@/components/UI";
 import {
   COMPARE_EXPORT_DEFAULT_VISIBLE,
   COMPARE_EXPORT_SVG_LAYOUT,
+  CSV_DECIMALS,
   DOCUMENT_TITLE,
   EXPORT_BAR_STYLE,
   EXPORT_PNG_SCALE,
@@ -17,6 +18,7 @@ import {
   buildFilename,
   downloadSvgString,
   exportTableToCsv,
+  formatCsvNumber,
   getDrawnSeries,
   getEntityShortLabels,
   getExportedSeriesLabels,
@@ -144,9 +146,8 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
         const index = entry?.martonneIndex ?? null;
         if (index === null) return MISSING_VALUE_LABEL;
         // * a weather year's column gives the index alone
-        return rule.isSingleYear
-          ? index.toFixed(1)
-          : `${index.toFixed(1)} (${martonneClass(index)})`;
+        const value = formatCsvNumber(index, CSV_DECIMALS.MARTONNE);
+        return rule.isSingleYear ? value : `${value} (${martonneClass(index)})`;
       }),
     ]);
     exportTableToCsv(

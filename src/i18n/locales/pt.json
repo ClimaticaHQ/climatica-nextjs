@@ -219,7 +219,9 @@
     "permissionDenied": "Acesso à localização negado. Permita a localização nas definições do navegador",
     "unavailable": "Não foi possível determinar a sua localização",
     "timeout": "O pedido de localização expirou. Tente novamente",
-    "unknown": "Ocorreu um erro desconhecido"
+    "unknown": "Ocorreu um erro desconhecido",
+    "pointLabel": "A minha localização {lat}, {lng}",
+    "yourLocation": "A sua localização"
   },
   "map": {
     "selectedFromMap": "Selecionado a partir do mapa",

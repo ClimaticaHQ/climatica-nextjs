@@ -219,7 +219,9 @@
     "permissionDenied": "Accesso alla posizione negato. Consenti la posizione nelle impostazioni del browser",
     "unavailable": "Impossibile determinare la tua posizione",
     "timeout": "La richiesta di posizione è scaduta. Riprova",
-    "unknown": "Si è verificato un errore sconosciuto"
+    "unknown": "Si è verificato un errore sconosciuto",
+    "pointLabel": "La mia posizione {lat}, {lng}",
+    "yourLocation": "La tua posizione"
   },
   "map": {
     "selectedFromMap": "Selezionato dalla mappa",

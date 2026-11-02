@@ -1,7 +1,8 @@
 import { seriesDataKey } from "@/components/charts/charts.util";
 import type { TTooltipFocus, TUseOverlayFocusArgs } from "@/components/charts/charts.type";
-import { MISSING_VALUE_LABEL, TOOLTIP_DIGITS, VALUE_DIGITS } from "@/constants";
-import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
+import { MISSING_VALUE_LABEL } from "@/constants";
+import { EDisplayMetric } from "@/enums";
+import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
 import type { TOverlayFocus } from "@/types";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -13,7 +14,7 @@ import { useState } from "react";
  */
 export function useOverlayFocus({ entries, rows, lines, activeMonthIndex }: TUseOverlayFocusArgs) {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
+  const { formatValue } = useDisplayFormat();
   const [focus, setFocus] = useState<TOverlayFocus | null>(null);
 
   function describe(current: TOverlayFocus, monthIndex: number): TTooltipFocus | null {
@@ -29,7 +30,9 @@ export function useOverlayFocus({ entries, rows, lines, activeMonthIndex }: TUse
       const value =
         number === null
           ? MISSING_VALUE_LABEL
-          : t("units.mmValue", { value: formatNumber(number, { digits: VALUE_DIGITS.PREC }) });
+          : t("units.mmValue", {
+              value: formatValue(number, { metric: EDisplayMetric.PRECIPITATION }),
+            });
       const period = t(isArid ? "chart.focusArid" : "chart.focusHumid");
       return {
         text: t("chart.focusBar", { entity: entry.label, month, value, period }),
@@ -42,7 +45,7 @@ export function useOverlayFocus({ entries, rows, lines, activeMonthIndex }: TUse
       number === null
         ? MISSING_VALUE_LABEL
         : t("units.celsiusValue", {
-            value: formatNumber(number, { digits: TOOLTIP_DIGITS.STANDARD }),
+            value: formatValue(number, { metric: EDisplayMetric.CHART_TOOLTIP_VALUE }),
           });
     return {
       text: t("chart.focusCurve", {

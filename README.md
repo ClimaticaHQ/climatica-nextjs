@@ -159,14 +159,13 @@ What each suite covers and how to write tests is in [docs/testing.md](docs/testi
 | Leaflet           | Interactive maps                  |
 | Recharts          | Charts                            |
 | next-intl         | Multilingual support              |
-| Solr 8            | City search                       |
+| Solr 8            | City search, nearest place        |
 | Redis 7           | Server-side caching               |
 
 ### External APIs
 
 - **WorldClim** (`https://scrapi.gsic.uva.es/apis/worldclim`): global climate and weather grids;
   bearer token `WORLDCLIM_API_KEY`, server-side only.
-- **Wikidata**: reverse geocoding (coordinates → nearest place).
 - **GeoNames**: the one-time city import into Solr.
 
 Code rules are in [AGENTS.md](AGENTS.md); `npm run check` runs type-check, lint and format.

@@ -1,4 +1,6 @@
 import { ClimateStatsBar } from "@/components";
+import { EDisplayMetric } from "@/enums";
+import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
 import { useTranslations } from "next-intl";
 import type { TRegionalClimateProfileProps } from "../HeatMap.type";
 
@@ -10,6 +12,7 @@ export function RegionalClimateProfile({
   cellCount,
 }: TRegionalClimateProfileProps) {
   const t = useTranslations();
+  const { formatValue } = useDisplayFormat();
 
   if (isLoading) {
     return (
@@ -19,9 +22,10 @@ export function RegionalClimateProfile({
 
   if (!profile) return null;
 
+  const count = formatValue(cellCount, { metric: EDisplayMetric.CELL_COUNT });
   const subtitle = isClimate
-    ? t("heatMap.profile.subtitle", { count: cellCount, period: periodLabel })
-    : t("heatMap.profile.subtitleWeather", { count: cellCount, year: periodLabel });
+    ? t("heatMap.profile.subtitle", { count, period: periodLabel })
+    : t("heatMap.profile.subtitleWeather", { count, year: periodLabel });
 
   return (
     <div>

@@ -66,7 +66,7 @@ export function useHeatMapPage(): THeatMapPage {
   const { data: datasetAttribution = null } = useGetDatasetVersion();
 
   const [mapTarget, setMapTarget] = useState<TMapTarget | null>(null);
-  const { pickCity } = useCitySelection({
+  const { pickCity, renamePick } = useCitySelection({
     slot: ECitySlot.MAP,
     onPicked: (city: TCity) => setMapTarget({ lat: city.lat, lng: city.lng }),
   });
@@ -140,7 +140,7 @@ export function useHeatMapPage(): THeatMapPage {
       isLocating,
       locationError: locationError !== null ? t(locationError) : null,
       onCitySelect: pickCity,
-      onLocate: () => locate(pickCity),
+      onLocate: () => locate({ onLocated: pickCity, onRenamed: renamePick }),
       onClearLocationError: clearLocationError,
     },
     toolbar: {

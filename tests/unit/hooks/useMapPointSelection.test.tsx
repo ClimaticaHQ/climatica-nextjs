@@ -39,7 +39,10 @@ describe("useMapPointSelection", () => {
       id: "map:49.8397,24.0297",
       label: "Map point 49.8397, 24.0297",
     });
-    expect(onResolved).toHaveBeenCalledWith({ ...LVIV, lat: 49.8397, lng: 24.0297 });
+    expect(onResolved).toHaveBeenCalledWith({
+      picked: onPicked.mock.calls[0]?.[0],
+      renamed: { ...LVIV, lat: 49.8397, lng: 24.0297 },
+    });
     expect(hook.result.current.lookupError).toBeNull();
   });
 
@@ -58,7 +61,7 @@ describe("useMapPointSelection", () => {
   });
 
   it("a failed lookup keeps the coordinates and says so, until dismissed", async () => {
-    lookup.resolve.mockRejectedValueOnce(new Error("Wikidata down"));
+    lookup.resolve.mockRejectedValueOnce(new Error("Solr down"));
     const { hook, onResolved } = setup();
 
     await act(async () => {

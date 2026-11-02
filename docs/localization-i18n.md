@@ -37,6 +37,31 @@ needed: pages are rendered per request with `Cache-Control: private, no-cache, n
 - Code outside React takes a `TTranslate` (e.g. [`filterChips.util.ts`](../src/utils/filterChips.util.ts)),
   so tests can pass a real translator.
 
+## Numbers
+
+Every number the UI shows (and the text in an SVG / PNG export) goes through
+[`displayFormat.util.ts`](../src/utils/displayFormat.util.ts), in components through
+[`useDisplayFormat`](../src/hooks/ui/useDisplayFormat.ts), which binds the locale:
+
+- **`DISPLAY_PRECISION`** ([`format.constant.ts`](../src/constants/format.constant.ts)) is the one
+  place display rounding is defined: decimals and grouping per `EDisplayMetric` (temperature 1,
+  precipitation 0, elevation 0, Martonne 1, month counts 0, cell counts 0 with grouping, axis ticks
+  0, heat map values 1, standard tooltips 2, Walter-Lieth tooltips 1). `SERIES_DISPLAY_METRIC` maps
+  a chart variable to its metric.
+- **`roundForDisplay(value, metric)`** rounds half away from zero on the exact value, as
+  `Intl.NumberFormat` does, so a rounded value always prints as the raw one would.
+- **`formatValue(value, { metric, locale, sign })`**: the locale's digits and the metric's
+  decimals; `sign` is the locale's minus (default) or a real minus (`ENumberSign.MINUS`, the
+  tables); "—" when unknown.
+- **`formatDifference({ minuend, subtrahend, metric, locale })`**: always signed ("+1,1", "−0,7",
+  "±0,0"), and the difference of the **displayed** values (`displayDifference`), taken in whole
+  units of the last decimal, so it always equals the difference of the two numbers beside it.
+
+CSV files don't use this: they keep "." and their own decimals (`formatCsvNumber`, `formatTemp`,
+`CSV_DECIMALS`). Calculations (aridity, Martonne, the warmer city) use the exact values. ESLint
+rejects `toFixed`, `toPrecision`, `toLocaleString`, `Math.round` and `new Intl.NumberFormat` in
+`src/components`, `src/app` and `src/hooks`.
+
 ## Key conventions
 
 - Keys are grouped by namespace (`pages`, `sidebar`, `filters`, `settings`, `chart`, `meta`,

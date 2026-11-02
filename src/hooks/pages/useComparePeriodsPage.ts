@@ -45,7 +45,7 @@ import { useWeatherYearsViewState } from "./useWeatherYearsViewState";
  */
 export function useComparePeriodsPage(): TComparePeriodsPage {
   const t = useTranslations();
-  const { city, selectCity } = usePersistedCity();
+  const { city, selectCity, renameCity } = usePersistedCity();
   const filters = useFilters();
   const { dataset, gridSize, months, variables } = filters;
   const periods = filters.weatherPeriods;
@@ -200,9 +200,12 @@ export function useComparePeriodsPage(): TComparePeriodsPage {
       onCitySelect: pickCity,
       // * your location is this page's city only — it doesn't follow to the other pages
       onLocate: () =>
-        locate((located) => {
-          scroll.markPicked();
-          selectCity(located);
+        locate({
+          onLocated: (located) => {
+            scroll.markPicked();
+            selectCity(located);
+          },
+          onRenamed: renameCity,
         }),
       onClearLocationError: clearLocationError,
     },

@@ -1,0 +1,28 @@
+# One URL per line: a path (/api/cities?q=49.9818,36.2548&lang=en) or a full URL, whose host --base replaces.
+# Empty lines and lines starting with # are ignored.
+# Coordinate lookups (map click path): /api/cities -> Redis -> Wikidata
+http://localhost:3000/api/cities?q=49.9818,36.2548&lang=en
+http://localhost:3000/api/cities?q=49.8383,24.0232&lang=en
+http://localhost:3000/api/cities?q=37.8916,-4.7728&lang=en
+http://localhost:3000/api/cities?q=60.1695,24.9355&lang=en
+http://localhost:3000/api/cities?q=40.4165,-3.7026&lang=en
+http://localhost:3000/api/cities?q=41.3888,2.1590&lang=en
+http://localhost:3000/api/cities?q=40.7143,-74.0060&lang=en
+http://localhost:3000/api/cities?q=51.5085,-0.1257&lang=en
+http://localhost:3000/api/cities?q=48.8534,2.3488&lang=en
+http://localhost:3000/api/cities?q=47.6062,-122.3321&lang=en
+http://localhost:3000/api/cities?q=37.7749,-122.4194&lang=en
+http://localhost:3000/api/cities?q=53.3331,-6.2489&lang=en
+http://localhost:3000/api/cities?q=35.6895,139.6917&lang=en
+http://localhost:3000/api/cities?q=47.3667,8.5500&lang=en
+http://localhost:3000/api/cities?q=41.8919,12.5113&lang=en
+http://localhost:3000/api/cities?q=52.5244,13.4105&lang=en
+http://localhost:3000/api/cities?q=38.7251,-9.1498&lang=en
+http://localhost:3000/api/cities?q=57.7072,11.9668&lang=en
+http://localhost:3000/api/cities?q=30.0626,31.2497&lang=en
+http://localhost:3000/api/cities?q=52.2298,21.0118&lang=en
+http://localhost:3000/api/cities?q=41.0138,28.9497&lang=en
+http://localhost:3000/api/cities?q=37.5660,126.9784&lang=en
+http://localhost:3000/api/cities?q=31.2222,121.4581&lang=en
+http://localhost:3000/api/cities?q=41.6554,-4.7235&lang=en
+http://localhost:3000/api/cities?q=19.0728,72.8826&lang=en

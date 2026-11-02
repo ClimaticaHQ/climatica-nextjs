@@ -1,8 +1,8 @@
-import { useResolveCityByCoordinates } from "@/hooks/data/useResolveCityByCoordinates";
 import type { TCity, TUseMapPointSelectionArgs } from "@/types";
 import { formatCoordinate } from "@/utils";
 import { useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { usePlaceLookup } from "@/hooks/data/usePlaceLookup";
 
 /**
  * Picking a point on the map: it's selected at once under its coordinates, then renamed when
@@ -11,13 +11,10 @@ import { useRef, useState } from "react";
  */
 export function useMapPointSelection({ onPicked, onResolved }: TUseMapPointSelectionArgs) {
   const t = useTranslations();
-  const { isLoading: isResolving, mutateAsync: resolveCity } = useResolveCityByCoordinates();
-  const latestPickRef = useRef(0);
+  const { lookUp, isResolving } = usePlaceLookup();
   const [hasLookupFailed, setHasLookupFailed] = useState(false);
 
-  async function pickPoint(lat: number, lng: number) {
-    const pick = latestPickRef.current + 1;
-    latestPickRef.current = pick;
+  function pickPoint(lat: number, lng: number) {
     setHasLookupFailed(false);
 
     const latLabel = formatCoordinate(lat);
@@ -30,17 +27,14 @@ export function useMapPointSelection({ onPicked, onResolved }: TUseMapPointSelec
       lng,
     };
     onPicked(pointCity);
-
-    try {
-      const resolved = await resolveCity({ lat, lng });
-      if (resolved && latestPickRef.current === pick) onResolved({ ...resolved, lat, lng });
-    } catch {
-      if (latestPickRef.current === pick) setHasLookupFailed(true);
-    }
+    lookUp(pointCity, {
+      onFound: (renamed) => onResolved({ picked: pointCity, renamed }),
+      onFailed: () => setHasLookupFailed(true),
+    });
   }
 
   return {
-    pickPoint: (lat: number, lng: number) => void pickPoint(lat, lng),
+    pickPoint,
     isResolving,
     lookupError: hasLookupFailed ? t("errors.placeLookupFailed") : null,
     clearLookupError: () => setHasLookupFailed(false),

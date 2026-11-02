@@ -9,17 +9,16 @@ import {
   pixelSelectedAvg,
   resolveCellBounds,
 } from "@/app/heat-map/_components/HeatMap.util";
+import { STATS_LEGEND_GRADIENT_STOPS } from "@/app/heat-map/_components/HeatMap.constant";
 import {
-  HEATMAP_VALUE_DIGITS,
-  STATS_LEGEND_GRADIENT_STOPS,
-} from "@/app/heat-map/_components/HeatMap.constant";
-import {
+  CSV_DECIMALS,
   DIFFERENCE_SIGN,
   EXPORT_PNG_SCALE,
   HEATMAP_EXPORT_SVG_LAYOUT,
   VARIABLE_LABELS,
 } from "@/constants";
-import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
+import { EDisplayMetric } from "@/enums";
+import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
 import type {
   THeatmapExportCell,
   THeatmapExportPayload,
@@ -29,6 +28,7 @@ import type {
 import {
   buildFilename,
   buildHeatmapExportSvg,
+  formatCsvNumber,
   downloadSvgString,
   exportTableToCsv,
   getPolygonBounds,
@@ -55,7 +55,7 @@ export function useHeatMapExport({
   shareUrl,
 }: TUseHeatMapExportArgs): THeatMapExportHandlers {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
+  const { formatValue } = useDisplayFormat();
   const fileParts = [activeVariable, periodLabel];
 
   function handleExportCSV() {
@@ -65,7 +65,11 @@ export function useHeatMapExport({
         const lng = typeof b.lng?.value === "string" ? parseFloat(b.lng.value) : NaN;
         const value = pixelAnnualAvg(b);
         if (isNaN(lat) || isNaN(lng) || isNaN(value)) return null;
-        return [lat.toFixed(4), lng.toFixed(4), value.toFixed(2)];
+        return [
+          formatCsvNumber(lat, CSV_DECIMALS.COORDINATE),
+          formatCsvNumber(lng, CSV_DECIMALS.COORDINATE),
+          formatCsvNumber(value, CSV_DECIMALS.HEATMAP_VALUE),
+        ];
       })
       .filter((r): r is string[] => r !== null);
     exportTableToCsv(buildFilename("heatmap", fileParts, "csv"), ["lat", "lng", "value"], rows);
@@ -109,7 +113,8 @@ export function useHeatMapExport({
         stops,
       ),
     );
-    const fmt = (v: number) => `${formatNumber(v, { digits: HEATMAP_VALUE_DIGITS })} ${unit}`;
+    const fmt = (v: number) =>
+      `${formatValue(v, { metric: EDisplayMetric.HEATMAP_VALUE })} ${unit}`;
     const statRow = (labelKey: string, value: string) => ({
       label: t(labelKey),
       value,
@@ -127,7 +132,7 @@ export function useHeatMapExport({
         statRow("heatMap.stats.stdDev", `${DIFFERENCE_SIGN.NONE}${fmt(stats.stdDev)}`),
         {
           label: t("heatMap.stats.cellsAnalyzed"),
-          value: formatNumber(stats.count, { hasGrouping: true }),
+          value: formatValue(stats.count, { metric: EDisplayMetric.CELL_COUNT }),
         },
       ],
       gradientColors,

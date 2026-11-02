@@ -8,6 +8,8 @@ export { useGetComparePeriods } from "./useGetComparePeriods";
 export { useGetDatasetVersion } from "./useGetDatasetVersion";
 export { useGetHeatmapData } from "./useGetHeatmapData";
 export { useGetMultiPeriodData } from "./useGetMultiPeriodData";
+export { useGetPointCells } from "./useGetPointCells";
 export { useGetRegionalProfile } from "./useGetRegionalProfile";
+export { usePlaceLookup } from "./usePlaceLookup";
 export { useResolveCityByCoordinates } from "./useResolveCityByCoordinates";
 export { useSearchCity } from "./useSearchCity";

@@ -32,7 +32,7 @@ Before reporting a task as done: `npm run check`, `npm run test`, `npm run build
   - docs/architecture.md — structure, data flow, page pattern, shared UI
   - docs/url-state.md — URL state, URL hooks, canonical and legacy params, navbar cache
   - docs/filters.md — filter config, sections, containers, draft, availability
-  - docs/backend.md — API routes, Redis, Solr, WorldClim, Wikidata, error handling
+  - docs/backend.md — API routes, Redis, Solr, WorldClim, nearest place, error handling
   - docs/localization-i18n.md — locales, translations, adding a language
   - docs/operations.md — Docker, env variables, Solr reindex, scripts, CI and deploy
   - docs/testing.md — Vitest, Playwright, test conventions
@@ -210,6 +210,7 @@ return SIZE_LABELS.find(({ maxBytes }) => bytes < maxBytes)?.label;
 ## i18n
 
 - Never hardcode user-facing strings: use next-intl (`useTranslations`).
+- Never format a displayed number by hand: use `useDisplayFormat` (or `formatValue` / `formatDifference` in utils) with an `EDisplayMetric`; precision lives only in `DISPLAY_PRECISION` (docs/localization-i18n.md).
 - A change to keys updates all 10 locale files in the same change, with natural phrasing in each language.
 - Restructuring keys is allowed: update every usage and every locale, and remove keys that become unused.
 

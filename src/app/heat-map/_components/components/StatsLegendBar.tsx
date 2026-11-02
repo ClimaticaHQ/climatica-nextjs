@@ -1,16 +1,12 @@
 import { Card } from "@/components/Card";
 import { StatCell } from "@/components/UI/StatCell";
 import { DATA_UPDATE_ALL_SERIES, DIFFERENCE_SIGN } from "@/constants";
-import { ECardPadding, ECardSize } from "@/enums";
+import { ECardPadding, ECardSize, EDisplayMetric } from "@/enums";
 import { useColorScale } from "@/hooks/ui/useColorScale";
-import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
+import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
 import { interpolateColor } from "@/utils";
 import { useTranslations } from "next-intl";
-import {
-  HEATMAP_VALUE_DIGITS,
-  STATS_LEGEND_BAR_CLASSES as C,
-  STATS_LEGEND_GRADIENT_STOPS,
-} from "../HeatMap.constant";
+import { STATS_LEGEND_BAR_CLASSES as C, STATS_LEGEND_GRADIENT_STOPS } from "../HeatMap.constant";
 import type { TStatsLegendBarProps } from "../HeatMap.type";
 
 /**
@@ -28,11 +24,12 @@ export function StatsLegendBar({
   avgTooltip,
 }: TStatsLegendBarProps) {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
+  const { formatValue } = useDisplayFormat();
   const stops = useColorScale(scale);
   if (!isLoading && !hasData) return null;
 
-  const fmt = (value: number) => `${formatNumber(value, { digits: HEATMAP_VALUE_DIGITS })} ${unit}`;
+  const fmt = (value: number) =>
+    `${formatValue(value, { metric: EDisplayMetric.HEATMAP_VALUE })} ${unit}`;
   const gradient =
     stops &&
     `linear-gradient(to right, ${Array.from({ length: STATS_LEGEND_GRADIENT_STOPS }, (_, i) =>
@@ -61,7 +58,7 @@ export function StatsLegendBar({
     },
     {
       label: t("heatMap.stats.cellsAnalyzed"),
-      value: formatNumber(stats.count, { hasGrouping: true }),
+      value: formatValue(stats.count, { metric: EDisplayMetric.CELL_COUNT }),
     },
   ];
 

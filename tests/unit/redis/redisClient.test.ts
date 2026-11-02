@@ -92,3 +92,16 @@ describe("RedisClient.incrementCounter", () => {
     await expect(RedisClient.incrementCounter("counter-key", 86400)).resolves.toBe(0);
   });
 });
+
+describe("RedisClient.expire", () => {
+  it("sets the key's TTL", async () => {
+    mockRedis.expire.mockResolvedValue(1);
+    await RedisClient.expire("key", 60);
+    expect(mockRedis.expire).toHaveBeenCalledWith("key", 60);
+  });
+
+  it("logs and swallows a Redis error", async () => {
+    mockRedis.expire.mockRejectedValue(new Error("down"));
+    await expect(RedisClient.expire("key", 60)).resolves.toBeUndefined();
+  });
+});

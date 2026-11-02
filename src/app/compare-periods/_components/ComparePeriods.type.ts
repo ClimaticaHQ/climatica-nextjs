@@ -7,6 +7,7 @@ import type {
   TExpandedPanel,
   TMarkerSlots,
   TPair,
+  TValuePair,
 } from "@/types";
 
 export type TComparePeriodsUrlState = {
@@ -32,10 +33,10 @@ export type TPeriodCitySearchProps = TLocationSearchProps & {
 
 /** The trend cards under a climate comparison: how temperature and precipitation changed. */
 export type TPeriodTrend = {
-  /** later minus earlier, °C; 0: no change */
-  tmaxDiff: number;
-  /** later minus earlier, mm */
-  precDiff: number;
+  /** the mean max temperatures, B and A: the card shows B − A of the displayed values */
+  tmax: TValuePair;
+  /** the annual precipitation totals, B and A */
+  prec: TValuePair;
   labelA: string;
   labelB: string;
 };

@@ -16,7 +16,7 @@ export { usePopover } from "./usePopover";
 export { useDelayedFlag } from "./useDelayedFlag";
 export { useMotionPreference } from "./useMotionPreference";
 export { useMonthName } from "./useMonthName";
-export { useFormatNumber } from "./useFormatNumber";
+export { useDisplayFormat } from "./useDisplayFormat";
 export { useBodyScrollLock } from "./useBodyScrollLock";
 export { useFocusTrap } from "./useFocusTrap";
 export { usePresence } from "./usePresence";

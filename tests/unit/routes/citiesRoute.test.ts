@@ -3,12 +3,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 vi.mock("@/libs/Logger", () => ({ logger: { info: vi.fn(), error: vi.fn() } }));
 vi.mock("@/libs/redis/client", () => ({
-  RedisClient: { get: vi.fn(), set: vi.fn(), incrementCounter: vi.fn() },
+  RedisClient: { get: vi.fn(), set: vi.fn(), expire: vi.fn(), incrementCounter: vi.fn() },
 }));
 vi.mock("@/libs/redis", async (importOriginal) => importOriginal());
 vi.mock("@/libs/services", () => ({
-  SolrService: { searchCities: vi.fn() },
-  WikidataService: { findNearestCityByCoordinates: vi.fn() },
+  SolrService: { searchCities: vi.fn(), findNearestCity: vi.fn() },
 }));
 vi.mock("@/libs/Env", () => ({
   env: {
@@ -24,7 +23,7 @@ import { GET } from "@/app/api/cities/route";
 import { API_ERRORS } from "@/constants";
 import { REDIS_STRATEGIES } from "@/libs/redis";
 import { RedisClient } from "@/libs/redis/client";
-import { SolrService, WikidataService } from "@/libs/services";
+import { SolrService } from "@/libs/services";
 import type { TCity } from "@/types";
 import { NextRequest } from "next/server";
 
@@ -74,6 +73,33 @@ describe("GET /api/cities — text search cache hit", () => {
     expect(res.headers.get("Server-Timing")).toBeNull();
     expect(SolrService.searchCities).not.toHaveBeenCalled();
     expect(RedisClient.set).not.toHaveBeenCalled();
+  });
+});
+
+describe("GET /api/cities — popularity on a hit", () => {
+  it("counts a hit and extends the entry in place when it becomes popular", async () => {
+    vi.mocked(RedisClient.get).mockResolvedValue([mockCity]);
+    vi.mocked(RedisClient.incrementCounter).mockResolvedValue(
+      REDIS_STRATEGIES.citySearch.popularThreshold,
+    );
+
+    await GET(makeRequest("rome"));
+
+    expect(RedisClient.incrementCounter).toHaveBeenCalledWith(
+      "city-search-counter:en:rome",
+      REDIS_STRATEGIES.citySearch.ttl,
+    );
+    expect(RedisClient.expire).toHaveBeenCalledWith(
+      "city-search:en:rome",
+      REDIS_STRATEGIES.citySearch.popularTtl,
+    );
+    expect(SolrService.searchCities).not.toHaveBeenCalled();
+  });
+
+  it("doesn't count a hit on a short query", async () => {
+    vi.mocked(RedisClient.get).mockResolvedValue([mockCity]);
+    await GET(makeRequest("lo"));
+    expect(RedisClient.incrementCounter).not.toHaveBeenCalled();
   });
 });
 
@@ -150,22 +176,26 @@ describe("GET /api/cities — popular query TTL", () => {
 });
 
 describe("GET /api/cities — coordinate queries", () => {
-  it("calls WikidataService and skips Solr for coordinate input", async () => {
+  it("looks up the nearest place, not a text search, for coordinate input", async () => {
     vi.mocked(RedisClient.get).mockResolvedValue(null);
-    vi.mocked(WikidataService.findNearestCityByCoordinates).mockResolvedValue(mockCity);
+    vi.mocked(SolrService.findNearestCity).mockResolvedValue(mockCity);
 
     const res = await GET(makeRequest("48.8566,2.3522"));
 
     expect(await res.json()).toEqual([mockCity]);
     expect(res.headers.get("X-Cache")).toBe("MISS");
-    expect(res.headers.get("Server-Timing")).toMatch(/^wikidata;dur=\d+\.\d$/);
-    expect(WikidataService.findNearestCityByCoordinates).toHaveBeenCalledWith(48.8566, 2.3522);
+    expect(res.headers.get("Server-Timing")).toMatch(/^solr;dur=\d+\.\d$/);
+    expect(SolrService.findNearestCity).toHaveBeenCalledWith({
+      lat: 48.8566,
+      lng: 2.3522,
+      lang: "en",
+    });
     expect(SolrService.searchCities).not.toHaveBeenCalled();
   });
 
   it("caches coordinate result with nearestCity TTL", async () => {
     vi.mocked(RedisClient.get).mockResolvedValue(null);
-    vi.mocked(WikidataService.findNearestCityByCoordinates).mockResolvedValue(mockCity);
+    vi.mocked(SolrService.findNearestCity).mockResolvedValue(mockCity);
 
     await GET(makeRequest("48.8566,2.3522"));
 
@@ -176,19 +206,19 @@ describe("GET /api/cities — coordinate queries", () => {
     );
   });
 
-  it("returns cached city for coordinates without calling WikidataService", async () => {
+  it("returns the cached place for coordinates without asking Solr", async () => {
     vi.mocked(RedisClient.get).mockResolvedValue([mockCity]);
 
     const res = await GET(makeRequest("48.8566,2.3522"));
 
     expect(await res.json()).toEqual([mockCity]);
     expect(res.headers.get("X-Cache")).toBe("HIT");
-    expect(WikidataService.findNearestCityByCoordinates).not.toHaveBeenCalled();
+    expect(SolrService.findNearestCity).not.toHaveBeenCalled();
   });
 
-  it("returns [] and does not cache when WikidataService finds nothing", async () => {
+  it("returns [] and does not cache when no place is within the radius", async () => {
     vi.mocked(RedisClient.get).mockResolvedValue(null);
-    vi.mocked(WikidataService.findNearestCityByCoordinates).mockResolvedValue(null);
+    vi.mocked(SolrService.findNearestCity).mockResolvedValue(null);
 
     const res = await GET(makeRequest("0,0"));
 
@@ -197,17 +227,49 @@ describe("GET /api/cities — coordinate queries", () => {
   });
 });
 
+describe("GET /api/cities — coordinate lookups by language", () => {
+  beforeEach(() => {
+    vi.mocked(RedisClient.get).mockResolvedValue(null);
+    vi.mocked(SolrService.findNearestCity).mockResolvedValue(mockCity);
+  });
+
+  it("names the place in the interface language and caches per language", async () => {
+    await GET(makeRequest("48.8566,2.3522", "uk"));
+
+    expect(SolrService.findNearestCity).toHaveBeenCalledWith({
+      lat: 48.8566,
+      lng: 2.3522,
+      lang: "uk",
+    });
+    expect(RedisClient.get).toHaveBeenCalledWith("nearest-city:uk:48.8566:2.3522");
+    expect(RedisClient.set).toHaveBeenCalledWith(
+      "nearest-city:uk:48.8566:2.3522",
+      [mockCity],
+      REDIS_STRATEGIES.nearestCity.ttl,
+    );
+  });
+
+  it("falls back to English for an unsupported language", async () => {
+    await GET(makeRequest("48.8566,2.3522", "zz"));
+    expect(RedisClient.get).toHaveBeenCalledWith("nearest-city:en:48.8566:2.3522");
+  });
+});
+
 describe("GET /api/cities — coordinate separators", () => {
   it.each(["48.8566,2.3522", "48.8566, 2.3522", "48.8566 2.3522", "-33.86 151.21"])(
     "reverse-geocodes %j",
     async (q) => {
       vi.mocked(RedisClient.get).mockResolvedValue(null);
-      vi.mocked(WikidataService.findNearestCityByCoordinates).mockResolvedValue(mockCity);
+      vi.mocked(SolrService.findNearestCity).mockResolvedValue(mockCity);
 
       await GET(makeRequest(q));
 
       const [lat, lng] = q.split(/[,\s]+/).map(Number);
-      expect(WikidataService.findNearestCityByCoordinates).toHaveBeenCalledWith(lat, lng);
+      expect(SolrService.findNearestCity).toHaveBeenCalledWith({
+        lat,
+        lng,
+        lang: "en",
+      });
       expect(SolrService.searchCities).not.toHaveBeenCalled();
     },
   );
@@ -229,10 +291,8 @@ describe("GET /api/cities — upstream failure", () => {
     expect(RedisClient.incrementCounter).not.toHaveBeenCalled();
   });
 
-  it("answers 502 and caches nothing when reverse geocoding fails", async () => {
-    vi.mocked(WikidataService.findNearestCityByCoordinates).mockRejectedValue(
-      new Error("Wikidata down"),
-    );
+  it("answers 502 and caches nothing when the nearest-place lookup fails", async () => {
+    vi.mocked(SolrService.findNearestCity).mockRejectedValue(new Error("Solr down"));
 
     const res = await GET(makeRequest("48.8566,2.3522"));
 

@@ -7,10 +7,10 @@ variables, the Solr city index, npm scripts, CI and deployment.
 
 [`docker/docker-compose.yml`](../docker/docker-compose.yml) (project `climatica`):
 
-| Service           | Image            | Port | Data                                                                                          |
-| ----------------- | ---------------- | ---- | --------------------------------------------------------------------------------------------- |
-| `climatica-solr`  | `solr:8`         | 8983 | volume `solr_data`; creates the `cities` core on first start with the repo's `solrconfig.xml` |
-| `climatica-redis` | `redis:7-alpine` | 6379 | volume `redis_data`, append-only                                                              |
+| Service           | Image            | Port | Data                                                                                             |
+| ----------------- | ---------------- | ---- | ------------------------------------------------------------------------------------------------ |
+| `climatica-solr`  | `solr:8`         | 8983 | volume `solr_data`; creates the `cities` core on first start with the repo's `solrconfig.xml`    |
+| `climatica-redis` | `redis:7-alpine` | 6379 | volume `redis_data`, append-only; `maxmemory` `REDIS_MAXMEMORY` (default `512mb`), `allkeys-lru` |
 
 `docker:up` starts them, `docker:stop` / `docker:down` stop them (volumes kept), `docker:reset`
 removes containers **and volumes**, `docker:reboot` resets and starts (then reindex),
@@ -78,14 +78,15 @@ deploys; after a change to what an API returns, `docker exec climatica-redis red
 
 ## npm scripts
 
-| Script                                                | Does                                                       |
-| ----------------------------------------------------- | ---------------------------------------------------------- |
-| `dev`, `build`, `start`                               | Next.js                                                    |
-| `check`                                               | type-check, lint, format check (`format` fixes formatting) |
-| `test`, `test:watch`, `test:coverage`                 | Vitest ([testing.md](testing.md))                          |
-| `test:e2e`, `test:e2e:ui`, `test:e2e:debug`           | Playwright; needs the Docker services                      |
-| `test:python`                                         | the Solr data script's pytest suite (`.venv`)              |
-| `cache:clear-city-search`, `cache:clear-nearest-city` | delete `city-search:*` / `nearest-city:*` (not counters)   |
+| Script                                                | Does                                                                   |
+| ----------------------------------------------------- | ---------------------------------------------------------------------- |
+| `dev`, `build`, `start`                               | Next.js                                                                |
+| `check`                                               | type-check, lint, format check (`format` fixes formatting)             |
+| `test`, `test:watch`, `test:coverage`                 | Vitest ([testing.md](testing.md))                                      |
+| `test:e2e`, `test:e2e:ui`, `test:e2e:debug`           | Playwright; needs the Docker services                                  |
+| `test:python`                                         | the Solr data script's pytest suite (`.venv`)                          |
+| `cache:clear-city-search`, `cache:clear-nearest-city` | delete `city-search:*` / `nearest-city:*` (not counters)               |
+| `bench`                                               | cold vs. cached API timings ([README](../scripts/benchmark/README.md)) |
 
 Node's version is [`.nvmrc`](../.nvmrc), read locally and by CI; npm's is `packageManager`. The
 lock must be written by that npm: npm 10's `npm ci` rejects a lock written by npm 11 that omits an
