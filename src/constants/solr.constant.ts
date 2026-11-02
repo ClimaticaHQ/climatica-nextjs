@@ -79,3 +79,20 @@ export const SOLR_QUERY_PARAMS = {
   FUZZY_TEXT: "cityFuzzyQ",
   FUZZY_QF: "cityFuzzyQf",
 } as const;
+
+// * The nearest-place lookup: the nearest populated place within RADIUS_KM of a point, by
+// * great-circle distance. No population weighting: the name describes the point itself, the
+// * spot whose climate is shown, not the biggest town around it.
+export const SOLR_NEAREST_PLACE = {
+  RADIUS_KM: 10,
+  EARTH_RADIUS_KM: 6371,
+  KM_PER_DEGREE: 111.32,
+  // * near a pole cos(lat) → 0, so the box's longitude half-width is capped
+  MAX_LNG_DELTA: 180,
+  // * ~0.1 m, and never an exponent ("1e-7") in the query
+  COORDINATE_DECIMALS: 6,
+  // * a non-cached filter with cost ≥ 100 runs as a post filter, only on the box's candidates
+  POST_FILTER_COST: 100,
+} as const;
+
+export const SOLR_LOCATION_FIELDS = { LAT: "latitude", LNG: "longitude" } as const;

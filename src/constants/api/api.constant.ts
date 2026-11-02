@@ -1,7 +1,3 @@
-export const ENDPOINTS = {
-  WIKIDATA: "https://www.wikidata.org/w/api.php",
-} as const;
-
 export const WORLDCLIM_UPSTREAM_BASE = "https://scrapi.gsic.uva.es/apis/worldclim";
 
 /** What a route handler answers when an upstream service fails — never 200, never cached */
@@ -21,6 +17,5 @@ export const SERVER_TIMING_DECIMALS = 1;
 // * Server-Timing metric names: the service a route waited on
 export const UPSTREAM_SOURCES = {
   SOLR: "solr",
-  WIKIDATA: "wikidata",
   WORLDCLIM: "worldclim",
 } as const;

@@ -106,6 +106,35 @@ export const WORLDCLIM_CACHED_QUERY_IDS: readonly string[] = [
   "avgpixelvaluesinpolygonGEO",
 ];
 
+// * point queries the proxy caches in Redis by the raster cell holding the point, not by lat/lng
+export const WORLDCLIM_POINT_QUERY_IDS = {
+  PIXEL_VALUES: "pixelvaluesofapoint",
+  CELL: "cellofpoint",
+} as const;
+
+export const POINT_QUERY_PARAMS = {
+  LAT: "lat",
+  LNG: "lng",
+  GRID: "grid",
+  VAR: "var",
+  IS_CLIMATE: "isClimate",
+  IS_WEATHER: "isWeather",
+  YEAR: "year",
+} as const;
+
+// * whole cells per degree: a cell index is then a product of whole numbers, never a division by
+// * an inexact 10/60
+export const CELLS_PER_DEGREE = {
+  [CELL_SIZES.TEN_MINUTES]: 6,
+  [CELL_SIZES.FIVE_MINUTES]: 12,
+  [CELL_SIZES.TWO_POINT_FIVE_MINUTES]: 24,
+  [CELL_SIZES.THIRTY_SECONDS]: 120,
+} as const;
+
+// * SCRAPI puts a point up to ~1e-4° from a cell edge in either cell, not the same way at every grid
+// * (measured against cellofpoint, 2026-10-29); a point nearer an edge than this goes uncached
+export const POINT_CELL_EDGE_MARGIN_DEG = 5e-4;
+
 export const CELL_IRI_ROW_COL_REGEX = /Cell_[^_]+_r(\d+)c(\d+)/;
 // * ~1 m at the equator: far finer than any grid cell, and short in query and share URLs
 export const WKT_COORDINATE_PRECISION = 5;
