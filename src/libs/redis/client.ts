@@ -85,6 +85,14 @@ export class RedisClient {
     }
   }
 
+  public static async expire(key: string, ttl: number): Promise<void> {
+    try {
+      await RedisClient.getInstance().expire(key, ttl);
+    } catch (error: any) {
+      logger.error(`[Redis] EXPIRE error for key "${key}": ${error.message}`);
+    }
+  }
+
   public static async del(key: string): Promise<void> {
     try {
       await RedisClient.getInstance().del(key);
