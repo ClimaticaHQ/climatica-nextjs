@@ -1,5 +1,6 @@
 import type {
   TCity,
+  TPlaceRename,
   TKeyValueStorage,
   TPersistedJsonStore,
   TPersistedJsonStoreArgs,
@@ -88,4 +89,15 @@ export function isCity(value: unknown): value is TCity {
     "lng" in value &&
     typeof value.lng === "number"
   );
+}
+
+/**
+ * Renames a picked place in its store only while the store still holds that pick: a place
+ * lookup answering after the reader picked something else never overwrites the newer pick.
+ */
+export function renameIfStillPicked(
+  store: TPersistedJsonStore<TCity>,
+  { picked, renamed }: TPlaceRename,
+): void {
+  if (store.getSnapshot().id === picked.id) store.set(renamed);
 }
