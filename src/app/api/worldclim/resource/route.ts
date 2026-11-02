@@ -6,7 +6,7 @@ import {
   WORLDCLIM_UPSTREAM_BASE,
 } from "@/constants";
 import { logger } from "@/libs/Logger";
-import { checkRateLimit, REDIS_STRATEGIES } from "@/libs/redis";
+import { checkRateLimit, PopularityCache, REDIS_STRATEGIES } from "@/libs/redis";
 import { RedisClient } from "@/libs/redis/client";
 import {
   apiErrorResponse,
@@ -25,11 +25,13 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams.toString();
   const url = `${WORLDCLIM_UPSTREAM_BASE}/resource?${searchParams}`;
 
-  const strategy = REDIS_STRATEGIES.worldclimResource;
-  const cacheKey = strategy.buildKey(searchParams);
+  const entry = REDIS_STRATEGIES.worldclimResource.buildEntry(searchParams);
 
-  const cached = await RedisClient.get<unknown>(cacheKey);
-  if (cached) return cachedJsonResponse(cached, { status: CACHE_STATUS.HIT });
+  const cached = await RedisClient.get<unknown>(entry.key);
+  if (cached) {
+    await PopularityCache.recordHit(entry);
+    return cachedJsonResponse(cached, { status: CACHE_STATUS.HIT });
+  }
 
   const { result, timing } = await timeUpstream(UPSTREAM_SOURCES.WORLDCLIM, () =>
     fetchWorldClimJson(url),
@@ -40,12 +42,7 @@ export async function GET(request: NextRequest) {
     return apiErrorResponse(API_ERRORS.WORLDCLIM_UNAVAILABLE);
   }
 
-  const count = await RedisClient.incrementCounter(
-    strategy.buildCounterKey(searchParams),
-    strategy.ttl,
-  );
-  const ttl = count >= strategy.popularThreshold ? strategy.popularTtl : strategy.ttl;
-  await RedisClient.set(cacheKey, result.data, ttl);
+  await PopularityCache.store(entry, result.data);
 
   return cachedJsonResponse(result.data, { status: CACHE_STATUS.MISS, upstream: timing });
 }

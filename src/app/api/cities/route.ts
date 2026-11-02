@@ -1,9 +1,17 @@
-import { API_ERRORS, CACHE_STATUS, CACHE_TTL, TIME, UPSTREAM_SOURCES } from "@/constants";
+import {
+  API_ERRORS,
+  CACHE_STATUS,
+  CACHE_TTL,
+  DEFAULT_LOCALE,
+  LOCALES,
+  TIME,
+  UPSTREAM_SOURCES,
+} from "@/constants";
 import { logger } from "@/libs/Logger";
-import { checkRateLimit, REDIS_STRATEGIES } from "@/libs/redis";
+import { checkRateLimit, PopularityCache, REDIS_STRATEGIES } from "@/libs/redis";
 import { RedisClient } from "@/libs/redis/client";
-import { SolrService, WikidataService } from "@/libs/services";
-import type { TCity, TCoordinates, TTimedUpstream } from "@/types";
+import { SolrService } from "@/libs/services";
+import type { TCity, TNearestCityParams, TTimedUpstream } from "@/types";
 import {
   apiErrorResponse,
   cachedJsonResponse,
@@ -26,11 +34,13 @@ export async function GET(request: NextRequest) {
   if (!q || q.length < 2) return cachedJsonResponse([], { status: CACHE_STATUS.BYPASS });
 
   const coords = parseCoordinates(q);
-  return coords ? searchByCoordinates(coords) : searchByText(q, lang);
+  // * only a supported language: any other would split the cache without changing the answer
+  const placeLang = LOCALES.includes(lang) ? lang : DEFAULT_LOCALE;
+  return coords ? searchByCoordinates({ ...coords, lang: placeLang }) : searchByText(q, lang);
 }
 
-async function searchByCoordinates(coords: TCoordinates) {
-  const cacheKey = REDIS_STRATEGIES.nearestCity.buildKey(coords);
+async function searchByCoordinates(params: TNearestCityParams) {
+  const cacheKey = REDIS_STRATEGIES.nearestCity.buildKey(params);
   const cached = await RedisClient.get(cacheKey);
   if (cached) {
     logger.info(`[Cities] Cache HIT for key: ${cacheKey}`);
@@ -40,9 +50,7 @@ async function searchByCoordinates(coords: TCoordinates) {
 
   let lookup: TTimedUpstream<TCity | null>;
   try {
-    lookup = await timeUpstream(UPSTREAM_SOURCES.WIKIDATA, () =>
-      WikidataService.findNearestCityByCoordinates(coords.lat, coords.lng),
-    );
+    lookup = await timeUpstream(UPSTREAM_SOURCES.SOLR, () => SolrService.findNearestCity(params));
   } catch (error) {
     logger.error(`[Cities] Reverse geocoding failed: ${String(error)}`);
     return apiErrorResponse(API_ERRORS.REVERSE_GEOCODING_UNAVAILABLE);
@@ -57,11 +65,15 @@ async function searchByCoordinates(coords: TCoordinates) {
 
 async function searchByText(q: string, lang: string) {
   const strategy = REDIS_STRATEGIES.citySearch;
-  const cacheKey = strategy.buildKey({ query: q, lang });
+  const entry = strategy.buildEntry({ query: q, lang });
+  const cacheKey = entry.key;
+  // * a short query is stored briefly and never counts as popular
+  const isShortQuery = q.length < 4;
 
   const cached = await RedisClient.get(cacheKey);
   if (cached) {
     logger.info(`[Cities] Cache HIT for key: ${cacheKey}`);
+    if (!isShortQuery) await PopularityCache.recordHit(entry);
     return cachedJsonResponse(cached, { status: CACHE_STATUS.HIT });
   }
   logger.info(`[Cities] Cache MISS for key: ${cacheKey}`);
@@ -77,19 +89,14 @@ async function searchByText(q: string, lang: string) {
   logger.info(`[Cities] Solr returned ${results.length} results`);
 
   if (results.length > 0) {
-    const isShortQuery = q.length < 4;
-
     if (isShortQuery) {
       await RedisClient.set(cacheKey, results, strategy.shortTtl);
       logger.info(
         `[Cities] Cached ${results.length} results with short TTL ${CACHE_TTL.CITY_SEARCH_SHORT}s`,
       );
     } else {
-      const counterKey = strategy.buildCounterKey({ query: q, lang });
-      const count = await RedisClient.incrementCounter(counterKey, strategy.ttl);
-      const ttl = count >= strategy.popularThreshold ? strategy.popularTtl : strategy.ttl;
-      await RedisClient.set(cacheKey, results, ttl);
-      logger.info(`[Cities] Cached ${results.length} results with TTL ${ttl}s`);
+      await PopularityCache.store(entry, results);
+      logger.info(`[Cities] Cached ${results.length} results`);
     }
   }
 

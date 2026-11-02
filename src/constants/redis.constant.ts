@@ -1,4 +1,4 @@
-import type { TCitySearchParams, TCoordinates } from "@/types";
+import type { TCitySearchParams, TNearestCityParams, TPointCacheParts } from "@/types";
 import { TIME } from "./time.constant";
 
 export const THRESHOLDS = {
@@ -22,8 +22,8 @@ export const CACHE_KEYS = {
   CITY_SEARCH_COUNTER: (dto: TCitySearchParams) =>
     `city-search-counter:${dto.lang}:${dto.query.toLowerCase().trim()}`,
 
-  NEAREST_CITY_SEARCH: (dto: TCoordinates) =>
-    `nearest-city:${dto.lat.toFixed(4)}:${dto.lng.toFixed(4)}`,
+  NEAREST_CITY_SEARCH: (dto: TNearestCityParams) =>
+    `nearest-city:${dto.lang}:${dto.lat.toFixed(4)}:${dto.lng.toFixed(4)}`,
 
   WORLDCLIM_RESOURCE: (searchParams: string) => `worldclim-resource:${searchParams}`,
   WORLDCLIM_RESOURCE_COUNTER: (searchParams: string) =>
@@ -33,6 +33,11 @@ export const CACHE_KEYS = {
     `worldclim-query:${queryId}:${searchParams}`,
   WORLDCLIM_QUERY_COUNTER: (queryId: string, searchParams: string) =>
     `worldclim-query-counter:${queryId}:${searchParams}`,
+
+  WORLDCLIM_POINT: ({ queryId, cell, variant }: TPointCacheParts) =>
+    `worldclim-point:${queryId}:${cell.size}:r${cell.row}c${cell.col}${variant ? `:${variant}` : ""}`,
+  WORLDCLIM_POINT_COUNTER: ({ queryId, cell, variant }: TPointCacheParts) =>
+    `worldclim-point-counter:${queryId}:${cell.size}:r${cell.row}c${cell.col}${variant ? `:${variant}` : ""}`,
 } as const;
 
 /**
