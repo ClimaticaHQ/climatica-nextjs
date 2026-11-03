@@ -64,3 +64,4 @@ export * from "./locale.util";
 export * from "./overlayScroll.util";
 export * from "./overlayBars.util";
 export * from "./entityLabel.util";
+export * from "./info.util";
