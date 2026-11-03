@@ -81,8 +81,6 @@ export type TFilterUnavailabilityChecks = Record<
 export type TFilterNavigationModes = Record<EFilterApplyMode, EFilterNavigation>;
 
 export type TFilterUnavailableLayout = {
-  /** the whole section greys out and ignores input, instead of disabling its controls */
-  isDimmed: boolean;
   /** the explanation goes above the controls instead of below */
   isNoteFirst: boolean;
   noteVariant: EFilterNoteVariant;
