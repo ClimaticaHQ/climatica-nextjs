@@ -1,3 +1,5 @@
+import { env } from "./Env";
+
 export type GlobalConfig = {
   appName: string;
   appVersion: string;
@@ -5,5 +7,6 @@ export type GlobalConfig = {
 
 export const GLOBAL_CONFIG: GlobalConfig = {
   appName: "Climatica",
-  appVersion: "1.0.0",
+  // * package.json's version (next.config inlines it)
+  appVersion: env.NEXT_PUBLIC_APP_VERSION,
 };
