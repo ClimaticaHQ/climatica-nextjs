@@ -24,7 +24,7 @@ import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { FilterNote } from "./FilterSection";
 import { FilterSections } from "./FilterSections";
-import { FILTERS_SHEET_BUTTON_CLASS } from "./filters.constant";
+import { FILTERS_SHEET_BUTTON_CLASS, FILTERS_SHEET_TEXT_CLASS } from "./filters.constant";
 import { FILTER_SECTION_COMPONENTS } from "./FilterSections";
 import { FilterSectionTitleContext, FilterUnavailableActionsContext } from "./filters.context";
 import type {
@@ -164,11 +164,7 @@ function getUnavailableInfoContent({ props, t }: TFiltersSheetContentArgs): TFil
         </Button>
       </div>
     ),
-    body: (
-      <p className="text-[length:var(--font-base)] text-[var(--color-text-secondary)]">
-        {t("chart.walterLiethFiltersExplanation")}
-      </p>
-    ),
+    body: <p className={FILTERS_SHEET_TEXT_CLASS}>{t("chart.walterLiethFiltersExplanation")}</p>,
   };
 }
 

@@ -2,7 +2,7 @@
 
 import { Chip } from "@/components/UI/Chip";
 import { DATASETS } from "@/constants";
-import { EFilterKey } from "@/enums";
+import { EFilterKey, ETextScale } from "@/enums";
 import { useTranslations } from "next-intl";
 import { FilterSection } from "../FilterSection";
 import type { TFilterSectionRenderProps } from "../filters.type";
@@ -15,6 +15,7 @@ export function DatasetFilter({ values, onChange }: TFilterSectionRenderProps) {
       <div className="flex flex-wrap gap-2">
         {Object.values(DATASETS).map((dataset) => (
           <Chip
+            textScale={ETextScale.TOUCH}
             key={dataset}
             label={t(`sidebar.datasets.${dataset}`)}
             isActive={values.dataset === dataset}
