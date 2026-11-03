@@ -26,3 +26,6 @@ export { useScrollEdges } from "./useScrollEdges";
 export { useUnitLabels } from "./useUnitLabels";
 export { useThemeSync } from "./useThemeSync";
 export { useIsTruncated } from "./useIsTruncated";
+export { useCopyToClipboard } from "./useCopyToClipboard";
+export { useActiveSection } from "./useActiveSection";
+export { useGridArcLabel } from "./useGridArcLabel";

@@ -38,7 +38,9 @@ export function useFocusTrap({ containerRef, isActive }: TFocusTrapOptions) {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      if (trigger?.isConnected) trigger.focus();
+      // * without scrolling: the trigger was in view when it opened the sheet, and a move made
+      // * from the sheet (the Info Contents jumping to a section) must not be undone
+      if (trigger?.isConnected) trigger.focus({ preventScroll: true });
     };
   }, [isActive, containerRef]);
 }
