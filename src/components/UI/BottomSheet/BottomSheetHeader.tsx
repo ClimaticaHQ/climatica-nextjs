@@ -13,7 +13,7 @@ export function BottomSheetHeader({ title, titleId, onClose }: TBottomSheetHeade
     <div className="flex items-center justify-between gap-3 px-4 pb-3">
       <h2
         id={titleId}
-        className="text-[length:var(--font-base)] font-semibold text-[var(--color-text)]"
+        className="text-[length:var(--font-base)] font-semibold text-[var(--color-text)] max-lg:text-[length:var(--font-touch-title)]"
       >
         {title}
       </h2>

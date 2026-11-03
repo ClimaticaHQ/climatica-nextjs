@@ -3,6 +3,7 @@ export { Button } from "./Button";
 export { ChartSkeleton } from "./ChartSkeleton";
 export { Chip } from "./Chip";
 export { DotLabel } from "./DotLabel/DotLabel";
+export { Disclosure } from "./Disclosure";
 export { Dropdown } from "./Dropdown";
 export { MapSkeleton } from "./MapSkeleton";
 export { ExportMenu } from "./ExportMenu";

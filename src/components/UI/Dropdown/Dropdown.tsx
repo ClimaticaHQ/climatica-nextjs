@@ -51,7 +51,7 @@ export default function Dropdown({
           ${isStretched ? "w-full justify-between" : ""}
           flex items-center gap-2 px-3 py-1.5
           ${FORM_CONTROL_CLASSES.FRAME} ${FORM_CONTROL_CLASSES.BORDER_COLOR} ${FORM_CONTROL_CLASSES.HOVER}
-          text-[length:var(--font-base)] md:text-[length:var(--font-sm)]
+          text-[length:var(--font-touch-body)] lg:text-[length:var(--font-sm)]
           text-[var(--color-text-secondary)]
           transition-colors duration-150
         `}
@@ -96,7 +96,7 @@ export default function Dropdown({
             }}
             className={`
               block w-full text-left px-3 py-2
-              text-[length:var(--font-base)]
+              text-[length:var(--font-base)] max-lg:text-[length:var(--font-touch-body)]
               transition-colors duration-100
               ${
                 option.disabled
@@ -117,7 +117,7 @@ export default function Dropdown({
             {option.description !== undefined && (
               <span
                 id={`${buttonId}-${option.value}-desc`}
-                className="block text-[length:var(--font-xs)] text-[var(--color-text-secondary)]"
+                className="block text-[length:var(--font-xs)] text-[var(--color-text-secondary)] max-lg:text-[length:var(--font-touch-secondary)]"
               >
                 {option.description}
               </span>
