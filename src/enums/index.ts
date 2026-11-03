@@ -20,3 +20,5 @@ export * from "./citySlot.enum";
 export * from "./badge.enum";
 export * from "./popover.enum";
 export * from "./sortOrder.enum";
+export * from "./copyStatus.enum";
+export * from "./textScale.enum";
