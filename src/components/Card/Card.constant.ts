@@ -5,6 +5,7 @@ export const CARD_FRAME_CLASS = "border border-[var(--color-border)]";
 export const CARD_BACKGROUND_CLASSES: Record<ECardBackground, string> = {
   [ECardBackground.DEFAULT]: "bg-[var(--color-surface)]",
   [ECardBackground.MUTED]: "bg-[var(--color-surface-secondary)]",
+  [ECardBackground.HIGHLIGHT]: "bg-[var(--color-primary-muted)]",
 };
 
 export const CARD_SIZE_CLASSES: Record<ECardSize, string> = {
