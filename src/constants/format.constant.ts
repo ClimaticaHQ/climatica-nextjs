@@ -22,6 +22,10 @@ export const DISPLAY_PRECISION: Record<EDisplayMetric, TDisplayPrecision> = {
   [EDisplayMetric.HEATMAP_COORDINATE]: { digits: 3, hasGrouping: false },
   [EDisplayMetric.CHART_TOOLTIP_VALUE]: { digits: 2, hasGrouping: false },
   [EDisplayMetric.WALTER_LIETH_TOOLTIP_VALUE]: { digits: 1, hasGrouping: false },
+  [EDisplayMetric.COUNT]: { digits: 0, hasGrouping: false },
+  [EDisplayMetric.CELL_SIZE_KM]: { digits: 1, hasGrouping: false },
+  [EDisplayMetric.ARC_MINUTES]: { digits: 1, hasGrouping: false },
+  [EDisplayMetric.ARC_SECONDS]: { digits: 0, hasGrouping: false },
 };
 
 // * the metric each chart variable is shown as

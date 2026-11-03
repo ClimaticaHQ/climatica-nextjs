@@ -5,4 +5,7 @@ export const ROUTES = {
   COMPARE_PERIODS: "/compare-periods",
   HEAT_MAP: "/heat-map",
   SETTINGS: "/settings",
+  ABOUT: "/about",
+  ABOUT_GUIDE: "/about/guide",
+  ABOUT_DATA: "/about/data",
 } as const;
