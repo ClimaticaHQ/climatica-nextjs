@@ -1,7 +1,8 @@
 {
   "navbar": {
     "toggleMenu": "Abrir ou fechar o menu",
-    "settings": "Definições"
+    "settings": "Definições",
+    "about": "Sobre"
   },
   "pages": {
     "climateStatistics": {
@@ -30,7 +31,7 @@
     "coordsResult": "Ir para as coordenadas"
   },
   "climateStatistics": {
-    "cellResolution": "Resolução da célula:",
+    "cellResolution": "Resolução da célula",
     "stats": {
       "avgTmax": "Temp. máx. média",
       "avgTmin": "Temp. mín. média",
@@ -229,10 +230,10 @@
     "gridCell": "Célula da grelha: {size}"
   },
   "cellSizes": {
-    "10m": "10 min (~324 km2)",
-    "5m": "5 min (~81 km2)",
-    "2_5m": "2.5 min (~20.25 km2)",
-    "30s": "30 seg (~1 km2)",
+    "10m": "10 min (~324 km²)",
+    "5m": "5 min (~81 km²)",
+    "2_5m": "2.5 min (~20.25 km²)",
+    "30s": "30 seg (~1 km²)",
     "onlyForPeriod": "Apenas para Clima {period}"
   },
   "cellSizesShort": {
@@ -256,12 +257,14 @@
       "value": "{name}: {value}",
       "variablesCount": "{count, plural, one {# variável} other {# variáveis}}",
       "allMonths": "Todos os meses",
-      "monthsCount": "{count, plural, one {# mês} other {# meses}}"
+      "monthsCount": "{count, plural, one {# mês} other {# meses}}",
+      "unavailable": "{name}: {reason}. Ver porquê"
     },
     "sheet": {
       "apply": "Aplicar",
       "reset": "Repor"
-    }
+    },
+    "resolutionHelp": "O que significam as resoluções?"
   },
   "validation": {
     "year": {
@@ -438,6 +441,233 @@
     },
     "hints": {
       "turnOnAnimations": "Ative as animações para escolher um destaque"
+    }
+  },
+  "info": {
+    "externalLink": "(abre num novo separador)",
+    "nav": {
+      "label": "Páginas informativas",
+      "about": "Sobre",
+      "guide": "Guia de utilização",
+      "data": "Dados e métodos",
+      "contents": "Índice",
+      "breadcrumb": "Está aqui"
+    },
+    "pages": {
+      "about": {
+        "title": "Sobre o Climatica",
+        "description": "Dados climáticos para qualquer lugar da Terra, sem software SIG."
+      },
+      "guide": {
+        "title": "Guia de utilização",
+        "description": "Como encontrar um local, ler os diagramas, comparar, filtrar e exportar."
+      },
+      "data": {
+        "title": "Dados e métodos",
+        "description": "De onde vêm os valores, o que descrevem e como são calculados os indicadores."
+      }
+    },
+    "sections": {
+      "howItWorks": "Como funciona",
+      "dataSources": "Fontes de dados",
+      "team": "Equipa",
+      "sourceCode": "Código-fonte e versões",
+      "cite": "Como citar",
+      "privacy": "Privacidade",
+      "findPlace": "Encontrar um local",
+      "walterLieth": "Ler um diagrama de Walter-Lieth",
+      "compare": "Comparar locais e períodos",
+      "filters": "Filtros",
+      "export": "Exportar e partilhar",
+      "questions": "Perguntas",
+      "cellValues": "O que descreve um valor",
+      "resolutions": "Resoluções espaciais",
+      "periods": "Períodos e variáveis",
+      "indicators": "Indicadores climáticos",
+      "references": "Referências"
+    },
+    "about": {
+      "hero": {
+        "description": "O Climatica transforma o arquivo WorldClim em diagramas de Walter-Lieth, gráficos e mapas. Escolha qualquer ponto em terra para ver as suas normais climáticas ou o tempo de um único ano, compare dois locais ou dois períodos e cartografe uma região inteira. Sem conta e sem nada para instalar.",
+        "openCityClimate": "Abrir Clima da Cidade",
+        "readGuide": "Ler o guia de utilização"
+      },
+      "facts": {
+        "resolutions": "Resoluções espaciais",
+        "resolutionsRange": "De {finest} a {coarsest}",
+        "normals": "Normais climáticas",
+        "normalsRange": "De {first} a {last}",
+        "weatherYears": "Anos de dados de tempo",
+        "weatherYearsCount": "{count} anos de dados mensais",
+        "languages": "Idiomas da interface"
+      },
+      "howItWorks": {
+        "intro": "Cada valor no ecrã percorre o mesmo caminho, de um arquivo global de rasters até ao seu navegador.",
+        "steps": {
+          "archive": {
+            "label": "Fonte",
+            "title": "Arquivo WorldClim",
+            "text": "Rasters mensais globais de temperatura e precipitação: normais climáticas de 30 anos e tempo anual obtido por redução de escala do CRU TS."
+          },
+          "scrapi": {
+            "label": "Serviço",
+            "title": "SCRAPI",
+            "text": "Uma API da {university} que responde a perguntas sobre os rasters: os valores de uma célula, de um retângulo ou de um polígono."
+          },
+          "climatica": {
+            "label": "Interface",
+            "title": "Climatica",
+            "text": "Pede ao SCRAPI as células que escolhe e desenha-as como diagramas, tabelas e mapas, guardando as respostas em cache para que as perguntas repetidas sejam rápidas."
+          }
+        }
+      },
+      "sources": {
+        "intro": "O Climatica não guarda dados climáticos próprios. Os valores, os nomes de locais e os mapas vêm destas fontes.",
+        "scrapi": {
+          "text": "O SCRAPI é a API de onde o Climatica lê cada valor. Publica os rasters do WorldClim como dados ligados e responde a consultas sobre pontos, regiões e metadados.",
+          "author": "Criado por {author}",
+          "docs": "Ler a documentação do SCRAPI"
+        },
+        "worldclim": "Superfícies climáticas globais de alta resolução: as normais climáticas e o tempo mensal com redução de escala.",
+        "cruTs": "As observações mensais em grelha da Climatic Research Unit, a partir das quais o tempo anual do WorldClim é obtido por redução de escala.",
+        "geonames": "O índice geográfico por trás da pesquisa de cidades: nomes de locais em muitos idiomas, coordenadas e populações.",
+        "osm": "O mapa de base de todos os mapas do Climatica.",
+        "visit": "Visitar {name}"
+      },
+      "team": {
+        "roles": {
+          "development": "Design e desenvolvimento",
+          "supervisionScrapi": "Supervisão; autor do SCRAPI",
+          "supervision": "Supervisão",
+          "forestManagement": "Especialista em gestão florestal",
+          "designAdvice": "Aconselhamento em design e desenvolvimento"
+        }
+      },
+      "code": {
+        "version": "Versão",
+        "licence": "Licença",
+        "stack": "Feito com",
+        "repository": "Código-fonte no GitHub",
+        "changelog": "Registo de alterações"
+      },
+      "cite": {
+        "intro": "Se o Climatica for útil no seu trabalho, cite:",
+        "copyCitation": "Copiar citação",
+        "copyBibtex": "Copiar BibTeX",
+        "copied": "Copiado para a área de transferência",
+        "failed": "Não foi possível copiar. Selecione o texto e copie-o manualmente."
+      },
+      "privacy": {
+        "account": "Não é preciso conta e nada o identifica.",
+        "storage": "As suas definições e locais recentes ficam no armazenamento deste navegador, e o idioma num cookie. Apagar os dados do site repõe-nos.",
+        "location": "«Usar a minha localização» pede a sua posição ao navegador apenas quando o prime, e envia só as coordenadas, para obter os respetivos dados.",
+        "tracking": "O Climatica não usa análises, publicidade nem rastreamento."
+      }
+    },
+    "guide": {
+      "findPlace": {
+        "intro": "Clima da Cidade, Comparar Cidades e Comparar Períodos partem de um local. Há quatro formas de o escolher.",
+        "ways": {
+          "name": {
+            "title": "Pesquisar pelo nome",
+            "text": "Escreva uma cidade ou localidade no campo de pesquisa e escolha-a na lista. Os nomes funcionam em muitos idiomas."
+          },
+          "coordinates": {
+            "title": "Escrever coordenadas",
+            "text": "Introduza a latitude e a longitude, por exemplo 46.4907, 11.3398, e escolha «Ir para as coordenadas». A etiqueta indica a localidade mais próxima."
+          },
+          "map": {
+            "title": "Clicar no mapa",
+            "text": "Clique em qualquer ponto em terra. Os dados são desse ponto exato; a etiqueta indica a localidade mais próxima."
+          },
+          "location": {
+            "title": "Usar a minha localização",
+            "text": "A posição do seu navegador, se a permitir. Os dados são do sítio onde está; a etiqueta indica a localidade mais próxima."
+          }
+        }
+      },
+      "walterLieth": {
+        "intro": "Um diagrama de Walter-Lieth mostra o ano de um local num relance: as curvas de temperatura e de precipitação, e as áreas entre elas que distinguem os meses húmidos dos áridos.",
+        "scale": "As duas curvas partilham um eixo com escala fixa, 1 °C para {ratio} mm, pelo que um mês cuja curva de precipitação fica abaixo da de temperatura é árido. Acima de {breakpoint} mm, a precipitação é comprimida {compression} vezes para que os meses muito chuvosos ainda caibam."
+      },
+      "compare": {
+        "cities": "Dois locais lado a lado, para o mesmo período ou ano: a tabela de estatísticas, os dois diagramas e a diferença entre eles.",
+        "periods": "Um local ao longo de normais climáticas ou anos de dados de tempo, para ver como o seu clima mudou.",
+        "layouts": {
+          "split": "Lado a lado: cada série no seu próprio painel. Expanda um a todo o cartão quando precisar de detalhe.",
+          "overlay": "Sobreposto: as séries num só diagrama, distinguidas pela forma dos marcadores, com uma delas sombreada."
+        }
+      },
+      "filters": {
+        "sidebar": "Os filtros (conjunto de dados, período ou ano, variáveis, resolução e meses) estão na barra lateral em ecrãs largos e atrás do chip «Filtros» no telemóvel. Altere-os e prima «{apply}».",
+        "autoApply": "Nas Definições pode aplicar os filtros à medida que os altera e manter o local e os filtros sincronizados entre páginas."
+      },
+      "export": {
+        "intro": "O menu de exportação acima de cada gráfico guarda o que vê:",
+        "share": "Cada página guarda no endereço o local, os filtros e a vista, por isso copiar o URL partilha exatamente essa vista. As imagens exportadas também levam a ligação."
+      },
+      "questions": {
+        "resolution": {
+          "question": "Porque mudam os valores quando mudo a resolução?",
+          "answer": "Cada valor descreve toda a célula da grelha à volta do seu ponto, e uma célula mais grosseira abrange mais terreno, muitas vezes com outras altitudes e paisagens. A mudança é esperada. <link>Veja em que diferem as resoluções</link>."
+        },
+        "elevation": {
+          "question": "Porque é que a altitude difere da altitude oficial do local?",
+          "answer": "É a altitude média da célula, não a do centro de uma localidade nem a de uma estação meteorológica. Em vales e encostas, uma célula pode estar centenas de metros acima ou abaixo da localidade; uma resolução mais fina aproxima-se mais."
+        },
+        "thirtySeconds": {
+          "question": "Porque é que {finest} não está disponível para todos os períodos?",
+          "answer": "O WorldClim publica rasters de {finest} apenas para as normais climáticas {period}. As outras normais e os anos de dados de tempo vão até {fallback}."
+        }
+      }
+    },
+    "data": {
+      "cell": {
+        "whole": "Cada valor que o Climatica mostra pertence à célula do raster que contém o seu ponto, não ao ponto em si. O mapa contorna essa célula.",
+        "mixed": "Uma célula grosseira pode abranger o fundo de um vale e as encostas acima dele, ou uma costa e o interior. O seu valor é a média de tudo isso e pode não descrever exatamente nenhuma das partes.",
+        "example": "Bolzano (normal {period}) mostra-o bem. A cidade fica num vale alpino, a cerca de {valleyElevation} m. A {coarseGrid}, a sua célula abrange também as encostas: altitude média {coarseElevation} m, temperatura média anual {coarseTemperature} °C. A {fineGrid}, a célula contém só o fundo do vale: {fineElevation} m e {fineTemperature} °C.",
+        "illustrationLabel": "Esquema de duas células que contêm o mesmo ponto. {coarse}: a célula grande, entre as vizinhas. {fine}: a célula pequena dentro dela, com o ponto.",
+        "illustrationCaption": "Células que contêm o mesmo ponto em duas resoluções (esquema, tamanhos no equador).",
+        "calloutTitle": "Os valores mudam com a resolução — é o esperado.",
+        "calloutText": "Escolha a resolução mais fina disponível para o seu período para descrever um local concreto.",
+        "cellLabel": "Célula de {size} (~{km} km)"
+      },
+      "resolutions": {
+        "intro": "As grelhas do WorldClim medem-se em minutos e segundos de arco. Uma célula é quase quadrada no equador e estreita-se em direção aos polos.",
+        "caption": "Resoluções espaciais, tamanho das células e disponibilidade",
+        "resolution": "Resolução",
+        "cellSize": "Célula no equador",
+        "availability": "Disponível para",
+        "km": "≈ {value} km",
+        "everywhere": "Todas as normais climáticas e todos os anos de dados de tempo",
+        "onlyFor": "Só a normal climática {periods}"
+      },
+      "periods": {
+        "climateIntro": "Médias de 30 anos de cada mês (normais climáticas):",
+        "fromWorldClim": "a normal do WorldClim 2.1",
+        "averaged": "média dos dados anuais de tempo",
+        "climateVariables": "Variáveis: {variables}. {restricted} só para {period}.",
+        "weatherIntro": "Os valores mensais de cada ano, {first}–{last}: CRU TS com redução de escala pelo WorldClim.",
+        "weatherVariables": "Variáveis: {variables}."
+      },
+      "indicators": {
+        "intro": "O Climatica calcula três indicadores a partir dos valores mensais. T é a temperatura média de um mês (a média da máxima e da mínima), P a sua precipitação.",
+        "arid": {
+          "title": "Mês árido",
+          "text": "Precipitação inferior ao dobro da temperatura média: a curva de precipitação abaixo da de temperatura num diagrama de Walter-Lieth. Um mês exatamente com P = 2T conta como húmido."
+        },
+        "frost": {
+          "title": "Mês de geada",
+          "text": "Uma temperatura mínima média abaixo de 0 °C, assinalada pela faixa de geada por baixo do diagrama."
+        },
+        "martonne": {
+          "title": "Índice de aridez de De Martonne",
+          "text": "Precipitação anual (mm) dividida pela temperatura média anual mais 10 °C; quanto mais baixo, mais seco. Não está definido onde a temperatura média anual é de −10 °C ou menos."
+        }
+      }
+    },
+    "footer": {
+      "researchGroup": "Grupo de investigação {group}"
     }
   }
 }

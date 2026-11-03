@@ -1,7 +1,8 @@
 {
   "navbar": {
     "toggleMenu": "Comută meniul",
-    "settings": "Setări"
+    "settings": "Setări",
+    "about": "Despre"
   },
   "pages": {
     "climateStatistics": {
@@ -30,7 +31,7 @@
     "coordsResult": "Mergi la coordonate"
   },
   "climateStatistics": {
-    "cellResolution": "Rezoluția celulei:",
+    "cellResolution": "Rezoluția celulei",
     "stats": {
       "avgTmax": "Temp. max. medie",
       "avgTmin": "Temp. min. medie",
@@ -256,12 +257,14 @@
       "value": "{name}: {value}",
       "variablesCount": "{count, plural, one {# variabilă} few {# variabile} other {# de variabile}}",
       "allMonths": "Toate lunile",
-      "monthsCount": "{count, plural, one {# lună} few {# luni} other {# de luni}}"
+      "monthsCount": "{count, plural, one {# lună} few {# luni} other {# de luni}}",
+      "unavailable": "{name}: {reason}. Vezi de ce"
     },
     "sheet": {
       "apply": "Aplică",
       "reset": "Resetează"
-    }
+    },
+    "resolutionHelp": "Ce înseamnă rezoluțiile?"
   },
   "validation": {
     "year": {
@@ -438,6 +441,233 @@
     },
     "hints": {
       "turnOnAnimations": "Pornește animațiile ca să alegi o evidențiere"
+    }
+  },
+  "info": {
+    "externalLink": "(se deschide într-o filă nouă)",
+    "nav": {
+      "label": "Pagini de informare",
+      "about": "Despre",
+      "guide": "Ghid de utilizare",
+      "data": "Date și metode",
+      "contents": "Cuprins",
+      "breadcrumb": "Te afli aici"
+    },
+    "pages": {
+      "about": {
+        "title": "Despre Climatica",
+        "description": "Date climatice pentru orice loc de pe Pământ, fără software GIS."
+      },
+      "guide": {
+        "title": "Ghid de utilizare",
+        "description": "Cum găsești un loc, cum citești diagramele, cum compari, filtrezi și exporți."
+      },
+      "data": {
+        "title": "Date și metode",
+        "description": "De unde provin valorile, ce descriu și cum se calculează indicatorii."
+      }
+    },
+    "sections": {
+      "howItWorks": "Cum funcționează",
+      "dataSources": "Surse de date",
+      "team": "Echipa",
+      "sourceCode": "Cod sursă și versiuni",
+      "cite": "Cum se citează",
+      "privacy": "Confidențialitate",
+      "findPlace": "Găsește un loc",
+      "walterLieth": "Citește o diagramă Walter-Lieth",
+      "compare": "Compară locuri și perioade",
+      "filters": "Filtre",
+      "export": "Exportă și distribuie",
+      "questions": "Întrebări",
+      "cellValues": "Ce descrie o valoare",
+      "resolutions": "Rezoluții spațiale",
+      "periods": "Perioade și variabile",
+      "indicators": "Indicatori climatici",
+      "references": "Bibliografie"
+    },
+    "about": {
+      "hero": {
+        "description": "Climatica transformă arhiva WorldClim în diagrame Walter-Lieth, grafice și hărți. Alege orice punct de pe uscat pentru a-i vedea normalele climatice sau vremea dintr-un singur an, compară două locuri sau două perioade și cartografiază o regiune întreagă. Fără cont, fără nimic de instalat.",
+        "openCityClimate": "Deschide Clima orașului",
+        "readGuide": "Citește ghidul de utilizare"
+      },
+      "facts": {
+        "resolutions": "Rezoluții spațiale",
+        "resolutionsRange": "De la {finest} la {coarsest}",
+        "normals": "Normale climatice",
+        "normalsRange": "De la {first} la {last}",
+        "weatherYears": "Ani de date meteo",
+        "weatherYearsCount": "{count} de ani de date lunare",
+        "languages": "Limbi ale interfeței"
+      },
+      "howItWorks": {
+        "intro": "Fiecare valoare de pe ecran parcurge același drum, de la o arhivă globală de rastere până în browserul tău.",
+        "steps": {
+          "archive": {
+            "label": "Sursă",
+            "title": "Arhiva WorldClim",
+            "text": "Rastere lunare globale de temperatură și precipitații: normale climatice pe 30 de ani și vremea anuală obținută prin reducerea la scară a datelor CRU TS."
+          },
+          "scrapi": {
+            "label": "Serviciu",
+            "title": "SCRAPI",
+            "text": "Un API de la {university} care răspunde la întrebări despre rastere: valorile unei celule, ale unui dreptunghi sau ale unui poligon."
+          },
+          "climatica": {
+            "label": "Interfață",
+            "title": "Climatica",
+            "text": "Cere de la SCRAPI celulele pe care le alegi și le desenează ca diagrame, tabele și hărți, păstrând răspunsurile în cache ca întrebările repetate să fie rapide."
+          }
+        }
+      },
+      "sources": {
+        "intro": "Climatica nu păstrează date climatice proprii. Valorile, numele locurilor și hărțile provin din aceste surse.",
+        "scrapi": {
+          "text": "SCRAPI este API-ul din care Climatica citește fiecare valoare. Publică rasterele WorldClim ca date legate și răspunde la interogări despre puncte, regiuni și metadate.",
+          "author": "Creat de {author}",
+          "docs": "Citește documentația SCRAPI"
+        },
+        "worldclim": "Suprafețe climatice globale de înaltă rezoluție: normalele climatice și vremea lunară redusă la scară.",
+        "cruTs": "Observațiile lunare în grilă ale Climatic Research Unit, din care este redusă la scară vremea anuală WorldClim.",
+        "geonames": "Indexul geografic din spatele căutării de orașe: nume de locuri în multe limbi, coordonate și populații.",
+        "osm": "Harta de bază de sub fiecare hartă din Climatica.",
+        "visit": "Vizitează {name}"
+      },
+      "team": {
+        "roles": {
+          "development": "Design și dezvoltare",
+          "supervisionScrapi": "Coordonare; autorul SCRAPI",
+          "supervision": "Coordonare",
+          "forestManagement": "Expertiză în gestionarea pădurilor",
+          "designAdvice": "Consultanță pentru design și dezvoltare"
+        }
+      },
+      "code": {
+        "version": "Versiune",
+        "licence": "Licență",
+        "stack": "Realizat cu",
+        "repository": "Codul sursă pe GitHub",
+        "changelog": "Istoricul modificărilor"
+      },
+      "cite": {
+        "intro": "Dacă Climatica îți este de folos în lucrările tale, te rugăm să citezi:",
+        "copyCitation": "Copiază citarea",
+        "copyBibtex": "Copiază BibTeX",
+        "copied": "Copiat în clipboard",
+        "failed": "Nu s-a putut copia. Selectează textul și copiază-l manual."
+      },
+      "privacy": {
+        "account": "Nu ai nevoie de cont și nimic nu te identifică.",
+        "storage": "Setările tale și locurile recente rămân în spațiul de stocare al acestui browser, iar limba într-un cookie. Ștergerea datelor site-ului le resetează.",
+        "location": "„Folosește locația mea” îi cere browserului poziția ta doar când apeși, și trimite doar coordonatele, pentru a obține datele lor.",
+        "tracking": "Climatica nu folosește analiză de trafic, reclame sau urmărire."
+      }
+    },
+    "guide": {
+      "findPlace": {
+        "intro": "Clima orașului, Compară orașe și Compară perioade pornesc de la un loc. Există patru moduri de a-l alege.",
+        "ways": {
+          "name": {
+            "title": "Caută după nume",
+            "text": "Scrie un oraș sau o localitate în câmpul de căutare și alege-o din listă. Numele funcționează în multe limbi."
+          },
+          "coordinates": {
+            "title": "Introdu coordonate",
+            "text": "Introdu latitudinea și longitudinea, de exemplu 46.4907, 11.3398, și alege „Mergi la coordonate”. Eticheta numește cea mai apropiată localitate."
+          },
+          "map": {
+            "title": "Dă clic pe hartă",
+            "text": "Dă clic oriunde pe uscat. Datele sunt pentru exact acel punct; eticheta numește cea mai apropiată localitate."
+          },
+          "location": {
+            "title": "Folosește locația mea",
+            "text": "Poziția browserului tău, dacă o permiți. Datele sunt pentru locul în care te afli; eticheta numește cea mai apropiată localitate."
+          }
+        }
+      },
+      "walterLieth": {
+        "intro": "O diagramă Walter-Lieth arată dintr-o privire anul unui loc: curbele de temperatură și de precipitații și suprafețele dintre ele, care deosebesc lunile umede de cele aride.",
+        "scale": "Cele două curbe împart o axă cu scară fixă, 1 °C la {ratio} mm, așa că o lună în care curba precipitațiilor coboară sub cea a temperaturii este aridă. Peste {breakpoint} mm, precipitațiile sunt comprimate de {compression} ori, ca lunile foarte ploioase să încapă în diagramă."
+      },
+      "compare": {
+        "cities": "Două locuri unul lângă altul, pentru aceeași perioadă sau același an: tabelul de statistici, ambele diagrame și diferența dintre ele.",
+        "periods": "Un loc de-a lungul normalelor climatice sau al anilor de date meteo, ca să vezi cum s-a schimbat clima sa.",
+        "layouts": {
+          "split": "Alăturat: fiecare serie în propriul panou. Extinde unul pe tot cardul când ai nevoie de detalii.",
+          "overlay": "Suprapus: seriile într-o singură diagramă, deosebite prin forma marcajelor, una dintre ele hașurată."
+        }
+      },
+      "filters": {
+        "sidebar": "Filtrele (setul de date, perioada sau anul, variabilele, rezoluția și lunile) se află în bara laterală pe ecranele late și în spatele butonului „Filtre” pe telefon. Modifică-le, apoi apasă „{apply}”.",
+        "autoApply": "În Setări poți aplica filtrele pe măsură ce le schimbi și poți păstra locul și filtrele sincronizate între pagini."
+      },
+      "export": {
+        "intro": "Meniul de export de deasupra fiecărui grafic salvează ce vezi:",
+        "share": "Fiecare pagină păstrează în adresă locul, filtrele și vizualizarea, așa că, dacă copiezi URL-ul, distribui exact acea vizualizare. Imaginile exportate conțin și ele linkul."
+      },
+      "questions": {
+        "resolution": {
+          "question": "De ce se schimbă valorile când schimb rezoluția?",
+          "answer": "Fiecare valoare descrie întreaga celulă a grilei din jurul punctului tău, iar o celulă mai mare acoperă mai mult teren, adesea cu alte altitudini și peisaje. Schimbarea este de așteptat. <link>Vezi prin ce diferă rezoluțiile</link>."
+        },
+        "elevation": {
+          "question": "De ce diferă altitudinea de altitudinea oficială a locului?",
+          "answer": "Este altitudinea medie a celulei, nu cea a centrului unei localități sau a unei stații meteo. În văi și pe versanți, o celulă poate fi cu sute de metri mai sus sau mai jos decât localitatea; o rezoluție mai fină se apropie mai mult."
+        },
+        "thirtySeconds": {
+          "question": "De ce {finest} nu este disponibil pentru fiecare perioadă?",
+          "answer": "WorldClim publică rastere la {finest} doar pentru normalele climatice {period}. Celelalte normale și anii de date meteo merg până la {fallback}."
+        }
+      }
+    },
+    "data": {
+      "cell": {
+        "whole": "Fiecare valoare afișată de Climatica aparține celulei rasterului care conține punctul tău, nu punctului în sine. Harta conturează acea celulă.",
+        "mixed": "O celulă mare poate cuprinde fundul unei văi și versanții de deasupra, sau o coastă și uscatul din spatele ei. Valoarea ei este media lor și poate să nu descrie exact niciuna dintre ele.",
+        "example": "Bolzano (normala {period}) arată bine acest lucru. Orașul se află într-o vale alpină, la circa {valleyElevation} m. La {coarseGrid}, celula sa cuprinde și versanții: altitudine medie {coarseElevation} m, temperatură medie anuală {coarseTemperature} °C. La {fineGrid}, celula conține doar fundul văii: {fineElevation} m și {fineTemperature} °C.",
+        "illustrationLabel": "Schema a două celule care conțin același punct. {coarse}: celula mare, printre vecinele ei. {fine}: celula mică din interiorul ei, cu punctul.",
+        "illustrationCaption": "Celulele care conțin același punct la două rezoluții (schemă, dimensiuni la ecuator).",
+        "calloutTitle": "Valorile se schimbă odată cu rezoluția — este de așteptat.",
+        "calloutText": "Alege cea mai fină rezoluție disponibilă pentru perioada ta ca să descrii un loc anume.",
+        "cellLabel": "Celulă de {size} (~{km} km)"
+      },
+      "resolutions": {
+        "intro": "Grilele WorldClim se măsoară în minute și secunde de arc. O celulă este aproape pătrată la ecuator și se îngustează spre poli.",
+        "caption": "Rezoluții spațiale, dimensiunea celulelor și disponibilitatea",
+        "resolution": "Rezoluție",
+        "cellSize": "Celula la ecuator",
+        "availability": "Disponibilă pentru",
+        "km": "≈ {value} km",
+        "everywhere": "Toate normalele climatice și toți anii de date meteo",
+        "onlyFor": "Doar normala climatică {periods}"
+      },
+      "periods": {
+        "climateIntro": "Medii pe 30 de ani ale fiecărei luni (normale climatice):",
+        "fromWorldClim": "normala WorldClim 2.1",
+        "averaged": "mediată din datele meteo anuale",
+        "climateVariables": "Variabile: {variables}. {restricted} doar pentru {period}.",
+        "weatherIntro": "Valorile lunare ale fiecărui an, {first}–{last}: CRU TS redus la scară de WorldClim.",
+        "weatherVariables": "Variabile: {variables}."
+      },
+      "indicators": {
+        "intro": "Climatica calculează trei indicatori din valorile lunare. T este temperatura medie a unei luni (media dintre maximă și minimă), iar P precipitațiile ei.",
+        "arid": {
+          "title": "Lună aridă",
+          "text": "Precipitații sub dublul temperaturii medii: curba precipitațiilor sub cea a temperaturii într-o diagramă Walter-Lieth. O lună cu exact P = 2T este considerată umedă."
+        },
+        "frost": {
+          "title": "Lună cu îngheț",
+          "text": "O temperatură minimă medie sub 0 °C, marcată de banda de îngheț de sub diagramă."
+        },
+        "martonne": {
+          "title": "Indicele de ariditate De Martonne",
+          "text": "Precipitațiile anuale (mm) împărțite la temperatura medie anuală plus 10 °C; cu cât e mai mic, cu atât e mai uscat. Nu este definit acolo unde temperatura medie anuală este de −10 °C sau mai puțin."
+        }
+      }
+    },
+    "footer": {
+      "researchGroup": "Grupul de cercetare {group}"
     }
   }
 }

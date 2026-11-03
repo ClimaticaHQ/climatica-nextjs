@@ -1,7 +1,8 @@
 {
   "navbar": {
     "toggleMenu": "Menü öffnen oder schließen",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "about": "Über"
   },
   "pages": {
     "climateStatistics": {
@@ -30,7 +31,7 @@
     "coordsResult": "Zu den Koordinaten gehen"
   },
   "climateStatistics": {
-    "cellResolution": "Zellauflösung:",
+    "cellResolution": "Zellauflösung",
     "stats": {
       "avgTmax": "Ø Max.-Temp.",
       "avgTmin": "Ø Min.-Temp.",
@@ -229,10 +230,10 @@
     "gridCell": "Rasterzelle: {size}"
   },
   "cellSizes": {
-    "10m": "10 Min (~324 km2)",
-    "5m": "5 Min (~81 km2)",
-    "2_5m": "2.5 Min (~20.25 km2)",
-    "30s": "30 Sek (~1 km2)",
+    "10m": "10 Min (~324 km²)",
+    "5m": "5 Min (~81 km²)",
+    "2_5m": "2.5 Min (~20.25 km²)",
+    "30s": "30 Sek (~1 km²)",
     "onlyForPeriod": "Nur für Klima {period}"
   },
   "cellSizesShort": {
@@ -256,12 +257,14 @@
       "value": "{name}: {value}",
       "variablesCount": "{count, plural, one {# Variable} other {# Variablen}}",
       "allMonths": "Alle Monate",
-      "monthsCount": "{count, plural, one {# Monat} other {# Monate}}"
+      "monthsCount": "{count, plural, one {# Monat} other {# Monate}}",
+      "unavailable": "{name}: {reason}. Grund anzeigen"
     },
     "sheet": {
       "apply": "Anwenden",
       "reset": "Zurücksetzen"
-    }
+    },
+    "resolutionHelp": "Was bedeuten die Auflösungen?"
   },
   "validation": {
     "year": {
@@ -438,6 +441,233 @@
     },
     "hints": {
       "turnOnAnimations": "Schalten Sie Animationen ein, um eine Hervorhebung zu wählen"
+    }
+  },
+  "info": {
+    "externalLink": "(öffnet in einem neuen Tab)",
+    "nav": {
+      "label": "Infoseiten",
+      "about": "Über",
+      "guide": "Benutzerhandbuch",
+      "data": "Daten & Methoden",
+      "contents": "Inhalt",
+      "breadcrumb": "Sie sind hier"
+    },
+    "pages": {
+      "about": {
+        "title": "Über Climatica",
+        "description": "Klimadaten für jeden Ort der Erde, ganz ohne GIS-Software."
+      },
+      "guide": {
+        "title": "Benutzerhandbuch",
+        "description": "Wie man einen Ort findet, die Diagramme liest, vergleicht, filtert und exportiert."
+      },
+      "data": {
+        "title": "Daten & Methoden",
+        "description": "Woher die Werte stammen, was sie beschreiben und wie die Indikatoren berechnet werden."
+      }
+    },
+    "sections": {
+      "howItWorks": "So funktioniert es",
+      "dataSources": "Datenquellen",
+      "team": "Team",
+      "sourceCode": "Quellcode und Versionen",
+      "cite": "Zitieren",
+      "privacy": "Datenschutz",
+      "findPlace": "Einen Ort finden",
+      "walterLieth": "Ein Walter-Lieth-Diagramm lesen",
+      "compare": "Orte und Zeiträume vergleichen",
+      "filters": "Filter",
+      "export": "Exportieren und teilen",
+      "questions": "Fragen",
+      "cellValues": "Was ein Wert beschreibt",
+      "resolutions": "Räumliche Auflösungen",
+      "periods": "Zeiträume und Variablen",
+      "indicators": "Klimaindikatoren",
+      "references": "Literatur"
+    },
+    "about": {
+      "hero": {
+        "description": "Climatica macht aus dem WorldClim-Archiv Walter-Lieth-Diagramme, Grafiken und Karten. Wählen Sie einen beliebigen Punkt an Land und sehen Sie seine Klimanormalwerte oder das Wetter eines einzelnen Jahres, vergleichen Sie zwei Orte oder zwei Zeiträume und kartieren Sie eine ganze Region. Ohne Konto, ohne Installation.",
+        "openCityClimate": "Klima der Stadt öffnen",
+        "readGuide": "Benutzerhandbuch lesen"
+      },
+      "facts": {
+        "resolutions": "Räumliche Auflösungen",
+        "resolutionsRange": "{finest} bis {coarsest}",
+        "normals": "Klimanormalwerte",
+        "normalsRange": "{first} bis {last}",
+        "weatherYears": "Wetterjahre",
+        "weatherYearsCount": "{count} Jahre mit Monatsdaten",
+        "languages": "Sprachen der Oberfläche"
+      },
+      "howItWorks": {
+        "intro": "Jeder angezeigte Wert nimmt denselben Weg, von einem globalen Rasterarchiv bis in Ihren Browser.",
+        "steps": {
+          "archive": {
+            "label": "Quelle",
+            "title": "WorldClim-Archiv",
+            "text": "Globale monatliche Raster von Temperatur und Niederschlag: 30-jährige Klimanormalwerte und Jahreswetter, aus CRU TS herunterskaliert."
+          },
+          "scrapi": {
+            "label": "Dienst",
+            "title": "SCRAPI",
+            "text": "Eine API der {university}, die Fragen zu den Rastern beantwortet: die Werte einer Zelle, eines Rechtecks oder eines Polygons."
+          },
+          "climatica": {
+            "label": "Oberfläche",
+            "title": "Climatica",
+            "text": "Fragt SCRAPI nach den gewählten Zellen und zeichnet sie als Diagramme, Tabellen und Karten; die Antworten werden zwischengespeichert, damit wiederholte Fragen schnell sind."
+          }
+        }
+      },
+      "sources": {
+        "intro": "Climatica speichert keine eigenen Klimadaten. Die Werte, die Ortsnamen und die Karten stammen aus diesen Quellen.",
+        "scrapi": {
+          "text": "SCRAPI ist die API, aus der Climatica jeden Wert liest. Sie veröffentlicht die WorldClim-Raster als Linked Data und beantwortet Punkt-, Regions- und Metadatenabfragen.",
+          "author": "Entwickelt von {author}",
+          "docs": "Zur SCRAPI-Dokumentation"
+        },
+        "worldclim": "Hochaufgelöste globale Klimaflächen: die Klimanormalwerte und das herunterskalierte monatliche Wetter.",
+        "cruTs": "Die gerasterten monatlichen Beobachtungen der Climatic Research Unit, aus denen das Jahreswetter von WorldClim herunterskaliert ist.",
+        "geonames": "Das Ortsverzeichnis hinter der Städtesuche: Ortsnamen in vielen Sprachen, Koordinaten und Einwohnerzahlen.",
+        "osm": "Die Grundkarte unter jeder Karte in Climatica.",
+        "visit": "{name} besuchen"
+      },
+      "team": {
+        "roles": {
+          "development": "Design und Entwicklung",
+          "supervisionScrapi": "Betreuung; Autor von SCRAPI",
+          "supervision": "Betreuung",
+          "forestManagement": "Fachwissen Waldbewirtschaftung",
+          "designAdvice": "Beratung zu Design und Entwicklung"
+        }
+      },
+      "code": {
+        "version": "Version",
+        "licence": "Lizenz",
+        "stack": "Erstellt mit",
+        "repository": "Quellcode auf GitHub",
+        "changelog": "Änderungsprotokoll"
+      },
+      "cite": {
+        "intro": "Wenn Climatica Ihrer Arbeit hilft, zitieren Sie bitte:",
+        "copyCitation": "Zitat kopieren",
+        "copyBibtex": "BibTeX kopieren",
+        "copied": "In die Zwischenablage kopiert",
+        "failed": "Kopieren nicht möglich. Markieren Sie den Text und kopieren Sie ihn selbst."
+      },
+      "privacy": {
+        "account": "Sie brauchen kein Konto, und nichts identifiziert Sie.",
+        "storage": "Ihre Einstellungen und letzten Orte bleiben im Speicher dieses Browsers, Ihre Sprache in einem Cookie. Wenn Sie die Websitedaten löschen, werden sie zurückgesetzt.",
+        "location": "„Meinen Standort verwenden“ fragt Ihren Browser nur dann nach Ihrer Position, wenn Sie darauf tippen, und sendet nur die Koordinaten, um ihre Daten abzurufen.",
+        "tracking": "Climatica verwendet keine Analyse-, Werbe- oder Tracking-Dienste."
+      }
+    },
+    "guide": {
+      "findPlace": {
+        "intro": "Klima der Stadt, Städte vergleichen und Zeiträume vergleichen beginnen mit einem Ort. Es gibt vier Wege, ihn zu wählen.",
+        "ways": {
+          "name": {
+            "title": "Nach Namen suchen",
+            "text": "Geben Sie eine Stadt oder einen Ort in das Suchfeld ein und wählen Sie ihn aus der Liste. Namen funktionieren in vielen Sprachen."
+          },
+          "coordinates": {
+            "title": "Koordinaten eingeben",
+            "text": "Geben Sie Breite und Länge ein, etwa 46.4907, 11.3398, und wählen Sie „Zu den Koordinaten gehen“. Die Beschriftung nennt die nächstgelegene Siedlung."
+          },
+          "map": {
+            "title": "Auf die Karte klicken",
+            "text": "Klicken Sie irgendwo an Land. Die Daten gelten für genau diesen Punkt; die Beschriftung nennt die nächstgelegene Siedlung."
+          },
+          "location": {
+            "title": "Meinen Standort verwenden",
+            "text": "Die Position Ihres Browsers, wenn Sie sie erlauben. Die Daten gelten für Ihren Standort; die Beschriftung nennt die nächstgelegene Siedlung."
+          }
+        }
+      },
+      "walterLieth": {
+        "intro": "Ein Walter-Lieth-Diagramm zeigt das Jahr eines Ortes auf einen Blick: die Temperatur- und die Niederschlagskurve und die Flächen dazwischen, die feuchte von trockenen Monaten unterscheiden.",
+        "scale": "Beide Kurven teilen sich eine Achse mit festem Maßstab, 1 °C zu {ratio} mm. Ein Monat, in dem die Niederschlagskurve unter der Temperaturkurve liegt, ist also arid. Über {breakpoint} mm wird der Niederschlag um das {compression}-Fache gestaucht, damit auch sehr nasse Monate passen."
+      },
+      "compare": {
+        "cities": "Zwei Orte nebeneinander, für denselben Zeitraum oder dasselbe Jahr: die Statistiktabelle, beide Diagramme und der Unterschied zwischen ihnen.",
+        "periods": "Ein Ort über Klimanormalperioden oder Wetterjahre hinweg, um zu sehen, wie sich sein Klima verändert hat.",
+        "layouts": {
+          "split": "Nebeneinander: jede Reihe in einem eigenen Feld. Vergrößern Sie eines über die ganze Karte, wenn Sie Details brauchen.",
+          "overlay": "Überlagert: die Reihen in einem Diagramm, an ihren Markerformen unterscheidbar, eine davon schraffiert."
+        }
+      },
+      "filters": {
+        "sidebar": "Die Filter (Datensatz, Zeitraum oder Jahr, Variablen, Auflösung und Monate) stehen auf breiten Bildschirmen in der Seitenleiste und auf dem Handy hinter dem Chip „Filter“. Ändern Sie sie und tippen Sie dann auf „{apply}“.",
+        "autoApply": "In den Einstellungen können Sie Filter sofort anwenden lassen und Ort und Filter über alle Seiten hinweg abgleichen."
+      },
+      "export": {
+        "intro": "Das Exportmenü über jedem Diagramm speichert, was Sie sehen:",
+        "share": "Jede Seite hält Ort, Filter und Ansicht in der Adresse fest. Wer die URL kopiert, teilt also genau diese Ansicht. Exportierte Bilder enthalten den Link ebenfalls."
+      },
+      "questions": {
+        "resolution": {
+          "question": "Warum ändern sich die Werte, wenn ich die Auflösung ändere?",
+          "answer": "Jeder Wert beschreibt die ganze Rasterzelle um Ihren Punkt, und eine gröbere Zelle umfasst mehr Fläche, oft mit anderen Höhen und Landschaften. Eine Änderung ist zu erwarten. <link>Sehen Sie, wie sich die Auflösungen unterscheiden</link>."
+        },
+        "elevation": {
+          "question": "Warum weicht die Höhe von der offiziellen Höhe des Ortes ab?",
+          "answer": "Es ist die mittlere Höhe der Rasterzelle, nicht die eines Ortszentrums oder einer Wetterstation. In Tälern und an Hängen kann eine Zelle Hunderte Meter höher oder tiefer liegen als der Ort; eine feinere Auflösung kommt näher heran."
+        },
+        "thirtySeconds": {
+          "question": "Warum gibt es {finest} nicht für jeden Zeitraum?",
+          "answer": "WorldClim veröffentlicht {finest}-Raster nur für die Klimanormalwerte {period}. Die übrigen Normalperioden und die Wetterjahre reichen bis {fallback}."
+        }
+      }
+    },
+    "data": {
+      "cell": {
+        "whole": "Jeder Wert in Climatica gehört zu der Rasterzelle, die Ihren Punkt enthält, nicht zum Punkt selbst. Die Karte umrandet diese Zelle.",
+        "mixed": "Eine grobe Zelle kann einen Talboden und die Hänge darüber umfassen oder eine Küste und das Hinterland. Ihr Wert ist deren Mittel und beschreibt womöglich keinen davon genau.",
+        "example": "Bozen (Normalperiode {period}) zeigt das gut. Die Stadt liegt in einem Alpental auf etwa {valleyElevation} m. Bei {coarseGrid} umfasst ihre Zelle auch die Hänge: mittlere Höhe {coarseElevation} m, Jahresmitteltemperatur {coarseTemperature} °C. Bei {fineGrid} enthält die Zelle nur den Talboden: {fineElevation} m und {fineTemperature} °C.",
+        "illustrationLabel": "Schema zweier Zellen, die denselben Punkt enthalten. {coarse}: die große Zelle, umgeben von ihren Nachbarn. {fine}: die kleine Zelle darin, mit dem Punkt.",
+        "illustrationCaption": "Zellen, die denselben Punkt enthalten, bei zwei Auflösungen (schematisch, Größen am Äquator).",
+        "calloutTitle": "Werte ändern sich mit der Auflösung – das ist zu erwarten.",
+        "calloutText": "Wählen Sie die feinste Auflösung, die es für Ihren Zeitraum gibt, um einen bestimmten Ort zu beschreiben.",
+        "cellLabel": "{size}-Zelle (~{km} km)"
+      },
+      "resolutions": {
+        "intro": "Die Raster von WorldClim werden in Bogenminuten und Bogensekunden gemessen. Eine Zelle ist am Äquator annähernd quadratisch und wird zu den Polen hin schmaler.",
+        "caption": "Räumliche Auflösungen, ihre Zellgrößen und Verfügbarkeit",
+        "resolution": "Auflösung",
+        "cellSize": "Zelle am Äquator",
+        "availability": "Verfügbar für",
+        "km": "≈ {value} km",
+        "everywhere": "Alle Klimanormalperioden und Wetterjahre",
+        "onlyFor": "Nur die Klimanormalperiode {periods}"
+      },
+      "periods": {
+        "climateIntro": "30-jährige Mittel jedes Monats (Klimanormalwerte):",
+        "fromWorldClim": "die Normalperiode von WorldClim 2.1",
+        "averaged": "aus den jährlichen Wetterdaten gemittelt",
+        "climateVariables": "Variablen: {variables}. {restricted} nur für {period}.",
+        "weatherIntro": "Die Monatswerte jedes Jahres, {first}–{last}: CRU TS, von WorldClim herunterskaliert.",
+        "weatherVariables": "Variablen: {variables}."
+      },
+      "indicators": {
+        "intro": "Climatica berechnet drei Indikatoren aus den Monatswerten. T ist die mittlere Temperatur eines Monats (das Mittel aus Maximum und Minimum), P sein Niederschlag.",
+        "arid": {
+          "title": "Arider Monat",
+          "text": "Niederschlag unter dem Doppelten der Mitteltemperatur: die Niederschlagskurve unter der Temperaturkurve im Walter-Lieth-Diagramm. Ein Monat mit genau P = 2T gilt als humid."
+        },
+        "frost": {
+          "title": "Frostmonat",
+          "text": "Eine mittlere Tiefsttemperatur unter 0 °C, markiert durch das Frostband unter dem Diagramm."
+        },
+        "martonne": {
+          "title": "Ariditätsindex nach De Martonne",
+          "text": "Jahresniederschlag (mm) geteilt durch die Jahresmitteltemperatur plus 10 °C; je niedriger, desto trockener. Er ist nicht definiert, wo die Jahresmitteltemperatur −10 °C oder weniger beträgt."
+        }
+      }
+    },
+    "footer": {
+      "researchGroup": "Forschungsgruppe {group}"
     }
   }
 }

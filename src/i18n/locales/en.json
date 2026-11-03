@@ -1,7 +1,8 @@
 {
   "navbar": {
     "toggleMenu": "Toggle menu",
-    "settings": "Settings"
+    "settings": "Settings",
+    "about": "About"
   },
   "pages": {
     "climateStatistics": {
@@ -30,7 +31,7 @@
     "coordsResult": "Go to coordinates"
   },
   "climateStatistics": {
-    "cellResolution": "Cell resolution:",
+    "cellResolution": "Cell resolution",
     "stats": {
       "avgTmax": "Avg max temp",
       "avgTmin": "Avg min temp",
@@ -229,10 +230,10 @@
     "gridCell": "Grid cell: {size}"
   },
   "cellSizes": {
-    "10m": "10 min (~324 km2)",
-    "5m": "5 min (~81 km2)",
-    "2_5m": "2.5 min (~20.25 km2)",
-    "30s": "30 sec (~1 km2)",
+    "10m": "10 min (~324 km²)",
+    "5m": "5 min (~81 km²)",
+    "2_5m": "2.5 min (~20.25 km²)",
+    "30s": "30 sec (~1 km²)",
     "onlyForPeriod": "Only for Climate {period}"
   },
   "cellSizesShort": {
@@ -256,12 +257,14 @@
       "value": "{name}: {value}",
       "variablesCount": "{count, plural, one {# variable} other {# variables}}",
       "allMonths": "All months",
-      "monthsCount": "{count, plural, one {# month} other {# months}}"
+      "monthsCount": "{count, plural, one {# month} other {# months}}",
+      "unavailable": "{name}: {reason}. Show why"
     },
     "sheet": {
       "apply": "Apply",
       "reset": "Reset"
-    }
+    },
+    "resolutionHelp": "What do resolutions mean?"
   },
   "validation": {
     "year": {
@@ -438,6 +441,233 @@
     },
     "hints": {
       "turnOnAnimations": "Turn on animations to choose a highlight"
+    }
+  },
+  "info": {
+    "externalLink": "(opens in a new tab)",
+    "nav": {
+      "label": "Info pages",
+      "about": "About",
+      "guide": "User guide",
+      "data": "Data & methods",
+      "contents": "Contents",
+      "breadcrumb": "You are here"
+    },
+    "pages": {
+      "about": {
+        "title": "About Climatica",
+        "description": "Climate data for any place on Earth, without GIS software."
+      },
+      "guide": {
+        "title": "User guide",
+        "description": "How to find a place, read the diagrams, compare, filter and export."
+      },
+      "data": {
+        "title": "Data & methods",
+        "description": "Where the values come from, what they describe and how the indicators are computed."
+      }
+    },
+    "sections": {
+      "howItWorks": "How it works",
+      "dataSources": "Data sources",
+      "team": "Team",
+      "sourceCode": "Source code and versions",
+      "cite": "How to cite",
+      "privacy": "Privacy",
+      "findPlace": "Find a place",
+      "walterLieth": "Read a Walter–Lieth diagram",
+      "compare": "Compare places and periods",
+      "filters": "Filters",
+      "export": "Export and share",
+      "questions": "Questions",
+      "cellValues": "What a value describes",
+      "resolutions": "Spatial resolutions",
+      "periods": "Periods and variables",
+      "indicators": "Climate indicators",
+      "references": "References"
+    },
+    "about": {
+      "hero": {
+        "description": "Climatica turns the WorldClim archive into Walter–Lieth diagrams, charts and maps. Pick any point on land to see its climate normals or the weather of a single year, compare two places or two periods, and map a whole region. No account, nothing to install.",
+        "openCityClimate": "Open City Climate",
+        "readGuide": "Read the user guide"
+      },
+      "facts": {
+        "resolutions": "Spatial resolutions",
+        "resolutionsRange": "{finest} to {coarsest}",
+        "normals": "Climate normals",
+        "normalsRange": "{first} to {last}",
+        "weatherYears": "Weather years",
+        "weatherYearsCount": "{count} years of monthly data",
+        "languages": "Interface languages"
+      },
+      "howItWorks": {
+        "intro": "Every value on screen takes the same path, from a global raster archive to your browser.",
+        "steps": {
+          "archive": {
+            "label": "Source",
+            "title": "WorldClim archive",
+            "text": "Global monthly rasters of temperature and precipitation: 30-year climate normals and yearly weather downscaled from CRU TS."
+          },
+          "scrapi": {
+            "label": "Service",
+            "title": "SCRAPI",
+            "text": "An API from the {university} that answers questions about the rasters: the values of a cell, a box or a polygon."
+          },
+          "climatica": {
+            "label": "Interface",
+            "title": "Climatica",
+            "text": "Asks SCRAPI for the cells you pick and draws them as diagrams, tables and maps, caching the answers so repeated questions are fast."
+          }
+        }
+      },
+      "sources": {
+        "intro": "Climatica keeps no climate data of its own. The values, the place names and the maps come from these sources.",
+        "scrapi": {
+          "text": "SCRAPI is the API Climatica reads every value from. It publishes the WorldClim rasters as linked data and answers point, region and metadata queries.",
+          "author": "Created by {author}",
+          "docs": "Read the SCRAPI documentation"
+        },
+        "worldclim": "High-resolution global climate surfaces: the climate normals and the downscaled monthly weather.",
+        "cruTs": "The Climatic Research Unit's gridded monthly observations, which WorldClim's yearly weather is downscaled from.",
+        "geonames": "The gazetteer behind the city search: place names in many languages, coordinates and populations.",
+        "osm": "The base map under every map in Climatica.",
+        "visit": "Visit {name}"
+      },
+      "team": {
+        "roles": {
+          "development": "Design and development",
+          "supervisionScrapi": "Supervision; author of SCRAPI",
+          "supervision": "Supervision",
+          "forestManagement": "Forest management expertise",
+          "designAdvice": "Advice on design and development"
+        }
+      },
+      "code": {
+        "version": "Version",
+        "licence": "Licence",
+        "stack": "Built with",
+        "repository": "Source code on GitHub",
+        "changelog": "Changelog"
+      },
+      "cite": {
+        "intro": "If Climatica helps your work, please cite:",
+        "copyCitation": "Copy citation",
+        "copyBibtex": "Copy BibTeX",
+        "copied": "Copied to the clipboard",
+        "failed": "Couldn't copy. Select the text and copy it instead."
+      },
+      "privacy": {
+        "account": "No account is needed, and nothing identifies you.",
+        "storage": "Your settings and recent places stay in this browser's storage, and your language in a cookie. Clearing the site's data resets them.",
+        "location": "“Use my location” asks your browser for your position only when you press it, and sends only the coordinates, to fetch their data.",
+        "tracking": "Climatica uses no analytics, advertising or tracking."
+      }
+    },
+    "guide": {
+      "findPlace": {
+        "intro": "City Climate, Compare Cities and Compare Periods start from a place. There are four ways to pick one.",
+        "ways": {
+          "name": {
+            "title": "Search by name",
+            "text": "Type a city or town in the search field and pick it from the list. Names work in many languages."
+          },
+          "coordinates": {
+            "title": "Type coordinates",
+            "text": "Enter latitude and longitude, such as 46.4907, 11.3398, and choose “Go to coordinates”. The label names the nearest settlement."
+          },
+          "map": {
+            "title": "Click the map",
+            "text": "Click anywhere on land. The data are for that exact point; the label names the nearest settlement."
+          },
+          "location": {
+            "title": "Use my location",
+            "text": "Your browser's position, if you allow it. The data are for where you are; the label names the nearest settlement."
+          }
+        }
+      },
+      "walterLieth": {
+        "intro": "A Walter–Lieth diagram shows a place's year at a glance: the temperature and precipitation curves, and the areas between them that tell humid months from arid ones.",
+        "scale": "Both curves share one axis at a fixed scale, 1 °C to {ratio} mm, so a month whose precipitation curve falls below the temperature curve is arid. Above {breakpoint} mm, precipitation is compressed {compression} times so that very wet months still fit."
+      },
+      "compare": {
+        "cities": "Two places side by side, for the same period or year: the stats table, both diagrams and the difference between them.",
+        "periods": "One place across climate normals or weather years, to see how its climate has changed.",
+        "layouts": {
+          "split": "Side by side: each series in its own panel. Expand one across the card when you need detail.",
+          "overlay": "Overlay: the series in one diagram, told apart by their marker shapes, with one of them shaded."
+        }
+      },
+      "filters": {
+        "sidebar": "The filters (dataset, period or year, variables, resolution and months) are in the sidebar on wide screens and behind the Filters chip on phones. Change them, then press “{apply}”.",
+        "autoApply": "In Settings you can apply filters as you change them, and keep the place and the filters in step across pages."
+      },
+      "export": {
+        "intro": "The export menu above each chart saves what you see:",
+        "share": "Every page keeps its place, filters and view in the address, so copying the URL shares exactly that view. Exported images carry the link too."
+      },
+      "questions": {
+        "resolution": {
+          "question": "Why do the values change when I change the resolution?",
+          "answer": "Each value describes the whole grid cell around your point, and a coarser cell covers more ground, often different elevations and landscapes. A change is expected. <link>See how the resolutions differ</link>."
+        },
+        "elevation": {
+          "question": "Why does the elevation differ from the place's official elevation?",
+          "answer": "It's the mean elevation of the grid cell, not that of a town centre or a weather station. In valleys and on slopes, a cell can be hundreds of metres higher or lower than the town; a finer resolution comes closer."
+        },
+        "thirtySeconds": {
+          "question": "Why isn't {finest} available for every period?",
+          "answer": "WorldClim publishes {finest} rasters only for the {period} climate normals. The other normals and the weather years go down to {fallback}."
+        }
+      }
+    },
+    "data": {
+      "cell": {
+        "whole": "Every value Climatica shows belongs to the raster cell that contains your point, not to the point itself. The map outlines that cell.",
+        "mixed": "A coarse cell can span a valley floor and the slopes above it, or a coast and the land behind it. Its value is their average, and may describe none of them exactly.",
+        "example": "Bolzano ({period} normal) shows it well. The town lies in an Alpine valley at about {valleyElevation} m. At {coarseGrid}, its cell also covers the slopes: mean elevation {coarseElevation} m, mean annual temperature {coarseTemperature} °C. At {fineGrid}, the cell holds only the valley floor: {fineElevation} m and {fineTemperature} °C.",
+        "illustrationLabel": "Schematic of two cells containing the same point. {coarse}: the large cell, among its neighbours. {fine}: the small cell inside it, holding the point.",
+        "illustrationCaption": "Cells containing the same point at two resolutions (schematic, sizes at the equator).",
+        "calloutTitle": "Values change with the resolution — this is expected.",
+        "calloutText": "Choose the finest resolution available for your period to describe a specific place.",
+        "cellLabel": "{size} cell (~{km} km)"
+      },
+      "resolutions": {
+        "intro": "WorldClim's grids are measured in arc-minutes and arc-seconds. A cell is roughly square at the equator and narrows towards the poles.",
+        "caption": "Spatial resolutions, their cell sizes and availability",
+        "resolution": "Resolution",
+        "cellSize": "Cell at the equator",
+        "availability": "Available for",
+        "km": "≈ {value} km",
+        "everywhere": "Every climate normal and weather year",
+        "onlyFor": "Only the {periods} climate normal"
+      },
+      "periods": {
+        "climateIntro": "30-year averages of each month (climate normals):",
+        "fromWorldClim": "the WorldClim 2.1 normal",
+        "averaged": "averaged from the yearly weather data",
+        "climateVariables": "Variables: {variables}. {restricted} only for {period}.",
+        "weatherIntro": "Each year's monthly values, {first}–{last}: CRU TS downscaled by WorldClim.",
+        "weatherVariables": "Variables: {variables}."
+      },
+      "indicators": {
+        "intro": "Climatica computes three indicators from the monthly values. T is a month's mean temperature (the average of its maximum and minimum), P its precipitation.",
+        "arid": {
+          "title": "Arid month",
+          "text": "Precipitation below twice the mean temperature: the precipitation curve under the temperature curve in a Walter–Lieth diagram. A month exactly at P = 2T counts as humid."
+        },
+        "frost": {
+          "title": "Frost month",
+          "text": "A mean minimum temperature below 0 °C, marked by the frost band under the diagram."
+        },
+        "martonne": {
+          "title": "De Martonne aridity index",
+          "text": "Annual precipitation (mm) divided by the annual mean temperature plus 10 °C; lower is drier. It isn't defined where the annual mean temperature is −10 °C or lower."
+        }
+      }
+    },
+    "footer": {
+      "researchGroup": "{group} research group"
     }
   }
 }
