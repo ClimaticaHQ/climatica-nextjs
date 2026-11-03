@@ -3,12 +3,14 @@
 import { NAV_LINKS, ROUTES } from "@/constants";
 import { useNavbarNavigation } from "@/hooks";
 import { GLOBAL_CONFIG } from "@/libs/GlobalConfig";
+import { isRouteActive } from "@/utils/pageParams.util";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ClimaticaLogo, GearIcon } from "../svg";
+import { TOPBAR_LINK_CLASSES as L } from "./Topbar.constant";
 
 function BurgerIcon({ isOpen }: { isOpen: boolean }) {
   return (
@@ -41,8 +43,9 @@ export function Topbar() {
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
   // * links to the other pages: the shared filters, plus (on click) the page's remembered params
-  const { getHref, settingsHref, navigate } = useNavbarNavigation();
+  const { getHref, settingsHref, aboutHref, navigate } = useNavbarNavigation();
   const isSettingsActive = pathname === ROUTES.SETTINGS;
+  const isAboutActive = isRouteActive(pathname, ROUTES.ABOUT);
 
   useEffect(() => {
     queueMicrotask(() => setIsNavOpen(false));
@@ -90,24 +93,25 @@ export function Topbar() {
           </span>
         </Link>
 
-        <nav className="hidden gap-3 lg:flex">
-          {NAV_LINKS.map(({ to, labelKey }) => {
-            const isActive = pathname === to || pathname.startsWith(to + "/");
-            return (
-              <Link
-                key={to}
-                href={getHref(to)}
-                onClick={(event) => navigate(event, to)}
-                className={`rounded-[var(--radius-sm)] px-4 py-2 text-[length:var(--font-sm)] font-medium transition-colors duration-150 ${
-                  isActive
-                    ? "bg-[var(--color-primary-muted)] font-medium text-[var(--color-primary)]"
-                    : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]"
-                }`}
-              >
-                {t(labelKey)}
-              </Link>
-            );
-          })}
+        <nav className={L.DESKTOP_ROW}>
+          {NAV_LINKS.map(({ to, labelKey }) => (
+            <Link
+              key={to}
+              href={getHref(to)}
+              onClick={(event) => navigate(event, to)}
+              aria-current={isRouteActive(pathname, to) ? "page" : undefined}
+              className={`${L.DESKTOP} ${isRouteActive(pathname, to) ? L.DESKTOP_ACTIVE : L.IDLE}`}
+            >
+              {t(labelKey)}
+            </Link>
+          ))}
+          <Link
+            href={aboutHref}
+            aria-current={isAboutActive ? "page" : undefined}
+            className={`${L.DESKTOP} ${isAboutActive ? L.DESKTOP_ACTIVE : L.IDLE}`}
+          >
+            {t("navbar.about")}
+          </Link>
         </nav>
 
         <div className="flex flex-1 items-center justify-end gap-1">
@@ -145,27 +149,31 @@ export function Topbar() {
         `}
       >
         <ul className="flex max-h-[calc(100dvh-4rem-env(safe-area-inset-top))] list-none flex-col gap-1 overflow-y-auto pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
-          {NAV_LINKS.map(({ to, labelKey }) => {
-            const isActive = pathname === to || pathname.startsWith(to + "/");
-            return (
-              <li key={to}>
-                <Link
-                  href={getHref(to)}
-                  onClick={(event) => {
-                    setIsNavOpen(false);
-                    navigate(event, to);
-                  }}
-                  className={`block w-full rounded-[var(--radius-sm)] px-4 py-3 text-[length:var(--font-sm)] transition-colors duration-150 ${
-                    isActive
-                      ? "bg-[var(--color-primary)] font-medium text-[var(--color-on-primary)]"
-                      : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]"
-                  }`}
-                >
-                  {t(labelKey)}
-                </Link>
-              </li>
-            );
-          })}
+          {NAV_LINKS.map(({ to, labelKey }) => (
+            <li key={to}>
+              <Link
+                href={getHref(to)}
+                onClick={(event) => {
+                  setIsNavOpen(false);
+                  navigate(event, to);
+                }}
+                aria-current={isRouteActive(pathname, to) ? "page" : undefined}
+                className={`${L.MOBILE} ${isRouteActive(pathname, to) ? L.MOBILE_ACTIVE : L.IDLE}`}
+              >
+                {t(labelKey)}
+              </Link>
+            </li>
+          ))}
+          <li>
+            <Link
+              href={aboutHref}
+              onClick={() => setIsNavOpen(false)}
+              aria-current={isAboutActive ? "page" : undefined}
+              className={`${L.MOBILE} ${isAboutActive ? L.MOBILE_ACTIVE : L.IDLE}`}
+            >
+              {t("navbar.about")}
+            </Link>
+          </li>
 
           <li className="mt-2 border-t border-[var(--color-border)] pt-3">
             <Link
