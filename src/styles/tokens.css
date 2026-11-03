@@ -165,6 +165,27 @@
   --font-lg: 22px;
   --font-xl: 30px;
   --font-2xl: 36px;
+  /* * the reading scale: the Info pages are prose, read at length, where the rest of the app
+     is data — their text steps up from lg (17 / 19 / 20 / 32); other sizes are the scale above */
+  --font-reading-body: 17px;
+  --font-reading-lead: 19px;
+  --font-reading-card-title: 20px;
+  --font-reading-heading: 32px;
+  /* * the touch scale: text on touch layouts (below lg — sheets, the Info contents bar), where
+     readability beats density. 16 px also keeps iOS Safari from zooming a focused control */
+  --font-touch-body: 16px;
+  /* * chips: a step under body, so a 36 px pill scales the desktop chip up evenly; 16 px stays
+     the floor for inputs, selects and dropdown triggers (iOS zoom) */
+  --font-touch-chip: 15px;
+  --font-touch-secondary: 15px;
+  --font-touch-label: 14px;
+  --font-touch-title: 18px;
+  --font-touch-nav: 17px;
+  --font-touch-nav-page: 19px;
+  --font-touch-button: 17px;
+  --touch-label-tracking: 0.06em;
+  /* * a readable line for prose */
+  --reading-measure: 72ch;
 
   /* * surfaces, text, borders */
   --color-surface: var(--white);
@@ -189,6 +210,27 @@
   --color-chip-active-bg: var(--tint-light-green-95);
   --color-chip-active-text: var(--tint-light-green-34);
   --color-chip-active-border: var(--tint-light-green-84);
+  /* * a selected chip that's disabled: its tints at reduced emphasis, mixed toward the surface */
+  --color-chip-disabled-selected-bg: color-mix(
+    in srgb,
+    var(--tint-light-green-95) 60%,
+    var(--white)
+  );
+  --color-chip-disabled-selected-border: color-mix(
+    in srgb,
+    var(--tint-light-green-84) 60%,
+    var(--white)
+  );
+  --color-chip-disabled-selected-text: color-mix(
+    in srgb,
+    var(--tint-light-green-34) 60%,
+    var(--white)
+  );
+
+  /* * disabled controls (M2): on-surface at the disabled emphasis, 38% — readable, plainly
+     inactive. Exempt from WCAG 1.4.3; the note under a disabled control carries the reason */
+  --color-text-disabled: var(--grey-500);
+  --color-border-disabled: var(--grey-200);
 
   /* * hover state layer (M2): the on-surface colour at low opacity, neutral on any surface — a
      hovered month's band on the charts, its column in the monthly values table, a hovered
@@ -349,6 +391,24 @@ html.dark {
   --color-chip-active-bg: var(--tint-dark-green-20);
   --color-chip-active-text: var(--tint-dark-green-85);
   --color-chip-active-border: var(--tint-dark-green-34);
+  --color-chip-disabled-selected-bg: color-mix(
+    in srgb,
+    var(--tint-dark-green-20) 60%,
+    var(--dark-grey-6)
+  );
+  --color-chip-disabled-selected-border: color-mix(
+    in srgb,
+    var(--tint-dark-green-34) 60%,
+    var(--dark-grey-6)
+  );
+  --color-chip-disabled-selected-text: color-mix(
+    in srgb,
+    var(--tint-dark-green-85) 60%,
+    var(--dark-grey-6)
+  );
+  /* * white at 38% on #121212; the border one step under the enabled one */
+  --color-text-disabled: var(--dark-grey-46);
+  --color-border-disabled: var(--dark-grey-18);
   --color-state-hover: color-mix(in srgb, var(--grey-300) 8%, transparent);
   --color-update-flash-border: var(--green-300);
   --color-update-flash-glow: color-mix(in srgb, var(--green-300) 40%, transparent);
