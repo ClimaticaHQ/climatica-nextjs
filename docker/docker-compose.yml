@@ -23,7 +23,11 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes
+    # * a cache: past the limit Redis evicts the least recently used key instead of refusing writes
+    command: >-
+      redis-server --appendonly yes
+      --maxmemory ${REDIS_MAXMEMORY:-512mb}
+      --maxmemory-policy allkeys-lru
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
