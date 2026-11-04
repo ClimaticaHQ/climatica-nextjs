@@ -21,6 +21,9 @@ export function WalterLiethChart({
   onActiveMonthIndexChange,
   headerSlots,
   footer,
+  isStatic = false,
+  overlay,
+  annotationBands,
 }: TWalterLiethChartProps) {
   const chart = useWalterLiethChart({ series, monthOrder });
 
@@ -41,6 +44,9 @@ export function WalterLiethChart({
         rows={chart.rows}
         domain={domain}
         isCompact={isCompact}
+        isStatic={isStatic}
+        overlay={overlay}
+        annotationBands={annotationBands}
         frost={chart.frost}
         syncId={syncId}
         tooltip={<WalterLiethTooltip />}

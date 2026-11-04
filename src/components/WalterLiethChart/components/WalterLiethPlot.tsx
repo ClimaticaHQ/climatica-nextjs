@@ -1,5 +1,5 @@
 import { ChartUnitTitles } from "@/components/ChartUnitTitles";
-import { CHART_PLOT, WALTER_LIETH_DASH } from "@/constants";
+import { WALTER_LIETH_DASH } from "@/constants";
 import {
   CartesianGrid,
   ComposedChart,
@@ -22,8 +22,11 @@ import {
   getTouchTooltipKey,
   getTouchTooltipProps,
   getXAxisProps,
+  getChartMargin,
+  toPrecipAxisValue,
 } from "@/utils";
 import { ChartDeviceContext } from "@/components/charts/chartDevice.context";
+import { ChartOverlayLayer } from "@/components/charts/ChartOverlayLayer";
 import { MonthTapLayer } from "@/components/charts/MonthTapLayer";
 import { useContext } from "react";
 import { WalterLiethFrostBand } from "./WalterLiethFrostBand";
@@ -37,6 +40,9 @@ export function WalterLiethPlot({
   layers,
   tooltip,
   isCompact,
+  isStatic = false,
+  overlay,
+  annotationBands,
   frost,
   syncId,
   activeMonthIndex,
@@ -64,12 +70,17 @@ export function WalterLiethPlot({
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={rows}
-          margin={CHART_PLOT.MARGIN}
-          {...(syncId !== undefined ? { syncId } : {})}
-          onMouseMove={(state) =>
-            onActiveMonthIndexChange?.(resolveActiveTooltipIndex(state.activeTooltipIndex))
-          }
-          onMouseLeave={() => onActiveMonthIndexChange?.(null)}
+          margin={getChartMargin(annotationBands)}
+          // * static: a picture, so no keyboard layer — the chart takes no tab stop
+          accessibilityLayer={!isStatic}
+          {...(syncId !== undefined && !isStatic ? { syncId } : {})}
+          onMouseMove={(state) => {
+            if (!isStatic)
+              onActiveMonthIndexChange?.(resolveActiveTooltipIndex(state.activeTooltipIndex));
+          }}
+          onMouseLeave={() => {
+            if (!isStatic) onActiveMonthIndexChange?.(null);
+          }}
         >
           {/* * horizontal only — no month lines, matching the export */}
           <CartesianGrid
@@ -115,12 +126,14 @@ export function WalterLiethPlot({
           />
           <ChartUnitTitles isCompact={isCompact} isNarrow={isNarrow} />
           {/* * on touch, the tapped month's */}
-          <Tooltip
-            key={getTouchTooltipKey(tooltipState)}
-            content={tooltip}
-            cursor={false}
-            {...getTouchTooltipProps(tooltipState)}
-          />
+          {!isStatic && (
+            <Tooltip
+              key={getTouchTooltipKey(tooltipState)}
+              content={tooltip}
+              cursor={false}
+              {...getTouchTooltipProps(tooltipState)}
+            />
+          )}
           {/* * invisible: they only register the rows with each axis for tooltip and sync */}
           <Line yAxisId="left" dataKey="tavg" stroke="none" dot={false} activeDot={false} />
           <Line yAxisId="right" dataKey="precAxis" stroke="none" dot={false} activeDot={false} />
@@ -140,9 +153,21 @@ export function WalterLiethPlot({
               isCompact={isCompact}
             />
           )}
+          {overlay !== undefined && (
+            <Customized
+              component={ChartOverlayLayer}
+              render={overlay}
+              xValueOf={(month: number) =>
+                rows.find(({ monthIndex }) => monthIndex === month - 1)?.position ?? month - 1
+              }
+              temperatureAxisId="left"
+              precipitationAxisId="left"
+              toPrecipitationAxis={toPrecipAxisValue}
+            />
+          )}
         </ComposedChart>
       </ResponsiveContainer>
-      {isTouch && (
+      {isTouch && !isStatic && (
         <MonthTapLayer
           activeMonthIndex={activeMonthIndex ?? null}
           onActiveMonthIndexChange={onActiveMonthIndexChange}

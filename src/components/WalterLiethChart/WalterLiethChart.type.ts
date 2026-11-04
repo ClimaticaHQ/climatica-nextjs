@@ -1,4 +1,6 @@
 import type {
+  TAnnotationBands,
+  TChartOverlay,
   TMonthLabelFormat,
   TWalterLiethHatchGeometry,
   TWalterLiethProjection,
@@ -113,6 +115,10 @@ export type TWalterLiethPlotProps = {
   layers: readonly TWalterLiethLayerSeries[];
   tooltip: ReactElement;
   isCompact: boolean;
+  /** a picture: no tooltip, hover, taps or tab stop */
+  isStatic?: boolean;
+  overlay?: TChartOverlay | undefined;
+  annotationBands?: TAnnotationBands | undefined;
   /** the frost band's months (calendar order); null = no band drawn (its room stays) */
   frost?: readonly EWalterLiethFrost[] | null | undefined;
   syncId?: string | undefined;
