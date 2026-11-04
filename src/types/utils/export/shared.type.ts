@@ -1,8 +1,6 @@
-import type {
-  TComparisonTable,
-  TComparisonTableLabels,
-  TComparisonTableValue,
-} from "../../components/comparisonTable";
+import type { TSeriesShape } from "../../charts/seriesShape.type";
+import type { TWalterLiethScales } from "../walterLieth.type";
+import type { TComparisonTable, TComparisonTableLabels } from "../../components/comparisonTable";
 import type { TMonthlyValuesRow, TMonthlyValuesSeries } from "../../components/monthlyValues";
 import type { TMonthlyTableMarker, TMonthlyTableRow } from "../../components/monthlyTable";
 
@@ -11,8 +9,6 @@ export type TExportChartColors = {
   textSecondary: string;
   border: string;
   bg: string;
-  /** the stats table's header row */
-  bgSecondary: string;
   tmax: string;
   tmin: string;
   tavg: string;
@@ -49,6 +45,13 @@ export type TUnitTitlesArgs = {
 };
 
 export type TLinearScale = (value: number) => number;
+
+export type TZeroLineArgs = {
+  scales: TWalterLiethScales | null;
+  tempScale: TLinearScale;
+  plotLeft: number;
+  plotRight: number;
+};
 
 export type TMonthBand = {
   x: number;
@@ -100,28 +103,52 @@ export type TExportComparisonTableArgs = {
   colors: TExportChartColors;
 };
 
-/** One text of the export's stats table. */
-export type TExportTableCellArgs = {
-  x: number;
-  y: number;
-  value: string;
-  anchor: "start" | "end";
-  size: number;
-  weight?: number | undefined;
-  fill: string;
+/** A box of the export's tables: square, unfilled, in the border colour. */
+export type TExportTableFrameArgs = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  colors: TExportChartColors;
 };
 
-/** A stats table value: right-aligned, with its Martonne badge (translated) before it. */
-export type TExportTableValueArgs = {
-  value: TComparisonTableValue;
-  badgeText: string | null;
-  cell: Omit<TExportTableCellArgs, "value" | "anchor" | "size">;
+/** One grid line of the export's tables. */
+export type TExportTableRuleArgs = {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  colors: TExportChartColors;
 };
 
-/** A monthly-table row's label in the export: the unit colored, cut to the label column. */
+/** A data column of an export table: its head (a series' shape before it), a muted column's values. */
+export type TExportTableColumn = {
+  label: string;
+  /** a second, smaller line under the head (the difference's direction) */
+  subtitle?: string;
+  shape?: TSeriesShape;
+  /** values in the secondary text colour (the difference) */
+  isMuted?: boolean;
+};
+
+/** A row of an export table: its label, then one value per column. */
+export type TExportTableRow = {
+  label: string;
+  cells: readonly string[];
+};
+
+export type TExportTableArgs = {
+  columns: readonly TExportTableColumn[];
+  rows: readonly TExportTableRow[];
+  top: number;
+  left: number;
+  width: number;
+  colors: TExportChartColors;
+};
+
+/** A monthly-table row's label in the export: the unit colored, whole. */
 export type TExportTableRowLabelArgs = {
   row: TMonthlyTableRow;
-  maxWidth: number;
   colors: TExportChartColors;
 };
 
@@ -155,4 +182,22 @@ export type TExportValuesRowsArgs = {
   colors: TExportChartColors;
   /** the UI's locale — the export shows the numbers as the screen does */
   locale: string;
+};
+
+/** A series' two names for a values-table row: its full label and its short one. */
+export type TRowHeaderSeries = { label: string; shortLabel: string };
+
+export type TRowHeadersArgs = {
+  series: readonly TRowHeaderSeries[];
+  /** the label column's least width: the plot's own side margin */
+  minGutter: number;
+};
+
+/** The values table's row headers and the label column they need. */
+export type TRowHeaders = { labels: readonly string[]; gutter: number };
+
+export type TWrapUrlArgs = {
+  url: string;
+  /** the most characters a line holds at the footer's size */
+  maxChars: number;
 };

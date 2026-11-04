@@ -39,7 +39,7 @@ describe("De Martonne tooltip scale", () => {
 
   it("writes the translated class labels", () => {
     expect(formatMartonneScale(translate)).toBe(
-      "<10 Arid | 10–20 Semi-arid | 20–24 Mediterranean | 24–28 Semi-humid | 28–35 Humid | 35–55 Very-humid | >55 Extremely humid",
+      "<10 Arid | 10–20 Semi-arid | 20–24 Mediterranean | 24–28 Semi-humid | 28–35 Humid | 35–55 Very humid | >55 Extremely humid",
     );
   });
 

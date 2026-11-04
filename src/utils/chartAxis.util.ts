@@ -7,12 +7,15 @@ import {
   WALTER_LIETH_MONTH_FORMAT,
 } from "@/constants";
 import type {
+  TAnnotationBands,
   TAxisTicksArgs,
   TMonthLabelFormat,
   TPlotHeightArgs,
   TStandardYAxesArgs,
   TUnitTitlePlacementArgs,
+  TWalterLiethScales,
 } from "@/types";
+import { getPrecipitationTicks, getTemperatureTicks } from "./axisTicks.util";
 import { getFrostBandHeight } from "./walterLieth.util";
 
 // * axis helpers shared by the WL diagram and the standard chart's split panels, so both chart
@@ -30,6 +33,19 @@ export function getXAxisProps(isCompact: boolean) {
     tickMargin: CHART_X_AXIS.TICK_MARGIN + band,
     height: CHART_X_AXIS.HEIGHT + band,
   } as const;
+}
+
+/** A chart's margin: the shared one, plus any room kept for annotations above and below. */
+export function getChartMargin(bands: TAnnotationBands | undefined) {
+  const { MARGIN } = CHART_PLOT;
+  return bands === undefined
+    ? MARGIN
+    : { ...MARGIN, top: MARGIN.top + bands.top, bottom: MARGIN.bottom + bands.bottom };
+}
+
+/** Whether the °C axis runs from below 0 to above it, so a 0 °C line falls inside the plot. */
+export function crossesZeroTemperature(scales: TWalterLiethScales | null) {
+  return scales !== null && scales.tempMin < 0 && scales.tempMax > 0;
 }
 
 /** The plot's height classes — the same for both chart types. */
@@ -151,22 +167,23 @@ export function getAxisTicks({ min, max, count }: TAxisTicksArgs): number[] {
 }
 
 /**
- * The standard chart's y axes: °C over the scales, mm from 0 — on a phone exactly
- * NARROW_TICK_COUNT round ticks each, the domain their span; otherwise Recharts' own ticks.
+ * The standard chart's y axes: °C over the scales on round ticks (fewer on a phone), mm from 0
+ * — on a phone exactly NARROW_TICK_COUNT round ticks, otherwise getPrecipitationTicks; the mm
+ * domain always their span, so the axis ends on a tick.
  */
 export function getStandardYAxes({ scales, rightMax, isNarrow }: TStandardYAxesArgs) {
   const temp = scales ? ([scales.tempMin, scales.tempMax] as const) : null;
   const ticks = (min: number, max: number) =>
     getAxisTicks({ min, max, count: WALTER_LIETH_AXIS.NARROW_TICK_COUNT });
-  const tempTicks = isNarrow && temp ? ticks(...temp) : null;
-  const precTicks = isNarrow ? ticks(0, rightMax) : null;
+  const precTicks = isNarrow ? ticks(0, rightMax) : getPrecipitationTicks(rightMax);
   const edges = (values: readonly number[]) => [values[0] ?? 0, values.at(-1) ?? 0] as const;
+  const tempMaxTicks = isNarrow
+    ? WALTER_LIETH_AXIS.NARROW_TICK_COUNT
+    : WALTER_LIETH_AXIS.TEMP_MAX_TICKS;
   return {
-    temp: tempTicks
-      ? { domain: edges(tempTicks), ticks: tempTicks }
-      : { domain: temp ?? (["auto", "auto"] as const) },
-    prec: precTicks
-      ? { domain: edges(precTicks), ticks: precTicks }
-      : { domain: [0, rightMax] as const },
+    temp: temp
+      ? { domain: temp, ticks: getTemperatureTicks(...temp, tempMaxTicks) }
+      : { domain: ["auto", "auto"] as const },
+    prec: { domain: edges(precTicks), ticks: precTicks },
   };
 }

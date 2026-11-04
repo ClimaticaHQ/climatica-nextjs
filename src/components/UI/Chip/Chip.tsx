@@ -2,9 +2,13 @@
 
 import { FilterIcon } from "@/components/svg";
 import { OptionMarker } from "@/components/UI/Dropdown/OptionMarker";
-import { EChipVariant } from "@/enums";
+import { EChipVariant, ETextScale } from "@/enums";
 import { useTranslations } from "next-intl";
-import { BAR_CHIP_CLASSES as BAR, TOGGLE_CHIP_CLASSES as TOGGLE } from "./Chip.constant";
+import {
+  BAR_CHIP_CLASSES as BAR,
+  TOGGLE_CHIP_SCALE_CLASSES,
+  TOGGLE_CHIP_CLASSES as TOGGLE,
+} from "./Chip.constant";
 import type {
   TAllFiltersChipProps,
   TChipProps,
@@ -30,10 +34,13 @@ function ToggleChip({
   markerShape,
   markerHatch,
   markerFill,
+  textScale = ETextScale.DEFAULT,
   onClick,
 }: TToggleChipProps) {
   const state = disabled
-    ? TOGGLE.DISABLED
+    ? isActive
+      ? TOGGLE.DISABLED_SELECTED
+      : TOGGLE.DISABLED
     : isLocked
       ? TOGGLE.LOCKED
       : isActive
@@ -47,7 +54,7 @@ function ToggleChip({
       disabled={disabled}
       aria-pressed={isActive}
       aria-disabled={isLocked || undefined}
-      className={`${TOGGLE.BASE} ${state}`}
+      className={`${TOGGLE.BASE} ${TOGGLE_CHIP_SCALE_CLASSES[textScale]} ${state}`}
     >
       {markerShape === undefined ? (
         label

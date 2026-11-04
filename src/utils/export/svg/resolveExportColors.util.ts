@@ -7,7 +7,6 @@ const CSS_VAR_MAP: Record<keyof TExportChartColors, string> = {
   textSecondary: "--color-text-secondary",
   border: "--color-border",
   bg: "--color-surface",
-  bgSecondary: "--color-surface-secondary",
   tmax: "--color-chart-temp-max",
   tmin: "--color-chart-temp-min",
   tavg: "--color-chart-temp-avg",

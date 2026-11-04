@@ -69,10 +69,11 @@ export function getFilterChips(
     return {
       key,
       value: getFilterChipValue(key, filters, t),
-      // * a disabled chip says why instead of its value: "Variables: Not available in …"
+      // * a disabled chip is still a button — it opens the explanation — and its name says so:
+      // * "Variables: Not available in Walter-Lieth view. Show why"
       ariaLabel:
         isDisabled && reasonKey !== undefined
-          ? t("filters.chips.value", { name: getFilterName(key, t), value: t(reasonKey) })
+          ? t("filters.chips.unavailable", { name: getFilterName(key, t), reason: t(reasonKey) })
           : getFilterChipAriaLabel(key, filters, t),
       isChanged: !isDisabled && !isFilterDefault(key, filters[key]),
       isDisabled,

@@ -126,8 +126,11 @@ With a mouse: tooltips, hover focus and the month band, as usual.
 
 ### Standard chart
 
-A Recharts `ComposedChart` with °C left (the model's scales) and mm right (0 to `rightMax`). The
-two axes aren't tied, unlike Walter-Lieth's ([climate-indices.md](climate-indices.md)).
+A Recharts `ComposedChart` with °C left (the model's scales) and mm right from 0. The two axes
+aren't tied, unlike Walter-Lieth's ([climate-indices.md](climate-indices.md)). The mm ticks
+(`getPrecipitationTicks`, screen and export) are multiples of the smallest step of 10, 20, 25,
+50… that keeps at most 7, and the axis ends on the first one at or above `rightMax` (0, 20 …
+100, never … 80, 90); on a phone, four round ticks.
 
 - **Colours:** semantic only; an entity is told apart by its shape
   ([colors.md](colors.md#entities-shapes-and-hatches-not-colours)).
@@ -140,6 +143,13 @@ two axes aren't tied, unlike Walter-Lieth's ([climate-indices.md](climate-indice
   the variables filter and follow it; the last one on is locked. Card-level UI state, kept across
   layouts and chart types; Walter-Lieth ignores it.
 - **Month filter:** months outside it are dimmed, not removed.
+- **0 °C line:** when the °C domain crosses 0 (`crossesZeroTemperature`), `StandardChartAxes`
+  draws a thin dashed line at 0 °C (`CHART_ZERO_LINE`), above the grid and behind the data, so
+  single, split and overlay all get it, as does the Info figure. No legend entry, nothing for
+  screen readers. Walter-Lieth has none (its frost band shows frost). The SVG / PNG export draws
+  the same line from the same constant and check (`buildZeroLine`), after the grid, in its single,
+  split and overlay charts. Its colour, `--color-chart-reference-line`, sits between the grid's
+  and the axis lines' in both themes.
 
 ### Overlay and side by side
 

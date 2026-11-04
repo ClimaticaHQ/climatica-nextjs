@@ -12,3 +12,7 @@ export { useComparePeriodsPage } from "./useComparePeriodsPage";
 export { useHeatMapPage } from "./useHeatMapPage";
 export { useTooManyCellsMessage } from "./useTooManyCellsMessage";
 export { useSettingsPage } from "./useSettingsPage";
+export { useInfoNavigation } from "./useInfoNavigation";
+export { useAboutFacts } from "./useAboutFacts";
+export { useGuidePage } from "./useGuidePage";
+export { useDataPage } from "./useDataPage";

@@ -229,10 +229,9 @@ export function getFilterUnavailableLayout(availability: EFilterAvailability) {
   return isFilterUnavailableReason(availability) ? FILTER_UNAVAILABLE_LAYOUTS[availability] : null;
 }
 
-/** Whether a section's controls are disabled — a dimmed section ignores input as a whole. */
+/** Whether a section's controls are disabled: whenever the filter is unavailable here. */
 export function areFilterControlsDisabled(availability: EFilterAvailability) {
-  const layout = getFilterUnavailableLayout(availability);
-  return layout !== null && !layout.isDimmed;
+  return getFilterUnavailableLayout(availability) !== null;
 }
 
 /** The translation key of what's wrong with a typed weather year, or null when it's valid. */

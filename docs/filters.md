@@ -30,7 +30,7 @@ Walter-Lieth shown):
 - **Disabled with a reason** (the first `unavailableWhen` that applies):
   - `WALTER_LIETH`: the diagram always plots mean temperature and precipitation for every month,
     so variables and months are disabled, with "Switch to standard chart" where possible;
-  - `HEAT_MAP`: months don't apply to the heat map.
+  - `HEAT_MAP`: months don't apply to the heat map (note above the disabled chips).
 - **Available** otherwise.
 
 The sidebar shows every non-hidden filter (`getSidebarFilterKeys`); the full sheet the same minus
@@ -62,6 +62,15 @@ exists twice:
 | [`FiltersSidebar`](../src/components/filters/FiltersSidebar.tsx)                                                      | lg and up                 | a draft: auto-apply (replace) or Apply (push)                                 |
 | [`FilterBar`](../src/components/filters/FilterBar.tsx) + [`FiltersSheet`](../src/components/filters/FiltersSheet.tsx) | below lg                  | chips open one filter's sheet (replace), all filters (push) or an explanation |
 | `ComparedPeriods`                                                                                                     | Compare Periods, below lg | immediately (replace)                                                         |
+
+### Touch typography and disabled chips
+
+- Below `lg` the sheets use the touch scale (`--font-touch-*`); shared controls opt in with
+  `textScale={ETextScale.TOUCH}`. Inputs and dropdown triggers are at least 16px so iOS Safari
+  doesn't zoom on focus. Checked by [`touchTypography.e2e.ts`](../tests/e2e/touchTypography.e2e.ts).
+- Disabled chips have one look everywhere (`DISABLED_LOOK` in `Chip.constant.ts`): disabled
+  colours, never opacity; a selected disabled chip keeps `aria-pressed="true"`. The filter bar's
+  pill for an unavailable filter stays a button that opens the explanation.
 
 ## Draft and auto-apply
 

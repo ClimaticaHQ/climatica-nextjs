@@ -1,16 +1,14 @@
 import { EXPORT_MONTHLY_TABLE as M } from "@/constants";
 import type {
-  TExportChartColors,
   TExportMonthlyTableArgs,
   TExportTableRowLabelArgs,
   TMonthlyTableMarker,
+  TMonthlyTableRow,
 } from "@/types";
 import { escapeXml, getMarkerPath, getMonthlyTableRowLabel } from "@/utils";
+import { buildTableFrame, buildTableRule } from "./exportTable.util";
 import { buildHatchPatternDefs, buildHatchSwatch } from "./hatchExport.util";
-import { measureExportText, truncateToWidth } from "./textWrap.util";
-
-const line = (x1: number, y1: number, x2: number, y2: number, colors: TExportChartColors) =>
-  `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colors.border}" stroke-width="1" />`;
+import { measureExportText } from "./textWrap.util";
 
 /** A row's series marker — its shape in graphite, like the screen table's. */
 export function buildMarker({ shape, color }: TMonthlyTableMarker, x: number, cy: number) {
@@ -18,15 +16,29 @@ export function buildMarker({ shape, color }: TMonthlyTableMarker, x: number, cy
   return `<path d="${d}" fill="${color}" />`;
 }
 
+/** A row's swatches before its label: the precipitation row's hatch, then the series' shape. */
+const getSwatchesWidth = (row: TMonthlyTableRow) =>
+  (row.variable === "prec" && row.marker?.hatch ? M.MARKER_SIZE + M.MARKER_GAP : 0) +
+  (row.marker ? M.MARKER_SIZE + M.MARKER_GAP : 0);
+
+/** The label column: as wide as its widest row (swatches and label) needs, never cut. */
+export const getMonthlyTableLabelWidth = (rows: readonly TMonthlyTableRow[]) =>
+  Math.max(
+    M.LABEL_MIN_WIDTH,
+    ...rows.map(
+      (row) =>
+        M.LABEL_PADDING_X * 2 +
+        getSwatchesWidth(row) +
+        measureExportText(getMonthlyTableRowLabel(row), M.LABEL_FONT_SIZE),
+    ),
+  );
+
 /**
  * A row's label: "Avg Temp (°C)" with the unit in its chart color (temperature red,
- * precipitation blue), then the series — cut with "…" (plain) when it doesn't fit.
+ * precipitation blue), then the series — whole: the label column fits it.
  */
-function buildRowLabel({ row, maxWidth, colors }: TExportTableRowLabelArgs) {
+function buildRowLabel({ row, colors }: TExportTableRowLabelArgs) {
   const full = getMonthlyTableRowLabel(row);
-  if (measureExportText(full, M.LABEL_FONT_SIZE) > maxWidth) {
-    return escapeXml(truncateToWidth(full, maxWidth, M.LABEL_FONT_SIZE));
-  }
   const unitColor = row.variable === "prec" ? colors.wlPrec : colors.wlTemp;
   const series = full.slice(`${row.variableLabel} (${row.unit})`.length);
   return `${escapeXml(row.variableLabel)} (<tspan font-weight="${M.UNIT_FONT_WEIGHT}" fill="${unitColor}">${escapeXml(row.unit)}</tspan>)${escapeXml(series)}`;
@@ -44,19 +56,20 @@ export function buildMonthlyTableSvg({
   width,
   colors,
 }: TExportMonthlyTableArgs) {
-  const hasSeries = rows.some((row) => row.seriesLabel !== undefined);
-  const labelWidth = hasSeries ? M.LABEL_WIDTH.MULTI : M.LABEL_WIDTH.SINGLE;
+  const labelWidth = getMonthlyTableLabelWidth(rows);
   const colWidth = (width - labelWidth) / monthNames.length;
   const height = M.ROW_HEIGHT * (rows.length + 1);
   const colX = (i: number) => left + labelWidth + colWidth * i;
   const rowMid = (r: number) => top + M.ROW_HEIGHT * r + M.ROW_HEIGHT / 2;
 
   const grid = [
-    `<rect x="${left}" y="${top}" width="${width}" height="${height}" fill="none" stroke="${colors.border}" stroke-width="1" />`,
-    ...monthNames.map((_, i) => line(colX(i), top, colX(i), top + height, colors)),
+    buildTableFrame({ left, top, width, height, colors }),
+    ...monthNames.map((_, i) =>
+      buildTableRule({ x1: colX(i), y1: top, x2: colX(i), y2: top + height, colors }),
+    ),
     ...rows.map((_, r) => {
       const y = top + M.ROW_HEIGHT * (r + 1);
-      return line(left, y, left + width, y, colors);
+      return buildTableRule({ x1: left, y1: y, x2: left + width, y2: y, colors });
     }),
   ].join("");
   const header = monthNames
@@ -81,11 +94,7 @@ export function buildMonthlyTableSvg({
             row.marker?.fill,
           )
         : "";
-      const label = buildRowLabel({
-        row,
-        maxWidth: left + labelWidth - M.LABEL_PADDING_X - textX,
-        colors,
-      });
+      const label = buildRowLabel({ row, colors });
       const values = row.values
         .map(
           (value, i) =>

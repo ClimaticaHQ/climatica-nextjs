@@ -11,6 +11,8 @@ export const env = createEnv({
   },
   client: {
     NEXT_PUBLIC_SITE_URL: zod.url().default("https://climatica.gsic.uva.es"),
+    // * set by next.config from package.json; empty outside a Next build (unit tests)
+    NEXT_PUBLIC_APP_VERSION: zod.string().default(""),
   },
   runtimeEnv: {
     PORT: process.env["PORT"],
@@ -19,5 +21,6 @@ export const env = createEnv({
     REDIS_URL: process.env["REDIS_URL"],
     SOLR_URL: process.env["SOLR_URL"],
     NEXT_PUBLIC_SITE_URL: process.env["NEXT_PUBLIC_SITE_URL"],
+    NEXT_PUBLIC_APP_VERSION: process.env["NEXT_PUBLIC_APP_VERSION"],
   },
 });

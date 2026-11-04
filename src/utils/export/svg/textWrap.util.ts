@@ -1,4 +1,5 @@
-import { EXPORT_FONT_FAMILY, EXPORT_TEXT } from "@/constants";
+import { EXPORT_FONT_FAMILY, EXPORT_TEXT, URL_BREAK_PATTERN } from "@/constants";
+import type { TWrapUrlArgs } from "@/types";
 
 /** Rough width of a string at a font size — the fallback where no canvas can measure it. */
 export function estimateTextWidth(text: string, fontSize: number): number {
@@ -39,12 +40,27 @@ export function wrapWords(text: string, maxWidth: number, fontSize: number): str
   }, []);
 }
 
-/** The text, cut with "…" to fit maxWidth — for one-line labels (table rows) that can't wrap. */
-export function truncateToWidth(text: string, maxWidth: number, fontSize: number): string {
-  if (measureExportText(text, fontSize) <= maxWidth) return text;
-  const chars = [...text];
-  while (chars.length > 0 && measureExportText(`${chars.join("")}…`, fontSize) > maxWidth) {
-    chars.pop();
-  }
-  return `${chars.join("").trimEnd()}…`;
+/** A part cut into even pieces of at most maxChars — never a short last piece. */
+function splitEvenly(part: string, maxChars: number) {
+  const count = Math.ceil(part.length / maxChars);
+  const size = Math.ceil(part.length / count);
+  return Array.from({ length: count }, (_, i) => part.slice(i * size, (i + 1) * size));
+}
+
+/**
+ * A URL in lines of at most maxChars, broken only before "?" or "&" (a part longer than a line
+ * is cut evenly). A lone character never makes a line: it joins the line before.
+ */
+export function wrapUrl({ url, maxChars }: TWrapUrlArgs): string[] {
+  const parts = url
+    .split(URL_BREAK_PATTERN)
+    .flatMap((part) => splitEvenly(part, Math.max(maxChars, 2)));
+  return parts.reduce<string[]>((lines, part) => {
+    const last = lines.at(-1);
+    const fits = last !== undefined && last.length + part.length <= maxChars;
+    if (last !== undefined && (fits || part.length === 1)) {
+      return [...lines.slice(0, -1), last + part];
+    }
+    return [...lines, part];
+  }, []);
 }

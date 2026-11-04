@@ -193,17 +193,15 @@ export const FILTER_UNAVAILABLE_NOTE_KEYS: Partial<Record<EFilterAvailability, s
   [EFilterAvailability.HEAT_MAP]: "sidebar.notes.notAvailableHeatmap",
 };
 
-// * how a section disabled for each reason looks: the heat map dims the whole section (note
-// * above), Walter-Lieth disables the controls (note below)
+// * how a section disabled for each reason looks — its controls are disabled either way: the heat
+// * map's note goes above them, Walter-Lieth's below (with a way out)
 export const FILTER_UNAVAILABLE_LAYOUTS: TFilterUnavailableLayouts = {
   [EFilterAvailability.WALTER_LIETH]: {
-    isDimmed: false,
     isNoteFirst: false,
     noteVariant: EFilterNoteVariant.INFO,
     noteClassName: "mt-1.5",
   },
   [EFilterAvailability.HEAT_MAP]: {
-    isDimmed: true,
     isNoteFirst: true,
     noteVariant: EFilterNoteVariant.MUTED,
     noteClassName: "mb-1.5",

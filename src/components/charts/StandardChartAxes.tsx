@@ -1,9 +1,10 @@
 import { ChartUnitTitles } from "@/components/ChartUnitTitles";
+import { CHART_ZERO_LINE } from "@/constants";
 import { EDisplayMetric } from "@/enums";
 import { useDisplayFormat } from "@/hooks";
-import { getStandardYAxes, getXAxisProps } from "@/utils";
+import { crossesZeroTemperature, getStandardYAxes, getXAxisProps } from "@/utils";
 import { useContext } from "react";
-import { CartesianGrid, XAxis, YAxis } from "recharts";
+import { CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 import { useStandardChartAxes } from "@/hooks/charts/useStandardChartAxes";
 import type { TStandardChartAxesProps } from "./charts.type";
 import { ChartDeviceContext } from "./chartDevice.context";
@@ -11,7 +12,7 @@ import { ChartDeviceContext } from "./chartDevice.context";
 /**
  * Grid and axes of every standard chart (single, split panel, overlay): the WL geometry — °C
  * left and mm right in the same widths, units above, months without a title. On a phone the
- * axes are narrower, with four round ticks each.
+ * axes are narrower, with four round ticks each. A dashed 0 °C line when the °C axis crosses 0.
  */
 export function StandardChartAxes({
   scales,
@@ -46,6 +47,17 @@ export function StandardChartAxes({
         tickFormatter={roundTick}
         {...axes.axis}
       />
+      {crossesZeroTemperature(scales) && (
+        <ReferenceLine
+          yAxisId="temp"
+          y={0}
+          stroke={CHART_ZERO_LINE.STROKE}
+          strokeWidth={CHART_ZERO_LINE.STROKE_WIDTH}
+          strokeDasharray={CHART_ZERO_LINE.DASH}
+          zIndex={CHART_ZERO_LINE.Z_INDEX}
+          className="chart-zero-line"
+        />
+      )}
       {shouldShowUnitTitles && <ChartUnitTitles isCompact={isCompact} isNarrow={isNarrow} />}
     </>
   );

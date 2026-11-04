@@ -16,8 +16,8 @@ import type {
   TWalterLiethSeriesInput,
   TWeatherYearsExport,
 } from "@/types";
-import { getStandardLegendItems } from "@/utils";
-import { buildGridAndAxes, computeNiceAxisTicks } from "./buildExportSvg.util";
+import { getPrecipitationTicks, getStandardLegendItems } from "@/utils";
+import { buildGridAndAxes, buildZeroLine } from "./buildExportSvg.util";
 import { buildGroupedBars, buildMonthLabels, buildSeriesLines } from "./compareChartParts.util";
 import { createLinearScale, monthBandX } from "./scales.util";
 import { getDrawnYearSeries } from "./buildCompareWalterLiethSvg.util";
@@ -41,7 +41,8 @@ function buildStandardPlot(
     box.bottom,
     box.top,
   );
-  const precScale = createLinearScale(0, payload.rightMax, box.bottom, box.top);
+  const precTicks = getPrecipitationTicks(payload.rightMax);
+  const precScale = createLinearScale(0, precTicks.at(-1) ?? 0, box.bottom, box.top);
   const monthCount = series.data.length;
   const monthBands = Array.from({ length: monthCount }, (_, i) => {
     const band = monthBandX(i, box.right - box.left, monthCount);
@@ -58,11 +59,17 @@ function buildStandardPlot(
       box.right,
       box.top,
       box.bottom,
-      computeNiceAxisTicks(payload.rightMax),
+      precTicks,
       (tick) => tick,
       undefined,
       EXPORT_AXES_STYLE,
     ),
+    buildZeroLine({
+      scales: payload.scales,
+      tempScale,
+      plotLeft: box.left,
+      plotRight: box.right,
+    }),
     buildGroupedBars(payload, precScale, monthBands, box.bottom, { seriesList: [series] }),
     // * the single-city chart's dashes, like the split panels on screen
     buildSeriesLines({

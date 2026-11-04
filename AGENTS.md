@@ -95,7 +95,9 @@ All env vars are validated in `src/libs/Env.ts`. Never read `process.env` or `im
 
 - A component gets its own file if it's reused or encapsulates meaningful logic or markup. Single-use wrappers that only forward props or add a class are inlined into their caller.
 - Organise by role, not platform: desktop and mobile differences are props or breakpoints of one component.
-- Aim for ~100 lines per component and ~30 per function; don't split into pieces that mean nothing on their own.
+- Components with logic (state, effects, hooks, computations, event handling): ~100 lines at most.
+- Composition-only components (linear JSX assembling existing components and constants, no logic beyond simple conditional rendering): ~200 lines at most. Their logic lives in a hook.
+- Functions: ~30 lines. Don't split into pieces that mean nothing on their own.
 - Shared UI primitives in src/components/UI/<ComponentName>/.
 - One folder per feature (e.g. src/components/filters/), flat component files, one `<feature>.type.ts` and one `<feature>.constant.ts`. A sub-area gets its own only when large.
 - index.ts only at feature level and for shared UI primitives.
@@ -114,9 +116,10 @@ Search these first; the code is the reference for their props. In src/components
 
 - Badge — `UI/Badge` — a non-interactive label in a tint set (Martonne, cell count, year).
 - BottomSheet — `UI/BottomSheet` — a modal sheet from the bottom edge (with useSheetHistory).
-- Button — `UI/Button` — the app's button.
+- Button — `UI/Button` — the app's button; with `href`, a link that looks like one.
 - Chip — `UI/Chip` — every chip: toggle, filter value, all filters.
 - ChipScroller — `UI/ChipScroller` — a row of chips scrolling sideways with faded ends.
+- Disclosure — `UI/Disclosure` — a question and its answer, closed until opened (details / summary).
 - DotLabel — `UI/DotLabel` — a label, with an entity's shape when it names one.
 - Dropdown — `UI/Dropdown` — the app's select; OptionMarker (`UI/Dropdown/OptionMarker`) is an entity's shape before a label.
 - ExportMenu — `UI/ExportMenu` — the CSV / PNG / SVG / raw export menu.

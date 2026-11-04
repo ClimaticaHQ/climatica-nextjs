@@ -55,6 +55,11 @@ export function pickSharedFilterParams(params: URLSearchParams): URLSearchParams
   return pickParams(pickFilterParams(params), SHARED_FILTER_PARAMS);
 }
 
+/** Whether a navigation item for this route is the current one: the route or a page below it. */
+export function isRouteActive(pathname: string, route: string) {
+  return pathname === route || pathname.startsWith(`${route}/`);
+}
+
 export function toRouteHref(route: string, params: URLSearchParams) {
   const query = params.toString();
   return query === "" ? route : `${route}?${query}`;

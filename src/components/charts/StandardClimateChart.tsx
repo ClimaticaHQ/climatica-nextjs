@@ -2,6 +2,7 @@ import { ClimateStatsBar } from "@/components";
 import { CHART_PLOT, CHART_LINE_DASH, CHART_HOVER_COLOR, MONTH_NAMES } from "@/constants";
 import {
   getAridityBarSwatch,
+  getChartMargin,
   getAridityByMonth,
   getMonthLabelFormat,
   getPlotHeightClass,
@@ -14,7 +15,16 @@ import {
 import { useDelayedHide, useElementWidth } from "@/hooks";
 import { useContext, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Bar, ComposedChart, Line, ResponsiveContainer, Tooltip, ReferenceArea } from "recharts";
+import {
+  Bar,
+  ComposedChart,
+  Customized,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+  ReferenceArea,
+} from "recharts";
+import { ChartOverlayLayer } from "./ChartOverlayLayer";
 import { useSeriesToggleMotion } from "@/hooks/charts/useSeriesToggleMotion";
 import { PrecipBarShape } from "./PrecipBarShape";
 import { StandardChartAxes } from "./StandardChartAxes";
@@ -41,6 +51,10 @@ export function StandardClimateChart({
   isPanel = false,
   syncId,
   footer,
+  isStatic = false,
+  overlay,
+  statsMarkers,
+  annotationBands,
 }: TStandardClimateChartProps) {
   const t = useTranslations();
   const seriesMotion = useSeriesToggleMotion();
@@ -111,6 +125,7 @@ export function StandardClimateChart({
           aridMonths={summary.aridCount}
           martonneIndex={summary.martonne}
           martonneYear={martonneYear}
+          markers={statsMarkers}
           {...(altitude !== undefined ? { altitude } : {})}
         />
       )}
@@ -119,16 +134,21 @@ export function StandardClimateChart({
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
               data={chartData}
-              margin={CHART_PLOT.MARGIN}
-              {...(syncId !== undefined ? { syncId } : {})}
+              margin={getChartMargin(annotationBands)}
+              // * static: a picture, so no keyboard layer — the chart takes no tab stop
+              accessibilityLayer={!isStatic}
+              {...(syncId !== undefined && !isStatic ? { syncId } : {})}
               barGap={2}
               barCategoryGap={
                 isNarrow ? CHART_PLOT.BAR_CATEGORY_GAP.NARROW : CHART_PLOT.BAR_CATEGORY_GAP.FULL
               }
-              onMouseMove={(state) =>
-                onActiveMonthIndexChange?.(resolveActiveTooltipIndex(state.activeTooltipIndex))
-              }
-              onMouseLeave={() => onActiveMonthIndexChange?.(null)}
+              onMouseMove={(state) => {
+                if (!isStatic)
+                  onActiveMonthIndexChange?.(resolveActiveTooltipIndex(state.activeTooltipIndex));
+              }}
+              onMouseLeave={() => {
+                if (!isStatic) onActiveMonthIndexChange?.(null);
+              }}
             >
               <StandardChartAxes
                 scales={scales}
@@ -150,17 +170,19 @@ export function StandardClimateChart({
               )}
               {/* * one series: each row after its variable's legend swatch, not a marker; on
                 touch, the tapped month's */}
-              <Tooltip
-                key={getTouchTooltipKey(tooltipState)}
-                cursor={false}
-                {...getTouchTooltipProps(tooltipState)}
-                content={
-                  <StandardTooltip
-                    formatLabel={axes.localMonthName}
-                    swatchOf={(name) => swatchByName[name]}
-                  />
-                }
-              />
+              {!isStatic && (
+                <Tooltip
+                  key={getTouchTooltipKey(tooltipState)}
+                  cursor={false}
+                  {...getTouchTooltipProps(tooltipState)}
+                  content={
+                    <StandardTooltip
+                      formatLabel={axes.localMonthName}
+                      swatchOf={(name) => swatchByName[name]}
+                    />
+                  }
+                />
+              )}
 
               <Bar
                 isAnimationActive={seriesMotion.isAnimationActive}
@@ -226,10 +248,19 @@ export function StandardClimateChart({
                 hide={hideTminLine}
                 style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
               />
+              {overlay !== undefined && (
+                <Customized
+                  component={ChartOverlayLayer}
+                  render={overlay}
+                  xValueOf={(month: number) => MONTH_NAMES[month - 1] ?? ""}
+                  temperatureAxisId="temp"
+                  precipitationAxisId="prec"
+                />
+              )}
             </ComposedChart>
           </ResponsiveContainer>
         </div>
-        {isTouch && (
+        {isTouch && !isStatic && (
           <MonthTapLayer
             activeMonthIndex={activeMonthIndex ?? null}
             onActiveMonthIndexChange={onActiveMonthIndexChange}

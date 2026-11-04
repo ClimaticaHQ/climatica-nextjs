@@ -404,7 +404,7 @@ describe("the month axis on a phone", () => {
   });
 });
 
-describe("the phone's y axes: four ticks, every value inside", () => {
+describe("the phone's y axes: round ticks, every value inside", () => {
   it("four round, evenly spaced ticks covering the values", () => {
     for (const [min, max] of [
       [0, 35],
@@ -441,12 +441,17 @@ describe("the phone's y axes: four ticks, every value inside", () => {
         expect(value).toBeLessThanOrEqual(Number(high));
       }
     }
-    expect("ticks" in axes.temp && axes.temp.ticks).toHaveLength(4);
-    // * wider screens keep Recharts' own ticks
-    expect(
-      "ticks" in
-        getStandardYAxes({ scales: getWalterLiethScales(rows), rightMax: 200, isNarrow: false })
-          .temp,
-    ).toBe(false);
+    // * °C: round multiples at an even step, at most four on a phone (0 when crossed)
+    const phoneTicks = "ticks" in axes.temp ? (axes.temp.ticks ?? []) : [];
+    expect(phoneTicks.length).toBeLessThanOrEqual(4);
+    expect(phoneTicks).toContain(0);
+    expect(new Set(phoneTicks.slice(1).map((tick, i) => tick - (phoneTicks[i] ?? 0))).size).toBe(1);
+    // * wider screens get the same round ticks, more of them
+    const desktop = getStandardYAxes({
+      scales: getWalterLiethScales(rows),
+      rightMax: 200,
+      isNarrow: false,
+    }).temp;
+    expect("ticks" in desktop && desktop.ticks?.every((tick) => tick % 5 === 0)).toBe(true);
   });
 });

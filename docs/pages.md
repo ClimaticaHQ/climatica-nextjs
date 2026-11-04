@@ -28,6 +28,25 @@ places blocks; it fetches nothing and holds no state.
   what both share: city, URL, view state, sort order, marker slots ([charts.md](charts.md#series)).
 - **Region Heatmap** has no series; see [heat-map.md](heat-map.md).
 
+## Info pages
+
+About (`/about`), User guide (`/about/guide`) and Data & methods (`/about/data`): static pages,
+no filters, no data requests. Components are in `src/components/info/` by role (`layout/`,
+`pages/`, `parts/`, `figures/`).
+
+- **Sections** are listed once in [`INFO_PAGES`](../src/constants/info.constant.ts); the
+  navigation (sidebar from `lg`, Contents bar and sheet below) and `InfoSection` both read it.
+  State is [`useInfoNavigation`](../src/hooks/pages/useInfoNavigation.ts); the section in view
+  comes from `useActiveSection`.
+- **Pages are composition-only**: shared UI and item constants from `info.constant.ts`; their
+  logic is in page hooks (`useAboutFacts`, `useGuidePage`, `useDataPage`).
+- **Facts come from the code** (resolutions, periods, languages, formulas, legends), never
+  typed into prose. Project facts and the team are in `PROJECT_INFO` and `TEAM`; an empty value
+  hides its element or section.
+- **Figures** are the app's own charts on a fixture (`figures.constant.ts`), drawn with
+  `isStatic` and an `overlay`; annotated months are picked from the data by their condition
+  (`infoFigure.util`), never typed in.
+
 ## PageLayout
 
 [`PageLayout`](../src/components/page/PageLayout.tsx) draws, in order:

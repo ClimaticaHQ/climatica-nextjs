@@ -21,13 +21,14 @@ removes containers **and volumes**, `docker:reboot` resets and starts (then rein
 Validated at startup in [`src/libs/Env.ts`](../src/libs/Env.ts); copy
 [`.example.env`](../.example.env) to `.env`. Code reads `env` from `@/libs/Env`, never `process.env`.
 
-| Variable               | Side   | Default                         | Purpose                                         |
-| ---------------------- | ------ | ------------------------------- | ----------------------------------------------- |
-| `WORLDCLIM_API_KEY`    | server | required                        | WorldClim bearer key, never sent to the browser |
-| `REDIS_URL`            | server | `redis://localhost:6379`        |                                                 |
-| `SOLR_URL`             | server | `http://localhost:8983`         | also used by `solr:schema`                      |
-| `PORT`                 | server | `3000`                          | dev port; the server-side axios base URL        |
-| `NEXT_PUBLIC_SITE_URL` | client | `https://climatica.gsic.uva.es` | absolute URLs: metadata, share links, OG images |
+| Variable                  | Side   | Default                         | Purpose                                              |
+| ------------------------- | ------ | ------------------------------- | ---------------------------------------------------- |
+| `WORLDCLIM_API_KEY`       | server | required                        | WorldClim bearer key, never sent to the browser      |
+| `REDIS_URL`               | server | `redis://localhost:6379`        |                                                      |
+| `SOLR_URL`                | server | `http://localhost:8983`         | also used by `solr:schema`                           |
+| `PORT`                    | server | `3000`                          | dev port; the server-side axios base URL             |
+| `NEXT_PUBLIC_SITE_URL`    | client | `https://climatica.gsic.uva.es` | absolute URLs: metadata, share links, OG images      |
+| `NEXT_PUBLIC_APP_VERSION` | client | set by `next.config.ts`         | package.json's version (About page); not set by hand |
 
 ## First-time setup
 

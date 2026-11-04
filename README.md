@@ -18,6 +18,7 @@
 - [Tech Stack](#tech-stack)
   - [External APIs](#external-apis)
 - [Documentation](#documentation)
+- [Authors and acknowledgements](#authors-and-acknowledgements)
 - [License](#license)
 
 ---
@@ -187,6 +188,14 @@ document. Good places to start:
 | [operations.md](docs/operations.md)               | Docker, Solr, deploy          |
 
 Code rules for contributors and AI agents are in [AGENTS.md](AGENTS.md).
+
+---
+
+## Authors and acknowledgements
+
+Climatica is developed by [Andrii Kononenko](https://www.linkedin.com/in/andrii-kononenko/) in the
+GSIC-EMIC research group, Universidad de Valladolid. It began as a bachelor's thesis project and
+internship, and is open for public use under the MIT licence.
 
 ---
 

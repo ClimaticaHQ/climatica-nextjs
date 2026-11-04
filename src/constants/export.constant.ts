@@ -41,18 +41,11 @@ export const EXPORT_SVG_LAYOUT = {
 // * the comparison exports (Compare Cities, Compare Periods)
 export const COMPARE_EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,
+  // * the stats table's top; the chart body starts under it (EXPORT_TABLE.GAP_BELOW) and each
+  // * body (WL or standard, split or overlay) sets its own height
   statsY: 92,
-  statsHeaderRowHeight: 32,
-  statsRowHeight: 26,
   // * the overlay's hatch patterns' id prefix
   hatchPrefix: "cmp-hatch",
-  statsHeaderFontSize: 13,
-  // * a stats column head's shape, before its name
-  statsMarkerSize: 8,
-  statsMarkerGap: 8,
-  // * where the chart body starts under the stats table (overlay, weather years); each body
-  // * (WL or standard, split or overlay) sets its own height
-  chartTop: 310,
 } as const;
 
 // * the heat map export: its height follows its content
@@ -98,6 +91,9 @@ export const COMPARE_WL_EXPORT_LAYOUT = {
   footerGap: 44,
 } as const;
 
+// * a share URL in the footer wraps only before these: "?" and each "&" start a new part
+export const URL_BREAK_PATTERN = /(?=[?&])/;
+
 // * every export SVG's font stack — text is measured in the same stack (measureExportText)
 export const EXPORT_FONT_FAMILY = "Inter, Roboto, Helvetica Neue, Arial, sans-serif";
 
@@ -121,7 +117,6 @@ export const COMPARE_EXPORT_DEFAULT_VISIBLE: TVisibleSeries = {
 export const EXPORT_MONTHLY_VALUES = {
   // * px below the month labels' baseline
   GAP_ABOVE: 8,
-  RADIUS: 4,
   // * one line per series in a cell (overlay: A above B), padded top and bottom
   LINE_HEIGHT: 16,
   ROW_PADDING: 5,
@@ -139,30 +134,36 @@ export const EXPORT_MONTHLY_VALUES = {
   UNIT_MARKER_GAP: 2,
   // * the standard overlay's table: a section label (the unit, in the unit's type) over each row
   SECTIONS: { PADDING_X: 6, HEIGHT: 14, BASELINE: 11 },
+  // * px — the widest label column a row header may take: past it, the series' short labels
+  // * (their full names are in the title and the legend)
+  ROW_HEADER_MAX_WIDTH: 120,
   // * a line's baseline below its centre
   BASELINE: 4,
 } as const;
 
-// * the comparison exports' stats table, on top — as on the page
-export const EXPORT_COMPARISON_TABLE = {
-  HEADER_HEIGHT: 46,
-  ROW_HEIGHT: 28,
-  // * share of the table's width for the metric column
-  METRIC_WIDTH_RATIO: 0.28,
-  PADDING_X: 12,
-  RADIUS: 8,
-  FONT_SIZE: 13,
-  HEAD_FONT_WEIGHT: 600,
-  VALUE_FONT_WEIGHT: 500,
-  SMALL_FONT_SIZE: 11,
-  // * header text baselines: names / "Difference", then the direction line under it
-  HEAD_BASELINE: 22,
-  DIRECTION_BASELINE: 37,
-  BASELINE: 5,
+// * every export table (stats, comparison, monthly) in one style, the City Climate one: a
+// * square frame, a plain grid, centred values, no header fill
+export const EXPORT_TABLE = {
+  HEADER_HEIGHT: 32,
+  // * a head with a second line under it (the difference's direction)
+  HEADER_WITH_SUBTITLE_HEIGHT: 44,
+  ROW_HEIGHT: 26,
+  PADDING_X: 10,
+  LABEL_FONT_SIZE: 12,
+  HEADER_FONT_SIZE: 13,
+  HEADER_FONT_WEIGHT: 700,
+  SUBTITLE_FONT_SIZE: 11,
+  // * a two-line head: the name this far above the head's centre, the subtitle this far below
+  SUBTITLE_OFFSET: 8,
+  VALUE_FONT_SIZE: 13,
+  VALUE_FONT_WEIGHT: 600,
+  // * a line's baseline below its centre
+  BASELINE: 4,
+  // * a series' shape before its name in a head
   MARKER_SIZE: 8,
-  MARKER_GAP: 6,
-  // * space below the table, above the chart
-  GAP_BELOW: 24,
+  MARKER_GAP: 8,
+  // * space below a table on top, above the chart: room for the °C / mm titles over the plot
+  GAP_BELOW: 36,
 } as const;
 
 // * the exports' monthly table: the city page's two rows, or a row per variable and series
@@ -170,8 +171,8 @@ export const EXPORT_MONTHLY_TABLE = {
   // * the table's own hatch patterns' id prefix: it's drawn under charts that define none
   HATCH_PREFIX: "tbl-hatch",
   ROW_HEIGHT: 26,
-  // * px — the label column: variable only (one series), or variable — series (compare)
-  LABEL_WIDTH: { SINGLE: 110, MULTI: 250 },
+  // * px — the label column's least width; wider rows widen it (getMonthlyTableLabelWidth)
+  LABEL_MIN_WIDTH: 110,
   LABEL_PADDING_X: 10,
   LABEL_FONT_SIZE: 11,
   // * the unit in a row label, in its chart color
@@ -190,7 +191,7 @@ export const EXPORT_MONTHLY_TABLE = {
   GAP_ABOVE: 32,
 } as const;
 
-// * WL export text: month labels under a panel, the panel header lines, the Martonne badge
+// * WL export text: month labels under a panel, the panel header lines
 export const WALTER_LIETH_EXPORT_TEXT = {
   // * every export's month labels (WL and standard), below the frost band's reserved room
   MONTH_LABEL_OFFSET: 18 + WALTER_LIETH_FROST.BAND_HEIGHT.FULL,
@@ -203,15 +204,6 @@ export const WALTER_LIETH_EXPORT_TEXT = {
   PANEL_DOT_RADIUS: 4,
   PANEL_SUBTITLE_Y: 34,
   PANEL_TEXT_FONT_SIZE: 12,
-  // * the Martonne class badge (comparison table)
-  BADGE_FONT_SIZE: 10,
-  BADGE_FONT_WEIGHT: 500,
-  BADGE_PADDING_X: 5,
-  BADGE_HEIGHT: 15,
-  BADGE_RADIUS: 3,
-  // * badge top above the value's baseline, and its text baseline below the badge top
-  BADGE_RISE: 11,
-  BADGE_TEXT_Y: 11,
 } as const;
 
 // * every export plot's axes, like the screen: tick labels this far from the plot, °C / mm

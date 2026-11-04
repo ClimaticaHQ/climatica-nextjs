@@ -2,13 +2,12 @@
 
 import { SectionLabel } from "@/components/UI/SectionLabel";
 import { FILTER_UNAVAILABLE_NOTE_KEYS, FOCUS_RING_CLASS } from "@/constants";
-import { EFilterAvailability } from "@/enums";
+import { EFilterAvailability, ETextScale } from "@/enums";
 import { getFilterUnavailableLayout, isFilterUnavailableReason } from "@/utils/filters.util";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import {
   FILTER_NOTE_CLASSES,
-  FILTER_SECTION_DIMMED_CLASS,
   FILTER_UNAVAILABLE_ACTION_CLASS,
   FILTER_UNAVAILABLE_ACTION_LABELS,
 } from "./filters.constant";
@@ -24,13 +23,13 @@ export function FilterSection({
 }: TFilterSectionProps) {
   const isTitleShown = useContext(FilterSectionTitleContext);
   const layout = getFilterUnavailableLayout(availability);
-  const isDimmed = layout?.isDimmed ?? false;
   const note = <UnavailableNote availability={availability} />;
-  const classes = [className, isDimmed ? FILTER_SECTION_DIMMED_CLASS : ""].filter(Boolean);
 
   return (
-    <div className={classes.join(" ")} inert={isDimmed}>
-      {isTitleShown && title !== undefined && <SectionLabel text={title} />}
+    <div className={className}>
+      {isTitleShown && title !== undefined && (
+        <SectionLabel text={title} textScale={ETextScale.TOUCH} />
+      )}
       {layout?.isNoteFirst && note}
       {children}
       {layout !== null && !layout.isNoteFirst && note}

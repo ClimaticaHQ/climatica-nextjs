@@ -25,4 +25,12 @@ export enum ECardBackground {
   DEFAULT = "default",
   // * a placeholder surface (the map skeleton)
   MUTED = "muted",
+  // * a block that stands out from the cards around it (a callout, a featured card)
+  HIGHLIGHT = "highlight",
+}
+
+// * a stat card's label and sub line: XS in the app's stats, BASE on the Info pages
+export enum EStatLabelSize {
+  XS = "xs",
+  BASE = "base",
 }

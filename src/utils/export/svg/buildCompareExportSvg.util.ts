@@ -2,7 +2,7 @@ import {
   COMPARE_EXPORT_SVG_LAYOUT as L,
   COMPARE_WL_EXPORT_LAYOUT as W,
   EXPORT_FONT_FAMILY,
-  EXPORT_COMPARISON_TABLE,
+  EXPORT_TABLE,
   EXPORT_LEGEND,
   EXPORT_MONTHLY_TABLE,
   WALTER_LIETH_DIAGRAM,
@@ -25,16 +25,15 @@ import type {
 import {
   buildMonthlyTableRows,
   getEntityBarSwatch,
-  getMarkerPath,
   getSwatchBarStyle,
   getMonthlyTableVariables,
+  getPrecipitationTicks,
   getSeriesLegendItems,
 } from "@/utils";
-import { estimateTextWidth } from "./textWrap.util";
 import { buildHatchPatternDefs } from "./hatchExport.util";
 import { formatValue } from "../../displayFormat.util";
 import { buildFooterTextLines } from "../shared/footerLines.util";
-import { buildGridAndAxes, computeNiceAxisTicks, escapeXml } from "./buildExportSvg.util";
+import { buildGridAndAxes, buildZeroLine, escapeXml } from "./buildExportSvg.util";
 import {
   buildCompareWalterLiethBody,
   buildWeatherYearsWalterLiethBody,
@@ -48,9 +47,11 @@ import {
   getExportBarLayout,
 } from "./compareChartParts.util";
 import { buildComparisonTableSvg } from "./comparisonTableExport.util";
+import { buildExportTableSvg } from "./exportTable.util";
 import {
   buildExportValuesRows,
   buildMonthlyValuesSvg,
+  getRowHeaders,
   getValuesTableTop,
 } from "./monthlyValuesExport.util";
 import { buildMonthlyTableSvg } from "./monthlyTableExport.util";
@@ -76,8 +77,8 @@ function buildHeader(payload: TCompareExportPayload, colors: TExportChartColors)
   `;
 }
 
-/** The bordered stats table, one column per series — the export counterpart to the page's StatsTable. */
-function buildStatsTable(payload: TCompareExportPayload, colors: TExportChartColors): string {
+/** The weather years' stats table, one column per year, in the export table style. */
+function buildStatsTable(payload: TCompareExportPayload, colors: TExportChartColors) {
   const { series, labels } = payload;
   const hasAltitude = series.some((s) => s.altitude !== null);
   const { locale } = labels;
@@ -122,62 +123,14 @@ function buildStatsTable(payload: TCompareExportPayload, colors: TExportChartCol
     },
   });
 
-  const tableWidth = L.width - L.paddingX * 2;
-  const labelColWidth = 150;
-  const dataColWidth = (tableWidth - labelColWidth) / series.length;
-  const y0 = L.statsY;
-  const tableHeight = L.statsHeaderRowHeight + rows.length * L.statsRowHeight;
-  const colX = (i: number) => L.paddingX + labelColWidth + dataColWidth * i;
-
-  const border = `<rect x="${L.paddingX}" y="${y0}" width="${tableWidth}" height="${tableHeight}" fill="none" stroke="${colors.border}" stroke-width="1" />`;
-
-  const vDividers = [
-    `<line x1="${L.paddingX + labelColWidth}" y1="${y0}" x2="${L.paddingX + labelColWidth}" y2="${y0 + tableHeight}" stroke="${colors.border}" stroke-width="1" />`,
-    ...series.slice(1).map((_, i) => {
-      const x = colX(i + 1);
-      return `<line x1="${x}" y1="${y0}" x2="${x}" y2="${y0 + tableHeight}" stroke="${colors.border}" stroke-width="1" />`;
-    }),
-  ].join("");
-
-  const hDividers = rows
-    .map((_, i) => {
-      const y = y0 + L.statsHeaderRowHeight + L.statsRowHeight * i;
-      return `<line x1="${L.paddingX}" y1="${y}" x2="${L.paddingX + tableWidth}" y2="${y}" stroke="${colors.border}" stroke-width="1" />`;
-    })
-    .join("");
-
-  const headerRow = series
-    .map((s, i) => {
-      const cx = colX(i) + dataColWidth / 2;
-      const cy = y0 + L.statsHeaderRowHeight / 2 + 4;
-      // * the series' shape before its name, as in the page's table head
-      const markerX = cx - estimateTextWidth(s.label, L.statsHeaderFontSize) / 2 - L.statsMarkerGap;
-      const d = getMarkerPath({
-        shape: s.shape,
-        cx: markerX,
-        cy: cy - L.statsMarkerSize / 2,
-        size: L.statsMarkerSize,
-      });
-      return `<path d="${d}" fill="${colors.seriesMarker}" /><text x="${cx}" y="${cy}" text-anchor="middle" font-size="${L.statsHeaderFontSize}" font-weight="700" fill="${colors.text}">${escapeXml(s.label)}</text>`;
-    })
-    .join("");
-
-  const dataRows = rows
-    .map((row, ri) => {
-      const rowY = y0 + L.statsHeaderRowHeight + L.statsRowHeight * ri;
-      const labelText = `<text x="${L.paddingX + 10}" y="${rowY + L.statsRowHeight / 2 + 4}" font-size="12" fill="${colors.textSecondary}">${escapeXml(row.label)}</text>`;
-      const valueTexts = series
-        .map((s, i) => {
-          const cx = colX(i) + dataColWidth / 2;
-          const cy = rowY + L.statsRowHeight / 2 + 4;
-          return `<text x="${cx}" y="${cy}" text-anchor="middle" font-size="13" font-weight="600" fill="${colors.text}">${escapeXml(row.format(s))}</text>`;
-        })
-        .join("");
-      return labelText + valueTexts;
-    })
-    .join("");
-
-  return border + vDividers + hDividers + headerRow + dataRows;
+  return buildExportTableSvg({
+    columns: series.map(({ label, shape }) => ({ label, shape })),
+    rows: rows.map(({ label, format }) => ({ label, cells: series.map(format) })),
+    top: L.statsY,
+    left: L.paddingX,
+    width: L.width - L.paddingX * 2,
+    colors,
+  });
 }
 
 /** The standard overlay's legend — the same items ChartLegend shows for it. */
@@ -230,8 +183,14 @@ function buildStandardChartBody(
   colors: TExportChartColors,
   top: number,
 ): TCompareWalterLiethBody {
-  const plotLeft = W.overlayPlotMarginX;
-  const plotRight = L.width - W.overlayPlotMarginX;
+  // * a pair's values table heads its rows with the series' labels: the plot's margins widen to
+  // * the label column they need
+  const rowHeaders = getRowHeaders({
+    series: payload.series,
+    minGutter: W.overlayPlotMarginX - L.paddingX,
+  });
+  const plotLeft = payload.comparison ? L.paddingX + rowHeaders.gutter : W.overlayPlotMarginX;
+  const plotRight = L.width - plotLeft;
   const chartBottom = top + W.overlayPlotHeight;
   const tempScale = createLinearScale(
     payload.scales.tempMin,
@@ -239,7 +198,8 @@ function buildStandardChartBody(
     chartBottom,
     top,
   );
-  const precScale = createLinearScale(0, payload.rightMax, chartBottom, top);
+  const precTicks = getPrecipitationTicks(payload.rightMax);
+  const precScale = createLinearScale(0, precTicks.at(-1) ?? 0, chartBottom, top);
   const monthCount = payload.series[0]?.data.length ?? WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR;
   const monthBands = Array.from({ length: monthCount }, (_, i) => {
     const band = monthBandX(i, plotRight - plotLeft, monthCount);
@@ -249,7 +209,14 @@ function buildStandardChartBody(
   const barLayout = getExportBarLayout(monthBands, payload.series.length, payload.barStyle);
   // * two-series comparisons: the values table under the plot (weather years keep theirs
   // * below the chart)
-  const strip = buildOverlayValues({ payload, colors, plotLeft, plotRight, chartBottom });
+  const strip = buildOverlayValues({
+    payload,
+    colors,
+    plotLeft,
+    plotRight,
+    chartBottom,
+    rowHeaders,
+  });
   const legend = buildLegend(
     payload,
     colors,
@@ -268,11 +235,12 @@ function buildStandardChartBody(
       plotRight,
       top,
       chartBottom,
-      computeNiceAxisTicks(payload.rightMax),
+      precTicks,
       (tick) => tick,
       undefined,
       EXPORT_AXES_STYLE,
     ),
+    buildZeroLine({ scales: payload.scales, tempScale, plotLeft, plotRight }),
     barStyle.hasHatch ? `<defs>${buildHatchPatternDefs(L.hatchPrefix, colors.bg)}</defs>` : "",
     buildGroupedBars(payload, precScale, monthBands, chartBottom, {
       barStyle: payload.barStyle,
@@ -303,6 +271,7 @@ function buildOverlayValues({
   plotLeft,
   plotRight,
   chartBottom,
+  rowHeaders,
 }: TOverlayValuesArgs) {
   if (!payload.comparison) return null;
   return buildMonthlyValuesSvg({
@@ -320,13 +289,13 @@ function buildOverlayValues({
       ...getEntityBarSwatch(getExportSwatchStyle(payload), hatch, place),
       color: colors.seriesMarker,
     })),
-    // * as on screen: each unit a section label, the rows headed by short labels (the legend
-    // * holds the markings)
-    rowHeaders: payload.series.map(({ shortLabel }) => shortLabel),
+    // * each unit a section label, the rows headed by the series' labels (the legend holds the
+    // * markings)
+    rowHeaders: rowHeaders.labels,
     hatchPrefix: L.hatchPrefix,
     span: { left: plotLeft, right: plotRight },
     // * the table spans the content width: its gutters are the plot margins inside the padding
-    gutter: W.overlayPlotMarginX - L.paddingX,
+    gutter: rowHeaders.gutter,
     top: getValuesTableTop(chartBottom, T.MONTH_LABEL_OFFSET),
     colors,
   });
@@ -394,18 +363,17 @@ function buildTable(payload: TCompareExportPayload, colors: TExportChartColors, 
  */
 function buildTopTable(payload: TCompareExportPayload, colors: TExportChartColors) {
   const { comparison } = payload;
-  if (!comparison) {
-    return { svg: buildStatsTable(payload, colors), chartTop: L.chartTop };
-  }
-  const table = buildComparisonTableSvg({
-    table: comparison.table,
-    labels: comparison.labels.table,
-    top: L.statsY,
-    left: L.paddingX,
-    width: L.width - L.paddingX * 2,
-    colors,
-  });
-  return { svg: table.svg, chartTop: table.bottom + EXPORT_COMPARISON_TABLE.GAP_BELOW };
+  const table = comparison
+    ? buildComparisonTableSvg({
+        table: comparison.table,
+        labels: comparison.labels.table,
+        top: L.statsY,
+        left: L.paddingX,
+        width: L.width - L.paddingX * 2,
+        colors,
+      })
+    : buildStatsTable(payload, colors);
+  return { svg: table.svg, chartTop: table.bottom + EXPORT_TABLE.GAP_BELOW };
 }
 
 /** For weather years, the payload with only the series the screen draws (pair or shown years). */

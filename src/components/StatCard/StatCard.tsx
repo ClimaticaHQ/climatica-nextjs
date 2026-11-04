@@ -1,7 +1,11 @@
 import { Card } from "@/components/Card";
 import { DATA_UPDATE_ALL_SERIES } from "@/constants";
-import { ECardPadding, ECardSize, EStatValueSize } from "@/enums";
-import { STAT_CARD_CLASSES as C, STAT_VALUE_CLASSES } from "./StatCard.constant";
+import { ECardPadding, ECardSize, EStatLabelSize, EStatValueSize } from "@/enums";
+import {
+  STAT_CARD_CLASSES as C,
+  STAT_LABEL_SIZE_CLASSES,
+  STAT_VALUE_CLASSES,
+} from "./StatCard.constant";
 import type { TStatCardProps } from "./StatCard.type";
 
 /**
@@ -15,6 +19,7 @@ export function StatCard({
   sub,
   valueColor,
   valueSize = EStatValueSize.XL,
+  labelSize = EStatLabelSize.XS,
   flashKeys = DATA_UPDATE_ALL_SERIES,
 }: TStatCardProps) {
   return (
@@ -25,7 +30,7 @@ export function StatCard({
       flashKeys={flashKeys}
       className={C.CARD}
     >
-      <span className={C.LABEL}>{label}</span>
+      <span className={`${C.LABEL} ${STAT_LABEL_SIZE_CLASSES[labelSize]}`}>{label}</span>
       <span
         className={STAT_VALUE_CLASSES[valueSize]}
         style={valueColor ? { color: valueColor } : undefined}
@@ -33,7 +38,7 @@ export function StatCard({
         {value}
         {unit && <span className={C.UNIT}>{unit}</span>}
       </span>
-      {sub && <span className={C.SUB}>{sub}</span>}
+      {sub && <span className={`${C.SUB} ${STAT_LABEL_SIZE_CLASSES[labelSize]}`}>{sub}</span>}
     </Card>
   );
 }

@@ -31,3 +31,18 @@ export enum EDifferenceMeaning {
   /** the later period against the earlier */
   PERIODS = "periods",
 }
+
+/** The value axis a chart annotation is anchored on: °C, or mm of precipitation. */
+export enum EChartValueAxis {
+  TEMPERATURE = "temperature",
+  PRECIPITATION = "precipitation",
+}
+
+/** A stats bar item an annotation can attach to. */
+export enum EStatsBarItem {
+  MEAN_TEMP = "meanTemp",
+  ANNUAL_PRECIP = "annualPrecip",
+  ARID_MONTHS = "aridMonths",
+  ALTITUDE = "altitude",
+  MARTONNE = "martonne",
+}

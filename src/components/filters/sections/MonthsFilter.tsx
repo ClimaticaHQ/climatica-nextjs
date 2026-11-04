@@ -2,7 +2,7 @@
 
 import { Chip } from "@/components/UI/Chip";
 import { ALL_MONTHS, MONTH_NUMBERS } from "@/constants";
-import { EFilterKey } from "@/enums";
+import { EFilterKey, ETextScale } from "@/enums";
 import { areFilterControlsDisabled, toggleFilterOption } from "@/utils/filters.util";
 import { useTranslations } from "next-intl";
 import { FilterSection } from "../FilterSection";
@@ -18,6 +18,7 @@ export function MonthsFilter({ values, availability, onChange }: TFilterSectionR
     <FilterSection title={t("sidebar.sections.months")} availability={availability}>
       <div className="flex flex-wrap gap-2">
         <Chip
+          textScale={ETextScale.TOUCH}
           label={t("sidebar.months.all")}
           isActive={values.months === ALL_MONTHS}
           disabled={isDisabled}
@@ -25,6 +26,7 @@ export function MonthsFilter({ values, availability, onChange }: TFilterSectionR
         />
         {MONTH_NUMBERS.map((month) => (
           <Chip
+            textScale={ETextScale.TOUCH}
             key={month}
             label={t(`months.${month}`)}
             isActive={selected.includes(month)}

@@ -54,18 +54,21 @@ DOM, which is why a payload is never built during render.
 - **Header:** title and subtitle.
 - **Stats:** the single chart's stats row, or the page's comparison table — complete even when a
   panel is expanded.
+- **Tables:** one style for every export table
+  ([`exportTable.util`](../src/utils/export/svg/exportTable.util.ts)). Labels are never cut.
 - **Chart body:** the Walter-Lieth diagram drawn with the screen's geometry functions
   (`getSharedDomain`, `getAridHumidSegments`, …), so hatching and crossings match; or the standard
   chart. Missing months break a line. An incomplete series is drawn as its notice.
 - **Standard overlay:** the full year, never scrolled, always in the plain bar style
   (`EXPORT_BAR_STYLE`); a legend names every entity even where the page's chips stand in for it.
 - **Monthly values:** the screen's rows (`buildMonthlyValuesRows`), columns under the months. A
-  file can't switch to the vertical layout, so the font shrinks to fit (never below 8 px).
+  file can't switch to the vertical layout, so the font shrinks to fit (never below 8 px). Rows
+  use the full labels, or the short ones when too wide (`getRowHeaders`).
 - **Legend:** the screen's items and swatches (`buildExportLegend`).
 - **Footer:** context, data attribution (creator and version read live from WorldClim,
-  `useGetDatasetVersion`) and the view's share URL.
+  `useGetDatasetVersion`) and the view's share URL, wrapped only before "?" or "&" (`wrapUrl`).
 
-Truncated text is measured on a canvas in the export's font (`measureExportText`). The XML
+Text is measured on a canvas in the export's font (`measureExportText`). The XML
 declaration must be the first character, so builders join an array of lines.
 
 ## Raw data
@@ -101,3 +104,4 @@ row, map, colour scale. The map section
 - A new colour: add it to `CSS_VAR_MAP` and `TExportChartColors`, or pass `var(--token)` and let
   `resolveCssVars` resolve it. Never a hex value in a builder.
 - Tests: builders are pure; test the SVG string ([`tests/unit/utils/export/`](../tests/unit/utils/export)).
+  Each export type has an SVG snapshot; update with `npx vitest run -u` when a change is meant.

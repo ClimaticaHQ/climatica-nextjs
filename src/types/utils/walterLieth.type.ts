@@ -1,3 +1,4 @@
+import type { TAnnotationBands, TChartOverlay } from "../charts/chartOverlay.type";
 import type { ReactNode } from "react";
 import type { EWalterLiethFrost, EWalterLiethRegime, EWalterLiethSeriesId } from "@/enums";
 import type { TPanelHeaderSlots } from "../components/chart";
@@ -113,6 +114,12 @@ export type TWalterLiethChartProps = {
   /** position (0-based, in monthOrder) of the month highlighted from outside, e.g. a table row */
   activeMonthIndex?: number | null | undefined;
   onActiveMonthIndexChange?: ((index: number | null) => void) | undefined;
+  /** a picture, not a control: no tooltip, hover, taps or tab stops (an Info page figure) */
+  isStatic?: boolean;
+  /** drawn over the plot through the diagram's own scales (a figure's annotations) */
+  overlay?: TChartOverlay;
+  /** room kept above the plot and under the month labels for annotations */
+  annotationBands?: TAnnotationBands;
 };
 
 /** One chart row per month, in display order. */

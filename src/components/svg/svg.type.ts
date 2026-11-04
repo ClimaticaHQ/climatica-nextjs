@@ -22,3 +22,14 @@ export type TSeriesHatchIconProps = {
 export type TSortArrowIconProps = {
   isDescending: boolean;
 };
+
+export type TNestedCellsIllustrationProps = {
+  /** the whole drawing, for screen readers */
+  ariaLabel: string;
+  /** "2.5′ cell (~4.6 km)" above the coarse cell */
+  coarseLabel: string;
+  /** "30″ cell (~0.9 km)" under the fine cell */
+  fineLabel: string;
+  /** how many fine cells fit along a coarse cell's side */
+  finePerCoarse: number;
+};

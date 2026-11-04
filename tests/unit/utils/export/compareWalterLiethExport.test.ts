@@ -77,7 +77,6 @@ const COLORS: TExportChartColors = {
   textSecondary: "#666",
   border: "#ccc",
   bg: "#fff",
-  bgSecondary: "#f5f5f5",
   tmax: "#f00",
   tmin: "#00f",
   tavg: "#f80",
@@ -241,9 +240,9 @@ const legendY = (svg: string) =>
   Number(svg.match(/<text x="[^"]+" y="([\d.]+)" font-size="13" fill="#666">(Avg|Max)</)?.[1]);
 /** The comparison table's header: the series names and "Difference". */
 const tableHeader = (svg: string) =>
-  [...svg.matchAll(/text-anchor="end" font-size="13" font-weight="600" fill="#000">([^<]+)</g)].map(
-    (m) => m[1],
-  );
+  [
+    ...svg.matchAll(/text-anchor="middle" font-size="13" font-weight="700" fill="#000">([^<]+)</g),
+  ].map((m) => m[1]);
 /** Each plot's month label centres, twelve at a time. */
 function monthLabelCenters(svg: string) {
   const xs = [
@@ -623,7 +622,8 @@ describe("compare export — comparison table and monthly strips", () => {
     expect(svg).toContain(">Frost months</text>");
     expect(svg).toMatch(new RegExp(`fill="${COLORS.text}">\\d+ mm</text>`));
     expect(svg).not.toMatch(new RegExp(`fill="${COLORS.seriesMarker}">\\d+ mm</text>`));
-    expect(svg).toContain(">Semi-arid</text>");
+    // * the class as plain text after the value, no pill
+    expect(svg).toMatch(/>[\d.]+ \(Semi-arid\)<\/text>/);
     // * above the chart
     expect(svg.indexOf(">Difference</text>")).toBeLessThan(svg.indexOf('clipPath id="wl-cmp-a'));
   });
@@ -653,10 +653,10 @@ describe("compare export — comparison table and monthly strips", () => {
         ].map((m) => m[1]);
         expect(markedUnits).toEqual(["°C", "mm"]);
       } else {
-        // * each unit a section label, then the row headed by the series' short labels as text;
-        // * the legend holds the markings and the names
-        expect(svg).toMatch(/>°C<\/text><text [^>]*>MAD<\/text><text [^>]*>MUM<\/text>/);
-        expect(svg).toMatch(/>mm<\/text><text [^>]*>MAD<\/text><text [^>]*>MUM<\/text>/);
+        // * each unit a section label, then the row headed by the series' names, whole (they
+        // * fit); the legend holds the markings
+        expect(svg).toMatch(/>°C<\/text><text [^>]*>Madrid<\/text><text [^>]*>Mumbai<\/text>/);
+        expect(svg).toMatch(/>mm<\/text><text [^>]*>Madrid<\/text><text [^>]*>Mumbai<\/text>/);
         expect(svg).toMatch(/>Madrid<\/text>/);
         expect(svg).toMatch(/>Mumbai<\/text>/);
       }
@@ -702,4 +702,23 @@ describe("single-city export — monthly values table", () => {
       expect(legendY(svg)).toBeGreaterThan(valuesY(svg));
     },
   );
+});
+
+describe("export snapshots", () => {
+  it.each([
+    ["walter-lieth", ECompareLayout.SPLIT],
+    ["walter-lieth", ECompareLayout.OVERLAY],
+    ["standard", ECompareLayout.SPLIT],
+    ["standard", ECompareLayout.OVERLAY],
+  ] as const)("compare export: %s, %s", async (chartMode, layout) => {
+    await expect(buildSvg({ chartMode, layout })).toMatchFileSnapshot(
+      `./__snapshots__/compare-${chartMode}-${layout}.svg`,
+    );
+  });
+
+  it.each(["standard", "walter-lieth"] as const)("City Climate export: %s", async (chartMode) => {
+    await expect(buildSingleSvg(chartMode)).toMatchFileSnapshot(
+      `./__snapshots__/city-${chartMode}.svg`,
+    );
+  });
 });

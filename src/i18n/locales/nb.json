@@ -1,7 +1,8 @@
 {
   "navbar": {
     "toggleMenu": "Veksle meny",
-    "settings": "Innstillinger"
+    "settings": "Innstillinger",
+    "about": "Om"
   },
   "pages": {
     "climateStatistics": {
@@ -30,7 +31,7 @@
     "coordsResult": "Gå til koordinater"
   },
   "climateStatistics": {
-    "cellResolution": "Celleoppløsning:",
+    "cellResolution": "Celleoppløsning",
     "stats": {
       "avgTmax": "Gjennomsnittlig maks.temp.",
       "avgTmin": "Gjennomsnittlig min.temp.",
@@ -256,12 +257,14 @@
       "value": "{name}: {value}",
       "variablesCount": "{count, plural, one {# variabel} other {# variabler}}",
       "allMonths": "Alle måneder",
-      "monthsCount": "{count, plural, one {# måned} other {# måneder}}"
+      "monthsCount": "{count, plural, one {# måned} other {# måneder}}",
+      "unavailable": "{name}: {reason}. Vis hvorfor"
     },
     "sheet": {
       "apply": "Bruk",
       "reset": "Tilbakestill"
-    }
+    },
+    "resolutionHelp": "Hva betyr oppløsningene?"
   },
   "validation": {
     "year": {
@@ -438,6 +441,242 @@
     },
     "hints": {
       "turnOnAnimations": "Slå på animasjoner for å velge fremheving"
+    }
+  },
+  "info": {
+    "externalLink": "(åpnes i en ny fane)",
+    "nav": {
+      "label": "Infosider",
+      "about": "Om",
+      "guide": "Brukerveiledning",
+      "data": "Data og metoder",
+      "contents": "Innhold",
+      "breadcrumb": "Du er her"
+    },
+    "pages": {
+      "about": {
+        "title": "Om Climatica",
+        "description": "Klimadata for ethvert sted på jorden, uten GIS-programvare."
+      },
+      "guide": {
+        "title": "Brukerveiledning",
+        "description": "Slik finner du et sted, leser diagrammene, sammenligner, filtrerer og eksporterer."
+      },
+      "data": {
+        "title": "Data og metoder",
+        "description": "Hvor verdiene kommer fra, hva de beskriver og hvordan indikatorene beregnes."
+      }
+    },
+    "sections": {
+      "howItWorks": "Slik fungerer det",
+      "dataSources": "Datakilder",
+      "team": "Team",
+      "sourceCode": "Kildekode og versjoner",
+      "cite": "Slik siterer du",
+      "privacy": "Personvern",
+      "findPlace": "Finn et sted",
+      "walterLieth": "Les et Walter-Lieth-diagram",
+      "compare": "Sammenlign steder og perioder",
+      "filters": "Filtre",
+      "export": "Eksporter og del",
+      "questions": "Spørsmål",
+      "cellValues": "Hva en verdi beskriver",
+      "resolutions": "Romlige oppløsninger",
+      "periods": "Perioder og variabler",
+      "indicators": "Klimaindikatorer",
+      "references": "Referanser"
+    },
+    "about": {
+      "hero": {
+        "description": "Climatica gjør WorldClim-arkivet om til Walter-Lieth-diagrammer, grafer og kart. Velg et hvilket som helst punkt på land for å se klimanormalene eller været i ett enkelt år, sammenlign to steder eller to perioder, og kartlegg en hel region. Ingen konto, ingenting å installere.",
+        "openCityClimate": "Åpne Byklima",
+        "readGuide": "Les brukerveiledningen"
+      },
+      "facts": {
+        "resolutions": "Romlige oppløsninger",
+        "resolutionsRange": "{finest} til {coarsest}",
+        "normals": "Klimanormaler",
+        "normalsRange": "{first} til {last}",
+        "weatherYears": "Værår",
+        "weatherYearsCount": "{count} år med månedsdata",
+        "languages": "Språk i grensesnittet"
+      },
+      "howItWorks": {
+        "intro": "Hver verdi på skjermen går samme vei, fra et globalt rasterarkiv til nettleseren din.",
+        "steps": {
+          "archive": {
+            "label": "Kilde",
+            "title": "WorldClim-arkivet",
+            "text": "Globale månedlige rastere for temperatur og nedbør: 30-års klimanormaler og årlig vær nedskalert fra CRU TS."
+          },
+          "scrapi": {
+            "label": "Tjeneste",
+            "title": "SCRAPI",
+            "text": "Et API ved {university} som svarer på spørsmål om rasterne: verdiene i en celle, et rektangel eller et polygon."
+          },
+          "climatica": {
+            "label": "Grensesnitt",
+            "title": "Climatica",
+            "text": "Spør SCRAPI om cellene du velger og tegner dem som diagrammer, tabeller og kart, og mellomlagrer svarene slik at gjentatte spørsmål går raskt."
+          }
+        }
+      },
+      "sources": {
+        "intro": "Climatica har ingen egne klimadata. Verdiene, stedsnavnene og kartene kommer fra disse kildene.",
+        "scrapi": {
+          "text": "SCRAPI er API-et Climatica leser hver verdi fra. Det publiserer WorldClim-rasterne som lenkede data og svarer på spørringer om punkter, regioner og metadata.",
+          "author": "Laget av {author}",
+          "docs": "Les dokumentasjonen for SCRAPI"
+        },
+        "worldclim": "Globale klimaflater med høy oppløsning: klimanormalene og det nedskalerte månedlige været.",
+        "cruTs": "Climatic Research Units månedlige observasjoner i rutenett, som WorldClims årlige vær er nedskalert fra.",
+        "geonames": "Stedsnavnregisteret bak bysøket: stedsnavn på mange språk, koordinater og innbyggertall.",
+        "osm": "Bakgrunnskartet under alle kartene i Climatica.",
+        "visit": "Besøk {name}"
+      },
+      "team": {
+        "roles": {
+          "development": "Design og utvikling",
+          "supervisionScrapi": "Veiledning; forfatter av SCRAPI",
+          "supervision": "Veiledning",
+          "forestManagement": "Ekspertise i skogforvaltning",
+          "designAdvice": "Rådgivning om design og utvikling"
+        }
+      },
+      "code": {
+        "version": "Versjon",
+        "licence": "Lisens",
+        "stack": "Laget med",
+        "repository": "Kildekode på GitHub",
+        "changelog": "Endringslogg"
+      },
+      "cite": {
+        "intro": "Hvis Climatica hjelper arbeidet ditt, vennligst siter:",
+        "copyCitation": "Kopier sitat",
+        "copyBibtex": "Kopier BibTeX",
+        "copied": "Kopiert til utklippstavlen",
+        "failed": "Kunne ikke kopiere. Merk teksten og kopier den selv."
+      },
+      "privacy": {
+        "account": "Du trenger ingen konto, og ingenting identifiserer deg.",
+        "storage": "Innstillingene og de siste stedene dine blir værende i denne nettleserens lagring, og språket i en informasjonskapsel. Sletter du nettstedsdataene, tilbakestilles de.",
+        "location": "«Bruk min posisjon» spør nettleseren om posisjonen din bare når du trykker på den, og sender bare koordinatene, for å hente dataene deres.",
+        "tracking": "Climatica bruker ingen analyse, reklame eller sporing."
+      }
+    },
+    "guide": {
+      "findPlace": {
+        "intro": "Byklima, Sammenlign byer og Sammenlign perioder starter fra et sted. Det finnes fire måter å velge det på.",
+        "ways": {
+          "name": {
+            "title": "Søk etter navn",
+            "text": "Skriv inn en by eller et tettsted i søkefeltet og velg det fra listen. Navn fungerer på mange språk."
+          },
+          "coordinates": {
+            "title": "Skriv inn koordinater",
+            "text": "Skriv inn breddegrad og lengdegrad, for eksempel 46.4907, 11.3398, og velg «Gå til koordinater». Etiketten navngir nærmeste tettsted."
+          },
+          "map": {
+            "title": "Klikk på kartet",
+            "text": "Klikk hvor som helst på land. Dataene gjelder akkurat det punktet; etiketten navngir nærmeste tettsted."
+          },
+          "location": {
+            "title": "Bruk min posisjon",
+            "text": "Nettleserens posisjon, hvis du tillater det. Dataene gjelder der du er; etiketten navngir nærmeste tettsted."
+          }
+        }
+      },
+      "walterLieth": {
+        "intro": "Et Walter-Lieth-diagram viser året på et sted med ett blikk: temperatur- og nedbørskurven, og flatene mellom dem som skiller fuktige måneder fra tørre.",
+        "scale": "Begge kurvene deler én akse med fast skala, 1 °C til {ratio} mm, så en måned der nedbørskurven ligger under temperaturkurven, er tørr. Over {breakpoint} mm komprimeres nedbøren {compression} ganger, slik at også svært våte måneder får plass."
+      },
+      "compare": {
+        "cities": "To steder side om side, for samme periode eller år: statistikktabellen, begge diagrammene og forskjellen mellom dem.",
+        "periods": "Ett sted på tvers av klimanormaler eller værår, for å se hvordan klimaet har endret seg.",
+        "layouts": {
+          "split": "Side om side: hver serie i sitt eget panel. Utvid ett over hele kortet når du trenger detaljer.",
+          "overlay": "Overlagt: seriene i ett diagram, skilt fra hverandre med markørformene, der én av dem er skravert."
+        }
+      },
+      "filters": {
+        "sidebar": "Filtrene (datasett, periode eller år, variabler, oppløsning og måneder) ligger i sidepanelet på brede skjermer og bak «Filtre»-brikken på mobil. Endre dem, og trykk deretter på «{apply}».",
+        "autoApply": "I Innstillinger kan du bruke filtrene med en gang du endrer dem, og holde stedet og filtrene i takt på tvers av sidene."
+      },
+      "export": {
+        "intro": "Eksportmenyen over hvert diagram lagrer det du ser:",
+        "share": "Hver side holder stedet, filtrene og visningen i adressen, så når du kopierer URL-en, deler du akkurat den visningen. Eksporterte bilder har også lenken."
+      },
+      "questions": {
+        "resolution": {
+          "question": "Hvorfor endres verdiene når jeg endrer oppløsningen?",
+          "answer": "Hver verdi beskriver hele rutenettcellen rundt punktet ditt, og en grovere celle dekker et større område, ofte med andre høyder og landskap. En endring er ventet. <link>Se hvordan oppløsningene skiller seg</link>."
+        },
+        "elevation": {
+          "question": "Hvorfor avviker høyden fra stedets offisielle høyde?",
+          "answer": "Det er cellens gjennomsnittshøyde, ikke høyden til et sentrum eller en værstasjon. I daler og i lier kan en celle ligge hundrevis av meter høyere eller lavere enn tettstedet; en finere oppløsning kommer nærmere."
+        },
+        "thirtySeconds": {
+          "question": "Hvorfor er ikke {finest} tilgjengelig for alle perioder?",
+          "answer": "WorldClim publiserer {finest}-rastere bare for klimanormalene {period}. De andre normalene og værårene går ned til {fallback}."
+        }
+      }
+    },
+    "data": {
+      "cell": {
+        "whole": "Hver verdi Climatica viser, hører til rastercellen som inneholder punktet ditt, ikke til selve punktet. Kartet tegner omrisset av den cellen.",
+        "mixed": "En grov celle kan spenne over en dalbunn og liene over den, eller en kyst og landet bak. Verdien er gjennomsnittet av dem og beskriver kanskje ingen av dem nøyaktig.",
+        "example": "Bolzano (normalperioden {period}) viser det godt. Byen ligger i en alpedal, på omtrent {valleyElevation} m. Ved {coarseGrid} dekker cellen også liene: gjennomsnittshøyde {coarseElevation} m, årsmiddeltemperatur {coarseTemperature} °C. Ved {fineGrid} inneholder cellen bare dalbunnen: {fineElevation} m og {fineTemperature} °C.",
+        "illustrationLabel": "Skisse av to celler som inneholder samme punkt. {coarse}: den store cellen, blant nabocellene. {fine}: den lille cellen inni den, med punktet.",
+        "illustrationCaption": "Celler som inneholder samme punkt ved to oppløsninger (skisse, størrelser ved ekvator).",
+        "calloutTitle": "Verdiene endres med oppløsningen – det er ventet.",
+        "calloutText": "Velg den fineste oppløsningen som finnes for perioden din, for å beskrive et bestemt sted.",
+        "cellLabel": "{size}-celle (~{km} km)"
+      },
+      "resolutions": {
+        "intro": "WorldClims rutenett måles i bueminutter og buesekunder. En celle er omtrent kvadratisk ved ekvator og blir smalere mot polene.",
+        "caption": "Romlige oppløsninger, cellestørrelser og tilgjengelighet",
+        "resolution": "Oppløsning",
+        "cellSize": "Celle ved ekvator",
+        "availability": "Tilgjengelig for",
+        "km": "≈ {value} km",
+        "everywhere": "Alle klimanormaler og værår",
+        "onlyFor": "Bare klimanormalen {periods}"
+      },
+      "periods": {
+        "climateIntro": "30-årsgjennomsnitt for hver måned (klimanormaler):",
+        "fromWorldClim": "normalen fra WorldClim 2.1",
+        "averaged": "beregnet som gjennomsnitt av de årlige værdataene",
+        "climateVariables": "Variabler: {variables}. {restricted} bare for {period}.",
+        "weatherIntro": "Månedsverdiene for hvert år, {first}–{last}: CRU TS nedskalert av WorldClim.",
+        "weatherVariables": "Variabler: {variables}."
+      },
+      "indicators": {
+        "intro": "Climatica beregner tre indikatorer fra månedsverdiene. T er månedens middeltemperatur (gjennomsnittet av maksimum og minimum), P nedbøren.",
+        "arid": {
+          "title": "Tørr måned",
+          "text": "Nedbør under det dobbelte av middeltemperaturen: nedbørskurven under temperaturkurven i et Walter-Lieth-diagram. En måned med nøyaktig P = 2T regnes som fuktig."
+        },
+        "frost": {
+          "title": "Frostmåned",
+          "text": "En gjennomsnittlig minimumstemperatur under 0 °C, markert med frostbåndet under diagrammet."
+        },
+        "martonne": {
+          "title": "De Martonnes tørkeindeks",
+          "text": "Årsnedbør (mm) delt på årsmiddeltemperaturen pluss 10 °C; jo lavere, desto tørrere. Den er ikke definert der årsmiddeltemperaturen er −10 °C eller lavere."
+        },
+        "figure": {
+          "aridBar": "En tørr måned: nedbørsstolpen tegnes i den tørre fargen, fordi nedbøren er under det dobbelte av middeltemperaturen (P < 2T).",
+          "frostLine": "En frostmåned: linjen for minimumstemperatur går under 0 °C.",
+          "aridCount": "Tørre måneder: hvor mange av årets måneder som er tørre.",
+          "martonne": "De Martonnes tørkeindeks for året, med klassen sin."
+        }
+      }
+    },
+    "footer": {
+      "researchGroup": "Forskningsgruppen {group}"
+    },
+    "figures": {
+      "source": "{place}, normalperioden {period}, {grid}-rutenett:"
     }
   }
 }

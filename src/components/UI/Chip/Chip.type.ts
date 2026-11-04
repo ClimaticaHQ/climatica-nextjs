@@ -1,4 +1,4 @@
-import type { EChipVariant } from "@/enums";
+import type { EChipVariant, ETextScale } from "@/enums";
 import type { TSeriesHatch, TSeriesShape } from "@/types";
 
 export type TToggleChipProps = {
@@ -14,6 +14,8 @@ export type TToggleChipProps = {
   markerHatch?: TSeriesHatch | undefined;
   /** the hatch swatch's fill; absent: the humid fill */
   markerFill?: string | undefined;
+  /** TOUCH: the touch scale below lg (a filter section in a sheet); DEFAULT otherwise */
+  textScale?: ETextScale;
   onClick: () => void;
 };
 

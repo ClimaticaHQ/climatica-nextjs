@@ -1,4 +1,5 @@
 import {
+  APP_TITLE,
   CLIMATE_PERIOD_LABELS,
   DATASETS,
   OG_IMAGE_SIZE,
@@ -8,6 +9,7 @@ import {
 } from "@/constants";
 import { parseLocale } from "./locale.util";
 import type {
+  TInfoPageKey,
   TCommonClimateParams,
   TFormatPeriodLabelParams,
   TFormatPeriodsComparisonParams,
@@ -320,6 +322,18 @@ export function createPageMetadata(resolver: TMetaResolver, route: string) {
         description,
         images: [imagePath],
       },
+    };
+  };
+}
+
+/** An Info page's metadata: its sidebar name as the title, its description, its canonical URL. */
+export function createInfoPageMetadata(page: TInfoPageKey, route: string) {
+  return async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations("info");
+    return {
+      title: `${t(`nav.${page}`)} | ${APP_TITLE}`,
+      description: t(`pages.${page}.description`),
+      alternates: { canonical: route },
     };
   };
 }
