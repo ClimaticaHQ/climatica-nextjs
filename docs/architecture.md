@@ -23,14 +23,13 @@ flowchart TB
 
   subgraph infra["Docker Compose"]
     direction LR
-    redis[("Redis<br/>search · nearest city · region strips · resources")]
-    solr[("Solr<br/>cities core")]
+    redis[("Redis<br/>search · nearest place · point cells · region strips · resources")]
+    solr[("Solr<br/>cities core: search and nearest place")]
   end
 
   subgraph external["External services"]
     direction LR
     scrapi["WorldClim SCRAPI<br/>bearer token, server only"]
-    wikidata["Wikidata<br/>reverse geocoding"]
   end
 
   osm["OpenStreetMap<br/>map tiles"]
@@ -45,8 +44,7 @@ flowchart TB
 
 The browser keeps filters and view state in the URL; settings, cities and the navbar's last page
 params in localStorage; the locale in a cookie ([State](#state)). Every API route but `/api/og`
-starts with a per-IP rate limiter; a route handler answers from Redis or asks Solr, Wikidata or
-WorldClim. Map tiles (on screen and in the heat map export) come straight from OpenStreetMap. The Next.js app runs under systemd; Redis and Solr run in Docker Compose
+starts with a per-IP rate limiter; a route handler answers from Redis or asks Solr or WorldClim. Map tiles (on screen and in the heat map export) come straight from OpenStreetMap. The Next.js app runs under systemd; Redis and Solr run in Docker Compose
 ([operations.md](operations.md)).
 
 ## Folder structure
@@ -59,7 +57,7 @@ WorldClim. Map tiles (on screen and in the heat map export) come straight from O
 | [`src/layouts/`](../src/layouts)                           | the shell: [`AppLayout`](../src/layouts/AppLayout.tsx) (topbar, filters sidebar, main) and its host components (`UrlSync`)  |
 | [`src/components/`](../src/components)                     | shared primitives in `UI/`, features in their own folder (`charts/`, `filters/`, `page/`), other shared components          |
 | [`src/hooks/`](../src/hooks)                               | `data/` (queries), `filters/`, `url/`, `ui/`, `persisted/`, `charts/`, `pages/` (page hooks)                                |
-| [`src/libs/`](../src/libs)                                 | `api/` (`apiClient`), `services/` (WorldClim, Solr, Wikidata), `redis/`, `Env.ts`, i18n setup                               |
+| [`src/libs/`](../src/libs)                                 | `api/` (`apiClient`), `services/` (WorldClim, Solr), `redis/`, `Env.ts`, i18n setup                                         |
 | [`src/stores/`](../src/stores)                             | Zustand stores and the persisted location stores                                                                            |
 | `src/constants/`, `src/enums/`, `src/types/`, `src/utils/` | shared constants, enums, types, pure functions                                                                              |
 | [`src/i18n/locales/`](../src/i18n/locales)                 | one message file per locale                                                                                                 |
@@ -76,34 +74,58 @@ WorldClim. Map tiles (on screen and in the heat map export) come straight from O
   [`WorldClimService`](../src/libs/services/worldClimService.ts) builds WorldClim queries and
   validates responses.
 - **The server keeps secrets and cache:** route handlers add the API key, rate-limit and cache in
-  Redis; Solr and Wikidata services are `server-only`.
-- **A city search and its climate data are two separate requests**, each cached by TanStack Query
-  in the browser. On the server Redis caches the search, but not a city's climate data: of
-  WorldClim's answers it keeps only region strips and resource lookups
-  ([backend.md](backend.md#redis-caching)).
+  Redis; the Solr service is `server-only`.
+- **A city search and its climate data are separate requests**, each cached by TanStack Query in
+  the browser and by Redis on the server: the search by its text, a point's climate data by the
+  raster cell holding the point ([backend.md](backend.md#redis-caching)).
 
 ### City search
 
+A place is picked four ways. Each ends as a city in the persisted slot, and its climate data is
+fetched by the city's coordinates ([Climate data](#climate-data)): a city found by name has its
+own coordinates; typed coordinates, a map click and the reader's position keep exactly the point
+picked, and a place lookup only renames it.
+
 ```mermaid
 flowchart TD
-  type["Reader types a city"] --> browser{"TanStack Query cache?"}
-  browser -- hit --> results["Results"]
-  browser -- miss --> route["GET /api/cities"]
-  route --> redis{"Redis cache?<br/>search or nearest-city key"}
-  redis -- hit --> results
-  redis -- miss --> coords{"Coordinates?"}
-  coords -- no --> solr["Solr"]
-  coords -- yes --> wikidata["Wikidata"]
-  solr --> store["Store in Redis"]
-  wikidata --> store
-  store --> results
+  type["Reader types a name"] --> search{"TanStack Query<br/>citySearch key?"}
+  search -- miss --> cities["GET /api/cities?q=&lang="]
+  cities --> redisS{"Redis city-search key?"}
+  redisS -- miss --> solr["Solr: name search"]
+  solr --> storeS["Stored unless empty"]
+  search -- hit --> pick
+  redisS -- hit --> pick
+  storeS --> pick["Pick: the city, at its coordinates"]
+
+  typed["Reader types coordinates"] --> parse["tryParseCoords: Go to coordinates<br/>no request"]
+  click["Reader clicks the map"]
+  locate["Reader asks for their location"] --> gps["navigator.geolocation"]
+  parse --> point["Pick: the point itself,<br/>named by its coordinates"]
+  click --> point
+  gps --> point
+  point --> lookup["usePlaceLookup<br/>GET /api/cities?q=lat,lng&lang="]
+  lookup --> redisN{"Redis nearest-city key?"}
+  redisN -- miss --> nearest["Solr: nearest populated place<br/>within 10 km"]
+  nearest --> storeN["Stored unless empty"]
+  redisN -- hit --> rename["Renamed if still the slot's city:<br/>same coordinates, no refetch"]
+  storeN --> rename
 ```
 
 [`SearchBar`](../src/components/SearchBar/SearchBar.tsx) asks
 [`useSearchCity`](../src/hooks/data/useSearchCity.ts) 400 ms after the last keystroke, from two
-characters (the route also answers `[]` below two). Text like `40.41, -3.70` is reverse-geocoded by
-Wikidata and cached under `nearest-city:`; anything else goes to Solr under `city-search:`. Only
-non-empty results are stored. How Solr ranks the results is in [city-search.md](city-search.md).
+characters (the route also answers `[]` below two); Solr results are cached under
+`city-search:<lang>:<query>`. How Solr ranks them is in [city-search.md](city-search.md).
+
+Text like `40.41, -3.70` is never searched: the bar offers "Go to coordinates" at once. Picking it,
+clicking the map ([`useMapPointSelection`](../src/hooks/pages/useMapPointSelection.ts)) or
+locating the reader ([`useGeolocation`](../src/hooks/ui/useGeolocation.ts)) selects that exact point
+straight away, named by its coordinates. Then
+[`usePlaceLookup`](../src/hooks/data/usePlaceLookup.ts) asks `/api/cities` for the nearest place
+(Solr, in the interface language, cached under `nearest-city:<lang>:<lat>:<lng>`) and the pick is
+renamed, keeping its coordinates, so its climate queries don't change. A rename only applies while
+the slot still holds that pick ([`renameIfStillPicked`](../src/utils/persistedJsonStore.util.ts)),
+and only the latest lookup of a picker answers. A failed map lookup says so; typed coordinates and
+the reader's position keep their coordinates quietly.
 
 ### Climate data
 
@@ -111,16 +133,20 @@ non-empty results are stored. How Solr ranks the results is in [city-search.md](
 flowchart TD
   pick["Reader picks a city"] --> browser{"TanStack Query cache?"}
   browser -- hit --> chart["Chart"]
-  browser -- miss --> route["GET /api/worldclim/pixelvaluesofapoint<br/>adds the bearer token"]
-  route --> scrapi["WorldClim SCRAPI"]
-  scrapi --> rows["12 monthly rows"]
+  browser -- miss --> route["GET /api/worldclim/pixelvaluesofapoint"]
+  route --> redis{"Redis, keyed by the point's cell?"}
+  redis -- hit --> rows["12 monthly rows"]
+  redis -- "miss or near an edge" --> scrapi["WorldClim SCRAPI<br/>with the bearer token"]
+  scrapi --> rows
   rows --> chart
 ```
 
 1. **Pick:** [`useCitySelection`](../src/hooks/pages/useCitySelection.ts) writes the persisted city
    (and, with `syncCity`, the slots that follow it); the page hook pushes it to the URL.
 2. **Fetch:** the data hook's key changes and the query goes through `WorldClimService`. A point's
-   Climate answer holds every normals period, so a period change needs no request.
+   Climate answer holds every normals period, so a period change needs no request. The route
+   caches it in Redis by the raster cell, so every point in one cell shares the entry
+   ([backend.md](backend.md#point-queries-by-cell)).
 3. **Shape:** twelve monthly rows, missing values `null` ([climate-indices.md](climate-indices.md)).
 4. **Model and draw:** the page hook builds a `TChartSeries`, derives the chart model
    ([charts.md](charts.md)) and the view passes it to `ChartSection` ([pages.md](pages.md)).

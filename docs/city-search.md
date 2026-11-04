@@ -2,7 +2,7 @@
 
 How a typed name becomes a ranked list of cities. Route, cache and errors: [backend.md](backend.md). Rebuilding the index: [operations.md](operations.md).
 
-The request's path (debounce, Redis, Wikidata for coordinates) is in
+The request's path (debounce, Redis, the nearest-place lookup for coordinates) is in
 [architecture.md](architecture.md#city-search); `SolrService.searchCities` de-duplicates the
 results by `geonameid` and returns each city's label in the reader's language.
 

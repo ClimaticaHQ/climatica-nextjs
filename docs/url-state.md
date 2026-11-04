@@ -183,17 +183,20 @@ query keys are still cached, so their data shows at once. With a sheet open, Bac
 Data hooks ([`src/hooks/data/`](../src/hooks/data)) build TanStack Query keys from what decides
 the request:
 
-| Hook                                 | Query key                                                     |
-| ------------------------------------ | ------------------------------------------------------------- |
-| `useGetClimateData`                  | `["climate", lat, lng, gridSize, "climate" \| weatherYear]`   |
-| `useGetCompareData`                  | `["compare", latA, lngA, latB, lngB, gridSize, …]`            |
-| `useGetComparePeriods`               | `["compare-periods", lat, lng, gridSize, "climate" \| years]` |
-| `useGetMultiPeriodData`              | one per year: `["compare-period", lat, lng, gridSize, year]`  |
-| `useGetHeatmapData`                  | `["heatmap", area, gridSize, variable, dataset]`              |
-| `useGetRegionalProfile`              | `["regional-profile", area, gridSize, dataset]`               |
-| `useGetAltitude`, `useGetCellBounds` | `["altitude" / "cellBounds", lat, lng, gridSize]`             |
+| Hook                    | Query key                                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- |
+| `useGetClimateData`     | `["climate", lat, lng, gridSize, "climate" \| weatherYear]`                                             |
+| `useGetCompareData`     | `["compare", latA, lngA, latB, lngB, gridSize, …]`                                                      |
+| `useGetComparePeriods`  | `["compare-periods", lat, lng, gridSize, "climate" \| years]`                                           |
+| `useGetMultiPeriodData` | one per year: `["compare-period", lat, lng, gridSize, year]`                                            |
+| `useGetHeatmapData`     | `["heatmap", area, gridSize, variable, dataset]`                                                        |
+| `useGetRegionalProfile` | `["regional-profile", area, gridSize, dataset]`                                                         |
+| `useGetPointCells`      | `["pointCells", lat, lng]`, shared by `useGetCellBounds` and `useGetAltitude` (each `select`s its grid) |
+| `useGetAltitude`        | then `["altitude", cellIri]`                                                                            |
 
 - A filter in a key refetches (`keepPreviousData` keeps the old data meanwhile).
+- A point's cells come in one `cellofpoint` request for every grid, so a grid change reselects
+  instead of refetching; points in one cell share their altitude.
 - Climate normals for a point come in one request for every period, so the period is applied to
   loaded data; point requests always ask for the same variables, so variables and months only
   change what's drawn.
