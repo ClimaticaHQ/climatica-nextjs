@@ -12,3 +12,4 @@ export type * from "./periodCharts.type";
 export type * from "./seriesShape.type";
 export type * from "./overlayChart.type";
 export type * from "./chartDevice.type";
+export * from "./chartOverlay.type";

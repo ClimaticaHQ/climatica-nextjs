@@ -32,6 +32,15 @@ export type TAxisTicksArgs = {
   count: number;
 };
 
+export type TRoundTicksArgs = {
+  min: number;
+  max: number;
+  /** at most this many ticks */
+  maxCount: number;
+  /** the steps allowed, smallest first */
+  steps: readonly number[];
+};
+
 /** A plot's tooltip on this device: Recharts' own on hover, the tapped month's on touch. */
 export type TTouchTooltipArgs = {
   isTouch: boolean;

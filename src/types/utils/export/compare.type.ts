@@ -1,3 +1,4 @@
+import type { TRowHeaders } from "./shared.type";
 import type { TComparisonExport, TWeatherYearsExport } from "./walterLiethExport.type";
 import type { TExportChartColors, TLinearScale, TMonthBand } from "./shared.type";
 import type {
@@ -95,6 +96,8 @@ export type TOverlayValuesArgs = {
   plotLeft: number;
   plotRight: number;
   chartBottom: number;
+  /** the rows' headers and the label column they need (getRowHeaders) */
+  rowHeaders: TRowHeaders;
 };
 
 export type TGroupedBarsArgs = {
