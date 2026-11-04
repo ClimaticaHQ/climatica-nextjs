@@ -1,3 +1,4 @@
+import { TYPED_COORDINATES_ID_PREFIX } from "@/constants";
 import { useDebounce, useErrorMessage, useSearchCity } from "@/hooks";
 import type { TCity, TCoordinates } from "@/types";
 import { getScrollBehavior } from "@/utils/motion.util";
@@ -102,7 +103,7 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
     setIsEditing(false);
     setDismissed(true);
     onCitySelect({
-      id: `coords:${coordResult.lat},${coordResult.lng}`,
+      id: `${TYPED_COORDINATES_ID_PREFIX}${coordResult.lat},${coordResult.lng}`,
       label,
       description: t("search.coordsResult"),
       lat: coordResult.lat,
