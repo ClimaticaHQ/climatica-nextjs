@@ -14,6 +14,7 @@ export { FlashGlowIcon } from "./FlashGlowIcon";
 export { ImageIcon } from "./ImageIcon";
 export { InfoIcon } from "./InfoIcon";
 export { LocationIcon } from "./LocationIcon";
+export { NestedCellsIllustration } from "./NestedCellsIllustration";
 export { NoShadingIcon } from "./NoShadingIcon";
 export { OverlayLayoutIcon } from "./OverlayLayoutIcon";
 export { ClimaticaLogo } from "./logos";
