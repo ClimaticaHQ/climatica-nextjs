@@ -1,6 +1,6 @@
 import { Card } from "@/components/Card";
 import { MartonneBadge } from "@/components/MartonneBadge";
-import { ECardPadding, ECardSize, EDisplayMetric } from "@/enums";
+import { ECardPadding, ECardSize, EDisplayMetric, EStatsBarItem } from "@/enums";
 import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
 import { buildMartonneTooltip, getMartonneBadge } from "@/utils";
 import { useTranslations } from "next-intl";
@@ -20,6 +20,7 @@ export function ClimateStatsBar({
   altitude,
   martonneIndex,
   martonneYear,
+  markers = {},
 }: TClimateStatsBarProps) {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();
@@ -53,6 +54,7 @@ export function ClimateStatsBar({
       >
         <StatCell
           {...cell}
+          marker={markers[EStatsBarItem.MEAN_TEMP]}
           label={t("chart.meanTemp")}
           value={t("units.celsiusValue", {
             value: formatValue(meanTemp, { metric: EDisplayMetric.TEMPERATURE }),
@@ -60,6 +62,7 @@ export function ClimateStatsBar({
         />
         <StatCell
           {...cell}
+          marker={markers[EStatsBarItem.ANNUAL_PRECIP]}
           label={t("chart.annualPrec")}
           value={t("units.mmValue", {
             value: formatValue(annualPrecip, { metric: EDisplayMetric.PRECIPITATION }),
@@ -67,12 +70,14 @@ export function ClimateStatsBar({
         />
         <StatCell
           {...cell}
+          marker={markers[EStatsBarItem.ARID_MONTHS]}
           label={t("chart.aridMonths")}
           value={formatValue(aridMonths, { metric: EDisplayMetric.MONTH_COUNT })}
         />
         {showAltitude && (
           <StatCell
             {...cell}
+            marker={markers[EStatsBarItem.ALTITUDE]}
             label={t("chart.altitude")}
             value={t("units.metersValue", {
               value: formatValue(altitude, { metric: EDisplayMetric.ELEVATION }),
@@ -81,6 +86,7 @@ export function ClimateStatsBar({
         )}
         <StatCell
           {...cell}
+          marker={markers[EStatsBarItem.MARTONNE]}
           {...martonneLabels}
           meta={badge && <MartonneBadge badge={badge} />}
           value={formatValue(martonneIndex, { metric: EDisplayMetric.MARTONNE })}
