@@ -219,7 +219,9 @@
     "permissionDenied": "Tilgang til posisjon avslått. Vennligst gi tillatelse i nettleserinnstillingene",
     "unavailable": "Kunne ikke fastslå posisjonen din",
     "timeout": "Forespørsel om posisjon utløp på tid. Vennligst prøv igjen",
-    "unknown": "Det oppsto en ukjent feil"
+    "unknown": "Det oppsto en ukjent feil",
+    "pointLabel": "Min posisjon {lat}, {lng}",
+    "yourLocation": "Din posisjon"
   },
   "map": {
     "selectedFromMap": "Valgt fra kartet",

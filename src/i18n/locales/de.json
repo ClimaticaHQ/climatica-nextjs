@@ -219,7 +219,9 @@
     "permissionDenied": "Standortzugriff verweigert. Erlaube den Standortzugriff in den Browsereinstellungen",
     "unavailable": "Dein Standort konnte nicht ermittelt werden",
     "timeout": "Die Standortanfrage hat das Zeitlimit überschritten. Versuche es erneut",
-    "unknown": "Ein unbekannter Fehler ist aufgetreten"
+    "unknown": "Ein unbekannter Fehler ist aufgetreten",
+    "pointLabel": "Mein Standort {lat}, {lng}",
+    "yourLocation": "Dein Standort"
   },
   "map": {
     "selectedFromMap": "Von der Karte ausgewählt",

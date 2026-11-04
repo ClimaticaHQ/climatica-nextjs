@@ -219,7 +219,9 @@
     "permissionDenied": "Accès à la position refusé. Autorisez la localisation dans les paramètres du navigateur",
     "unavailable": "Impossible de déterminer votre position",
     "timeout": "La demande de localisation a expiré. Réessayez",
-    "unknown": "Une erreur inconnue s'est produite"
+    "unknown": "Une erreur inconnue s'est produite",
+    "pointLabel": "Ma position {lat}, {lng}",
+    "yourLocation": "Votre position"
   },
   "map": {
     "selectedFromMap": "Sélectionné depuis la carte",

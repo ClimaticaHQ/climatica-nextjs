@@ -219,7 +219,9 @@
     "permissionDenied": "Accesul la locație a fost refuzat. Permite accesul din setările browserului",
     "unavailable": "Nu s-a putut determina locația ta",
     "timeout": "Solicitarea de locație a expirat. Te rugăm să încerci din nou",
-    "unknown": "A apărut o eroare necunoscută"
+    "unknown": "A apărut o eroare necunoscută",
+    "pointLabel": "Locația mea {lat}, {lng}",
+    "yourLocation": "Locația ta"
   },
   "map": {
     "selectedFromMap": "Selectat de pe hartă",
