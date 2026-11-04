@@ -9,7 +9,6 @@ import {
 import { EDifferenceMeaning, ESeriesKind, EWalterLiethSeriesId } from "@/enums";
 import type { TChartSeries, TPeriodsChart, TUseClimatePeriodsChartArgs } from "@/types";
 import { computeCompareStats, resolveDataState, sortByYear } from "@/utils";
-import { differenceOf } from "@/utils/monthlyClimate.util";
 import { useTranslations } from "next-intl";
 import { useNoPeriodDataMessage } from "./useNoPeriodDataMessage";
 
@@ -58,8 +57,20 @@ export function useClimatePeriodsChart(
   }));
   const statsA = dataA ? computeCompareStats(dataA) : null;
   const statsB = dataB ? computeCompareStats(dataB) : null;
-  const tmaxDiff = statsA && statsB ? differenceOf(statsB.avgTmax, statsA.avgTmax) : null;
-  const precDiff = statsA && statsB ? differenceOf(statsB.totalPrec, statsA.totalPrec) : null;
+  const trend =
+    statsA &&
+    statsB &&
+    statsA.avgTmax !== null &&
+    statsB.avgTmax !== null &&
+    statsA.totalPrec !== null &&
+    statsB.totalPrec !== null
+      ? {
+          tmax: { minuend: statsB.avgTmax, subtrahend: statsA.avgTmax },
+          prec: { minuend: statsB.totalPrec, subtrahend: statsA.totalPrec },
+          labelA,
+          labelB,
+        }
+      : null;
 
   return {
     series,
@@ -84,7 +95,7 @@ export function useClimatePeriodsChart(
         period: [labelA, labelB].join(DATA_UPDATE_NAMES_SEPARATOR),
       }),
     },
-    details: tmaxDiff !== null && precDiff !== null ? { tmaxDiff, precDiff, labelA, labelB } : null,
+    details: trend,
     titleDetails: `${labelA} vs ${labelB}`,
   };
 }

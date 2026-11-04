@@ -13,14 +13,14 @@ import { useMapPointSelection } from "./useMapPointSelection";
  */
 export function useCityClimatePicking({ city, onShown }: TUseCityClimatePickingArgs) {
   const t = useTranslations();
-  const { selectCity } = usePersistedCity();
+  const { selectCity, renameCity } = usePersistedCity();
   const { pickCity } = useCitySelection({ slot: ECitySlot.CITY, onPicked: onShown });
   const mapPoint = useMapPointSelection({
     onPicked: (point) => {
       selectCity(point);
       onShown(point);
     },
-    onResolved: selectCity,
+    onResolved: renameCity,
   });
   const { locate, isLocating, locationError, clearLocationError } = useGeolocation();
   const clearNotice = () => {
@@ -40,9 +40,12 @@ export function useCityClimatePicking({ city, onShown }: TUseCityClimatePickingA
       },
       // * your location is this page's city only — it doesn't follow to the other pages
       onLocate: () =>
-        locate((located) => {
-          selectCity(located);
-          onShown(located);
+        locate({
+          onLocated: (located) => {
+            selectCity(located);
+            onShown(located);
+          },
+          onRenamed: renameCity,
         }),
       onClearLocationError: clearNotice,
     },
