@@ -7,10 +7,6 @@ export const HEAT_MAP_URL_SCHEMA: TUrlSchema<THeatMapUrlState> = {
   selection: selectionUrlField,
 };
 
-// * decimals of the heat map's values (legend, popups, export): one; coordinates in popups three
-export const HEATMAP_VALUE_DIGITS = 1;
-export const HEATMAP_COORDINATE_DIGITS = 3;
-
 // * the region's stats: one row of six from `sm`, three per row below; a 1px gap over the
 // * border colour draws the dividers. The bar is its own size container (the cells' text scales)
 export const STATS_LEGEND_BAR_CLASSES = {

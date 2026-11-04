@@ -1,17 +1,17 @@
 import { StatCard } from "@/components/StatCard";
-import { VALUE_DIGITS } from "@/constants";
-import { EStatValueSize } from "@/enums";
-import { useFormatNumber } from "@/hooks/ui/useFormatNumber";
+import { EDisplayMetric, EStatValueSize } from "@/enums";
+import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
 import { useMonthName } from "@/hooks/ui/useMonthName";
 import { useTranslations } from "next-intl";
 import { CITY_DIFFERENCE_CARDS_CLASS } from "./CompareCities.constant";
-import type { TDiffStats } from "@/types";
+import type { TDiffStats, TValuePair } from "@/types";
+import { displayDifference } from "@/utils/displayFormat.util";
 import type { TCityDifferenceCardsProps } from "./CompareCities.type";
 
 /** Under the chart: the warmer and the wetter city, and both cities' hottest and coldest month. */
 export function CityDifferenceCards({ differences }: TCityDifferenceCardsProps) {
   const t = useTranslations();
-  const formatNumber = useFormatNumber();
+  const { formatValue } = useDisplayFormat();
   const monthName = useMonthName();
   if (!differences) return null;
 
@@ -19,7 +19,10 @@ export function CityDifferenceCards({ differences }: TCityDifferenceCardsProps) 
   const winner = (side: TDiffStats["warmerCity"]) =>
     side === "tie" ? t("climateComparison.diff.tie") : side === "A" ? labelA : labelB;
   const celsius = (value: number) =>
-    t("units.celsiusValue", { value: formatNumber(value, { digits: VALUE_DIGITS.TEMP }) });
+    t("units.celsiusValue", { value: formatValue(value, { metric: EDisplayMetric.TEMPERATURE }) });
+  // * how far apart the two displayed values are, unsigned: the winner names the direction
+  const gap = (pair: TValuePair, metric: EDisplayMetric) =>
+    formatValue(Math.abs(displayDifference({ ...pair, metric }) ?? 0), { metric });
   const monthTemps = (tempA: number, tempB: number) =>
     t("climateComparison.diff.monthTemps", {
       a: labelA,
@@ -39,7 +42,7 @@ export function CityDifferenceCards({ differences }: TCityDifferenceCardsProps) 
           diff.warmerCity === "tie"
             ? t("climateComparison.diff.tieSub")
             : t("climateComparison.diff.byDegrees", {
-                value: formatNumber(diff.tmaxDiff, { digits: VALUE_DIGITS.TEMP }),
+                value: gap(diff.avgTmax, EDisplayMetric.TEMPERATURE),
               })
         }
       />
@@ -50,7 +53,9 @@ export function CityDifferenceCards({ differences }: TCityDifferenceCardsProps) 
         sub={
           diff.moreRainCity === "tie"
             ? t("climateComparison.diff.tieSub")
-            : t("climateComparison.diff.byMm", { value: formatNumber(diff.precDiff) })
+            : t("climateComparison.diff.byMm", {
+                value: gap(diff.totalPrec, EDisplayMetric.PRECIPITATION),
+              })
         }
       />
       <StatCard

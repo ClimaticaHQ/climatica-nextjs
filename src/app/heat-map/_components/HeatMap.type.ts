@@ -5,7 +5,7 @@ import type {
   TColorScale,
   TDataState,
   TDatasetAttribution,
-  TNumberFormatter,
+  TDisplayFormat,
   TPageUpdate,
   TPolygon,
   TVariable,
@@ -172,5 +172,5 @@ export type TPopupContentArgs = {
   value: number;
   unit: string;
   center: { lat: number; lng: number };
-  formatNumber: TNumberFormatter;
+  formatValue: TDisplayFormat["formatValue"];
 };

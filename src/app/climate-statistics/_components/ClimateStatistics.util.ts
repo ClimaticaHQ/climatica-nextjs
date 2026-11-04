@@ -1,6 +1,7 @@
 import { MISSING_VALUE_LABEL } from "@/constants";
+import { EDisplayMetric } from "@/enums";
 import { meanOf, sumOf } from "@/utils/monthlyClimate.util";
-import { formatNumber } from "@/utils/numberFormat.util";
+import { formatValue } from "@/utils/displayFormat.util";
 import type {
   TBuildCityStatsSummaryArgs,
   TCityStatsSummary,
@@ -17,11 +18,11 @@ export function computeClimateStats({
     months && months.length > 0 ? data.filter((d) => months.includes(d.month)) : data;
 
   // * unknown ("—") when no month is selected or any selected month lacks the value
-  const format = (value: number | null, digits: number) =>
-    filtered.length > 0 ? formatNumber(value, { locale, digits }) : MISSING_VALUE_LABEL;
-  const avgTmax = format(meanOf(filtered.map((d) => d.tmax)), 1);
-  const avgTmin = format(meanOf(filtered.map((d) => d.tmin)), 1);
-  const totalPrec = format(sumOf(filtered.map((d) => d.prec)), 0);
+  const format = (value: number | null, metric: EDisplayMetric) =>
+    filtered.length > 0 ? formatValue(value, { metric, locale }) : MISSING_VALUE_LABEL;
+  const avgTmax = format(meanOf(filtered.map((d) => d.tmax)), EDisplayMetric.TEMPERATURE);
+  const avgTmin = format(meanOf(filtered.map((d) => d.tmin)), EDisplayMetric.TEMPERATURE);
+  const totalPrec = format(sumOf(filtered.map((d) => d.prec)), EDisplayMetric.PRECIPITATION);
 
   return { avgTmax, avgTmin, totalPrec };
 }
