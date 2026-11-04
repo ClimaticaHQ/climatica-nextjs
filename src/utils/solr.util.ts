@@ -1,5 +1,7 @@
 import {
   SOLR_FUZZY_EDITS,
+  SOLR_LOCATION_FIELDS,
+  SOLR_NEAREST_PLACE,
   SOLR_POPULATION_LOG,
   SOLR_QUERY_PARAMS as P,
   SOLR_RANKING,
@@ -8,6 +10,7 @@ import {
   SOLR_SPECIAL_CHARACTERS,
   SOLR_FUZZY_WORD_SEPARATOR,
 } from "@/constants";
+import type { TCoordinates } from "@/types";
 import { parseLocale } from "./locale.util";
 
 /** Edits a word of this many characters may have in the typo-tolerant clause: 0, 1 or 2. */
@@ -71,4 +74,42 @@ export function buildSolrQueryParams(query: string, lang: string): URLSearchPara
     [P.FUZZY_TEXT]: toFuzzyText(text),
     [P.FUZZY_QF]: [`${NAMES}^${FUZZY_NAMES}`, NAMES_PREFIX].join(" "),
   });
+}
+
+/**
+ * The nearest-place query: the populated place nearest the point within RADIUS_KM. A box on the
+ * coordinate fields narrows the candidates; the distance filter keeps the radius a circle and
+ * the sort picks the nearest. None of it is cached: every point is its own filter. A box crossing
+ * the antimeridian stops at ±180°, so a place just across it isn't found.
+ */
+export function buildNearestPlaceParams({ lat, lng }: TCoordinates): URLSearchParams {
+  const { RADIUS_KM, EARTH_RADIUS_KM, KM_PER_DEGREE, MAX_LNG_DELTA, COORDINATE_DECIMALS } =
+    SOLR_NEAREST_PLACE;
+  const { LAT, LNG } = SOLR_LOCATION_FIELDS;
+  const fixed = (value: number) => value.toFixed(COORDINATE_DECIMALS);
+  const latDelta = RADIUS_KM / KM_PER_DEGREE;
+  const cosLat = Math.cos((lat * Math.PI) / 180);
+  const lngDelta = Math.min(MAX_LNG_DELTA, latDelta / Math.max(cosLat, Number.EPSILON));
+  const distance = `hsin(${EARTH_RADIUS_KM},true,${LAT},${LNG},${fixed(lat)},${fixed(lng)})`;
+
+  const params = new URLSearchParams({
+    defType: "lucene",
+    q: "*:*",
+    // * geonameid: the same answer for two places at the same distance, whatever the index order
+    sort: `${distance} asc, geonameid asc`,
+    rows: "1",
+  });
+  params.append(
+    "fq",
+    `{!cache=false}${LAT}:[${fixed(lat - latDelta)} TO ${fixed(lat + latDelta)}]`,
+  );
+  params.append(
+    "fq",
+    `{!cache=false}${LNG}:[${fixed(lng - lngDelta)} TO ${fixed(lng + lngDelta)}]`,
+  );
+  params.append(
+    "fq",
+    `{!frange u=${RADIUS_KM} cache=false cost=${SOLR_NEAREST_PLACE.POST_FILTER_COST}}${distance}`,
+  );
+  return params;
 }
