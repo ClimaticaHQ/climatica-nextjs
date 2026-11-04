@@ -5,10 +5,13 @@ import type {
   EDifferenceMeaning,
   EPairSide,
   ECompareLayout,
+  EStatsBarItem,
   EWalterLiethShading,
 } from "@/enums";
 import type {
   TActiveMonth,
+  TAnnotationBands,
+  TChartOverlay,
   TOverlayFocus,
   TChartFeatures,
   TSeriesSort,
@@ -409,6 +412,14 @@ export type TStandardClimateChartProps = {
   syncId?: string;
   /** the chart card's blocks (values table, legend), drawn under this chart */
   footer: ReactNode;
+  /** a picture, not a control: no tooltip, hover, taps or tab stops (an Info page figure) */
+  isStatic?: boolean;
+  /** drawn over the plot through the chart's own scales (a figure's annotations) */
+  overlay?: TChartOverlay;
+  /** annotations attached to the stats bar's items */
+  statsMarkers?: Partial<Record<EStatsBarItem, ReactNode>>;
+  /** room kept above the plot and under the month labels for annotations */
+  annotationBands?: TAnnotationBands;
 };
 
 export type TStandardChartColors = {
