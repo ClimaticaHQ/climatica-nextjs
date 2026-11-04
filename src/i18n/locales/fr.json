@@ -663,11 +663,20 @@
         "martonne": {
           "title": "Indice d'aridité de De Martonne",
           "text": "Précipitations annuelles (mm) divisées par la température annuelle moyenne plus 10 °C ; plus il est bas, plus c'est sec. Il n'est pas défini là où la température annuelle moyenne est de −10 °C ou moins."
+        },
+        "figure": {
+          "aridBar": "Un mois aride : sa barre de précipitations est dessinée dans la couleur aride, car les précipitations sont inférieures au double de la température moyenne (P < 2T).",
+          "frostLine": "Un mois de gel : la courbe de la température minimale passe sous 0 °C.",
+          "aridCount": "Mois arides : combien de mois de l'année sont arides.",
+          "martonne": "L'indice d'aridité de De Martonne de l'année, avec sa classe."
         }
       }
     },
     "footer": {
       "researchGroup": "Groupe de recherche {group}"
+    },
+    "figures": {
+      "source": "{place}, normale {period}, grille de {grid} :"
     }
   }
 }

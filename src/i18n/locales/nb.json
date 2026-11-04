@@ -663,11 +663,20 @@
         "martonne": {
           "title": "De Martonnes tørkeindeks",
           "text": "Årsnedbør (mm) delt på årsmiddeltemperaturen pluss 10 °C; jo lavere, desto tørrere. Den er ikke definert der årsmiddeltemperaturen er −10 °C eller lavere."
+        },
+        "figure": {
+          "aridBar": "En tørr måned: nedbørsstolpen tegnes i den tørre fargen, fordi nedbøren er under det dobbelte av middeltemperaturen (P < 2T).",
+          "frostLine": "En frostmåned: linjen for minimumstemperatur går under 0 °C.",
+          "aridCount": "Tørre måneder: hvor mange av årets måneder som er tørre.",
+          "martonne": "De Martonnes tørkeindeks for året, med klassen sin."
         }
       }
     },
     "footer": {
       "researchGroup": "Forskningsgruppen {group}"
+    },
+    "figures": {
+      "source": "{place}, normalperioden {period}, {grid}-rutenett:"
     }
   }
 }

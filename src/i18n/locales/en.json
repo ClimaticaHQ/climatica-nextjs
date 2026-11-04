@@ -368,7 +368,7 @@
     "mediterranean": "Mediterranean",
     "semiHumid": "Semi-humid",
     "humid": "Humid",
-    "veryHumid": "Very-humid",
+    "veryHumid": "Very humid",
     "extremelyHumid": "Extremely humid"
   },
   "meta": {
@@ -663,11 +663,20 @@
         "martonne": {
           "title": "De Martonne aridity index",
           "text": "Annual precipitation (mm) divided by the annual mean temperature plus 10 °C; lower is drier. It isn't defined where the annual mean temperature is −10 °C or lower."
+        },
+        "figure": {
+          "aridBar": "An arid month: its precipitation bar is drawn in the arid colour, because precipitation is below twice the mean temperature (P < 2T).",
+          "frostLine": "A frost month: the minimum temperature line runs below 0 °C.",
+          "aridCount": "Arid months: how many months of the year are arid.",
+          "martonne": "The De Martonne aridity index for the year, with its class."
         }
       }
     },
     "footer": {
       "researchGroup": "{group} research group"
+    },
+    "figures": {
+      "source": "{place}, {period} normal, {grid} grid:"
     }
   }
 }

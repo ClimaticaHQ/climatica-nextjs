@@ -663,11 +663,20 @@
         "martonne": {
           "title": "Índice de aridez de De Martonne",
           "text": "Precipitación anual (mm) dividida entre la temperatura media anual más 10 °C; cuanto más bajo, más seco. No está definido donde la temperatura media anual es de −10 °C o menos."
+        },
+        "figure": {
+          "aridBar": "Un mes árido: su barra de precipitación se dibuja en el color árido, porque la precipitación es inferior al doble de la temperatura media (P < 2T).",
+          "frostLine": "Un mes de helada: la línea de temperatura mínima queda por debajo de 0 °C.",
+          "aridCount": "Meses áridos: cuántos meses del año son áridos.",
+          "martonne": "El índice de aridez de De Martonne del año, con su clase."
         }
       }
     },
     "footer": {
       "researchGroup": "Grupo de investigación {group}"
+    },
+    "figures": {
+      "source": "{place}, normal {period}, malla de {grid}:"
     }
   }
 }

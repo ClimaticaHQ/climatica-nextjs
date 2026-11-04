@@ -663,11 +663,20 @@
         "martonne": {
           "title": "Indice di aridità di De Martonne",
           "text": "Precipitazioni annue (mm) divise per la temperatura media annua più 10 °C; più è basso, più è secco. Non è definito dove la temperatura media annua è di −10 °C o meno."
+        },
+        "figure": {
+          "aridBar": "Un mese arido: la sua barra delle precipitazioni è disegnata nel colore arido, perché le precipitazioni sono inferiori al doppio della temperatura media (P < 2T).",
+          "frostLine": "Un mese di gelo: la linea della temperatura minima scende sotto 0 °C.",
+          "aridCount": "Mesi aridi: quanti mesi dell'anno sono aridi.",
+          "martonne": "L'indice di aridità di De Martonne dell'anno, con la sua classe."
         }
       }
     },
     "footer": {
       "researchGroup": "Gruppo di ricerca {group}"
+    },
+    "figures": {
+      "source": "{place}, normale {period}, griglia da {grid}:"
     }
   }
 }

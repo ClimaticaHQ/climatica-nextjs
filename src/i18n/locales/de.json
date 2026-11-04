@@ -663,11 +663,20 @@
         "martonne": {
           "title": "Ariditätsindex nach De Martonne",
           "text": "Jahresniederschlag (mm) geteilt durch die Jahresmitteltemperatur plus 10 °C; je niedriger, desto trockener. Er ist nicht definiert, wo die Jahresmitteltemperatur −10 °C oder weniger beträgt."
+        },
+        "figure": {
+          "aridBar": "Ein arider Monat: Sein Niederschlagsbalken ist in der ariden Farbe gezeichnet, weil der Niederschlag unter dem Doppelten der Mitteltemperatur liegt (P < 2T).",
+          "frostLine": "Ein Frostmonat: Die Linie der Tiefsttemperatur verläuft unter 0 °C.",
+          "aridCount": "Aride Monate: wie viele Monate des Jahres arid sind.",
+          "martonne": "Der Ariditätsindex nach De Martonne für das Jahr, mit seiner Klasse."
         }
       }
     },
     "footer": {
       "researchGroup": "Forschungsgruppe {group}"
+    },
+    "figures": {
+      "source": "{place}, Normalperiode {period}, Raster {grid}:"
     }
   }
 }

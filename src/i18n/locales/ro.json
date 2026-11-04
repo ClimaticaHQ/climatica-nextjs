@@ -663,11 +663,20 @@
         "martonne": {
           "title": "Indicele de ariditate De Martonne",
           "text": "Precipitațiile anuale (mm) împărțite la temperatura medie anuală plus 10 °C; cu cât e mai mic, cu atât e mai uscat. Nu este definit acolo unde temperatura medie anuală este de −10 °C sau mai puțin."
+        },
+        "figure": {
+          "aridBar": "O lună aridă: bara ei de precipitații e desenată în culoarea aridă, pentru că precipitațiile sunt sub dublul temperaturii medii (P < 2T).",
+          "frostLine": "O lună cu îngheț: linia temperaturii minime coboară sub 0 °C.",
+          "aridCount": "Luni aride: câte luni ale anului sunt aride.",
+          "martonne": "Indicele de ariditate De Martonne al anului, cu clasa lui."
         }
       }
     },
     "footer": {
       "researchGroup": "Grupul de cercetare {group}"
+    },
+    "figures": {
+      "source": "{place}, normala {period}, grilă de {grid}:"
     }
   }
 }
