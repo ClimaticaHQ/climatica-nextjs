@@ -53,9 +53,10 @@ starts with a per-IP rate limiter; a route handler answers from Redis or asks So
 | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | [`src/app/`](../src/app)                                   | routes without a locale prefix; each `page.tsx` renders its container in `Suspense`; `/` redirects to `/climate-statistics` |
 | `src/app/<page>/_components/`                              | a page's container, view and their type / constant / util files                                                             |
+| [`src/app/about/`](../src/app/about)                       | the Info pages (About, User guide, Data & methods) and their shared layout ([pages.md](pages.md#info-pages))                |
 | [`src/app/api/`](../src/app/api)                           | route handlers: `cities`, `worldclim/[queryId]`, `worldclim/resource`, `og` ([backend.md](backend.md))                      |
 | [`src/layouts/`](../src/layouts)                           | the shell: [`AppLayout`](../src/layouts/AppLayout.tsx) (topbar, filters sidebar, main) and its host components (`UrlSync`)  |
-| [`src/components/`](../src/components)                     | shared primitives in `UI/`, features in their own folder (`charts/`, `filters/`, `page/`), other shared components          |
+| [`src/components/`](../src/components)                     | shared primitives in `UI/`, features in their own folder (`charts/`, `filters/`, `page/`, `info/`), other shared components |
 | [`src/hooks/`](../src/hooks)                               | `data/` (queries), `filters/`, `url/`, `ui/`, `persisted/`, `charts/`, `pages/` (page hooks)                                |
 | [`src/libs/`](../src/libs)                                 | `api/` (`apiClient`), `services/` (WorldClim, Solr), `redis/`, `Env.ts`, i18n setup                                         |
 | [`src/stores/`](../src/stores)                             | Zustand stores and the persisted location stores                                                                            |

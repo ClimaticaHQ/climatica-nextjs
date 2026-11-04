@@ -65,7 +65,17 @@ rejects `toFixed`, `toPrecision`, `toLocaleString`, `Math.round` and `new Intl.N
 ## Key conventions
 
 - Keys are grouped by namespace (`pages`, `sidebar`, `filters`, `settings`, `chart`, `meta`,
-  `months`, `units`, `errors`, …; see [`en.json`](../src/i18n/locales/en.json)).
+  `months`, `units`, `errors`, `info`, …; see [`en.json`](../src/i18n/locales/en.json)).
+- The Info pages' text is under `info`: `nav`, `pages` (titles and descriptions), `sections`
+  (section titles, also the sidebar's section links), then one subtree per page (`about`, `guide`,
+  `data`). Long text is one key per paragraph; lists are keyed objects whose order comes from the
+  constants. Links inside text are `t.rich` tags (`<link>`), and numbers arrive as already
+  formatted arguments.
+- **Proper names are constants, not messages:** people, "GSIC-EMIC", "iuFOR" and the
+  university's official name, "Universidad de Valladolid" (in every language), are in
+  [`PROPER_NAMES`](../src/constants/project.constant.ts). Messages take them as arguments
+  (`{university}`, `{group}`), and only the words around them are translated, e.g.
+  `info.footer.researchGroup`: "{group} research group" / "Grupo de investigación {group}".
 - Every locale file has the same keys; a key change updates all 10 with natural phrasing, and
   unused keys are removed. No hard-coded user-facing text.
 - [`localeParity.test.ts`](../tests/unit/utils/localeParity.test.ts) checks one file per locale,

@@ -71,6 +71,8 @@ a hatch (or shade) on its overlay bars — assigned by its marker slot
 - **Focus context:** the non-focused entities turn plain gray (`FOCUS_CONTEXT`:
   `--color-chart-context-line`, `--color-chart-context-bar`, `--color-text-secondary` in the
   table) — no hue, no opacity.
+- **0 °C line:** `--color-chart-reference-line`, darker than the grid (`--color-border`) and
+  lighter than the axis lines in both themes ([charts.md](charts.md#standard-chart)).
 - Bar fills need no contrast ratio: every value is also in the values table and the tooltip.
 
 **Text** never takes an entity's colour: values and names are in the text colour, the entity

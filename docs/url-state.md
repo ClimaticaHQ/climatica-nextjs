@@ -14,7 +14,7 @@ Router calls happen only in these hooks:
 | [`useFilterNavigation`](../src/hooks/filters/useFilterNavigation.ts)     | filter params                          | `applyFilters(next, mode)`: replace (`QUICK`) or push (`APPLY`); page params kept            |
 | [`useUrlStateSync`](../src/hooks/ui/useUrlStateSync.ts)                  | a page's own params, by its URL schema | replace when page state drifts; `pushUrlState` for explicit actions; filter params untouched |
 | [`useChartModeUrl`](../src/hooks/url/useChartModeUrl.ts)                 | `chart`                                | replace                                                                                      |
-| [`useNavbarNavigation`](../src/hooks/url/useNavbarNavigation.ts)         | navbar, logo and settings links        | push to another page                                                                         |
+| [`useNavbarNavigation`](../src/hooks/url/useNavbarNavigation.ts)         | navbar, logo, settings and Info links  | push to another page                                                                         |
 | [`useCanonicalFilterUrl`](../src/hooks/filters/useCanonicalFilterUrl.ts) | canonical filter params                | replace once when the URL isn't canonical                                                    |
 | [`useLocaleSwitch`](../src/hooks/url/useLocaleSwitch.ts)                 | the `NEXT_LOCALE` cookie               | saves the cookie, then `router.refresh()`                                                    |
 
@@ -244,7 +244,7 @@ The locale isn't in the URL: it's the `NEXT_LOCALE` cookie.
 | The city name resolved after a map click                                       | replace         | the city before the click    |
 | Drawing or clearing a heat map selection                                       | push            | the previous selection       |
 | Layout, shading, expanded panel, pair, shown years, order, markers, chart type | replace         | skips the change             |
-| Navbar, logo or settings link                                                  | push            | the previous page            |
+| Navbar, logo, settings or Info link                                            | push            | the previous page            |
 | Language switch                                                                | none            | —                            |
 | Opening a filters sheet                                                        | push (same URL) | closes the sheet             |
 
