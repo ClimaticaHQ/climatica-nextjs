@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 vi.mock("@/libs/Logger", () => ({ logger: { info: vi.fn(), error: vi.fn() } }));
 vi.mock("@/libs/redis/client", () => ({
-  RedisClient: { get: vi.fn(), set: vi.fn(), incrementCounter: vi.fn() },
+  RedisClient: { get: vi.fn(), set: vi.fn(), expire: vi.fn(), incrementCounter: vi.fn() },
 }));
 vi.mock("@/libs/redis", async (importOriginal) => importOriginal());
 vi.mock("@/libs/Env", () => ({ env: { WORLDCLIM_API_KEY: "test-key" } }));
@@ -115,6 +115,23 @@ describe("GET /api/worldclim/resource — popular resource", () => {
       expect.anything(),
       REDIS_STRATEGIES.worldclimResource.popularTtl,
     );
+  });
+});
+
+describe("GET /api/worldclim/resource — popularity on a hit", () => {
+  it("counts a hit and extends the entry once it reaches popularThreshold", async () => {
+    vi.mocked(RedisClient.get).mockResolvedValue({ cached: true });
+    vi.mocked(RedisClient.incrementCounter).mockResolvedValue(
+      REDIS_STRATEGIES.worldclimResource.popularThreshold,
+    );
+    const fetchMock = stubFetch({});
+
+    await GET(makeRequest("id=Cell&iri=popular"));
+    expect(RedisClient.expire).toHaveBeenCalledWith(
+      "worldclim-resource:id=Cell&iri=popular",
+      REDIS_STRATEGIES.worldclimResource.popularTtl,
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
 

@@ -164,3 +164,37 @@ describe("SolrService.getLabelField", () => {
     expect(SolrService.getLabelField("xx")).toBe("label_en");
   });
 });
+
+describe("SolrService.findNearestCity", () => {
+  it("names the nearest place in the language", async () => {
+    stubFetch(makeSolrResponse([makeSolrDoc()]));
+    const city = await SolrService.findNearestCity({ lat: 41.9, lng: 12.5, lang: "uk" });
+    expect(city).toMatchObject({ id: "3169070", label: "Рим", lat: 41.8919, lng: 12.5113 });
+  });
+
+  it("falls back to the English label where the index has none in the language", async () => {
+    stubFetch(makeSolrResponse([makeSolrDoc({ label_uk: undefined })]));
+    const city = await SolrService.findNearestCity({ lat: 41.9, lng: 12.5, lang: "uk" });
+    expect(city?.label).toBe("Rome");
+  });
+
+  it("answers null when no place is within the radius", async () => {
+    stubFetch(makeSolrResponse([]));
+    expect(await SolrService.findNearestCity({ lat: 0, lng: -30, lang: "en" })).toBeNull();
+  });
+
+  it("asks the /cities handler with the nearest-place query", async () => {
+    stubFetch(makeSolrResponse([]));
+    await SolrService.findNearestCity({ lat: 41.9, lng: 12.5, lang: "en" });
+    const url = String(vi.mocked(fetch).mock.calls[0]?.[0]);
+    expect(url).toContain("/solr/cities/cities?");
+    expect(new URL(url).searchParams.get("sort")).toMatch(/^hsin\(/);
+  });
+
+  it("throws on an outage, rather than answering no place", async () => {
+    stubFetch({}, false);
+    await expect(
+      SolrService.findNearestCity({ lat: 41.9, lng: 12.5, lang: "en" }),
+    ).rejects.toThrow();
+  });
+});

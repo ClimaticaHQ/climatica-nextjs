@@ -4,7 +4,13 @@ import {
   SOLR_SCORE_BOUNDS,
   SOLR_SEARCH_WEIGHTS,
 } from "@/constants";
-import { buildSolrQueryParams, getFuzzyEdits, toFuzzyTerm, toFuzzyText } from "@/utils/solr.util";
+import {
+  buildNearestPlaceParams,
+  buildSolrQueryParams,
+  getFuzzyEdits,
+  toFuzzyTerm,
+  toFuzzyText,
+} from "@/utils/solr.util";
 import { describe, expect, it } from "vitest";
 
 describe("getFuzzyEdits", () => {
@@ -135,5 +141,38 @@ describe("SOLR_RANKING.EXACT_TIER", () => {
     const maxFuzzyScore = MAX_QUERY_WORDS * MAX_FUZZY_EXPANSIONS * maxFieldWeight * maxTermScore;
 
     expect(SOLR_RANKING.EXACT_TIER).toBeGreaterThan(maxPopulationBoost + maxFuzzyScore);
+  });
+});
+
+describe("buildNearestPlaceParams", () => {
+  const filters = (params: URLSearchParams) => params.getAll("fq");
+
+  it("sorts every place by distance from the point and keeps the nearest", () => {
+    const params = buildNearestPlaceParams({ lat: 41.6554, lng: -4.7235 });
+    expect(params.get("q")).toBe("*:*");
+    expect(params.get("rows")).toBe("1");
+    expect(params.get("sort")).toBe(
+      "hsin(6371,true,latitude,longitude,41.655400,-4.723500) asc, geonameid asc",
+    );
+  });
+
+  it("filters to a 10 km circle, inside a box that only narrows the candidates", () => {
+    const [latBox, lngBox, circle] = filters(buildNearestPlaceParams({ lat: 0, lng: 0 }));
+    expect(latBox).toBe("{!cache=false}latitude:[-0.089831 TO 0.089831]");
+    expect(lngBox).toBe("{!cache=false}longitude:[-0.089831 TO 0.089831]");
+    expect(circle).toBe(
+      "{!frange u=10 cache=false cost=100}hsin(6371,true,latitude,longitude,0.000000,0.000000)",
+    );
+  });
+
+  it("widens the box's longitude away from the equator, and caps it at a pole", () => {
+    const at60 = filters(buildNearestPlaceParams({ lat: 60, lng: 10 }))[1];
+    expect(at60).toBe("{!cache=false}longitude:[9.820338 TO 10.179662]");
+    const atPole = filters(buildNearestPlaceParams({ lat: 90, lng: 10 }))[1];
+    expect(atPole).toBe("{!cache=false}longitude:[-170.000000 TO 190.000000]");
+  });
+
+  it("never writes a coordinate as an exponent", () => {
+    expect(buildNearestPlaceParams({ lat: 1e-7, lng: -1e-7 }).toString()).not.toMatch(/\de-/);
   });
 });

@@ -2,7 +2,7 @@ import { getLaterPeriodSeries } from "@/app/compare-periods/_components/CompareP
 import { MISSING_VALUE_LABEL } from "@/constants";
 import { EWalterLiethSeriesId } from "@/enums";
 import type { TMonthlyTemperature } from "@/types";
-import { buildComparisonTable } from "@/utils/comparisonTable.util";
+import { buildComparisonTable, buildStatsTable } from "@/utils/comparisonTable.util";
 import { describe, expect, it } from "vitest";
 
 const UNITS = { celsius: "°C", mm: "mm", meters: "m" };
@@ -77,3 +77,67 @@ describe("buildComparisonTable", () => {
     expect(getLaterPeriodSeries("c1961-1990", "c1981-2010")).toBe(EWalterLiethSeriesId.B);
   });
 });
+
+// * Bolzano, 1961–1990 vs 1991–2020 at 2.5′: the values shown were 4.9 / 6.0 °C (avg min) and
+// * 37.3 / 36.6 (Martonne), but the differences read +1.0 and −0.6 — taken from the exact values
+describe("differences of the displayed values", () => {
+  const flat = (tmin: number, tmax: number, prec: number): TMonthlyTemperature[] =>
+    Array.from({ length: 12 }, (_, i) => ({
+      month: i + 1,
+      monthName: `M${i + 1}`,
+      tmin,
+      tmax,
+      prec,
+    }));
+  const earlier = {
+    id: EWalterLiethSeriesId.A,
+    label: "1961–1990",
+    altitude: 262,
+    data: flat(4.94, 17.5, 72),
+  };
+  const later = {
+    id: EWalterLiethSeriesId.B,
+    label: "1991–2020",
+    altitude: 262,
+    data: flat(5.96, 18.7, 74),
+  };
+
+  it("the comparison table's difference equals the difference of the values beside it", () => {
+    const table = buildComparisonTable({
+      units: UNITS,
+      seriesA: earlier,
+      seriesB: later,
+      minuend: EWalterLiethSeriesId.B,
+      locale: "en",
+    });
+    const avgTmin = table.rows.find((r) => r.metric === "avgTmin");
+    expect([avgTmin?.a.text, avgTmin?.b.text]).toEqual(["4.9 °C", "6.0 °C"]);
+    expect(avgTmin?.difference).toBe("+1.1 °C");
+  });
+
+  it("the stats table's difference does too", () => {
+    const table = buildStatsTable({
+      units: UNITS,
+      series: [
+        { ...earlier, isLoading: false },
+        { ...later, isLoading: false },
+      ],
+      minuendId: EWalterLiethSeriesId.B,
+      locale: "en",
+    });
+    const avgTmin = table.rows.find((r) => r.metric === "avgTmin");
+    expect(avgTmin?.values.map((v) => v?.text)).toEqual(["4.9 °C", "6.0 °C"]);
+    expect(avgTmin?.difference).toBe("+1.1 °C");
+
+    const martonne = table.rows.find((r) => r.metric === "martonne");
+    const [shownA, shownB] = (martonne?.values ?? []).map((v) => Number(v?.text));
+    expect(martonne?.difference).toBe(formatShownDifference(shownB ?? 0, shownA ?? 0));
+  });
+});
+
+/** The difference a reader would work out from two shown one-decimal values. */
+function formatShownDifference(minuend: number, subtrahend: number) {
+  const tenths = Math.round(minuend * 10) - Math.round(subtrahend * 10);
+  const sign = tenths > 0 ? "+" : tenths < 0 ? "−" : "±";
+  return `${sign}${(Math.abs(tenths) / 10).toFixed(1)}`;
+}

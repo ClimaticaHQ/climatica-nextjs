@@ -56,24 +56,20 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe("WorldClimService.getCellForPoint", () => {
-  it("returns cell IRI string for matching gridSize", async () => {
-    mockGet.mockResolvedValue(makeAxiosResponse(makeCellResponse(["10m", "5m"])));
-    const result = await WorldClimService.getCellForPoint(48.0, 16.0, "10m");
-    expect(result).toBe("http://example.com/Cell_10m_r10c20");
-  });
-
-  it("returns null when no cell matches gridSize", async () => {
-    mockGet.mockResolvedValue(makeAxiosResponse(makeCellResponse(["5m"])));
-    const result = await WorldClimService.getCellForPoint(48.0, 16.0, "10m");
-    expect(result).toBeNull();
+describe("WorldClimService.getCellsForPoint", () => {
+  it("returns the point's cell at every grid", async () => {
+    const cells = makeCellResponse(["10m", "5m"]);
+    mockGet.mockResolvedValue(makeAxiosResponse(cells));
+    const result = await WorldClimService.getCellsForPoint(48.0, 16.0);
+    expect(result).toEqual(cells);
+    expect(mockGet).toHaveBeenCalledWith("/api/worldclim/cellofpoint", {
+      params: { lat: 48.0, lng: 16.0 },
+    });
   });
 
   it("throws when axios.get rejects", async () => {
     mockGet.mockRejectedValue(new Error("network error"));
-    await expect(WorldClimService.getCellForPoint(48.0, 16.0, "10m")).rejects.toThrow(
-      "network error",
-    );
+    await expect(WorldClimService.getCellsForPoint(48.0, 16.0)).rejects.toThrow("network error");
   });
 });
 

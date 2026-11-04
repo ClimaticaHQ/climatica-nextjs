@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 vi.mock("@/libs/Logger", () => ({ logger: { info: vi.fn(), error: vi.fn() } }));
 vi.mock("@/libs/redis/client", () => ({
-  RedisClient: { get: vi.fn(), set: vi.fn(), incrementCounter: vi.fn() },
+  RedisClient: { get: vi.fn(), set: vi.fn(), expire: vi.fn(), incrementCounter: vi.fn() },
 }));
 vi.mock("@/libs/Env", () => ({ env: { WORLDCLIM_API_KEY: "test-key" } }));
 
@@ -120,17 +120,100 @@ describe("GET /api/worldclim/[queryId] — Redis cache for region strips", () =>
     ]);
   });
 
-  it("leaves point queries uncached", async () => {
-    stubFetch({ results: { bindings: [] } });
-    await callRoute("pixelvaluesofapoint", "lat=1&lng=2");
-    expect(RedisClient.get).not.toHaveBeenCalled();
-    expect(RedisClient.set).not.toHaveBeenCalled();
-  });
-
   it("never caches a failed strip", async () => {
     vi.mocked(RedisClient.get).mockResolvedValue(null);
     stubFetch({ error: "no" }, 500);
     await callRoute("pixelvaluesinbox", STRIP);
     expect(RedisClient.set).not.toHaveBeenCalled();
+  });
+});
+
+describe("GET /api/worldclim/[queryId] — Redis cache for point queries, by cell", () => {
+  const D = "http://climate.gsic.uva.es/data/";
+  const pixelQuery = (lat: number, lng: number) =>
+    `lat=${lat}&lng=${lng}&grid=${encodeURIComponent(`${D}Grid_10m`)}` +
+    `&var=${encodeURIComponent(`${D}Variable_tmax`)}&isClimate=true`;
+  const tromsoAnswer = {
+    results: { bindings: [{ cell: { type: "uri", value: `${D}Cell_10m_r122c1193` } }] },
+  };
+  const KEY = "worldclim-point:pixelvaluesofapoint:10m:r122c1193:tmax:climate";
+
+  beforeEach(() => vi.mocked(RedisClient.incrementCounter).mockResolvedValue(1));
+
+  it("stores a miss under the cell, not the coordinates", async () => {
+    vi.mocked(RedisClient.get).mockResolvedValue(null);
+    stubFetch(tromsoAnswer);
+
+    const res = await callRoute("pixelvaluesofapoint", pixelQuery(69.6492, 18.9553));
+    expect(res.headers.get("X-Cache")).toBe("MISS");
+    expect(RedisClient.set).toHaveBeenCalledWith(KEY, tromsoAnswer, expect.any(Number));
+  });
+
+  it("answers another point in the same cell from that entry", async () => {
+    vi.mocked(RedisClient.get).mockResolvedValue(tromsoAnswer);
+    const fetchMock = stubFetch({});
+
+    const res = await callRoute("pixelvaluesofapoint", pixelQuery(69.6, 18.98));
+    expect(res.headers.get("X-Cache")).toBe("HIT");
+    expect(await res.json()).toEqual(tromsoAnswer);
+    expect(RedisClient.get).toHaveBeenCalledWith(KEY);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("counts a hit and extends a popular entry in place", async () => {
+    vi.mocked(RedisClient.get).mockResolvedValue(tromsoAnswer);
+    vi.mocked(RedisClient.incrementCounter).mockResolvedValue(5);
+
+    await callRoute("pixelvaluesofapoint", pixelQuery(69.6, 18.98));
+    expect(RedisClient.incrementCounter).toHaveBeenCalledWith(
+      "worldclim-point-counter:pixelvaluesofapoint:10m:r122c1193:tmax:climate",
+      expect.any(Number),
+    );
+    expect(RedisClient.expire).toHaveBeenCalledWith(KEY, expect.any(Number));
+  });
+
+  it("forwards the request unchanged upstream", async () => {
+    vi.mocked(RedisClient.get).mockResolvedValue(null);
+    const fetchMock = stubFetch(tromsoAnswer);
+
+    await callRoute("pixelvaluesofapoint", pixelQuery(69.6492, 18.9553));
+    expect(fetchMock.mock.calls[0][0]).toContain("lat=69.6492&lng=18.9553");
+  });
+
+  it("doesn't store an answer for another cell", async () => {
+    vi.mocked(RedisClient.get).mockResolvedValue(null);
+    stubFetch({ results: { bindings: [{ cell: { type: "uri", value: `${D}Cell_10m_r1c1` } }] } });
+
+    const res = await callRoute("pixelvaluesofapoint", pixelQuery(69.6492, 18.9553));
+    expect(res.headers.get("X-Cache")).toBe("MISS");
+    expect(RedisClient.set).not.toHaveBeenCalled();
+  });
+
+  it("bypasses the cache for a point on a cell edge", async () => {
+    stubFetch(tromsoAnswer);
+
+    const res = await callRoute("pixelvaluesofapoint", pixelQuery(45, 10.08));
+    expect(res.headers.get("X-Cache")).toBe("BYPASS");
+    expect(RedisClient.get).not.toHaveBeenCalled();
+    expect(RedisClient.set).not.toHaveBeenCalled();
+  });
+
+  it("keys cellofpoint by the 30 s cell", async () => {
+    vi.mocked(RedisClient.get).mockResolvedValue(null);
+    stubFetch({
+      results: {
+        bindings: [
+          { cell: { type: "uri", value: `${D}Cell_10m_r122c1193` } },
+          { cell: { type: "uri", value: `${D}Cell_30s_r2442c23874` } },
+        ],
+      },
+    });
+
+    await callRoute("cellofpoint", "lat=69.6492&lng=18.9553");
+    expect(RedisClient.set).toHaveBeenCalledWith(
+      "worldclim-point:cellofpoint:30s:r2442c23874",
+      expect.anything(),
+      expect.any(Number),
+    );
   });
 });

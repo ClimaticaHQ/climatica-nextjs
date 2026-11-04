@@ -43,7 +43,7 @@ describe("timeUpstream", () => {
 
   it("lets a rejection through", async () => {
     await expect(
-      timeUpstream(UPSTREAM_SOURCES.WIKIDATA, () => Promise.reject(new Error("down"))),
+      timeUpstream(UPSTREAM_SOURCES.SOLR, () => Promise.reject(new Error("down"))),
     ).rejects.toThrow("down");
   });
 });
