@@ -8,6 +8,7 @@ import type {
 import { buildFooterTextLines } from "../shared/footerLines.util";
 import { escapeXml } from "./buildExportSvg.util";
 import { buildHeatmapMapSection } from "./buildHeatmapMapSection.util";
+import { buildTableFrame, buildTableRule } from "./exportTable.util";
 
 function buildHeader(payload: THeatmapExportPayload, colors: TExportChartColors): string {
   return `
@@ -23,12 +24,18 @@ function buildStatsRow(payload: THeatmapExportPayload, colors: TExportChartColor
   const tableWidth = L.width - L.paddingX * 2;
   const colWidth = tableWidth / payload.stats.length;
 
-  const border = `<rect x="${L.paddingX}" y="${L.statsY}" width="${tableWidth}" height="${L.statsHeight}" fill="none" stroke="${colors.border}" stroke-width="1" />`;
+  const border = buildTableFrame({
+    left: L.paddingX,
+    top: L.statsY,
+    width: tableWidth,
+    height: L.statsHeight,
+    colors,
+  });
   const dividers = payload.stats
     .slice(1)
     .map((_, i) => {
       const x = L.paddingX + colWidth * (i + 1);
-      return `<line x1="${x}" y1="${L.statsY}" x2="${x}" y2="${L.statsY + L.statsHeight}" stroke="${colors.border}" stroke-width="1" />`;
+      return buildTableRule({ x1: x, y1: L.statsY, x2: x, y2: L.statsY + L.statsHeight, colors });
     })
     .join("");
 

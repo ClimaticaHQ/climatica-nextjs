@@ -5,11 +5,14 @@ import type {
   TExportUnitMarkersArgs,
   TExportValuesRowsArgs,
   TMonthlyValuesRow,
+  TRowHeaders,
+  TRowHeadersArgs,
 } from "@/types";
 import { buildMonthlyValuesRows, escapeXml } from "@/utils";
+import { buildTableFrame, buildTableRule } from "./exportTable.util";
 import { buildHatchSwatch } from "./hatchExport.util";
 import { buildMarker } from "./monthlyTableExport.util";
-import { truncateToWidth } from "./textWrap.util";
+import { measureExportText } from "./textWrap.util";
 
 /** The export's unit colors — the WL red and blue, as on screen — and the values' text colour. */
 export const getValuesExportPalette = (colors: TExportChartColors) => ({
@@ -31,6 +34,21 @@ export const buildExportValuesRows = ({
     names: { tavg: "", prec: "" },
     locale,
   });
+
+/**
+ * The overlay's row headers, never cut: every series' full label while the widest fits
+ * ROW_HEADER_MAX_WIDTH ("1961–1990", "Paris"), else the short labels — with the label column
+ * they need, never narrower than the plot's own margin.
+ */
+export function getRowHeaders({ series, minGutter }: TRowHeadersArgs): TRowHeaders {
+  const gutterFor = (labels: readonly string[]) =>
+    Math.max(0, ...labels.map((label) => measureExportText(label, V.VALUE_FONT_SIZE.WIDE))) +
+    V.SECTIONS.PADDING_X * 2;
+  const full = series.map(({ label }) => label);
+  const labels =
+    gutterFor(full) <= V.ROW_HEADER_MAX_WIDTH ? full : series.map(({ shortLabel }) => shortLabel);
+  return { labels, gutter: Math.max(minGutter, gutterFor(labels)) };
+}
 
 /** A row's height: one line per series in its cells. */
 const rowHeight = (row: TMonthlyValuesRow | undefined) =>
@@ -69,11 +87,11 @@ const lineCentre = (cy: number, line: number, lines: number) =>
   cy + (line - (lines - 1) / 2) * V.LINE_HEIGHT;
 
 /**
- * String twin of MonthlyValuesTable: a framed two-row table under a plot — the unit in its
+ * The monthly values under a plot, in the export table style: a framed two-row table — the unit in its
  * color in the left gutter (in overlay with the series' markers beside it), one column per
  * month exactly under that month of the plot, A's value above B's in overlay. With row headers
  * (the standard overlay): each unit a section label over its row, the row headed by the series'
- * short labels — the legend holds the markings.
+ * labels (getRowHeaders), whole — the legend holds the markings.
  */
 export function buildMonthlyValuesSvg({
   rows,
@@ -101,9 +119,7 @@ export function buildMonthlyValuesSvg({
   const body = rows
     .map((row, r) => {
       const divider =
-        r > 0
-          ? `<line x1="${left}" y1="${rowTop}" x2="${left + width}" y2="${rowTop}" stroke="${colors.border}" stroke-width="1" />`
-          : "";
+        r > 0 ? buildTableRule({ x1: left, y1: rowTop, x2: left + width, y2: rowTop, colors }) : "";
       const section = hasSections
         ? `<text x="${left + V.SECTIONS.PADDING_X}" y="${rowTop + V.SECTIONS.BASELINE}" font-size="${V.UNIT_FONT_SIZE}" font-weight="${V.UNIT_FONT_WEIGHT}" fill="${row.unitColor}">${escapeXml(row.unit)}</text>`
         : "";
@@ -119,7 +135,7 @@ export function buildMonthlyValuesSvg({
         ? rowHeaders
             .map(
               (label, line) =>
-                `<text x="${left + V.SECTIONS.PADDING_X}" y="${lineCentre(cy, line, rowHeaders.length) + V.BASELINE}" font-size="${fontSize}" fill="${colors.text}" style="font-variant-numeric:tabular-nums">${escapeXml(truncateToWidth(label, gutter - V.SECTIONS.PADDING_X - V.UNIT_MARKER_GAP, fontSize))}</text>`,
+                `<text x="${left + V.SECTIONS.PADDING_X}" y="${lineCentre(cy, line, rowHeaders.length) + V.BASELINE}" font-size="${fontSize}" fill="${colors.text}" style="font-variant-numeric:tabular-nums">${escapeXml(label)}</text>`,
             )
             .join("")
         : `<text x="${unitX}" y="${cy + V.BASELINE}" text-anchor="${anchor}" font-size="${V.UNIT_FONT_SIZE}" font-weight="${V.UNIT_FONT_WEIGHT}" fill="${row.unitColor}">${escapeXml(row.unit)}</text>${buildUnitMarkers({ row, markers, x: centre + V.UNIT_MARKER_GAP, cy, hatchPrefix })}`;
@@ -139,8 +155,7 @@ export function buildMonthlyValuesSvg({
     .join("");
 
   const height = rowTop - top;
-  const frame = `<rect x="${left}" y="${top}" width="${width}" height="${height}" rx="${V.RADIUS}" fill="${colors.bg}" stroke="${colors.border}" stroke-width="1" />`;
-  return { svg: frame + body, bottom: rowTop };
+  return { svg: buildTableFrame({ left, top, width, height, colors }) + body, bottom: rowTop };
 }
 
 /** An overlay row's markers beside its unit: the shape, the mm row's hatch before it. */

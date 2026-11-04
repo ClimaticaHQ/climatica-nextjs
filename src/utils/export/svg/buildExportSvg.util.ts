@@ -1,5 +1,6 @@
 import {
   CHART_LINE_DASH,
+  CHART_ZERO_LINE,
   EXPORT_SVG_LAYOUT as L,
   EXPORT_AXES_STYLE,
   EXPORT_FONT_FAMILY,
@@ -17,14 +18,17 @@ import type {
   TLinearScale,
   TMonthBand,
   TSvgExportResult,
+  TZeroLineArgs,
 } from "@/types";
 import {
   computeWLAxisTicks,
+  crossesZeroTemperature,
   getSharedDomain,
   getStandardLegendItems,
   getWalterLiethLegendItems,
   toWalterLiethMonths,
   getFrostMonths,
+  getPrecipitationTicks,
   formatLatLng,
   formatValue,
   roundForDisplay,
@@ -39,6 +43,7 @@ import {
   getConventionExportPaint,
 } from "./walterLiethExport.util";
 import { getSingleExportPlotBox } from "./exportPlotBox.util";
+import { buildTableFrame, buildTableRule } from "./exportTable.util";
 import {
   buildExportValuesRows,
   buildMonthlyValuesSvg,
@@ -60,28 +65,6 @@ export function monthOpacity(month: number, selectedMonths: number[] | null): nu
 
 export function dotRadius(month: number, selectedMonths: number[] | null): number {
   return selectedMonths?.length === 1 && selectedMonths.includes(month) ? 5 : 3;
-}
-
-/**
- * Nice round ticks from 0 to max, sized for a target count regardless of range —
- * unlike computeWLAxisTicks (fixed step 5/10, built for the temp axis's small range),
- * this scales its step with the magnitude of max so a monsoon-scale rightMax
- * (~1000+) doesn't produce hundreds of overlapping labels. The actual max is
- * appended as a final tick so the axis's real top boundary is always labeled.
- */
-export function computeNiceAxisTicks(max: number, targetCount = 6): number[] {
-  if (max <= 0) return [0];
-
-  const roughStep = max / targetCount;
-  const magnitude = 10 ** Math.floor(Math.log10(roughStep));
-  const normalized = roughStep / magnitude;
-  const niceNormalized = [1, 2, 5, 10].find((n) => n >= normalized) ?? 10;
-  const step = niceNormalized * magnitude;
-
-  const ticks: number[] = [];
-  for (let v = 0; v < max; v += step) ticks.push(v);
-  if (ticks[ticks.length - 1] !== max) ticks.push(max);
-  return ticks;
 }
 
 function buildHeader(payload: TExportPayload, colors: TExportChartColors): string {
@@ -132,12 +115,18 @@ function buildStatsTable(payload: TExportPayload, colors: TExportChartColors): s
   const y0 = L.statsY;
   const y1 = y0 + L.statsHeight;
 
-  const border = `<rect x="${L.paddingX}" y="${y0}" width="${tableWidth}" height="${L.statsHeight}" fill="none" stroke="${colors.border}" stroke-width="1" />`;
+  const border = buildTableFrame({
+    left: L.paddingX,
+    top: y0,
+    width: tableWidth,
+    height: L.statsHeight,
+    colors,
+  });
   const dividers = cells
     .slice(1)
     .map((_, i) => {
       const x = L.paddingX + cellWidth * (i + 1);
-      return `<line x1="${x}" y1="${y0}" x2="${x}" y2="${y1}" stroke="${colors.border}" stroke-width="1" />`;
+      return buildTableRule({ x1: x, y1: y0, x2: x, y2: y1, colors });
     })
     .join("");
   const content = cells
@@ -203,6 +192,17 @@ export function buildGridAndAxes(
     ${precLabels}
     ${buildUnitTitles({ plotLeft, plotRight, chartTop, colors, axesStyle })}
   `;
+}
+
+/**
+ * The standard chart's 0 °C line, as on screen (StandardChartAxes): only when the °C domain crosses
+ * 0; drawn right after the grid, so behind the bars and lines. Its colour stays a token,
+ * resolved with the rest of the markup.
+ */
+export function buildZeroLine({ scales, tempScale, plotLeft, plotRight }: TZeroLineArgs) {
+  if (!crossesZeroTemperature(scales)) return "";
+  const y = tempScale(0);
+  return `<line x1="${plotLeft}" y1="${y}" x2="${plotRight}" y2="${y}" stroke="${CHART_ZERO_LINE.STROKE}" stroke-width="${CHART_ZERO_LINE.STROKE_WIDTH}" stroke-dasharray="${CHART_ZERO_LINE.DASH}" data-zero-line="" />`;
 }
 
 /**
@@ -283,7 +283,8 @@ function buildStandardBody(
   chartBottom: number,
   monthBands: TMonthBand[],
 ): string {
-  const precScale = createLinearScale(0, payload.rightMax, chartBottom, L.chartTop);
+  const precTicks = getPrecipitationTicks(payload.rightMax);
+  const precScale = createLinearScale(0, precTicks.at(-1) ?? 0, chartBottom, L.chartTop);
 
   return [
     buildGridAndAxes(
@@ -295,12 +296,13 @@ function buildStandardBody(
       plotRight,
       L.chartTop,
       chartBottom,
-      computeNiceAxisTicks(payload.rightMax),
+      precTicks,
       (tick) => tick,
       undefined,
       // * the WL plot's axes: °C / mm above them, like the screen
       EXPORT_AXES_STYLE,
     ),
+    buildZeroLine({ scales: payload.scales, tempScale, plotLeft, plotRight }),
     buildBars(payload, colors, precScale, monthBands, chartBottom),
     buildLine(payload, colors.tmax, "tmax", tempScale, monthBands),
     buildLine(payload, colors.tavg, "tavg", tempScale, monthBands),

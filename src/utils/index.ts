@@ -65,3 +65,5 @@ export * from "./overlayScroll.util";
 export * from "./overlayBars.util";
 export * from "./entityLabel.util";
 export * from "./info.util";
+export * from "./infoFigure.util";
+export * from "./axisTicks.util";

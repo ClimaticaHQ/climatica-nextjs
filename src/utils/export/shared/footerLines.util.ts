@@ -1,4 +1,5 @@
 import type { TDatasetAttribution, TFooterLinesParams, TFooterTextLine } from "@/types";
+import { wrapUrl } from "../svg/textWrap.util";
 
 /** "WorldClim v2.1 (CRU-TS 4.09)" — both numbers fetched live from WorldClim's
  * Raster resource, not hardcoded. Cited together regardless of dataset: even
@@ -12,8 +13,8 @@ export function formatDatasetAttribution(attribution: TDatasetAttribution | null
 
 /**
  * The share-URL line shrinks to fit on one line down to footerUrlMinFontSize.
- * If it still doesn't fit even at that size, it wraps across as many lines as
- * needed (all at the minimum size) instead of overflowing the canvas.
+ * If it still doesn't fit even at that size, it wraps (wrapUrl: before "?" or "&",
+ * never a lone character) across as many lines as needed, all at the minimum size.
  */
 function buildShareUrlLines(url: string, layout: TFooterLinesParams["layout"]): TFooterTextLine[] {
   const { width, paddingX, footerFontSize, footerUrlMinFontSize, footerUrlAvgCharWidthRatio } =
@@ -29,12 +30,10 @@ function buildShareUrlLines(url: string, layout: TFooterLinesParams["layout"]): 
     return [{ text: url, fontSize: Math.min(footerFontSize, fittedSingleLineSize) }];
   }
 
-  const charsPerLine = maxCharsAtSize(footerUrlMinFontSize);
-  const lines: TFooterTextLine[] = [];
-  for (let i = 0; i < url.length; i += charsPerLine) {
-    lines.push({ text: url.slice(i, i + charsPerLine), fontSize: footerUrlMinFontSize });
-  }
-  return lines;
+  return wrapUrl({ url, maxChars: maxCharsAtSize(footerUrlMinFontSize) }).map((text) => ({
+    text,
+    fontSize: footerUrlMinFontSize,
+  }));
 }
 
 /** The footer every export image (PNG/SVG, any page) carries as a mandatory

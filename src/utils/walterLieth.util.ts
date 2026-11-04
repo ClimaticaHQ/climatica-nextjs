@@ -1,3 +1,4 @@
+import { getTemperatureTicks } from "./axisTicks.util";
 import { getMonthlyMean, toWalterLiethMonths } from "./monthlyClimate.util";
 import {
   MARTONNE_TEMP_OFFSET,
@@ -126,11 +127,9 @@ export function summarizeMonths(
   return months ? getAnnualSummary(months) : null;
 }
 
+/** The diagram's °C ticks: the shared round ticks (multiples of 5, 10…, 0 when crossed). */
 export function computeWLAxisTicks(min: number, max: number): number[] {
-  const step = max - min <= 30 ? 5 : 10;
-  const ticks: number[] = [];
-  for (let v = min; v <= max; v += step) ticks.push(v);
-  return ticks;
+  return getTemperatureTicks(min, max);
 }
 
 /**
