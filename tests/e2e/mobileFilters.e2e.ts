@@ -137,7 +137,7 @@ test.describe("Mobile filters", () => {
   }) => {
     await page.goto(CITY_URL);
     const disabledVariables = page.getByRole("button", {
-      name: "Variables: Not available in Walter-Lieth view",
+      name: "Variables: Not available in Walter-Lieth view. Show why",
     });
     await expect(disabledVariables).toBeVisible();
 

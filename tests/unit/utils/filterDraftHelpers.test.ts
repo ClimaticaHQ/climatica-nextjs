@@ -31,10 +31,10 @@ describe("filter draft helpers", () => {
     expect(areFiltersEqual(FILTER_DEFAULTS, weather)).toBe(false);
   });
 
-  it("areFilterControlsDisabled: Walter-Lieth disables controls, the heat map dims instead", () => {
+  it("areFilterControlsDisabled: an unavailable filter disables its controls, whatever the reason", () => {
     expect(areFilterControlsDisabled(EFilterAvailability.AVAILABLE)).toBe(false);
     expect(areFilterControlsDisabled(EFilterAvailability.WALTER_LIETH)).toBe(true);
-    expect(areFilterControlsDisabled(EFilterAvailability.HEAT_MAP)).toBe(false);
+    expect(areFilterControlsDisabled(EFilterAvailability.HEAT_MAP)).toBe(true);
   });
 
   it("getAddedWeatherPeriodError rejects missing, out-of-range and duplicate years", () => {

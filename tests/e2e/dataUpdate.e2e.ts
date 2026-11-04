@@ -34,7 +34,7 @@ test.describe("Data update feedback", () => {
       await new Promise((resolve) => setTimeout(resolve, SLOW_RESPONSE_MS));
       await route.continue();
     });
-    await applySidebarOption(page, "Cell resolution:", "5m");
+    await applySidebarOption(page, "Cell resolution", "5m");
 
     await expect(exportButton).toBeDisabled();
     await expect(page.locator("[data-update-progress]")).toBeVisible();
@@ -107,7 +107,7 @@ test.describe("Animation settings", () => {
       await new Promise((resolve) => setTimeout(resolve, SLOW_RESPONSE_MS));
       await route.continue();
     });
-    await applySidebarOption(page, "Cell resolution:", "5m");
+    await applySidebarOption(page, "Cell resolution", "5m");
 
     // * the loading state stays visible, only without motion
     await expect(page.locator("[data-update-progress]")).toBeVisible();

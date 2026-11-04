@@ -13,7 +13,6 @@ const COLORS: TExportChartColors = {
   textSecondary: "#666",
   border: "#ccc",
   bg: "#fff",
-  bgSecondary: "#f5f5f5",
   tmax: "#f00",
   tmin: "#00f",
   tavg: "#f80",
