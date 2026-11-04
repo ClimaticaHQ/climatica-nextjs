@@ -1,5 +1,6 @@
 import type { TInfoPage, TInfoSection } from "@/types";
 import { PROJECT_INFO } from "./project.constant";
+import { CLIMATE_PERIOD_LABELS, CLIMATE_PERIODS } from "./worldclim.constant";
 import { ROUTES } from "./route.constant";
 import { TEAM } from "./team.constant";
 import { TIME } from "./time.constant";
@@ -102,4 +103,11 @@ export const SCROLL_SPY = {
   // * px from the bottom that counts as scrolled to the end: the last section is then current
   END_TOLERANCE_PX: 2,
   LOCK_MS: TIME.IN_MILLISECONDS.SECOND,
+} as const;
+
+// * where the Info figures' data come from (their fixture is in components/info)
+export const FIGURE_PLACE = {
+  NAME: "Soria",
+  PERIOD: CLIMATE_PERIOD_LABELS[CLIMATE_PERIODS.C1970_2000],
+  GRID_KEY: "2_5m",
 } as const;

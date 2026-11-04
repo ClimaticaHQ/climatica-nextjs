@@ -1,4 +1,5 @@
 import type { TBarStyle, TOverlayBarStyle, TVisibleSeries } from "@/types";
+import { DefaultZIndexes } from "recharts";
 // * one plot geometry for every chart type (WL and standard), so switching between them moves
 // * nothing: the same margins, y-axis widths (getAxisStyle) and heights give the same plot area
 export const CHART_PLOT = {
@@ -34,6 +35,16 @@ export const MONTH_TAP = { MOVE_THRESHOLD: 8 } as const;
 
 // * the tapped month's tooltip: over the tap layer and a scrolling plot's fixed axes (z-10)
 export const TOUCH_TOOLTIP_Z_INDEX = 20;
+
+// * the standard chart's 0 °C reference line, when the °C axis crosses 0: thin, dashed, just
+// * above the grid and behind every bar and curve, so it never covers data; its colour sits
+// * between the grid's and the axis lines' in both themes
+export const CHART_ZERO_LINE = {
+  STROKE: "var(--color-chart-reference-line)",
+  STROKE_WIDTH: 1,
+  DASH: "6 3",
+  Z_INDEX: DefaultZIndexes.grid + 1,
+} as const;
 
 // * a hovered month: the chart's band and the monthly values table's column, the same token
 export const CHART_HOVER_COLOR = "var(--color-state-hover)";

@@ -71,8 +71,15 @@ export const WALTER_LIETH_AXIS = {
   // * a phone's full-width chart: narrower axes, so the plot gets the width (ticks in --font-xs)
   NARROW_WIDTH: 34,
   NARROW_TICK_FONT_SIZE: 12,
-  // * a phone's standard chart: this many ticks per y axis
+  // * a phone's standard chart: this many ticks per y axis (°C: at most this many)
   NARROW_TICK_COUNT: 4,
+  // * °C ticks, on both charts: multiples of one of these steps, at most TEMP_MAX_TICKS of them
+  TEMP_TICK_STEPS: [5, 10, 20, 50],
+  TEMP_MAX_TICKS: 7,
+  // * the standard chart's mm ticks (screen and export): multiples of one of these steps, at
+  // * most PREC_MAX_TICKS, the axis ending on a tick
+  PREC_TICK_STEPS: [10, 20, 25, 50, 100, 200, 250, 500, 1000],
+  PREC_MAX_TICKS: 7,
   // * tick labels sit this far from the axis line, with no tick marks
   TICK_GAP: 4,
   // * °C / mm sit above their axis, this far over the plot top
