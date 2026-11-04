@@ -10,4 +10,6 @@ export type TStatCellProps = {
   hasMetaRow: boolean;
   meta?: ReactNode;
   cellClassName: string;
+  /** an annotation attached to this stat (an Info figure's number), at its top right */
+  marker?: ReactNode;
 };
