@@ -6,3 +6,4 @@ export type * from "./heatmap.type";
 export type * from "./urlStateSync.type";
 export type * from "./filtersDraft.type";
 export type * from "./bottomSheet.type";
+export type * from "./topbar.type";

@@ -19,6 +19,7 @@ export function ChartModeSwitch({ value }: TChartModeSwitchProps) {
 
   return (
     <SegmentedControl
+      isIconOnlyBelowSm
       label={t("chart.mode")}
       options={options}
       value={value}

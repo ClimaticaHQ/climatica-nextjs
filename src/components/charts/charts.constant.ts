@@ -43,14 +43,15 @@ export const STANDARD_CHART_HOVER_DIMMED_BAR_OPACITY = 0.35;
 // * a line's or bar's name in a multi-series chart: "<series> — <variable>"
 export const SERIES_ITEM_SEPARATOR = " — ";
 
-// * px — every chart tooltip's text (TOOLTIP_CLASSES.FRAME); its swatches scale with it
+// * px at the default text size — every chart tooltip's text (TOOLTIP_CLASSES.FRAME, --font-tooltip);
+// * its swatches scale with it and with the text scale
 export const TOOLTIP_FONT_SIZE = 13;
 
 // * every chart tooltip: text in the text colour, a row after its series' marker or, in a chart
 // * of one series, its variable's legend swatch
 export const TOOLTIP_CLASSES = {
   FRAME:
-    "rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-[13px] text-[var(--color-text)]",
+    "rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-[length:var(--font-tooltip)] text-[var(--color-text)]",
   TITLE: "mb-1 font-semibold",
   ROW: "flex items-center gap-1.5",
   SERIES: "mb-1",
@@ -76,22 +77,25 @@ export const STATS_TABLE_CLASSES = {
   METRIC_COL: "w-[36%] sm:w-[28%]",
   // * every header bottom-aligned on one line height: the titles share a baseline
   HEAD_CELL: "px-3 py-2.5 text-right align-bottom font-semibold leading-5 sm:px-4",
-  METRIC_HEAD: "sticky left-0 z-10 bg-inherit px-3 py-2.5 text-left align-bottom leading-5 sm:px-4",
+  // * above the body's pinned cells (z-10), so the sort button's tap target reaches into the first row
+  METRIC_HEAD: "sticky left-0 z-20 bg-inherit px-3 py-2.5 text-left align-bottom leading-5 sm:px-4",
   // * the corner's sort toggle: "Year" and its direction, a quiet button in the header's type
-  SORT_BUTTON: `${FOCUS_RING_CLASS} -mx-1 inline-flex items-center gap-1 rounded-[var(--radius-xs)] px-1 font-semibold text-[var(--color-text-secondary)] transition-colors duration-150 hover:text-[var(--color-text)]`,
+  SORT_BUTTON: `${FOCUS_RING_CLASS} touch-target -mx-1 inline-flex items-center gap-1 rounded-[var(--radius-xs)] px-1 font-semibold text-[var(--color-text-secondary)] transition-colors duration-150 hover:text-[var(--color-text)]`,
   SERIES_NAME: "inline-flex max-w-full items-center justify-end gap-1.5",
-  SERIES_LABEL: "truncate",
+  // * a name wraps where it can ("1970–" / "2000"), and only past two lines is it cut
+  SERIES_LABEL: "line-clamp-2 [overflow-wrap:anywhere]",
   DIFFERENCE: "max-sm:hidden",
   DIFFERENCE_HEAD: "inline-flex items-center gap-1",
   DIFFERENCE_BELOW: "sm:hidden",
-  MUTED_LINE: "block text-[11px] font-normal text-[var(--color-text-secondary)]",
+  MUTED_LINE: "block text-[length:var(--font-2xs)] font-normal text-[var(--color-text-secondary)]",
   // * hover (only where the device can hover) paints the state layer as an inset shadow on each
   // * cell: it tints the pinned metric cell over its opaque background too, and it can fade
   ROW: "state-hover-row border-t border-[var(--color-border)] hover:[&>*]:shadow-[inset_0_0_0_100vmax_var(--color-state-hover)]",
   METRIC_CELL:
     "sticky left-0 z-10 bg-[var(--color-surface)] px-3 py-2 text-left font-normal text-[var(--color-text-secondary)] sm:px-4",
   VALUE_CELL: "px-3 py-2 text-right tabular-nums font-medium sm:px-4",
-  VALUE_LINE: "inline-flex max-w-full items-center justify-end gap-1.5",
+  // * a value and its class badge wrap onto two lines rather than cut the badge
+  VALUE_LINE: "inline-flex max-w-full flex-wrap items-center justify-end gap-x-1.5 gap-y-0.5",
   LOADING_VALUE: "ml-auto h-4 w-16 animate-pulse rounded bg-[var(--color-border)]",
   DIFFERENCE_CELL:
     "px-3 py-2 text-right tabular-nums text-[var(--color-text-secondary)] max-sm:hidden sm:px-4",
@@ -173,7 +177,7 @@ const TITLE_NAME_WRAP =
   "max-sm:overflow-visible max-sm:whitespace-normal max-sm:break-words max-sm:text-clip";
 
 export const CHART_TITLE_CLASSES = {
-  EYEBROW: "text-[12px] font-medium text-[var(--color-text-secondary)]",
+  EYEBROW: "text-[length:var(--font-xs)] font-medium text-[var(--color-text-secondary)]",
   HEADING:
     "font-semibold text-[length:var(--font-md)] md:text-[length:var(--font-lg)] text-[var(--color-text)]",
   // * one location: may wrap, clamped to two lines — never cut on a phone
@@ -187,10 +191,11 @@ export const CHART_TITLE_CLASSES = {
   VERSUS: "shrink-0 font-normal text-[var(--color-text-secondary)]",
   SUBTITLE_ROW: "flex flex-wrap items-center gap-2",
   // * a subtitle wrapping onto several lines keeps its icon level with the first one
-  SUBTITLE: "flex items-start gap-1 text-[12px] text-[var(--color-text-secondary)]",
+  SUBTITLE:
+    "flex items-start gap-1 text-[length:var(--font-xs)] text-[var(--color-text-secondary)]",
   SUBTITLE_ICON: "flex h-[1lh] shrink-0 items-center",
   MONTH_BADGE:
-    "rounded-full border-[0.5px] border-[var(--color-month-badge-border)] bg-[var(--color-month-badge-bg)] px-2.5 py-0.5 text-[12px] text-[var(--color-month-badge-text)]",
+    "rounded-full border-[0.5px] border-[var(--color-month-badge-border)] bg-[var(--color-month-badge-bg)] px-2.5 py-0.5 text-[length:var(--font-xs)] text-[var(--color-month-badge-text)]",
 } as const;
 
 // * a scrolling overlay's fixed y axes: room beside each axis for its unit title (px), the strip
@@ -220,3 +225,9 @@ export const MONTH_TAP_LAYER_CLASSES = {
 
 // * a series chip's frame: rounded like the chip, so its arrival flash follows its outline
 export const SERIES_CHIP_FRAME_CLASS = "shrink-0 rounded-[var(--radius-full)]";
+
+// * the variable chips: one row scrolling sideways below `sm` (with room above and below for the
+// * chips' tap targets, which the scroller would clip; px floors, so it holds at a smaller text
+// * size), wrapping from `sm`
+export const VARIABLE_CHIPS_ROW_CLASS =
+  "flex flex-wrap justify-end gap-[max(0.5rem,8px)] touch-gap-x-2 sm:touch-gap-y-2 max-sm:pointer-events-none max-sm:-my-[max(0.5rem,12px)] max-sm:max-w-full max-sm:flex-nowrap max-sm:justify-start max-sm:overflow-x-auto max-sm:py-[max(0.5rem,12px)] max-sm:*:pointer-events-auto";

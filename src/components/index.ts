@@ -1,5 +1,6 @@
 export { ChartTransition } from "./ChartTransition";
 export { MotionRoot } from "./MotionRoot";
+export { TextSizeRoot } from "./TextSizeRoot";
 export { ThemeRoot } from "./ThemeRoot";
 export { NavigationIntentTracker } from "./NavigationIntentTracker";
 export * from "./filters";

@@ -54,7 +54,7 @@ describe("Badge", () => {
     const content = screen.getByText("Extremely humid");
     expect(content.className).toContain("truncate");
     expect(content.parentElement?.getAttribute("title")).toBe("Extremely humid");
-    expect(content.parentElement?.className).toContain("text-[10px]");
+    expect(content.parentElement?.className).toContain("text-[length:max(0.625rem,10px)]");
   });
 
   it("is medium by default", () => {

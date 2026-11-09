@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "./tokens.css";
+@import "./typography.css";
 @import "./base.css";
+@import "./utilities.css";
 @import "./animations.css";
 @import "./leaflet.css";

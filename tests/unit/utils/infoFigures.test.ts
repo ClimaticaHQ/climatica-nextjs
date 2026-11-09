@@ -121,6 +121,7 @@ const LAYOUT: TAnnotationLayout = {
   topBand: 36,
   bottomBand: 28,
   numberRadius: 10,
+  numberFontSize: 14,
   numberGap: 4,
   bracketTick: 5,
 };

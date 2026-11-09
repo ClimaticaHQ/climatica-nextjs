@@ -1,4 +1,4 @@
-import { EXTERNAL_LINK_CLASS } from "@/components/UI/ExternalLink";
+import { EXTERNAL_LINK_CLASS, EXTERNAL_LINK_TARGET_CLASS } from "@/components/UI/ExternalLink";
 import { AreaChartIcon, CodeIcon, DatabaseIcon } from "@/components/svg";
 import { OverlayLayoutIcon, SplitLayoutIcon } from "@/components/svg";
 import {
@@ -106,7 +106,7 @@ export const REFERENCES: readonly TReference[] = [
   },
 ];
 
-// * Info typography: the app's sizes on phones; from lg the reading scale (tokens.css) —
+// * Info typography: the app's sizes on phones; from lg the reading scale (typography.css) —
 // * body 17, lead 19, card titles 20, headings 32, card text 16, small labels 14
 const BODY = "lg:text-[length:var(--font-reading-body)]";
 const CARD_TEXT = "text-[length:var(--font-xs)] lg:text-[length:var(--font-sm)]";
@@ -129,8 +129,8 @@ export const INFO_CLASSES = {
   // * an intro: 17 px on phones, 19 px from lg, left-aligned under the centred title
   LEAD: "text-left text-[length:var(--font-reading-body)] text-[var(--color-text-secondary)] lg:text-[length:var(--font-reading-lead)]",
   SMALL: `${CARD_TEXT} text-[var(--color-text-secondary)]`,
-  // * the app's inline link — the same as an external link's
-  LINK: EXTERNAL_LINK_CLASS,
+  // * the app's inline link — the same as an external link's, with its target
+  LINK: `${EXTERNAL_LINK_CLASS} ${EXTERNAL_LINK_TARGET_CLASS}`,
   // * the key facts: 2 × 2 below lg
   GRID_4: "grid grid-cols-2 gap-3 lg:grid-cols-4",
   // * What a value describes: text and callout on the left, the schematic on the right
@@ -157,7 +157,7 @@ export const INFO_CLASSES = {
   BUTTON: "inline-flex min-h-10 items-center px-4",
   // * the About intro's buttons: full width and stacked below lg
   HERO_ACTIONS: "flex flex-col gap-3 lg:flex-row lg:items-center",
-  HERO_BUTTON: "inline-flex min-h-11 w-full items-center justify-center px-4 lg:w-auto",
+  HERO_BUTTON: "inline-flex min-h-target w-full items-center justify-center px-4 lg:w-auto",
   // * a table keeps its columns and scrolls sideways in its box when the screen is narrower
   TABLE_SCROLL: "overflow-x-auto",
   TABLE:
@@ -195,14 +195,14 @@ export const INFO_NAV_CLASSES = {
   },
   // * the touch scale: pages 19 px, sections 17 px
   LARGE: {
-    PAGE_LINK: "min-h-12 text-[length:var(--font-touch-nav-page)]",
-    SECTION_LINK: "min-h-11 text-[length:var(--font-touch-nav)]",
+    PAGE_LINK: "min-h-[max(3rem,44px)] text-[length:var(--font-touch-nav-page)]",
+    SECTION_LINK: "min-h-target text-[length:var(--font-touch-nav)]",
   },
 } as const;
 
 // * below lg, pinned to the top of the scrolling <main>, under the top bar
 export const INFO_CONTENTS_BAR_CLASSES = {
-  ROOT: "sticky top-0 z-20 flex h-13 items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-[length:var(--font-touch-nav)] sm:px-10 lg:hidden",
+  ROOT: "sticky top-0 z-20 flex min-h-13 items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-[length:var(--font-touch-nav)] sm:px-10 lg:hidden",
   TRAIL: "flex min-w-0 flex-1 items-center gap-1.5",
   // * when the trail is too long the page name gives way first (it shrinks a hundred times
   // * faster, down to its ellipsis); the section is never cut — it wraps onto a second line instead
@@ -211,7 +211,7 @@ export const INFO_CONTENTS_BAR_CLASSES = {
   SEPARATOR:
     "flex size-4 shrink-0 -rotate-90 items-center justify-center text-[var(--color-text-secondary)] [&_svg]:size-4",
   SECTION: "min-w-0 font-medium leading-tight text-[var(--color-text)]",
-  BUTTON: `${FOCUS_RING_CLASS} -mr-2 flex min-h-11 shrink-0 items-center gap-1.5 rounded-[var(--radius-sm)] px-2 font-medium text-[var(--color-primary)] hover:bg-[var(--color-surface-secondary)]`,
+  BUTTON: `${FOCUS_RING_CLASS} -mr-2 flex min-h-target shrink-0 items-center gap-1.5 rounded-[var(--radius-sm)] px-2 font-medium text-[var(--color-primary)] hover:bg-[var(--color-surface-secondary)]`,
 } as const;
 
 // * how many fine cells per side of a coarse one, in the Bolzano schematic: from the two grids
@@ -269,8 +269,9 @@ export const TEAM_CARD_CLASSES = {
   NAME_ICON: "ml-1 inline-block size-3.5 align-[-0.125em] text-[var(--color-text-secondary)]",
   DETAIL:
     "text-[length:var(--font-xs)] text-[var(--color-text-secondary)] lg:text-[length:var(--font-sm)]",
-  // * each part of an affiliation kept whole: it can break only after the comma
-  AFFILIATION_PART: "whitespace-nowrap",
+  // * each part of an affiliation kept whole: it moves to the next line after the comma, and
+  // * breaks inside only when it is wider than the line on its own (very large text)
+  AFFILIATION_PART: "inline-block max-w-full",
 } as const;
 
 // * InfoCardGrid: its grid per column count (one column below lg), and a card's parts
@@ -302,12 +303,14 @@ export const INFO_FIGURE = {
   NEAR_MARGIN: "400px",
 } as const;
 
-// * the annotation band (px): room above the plot (and under the month labels, for a bottom
-// * span) inside the chart's own margin, so no number is ever clipped or over the data
+// * the annotation band (px, at the default text size — scaleAnnotationLayout): room above the
+// * plot (and under the month labels, for a bottom span) inside the chart's own margin, so no
+// * number is ever clipped or over the data
 export const ANNOTATION_LAYOUT: TAnnotationLayout = {
   topBand: 36,
   bottomBand: 28,
   numberRadius: 10,
+  numberFontSize: 14,
   numberGap: 4,
   bracketTick: 5,
 };
@@ -323,7 +326,6 @@ export const ANNOTATION_STYLE = {
   NUMBER_TEXT: "var(--color-on-primary)",
   NUMBER_RING: "var(--color-surface)",
   NUMBER_RING_WIDTH: 2,
-  NUMBER_FONT_SIZE: 14,
   NUMBER_FONT_WEIGHT: 600,
 } as const;
 

@@ -8,9 +8,10 @@ import { BarStylePreview } from "./BarStylePreview";
 
 /**
  * The bar style as appearance cards — a thumbnail of the chart in that style, its name under it.
- * One radio group: the arrows move the selection (and the focus), the whole card is clickable.
+ * One radio group, described by its row and each card by its style: the arrows move
+ * the selection (and the focus), the whole card is clickable.
  */
-export function BarStylePicker({ labelId, value, onChange }: TBarStylePickerProps) {
+export function BarStylePicker({ labelId, describedById, value, onChange }: TBarStylePickerProps) {
   const t = useTranslations();
   const descriptionId = useId();
   const cards = useRef<(HTMLButtonElement | null)[]>([]);
@@ -43,7 +44,7 @@ export function BarStylePicker({ labelId, value, onChange }: TBarStylePickerProp
             type="button"
             role="radio"
             aria-checked={isSelected}
-            aria-describedby={`${descriptionId}-${option.value}`}
+            aria-describedby={`${describedById} ${descriptionId}-${option.value}`}
             // * roving focus: Tab reaches the group once, on its selected card
             tabIndex={isSelected ? 0 : -1}
             title={description}

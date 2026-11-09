@@ -1,7 +1,8 @@
 import { ETextScale } from "@/enums";
 
 // * the app's small section label type — shared with labels that can't be uppercased (units)
-export const SECTION_LABEL_TEXT = "text-xs font-semibold tracking-widest";
+export const SECTION_LABEL_TEXT =
+  "text-[length:var(--font-xs)] leading-[var(--leading-xs)] font-semibold tracking-widest";
 
 // * the label's size and tracking per text scale; TOUCH: 14 px, tracking ≤ 0.06em below lg
 export const SECTION_LABEL_SCALE_CLASSES: Record<ETextScale, string> = {

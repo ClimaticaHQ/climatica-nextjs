@@ -1,10 +1,12 @@
-import type { ETheme, EUpdateFlashVariant } from "@/enums";
+import type { ETextSize, ETheme, EUpdateFlashVariant } from "@/enums";
 import type { TBarStyle } from "../charts/overlayChart.type";
 import type { TKeyValueStorage } from "../utils/persistedStore.type";
 
 /** Every user setting but the language (a cookie the server reads). */
 export type TSettings = {
   theme: ETheme;
+  /** a step on top of the browser's font size, for all text and the on-screen charts */
+  textSize: ETextSize;
   /** UI motion on / off — prefers-reduced-motion still wins when on */
   animationsEnabled: boolean;
   updateFlashVariant: EUpdateFlashVariant;

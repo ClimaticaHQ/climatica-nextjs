@@ -17,6 +17,8 @@ export type TChartDevice = {
   isTouch: boolean;
   /** below `sm`: the narrow axes, the taller plot */
   isNarrow: boolean;
+  /** the effective text scale (useTextScale): ticks, unit titles and axes grow with it */
+  textScale: number;
 };
 
 /** The standard chart's y axes: their domains, and their ticks where they're set. */

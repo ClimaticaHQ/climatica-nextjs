@@ -41,7 +41,7 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 
 describe("getOverlayScroll", () => {
   // * the two axes' own widths: the values table's header column is the left one
-  const AXES = getPlotMargin(false) * 2;
+  const AXES = getPlotMargin({ isCompact: false }) * 2;
   const MONTHS = 12;
   const scroll = (availableWidth: number, entityCount: number) =>
     getOverlayScroll({ availableWidth, entityCount });

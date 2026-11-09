@@ -31,7 +31,7 @@ function SortButton({ sort }: TSortButtonProps) {
   );
 }
 
-/** A series' name on one line; only when it's clipped it opens its full name. */
+/** A series' name, wrapped to two lines at most; only when it's cut it opens its full name. */
 function SeriesHeadLabel({ label }: TSeriesHeadLabelProps) {
   const { ref, isTruncated } = useIsTruncated<HTMLSpanElement>(label);
   const text = (

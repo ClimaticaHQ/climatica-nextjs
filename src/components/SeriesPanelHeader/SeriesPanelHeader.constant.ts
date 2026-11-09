@@ -5,5 +5,5 @@ export const SPLIT_PANEL_HEADER_CLASSES = {
   NAME_ROW:
     "flex items-center gap-2 text-[length:var(--font-sm)] font-semibold text-[var(--color-text)]",
   NAME: "truncate",
-  SUBTITLE: "truncate text-[12px] text-[var(--color-text-secondary)]",
+  SUBTITLE: "truncate text-[length:var(--font-xs)] text-[var(--color-text-secondary)]",
 } as const;

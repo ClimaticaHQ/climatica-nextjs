@@ -1,5 +1,6 @@
 import { INDICATORS_FIGURE, WALTER_LIETH_FIGURE } from "@/components/info/figures/figures.constant";
-import { EFigureAnchor, EStatsBarItem } from "@/enums";
+import { LOCAL_STORAGE_KEYS, SETTINGS_STORE_VERSION } from "@/constants";
+import { EFigureAnchor, EStatsBarItem, ETextSize } from "@/enums";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -76,97 +77,107 @@ const leaderEnd = (leader: Locator) =>
     return { x: point.x, y: point.y };
   });
 
-for (const width of [360, 1440]) {
-  test.describe(`Info figures at ${width}px`, () => {
-    test.use({ viewport: { width, height: 900 } });
-
-    for (const { route, section, annotations } of FIGURES) {
-      test(`${route}: from its fixture, static, annotations in place`, async ({ page }) => {
-        const apiCalls: string[] = [];
-        page.on("request", (request) => {
-          if (new URL(request.url()).pathname.startsWith("/api/")) apiCalls.push(request.url());
+for (const width of [360, 1440])
+  for (const textSize of Object.values(ETextSize)) {
+    test.describe(`Info figures at ${width}px, ${textSize} text`, () => {
+      test.use({ viewport: { width, height: 900 } });
+      // * the numbers and their bands grow with the text: the anchors must hold at every size
+      test.beforeEach(async ({ page }) => {
+        await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), {
+          key: LOCAL_STORAGE_KEYS.SETTINGS,
+          value: JSON.stringify({ state: { textSize }, version: SETTINGS_STORE_VERSION }),
         });
-        const visual = await openFigure(page, route, section);
-        expect(apiCalls).toEqual([]);
-        await expect(visual.locator(FOCUSABLE)).toHaveCount(0);
-
-        // * every number wholly inside the chart, none over another
-        const chart = await boxOf(visual.locator("svg.recharts-surface").first());
-        const numbers = await visual.locator("[data-annotation-number]").evaluateAll((groups) =>
-          groups.map((group) => {
-            const { left, right, top, bottom } = group.getBoundingClientRect();
-            return { left, right, top, bottom };
-          }),
-        );
-        expect(numbers.length).toBeGreaterThan(0);
-        for (const box of numbers) {
-          expect(box.left).toBeGreaterThanOrEqual(chart.left);
-          expect(box.right).toBeLessThanOrEqual(chart.right);
-          expect(box.top).toBeGreaterThanOrEqual(chart.top);
-          expect(box.bottom).toBeLessThanOrEqual(chart.bottom);
-        }
-        for (const [i, a] of numbers.entries()) {
-          for (const b of numbers.slice(i + 1)) {
-            const overlaps =
-              a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
-            expect(overlaps).toBe(false);
-          }
-        }
-
-        const months = await readMonthAxis(visual);
-        expect(months.centres).toHaveLength(12);
-        const yOf = await readTemperatureAxis(visual);
-
-        for (const [index, { anchor }] of annotations.entries()) {
-          const number = index + 1;
-          if (anchor.kind === EFigureAnchor.POINT) {
-            // * the leader ends on the anchor: its month's centre, its value on the °C axis
-            const end = await leaderEnd(visual.locator(`[data-annotation-leader="${number}"]`));
-            expect(Math.abs(end.x - (months.centres[anchor.month - 1] ?? 0))).toBeLessThanOrEqual(
-              TOLERANCE_PX,
-            );
-            expect(Math.abs(end.y - yOf(anchor.value))).toBeLessThanOrEqual(TOLERANCE_PX);
-          } else if (anchor.kind === EFigureAnchor.SPAN) {
-            // * the brackets cover exactly the span's months, edge to edge
-            const brackets = visual.locator(`[data-annotation-bracket="${number}"]`);
-            const segments = await brackets.evaluateAll((paths) =>
-              paths.map((path) => {
-                const { left, right } = path.getBoundingClientRect();
-                return {
-                  months: (path.getAttribute("data-months") ?? "").split(",").map(Number),
-                  left,
-                  right,
-                };
-              }),
-            );
-            expect(
-              segments.flatMap(({ months: runMonths }) => runMonths).sort((a, b) => a - b),
-            ).toEqual([...anchor.months].sort((a, b) => a - b));
-            for (const segment of segments) {
-              const first = months.centres[(segment.months[0] ?? 1) - 1] ?? 0;
-              const last = months.centres[(segment.months.at(-1) ?? 1) - 1] ?? 0;
-              expect(Math.abs(segment.left - (first - months.width / 2))).toBeLessThanOrEqual(
-                TOLERANCE_PX,
-              );
-              expect(Math.abs(segment.right - (last + months.width / 2))).toBeLessThanOrEqual(
-                TOLERANCE_PX,
-              );
-            }
-            await expect(visual.locator(`[data-annotation-number="${number}"]`)).toHaveCount(1);
-          } else {
-            // * a stats marker sits in its own item's cell
-            const marker = visual.locator(`[data-figure-marker="${number}"]`);
-            await expect(marker).toBeVisible();
-            const label = STATS_LABELS[anchor.item] ?? "";
-            const cell = marker.locator(`xpath=ancestor::div[.//span[contains(., "${label}")]][1]`);
-            await expect(cell).toContainText(label);
-            expect(await cell.locator("[data-figure-marker]").count()).toBe(1);
-          }
-        }
       });
-    }
-  });
-}
+
+      for (const { route, section, annotations } of FIGURES) {
+        test(`${route}: from its fixture, static, annotations in place`, async ({ page }) => {
+          const apiCalls: string[] = [];
+          page.on("request", (request) => {
+            if (new URL(request.url()).pathname.startsWith("/api/")) apiCalls.push(request.url());
+          });
+          const visual = await openFigure(page, route, section);
+          expect(apiCalls).toEqual([]);
+          await expect(visual.locator(FOCUSABLE)).toHaveCount(0);
+
+          // * every number wholly inside the chart, none over another
+          const chart = await boxOf(visual.locator("svg.recharts-surface").first());
+          const numbers = await visual.locator("[data-annotation-number]").evaluateAll((groups) =>
+            groups.map((group) => {
+              const { left, right, top, bottom } = group.getBoundingClientRect();
+              return { left, right, top, bottom };
+            }),
+          );
+          expect(numbers.length).toBeGreaterThan(0);
+          for (const box of numbers) {
+            expect(box.left).toBeGreaterThanOrEqual(chart.left);
+            expect(box.right).toBeLessThanOrEqual(chart.right);
+            expect(box.top).toBeGreaterThanOrEqual(chart.top);
+            expect(box.bottom).toBeLessThanOrEqual(chart.bottom);
+          }
+          for (const [i, a] of numbers.entries()) {
+            for (const b of numbers.slice(i + 1)) {
+              const overlaps =
+                a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+              expect(overlaps).toBe(false);
+            }
+          }
+
+          const months = await readMonthAxis(visual);
+          expect(months.centres).toHaveLength(12);
+          const yOf = await readTemperatureAxis(visual);
+
+          for (const [index, { anchor }] of annotations.entries()) {
+            const number = index + 1;
+            if (anchor.kind === EFigureAnchor.POINT) {
+              // * the leader ends on the anchor: its month's centre, its value on the °C axis
+              const end = await leaderEnd(visual.locator(`[data-annotation-leader="${number}"]`));
+              expect(Math.abs(end.x - (months.centres[anchor.month - 1] ?? 0))).toBeLessThanOrEqual(
+                TOLERANCE_PX,
+              );
+              expect(Math.abs(end.y - yOf(anchor.value))).toBeLessThanOrEqual(TOLERANCE_PX);
+            } else if (anchor.kind === EFigureAnchor.SPAN) {
+              // * the brackets cover exactly the span's months, edge to edge
+              const brackets = visual.locator(`[data-annotation-bracket="${number}"]`);
+              const segments = await brackets.evaluateAll((paths) =>
+                paths.map((path) => {
+                  const { left, right } = path.getBoundingClientRect();
+                  return {
+                    months: (path.getAttribute("data-months") ?? "").split(",").map(Number),
+                    left,
+                    right,
+                  };
+                }),
+              );
+              expect(
+                segments.flatMap(({ months: runMonths }) => runMonths).sort((a, b) => a - b),
+              ).toEqual([...anchor.months].sort((a, b) => a - b));
+              for (const segment of segments) {
+                const first = months.centres[(segment.months[0] ?? 1) - 1] ?? 0;
+                const last = months.centres[(segment.months.at(-1) ?? 1) - 1] ?? 0;
+                expect(Math.abs(segment.left - (first - months.width / 2))).toBeLessThanOrEqual(
+                  TOLERANCE_PX,
+                );
+                expect(Math.abs(segment.right - (last + months.width / 2))).toBeLessThanOrEqual(
+                  TOLERANCE_PX,
+                );
+              }
+              await expect(visual.locator(`[data-annotation-number="${number}"]`)).toHaveCount(1);
+            } else {
+              // * a stats marker sits in its own item's cell
+              const marker = visual.locator(`[data-figure-marker="${number}"]`);
+              await expect(marker).toBeVisible();
+              const label = STATS_LABELS[anchor.item] ?? "";
+              const cell = marker.locator(
+                `xpath=ancestor::div[.//span[contains(., "${label}")]][1]`,
+              );
+              await expect(cell).toContainText(label);
+              expect(await cell.locator("[data-figure-marker]").count()).toBe(1);
+            }
+          }
+        });
+      }
+    });
+  }
 
 test.describe("Info figures on a phone", () => {
   test.use({ viewport: { width: 360, height: 800 } });

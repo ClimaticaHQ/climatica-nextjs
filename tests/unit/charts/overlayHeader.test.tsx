@@ -29,7 +29,7 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 const YEARS = ["2021", "1967", "1990", "2010", "2000"];
 const HOVERED = 5;
 // * the plot's left axis area: the header column's width, the table frame's border given back
-const AXIS = getPlotMargin(false);
+const AXIS = getPlotMargin({ isCompact: false });
 const FRAME_BORDER = 1;
 
 describe("the standard overlay's values table", () => {
@@ -203,13 +203,13 @@ describe("the plot's margins are its axes'", () => {
 describe("the unit titles stay inside their charts", () => {
   const CHART_WIDTH = 400;
   const titleWidth = (text: string, isCompact: boolean) =>
-    estimateTextWidth(text, getUnitTitleFontSize(isCompact));
+    estimateTextWidth(text, getUnitTitleFontSize({ isCompact }));
 
   it("°C starts at the left axis, mm ends at the right one: never past the chart's edges", () => {
     for (const isCompact of [false, true]) {
       const left = getUnitTitlePlacement({ side: "left", chartWidth: CHART_WIDTH, isCompact });
       const right = getUnitTitlePlacement({ side: "right", chartWidth: CHART_WIDTH, isCompact });
-      expect(left).toMatchObject({ textAnchor: "start", x: getPlotMargin(isCompact) });
+      expect(left).toMatchObject({ textAnchor: "start", x: getPlotMargin({ isCompact }) });
       expect(right).toMatchObject({ textAnchor: "end" });
       expect(right.x - titleWidth("mm", isCompact)).toBeGreaterThanOrEqual(0);
       expect(right.x).toBeLessThanOrEqual(CHART_WIDTH);
@@ -219,7 +219,7 @@ describe("the unit titles stay inside their charts", () => {
   it("a fixed axis' frame holds its whole title beside the axis", () => {
     expect(titleWidth("°C", false)).toBeLessThanOrEqual(FIXED_Y_AXES.TITLE_ROOM);
     expect(titleWidth("mm", false)).toBeLessThanOrEqual(
-      getPlotMargin(false) + FIXED_Y_AXES.TITLE_ROOM,
+      getPlotMargin({ isCompact: false }) + FIXED_Y_AXES.TITLE_ROOM,
     );
   });
 });

@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from "@/constants";
-import { ETheme, EUpdateFlashVariant } from "@/enums";
+import { ETextSize, ETheme, EUpdateFlashVariant } from "@/enums";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 /** A localStorage for the node test environment. */
@@ -57,13 +57,14 @@ describe("settings store", () => {
     });
   });
 
-  it("saves every setting as one object, at version 1 — never the actions or the hydration flag", async () => {
+  it("saves every setting as one object, at version 2 — never the actions or the hydration flag", async () => {
     const store = await loadStore();
     store.getState().setSetting("theme", ETheme.DARK);
     store.getState().setSetting("animationsEnabled", false);
     store.getState().setSetting("updateFlashVariant", EUpdateFlashVariant.BORDER);
     expect(saved()).toEqual({
       theme: ETheme.DARK,
+      textSize: ETextSize.DEFAULT,
       animationsEnabled: false,
       updateFlashVariant: EUpdateFlashVariant.BORDER,
       autoApplyFilters: true,
@@ -72,7 +73,7 @@ describe("settings store", () => {
       autoScroll: false,
       chartBarStyle: "plain",
     });
-    expect(JSON.parse(storage.getItem(LOCAL_STORAGE_KEYS.SETTINGS) ?? "{}").version).toBe(1);
+    expect(JSON.parse(storage.getItem(LOCAL_STORAGE_KEYS.SETTINGS) ?? "{}").version).toBe(2);
   });
 
   it("restores the saved settings on the next load", async () => {
@@ -182,5 +183,45 @@ describe("settings store migration (version 0 → 1)", () => {
     storage.setItem("climatica:theme", ETheme.DARK);
     const store = await loadStore();
     expect(store.getState().theme).toBe(ETheme.LIGHT);
+  });
+});
+
+describe("text size setting", () => {
+  it("starts at Default", async () => {
+    const store = await loadStore();
+    expect(store.getState().textSize).toBe(ETextSize.DEFAULT);
+  });
+
+  it("is saved with the rest and restored on the next load", async () => {
+    const first = await loadStore();
+    first.getState().setSetting("textSize", ETextSize.LARGER);
+    expect(saved().textSize).toBe(ETextSize.LARGER);
+    const store = await loadStore();
+    expect(store.getState().textSize).toBe(ETextSize.LARGER);
+  });
+
+  it("a version 1 entry (before it existed) migrates to Default and keeps its other settings", async () => {
+    saveEntry({ theme: ETheme.DARK, autoScroll: true }, 1);
+    const store = await loadStore();
+    expect(store.getState()).toMatchObject({
+      textSize: ETextSize.DEFAULT,
+      theme: ETheme.DARK,
+      autoScroll: true,
+    });
+  });
+
+  it("an invalid saved value falls back to Default; each valid one is kept", async () => {
+    for (const [value, expected] of [
+      ["huge", ETextSize.DEFAULT],
+      [1.25, ETextSize.DEFAULT],
+      [ETextSize.SMALLER, ETextSize.SMALLER],
+      [ETextSize.SMALL, ETextSize.SMALL],
+      [ETextSize.LARGE, ETextSize.LARGE],
+      [ETextSize.LARGER, ETextSize.LARGER],
+    ] as const) {
+      saveEntry({ textSize: value }, 2);
+      const store = await loadStore();
+      expect(store.getState().textSize).toBe(expected);
+    }
   });
 });

@@ -1,8 +1,13 @@
 import { ChartUnitTitles } from "@/components/ChartUnitTitles";
-import { CHART_PLOT } from "@/constants";
 import { EDisplayMetric } from "@/enums";
 import { useDisplayFormat } from "@/hooks";
-import { getAxisStyle, getPlotMargin, getStandardYAxes, getXAxisProps } from "@/utils";
+import {
+  getAxisStyle,
+  getChartMargin,
+  getPlotMargin,
+  getStandardYAxes,
+  getXAxisProps,
+} from "@/utils";
 import { useContext } from "react";
 import { ComposedChart, Line, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { FIXED_Y_AXES as F } from "./charts.constant";
@@ -17,9 +22,10 @@ import { ChartDeviceContext } from "./chartDevice.context";
 export function FixedYAxes({ scales, rightMax, rows }: TFixedYAxesProps) {
   const { formatValue } = useDisplayFormat();
   const roundTick = (v: unknown) => formatValue(Number(v), { metric: EDisplayMetric.AXIS_TICK });
-  const { isNarrow } = useContext(ChartDeviceContext);
-  const margin = getPlotMargin(false, isNarrow);
-  const axis = getAxisStyle(false, isNarrow);
+  const { isNarrow, textScale } = useContext(ChartDeviceContext);
+  const axisSize = { isCompact: false, isNarrow, textScale };
+  const margin = getPlotMargin(axisSize);
+  const axis = getAxisStyle(axisSize);
   const y = getStandardYAxes({ scales, rightMax, isNarrow });
   const sides = [
     {
@@ -56,15 +62,15 @@ export function FixedYAxes({ scales, rightMax, rows }: TFixedYAxesProps) {
       aria-hidden
       data-fixed-axis={side}
       className={`${F.FRAME} ${side === "left" ? "left-0" : "right-0"}`}
-      style={{ width: margin + F.TITLE_ROOM }}
+      style={{ width: margin + Math.ceil(F.TITLE_ROOM * textScale) }}
     >
       <div
         className={`${F.STRIP} ${side === "left" ? "left-0" : "right-0"}`}
         style={{ width: margin }}
       />
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={rows} margin={CHART_PLOT.MARGIN}>
-          <XAxis {...getXAxisProps(false)} dataKey="monthName" tick={false} axisLine={false} />
+        <ComposedChart data={rows} margin={getChartMargin({ textScale })}>
+          <XAxis {...getXAxisProps(axisSize)} dataKey="monthName" tick={false} axisLine={false} />
           {yAxis}
           {/* * Recharts draws an axis' ticks only for an axis a series uses: an empty one */}
           <Line

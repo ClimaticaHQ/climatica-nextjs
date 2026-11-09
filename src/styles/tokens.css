@@ -1,4 +1,4 @@
-/* * Design tokens: fonts, colours, radii, spacing, shadows. Colours follow the Material Design 2
+/* * Design tokens: colours, radii, spacing, shadows (text sizes: typography.css). Colours follow the Material Design 2
    colour system and come in two layers (see docs/colors.md):
    1. primitives — M2 grey and the dark theme's neutrals, the green tonal palette (steps 50…900
       by lightness), M2 swatches, tint sets and the heat map's ColorBrewer classes;
@@ -158,42 +158,15 @@
    carrying it resolves to the light palette even while html.dark is active (exportPalette.util) */
 :root,
 [data-export-palette] {
-  --font-sans: "Inter", "Roboto", "Helvetica Neue", Arial, sans-serif;
-  --font-xs: 12px;
-  --font-base: 14px;
-  --font-sm: 16px;
-  --font-md: 18px;
-  --font-lg: 22px;
-  --font-xl: 30px;
-  --font-2xl: 36px;
-  /* * the reading scale: the Info pages are prose, read at length, where the rest of the app
-     is data — their text steps up from lg (17 / 19 / 20 / 32); other sizes are the scale above */
-  --font-reading-body: 17px;
-  --font-reading-lead: 19px;
-  --font-reading-card-title: 20px;
-  --font-reading-heading: 32px;
-  /* * the touch scale: text on touch layouts (below lg — sheets, the Info contents bar), where
-     readability beats density. 16 px also keeps iOS Safari from zooming a focused control */
-  --font-touch-body: 16px;
-  /* * chips: a step under body, so a 36 px pill scales the desktop chip up evenly; 16 px stays
-     the floor for inputs, selects and dropdown triggers (iOS zoom) */
-  --font-touch-chip: 15px;
-  --font-touch-secondary: 15px;
-  --font-touch-label: 14px;
-  --font-touch-title: 18px;
-  --font-touch-nav: 17px;
-  --font-touch-nav-page: 19px;
-  --font-touch-button: 17px;
-  --touch-label-tracking: 0.06em;
-  /* * a readable line for prose */
-  --reading-measure: 72ch;
-
   /* * surfaces, text, borders */
   --color-surface: var(--white);
   --color-surface-secondary: var(--grey-50);
   --color-text: var(--grey-900);
   --color-text-secondary: var(--grey-black-60);
   --color-border: var(--grey-300);
+  /* * a hairline between rows of a settings group: one step from the group's surface, quieter than
+     a border */
+  --color-divider: var(--grey-200);
 
   /* * the brand: filled controls, active states, the logo */
   --color-primary: var(--green-700);
@@ -250,6 +223,8 @@
   --color-control-track: var(--grey-200);
   --color-control-active: var(--white);
   --color-switch-knob: var(--white);
+  /* * the flat slider's thumb, and the step dots on its filled part: white, light grey in dark */
+  --color-slider-thumb: var(--white);
 
   --color-error: var(--crimson);
   --color-error-bg: var(--tint-light-crimson-95);
@@ -367,9 +342,18 @@
   --section-toolbar-gap: 0.5rem; /* the export row above a chart section */
   --section-gap: 1.5rem; /* between a chart section's summary and its card */
 
+  /* * a divider's thickness: one device pixel on a high-density screen */
+  --divider-width: 1px;
+
   --shadow-sm: 0 1px 2px color-mix(in srgb, var(--black) 5%, transparent);
   --shadow-md: 0 4px 6px color-mix(in srgb, var(--black) 10%, transparent);
   --shadow-lg: 0 10px 15px color-mix(in srgb, var(--black) 15%, transparent);
+}
+
+@media (min-resolution: 2dppx) {
+  :root {
+    --divider-width: 0.5px;
+  }
 }
 
 /* * 3. Semantic tokens, dark (M2 dark theme): only remaps — what isn't listed keeps its light
@@ -380,6 +364,7 @@ html.dark {
   --color-text: var(--grey-300);
   --color-text-secondary: var(--dark-grey-66);
   --color-border: var(--dark-grey-24);
+  --color-divider: var(--dark-grey-18);
 
   /* * M2: a desaturated, lighter primary carrying dark text */
   --color-primary: var(--green-200);
@@ -422,6 +407,7 @@ html.dark {
 
   --color-control-track: var(--dark-grey-18);
   --color-control-active: var(--dark-grey-26);
+  --color-slider-thumb: var(--grey-300);
 
   --color-error: var(--red-300);
   --color-error-bg: var(--tint-dark-crimson-18);

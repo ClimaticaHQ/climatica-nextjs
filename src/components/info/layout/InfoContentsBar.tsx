@@ -20,7 +20,7 @@ export function InfoContentsBar({
   return (
     <div className={C.ROOT}>
       <nav aria-label={t("info.nav.breadcrumb")} className={C.TRAIL}>
-        <span aria-current="page" className={C.PAGE}>
+        <span aria-current="page" className={C.PAGE} data-breadcrumb-page>
           {pageLabel}
         </span>
         {sectionLabel !== null && (

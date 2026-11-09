@@ -1,4 +1,5 @@
 import { useEffect, useState, type ChangeEvent, type KeyboardEvent } from "react";
+import { FORM_CONTROL_CLASSES } from "@/constants";
 import { YEAR_INPUT_CLASS } from "./filters.constant";
 import type { TYearInputProps } from "./filters.type";
 
@@ -32,16 +33,18 @@ export function YearInput({
   }
 
   return (
-    <input
-      type="number"
-      value={raw}
-      min={min}
-      max={max}
-      placeholder={placeholder}
-      onChange={handleChange}
-      onKeyDown={handleKeyDown}
-      disabled={disabled}
-      className={YEAR_INPUT_CLASS}
-    />
+    <label className={FORM_CONTROL_CLASSES.FIELD_TARGET}>
+      <input
+        type="number"
+        value={raw}
+        min={min}
+        max={max}
+        placeholder={placeholder}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        disabled={disabled}
+        className={YEAR_INPUT_CLASS}
+      />
+    </label>
   );
 }

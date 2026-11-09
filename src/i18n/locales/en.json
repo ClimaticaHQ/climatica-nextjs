@@ -409,6 +409,14 @@
       "dark": "Dark",
       "system": "System"
     },
+    "textSize": "Text size",
+    "textSizeOptions": {
+      "smaller": "Smaller",
+      "small": "Small",
+      "default": "Default",
+      "large": "Large",
+      "larger": "Larger"
+    },
     "autoScroll": "Auto-scroll to results",
     "syncCity": "Sync selected city across pages",
     "syncFilters": "Sync filters across pages",
@@ -433,7 +441,7 @@
     "descriptions": {
       "animations": "Smooth transitions when charts and data change",
       "updateHighlight": "How a card is marked when its data updates",
-      "autoApplyFilters": "Filter changes apply at once; when off, they wait for “Apply filters”",
+      "autoApplyFilters": "When off, changes wait for “Apply filters”",
       "syncCity": "A city you pick on one page opens on the other pages too",
       "syncFilters": "Filters you set on one page apply on the other pages too",
       "autoScroll": "Scrolls down to the results after you pick a city",

@@ -19,6 +19,7 @@ export * from "./locales.constant";
 export * from "./localStorageKeys.constant";
 export * from "./settings.constant";
 export * from "./theme.constant";
+export * from "./textSize.constant";
 export * from "./map.constant";
 export * from "./martonne.constant";
 export * from "./motion.constant";

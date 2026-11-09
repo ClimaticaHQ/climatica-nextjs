@@ -39,6 +39,7 @@ Before reporting a task as done: `npm run check`, `npm run test`, `npm run build
   - docs/pages.md — the page hook, PageLayout, the four pages, adding a page or a page block
   - docs/charts.md — series, kind rules, the chart model, chart section and blocks, exports
   - docs/colors.md — colour layers, entities by shape, bars by aridity, contrast, adding a colour
+  - docs/styles.md — typography.css, the rem type scale, the text size setting in charts, what stays in px, breakpoints
   - docs/climate-indices.md — Walter-Lieth geometry and rules, arid / frost months, De Martonne
   - docs/export.md — export menu, SVG builders, export palette, PNG, raw data, heat map image
   - docs/city-search.md — city search: labels vs search names, analysis, the two clauses, ranking, limits
@@ -130,6 +131,7 @@ Search these first; the code is the reference for their props. In src/components
 - SectionLabel — `UI/SectionLabel` — a small uppercase section title.
 - StatCell — `UI/StatCell` — one stat of a stats bar.
 - StatusMessage — `UI/StatusMessage` — a page's empty or error message, or a closable notice.
+- StepSlider — `UI/StepSlider` — a slider over named steps, applied on release (the text size).
 - SwapButton — `UI/SwapButton` — an icon button exchanging two sides.
 - ToggleSwitch — `UI/ToggleSwitch` — a labelled on / off switch.
 - Skeletons — `UI/ChartSkeleton`, `MapSkeleton`, `SidebarSkeleton`, `StatCardsSkeleton`, `TableSkeleton`, `TopbarSkeleton` — loading placeholders.
@@ -233,6 +235,7 @@ Tailwind v4. Components are styled with Tailwind classes; CSS custom properties 
 
 - Global CSS lives in src/styles/, split by concern and imported by global.css, which holds only the imports (Tailwind first):
   - tokens.css — custom properties: colours, spacing, radii, shadows, z-index, both themes, @theme mappings
+  - typography.css — the root font size and every text size token, in rem (docs/styles.md)
   - animations.css — keyframes, transitions, motion-off and reduced-motion rules
   - utilities.css — custom @utility and @custom-variant definitions (create it when it has content)
   - base.css — element-level base styles

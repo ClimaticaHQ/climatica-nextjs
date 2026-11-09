@@ -17,6 +17,7 @@ export function Badge({
       className={`${C.BASE} ${C.SIZE[size]} ${isTruncated ? C.TRUNCATED : ""}`}
       style={{ backgroundColor: tone.bg, borderColor: tone.border, color: tone.text }}
       title={title}
+      data-badge-size={size}
     >
       {markerShape && <OptionMarker shape={markerShape} />}
       {isTruncated ? <span className={C.TRUNCATED_CONTENT}>{children}</span> : children}

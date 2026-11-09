@@ -1,3 +1,4 @@
+import { TEXT_SIZE_OPTIONS } from "@/app/settings/_components/Settings.constant";
 import type { TSettingsPage } from "@/app/settings/_components/Settings.type";
 import { useMotionPreference } from "@/hooks/ui/useMotionPreference";
 import { useLocaleSwitch } from "@/hooks/url/useLocaleSwitch";
@@ -17,6 +18,8 @@ export function useSettingsPage(): TSettingsPage {
 
   useDocumentTitle({ pageTitle: t("pages.settings.title"), places: [], details: null });
 
+  const textSize = TEXT_SIZE_OPTIONS.find((option) => option.value === state.textSize);
+
   return {
     locale,
     isLocaleSwitching: isSwitching,
@@ -34,8 +37,13 @@ export function useSettingsPage(): TSettingsPage {
     updateHighlight: {
       isDisabled: !isMotionEnabled,
       // * no hint under reduced motion: turning animations on isn't the reader's to do then
-      disabledHint: isReducedMotion ? undefined : t("settings.hints.turnOnAnimations"),
+      description: t(
+        isMotionEnabled || isReducedMotion
+          ? "settings.descriptions.updateHighlight"
+          : "settings.hints.turnOnAnimations",
+      ),
     },
+    textSizeDescription: textSize ? t(textSize.labelKey) : "",
     onSettingChange: state.setSetting,
   };
 }

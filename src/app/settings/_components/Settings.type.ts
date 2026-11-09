@@ -1,3 +1,4 @@
+import type { ESettingsControlPlacement } from "@/enums";
 import type { TAridityPalette, TBarStyle, TSeriesHatch, TSettings } from "@/types";
 import type { ReactNode } from "react";
 
@@ -10,6 +11,8 @@ export type TSettingsPage = {
   settings: TSettings;
   animations: TAnimationsSetting;
   updateHighlight: TDependentSetting;
+  /** the text size row's description: the applied step's name */
+  textSizeDescription: string;
   onSettingChange: <K extends keyof TSettings>(key: K, value: TSettings[K]) => void;
 };
 
@@ -17,14 +20,15 @@ export type TSettingsPage = {
 export type TAnimationsSetting = {
   isChecked: boolean;
   isDisabled: boolean;
+  /** what it does, or why the device has turned it off */
   description: string;
 };
 
 /** A setting that only applies while another one is on. */
 export type TDependentSetting = {
   isDisabled: boolean;
-  /** why it's disabled and how to enable it; none when the reader can't (the device decides) */
-  disabledHint?: string | undefined;
+  /** what it does, or how to enable it when the reader can */
+  description: string;
 };
 
 export type TSettingsViewProps = {
@@ -32,7 +36,7 @@ export type TSettingsViewProps = {
 };
 
 export type TSettingsGroupProps = {
-  /** names the group after its heading */
+  /** names the section after its heading */
   id: string;
   title: string;
   children: ReactNode;
@@ -41,15 +45,15 @@ export type TSettingsGroupProps = {
 export type TSettingsRowProps = {
   /** the label's id, naming the control */
   labelId?: string | undefined;
-  label: string;
+  /** absent: the control labels and describes itself across the row (a switch) */
+  label?: string | undefined;
   description?: string | undefined;
+  /** the description's id, for the control's aria-describedby */
+  descriptionId?: string | undefined;
   /** dims the label; the control is disabled by its own prop */
   isDisabled?: boolean | undefined;
-  /** replaces the description while disabled, in the same space — the row never changes height */
-  disabledHint?: string | undefined;
-  /** a wide control: on the right from `sm`, under the label (centred) below it */
-  hasWideControl?: boolean | undefined;
-  /** the control, on the right */
+  /** FIT when absent */
+  placement?: ESettingsControlPlacement | undefined;
   children: ReactNode;
 };
 
@@ -59,9 +63,11 @@ export type TBarStyleOption = {
   descriptionKey: string;
 };
 
-/** The bar style cards: one radio group, named by its row's label. */
+/** The bar style cards: one radio group, named and described by its row. */
 export type TBarStylePickerProps = {
   labelId: string;
+  /** the row's description, describing every card */
+  describedById: string;
   value: TBarStyle;
   onChange: (barStyle: TBarStyle) => void;
 };
@@ -95,11 +101,4 @@ export type TBarStylePreviewCurve = {
 export type TBarStylePreview = {
   bars: readonly TBarStylePreviewBar[];
   curves: readonly TBarStylePreviewCurve[];
-};
-
-export type TSettingsDependentRowsProps = {
-  /** the setting the others depend on */
-  parent: ReactNode;
-  /** the settings that apply only while the parent is on */
-  children: ReactNode;
 };

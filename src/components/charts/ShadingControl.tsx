@@ -30,6 +30,7 @@ export function ShadingControl({ seriesA, seriesB, shading, onChange }: TShading
         {t("chart.wlShading")}
       </span>
       <SegmentedControl
+        isIconOnlyBelowSm
         label={t("chart.wlShading")}
         options={options}
         value={shading}

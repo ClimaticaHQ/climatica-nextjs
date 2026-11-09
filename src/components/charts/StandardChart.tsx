@@ -13,6 +13,7 @@ import { useSeriesToggleMotion } from "@/hooks/charts/useSeriesToggleMotion";
 import { useDelayedHide } from "@/hooks/ui/useDelayedHide";
 import { useElementWidth } from "@/hooks/ui/useElementWidth";
 import {
+  getChartMargin,
   getMonthLabelFormat,
   getFixedOverlayBarLayout,
   getOverlayBarLayout,
@@ -65,7 +66,8 @@ export function StandardChart({
 }: TStandardChartProps) {
   const t = useTranslations();
   const seriesMotion = useSeriesToggleMotion();
-  const { isTouch, isNarrow } = useContext(ChartDeviceContext);
+  const { isTouch, isNarrow, textScale } = useContext(ChartDeviceContext);
+  const plotMargin = getPlotMargin({ isCompact: false, isNarrow, textScale });
   // * touch, scrolling sideways: the tooltip pins over the visible part
   const [scrollLeft, setScrollLeft] = useState(0);
   const { ref: plotRef, width: availableWidth } = useElementWidth<HTMLDivElement>();
@@ -94,6 +96,7 @@ export function StandardChart({
     gap,
     minGap,
     isNarrow,
+    textScale,
     ...(phoneBars ? { minBand: phoneBars.band } : {}),
   });
   const layout = phoneBars
@@ -130,14 +133,14 @@ export function StandardChart({
   const tooltipState = {
     isTouch,
     activeMonthIndex,
-    ...(scroll.isOverflowing ? { visibleLeft: scrollLeft + getPlotMargin(false, isNarrow) } : {}),
+    ...(scroll.isOverflowing ? { visibleLeft: scrollLeft + plotMargin } : {}),
   };
   // * scrolling sideways, the plot keeps its own drag: months by tap only
   const tapLayer = isTouch && (
     <MonthTapLayer
       activeMonthIndex={activeMonthIndex}
       onActiveMonthIndexChange={onActiveMonthIndexChange}
-      inset={getPlotMargin(false, isNarrow)}
+      inset={plotMargin}
       canScrub={!scroll.isOverflowing}
     />
   );
@@ -148,7 +151,7 @@ export function StandardChart({
         // * lands late would go last; a new set of series remounts the chart in order
         key={entries.map(({ id }) => id).join("|")}
         data={rows}
-        margin={CHART_PLOT.MARGIN}
+        margin={getChartMargin({ textScale })}
         barSize={layout.barSize}
         barGap={layout.gap}
         onMouseMove={(state) =>
@@ -163,7 +166,11 @@ export function StandardChart({
           scales={scales}
           rightMax={rightMax}
           isCompact={false}
-          monthFormat={getMonthLabelFormat(scroll.contentWidth, isNarrow)}
+          monthFormat={getMonthLabelFormat({
+            chartWidth: scroll.contentWidth,
+            isNarrow,
+            textScale,
+          })}
           // * scrolling: the fixed axes hold °C and mm — the plot's own would slide out under them
           shouldShowUnitTitles={!scroll.isOverflowing}
         />

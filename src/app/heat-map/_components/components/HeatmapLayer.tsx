@@ -16,7 +16,7 @@ function popupContent({ value, unit, center, formatValue }: TPopupContentArgs): 
   const lngDir = center.lng >= 0 ? "E" : "W";
   const coordinate = (degrees: number) =>
     formatValue(Math.abs(degrees), { metric: EDisplayMetric.HEATMAP_COORDINATE });
-  return `<div style="font-size:13px;font-weight:500;">${formatValue(value, { metric: EDisplayMetric.HEATMAP_VALUE })} ${unit}</div><div style="font-size:11px;opacity:.65;">${coordinate(center.lat)}°${latDir}, ${coordinate(center.lng)}°${lngDir}</div>`;
+  return `<div style="font-size:var(--font-tooltip);font-weight:500;">${formatValue(value, { metric: EDisplayMetric.HEATMAP_VALUE })} ${unit}</div><div style="font-size:var(--font-2xs);opacity:.65;">${coordinate(center.lat)}°${latDir}, ${coordinate(center.lng)}°${lngDir}</div>`;
 }
 
 export function HeatmapLayer({

@@ -49,7 +49,7 @@ export default function Dropdown({
         aria-expanded={isOpen}
         className={`
           ${isStretched ? "w-full justify-between" : ""}
-          flex items-center gap-2 px-3 py-1.5
+          touch-target flex items-center gap-2 px-3 py-1.5
           ${FORM_CONTROL_CLASSES.FRAME} ${FORM_CONTROL_CLASSES.BORDER_COLOR} ${FORM_CONTROL_CLASSES.HOVER}
           text-[length:var(--font-touch-body)] lg:text-[length:var(--font-sm)]
           text-[var(--color-text-secondary)]
@@ -95,7 +95,7 @@ export default function Dropdown({
               setIsOpen(false);
             }}
             className={`
-              block w-full text-left px-3 py-2
+              block w-full text-left px-3 py-2 max-lg:flex max-lg:min-h-target max-lg:flex-col max-lg:justify-center
               text-[length:var(--font-base)] max-lg:text-[length:var(--font-touch-body)]
               transition-colors duration-100
               ${

@@ -34,10 +34,10 @@ export function HorizontalValues({
 }: THorizontalValuesProps) {
   const t = useTranslations();
   const scroll = useContext(ChartScrollContext);
-  const { isNarrow } = useContext(ChartDeviceContext);
+  const { isNarrow, textScale } = useContext(ChartDeviceContext);
   // * the plot's own margins (its axes) — the frame's border given back, so the months line up
   // * exactly
-  const margin = getPlotMargin(isCompact, isNarrow) - MONTHLY_VALUES_BORDER;
+  const margin = getPlotMargin({ isCompact, isNarrow, textScale }) - MONTHLY_VALUES_BORDER;
   const months = rows[0]?.cells ?? [];
   const fixed = scroll ? C.UNIT_FIXED : "";
   // * the hovered month: one band from the table's top edge to its bottom — every row's cell

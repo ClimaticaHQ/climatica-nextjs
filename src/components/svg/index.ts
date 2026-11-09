@@ -2,6 +2,7 @@ export { AreaChartIcon } from "./AreaChartIcon";
 export { BarChartIcon } from "./BarChartIcon";
 export { CheckIcon } from "./CheckIcon";
 export { ChevronDownIcon } from "./ChevronDownIcon";
+export { BurgerIcon } from "./BurgerIcon";
 export { CloseIcon } from "./CloseIcon";
 export { CodeIcon } from "./CodeIcon";
 export { DatabaseIcon } from "./DatabaseIcon";

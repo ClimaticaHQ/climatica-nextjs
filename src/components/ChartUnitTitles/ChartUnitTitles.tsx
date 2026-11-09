@@ -1,5 +1,7 @@
 import { WALTER_LIETH_AXIS } from "@/constants";
+import { ChartDeviceContext } from "@/components/charts/chartDevice.context";
 import { getUnitTitleFontSize, getUnitTitlePlacement } from "@/utils";
+import { useContext } from "react";
 import { useChartWidth, usePlotArea } from "recharts";
 import { CHART_UNIT_TITLES } from "./ChartUnitTitles.constant";
 import type { TChartUnitTitlesProps } from "./ChartUnitTitles.type";
@@ -13,11 +15,13 @@ export function ChartUnitTitles({
   isNarrow = false,
   side: only,
 }: TChartUnitTitlesProps) {
+  const { textScale } = useContext(ChartDeviceContext);
   const chartWidth = useChartWidth();
   const plot = usePlotArea();
   if (!chartWidth || !plot) return null;
 
-  const y = plot.y - WALTER_LIETH_AXIS.UNIT_LABEL_OFFSET;
+  const axisSize = { isCompact, isNarrow, textScale };
+  const y = plot.y - WALTER_LIETH_AXIS.UNIT_LABEL_OFFSET * textScale;
   return (
     <g aria-hidden>
       {CHART_UNIT_TITLES.filter(({ side }) => only === undefined || side === only).map(
@@ -25,8 +29,7 @@ export function ChartUnitTitles({
           const { x, textAnchor } = getUnitTitlePlacement({
             side,
             chartWidth,
-            isCompact,
-            isNarrow,
+            ...axisSize,
           });
           return (
             <text
@@ -34,7 +37,7 @@ export function ChartUnitTitles({
               x={x}
               y={y}
               textAnchor={textAnchor}
-              fontSize={getUnitTitleFontSize(isCompact, isNarrow)}
+              fontSize={getUnitTitleFontSize(axisSize)}
               fontWeight={WALTER_LIETH_AXIS.UNIT_LABEL_FONT_WEIGHT}
               fill={color}
             >

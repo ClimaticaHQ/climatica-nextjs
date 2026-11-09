@@ -1,0 +1,66 @@
+/* * Custom utilities (docs/styles.md) */
+
+/* * a tap target of at least 44px below lg (WCAG 2.5.5), at every text size: a transparent
+   ::before around the control, the control keeping its look. Each axis reaches 44px − the
+   control's size in all, split evenly; a side whose reach is capped by --touch-room-* (touch-gap-*,
+   or set by the layout) leaves the rest to the other side, so neighbouring targets never overlap
+   and the target still makes 44px where there is room. Not for a control that is absolutely
+   positioned or already draws a ::before */
+@utility touch-target {
+  @media (width < 64rem) {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: calc(
+        -1 *
+          min(
+            var(--touch-room-top, 44px),
+            max(max(0px, 44px - 100%) / 2, max(0px, 44px - 100%) - var(--touch-room-bottom, 44px))
+          )
+      );
+      bottom: calc(
+        -1 *
+          min(
+            var(--touch-room-bottom, 44px),
+            max(max(0px, 44px - 100%) / 2, max(0px, 44px - 100%) - var(--touch-room-top, 44px))
+          )
+      );
+      left: calc(-1 * min(var(--touch-room-x, 44px), max(0px, 44px - 100%) / 2));
+      right: calc(-1 * min(var(--touch-room-x, 44px), max(0px, 44px - 100%) / 2));
+    }
+  }
+}
+
+/* * on a row or list of touch targets: each may reach half the gap between them on every side.
+   The room never drops below its default size, so the gap it halves needs the same px floor */
+@utility touch-gap-* {
+  --touch-room-top: max(calc(--spacing(--value(number)) / 2), calc(--value(number) * 2px));
+  --touch-room-bottom: max(calc(--spacing(--value(number)) / 2), calc(--value(number) * 2px));
+  --touch-room-x: max(calc(--spacing(--value(number)) / 2), calc(--value(number) * 2px));
+}
+
+/* * one axis only: a single-line row (touch-gap-x-*), or the lines of a wrapping one (touch-gap-y-*) */
+@utility touch-gap-x-* {
+  --touch-room-x: max(calc(--spacing(--value(number)) / 2), calc(--value(number) * 2px));
+}
+
+@utility touch-gap-y-* {
+  --touch-room-top: max(calc(--spacing(--value(number)) / 2), calc(--value(number) * 2px));
+  --touch-room-bottom: max(calc(--spacing(--value(number)) / 2), calc(--value(number) * 2px));
+}
+
+/* * a control that is its own 44px target: rem, so it grows with the text, never below 44px */
+@utility min-h-target {
+  min-height: max(2.75rem, 44px);
+}
+
+@utility min-w-target {
+  min-width: max(2.75rem, 44px);
+}
+
+@utility size-target {
+  width: max(2.75rem, 44px);
+  height: max(2.75rem, 44px);
+}

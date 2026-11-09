@@ -6,6 +6,7 @@ import { DataUpdateFade, DataUpdateProgress, useDataUpdate } from "@/components/
 import { useVisibleSeries } from "@/hooks/charts/useVisibleSeries";
 import { useIsTouch } from "@/hooks/ui/useIsTouch";
 import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
+import { useTextScale } from "@/hooks/ui/useTextScale";
 import { useSettingsStore } from "@/stores";
 import { NO_FLASH_KEYS, SM_MEDIA_QUERY } from "@/constants";
 import { ECardPadding, EChartBody } from "@/enums";
@@ -48,6 +49,7 @@ export function ChartCard({ model, viewState, features, onVisibleChange }: TChar
   const barStyle = useSettingsStore((state) => state.chartBarStyle);
   const isTouch = useIsTouch();
   const isNarrow = !useMediaQuery(SM_MEDIA_QUERY);
+  const textScale = useTextScale();
   const syncId = useId();
   const { update } = useDataUpdate();
   if (!model.hasData) return null;
@@ -79,7 +81,7 @@ export function ChartCard({ model, viewState, features, onVisibleChange }: TChar
         body={body}
         onHighlight={isTouch ? ignoreHighlight : setHighlightedId}
       />
-      <ChartDeviceContext.Provider value={{ isTouch, isNarrow }}>
+      <ChartDeviceContext.Provider value={{ isTouch, isNarrow, textScale }}>
         <DataUpdateFade>
           <ChartTransition transitionKey={`${viewState.mode}-${body}-${update.id}`}>
             <Body

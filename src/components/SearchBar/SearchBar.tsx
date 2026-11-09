@@ -1,4 +1,4 @@
-import { TYPED_COORDINATES_ID_PREFIX } from "@/constants";
+import { FORM_CONTROL_CLASSES, TYPED_COORDINATES_ID_PREFIX } from "@/constants";
 import { useDebounce, useErrorMessage, useSearchCity } from "@/hooks";
 import type { TCity, TCoordinates } from "@/types";
 import { getScrollBehavior } from "@/utils/motion.util";
@@ -165,16 +165,18 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
 
   return (
     <div ref={containerRef} className="relative w-full max-w-[480px]">
-      <input
-        data-testid="city-search-input"
-        type="text"
-        value={query}
-        onChange={(e) => handleInputChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onBlur={handleBlur}
-        placeholder={t("search.placeholder")}
-        className={SEARCH_INPUT_CLASS}
-      />
+      <label className={FORM_CONTROL_CLASSES.FIELD_TARGET}>
+        <input
+          data-testid="city-search-input"
+          type="text"
+          value={query}
+          onChange={(e) => handleInputChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
+          placeholder={t("search.placeholder")}
+          className={SEARCH_INPUT_CLASS}
+        />
+      </label>
 
       {isSearching && (
         <span

@@ -1,6 +1,7 @@
 "use client";
 
 import { Chip } from "@/components/UI/Chip";
+import { FILTER_CHIP_ROW_CLASS } from "../filters.constant";
 import { DATASETS } from "@/constants";
 import { EFilterKey, ETextScale } from "@/enums";
 import { useTranslations } from "next-intl";
@@ -12,7 +13,7 @@ export function DatasetFilter({ values, onChange }: TFilterSectionRenderProps) {
 
   return (
     <FilterSection title={t("sidebar.sections.dataset")}>
-      <div className="flex flex-wrap gap-2">
+      <div className={FILTER_CHIP_ROW_CLASS}>
         {Object.values(DATASETS).map((dataset) => (
           <Chip
             textScale={ETextScale.TOUCH}

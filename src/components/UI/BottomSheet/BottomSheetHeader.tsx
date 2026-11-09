@@ -21,7 +21,7 @@ export function BottomSheetHeader({ title, titleId, onClose }: TBottomSheetHeade
         type="button"
         onClick={onClose}
         aria-label={t("common.close")}
-        className={`${FOCUS_RING_CLASS} -mr-2 rounded-[var(--radius-sm)] p-2 text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]`}
+        className={`${FOCUS_RING_CLASS} touch-target -mr-2 rounded-[var(--radius-sm)] p-2 text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]`}
       >
         <CloseIcon />
       </button>

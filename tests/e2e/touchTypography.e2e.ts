@@ -1,6 +1,6 @@
 import { devices, expect, test, type Locator, type Page } from "@playwright/test";
 
-// * the touch scale (tokens.css): what phones must get, in px
+// * the touch scale (typography.css): what phones must get, in px at the default 16px
 const MIN_PX = {
   BODY: 16,
   CHIP: 15,

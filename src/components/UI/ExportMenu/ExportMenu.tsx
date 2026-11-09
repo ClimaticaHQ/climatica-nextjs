@@ -143,7 +143,7 @@ export function ExportMenu({
             onClick={handler}
             disabled={disabled}
             title={disabled ? t("exportMenu.rawDataUnavailable") : undefined}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-[length:var(--font-sm)] text-[var(--color-text)] transition-colors duration-100 hover:bg-[var(--color-surface-secondary)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            className="flex w-full items-center gap-2 px-3 py-2 text-left max-lg:min-h-target text-[length:var(--font-sm)] text-[var(--color-text)] transition-colors duration-100 hover:bg-[var(--color-surface-secondary)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
           >
             {loadingKey === key ? <SpinnerIcon /> : icon}
             {label}

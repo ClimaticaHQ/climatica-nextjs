@@ -1,6 +1,7 @@
 "use client";
 
 import { Chip } from "@/components/UI/Chip";
+import { FILTER_CHIP_ROW_CLASS } from "../filters.constant";
 import { EFilterKey, ETextScale } from "@/enums";
 import {
   areFilterControlsDisabled,
@@ -27,7 +28,7 @@ export function VariablesFilter({
 
   return (
     <FilterSection title={t("sidebar.sections.variables")} availability={availability}>
-      <div className="flex flex-wrap gap-2">
+      <div className={FILTER_CHIP_ROW_CLASS}>
         {getVariableOptionStates(values, context).map((option) => (
           <Chip
             textScale={ETextScale.TOUCH}

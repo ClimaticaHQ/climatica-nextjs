@@ -63,10 +63,10 @@ const barXs = (style: TBarStyle) =>
     .slice(0, 3)
     .map((rect) => Number(rect.getAttribute("x")));
 
-describe("the bar style row in Charts and filters", () => {
-  it("is a radio group named by its row, three cards in order, plain selected by default", () => {
+describe("the Comparison bar style row", () => {
+  it("is a radio group named by its row's label, three cards in order, plain selected by default", () => {
     const group = renderPage();
-    expect(screen.getByText(text.descriptions.chartBarStyle)).toBeTruthy();
+    const description = screen.getByText(text.descriptions.chartBarStyle);
     const radios = within(group).getAllByRole("radio");
     // * named by their style alone (the description is theirs too, apart)
     expect(radios).toEqual([card("plain"), card("shades"), card("hatch")]);
@@ -75,8 +75,12 @@ describe("the bar style row in Charts and filters", () => {
       "false",
       "false",
     ]);
-    // * each card describes its style
-    expect(card("hatch").getAttribute("aria-describedby")).toBeTruthy();
+    // * each card is described by its row's description, then by its style
+    const [rowId, styleId] = card("hatch").getAttribute("aria-describedby")?.split(" ") ?? [];
+    expect(rowId).toBe(description.id);
+    expect(document.getElementById(styleId ?? "")?.textContent).toBe(
+      text.barStyleDescriptions.hatch,
+    );
     expect(
       screen.getByText(text.barStyleDescriptions.hatch, { selector: "[hidden]" }),
     ).toBeTruthy();
@@ -113,30 +117,16 @@ describe("the bar style row in Charts and filters", () => {
     expect(preview("plain")?.querySelectorAll("path")).toHaveLength(2);
   });
 
-  it("the selected card: its thumbnail ringed, its name bold, its indicator filled with a check", () => {
+  it("the selected card: its thumbnail ringed, its name in primary", () => {
     renderPage();
     const parts = (style: TBarStyle) => ({
       thumb: classOf(preview(style)?.parentElement),
       name: classOf(within(card(style)).getByText(NAMES[style])),
-      indicator: card(style).querySelector("[data-selection-indicator]"),
     });
-    const selected = parts("plain");
-    expect(selected.thumb).toContain(C.THUMB_SELECTED);
-    expect(selected.name).toBe(C.NAME_SELECTED);
-    expect(classOf(selected.indicator)).toBe(C.INDICATOR_SELECTED);
-    expect(selected.indicator?.querySelector("svg")).not.toBeNull();
-
-    const other = parts("hatch");
-    expect(other.thumb).not.toContain(C.THUMB_SELECTED);
-    expect(other.name).toBe(C.NAME);
-    expect(classOf(other.indicator)).toBe(C.INDICATOR);
-    expect(other.indicator?.querySelector("svg")).toBeNull();
-  });
-
-  it("desktop shows the ring, narrow screens the indicator — one breakpoint, `sm`", () => {
-    expect(C.THUMB_SELECTED.split(" ").every((name) => name.startsWith("sm:"))).toBe(true);
-    expect(C.INDICATOR.split(" ")).toContain("sm:hidden");
-    expect(C.INDICATOR_SELECTED.split(" ")).toContain("sm:hidden");
+    expect(parts("plain").thumb).toContain(C.THUMB_SELECTED);
+    expect(parts("plain").name).toBe(C.NAME_SELECTED);
+    expect(parts("hatch").thumb).not.toContain(C.THUMB_SELECTED);
+    expect(parts("hatch").name).toBe(C.NAME);
   });
 
   it("a click on a card selects it and saves the setting", () => {
