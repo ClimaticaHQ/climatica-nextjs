@@ -20,6 +20,7 @@ New to the project: read the first six in order. To run the app first, see
 | [heat-map.md](heat-map.md)                   | the region, the cell cap, requests, colour scales, statistics                                   |
 | [export.md](export.md)                       | the export pipeline, the export palette, the image, raw data, the heat map image                |
 | [colors.md](colors.md)                       | colour layers, entities by shape, precipitation bars, contrast, dark theme, the tests           |
+| [styles.md](styles.md)                       | typography.css, the rem type scale, text size in charts, what stays in px, breakpoints          |
 | [settings.md](settings.md)                   | what is stored where, the settings store, theme, animations, the settings page                  |
 | [localization-i18n.md](localization-i18n.md) | locales, choosing the locale, key conventions, adding a language                                |
 | [testing.md](testing.md)                     | Vitest, Playwright and pytest conventions                                                       |
