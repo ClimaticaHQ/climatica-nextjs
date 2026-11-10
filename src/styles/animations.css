@@ -6,7 +6,7 @@
 
 /* * SegmentedControl: the active pill sliding to the selected option */
 .segmented-indicator {
-  transition-property: transform, width;
+  transition-property: transform, width, height;
   transition-duration: var(--motion-control-slide);
   transition-timing-function: var(--motion-control-slide-easing);
 }
