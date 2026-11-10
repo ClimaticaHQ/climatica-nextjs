@@ -1,7 +1,9 @@
+import { ChartDeviceContext } from "@/components/charts/chartDevice.context";
 import { MONTH_NAMES } from "@/constants";
 import type { TMonthLabelFormat } from "@/types";
 import { formatMonthLabel, getAxisStyle } from "@/utils";
 import { useLocale, useTranslations } from "next-intl";
+import { useContext } from "react";
 
 /**
  * The standard chart's axes — the WL diagram's: same widths (so the same plot area), no month
@@ -14,7 +16,8 @@ export function useStandardChartAxes(
 ) {
   const t = useTranslations();
   const locale = useLocale();
-  const { tick, ...geometry } = getAxisStyle(isCompact, isNarrow);
+  const { textScale } = useContext(ChartDeviceContext);
+  const { tick, ...geometry } = getAxisStyle({ isCompact, isNarrow, textScale });
 
   const monthIndexOf = (v: unknown) => MONTH_NAMES.findIndex((name) => name === String(v));
   const localMonthName = (v: unknown) => {
