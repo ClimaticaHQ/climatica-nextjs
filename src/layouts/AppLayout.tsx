@@ -1,6 +1,6 @@
 "use client";
 
-import { MotionRoot, NavigationIntentTracker, ThemeRoot, Topbar } from "@/components";
+import { MotionRoot, NavigationIntentTracker, TextSizeRoot, ThemeRoot, Topbar } from "@/components";
 import { FiltersSidebar } from "@/components/filters";
 import { SidebarSkeleton, TopbarSkeleton } from "@/components/UI";
 import { useFilterView } from "@/hooks/filters/useFilterView";
@@ -14,6 +14,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
       <ThemeRoot />
+      <TextSizeRoot />
       <MotionRoot />
       <NavigationIntentTracker />
       <Suspense fallback={null}>
