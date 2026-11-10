@@ -30,6 +30,7 @@ export function ExpandedPanelControls({
       {canSwitch && (
         <div ref={switchRef}>
           <SegmentedControl
+            isIconOnlyBelowSm
             label={t("chart.expandedPanel")}
             options={options}
             value={shown}

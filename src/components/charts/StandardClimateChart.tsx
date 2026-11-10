@@ -58,11 +58,11 @@ export function StandardClimateChart({
 }: TStandardClimateChartProps) {
   const t = useTranslations();
   const seriesMotion = useSeriesToggleMotion();
-  const { isTouch, isNarrow } = useContext(ChartDeviceContext);
+  const { isTouch, isNarrow, textScale } = useContext(ChartDeviceContext);
   const tooltipState = { isTouch, activeMonthIndex };
   const curveWidth = isNarrow ? CHART_PLOT.CURVE_WIDTH.NARROW : CHART_PLOT.CURVE_WIDTH.FULL;
   const { ref: plotRef, width: plotWidth } = useElementWidth<HTMLDivElement>();
-  const monthFormat = getMonthLabelFormat(plotWidth, isNarrow);
+  const monthFormat = getMonthLabelFormat({ chartWidth: plotWidth, isNarrow, textScale });
   // * the tooltip's month names; the axes themselves are StandardChartAxes
   const axes = useStandardChartAxes(isPanel, monthFormat);
   const hidePrecBar = useDelayedHide(!visible.prec, seriesMotion.toggleMs);
@@ -134,7 +134,7 @@ export function StandardClimateChart({
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
               data={chartData}
-              margin={getChartMargin(annotationBands)}
+              margin={getChartMargin({ bands: annotationBands, textScale })}
               // * static: a picture, so no keyboard layer — the chart takes no tab stop
               accessibilityLayer={!isStatic}
               {...(syncId !== undefined && !isStatic ? { syncId } : {})}
@@ -264,7 +264,7 @@ export function StandardClimateChart({
           <MonthTapLayer
             activeMonthIndex={activeMonthIndex ?? null}
             onActiveMonthIndexChange={onActiveMonthIndexChange}
-            inset={getPlotMargin(isPanel, isNarrow)}
+            inset={getPlotMargin({ isCompact: isPanel, isNarrow, textScale })}
             canScrub
           />
         )}

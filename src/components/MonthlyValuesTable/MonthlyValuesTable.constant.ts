@@ -58,7 +58,7 @@ export const MONTHLY_VALUES_CLASSES = {
   // * too narrow for twelve aligned columns (phones, split panels): a disclosure per chart
   // * revealing the vertical table, which labels its months itself
   DISCLOSURE: "mt-2 @min-[30rem]/monthly-values:hidden",
-  DISCLOSURE_BUTTON: `${FOCUS_RING_CLASS} flex min-h-11 w-full items-center justify-center rounded-[var(--radius-sm)] border border-[var(--color-border)] text-[length:var(--font-sm)] font-medium text-[var(--color-text-secondary)]`,
+  DISCLOSURE_BUTTON: `${FOCUS_RING_CLASS} flex min-h-target w-full items-center justify-center rounded-[var(--radius-sm)] border border-[var(--color-border)] text-[length:var(--font-sm)] font-medium text-[var(--color-text-secondary)]`,
   VERTICAL_FRAME: "mt-2",
   VERTICAL_TABLE: "w-full border-collapse text-[length:var(--font-sm)]",
   VERTICAL_MONTH: "px-3 py-1.5 text-left font-normal text-[var(--color-text-secondary)]",

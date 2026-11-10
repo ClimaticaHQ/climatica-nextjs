@@ -1,8 +1,9 @@
-import type { ReactNode } from "react";
+import type { ESegmentedSize } from "@/enums";
+import type { CSSProperties, ReactNode } from "react";
 
 export type TSegmentedOption<TValue extends string> = {
   value: TValue;
-  /** visible from Tailwind's `sm` up; below it the option shows only its icon */
+  /** always visible; with isIconOnlyBelowSm, from Tailwind's `sm` up only */
   label: string;
   icon: ReactNode;
 };
@@ -15,10 +16,24 @@ export type TSegmentedControlProps<TValue extends string> = {
   onChange: (value: TValue) => void;
   /** every option inert and dimmed — e.g. a setting that depends on another one that's off */
   isDisabled?: boolean | undefined;
+  /** the active pill without a shadow: the card surface in a thin outline, primary text */
+  isFlat?: boolean | undefined;
+  /** below `sm` the options show only their icons (a dense chart toolbar); otherwise every label
+   * shows, the segments equal */
+  isIconOnlyBelowSm?: boolean | undefined;
+  /** the pill's height below `sm`; DEFAULT when absent */
+  size?: ESegmentedSize | undefined;
+  /** the id of a text describing every option (a settings row's description) */
+  ariaDescribedBy?: string | undefined;
 };
 
 /** The active pill's box inside the track, in px. */
 export type TIndicatorRect = {
   left: number;
+  top: number;
   width: number;
+  height: number;
 };
+
+/** The list's width: the room the control can take (TRACK_LIST). */
+export type TSegmentedRoomStyle = CSSProperties & Record<"--segmented-room", string>;

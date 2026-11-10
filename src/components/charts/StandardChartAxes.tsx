@@ -21,7 +21,7 @@ export function StandardChartAxes({
   monthFormat,
   shouldShowUnitTitles = true,
 }: TStandardChartAxesProps) {
-  const { isNarrow } = useContext(ChartDeviceContext);
+  const { isNarrow, textScale } = useContext(ChartDeviceContext);
   const axes = useStandardChartAxes(isCompact, monthFormat, isNarrow);
   const y = getStandardYAxes({ scales, rightMax, isNarrow: isNarrow && !isCompact });
   const { formatValue } = useDisplayFormat();
@@ -32,7 +32,7 @@ export function StandardChartAxes({
     <>
       <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
       <XAxis
-        {...getXAxisProps(isCompact)}
+        {...getXAxisProps({ isCompact, textScale })}
         dataKey="monthName"
         interval={0}
         tickFormatter={axes.monthTick}

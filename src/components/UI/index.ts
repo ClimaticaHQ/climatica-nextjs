@@ -15,6 +15,7 @@ export { Popover } from "./Popover";
 export { SectionLabel } from "./SectionLabel";
 export { SidebarSkeleton } from "./SidebarSkeleton";
 export { StatCardsSkeleton } from "./StatCardsSkeleton";
+export { StepSlider } from "./StepSlider";
 export { SwapButton } from "./SwapButton";
 export { TableSkeleton } from "./TableSkeleton";
 export { ToggleSwitch } from "./ToggleSwitch";

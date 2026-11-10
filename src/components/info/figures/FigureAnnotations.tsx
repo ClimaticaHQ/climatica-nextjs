@@ -1,5 +1,5 @@
 import { layoutAnnotations } from "@/utils/infoFigure.util";
-import { ANNOTATION_LAYOUT as L, ANNOTATION_STYLE as S } from "../info.constant";
+import { ANNOTATION_STYLE as S } from "../info.constant";
 import type { TAnnotationNumberProps, TFigureAnnotationsProps } from "../info.type";
 
 const line = { stroke: S.STROKE, strokeWidth: S.STROKE_WIDTH, fill: "none" } as const;
@@ -9,8 +9,9 @@ const line = { stroke: S.STROKE, strokeWidth: S.STROKE_WIDTH, fill: "none" } as 
  * span's under the month labels), thin brackets over spans, dashed leaders down to rings at
  * points. Numbered by the caption. The 0 °C line is the standard chart's own.
  */
-export function FigureAnnotations({ annotations, projection }: TFigureAnnotationsProps) {
-  const { numbers, brackets, leaders } = layoutAnnotations({ annotations, projection, layout: L });
+export function FigureAnnotations({ annotations, projection, layout }: TFigureAnnotationsProps) {
+  const { numbers, brackets, leaders } = layoutAnnotations({ annotations, projection, layout });
+  const tick = layout.bracketTick;
 
   return (
     <g>
@@ -18,7 +19,7 @@ export function FigureAnnotations({ annotations, projection }: TFigureAnnotation
         <path
           key={`${number}-${months.join(",")}`}
           {...line}
-          d={`M${x1},${y + tickDirection * L.bracketTick}V${y}H${x2}V${y + tickDirection * L.bracketTick}`}
+          d={`M${x1},${y + tickDirection * tick}V${y}H${x2}V${y + tickDirection * tick}`}
           data-annotation-bracket={number}
           data-months={months.join(",")}
         />
@@ -30,19 +31,19 @@ export function FigureAnnotations({ annotations, projection }: TFigureAnnotation
         </g>
       ))}
       {numbers.map((props) => (
-        <AnnotationNumber key={props.number} {...props} />
+        <AnnotationNumber key={props.number} {...props} layout={layout} />
       ))}
     </g>
   );
 }
 
-function AnnotationNumber({ number, x, y }: TAnnotationNumberProps) {
+function AnnotationNumber({ number, x, y, layout }: TAnnotationNumberProps) {
   return (
     <g data-annotation-number={number}>
       <circle
         cx={x}
         cy={y}
-        r={L.numberRadius}
+        r={layout.numberRadius}
         fill={S.NUMBER_FILL}
         stroke={S.NUMBER_RING}
         strokeWidth={S.NUMBER_RING_WIDTH}
@@ -52,7 +53,7 @@ function AnnotationNumber({ number, x, y }: TAnnotationNumberProps) {
         y={y}
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize={S.NUMBER_FONT_SIZE}
+        fontSize={layout.numberFontSize}
         fontWeight={S.NUMBER_FONT_WEIGHT}
         fill={S.NUMBER_TEXT}
       >

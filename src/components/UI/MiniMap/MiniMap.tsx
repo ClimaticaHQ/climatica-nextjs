@@ -112,8 +112,8 @@ export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
     >
       <div className="flex h-full flex-col">
         {showToggle && (
-          <div className="shrink-0 flex justify-center border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1.5">
-            <div className="flex rounded-full border border-[var(--color-border)] bg-[var(--color-surface-secondary)] p-0.5">
+          <div className={T.BAR}>
+            <div className={T.GROUP}>
               {locations.map((loc, i) => (
                 <button
                   key={loc.label}

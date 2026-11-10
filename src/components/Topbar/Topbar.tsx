@@ -1,196 +1,56 @@
 "use client";
 
-import { NAV_LINKS, ROUTES } from "@/constants";
-import { useNavbarNavigation } from "@/hooks";
+import { useNavbarFit, useTopbarLinks, useTopbarMenu } from "@/hooks";
 import { GLOBAL_CONFIG } from "@/libs/GlobalConfig";
-import { isRouteActive } from "@/utils/pageParams.util";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ClimaticaLogo, GearIcon } from "../svg";
-import { TOPBAR_LINK_CLASSES as L } from "./Topbar.constant";
+import { BurgerIcon, ClimaticaLogo, GearIcon } from "../svg";
+import { TOPBAR_CLASSES as C, TOPBAR_LINK_CLASSES as L } from "./Topbar.constant";
+import { TopbarLinks } from "./TopbarLinks";
+import { TopbarMenu } from "./TopbarMenu";
 
-function BurgerIcon({ isOpen }: { isOpen: boolean }) {
-  return (
-    <div className="flex h-5 w-5 flex-col items-center justify-center gap-[5px]">
-      <span
-        className={`block h-[2px] w-5 origin-center rounded-full stroke-current transition-all duration-300 ${
-          isOpen ? "translate-y-[7px] rotate-45" : ""
-        }`}
-        style={{ backgroundColor: "currentColor" }}
-      />
-      <span
-        className={`block h-[2px] w-5 rounded-full stroke-current transition-all duration-300 ${
-          isOpen ? "scale-x-0 opacity-0" : ""
-        }`}
-        style={{ backgroundColor: "currentColor" }}
-      />
-      <span
-        className={`block h-[2px] w-5 origin-center rounded-full stroke-current transition-all duration-300 ${
-          isOpen ? "-translate-y-[7px] -rotate-45" : ""
-        }`}
-        style={{ backgroundColor: "currentColor" }}
-      />
-    </div>
-  );
-}
-
+/** The app's bar: the logo, the page links (or the menu when they don't fit) and Settings. */
 export function Topbar() {
   const t = useTranslations();
-  const [isNavOpen, setIsNavOpen] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
-  const pathname = usePathname();
-  // * links to the other pages: the shared filters, plus (on click) the page's remembered params
-  const { getHref, settingsHref, aboutHref, navigate } = useNavbarNavigation();
-  const isSettingsActive = pathname === ROUTES.SETTINGS;
-  const isAboutActive = isRouteActive(pathname, ROUTES.ABOUT);
-
-  useEffect(() => {
-    queueMicrotask(() => setIsNavOpen(false));
-  }, [pathname]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) setIsNavOpen(false);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (!isNavOpen) return;
-    const handleOutside = (e: MouseEvent | TouchEvent) => {
-      if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
-        setIsNavOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutside);
-    document.addEventListener("touchstart", handleOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleOutside);
-      document.removeEventListener("touchstart", handleOutside);
-    };
-  }, [isNavOpen]);
+  const { pages, settings, home } = useTopbarLinks();
+  const { rowRef, navRef, isCollapsed } = useNavbarFit();
+  const { headerRef, isOpen, toggle, close } = useTopbarMenu({ isCollapsed });
 
   return (
-    <header
-      ref={headerRef}
-      className="relative box-content h-16 w-full shrink-0 border-b pt-[env(safe-area-inset-top)] border-[var(--color-border)] bg-[var(--color-surface)]"
-    >
-      <div className="flex h-full items-center pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
-        {/* * the home page is City Climate ("/" redirects there, dropping the query) — so the
-         * logo goes the navbar's way: shared filters, plus City Climate's remembered params */}
-        <Link
-          href={getHref(ROUTES.CLIMATE_STATISTICS)}
-          onClick={(event) => navigate(event, ROUTES.CLIMATE_STATISTICS)}
-          className="flex flex-1 items-center gap-2.5 text-[var(--color-brand)] hover:opacity-80 transition-opacity duration-150"
-        >
-          <ClimaticaLogo className="h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 shrink-0" />
-          <span className="text-[length:var(--font-md)] lg:text-[length:var(--font-lg)] font-semibold tracking-wide leading-none">
-            {GLOBAL_CONFIG.appName}
-          </span>
+    <header ref={headerRef} className={C.HEADER}>
+      <div ref={rowRef} className={C.ROW}>
+        <Link href={home.href} onClick={home.onNavigate} className={C.LOGO}>
+          <ClimaticaLogo className={C.LOGO_MARK} />
+          <span className={C.LOGO_NAME}>{GLOBAL_CONFIG.appName}</span>
         </Link>
-
-        <nav className={L.DESKTOP_ROW}>
-          {NAV_LINKS.map(({ to, labelKey }) => (
-            <Link
-              key={to}
-              href={getHref(to)}
-              onClick={(event) => navigate(event, to)}
-              aria-current={isRouteActive(pathname, to) ? "page" : undefined}
-              className={`${L.DESKTOP} ${isRouteActive(pathname, to) ? L.DESKTOP_ACTIVE : L.IDLE}`}
-            >
-              {t(labelKey)}
-            </Link>
-          ))}
+        <TopbarLinks links={pages} navRef={navRef} isCollapsed={isCollapsed} />
+        <div className={C.CONTROLS}>
           <Link
-            href={aboutHref}
-            aria-current={isAboutActive ? "page" : undefined}
-            className={`${L.DESKTOP} ${isAboutActive ? L.DESKTOP_ACTIVE : L.IDLE}`}
-          >
-            {t("navbar.about")}
-          </Link>
-        </nav>
-
-        <div className="flex flex-1 items-center justify-end gap-1">
-          <Link
-            href={settingsHref}
-            aria-label={t("navbar.settings")}
-            aria-current={isSettingsActive ? "page" : undefined}
-            className={`hidden h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] transition-colors duration-150 lg:flex ${
-              isSettingsActive
-                ? "bg-[var(--color-primary-muted)] text-[var(--color-primary)]"
-                : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]"
-            }`}
+            href={settings.href}
+            aria-label={settings.label}
+            aria-current={settings.isActive ? "page" : undefined}
+            className={`${C.SETTINGS} ${settings.isActive ? C.SETTINGS_ACTIVE : L.IDLE}`}
           >
             <GearIcon />
           </Link>
-
           <button
             type="button"
             aria-label={t("navbar.toggleMenu")}
-            aria-expanded={isNavOpen}
-            onClick={() => setIsNavOpen((prev) => !prev)}
-            className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)] lg:hidden"
+            aria-expanded={isOpen}
+            onClick={toggle}
+            className={`${C.MENU_BUTTON} ${isCollapsed ? "" : L.MENU_ONLY_BELOW_LG}`}
           >
-            <BurgerIcon isOpen={isNavOpen} />
+            <BurgerIcon isOpen={isOpen} />
           </button>
         </div>
       </div>
-
-      <div
-        className={`
-          absolute left-0 right-0 top-full z-50
-          border-t border-[var(--color-border)] bg-[var(--color-surface)] shadow-md
-          transition-all duration-300 ease-in-out lg:hidden
-          ${isNavOpen ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-2 opacity-0"}
-        `}
-      >
-        <ul className="flex max-h-[calc(100dvh-4rem-env(safe-area-inset-top))] list-none flex-col gap-1 overflow-y-auto pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
-          {NAV_LINKS.map(({ to, labelKey }) => (
-            <li key={to}>
-              <Link
-                href={getHref(to)}
-                onClick={(event) => {
-                  setIsNavOpen(false);
-                  navigate(event, to);
-                }}
-                aria-current={isRouteActive(pathname, to) ? "page" : undefined}
-                className={`${L.MOBILE} ${isRouteActive(pathname, to) ? L.MOBILE_ACTIVE : L.IDLE}`}
-              >
-                {t(labelKey)}
-              </Link>
-            </li>
-          ))}
-          <li>
-            <Link
-              href={aboutHref}
-              onClick={() => setIsNavOpen(false)}
-              aria-current={isAboutActive ? "page" : undefined}
-              className={`${L.MOBILE} ${isAboutActive ? L.MOBILE_ACTIVE : L.IDLE}`}
-            >
-              {t("navbar.about")}
-            </Link>
-          </li>
-
-          <li className="mt-2 border-t border-[var(--color-border)] pt-3">
-            <Link
-              href={settingsHref}
-              onClick={() => setIsNavOpen(false)}
-              aria-current={isSettingsActive ? "page" : undefined}
-              className={`block w-full rounded-[var(--radius-sm)] px-4 py-3 text-[length:var(--font-sm)] transition-colors duration-150 ${
-                isSettingsActive
-                  ? "bg-[var(--color-primary)] font-medium text-[var(--color-on-primary)]"
-                  : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]"
-              }`}
-            >
-              {t("navbar.settings")}
-            </Link>
-          </li>
-        </ul>
-      </div>
+      <TopbarMenu
+        links={pages}
+        settings={settings}
+        isOpen={isOpen}
+        isCollapsed={isCollapsed}
+        onClose={close}
+      />
     </header>
   );
 }

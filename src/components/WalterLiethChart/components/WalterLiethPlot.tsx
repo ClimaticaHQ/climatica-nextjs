@@ -49,14 +49,15 @@ export function WalterLiethPlot({
   onActiveMonthIndexChange,
 }: TWalterLiethPlotProps) {
   const { ref, width } = useElementWidth<HTMLDivElement>();
-  const { isTouch, isNarrow } = useContext(ChartDeviceContext);
+  const { isTouch, isNarrow, textScale } = useContext(ChartDeviceContext);
+  const axisSize = { isCompact, isNarrow, textScale };
   const tooltipState = { isTouch, activeMonthIndex };
   const axes = useWalterLiethAxes({
     rows,
     domain,
-    monthFormat: getMonthLabelFormat(width, isNarrow),
+    monthFormat: getMonthLabelFormat({ chartWidth: width, isNarrow, textScale }),
   });
-  const { tick, ...axisGeometry } = getAxisStyle(isCompact, isNarrow);
+  const { tick, ...axisGeometry } = getAxisStyle(axisSize);
   // * both axes share the domain: precipitation is plotted through the °C scale
   const yAxisBase = {
     domain: [domain.tempMin, domain.plotMax],
@@ -70,7 +71,7 @@ export function WalterLiethPlot({
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={rows}
-          margin={getChartMargin(annotationBands)}
+          margin={getChartMargin({ bands: annotationBands, textScale })}
           // * static: a picture, so no keyboard layer — the chart takes no tab stop
           accessibilityLayer={!isStatic}
           {...(syncId !== undefined && !isStatic ? { syncId } : {})}
@@ -89,7 +90,7 @@ export function WalterLiethPlot({
             stroke="var(--color-border)"
           />
           <XAxis
-            {...getXAxisProps(isCompact)}
+            {...getXAxisProps(axisSize)}
             dataKey="position"
             type="number"
             domain={axes.monthAxis.domain}
@@ -171,7 +172,7 @@ export function WalterLiethPlot({
         <MonthTapLayer
           activeMonthIndex={activeMonthIndex ?? null}
           onActiveMonthIndexChange={onActiveMonthIndexChange}
-          inset={getPlotMargin(isCompact, isNarrow)}
+          inset={getPlotMargin(axisSize)}
           monthCount={rows.length}
           canScrub
         />

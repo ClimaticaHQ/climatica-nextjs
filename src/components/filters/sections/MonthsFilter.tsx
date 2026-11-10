@@ -1,6 +1,7 @@
 "use client";
 
 import { Chip } from "@/components/UI/Chip";
+import { FILTER_CHIP_ROW_CLASS } from "../filters.constant";
 import { ALL_MONTHS, MONTH_NUMBERS } from "@/constants";
 import { EFilterKey, ETextScale } from "@/enums";
 import { areFilterControlsDisabled, toggleFilterOption } from "@/utils/filters.util";
@@ -16,7 +17,7 @@ export function MonthsFilter({ values, availability, onChange }: TFilterSectionR
 
   return (
     <FilterSection title={t("sidebar.sections.months")} availability={availability}>
-      <div className="flex flex-wrap gap-2">
+      <div className={FILTER_CHIP_ROW_CLASS}>
         <Chip
           textScale={ETextScale.TOUCH}
           label={t("sidebar.months.all")}

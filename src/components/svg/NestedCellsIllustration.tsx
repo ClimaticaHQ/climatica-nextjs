@@ -1,3 +1,8 @@
+"use client";
+
+import { CHART_TEXT_MIN_PX } from "@/constants";
+import { useTextScale } from "@/hooks/ui/useTextScale";
+import { scaleChartFont } from "@/utils/textSize.util";
 import { NESTED_CELLS as N } from "./svg.constant";
 import type { TNestedCellsIllustrationProps } from "./svg.type";
 
@@ -11,6 +16,7 @@ export function NestedCellsIllustration({
   fineLabel,
   finePerCoarse,
 }: TNestedCellsIllustrationProps) {
+  const textScale = useTextScale();
   const { x, y, size } = N.COARSE;
   const fine = size / finePerCoarse;
   const fineX = x + fine * N.POINT_CELL.col;
@@ -24,8 +30,8 @@ export function NestedCellsIllustration({
       viewBox={`0 0 ${N.WIDTH} ${N.HEIGHT}`}
       role="img"
       aria-label={ariaLabel}
-      className="h-auto w-full max-w-xs"
-      fontSize={N.FONT_SIZE}
+      className={N.CLASS}
+      fontSize={scaleChartFont({ size: N.FONT_SIZE, textScale, min: CHART_TEXT_MIN_PX.TEXT })}
     >
       <g stroke="var(--color-border)" strokeWidth={N.GRID_STROKE}>
         {columns.map((at) => (

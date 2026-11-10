@@ -1,7 +1,7 @@
 import { LegendSwatch } from "@/components/ChartLegend";
 import { TOOLTIP_CLASSES as C, TOOLTIP_FONT_SIZE } from "@/components/charts/charts.constant";
 import { EDisplayMetric } from "@/enums";
-import { useDisplayFormat, useWalterLiethLegendItems } from "@/hooks";
+import { useDisplayFormat, useTextScale, useWalterLiethLegendItems } from "@/hooks";
 import { getSwatchSize, isAridMonth } from "@/utils";
 import { useTranslations } from "next-intl";
 import type { TWalterLiethTooltipProps } from "../WalterLiethChart.type";
@@ -15,11 +15,12 @@ export function WalterLiethTooltip({ active, payload }: TWalterLiethTooltipProps
   const { formatValue } = useDisplayFormat();
   const metric = EDisplayMetric.WALTER_LIETH_TOOLTIP_VALUE;
   const legendItems = useWalterLiethLegendItems();
+  const textScale = useTextScale();
   const row = payload?.[0]?.payload;
   if (!active || !row) return null;
 
   const isArid = isAridMonth(row);
-  const size = getSwatchSize(TOOLTIP_FONT_SIZE);
+  const size = getSwatchSize(TOOLTIP_FONT_SIZE * textScale);
   const swatch = (key: string) => {
     const item = legendItems.find((legendItem) => legendItem.key === key);
     return item && <LegendSwatch swatch={item.swatch} size={size} />;

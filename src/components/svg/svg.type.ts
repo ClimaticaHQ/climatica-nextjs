@@ -33,3 +33,8 @@ export type TNestedCellsIllustrationProps = {
   /** how many fine cells fit along a coarse cell's side */
   finePerCoarse: number;
 };
+
+export type TBurgerIconProps = {
+  /** turned into a cross while its menu is open */
+  isOpen: boolean;
+};

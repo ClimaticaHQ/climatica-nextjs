@@ -3,6 +3,7 @@ import { SeriesMarker } from "@/components/SeriesMarker";
 import { MISSING_VALUE_LABEL, OVERLAY_FOCUS } from "@/constants";
 import { EDisplayMetric } from "@/enums";
 import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
+import { useTextScale } from "@/hooks/ui/useTextScale";
 import { getSwatchSize } from "@/utils";
 import { useTranslations } from "next-intl";
 import { TOOLTIP_CLASSES as C, TOOLTIP_FONT_SIZE } from "./charts.constant";
@@ -25,6 +26,7 @@ export function StandardTooltip({
 }: TStandardTooltipProps) {
   const t = useTranslations();
   const { formatValue: formatDisplayValue } = useDisplayFormat();
+  const swatchSize = getSwatchSize(TOOLTIP_FONT_SIZE * useTextScale());
   if (!active || !payload || payload.length === 0) return null;
 
   // * a hovered curve or bar of the overlay: only it, named by variable, entity and month
@@ -60,7 +62,7 @@ export function StandardTooltip({
         return (
           <p key={itemName} className={C.ROW}>
             {marker && <SeriesMarker {...marker} />}
-            {swatch && <LegendSwatch swatch={swatch} size={getSwatchSize(TOOLTIP_FONT_SIZE)} />}
+            {swatch && <LegendSwatch swatch={swatch} size={swatchSize} />}
             <span>{`${itemName}: ${formatValue(value, itemName)}`}</span>
           </p>
         );

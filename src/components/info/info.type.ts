@@ -1,4 +1,10 @@
-import type { TChartProjection, TFigureAnnotation, TInfoPage, TInfoSection } from "@/types";
+import type {
+  TAnnotationLayout,
+  TChartProjection,
+  TFigureAnnotation,
+  TInfoPage,
+  TInfoSection,
+} from "@/types";
 import type { EInfoCardLayout } from "@/enums";
 import type { ComponentType, MouseEvent, ReactNode } from "react";
 
@@ -130,10 +136,13 @@ export type TInfoFigureMarkerProps = {
 export type TFigureAnnotationsProps = {
   annotations: readonly TFigureAnnotation[];
   projection: TChartProjection;
+  /** at the text scale (scaleAnnotationLayout) */
+  layout: TAnnotationLayout;
 };
 
 export type TAnnotationNumberProps = {
   number: number;
   x: number;
   y: number;
+  layout: TAnnotationLayout;
 };

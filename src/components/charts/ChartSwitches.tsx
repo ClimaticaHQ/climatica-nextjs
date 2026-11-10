@@ -17,6 +17,7 @@ export function ChartSwitches({ chartMode, layout, onLayoutChange }: TChartSwitc
       <ChartModeSwitch value={chartMode} />
       {layout !== undefined && (
         <SegmentedControl
+          isIconOnlyBelowSm
           label={t("chart.layout")}
           options={[
             {

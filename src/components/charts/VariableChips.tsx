@@ -1,6 +1,7 @@
 import { Chip } from "@/components/UI/Chip";
 import type { TVisibleSeries } from "@/types";
 import { useTranslations } from "next-intl";
+import { VARIABLE_CHIPS_ROW_CLASS } from "./charts.constant";
 import type { TVariableChipsProps } from "./charts.type";
 
 /**
@@ -39,9 +40,5 @@ export function VariableChips({ visible, variables, onChange }: TVariableChipsPr
   });
 
   // * a phone: one row, scrolling sideways, so the toolbar keeps one height in every view
-  return (
-    <div className="flex flex-wrap justify-end gap-2 max-sm:max-w-full max-sm:flex-nowrap max-sm:justify-start max-sm:overflow-x-auto">
-      {items}
-    </div>
-  );
+  return <div className={VARIABLE_CHIPS_ROW_CLASS}>{items}</div>;
 }

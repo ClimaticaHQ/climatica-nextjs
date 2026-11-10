@@ -11,9 +11,14 @@ import { WalterLiethChart } from "@/components/WalterLiethChart";
 import { CHART_LEGEND, SM_MEDIA_QUERY } from "@/constants";
 import { EFigureAnchor } from "@/enums";
 import { useChartModel } from "@/hooks/charts/useChartModel";
-import { useLegendLabels, useMediaQuery, useWalterLiethLegendItems } from "@/hooks/ui";
+import {
+  useLegendLabels,
+  useMediaQuery,
+  useTextScale,
+  useWalterLiethLegendItems,
+} from "@/hooks/ui";
 import { getStandardLegendItems, isCompleteSeries } from "@/utils";
-import { getAnnotationBands } from "@/utils/infoFigure.util";
+import { getAnnotationBands, scaleAnnotationLayout } from "@/utils/infoFigure.util";
 import { ANNOTATION_LAYOUT } from "../info.constant";
 import { FigureAnnotations } from "./FigureAnnotations";
 import {
@@ -32,22 +37,24 @@ export function WalterLiethFigureChart() {
   const model = useChartModel(FIGURE_SERIES_LIST);
   const legendItems = useWalterLiethLegendItems();
   const isNarrow = !useMediaQuery(SM_MEDIA_QUERY);
+  const textScale = useTextScale();
+  const layout = scaleAnnotationLayout({ layout: ANNOTATION_LAYOUT, textScale });
   const series = model.series[0]?.walterLieth;
   if (series === undefined || !isCompleteSeries(series)) return null;
   const { ANNOTATIONS } = WALTER_LIETH_FIGURE;
 
   return (
-    <ChartDeviceContext.Provider value={{ isTouch: false, isNarrow }}>
+    <ChartDeviceContext.Provider value={{ isTouch: false, isNarrow, textScale }}>
       <WalterLiethChart
         series={series}
         domain={model.domain}
         isStatic
         annotationBands={getAnnotationBands({
           annotations: ANNOTATIONS,
-          layout: ANNOTATION_LAYOUT,
+          layout,
         })}
         overlay={(projection) => (
-          <FigureAnnotations annotations={ANNOTATIONS} projection={projection} />
+          <FigureAnnotations annotations={ANNOTATIONS} projection={projection} layout={layout} />
         )}
         footer={
           <div className={CHART_LEGEND.GAP_CLASS}>
@@ -64,6 +71,8 @@ export function IndicatorsFigureChart() {
   const model = useChartModel(FIGURE_SERIES_LIST);
   const labels = useLegendLabels();
   const isNarrow = !useMediaQuery(SM_MEDIA_QUERY);
+  const textScale = useTextScale();
+  const layout = scaleAnnotationLayout({ layout: ANNOTATION_LAYOUT, textScale });
   const entry = model.series[0];
   if (entry === undefined) return null;
   const { ANNOTATIONS } = INDICATORS_FIGURE;
@@ -83,7 +92,7 @@ export function IndicatorsFigureChart() {
   });
 
   return (
-    <ChartDeviceContext.Provider value={{ isTouch: false, isNarrow }}>
+    <ChartDeviceContext.Provider value={{ isTouch: false, isNarrow, textScale }}>
       <StandardClimateChart
         chartData={entry.chartData}
         aridity={entry.aridity}
@@ -95,11 +104,11 @@ export function IndicatorsFigureChart() {
         isStatic
         annotationBands={getAnnotationBands({
           annotations: ANNOTATIONS,
-          layout: ANNOTATION_LAYOUT,
+          layout,
         })}
         statsMarkers={statsMarkers}
         overlay={(projection) => (
-          <FigureAnnotations annotations={ANNOTATIONS} projection={projection} />
+          <FigureAnnotations annotations={ANNOTATIONS} projection={projection} layout={layout} />
         )}
         footer={
           <div className={CHART_LEGEND.GAP_CLASS}>
