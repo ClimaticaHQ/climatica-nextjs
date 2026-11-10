@@ -409,6 +409,14 @@
       "dark": "Scuro",
       "system": "Sistema"
     },
+    "textSize": "Dimensione del testo",
+    "textSizeOptions": {
+      "smaller": "Più piccola",
+      "small": "Piccola",
+      "default": "Predefinita",
+      "large": "Grande",
+      "larger": "Più grande"
+    },
     "autoScroll": "Scorrimento automatico ai risultati",
     "syncCity": "Sincronizza la città selezionata su tutte le pagine",
     "syncFilters": "Sincronizza i filtri su tutte le pagine",
@@ -433,7 +441,7 @@
     "descriptions": {
       "animations": "Transizioni fluide quando cambiano grafici e dati",
       "updateHighlight": "Come viene segnalata una scheda quando i suoi dati si aggiornano",
-      "autoApplyFilters": "Le modifiche ai filtri valgono subito; se disattivato, attendono «Applica filtri»",
+      "autoApplyFilters": "Se disattivato, le modifiche attendono «Applica filtri»",
       "syncCity": "La città scelta in una pagina si apre anche nelle altre",
       "syncFilters": "I filtri scelti in una pagina valgono anche nelle altre",
       "autoScroll": "Scorre fino ai risultati dopo aver scelto una città",

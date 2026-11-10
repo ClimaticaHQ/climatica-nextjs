@@ -409,6 +409,14 @@
       "dark": "Mørkt",
       "system": "System"
     },
+    "textSize": "Tekststørrelse",
+    "textSizeOptions": {
+      "smaller": "Mindre",
+      "small": "Liten",
+      "default": "Standard",
+      "large": "Stor",
+      "larger": "Større"
+    },
     "autoScroll": "Rull automatisk til resultater",
     "syncCity": "Synkroniser valgt by på tvers av sider",
     "syncFilters": "Synkroniser filtre på tvers av sider",
@@ -433,7 +441,7 @@
     "descriptions": {
       "animations": "Myke overganger når diagrammer og data endres",
       "updateHighlight": "Hvordan et kort markeres når dataene i det oppdateres",
-      "autoApplyFilters": "Filterendringer brukes med en gang; når det er av, venter de på «Bruk filtre»",
+      "autoApplyFilters": "Når det er av, venter endringer på «Bruk filtre»",
       "syncCity": "En by du velger på én side, åpnes også på de andre sidene",
       "syncFilters": "Filtre du velger på én side, gjelder også på de andre sidene",
       "autoScroll": "Ruller ned til resultatene når du har valgt en by",

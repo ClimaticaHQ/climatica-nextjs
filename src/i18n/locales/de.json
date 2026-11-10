@@ -409,6 +409,14 @@
       "dark": "Dunkel",
       "system": "System"
     },
+    "textSize": "Textgröße",
+    "textSizeOptions": {
+      "smaller": "Kleiner",
+      "small": "Klein",
+      "default": "Standard",
+      "large": "Groß",
+      "larger": "Größer"
+    },
     "autoScroll": "Automatisch zu Ergebnissen scrollen",
     "syncCity": "Ausgewählte Stadt auf allen Seiten synchronisieren",
     "syncFilters": "Filter auf allen Seiten synchronisieren",
@@ -433,7 +441,7 @@
     "descriptions": {
       "animations": "Weiche Übergänge, wenn sich Diagramme und Daten ändern",
       "updateHighlight": "Wie eine Karte markiert wird, wenn sich ihre Daten ändern",
-      "autoApplyFilters": "Filteränderungen gelten sofort; ausgeschaltet warten sie auf „Filter anwenden“",
+      "autoApplyFilters": "Ausgeschaltet warten Änderungen auf „Filter anwenden“",
       "syncCity": "Eine auf einer Seite gewählte Stadt öffnet sich auch auf den anderen Seiten",
       "syncFilters": "Auf einer Seite gewählte Filter gelten auch auf den anderen Seiten",
       "autoScroll": "Scrollt nach der Wahl einer Stadt zu den Ergebnissen",

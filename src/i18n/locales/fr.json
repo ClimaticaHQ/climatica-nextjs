@@ -409,6 +409,14 @@
       "dark": "Sombre",
       "system": "Système"
     },
+    "textSize": "Taille du texte",
+    "textSizeOptions": {
+      "smaller": "Plus petit",
+      "small": "Petit",
+      "default": "Par défaut",
+      "large": "Grand",
+      "larger": "Plus grand"
+    },
     "autoScroll": "Défilement automatique vers les résultats",
     "syncCity": "Synchroniser la ville sélectionnée sur toutes les pages",
     "syncFilters": "Synchroniser les filtres sur toutes les pages",
@@ -433,7 +441,7 @@
     "descriptions": {
       "animations": "Transitions fluides quand les graphiques et les données changent",
       "updateHighlight": "La façon dont une carte est signalée quand ses données changent",
-      "autoApplyFilters": "Les filtres s’appliquent dès qu’ils changent ; désactivé, ils attendent « Appliquer les filtres »",
+      "autoApplyFilters": "Désactivé, les changements attendent « Appliquer les filtres »",
       "syncCity": "Une ville choisie sur une page s’ouvre aussi sur les autres pages",
       "syncFilters": "Les filtres choisis sur une page s’appliquent aussi aux autres pages",
       "autoScroll": "Fait défiler jusqu’aux résultats après le choix d’une ville",

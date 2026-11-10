@@ -409,6 +409,14 @@
       "dark": "Întunecată",
       "system": "Sistem"
     },
+    "textSize": "Dimensiunea textului",
+    "textSizeOptions": {
+      "smaller": "Mai mică",
+      "small": "Mică",
+      "default": "Implicită",
+      "large": "Mare",
+      "larger": "Mai mare"
+    },
     "autoScroll": "Derulare automată la rezultate",
     "syncCity": "Sincronizează orașul selectat pe toate paginile",
     "syncFilters": "Sincronizează filtrele pe toate paginile",
@@ -433,7 +441,7 @@
     "descriptions": {
       "animations": "Tranziții line când se schimbă graficele și datele",
       "updateHighlight": "Cum este marcat un card când datele lui se actualizează",
-      "autoApplyFilters": "Modificările filtrelor se aplică imediat; dezactivat, așteaptă „Aplică filtrele”",
+      "autoApplyFilters": "Dezactivat, modificările așteaptă „Aplică filtrele”",
       "syncCity": "Orașul ales pe o pagină se deschide și pe celelalte pagini",
       "syncFilters": "Filtrele alese pe o pagină se aplică și pe celelalte pagini",
       "autoScroll": "Derulează la rezultate după ce alegi un oraș",
