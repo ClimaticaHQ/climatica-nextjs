@@ -1,0 +1,502 @@
+[
+  {
+    "name": "Kharkiv",
+    "country": "Ukraine",
+    "continent": "Europe",
+    "lat": 49.98177,
+    "lng": 36.25475,
+    "geonameid": 706483,
+    "searchQuery": "Kharkiv",
+    "sample": "original"
+  },
+  {
+    "name": "Lviv",
+    "country": "Ukraine",
+    "continent": "Europe",
+    "lat": 49.83826,
+    "lng": 24.02324,
+    "geonameid": 702550,
+    "searchQuery": "Львів",
+    "sample": "original"
+  },
+  {
+    "name": "Córdoba",
+    "country": "Spain",
+    "continent": "Europe",
+    "lat": 37.89155,
+    "lng": -4.77275,
+    "geonameid": 2519240,
+    "searchQuery": "Córdoba",
+    "sample": "original"
+  },
+  {
+    "name": "Helsinki",
+    "country": "Finland",
+    "continent": "Europe",
+    "lat": 60.16952,
+    "lng": 24.93545,
+    "geonameid": 658225,
+    "searchQuery": "Helsinki",
+    "sample": "original"
+  },
+  {
+    "name": "Madrid",
+    "country": "Spain",
+    "continent": "Europe",
+    "lat": 40.4165,
+    "lng": -3.70256,
+    "geonameid": 3117735,
+    "searchQuery": "Madrid",
+    "sample": "original"
+  },
+  {
+    "name": "Barcelona",
+    "country": "Spain",
+    "continent": "Europe",
+    "lat": 41.38879,
+    "lng": 2.15899,
+    "geonameid": 3128760,
+    "searchQuery": "Barcelona",
+    "sample": "original"
+  },
+  {
+    "name": "New York",
+    "country": "United States",
+    "continent": "North America",
+    "lat": 40.71427,
+    "lng": -74.00597,
+    "geonameid": 5128581,
+    "searchQuery": "New York",
+    "sample": "original"
+  },
+  {
+    "name": "London",
+    "country": "United Kingdom",
+    "continent": "Europe",
+    "lat": 51.50853,
+    "lng": -0.12574,
+    "geonameid": 2643743,
+    "searchQuery": "London",
+    "sample": "original"
+  },
+  {
+    "name": "Paris",
+    "country": "France",
+    "continent": "Europe",
+    "lat": 48.85341,
+    "lng": 2.3488,
+    "geonameid": 2988507,
+    "searchQuery": "Paris",
+    "sample": "original"
+  },
+  {
+    "name": "Seattle",
+    "country": "United States",
+    "continent": "North America",
+    "lat": 47.60621,
+    "lng": -122.33207,
+    "geonameid": 5809844,
+    "searchQuery": "Seattle",
+    "sample": "original"
+  },
+  {
+    "name": "San Francisco",
+    "country": "United States",
+    "continent": "North America",
+    "lat": 37.77493,
+    "lng": -122.41942,
+    "geonameid": 5391959,
+    "searchQuery": "San Francisco",
+    "sample": "original"
+  },
+  {
+    "name": "Dublin",
+    "country": "Ireland",
+    "continent": "Europe",
+    "lat": 53.33306,
+    "lng": -6.24889,
+    "geonameid": 2964574,
+    "searchQuery": "Dublin",
+    "sample": "original"
+  },
+  {
+    "name": "Tokyo",
+    "country": "Japan",
+    "continent": "Asia",
+    "lat": 35.6895,
+    "lng": 139.69171,
+    "geonameid": 1850147,
+    "searchQuery": "Tokyo",
+    "sample": "original"
+  },
+  {
+    "name": "Zurich",
+    "country": "Switzerland",
+    "continent": "Europe",
+    "lat": 47.36667,
+    "lng": 8.55,
+    "geonameid": 2657896,
+    "searchQuery": "Zurich",
+    "sample": "original"
+  },
+  {
+    "name": "Rome",
+    "country": "Italy",
+    "continent": "Europe",
+    "lat": 41.89193,
+    "lng": 12.51133,
+    "geonameid": 3169070,
+    "searchQuery": "Рим",
+    "sample": "original"
+  },
+  {
+    "name": "Berlin",
+    "country": "Germany",
+    "continent": "Europe",
+    "lat": 52.52437,
+    "lng": 13.41053,
+    "geonameid": 2950159,
+    "searchQuery": "Berlin",
+    "sample": "original"
+  },
+  {
+    "name": "Lisbon",
+    "country": "Portugal",
+    "continent": "Europe",
+    "lat": 38.72509,
+    "lng": -9.1498,
+    "geonameid": 2267057,
+    "searchQuery": "Lisboa",
+    "sample": "original"
+  },
+  {
+    "name": "Gothenburg",
+    "country": "Sweden",
+    "continent": "Europe",
+    "lat": 57.70716,
+    "lng": 11.96679,
+    "geonameid": 2711537,
+    "searchQuery": "Göteborg",
+    "sample": "original"
+  },
+  {
+    "name": "Cairo",
+    "country": "Egypt",
+    "continent": "Africa",
+    "lat": 30.06263,
+    "lng": 31.24967,
+    "geonameid": 360630,
+    "searchQuery": "Cairo",
+    "sample": "original"
+  },
+  {
+    "name": "Warsaw",
+    "country": "Poland",
+    "continent": "Europe",
+    "lat": 52.22977,
+    "lng": 21.01178,
+    "geonameid": 756135,
+    "searchQuery": "Warszawa",
+    "sample": "original"
+  },
+  {
+    "name": "Istanbul",
+    "country": "Turkey",
+    "continent": "Europe",
+    "lat": 41.01384,
+    "lng": 28.94966,
+    "geonameid": 745044,
+    "searchQuery": "Istanbul",
+    "sample": "original"
+  },
+  {
+    "name": "Seoul",
+    "country": "South Korea",
+    "continent": "Asia",
+    "lat": 37.566,
+    "lng": 126.9784,
+    "geonameid": 1835848,
+    "searchQuery": "Seoul",
+    "sample": "original"
+  },
+  {
+    "name": "Shanghai",
+    "country": "China",
+    "continent": "Asia",
+    "lat": 31.22222,
+    "lng": 121.45806,
+    "geonameid": 1796236,
+    "searchQuery": "Shanghai",
+    "sample": "original"
+  },
+  {
+    "name": "Valladolid",
+    "country": "Spain",
+    "continent": "Europe",
+    "lat": 41.65541,
+    "lng": -4.72353,
+    "geonameid": 3106672,
+    "searchQuery": "Valladolid",
+    "sample": "original"
+  },
+  {
+    "name": "Mumbai",
+    "country": "India",
+    "continent": "Asia",
+    "lat": 19.07283,
+    "lng": 72.88261,
+    "geonameid": 1275339,
+    "searchQuery": "Mumbai",
+    "sample": "original"
+  },
+  {
+    "name": "Guadalajara",
+    "country": "Mexico",
+    "continent": "North America",
+    "lat": 20.67738,
+    "lng": -103.34749,
+    "geonameid": 4005539,
+    "searchQuery": "Guadalajara",
+    "sample": "added"
+  },
+  {
+    "name": "Mexico City",
+    "country": "Mexico",
+    "continent": "North America",
+    "lat": 19.42847,
+    "lng": -99.12766,
+    "geonameid": 3530597,
+    "searchQuery": "Mexico City",
+    "sample": "added"
+  },
+  {
+    "name": "Havana",
+    "country": "Cuba",
+    "continent": "North America",
+    "lat": 23.13302,
+    "lng": -82.38304,
+    "geonameid": 3553478,
+    "searchQuery": "Havana",
+    "sample": "added"
+  },
+  {
+    "name": "Toronto",
+    "country": "Canada",
+    "continent": "North America",
+    "lat": 43.70643,
+    "lng": -79.39864,
+    "geonameid": 6167865,
+    "searchQuery": "Toronto",
+    "sample": "added"
+  },
+  {
+    "name": "Bogotá",
+    "country": "Colombia",
+    "continent": "South America",
+    "lat": 4.60971,
+    "lng": -74.08175,
+    "geonameid": 3688689,
+    "searchQuery": "Bogotá",
+    "sample": "added"
+  },
+  {
+    "name": "Quito",
+    "country": "Ecuador",
+    "continent": "South America",
+    "lat": -0.22985,
+    "lng": -78.52495,
+    "geonameid": 3652462,
+    "searchQuery": "Quito",
+    "sample": "added"
+  },
+  {
+    "name": "Lima",
+    "country": "Peru",
+    "continent": "South America",
+    "lat": -12.04318,
+    "lng": -77.02824,
+    "geonameid": 3936456,
+    "searchQuery": "Lima",
+    "sample": "added"
+  },
+  {
+    "name": "São Paulo",
+    "country": "Brazil",
+    "continent": "South America",
+    "lat": -23.5475,
+    "lng": -46.63611,
+    "geonameid": 3448439,
+    "searchQuery": "São Paulo",
+    "sample": "added"
+  },
+  {
+    "name": "Buenos Aires",
+    "country": "Argentina",
+    "continent": "South America",
+    "lat": -34.61315,
+    "lng": -58.37723,
+    "geonameid": 3435910,
+    "searchQuery": "Buenos Aires",
+    "sample": "added"
+  },
+  {
+    "name": "Santiago",
+    "country": "Chile",
+    "continent": "South America",
+    "lat": -33.45694,
+    "lng": -70.64827,
+    "geonameid": 3871336,
+    "searchQuery": "Santiago",
+    "sample": "added"
+  },
+  {
+    "name": "Nairobi",
+    "country": "Kenya",
+    "continent": "Africa",
+    "lat": -1.28333,
+    "lng": 36.81667,
+    "geonameid": 184745,
+    "searchQuery": "Nairobi",
+    "sample": "added"
+  },
+  {
+    "name": "Cape Town",
+    "country": "South Africa",
+    "continent": "Africa",
+    "lat": -33.92584,
+    "lng": 18.42322,
+    "geonameid": 3369157,
+    "searchQuery": "Cape Town",
+    "sample": "added"
+  },
+  {
+    "name": "Lagos",
+    "country": "Nigeria",
+    "continent": "Africa",
+    "lat": 6.45407,
+    "lng": 3.39467,
+    "geonameid": 2332459,
+    "searchQuery": "Lagos",
+    "sample": "added"
+  },
+  {
+    "name": "Casablanca",
+    "country": "Morocco",
+    "continent": "Africa",
+    "lat": 33.58831,
+    "lng": -7.61138,
+    "geonameid": 2553604,
+    "searchQuery": "Casablanca",
+    "sample": "added"
+  },
+  {
+    "name": "Addis Ababa",
+    "country": "Ethiopia",
+    "continent": "Africa",
+    "lat": 9.02497,
+    "lng": 38.74689,
+    "geonameid": 344979,
+    "searchQuery": "Addis Ababa",
+    "sample": "added"
+  },
+  {
+    "name": "Taipei",
+    "country": "Taiwan",
+    "continent": "Asia",
+    "lat": 25.05306,
+    "lng": 121.52639,
+    "geonameid": 1668341,
+    "searchQuery": "Taipei",
+    "sample": "added"
+  },
+  {
+    "name": "Denpasar",
+    "country": "Indonesia",
+    "continent": "Asia",
+    "lat": -8.65,
+    "lng": 115.21667,
+    "geonameid": 1645528,
+    "searchQuery": "Denpasar",
+    "sample": "added"
+  },
+  {
+    "name": "Singapore",
+    "country": "Singapore",
+    "continent": "Asia",
+    "lat": 1.28967,
+    "lng": 103.85007,
+    "geonameid": 1880252,
+    "searchQuery": "Singapore",
+    "sample": "added"
+  },
+  {
+    "name": "Bangkok",
+    "country": "Thailand",
+    "continent": "Asia",
+    "lat": 13.75398,
+    "lng": 100.50144,
+    "geonameid": 1609350,
+    "searchQuery": "Bangkok",
+    "sample": "added"
+  },
+  {
+    "name": "Almaty",
+    "country": "Kazakhstan",
+    "continent": "Asia",
+    "lat": 43.25249,
+    "lng": 76.9115,
+    "geonameid": 1526384,
+    "searchQuery": "Almaty",
+    "sample": "added"
+  },
+  {
+    "name": "Sydney",
+    "country": "Australia",
+    "continent": "Oceania",
+    "lat": -33.86785,
+    "lng": 151.20732,
+    "geonameid": 2147714,
+    "searchQuery": "Sydney",
+    "sample": "added"
+  },
+  {
+    "name": "Perth",
+    "country": "Australia",
+    "continent": "Oceania",
+    "lat": -31.95224,
+    "lng": 115.8614,
+    "geonameid": 2063523,
+    "searchQuery": "Perth",
+    "sample": "added"
+  },
+  {
+    "name": "Auckland",
+    "country": "New Zealand",
+    "continent": "Oceania",
+    "lat": -36.84853,
+    "lng": 174.76349,
+    "geonameid": 2193733,
+    "searchQuery": "Auckland",
+    "sample": "added"
+  },
+  {
+    "name": "Honolulu",
+    "country": "United States",
+    "continent": "Oceania",
+    "lat": 21.30694,
+    "lng": -157.85833,
+    "geonameid": 5856195,
+    "searchQuery": "Honolulu",
+    "sample": "added"
+  },
+  {
+    "name": "Reykjavík",
+    "country": "Iceland",
+    "continent": "Europe",
+    "lat": 64.13548,
+    "lng": -21.89541,
+    "geonameid": 3413829,
+    "searchQuery": "Reykjavik",
+    "sample": "added"
+  }
+]
