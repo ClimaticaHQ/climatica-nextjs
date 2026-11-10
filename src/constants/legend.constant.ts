@@ -1,5 +1,6 @@
 // * one legend for every chart, on screen and in exports
 export const CHART_LEGEND = {
+  // * the base size: exports draw it as is, the screen scales it with the text (ChartLegend)
   FONT_SIZE: 13,
   // * the swatch box scales with the text: width and height as multiples of the font size
   SWATCH_WIDTH_RATIO: 1.25,
