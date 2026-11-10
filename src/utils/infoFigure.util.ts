@@ -1,4 +1,4 @@
-import { WALTER_LIETH_FROST } from "@/constants";
+import { CHART_TEXT_MIN_PX, WALTER_LIETH_FROST } from "@/constants";
 import { EAnnotationBand, EFigureAnchor } from "@/enums";
 import type {
   TAnnotationBands,
@@ -11,10 +11,12 @@ import type {
   TFigureMonthReading,
   TLayoutAnnotationsArgs,
   TMonthlyTemperature,
+  TScaleAnnotationLayoutArgs,
   TSpreadArgs,
   TTopAnnotationNumber,
 } from "@/types";
 import { getMonthlyMean } from "./monthlyClimate.util";
+import { scaleChartFont } from "./textSize.util";
 import { isAridMonth, toPrecipAxisValue } from "./walterLieth.util";
 
 /** The months with every value, and their mean temperature. */
@@ -100,6 +102,26 @@ export function spreadPositions({ wanted, min, max, gap }: TSpreadArgs): number[
     result[index] = placed[sortedIndex] ?? 0;
   });
   return result;
+}
+
+/**
+ * The annotation layout at a text scale: the numbers grow with the text, and the bands with
+ * them, so a number never meets the plot; a bracket's tick is a line and stays.
+ */
+export function scaleAnnotationLayout({ layout, textScale }: TScaleAnnotationLayoutArgs) {
+  const scale = (value: number) => Math.round(value * textScale);
+  return {
+    ...layout,
+    topBand: scale(layout.topBand),
+    bottomBand: scale(layout.bottomBand),
+    numberRadius: scale(layout.numberRadius),
+    numberFontSize: scaleChartFont({
+      size: layout.numberFontSize,
+      textScale,
+      min: CHART_TEXT_MIN_PX.TEXT,
+    }),
+    numberGap: scale(layout.numberGap),
+  };
 }
 
 /**

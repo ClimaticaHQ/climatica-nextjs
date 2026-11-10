@@ -1,4 +1,6 @@
 import {
+  BASE_TEXT_SCALE,
+  CHART_TEXT_MIN_PX,
   CHART_MONTH_LABEL_MIN_WIDE_SLOT_PX,
   CHART_PLOT,
   CHART_X_AXIS,
@@ -7,15 +9,18 @@ import {
   WALTER_LIETH_MONTH_FORMAT,
 } from "@/constants";
 import type {
-  TAnnotationBands,
+  TAxisSizeArgs,
   TAxisTicksArgs,
+  TChartMarginArgs,
   TMonthLabelFormat,
+  TMonthLabelFormatArgs,
   TPlotHeightArgs,
   TStandardYAxesArgs,
   TUnitTitlePlacementArgs,
   TWalterLiethScales,
 } from "@/types";
 import { getPrecipitationTicks, getTemperatureTicks } from "./axisTicks.util";
+import { scaleChartFont } from "./textSize.util";
 import { getFrostBandHeight } from "./walterLieth.util";
 
 // * axis helpers shared by the WL diagram and the standard chart's split panels, so both chart
@@ -26,21 +31,26 @@ import { getFrostBandHeight } from "./walterLieth.util";
  * at the cell boundaries), labels below the band's reserved room — the same in both chart
  * types, frost or not, so their plot areas always match.
  */
-export function getXAxisProps(isCompact: boolean) {
+export function getXAxisProps({ isCompact, textScale = BASE_TEXT_SCALE }: TAxisSizeArgs) {
   const band = getFrostBandHeight(isCompact);
   return {
     tickLine: false,
     tickMargin: CHART_X_AXIS.TICK_MARGIN + band,
-    height: CHART_X_AXIS.HEIGHT + band,
+    height: Math.round(CHART_X_AXIS.HEIGHT * textScale) + band,
   } as const;
 }
 
-/** A chart's margin: the shared one, plus any room kept for annotations above and below. */
-export function getChartMargin(bands: TAnnotationBands | undefined) {
+/**
+ * A chart's margin: the shared one, its top (the °C / mm titles' room) scaled with the text,
+ * plus any room kept for annotations above and below.
+ */
+export function getChartMargin({ bands, textScale = BASE_TEXT_SCALE }: TChartMarginArgs = {}) {
   const { MARGIN } = CHART_PLOT;
-  return bands === undefined
-    ? MARGIN
-    : { ...MARGIN, top: MARGIN.top + bands.top, bottom: MARGIN.bottom + bands.bottom };
+  return {
+    ...MARGIN,
+    top: Math.round(MARGIN.top * textScale) + (bands?.top ?? 0),
+    bottom: MARGIN.bottom + (bands?.bottom ?? 0),
+  };
 }
 
 /** Whether the °C axis runs from below 0 to above it, so a 0 °C line falls inside the plot. */
@@ -67,14 +77,21 @@ const axisSize = (isCompact: boolean, isNarrow: boolean) =>
 
 /**
  * Tick text and y-axis geometry: compact diagrams (a split panel) get narrower margins and
- * smaller text; a phone's full-width chart narrower margins (isNarrow).
+ * smaller text; a phone's full-width chart narrower margins (isNarrow). The text follows the text
+ * scale down to its floor (CHART_TEXT_MIN_PX.TICK), and the width follows the text, so a tick
+ * label is never clipped.
  */
-export function getAxisStyle(isCompact: boolean, isNarrow = false) {
+export function getAxisStyle({
+  isCompact,
+  isNarrow = false,
+  textScale = BASE_TEXT_SCALE,
+}: TAxisSizeArgs) {
   const size = axisSize(isCompact, isNarrow);
+  const fontSize = scaleChartFont({ size: size.font, textScale, min: CHART_TEXT_MIN_PX.TICK });
   return {
-    width: size.width,
+    width: Math.ceil((size.width * fontSize) / size.font),
     tick: {
-      fontSize: size.font,
+      fontSize,
       fill: "var(--color-text-secondary)",
     },
     tickLine: false,
@@ -84,9 +101,11 @@ export function getAxisStyle(isCompact: boolean, isNarrow = false) {
 }
 
 /** Unit title (°C / mm) font size: a step above the axis' tick text. */
-export function getUnitTitleFontSize(isCompact: boolean, isNarrow = false) {
-  return (
-    getAxisStyle(isCompact, isNarrow).tick.fontSize + WALTER_LIETH_AXIS.UNIT_LABEL_SIZE_INCREMENT
+export function getUnitTitleFontSize(args: TAxisSizeArgs) {
+  const { textScale = BASE_TEXT_SCALE } = args;
+  return Math.max(
+    CHART_TEXT_MIN_PX.TEXT,
+    getAxisStyle(args).tick.fontSize + WALTER_LIETH_AXIS.UNIT_LABEL_SIZE_INCREMENT * textScale,
   );
 }
 
@@ -94,13 +113,8 @@ export function getUnitTitleFontSize(isCompact: boolean, isNarrow = false) {
  * A unit title's anchor, from the plot geometry: °C starts at the left axis (the plot's left
  * edge), mm ends at the right one — both over the plot box, never past the chart's edges.
  */
-export function getUnitTitlePlacement({
-  side,
-  chartWidth,
-  isCompact,
-  isNarrow = false,
-}: TUnitTitlePlacementArgs) {
-  const margin = getPlotMargin(isCompact, isNarrow);
+export function getUnitTitlePlacement({ side, chartWidth, ...axis }: TUnitTitlePlacementArgs) {
+  const margin = getPlotMargin(axis);
   const placements = {
     left: { x: margin, textAnchor: "start" },
     right: { x: chartWidth - margin, textAnchor: "end" },
@@ -124,20 +138,21 @@ export function resolveActiveTooltipIndex(
  * Short month labels while the chart is wide enough for them, one letter otherwise — always one
  * letter on a phone (isNarrow), where the full names live in the tooltip.
  */
-export function getMonthLabelFormat(
-  chartWidth: number | null,
+export function getMonthLabelFormat({
+  chartWidth,
   isNarrow = false,
-): TMonthLabelFormat {
+  textScale = BASE_TEXT_SCALE,
+}: TMonthLabelFormatArgs): TMonthLabelFormat {
+  const minSlot = CHART_MONTH_LABEL_MIN_WIDE_SLOT_PX * textScale;
   const isWide =
     !isNarrow &&
-    (chartWidth === null ||
-      chartWidth / WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR >= CHART_MONTH_LABEL_MIN_WIDE_SLOT_PX);
+    (chartWidth === null || chartWidth / WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR >= minSlot);
   return isWide ? WALTER_LIETH_MONTH_FORMAT.WIDE : WALTER_LIETH_MONTH_FORMAT.NARROW;
 }
 
 /** A plot's side margin: its y axis' width (no chart margin beside it) — the same both sides. */
-export function getPlotMargin(isCompact: boolean, isNarrow = false) {
-  return getAxisStyle(isCompact, isNarrow).width + CHART_PLOT.MARGIN.left;
+export function getPlotMargin(args: TAxisSizeArgs) {
+  return getAxisStyle(args).width + CHART_PLOT.MARGIN.left;
 }
 
 // * a tick step's mantissas, smallest first (× a power of ten): fine enough that four ticks hug

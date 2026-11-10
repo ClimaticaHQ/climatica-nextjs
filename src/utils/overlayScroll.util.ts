@@ -15,9 +15,10 @@ export function getOverlayScroll({
   gap,
   minGap = gap,
   isNarrow = false,
+  textScale,
   minBand,
 }: TOverlayScrollArgs): TOverlayScroll {
-  const axes = getPlotMargin(false, isNarrow) * 2;
+  const axes = getPlotMargin({ isCompact: false, isNarrow, textScale }) * 2;
   // * an adaptive gap is at its floor at the minimum bar width (getOverlayGap); a phone's bars
   // * have a fixed band
   const band = minBand ?? getMinOverlayBand(entityCount, minGap);

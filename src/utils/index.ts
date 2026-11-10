@@ -54,6 +54,7 @@ export * from "./bottomSheet.util";
 export * from "./focus.util";
 export * from "./filterChips.util";
 export * from "./theme.util";
+export * from "./textSize.util";
 export * from "./pair.util";
 export * from "./seriesShape.util";
 export * from "./apiError.util";

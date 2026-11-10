@@ -1,7 +1,8 @@
-import { LEGACY_THEME_STORAGE_KEYS } from "@/constants";
+import { LEGACY_THEME_STORAGE_KEYS, SETTINGS_DEFAULTS } from "@/constants";
 import type { TKeyValueStorage, TSettings, TSettingsState, TSettingsStorage } from "@/types";
 import { isUpdateFlashVariant } from "./motion.util";
 import { isBarStyle } from "./overlayBars.util";
+import { isTextSize } from "./textSize.util";
 import { isTheme } from "./theme.util";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -18,6 +19,7 @@ export function mergePersistedSettings(
   if (!isRecord(persisted)) return current;
   const settings: TSettings = {
     theme: isTheme(persisted["theme"]) ? persisted["theme"] : current.theme,
+    textSize: isTextSize(persisted["textSize"]) ? persisted["textSize"] : current.textSize,
     animationsEnabled: pickBoolean(persisted["animationsEnabled"], current.animationsEnabled),
     updateFlashVariant: isUpdateFlashVariant(persisted["updateFlashVariant"])
       ? persisted["updateFlashVariant"]
@@ -37,6 +39,7 @@ export function mergePersistedSettings(
 export function getPersistedSettings(state: TSettingsState): TSettings {
   return {
     theme: state.theme,
+    textSize: state.textSize,
     animationsEnabled: state.animationsEnabled,
     updateFlashVariant: state.updateFlashVariant,
     autoApplyFilters: state.autoApplyFilters,
@@ -57,13 +60,14 @@ export function readLegacyTheme(storage: TKeyValueStorage) {
 }
 
 /**
- * Version 0 → 1: the settings saved before (no theme) plus the theme from its old key. Values
- * are validated afterwards (mergePersistedSettings), so anything odd falls back to the default.
+ * Version 0 → 1: the settings saved before (no theme) plus the theme from its old key; 1 → 2: the
+ * default text size. Values are validated afterwards (mergePersistedSettings), so anything odd
+ * falls back to the default.
  */
 export function migrateSettings(persisted: unknown, version: number, legacyTheme: string | null) {
   const saved = isRecord(persisted) ? persisted : {};
-  if (version >= 1) return saved;
-  return legacyTheme === null ? saved : { ...saved, theme: legacyTheme };
+  const withTheme = version >= 1 || legacyTheme === null ? saved : { ...saved, theme: legacyTheme };
+  return version >= 2 ? withTheme : { textSize: SETTINGS_DEFAULTS.textSize, ...withTheme };
 }
 
 /**
