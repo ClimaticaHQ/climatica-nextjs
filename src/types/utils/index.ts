@@ -17,3 +17,7 @@ export type * from "./pair.type";
 export type * from "./radioGroup.type";
 export * from "./info.type";
 export * from "./infoFigure.type";
+export type * from "./navbarFit.type";
+export type * from "./textSize.type";
+export type * from "./stepSlider.type";
+export type * from "./segmentedControl.type";

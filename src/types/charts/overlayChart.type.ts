@@ -13,6 +13,8 @@ export type TOverlayScrollArgs = {
   minGap?: number;
   /** a phone: the narrow axes' widths */
   isNarrow?: boolean;
+  /** the effective text scale: wider axes */
+  textScale?: number;
   /** a fixed month band (a phone's overlay, getPhoneOverlayBars); absent: getMinOverlayBand */
   minBand?: number;
 };

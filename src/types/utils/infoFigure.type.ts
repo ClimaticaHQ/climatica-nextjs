@@ -22,8 +22,15 @@ export type TAnnotationLayout = {
   topBand: number;
   bottomBand: number;
   numberRadius: number;
+  numberFontSize: number;
   numberGap: number;
   bracketTick: number;
+};
+
+export type TScaleAnnotationLayoutArgs = {
+  layout: TAnnotationLayout;
+  /** the effective text scale (useTextScale) */
+  textScale: number;
 };
 
 export type TAnnotationBandsArgs = {

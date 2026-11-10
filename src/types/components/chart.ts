@@ -1,5 +1,6 @@
 import type { EWalterLiethSeriesId } from "@/enums";
 import type { ReactNode } from "react";
+import type { TAnnotationBands } from "../charts/chartOverlay.type";
 import { TClimatePeriod } from "../api";
 import { TDataset, TMonthlyTemperature } from "../domain";
 
@@ -64,11 +65,30 @@ export type TPanelHeaderSlots = {
 /** Which axis a unit title (°C / mm) belongs to. */
 export type TUnitTitleSide = "left" | "right";
 
-export type TUnitTitlePlacementArgs = {
-  side: TUnitTitleSide;
-  chartWidth: number;
+/** A chart's axis sizes: by the chart's room, then scaled with the text. */
+export type TAxisSizeArgs = {
   /** one panel of a split pair — the compact margins */
   isCompact: boolean;
   /** a phone: the narrow axes */
-  isNarrow?: boolean;
+  isNarrow?: boolean | undefined;
+  /** the effective text scale (useTextScale); absent: 1, the exports' fixed sizes */
+  textScale?: number | undefined;
+};
+
+export type TUnitTitlePlacementArgs = TAxisSizeArgs & {
+  side: TUnitTitleSide;
+  chartWidth: number;
+};
+
+export type TChartMarginArgs = {
+  /** room kept for annotations above and below the plot */
+  bands?: TAnnotationBands | undefined;
+  textScale?: number | undefined;
+};
+
+export type TMonthLabelFormatArgs = {
+  /** the chart's measured width; null before it's measured */
+  chartWidth: number | null;
+  isNarrow?: boolean | undefined;
+  textScale?: number | undefined;
 };
