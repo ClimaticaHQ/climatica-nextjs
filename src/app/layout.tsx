@@ -1,4 +1,9 @@
-import { APP_TITLE, MOTION_CSS_VARIABLES, THEME_INIT_SCRIPT } from "@/constants";
+import {
+  APP_TITLE,
+  MOTION_CSS_VARIABLES,
+  TEXT_SIZE_INIT_SCRIPT,
+  THEME_INIT_SCRIPT,
+} from "@/constants";
 import { AppLayout } from "@/layouts";
 import { env } from "@/libs/Env";
 import "@/styles/global.css";
@@ -27,7 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang={locale}
-      // * the head script sets the theme class before React hydrates
+      // * the head scripts set the theme class and the text scale before React hydrates
       suppressHydrationWarning
       data-scroll-behavior="smooth"
       // * the motion settings, for src/styles/animations.css
@@ -35,6 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: TEXT_SIZE_INIT_SCRIPT }} />
       </head>
       <body>
         <Providers>

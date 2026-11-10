@@ -10,7 +10,7 @@ export default async function NotFoundPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-4 bg-[var(--color-surface)] text-center">
       <h1 className="relative flex items-center justify-center">
-        <span className="text-[120px] font-bold text-[var(--color-brand)] opacity-10 leading-none select-none">
+        <span className="text-[7.5rem] font-bold text-[var(--color-brand)] opacity-10 leading-none select-none">
           404
         </span>
         <span className="absolute text-[length:var(--font-2xl)] font-bold text-[var(--color-brand)]">

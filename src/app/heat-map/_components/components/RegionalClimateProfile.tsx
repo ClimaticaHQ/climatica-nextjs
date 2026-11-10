@@ -16,7 +16,7 @@ export function RegionalClimateProfile({
 
   if (isLoading) {
     return (
-      <div className="h-[52px] animate-pulse rounded-[var(--radius-md)] bg-[var(--color-surface-secondary)]" />
+      <div className="min-h-13 animate-pulse rounded-[var(--radius-md)] bg-[var(--color-surface-secondary)]" />
     );
   }
 

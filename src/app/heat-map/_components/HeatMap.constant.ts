@@ -19,7 +19,8 @@ export const STATS_LEGEND_BAR_CLASSES = {
   GRADIENT: "h-2.5 w-full rounded sm:h-3",
   GRADIENT_LABELS: "mt-1 flex justify-between",
   GRADIENT_LABEL: "text-[length:var(--font-xs)] text-[var(--color-text-secondary)]",
-  SUBTITLE: "truncate",
+  // * wraps rather than cuts: a narrow cell (or larger text) takes it onto two lines
+  SUBTITLE: "block",
 } as const;
 
 export const STATS_LEGEND_GRADIENT_STOPS = 10;
