@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/Card";
 import { PageLayout } from "@/components/page";
+import { ECardPadding } from "@/enums";
 import { useTranslations } from "next-intl";
 import { AppearanceSettings } from "./components/AppearanceSettings";
 import { BehaviourSettings } from "./components/BehaviourSettings";
@@ -17,12 +18,10 @@ export function SettingsView({ page }: TSettingsViewProps) {
       title={t("pages.settings.title")}
       description={t("pages.settings.description")}
       main={
-        <Card className={C.CARD}>
-          <div className={C.GROUPS}>
-            <LanguageSettings page={page} />
-            <AppearanceSettings page={page} />
-            <BehaviourSettings page={page} />
-          </div>
+        <Card padding={ECardPadding.NONE} className={C.CARD}>
+          <LanguageSettings page={page} />
+          <AppearanceSettings page={page} />
+          <BehaviourSettings page={page} />
         </Card>
       }
     />

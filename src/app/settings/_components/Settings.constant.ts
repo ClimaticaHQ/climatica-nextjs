@@ -1,6 +1,6 @@
 import { FlashBorderIcon, FlashGlowIcon, MonitorIcon, MoonIcon, SunIcon } from "@/components/svg";
 import { FOCUS_RING_CLASS } from "@/constants";
-import { ETheme, EUpdateFlashVariant } from "@/enums";
+import { ESettingsControlPlacement, ETextSize, ETheme, EUpdateFlashVariant } from "@/enums";
 import type { TBarStyleOption } from "./Settings.type";
 
 // * each section's title id — the section is named by it
@@ -14,6 +14,30 @@ export const THEME_OPTIONS = [
   { value: ETheme.LIGHT, labelKey: "settings.themeOptions.light", Icon: SunIcon },
   { value: ETheme.DARK, labelKey: "settings.themeOptions.dark", Icon: MoonIcon },
   { value: ETheme.SYSTEM, labelKey: "settings.themeOptions.system", Icon: MonitorIcon },
+] as const;
+
+// * the text size slider's steps, smallest first
+export const TEXT_SIZE_OPTIONS = [
+  {
+    value: ETextSize.SMALLER,
+    labelKey: "settings.textSizeOptions.smaller",
+  },
+  {
+    value: ETextSize.SMALL,
+    labelKey: "settings.textSizeOptions.small",
+  },
+  {
+    value: ETextSize.DEFAULT,
+    labelKey: "settings.textSizeOptions.default",
+  },
+  {
+    value: ETextSize.LARGE,
+    labelKey: "settings.textSizeOptions.large",
+  },
+  {
+    value: ETextSize.LARGER,
+    labelKey: "settings.textSizeOptions.larger",
+  },
 ] as const;
 
 export const UPDATE_HIGHLIGHT_OPTIONS = [
@@ -111,45 +135,96 @@ export const SETTINGS_ROW_IDS = {
   BAR_STYLE: "settings-chart-bar-style",
 } as const;
 
-export const SETTINGS_CLASSES = {
-  // * one readable column — a label this far from its control is hard to follow on a wide screen
-  CARD: "mx-auto w-full max-w-2xl",
-  GROUPS: "flex flex-col divide-y divide-[var(--color-border)]",
-  GROUP: "py-5 first:pt-1 last:pb-1",
-  HEADING: "mb-1 text-[length:var(--font-md)] font-semibold text-[var(--color-text)]",
-  // * every row the same height rhythm, a hairline between rows
-  ROWS: "flex flex-col divide-y divide-[var(--color-border)] *:py-3 *:last:pb-0",
-  ROW: "flex items-center justify-between gap-4",
-  // * a control too wide to sit beside its label on a phone: under it there, centred
-  ROW_WIDE:
-    "flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4",
-  CONTROL_WIDE: "self-center sm:self-auto",
-  TEXT: "flex min-w-0 flex-col gap-0.5",
-  LABEL: "text-[length:var(--font-sm)] text-[var(--color-text)]",
-  DESCRIPTION: "text-[length:var(--font-xs)] text-[var(--color-text-secondary)]",
-  DISABLED_LABEL: "opacity-50",
-  // * the description and the disabled hint share one cell, so the row is as tall as the longer
-  // * of the two whichever shows
-  TEXT_STACK: "grid *:col-start-1 *:row-start-1",
-  HIDDEN_TEXT: "invisible",
-  // * the sub-settings: indented under their parent behind a thin line, no divider between
-  DEPENDENT: "flex flex-col gap-3",
-  DEPENDENT_CHILDREN: "ml-2 flex flex-col gap-3 border-l border-[var(--color-border)] pl-4",
+// * each row's description id — its control is described by it
+export const SETTINGS_DESCRIPTION_IDS = {
+  TEXT_SIZE: "settings-text-size-description",
+  UPDATE_HIGHLIGHT: "settings-update-highlight-description",
+  BAR_STYLE: "settings-chart-bar-style-description",
 } as const;
 
-// * the bar style cards: macOS Appearance-style on desktop (the selected thumbnail ringed, its
-// * name bold); below `sm` iOS-style, a round indicator under each name
+// * the line between sections and between rows, one source for both: a top band of the
+// * background — a border can't be thinner than 1 CSS px, this is one device pixel on a
+// * high-density screen. None above the first
+const HAIRLINE =
+  "bg-[linear-gradient(var(--color-divider),var(--color-divider))] bg-[length:100%_var(--divider-width)] bg-top bg-no-repeat first:bg-none";
+
+// * a row's least height, whatever its control: a label and a description, or a 44px target in
+// * its track
+const ROW_MIN_HEIGHT = "min-h-[max(3rem,48px)]";
+
+// * flat: one card, no shadows anywhere
+export const SETTINGS_CLASSES = {
+  // * one readable column — a label this far from its control is hard to follow on a wide screen
+  CARD: "mx-auto w-full max-w-[40rem] px-4 sm:px-7 sm:py-1",
+  SECTION: `${HAIRLINE} py-4 sm:py-5`,
+  HEADING:
+    "mb-1 text-[length:var(--font-md)] font-semibold text-[var(--color-text)] sm:text-[length:var(--font-reading-card-title)]",
+  ROW: `${HAIRLINE} py-2.5 sm:py-3`,
+  // * a switch labels itself across the whole row
+  ROW_SELF_LABELLED: `grid ${ROW_MIN_HEIGHT}`,
+  ROW_CONTENT: `flex ${ROW_MIN_HEIGHT} justify-between gap-x-4 gap-y-1 sm:gap-y-3`,
+  // * FIT (a wide control): it sits beside the label while both fit at their natural widths (the
+  // * label's basis is its own width), else it goes under it and takes the row's width (it grows;
+  // * beside the label, the label takes the free space). Below `sm` the text block dissolves
+  // * (contents): label and control on one line, the description under both across the row —
+  // * under the control once that has wrapped. The control's line is the label's line height,
+  // * the control centred on it and overflowing it, so it never pushes the description down (its
+  // * 44px target is touch-target's); wrapped, it takes its own height. BESIDE (a narrow control): always on the right of the
+  // * stacked label and description. BELOW: always under them
+  PLACEMENT: {
+    [ESettingsControlPlacement.FIT]: {
+      CONTENT: "flex-wrap items-center *:last:grow",
+      TEXT: "max-sm:contents",
+      LABEL: "max-sm:flex-[1000_1_auto]",
+      DESCRIPTION: "max-sm:order-last max-sm:basis-full",
+      CONTROL: "*:grow max-sm:flex max-sm:items-center sm:contents",
+      // * measured (useIsWrapped): CSS can't tell a wrapped flex item from one beside
+      CONTROL_BESIDE: "max-sm:h-[calc(var(--font-sm)*1.6)]",
+      CONTROL_WRAPPED: "max-sm:mt-1",
+    },
+    [ESettingsControlPlacement.BESIDE]: {
+      CONTENT: "items-center",
+      TEXT: "max-sm:gap-1",
+      LABEL: "",
+      DESCRIPTION: "",
+      CONTROL: "contents",
+      CONTROL_BESIDE: "",
+      CONTROL_WRAPPED: "",
+    },
+    [ESettingsControlPlacement.BELOW]: {
+      CONTENT: "flex-col max-sm:gap-y-3",
+      TEXT: "max-sm:gap-1",
+      LABEL: "",
+      DESCRIPTION: "",
+      CONTROL: "contents",
+      CONTROL_BESIDE: "",
+      CONTROL_WRAPPED: "",
+    },
+  },
+  TEXT: "flex min-w-0 flex-[1000_1_auto] flex-col gap-0.5",
+  LABEL: "text-[length:var(--font-sm)] text-[var(--color-text)]",
+  // * no width of its own (w-0, then the text's): it wraps under the label instead of widening the
+  // * text past the control
+  DESCRIPTION: "w-0 min-w-full text-[length:var(--font-xs)] text-[var(--color-text-secondary)]",
+  DISABLED_LABEL: "opacity-50",
+} as const;
+
+const BAR_STYLE_NAME = "whitespace-nowrap text-center text-[length:var(--font-xs)]";
+
+// * the bar style cards: from `sm` macOS Appearance-style (the selected thumbnail ringed — an
+// * outline: no shadow); below `sm` iOS-style, a round indicator under each name. The selected
+// * name in primary at every width; below ~22rem the cards shrink
 export const BAR_STYLE_PICKER_CLASSES = {
-  // * below `sm` the three share the row, each thumbnail scaled to its third; from `sm` at size
-  GROUP: "flex w-full max-w-sm items-start gap-2 sm:w-auto sm:max-w-none sm:shrink-0 sm:gap-3",
-  CARD: `${FOCUS_RING_CLASS} group flex min-w-0 flex-1 cursor-pointer flex-col items-center gap-1.5 rounded-[var(--radius-sm)] p-1 sm:flex-none`,
-  PREVIEW: "block h-auto w-full sm:w-auto",
+  // * equal thirds, each at least as wide as its name on one line (a word is never broken)
+  GROUP: "grid grid-cols-[repeat(3,minmax(min-content,1fr))] gap-2",
+  CARD: `${FOCUS_RING_CLASS} group flex min-h-target min-w-0 cursor-pointer flex-col items-center gap-1.5 rounded-[var(--radius-sm)] p-1`,
+  PREVIEW: "block h-auto w-full",
   THUMB:
-    "block w-full overflow-hidden rounded-[var(--radius-xs)] border border-[var(--color-border)] bg-[var(--color-surface)] transition-shadow duration-150 sm:w-auto",
+    "block w-full max-w-[122px] overflow-hidden rounded-[var(--radius-xs)] border border-[var(--color-border)] bg-[var(--color-surface)]",
   THUMB_SELECTED:
-    "sm:ring-2 sm:ring-[var(--color-primary)] sm:ring-offset-2 sm:ring-offset-[var(--color-surface)]",
-  NAME: "text-[length:var(--font-xs)] text-[var(--color-text-secondary)] group-hover:text-[var(--color-text)]",
-  NAME_SELECTED: "text-[length:var(--font-xs)] font-semibold text-[var(--color-text)]",
+    "sm:outline-2 sm:outline-offset-2 sm:outline-solid sm:outline-[var(--color-primary)]",
+  NAME: `${BAR_STYLE_NAME} text-[var(--color-text-secondary)] group-hover:text-[var(--color-text)]`,
+  NAME_SELECTED: `${BAR_STYLE_NAME} font-semibold text-[var(--color-primary)]`,
   INDICATOR:
     "flex size-5 items-center justify-center rounded-full border border-[var(--color-border)] sm:hidden",
   INDICATOR_SELECTED:
