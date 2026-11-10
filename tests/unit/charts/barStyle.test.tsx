@@ -212,7 +212,7 @@ describe("bar style: gaps", () => {
       const { gap, minGap } = OVERLAY_BAR_STYLES.plain;
       const scroll = (availableWidth: number) =>
         getOverlayScroll({ availableWidth, entityCount: count, gap, minGap }).isOverflowing;
-      const fit = min("plain") * 12 + getPlotMargin(false) * 2;
+      const fit = min("plain") * 12 + getPlotMargin({ isCompact: false }) * 2;
       expect(scroll(fit)).toBe(false);
       expect(scroll(fit - 2)).toBe(true);
     }
