@@ -17,13 +17,25 @@ import type { TDatasetSelections } from "../stores/datasetSelectionStore.type";
 export type TFilterUnavailableReason =
   EFilterAvailability.WALTER_LIETH | EFilterAvailability.HEAT_MAP;
 
+/**
+ * The resolution as chosen: a cell size the reader picked (or a URL names), or null — none
+ * chosen, so each view opens at its default (resolveGridSize).
+ */
+export type TGridSizeChoice = TCellSize | null;
+
+/** A dataset and climate period a view shows data for: a resolution must be offered for each. */
+export type TGridSizeContext = { dataset: TDataset; climatePeriod: TClimatePeriod };
+
+/** A climate period and the resolution it would load at in a view. */
+export type TPeriodGridSize = { climatePeriod: TClimatePeriod; gridSize: TCellSize };
+
 /** Every filter value — what the URL carries, parsed and normalized. */
 export type TFilters = {
   [EFilterKey.DATASET]: TDataset;
   [EFilterKey.CLIMATE_PERIOD]: TClimatePeriod;
   [EFilterKey.WEATHER_YEAR]: number;
   [EFilterKey.VARIABLES]: TVariable[];
-  [EFilterKey.GRID_SIZE]: TCellSize;
+  [EFilterKey.GRID_SIZE]: TGridSizeChoice;
   [EFilterKey.MONTHS]: TMonthFilter;
   [EFilterKey.CLIMATE_PERIOD_A]: TClimatePeriod;
   [EFilterKey.CLIMATE_PERIOD_B]: TClimatePeriod;
