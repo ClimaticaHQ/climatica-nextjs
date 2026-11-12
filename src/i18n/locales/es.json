@@ -637,7 +637,7 @@
         "illustrationLabel": "Esquema de dos celdas que contienen el mismo punto. {coarse}: la celda grande, entre sus vecinas. {fine}: la celda pequeña dentro de ella, con el punto.",
         "illustrationCaption": "Celdas que contienen el mismo punto a dos resoluciones (esquema, tamaños en el ecuador).",
         "calloutTitle": "Los valores cambian con la resolución: es lo esperable.",
-        "calloutText": "Elige la resolución más fina disponible para tu período si quieres describir un lugar concreto.",
+        "calloutText": "Cada período se abre con la resolución más fina disponible para él. Elige una resolución más gruesa para ver la media de un área mayor.",
         "cellLabel": "Celda de {size} (~{km} km)"
       },
       "resolutions": {

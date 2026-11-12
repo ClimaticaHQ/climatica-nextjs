@@ -637,7 +637,7 @@
         "illustrationLabel": "Schematic of two cells containing the same point. {coarse}: the large cell, among its neighbours. {fine}: the small cell inside it, holding the point.",
         "illustrationCaption": "Cells containing the same point at two resolutions (schematic, sizes at the equator).",
         "calloutTitle": "Values change with the resolution — this is expected.",
-        "calloutText": "Choose the finest resolution available for your period to describe a specific place.",
+        "calloutText": "Each period opens at the finest resolution available for it. Choose a coarser resolution to see the average over a larger area.",
         "cellLabel": "{size} cell (~{km} km)"
       },
       "resolutions": {

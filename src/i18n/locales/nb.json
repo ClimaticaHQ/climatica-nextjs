@@ -637,7 +637,7 @@
         "illustrationLabel": "Skisse av to celler som inneholder samme punkt. {coarse}: den store cellen, blant nabocellene. {fine}: den lille cellen inni den, med punktet.",
         "illustrationCaption": "Celler som inneholder samme punkt ved to oppløsninger (skisse, størrelser ved ekvator).",
         "calloutTitle": "Verdiene endres med oppløsningen – det er ventet.",
-        "calloutText": "Velg den fineste oppløsningen som finnes for perioden din, for å beskrive et bestemt sted.",
+        "calloutText": "Hver periode åpnes med den fineste oppløsningen som finnes for den. Velg en grovere oppløsning for å se gjennomsnittet over et større område.",
         "cellLabel": "{size}-celle (~{km} km)"
       },
       "resolutions": {

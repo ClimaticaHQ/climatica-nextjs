@@ -637,7 +637,7 @@
         "illustrationLabel": "Schéma de deux cellules contenant le même point. {coarse} : la grande cellule, parmi ses voisines. {fine} : la petite cellule à l'intérieur, qui contient le point.",
         "illustrationCaption": "Cellules contenant le même point à deux résolutions (schéma, tailles à l'équateur).",
         "calloutTitle": "Les valeurs changent avec la résolution : c'est normal.",
-        "calloutText": "Choisissez la résolution la plus fine disponible pour votre période pour décrire un lieu précis.",
+        "calloutText": "Chaque période s'ouvre à la résolution la plus fine disponible pour elle. Choisissez une résolution plus grossière pour voir la moyenne sur une zone plus vaste.",
         "cellLabel": "Cellule de {size} (~{km} km)"
       },
       "resolutions": {

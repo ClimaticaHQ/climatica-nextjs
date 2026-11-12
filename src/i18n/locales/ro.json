@@ -637,7 +637,7 @@
         "illustrationLabel": "Schema a două celule care conțin același punct. {coarse}: celula mare, printre vecinele ei. {fine}: celula mică din interiorul ei, cu punctul.",
         "illustrationCaption": "Celulele care conțin același punct la două rezoluții (schemă, dimensiuni la ecuator).",
         "calloutTitle": "Valorile se schimbă odată cu rezoluția — este de așteptat.",
-        "calloutText": "Alege cea mai fină rezoluție disponibilă pentru perioada ta ca să descrii un loc anume.",
+        "calloutText": "Fiecare perioadă se deschide la cea mai fină rezoluție disponibilă pentru ea. Alege o rezoluție mai grosieră ca să vezi media pe o suprafață mai mare.",
         "cellLabel": "Celulă de {size} (~{km} km)"
       },
       "resolutions": {

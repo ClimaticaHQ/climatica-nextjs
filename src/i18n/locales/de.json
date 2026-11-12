@@ -637,7 +637,7 @@
         "illustrationLabel": "Schema zweier Zellen, die denselben Punkt enthalten. {coarse}: die große Zelle, umgeben von ihren Nachbarn. {fine}: die kleine Zelle darin, mit dem Punkt.",
         "illustrationCaption": "Zellen, die denselben Punkt enthalten, bei zwei Auflösungen (schematisch, Größen am Äquator).",
         "calloutTitle": "Werte ändern sich mit der Auflösung – das ist zu erwarten.",
-        "calloutText": "Wählen Sie die feinste Auflösung, die es für Ihren Zeitraum gibt, um einen bestimmten Ort zu beschreiben.",
+        "calloutText": "Jeder Zeitraum öffnet mit der feinsten Auflösung, die es für ihn gibt. Wählen Sie eine gröbere Auflösung, um den Mittelwert über eine größere Fläche zu sehen.",
         "cellLabel": "{size}-Zelle (~{km} km)"
       },
       "resolutions": {
