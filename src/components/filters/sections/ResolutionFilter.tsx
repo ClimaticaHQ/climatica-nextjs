@@ -7,7 +7,7 @@ import {
   RESOLUTIONS_HELP_HREF,
 } from "@/constants";
 import { EFilterKey, EFilterNoteVariant } from "@/enums";
-import { getGridSizeOptionStates, toCellSizeHandler } from "@/utils/filters.util";
+import { getGridSizeOptionStates, resolveGridSize, toCellSizeHandler } from "@/utils/filters.util";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useContext } from "react";
@@ -23,13 +23,14 @@ import type { TFilterSectionRenderProps } from "../filters.type";
  */
 export function ResolutionFilter({
   values,
+  context,
   cellCount,
   isApplyBlocked,
   onChange,
 }: TFilterSectionRenderProps) {
   const t = useTranslations();
   const isTitleShown = useContext(FilterSectionTitleContext);
-  const options = getGridSizeOptionStates(values).map((option) => ({
+  const options = getGridSizeOptionStates(values, context.view).map((option) => ({
     value: option.value,
     label: t(`cellSizes.${option.value.replace(".", "_")}`),
     // * only 30 s is ever withheld — it exists for one climate period's normals alone
@@ -51,7 +52,9 @@ export function ResolutionFilter({
         )}
         <Dropdown
           options={options}
-          value={values.gridSize}
+          // * the grid the view loads: the choice, or (none chosen) the view's default. Picking
+          // * any option, the shown one too, makes it the reader's choice
+          value={resolveGridSize(values, context.view)}
           onChange={toCellSizeHandler((gridSize) => onChange(EFilterKey.GRID_SIZE, gridSize))}
           className="w-full"
         />

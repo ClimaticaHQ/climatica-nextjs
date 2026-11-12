@@ -19,6 +19,7 @@ import {
   getFilterAvailability,
   getSectionFilterKeys,
   isAppliedOnSelect,
+  resolveGridSize,
 } from "@/utils/filters.util";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
@@ -116,7 +117,8 @@ function getSingleContent(args: TFiltersSheetContentArgs): TFiltersSheetContent 
   // * an instant pick still waits when it'd load too many heat map cells — the section says why
   const handleChange: TFilterChangeHandler = (key, value) => {
     const next = filtersDraft.withFilter(key, value);
-    if (isInstant && !isHeatmapCellLimitExceeded(heatmapBbox, next.gridSize)) {
+    const gridSize = resolveGridSize(next, props.context.view);
+    if (isInstant && !isHeatmapCellLimitExceeded(heatmapBbox, gridSize)) {
       props.onApply(next, EFilterApplyMode.QUICK);
     } else filtersDraft.setFilter(key, value);
   };
