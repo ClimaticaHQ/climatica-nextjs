@@ -9,6 +9,7 @@ import {
   EFilterView,
 } from "@/enums";
 import type {
+  TCellSize,
   TFilterNoteRule,
   TFilters,
   TFilterNavigationModes,
@@ -37,8 +38,14 @@ export const FILTER_WEATHER_PERIODS_LIMITS = { MIN: MIN_PERIODS, MAX: MAX_PERIOD
 
 // * the period whose normals carry every variable and the 30s grid
 export const FULL_VARIABLES_CLIMATE_PERIOD = CLIMATE_PERIODS.C1970_2000;
-// * where the 30s grid falls back to when it isn't offered
-export const FALLBACK_GRID_SIZE = CELL_SIZES.TWO_POINT_FIVE_MINUTES;
+// * offered for every dataset and period: the last resort of the finest-offered search
+export const ALWAYS_OFFERED_GRID_SIZE = CELL_SIZES.TEN_MINUTES;
+
+// * a view whose default resolution isn't the finest offered: at 30″ almost any heat map region
+// * would pass the cell cap (FILTER_MAX_HEATMAP_CELLS), so it opens at 2.5′
+export const GRID_SIZE_VIEW_DEFAULTS: Partial<Record<EFilterView, TCellSize>> = {
+  [EFilterView.HEAT_MAP]: CELL_SIZES.TWO_POINT_FIVE_MINUTES,
+};
 
 // * the years Compare Periods opens with on the Weather dataset
 export const DEFAULT_WEATHER_PERIODS = [2021, 1967] as const;
@@ -48,7 +55,8 @@ export const FILTER_DEFAULTS: TFilters = {
   [EFilterKey.CLIMATE_PERIOD]: CLIMATE_PERIODS.C1970_2000,
   [EFilterKey.WEATHER_YEAR]: WEATHER_MAX_YEAR,
   [EFilterKey.VARIABLES]: [...DEFAULT_VARIABLES],
-  [EFilterKey.GRID_SIZE]: CELL_SIZES.TWO_POINT_FIVE_MINUTES,
+  // * none chosen: each view opens at its default (resolveGridSize), and the URL leaves `grid` out
+  [EFilterKey.GRID_SIZE]: null,
   [EFilterKey.MONTHS]: ALL_MONTHS,
   [EFilterKey.CLIMATE_PERIOD_A]: CLIMATE_PERIODS.C1970_2000,
   [EFilterKey.CLIMATE_PERIOD_B]: CLIMATE_PERIODS.C1991_2020,
