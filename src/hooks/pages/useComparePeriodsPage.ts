@@ -1,3 +1,4 @@
+import { resolveGridSize } from "@/utils/filters.util";
 import {
   COMPARE_PERIODS_SCROLL_OPTIONS,
   COMPARE_PERIODS_URL_SCHEMA,
@@ -13,7 +14,7 @@ import {
   WEATHER_MAX_YEAR,
   WEATHER_MIN_YEAR,
 } from "@/constants";
-import { ECitySlot, ECompareLayout, type ESortOrder } from "@/enums";
+import { ECitySlot, ECompareLayout, type ESortOrder, EFilterView } from "@/enums";
 import type { EWalterLiethShading } from "@/enums";
 import { useChartModel, useComparisonChartExport } from "@/hooks/charts";
 import { useMarkerSlots } from "@/hooks/charts/useMarkerSlots";
@@ -47,7 +48,8 @@ export function useComparePeriodsPage(): TComparePeriodsPage {
   const t = useTranslations();
   const { city, selectCity, renameCity } = usePersistedCity();
   const filters = useFilters();
-  const { dataset, gridSize, months, variables } = filters;
+  const { dataset, months, variables } = filters;
+  const gridSize = resolveGridSize(filters, EFilterView.COMPARE_PERIODS);
   const periods = filters.weatherPeriods;
   const isClimate = dataset === DATASETS.CLIMATE;
   const [layout, setLayout] = useState<ECompareLayout>(DEFAULT_COMPARE_LAYOUT);

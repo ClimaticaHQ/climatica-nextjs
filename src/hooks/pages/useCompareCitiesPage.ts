@@ -1,3 +1,4 @@
+import { resolveGridSize } from "@/utils/filters.util";
 import { getPairMarker } from "@/utils/seriesShape.util";
 import {
   COMPARE_CITIES_SCROLL_OPTIONS,
@@ -20,6 +21,7 @@ import {
   ESeriesKind,
   EWalterLiethSeriesId,
   type EWalterLiethShading,
+  EFilterView,
 } from "@/enums";
 import { useChartModel, useComparisonChartExport } from "@/hooks/charts";
 import { useGetAltitude, useGetCompareData, useGetDatasetVersion } from "@/hooks/data";
@@ -50,7 +52,9 @@ import { useScrollToResults } from "./useScrollToResults";
 export function useCompareCitiesPage(): TCompareCitiesPage {
   const t = useTranslations();
   const { cityA, cityB, selectCityA, selectCityB } = usePersistedComparisonCities();
-  const { dataset, climatePeriod, weatherYear, gridSize, months, variables } = useFilters();
+  const filters = useFilters();
+  const { dataset, climatePeriod, weatherYear, months, variables } = filters;
+  const gridSize = resolveGridSize(filters, EFilterView.COMPARE_CITIES);
   const [layout, setLayout] = useState<ECompareLayout>(DEFAULT_COMPARE_LAYOUT);
   const [wlShading, setWlShading] = useState<EWalterLiethShading>(
     WALTER_LIETH_COMPARISON.DEFAULT_SHADING,

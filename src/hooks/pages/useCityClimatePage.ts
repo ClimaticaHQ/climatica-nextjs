@@ -1,3 +1,4 @@
+import { resolveGridSize } from "@/utils/filters.util";
 import { getPairMarker } from "@/utils/seriesShape.util";
 import {
   CITY_CLIMATE_SCROLL_OPTIONS,
@@ -14,7 +15,7 @@ import {
   DEFAULT_CHART_MODE,
   VARIABLE_LABELS,
 } from "@/constants";
-import { EChartBlock, EDataStatus, ESeriesKind, EWalterLiethSeriesId } from "@/enums";
+import { EChartBlock, EDataStatus, ESeriesKind, EWalterLiethSeriesId, EFilterView } from "@/enums";
 import { useChartModel, useSingleChartExport } from "@/hooks/charts";
 import {
   useGetAltitude,
@@ -43,7 +44,8 @@ export function useCityClimatePage(): TCityClimatePage {
   const locale = useLocale();
   const { city, selectCity } = usePersistedCity();
   const filters = useFilters();
-  const { dataset, climatePeriod, weatherYear, gridSize, variables } = filters;
+  const { dataset, climatePeriod, weatherYear, variables } = filters;
+  const gridSize = resolveGridSize(filters, EFilterView.CLIMATE_STATISTICS);
   const [chartMode, setChartMode] = useState<TChartMode>(DEFAULT_CHART_MODE);
   const [visible, setVisible] = useState<TVisibleSeries | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);

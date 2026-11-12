@@ -1,3 +1,4 @@
+import { resolveGridSize } from "@/utils/filters.util";
 import type { THeatMapPage, TMapTarget } from "@/app/heat-map/_components/HeatMap.type";
 import {
   computeHeatmapStats,
@@ -10,7 +11,7 @@ import {
   DATASETS,
   VARIABLE_LABELS,
 } from "@/constants";
-import { ECitySlot } from "@/enums";
+import { ECitySlot, EFilterView } from "@/enums";
 import { useGetDatasetVersion, useGetHeatmapData, useGetRegionalProfile } from "@/hooks/data";
 import { useFilters } from "@/hooks/filters";
 import { usePersistedCity } from "@/hooks/persisted";
@@ -33,7 +34,9 @@ import { useTooManyCellsMessage } from "./useTooManyCellsMessage";
  */
 export function useHeatMapPage(): THeatMapPage {
   const t = useTranslations();
-  const { dataset, climatePeriod, weatherYear, gridSize, variables, months } = useFilters();
+  const filters = useFilters();
+  const { dataset, climatePeriod, weatherYear, variables, months } = filters;
+  const gridSize = resolveGridSize(filters, EFilterView.HEAT_MAP);
   const isClimate = dataset === DATASETS.CLIMATE;
   const selectedMonths = months === "all" ? [] : months;
   const periodLabel = isClimate ? CLIMATE_PERIOD_LABELS[climatePeriod] : String(weatherYear);

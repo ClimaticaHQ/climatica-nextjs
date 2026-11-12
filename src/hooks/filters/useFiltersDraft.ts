@@ -1,10 +1,15 @@
 "use client";
 
 import { DATASETS, FILTER_DEFAULTS } from "@/constants";
-import type { EFilterKey } from "@/enums";
+import { EFilterView, type EFilterKey } from "@/enums";
 import type { TFilters, TFiltersDraftOptions } from "@/types";
 import { countCellsInBounds, isHeatmapCellLimitExceeded } from "@/utils/cellCount.util";
-import { getWeatherYearError, normalizeFilters, setFilterValue } from "@/utils/filters.util";
+import {
+  getWeatherYearError,
+  normalizeFilters,
+  resolveGridSize,
+  setFilterValue,
+} from "@/utils/filters.util";
 import { areFiltersEqual, restoreDatasetSelection } from "@/utils/filtersUrl.util";
 import { useDatasetSelectionStore } from "@/stores";
 import { useState } from "react";
@@ -33,7 +38,9 @@ export function useFiltersDraft({ filters, heatmapBbox }: TFiltersDraftOptions) 
 
   const yearError =
     draft.dataset === DATASETS.WEATHER ? getWeatherYearError(draft.weatherYear) : null;
-  const cellCount = heatmapBbox === null ? null : countCellsInBounds(heatmapBbox, draft.gridSize);
+  // * a region (and so a cell count) exists only on the heat map: the grid it would load at there
+  const heatmapGridSize = resolveGridSize(draft, EFilterView.HEAT_MAP);
+  const cellCount = heatmapBbox === null ? null : countCellsInBounds(heatmapBbox, heatmapGridSize);
 
   function withValues(prev: TFilters, values: Partial<TFilters>) {
     const next = normalizeFilters({ ...prev, ...values });
@@ -87,7 +94,7 @@ export function useFiltersDraft({ filters, heatmapBbox }: TFiltersDraftOptions) 
     discard,
     isDirty: !areFiltersEqual(draft, filters),
     cellCount,
-    isApplyBlocked: isHeatmapCellLimitExceeded(heatmapBbox, draft.gridSize),
+    isApplyBlocked: isHeatmapCellLimitExceeded(heatmapBbox, heatmapGridSize),
     weatherYearError: isValidationShown ? yearError : null,
   };
 }

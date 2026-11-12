@@ -2,11 +2,11 @@
 
 import {
   CLIMATE_PERIOD_LABELS,
-  FALLBACK_GRID_SIZE,
   FULL_VARIABLES_CLIMATE_PERIOD,
   WALTER_LIETH_DIAGRAM,
 } from "@/constants";
 import { EDisplayMetric } from "@/enums";
+import { getFinestGridSizeBeyondFullPeriod } from "@/utils";
 import { useTranslations } from "next-intl";
 import { useDisplayFormat } from "../ui/useDisplayFormat";
 import { useNavbarNavigation } from "../url/useNavbarNavigation";
@@ -35,7 +35,7 @@ export function useGuidePage() {
     questionValues: {
       period: CLIMATE_PERIOD_LABELS[FULL_VARIABLES_CLIMATE_PERIOD],
       finest: t("cellSizesShort.30s"),
-      fallback: t(`cellSizesShort.${FALLBACK_GRID_SIZE.replace(".", "_")}`),
+      fallback: t(`cellSizesShort.${getFinestGridSizeBeyondFullPeriod().replace(".", "_")}`),
     },
   };
 }
