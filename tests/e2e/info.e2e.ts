@@ -250,7 +250,7 @@ test.describe("Info pages on a phone", () => {
     page,
   }) => {
     await page.goto(CITY_URL);
-    await page.getByRole("button", { name: "Resolution: 2.5 min" }).click();
+    await page.getByRole("button", { name: "Resolution: 30 sec" }).click();
     await page.getByRole("dialog").getByRole("link", { name: "What do resolutions mean?" }).click();
     await expect(page).toHaveURL(/\/about\/data#resolutions$/);
     await expect(page.getByRole("dialog")).toHaveCount(0);

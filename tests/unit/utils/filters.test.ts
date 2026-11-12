@@ -37,7 +37,8 @@ describe("normalizeFilters", () => {
       filtersWith({ dataset: "weather", variables: ["srad", "prec", "wind"], gridSize: "30s" }),
     );
     expect(result.variables).toEqual(["prec"]);
-    expect(result.gridSize).toBe("2.5m");
+    // * a choice no longer offered becomes none chosen: the view's default again
+    expect(result.gridSize).toBeNull();
   });
 
   it("drops period-restricted variables outside 1970–2000", () => {
@@ -45,7 +46,8 @@ describe("normalizeFilters", () => {
       filtersWith({ climatePeriod: "c1991-2020", variables: ["wind", "tmin"], gridSize: "30s" }),
     );
     expect(result.variables).toEqual(["tmin"]);
-    expect(result.gridSize).toBe("2.5m");
+    // * a choice no longer offered becomes none chosen: the view's default again
+    expect(result.gridSize).toBeNull();
   });
 
   it("keeps restricted variables and the 30s grid for 1970–2000 climate", () => {

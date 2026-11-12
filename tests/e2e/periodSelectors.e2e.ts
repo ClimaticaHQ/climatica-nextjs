@@ -78,8 +78,9 @@ test("the sidebar's Cell Resolution says why 30 s is unavailable — and offers 
   await expect(option).toBeDisabled();
   await expect(option).toHaveAccessibleDescription("Only for Climate 1970–2000");
 
+  // * 1970–2000 opens at 30″, its finest
   await page.goto("/climate-statistics?city=Paris&lat=48.8566&lng=2.3522");
-  await sidebar.locator("button[aria-expanded]").filter({ hasText: "2.5 min" }).click();
+  await sidebar.locator("button[aria-expanded]").filter({ hasText: "30 sec" }).click();
   await expect(sidebar.locator('button[data-value="30s"]')).toBeEnabled();
   await expect(sidebar.locator('button[data-value="30s"]')).not.toHaveAttribute(
     "aria-describedby",

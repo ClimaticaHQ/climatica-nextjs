@@ -32,10 +32,10 @@ async function openFullSheet(page: Page) {
 test.describe("Mobile filters", () => {
   test("a single-choice chip applies with replace and survives a reload", async ({ page }) => {
     await page.goto(CITY_URL);
-    await expect(page.getByRole("button", { name: "Resolution: 2.5 min" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Resolution: 30 sec" })).toBeVisible();
     const lengthBefore = await historyLength(page);
 
-    await page.getByRole("button", { name: "Resolution: 2.5 min" }).click();
+    await page.getByRole("button", { name: "Resolution: 30 sec" }).click();
     await pickInSheet(page, 0, "10m");
 
     await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -105,7 +105,7 @@ test.describe("Mobile filters", () => {
       if (DATA_REQUEST.test(request.url())) requests.push(request.url());
     });
     await page.goto(CITY_URL);
-    await page.getByRole("button", { name: "Resolution: 2.5 min" }).click();
+    await page.getByRole("button", { name: "Resolution: 30 sec" }).click();
     await pickInSheet(page, 0, "10m");
     await expect(page).toHaveURL(/grid=10m/);
     await openFullSheet(page);
@@ -186,11 +186,11 @@ test.describe("Mobile filters", () => {
 
   test("Back with a sheet open closes it without changing the URL", async ({ page }) => {
     await page.goto(CITY_URL);
-    await expect(page.getByRole("button", { name: "Resolution: 2.5 min" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Resolution: 30 sec" })).toBeVisible();
     const urlBefore = page.url();
 
     for (const open of [
-      () => page.getByRole("button", { name: "Resolution: 2.5 min" }).click(),
+      () => page.getByRole("button", { name: "Resolution: 30 sec" }).click(),
       () => openFullSheet(page),
     ]) {
       await open();

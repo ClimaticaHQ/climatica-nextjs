@@ -79,7 +79,7 @@ describe("parseFilters", () => {
   it("normalizes what it parses", () => {
     const filters = parse("dataset=weather&var=srad,tmin&grid=30s");
     expect(filters.variables).toEqual(["tmin"]);
-    expect(filters.gridSize).toBe("2.5m");
+    expect(filters.gridSize).toBeNull();
   });
 
   it("parses existing exported links", () => {

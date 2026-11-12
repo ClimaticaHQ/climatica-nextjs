@@ -22,6 +22,11 @@ describe("climate-statistics URL", () => {
   });
 
   it("parses an existing exported link's filters", () => {
-    expect(parseFilters(params)).toEqual({ ...FILTER_DEFAULTS, climatePeriod: "c1961-1990" });
+    // * the link names its grid: the reader's choice, kept
+    expect(parseFilters(params)).toEqual({
+      ...FILTER_DEFAULTS,
+      climatePeriod: "c1961-1990",
+      gridSize: "2.5m",
+    });
   });
 });
