@@ -7,11 +7,12 @@ import {
   DATASETS,
   EQUATOR_KM_PER_DEGREE,
   FILTER_DEFAULTS,
+  FULL_VARIABLES_CLIMATE_PERIOD,
   GRID_DELTA,
 } from "@/constants";
 import { EDisplayMetric, EFilterKey } from "@/enums";
 import type { TCellSize, TCopyrightYearsArgs, TGridArc, TResolutionRow } from "@/types";
-import { isGridSizeOffered } from "./filters.util";
+import { getFinestGridSize, isGridSizeOffered } from "./filters.util";
 
 /**
  * A person's initials for an avatar: the first letters of their first two words — the given
@@ -68,4 +69,15 @@ export function getResolutionRows(): TResolutionRow[] {
       climatePeriod: FILTER_DEFAULTS[EFilterKey.CLIMATE_PERIOD],
     }),
   }));
+}
+
+/** The finest resolution the other climate normals and the weather years go down to. */
+export function getFinestGridSizeBeyondFullPeriod(): TCellSize {
+  const otherNormals = Object.values(CLIMATE_PERIODS)
+    .filter((climatePeriod) => climatePeriod !== FULL_VARIABLES_CLIMATE_PERIOD)
+    .map((climatePeriod) => ({ dataset: DATASETS.CLIMATE, climatePeriod }));
+  return getFinestGridSize([
+    ...otherNormals,
+    { dataset: DATASETS.WEATHER, climatePeriod: FULL_VARIABLES_CLIMATE_PERIOD },
+  ]);
 }

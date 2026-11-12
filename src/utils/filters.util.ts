@@ -5,8 +5,8 @@ import {
   CLIMATE_PERIOD_LABELS,
   CLIMATE_PERIODS,
   CLIMATE_VARIABLES,
+  ALWAYS_OFFERED_GRID_SIZE,
   DATASETS,
-  FALLBACK_GRID_SIZE,
   FILTER_CHIP_AVAILABILITIES,
   FILTER_DEFAULTS,
   FILTER_ORDER,
@@ -14,6 +14,8 @@ import {
   FILTER_WEATHER_PERIODS_LIMITS,
   FILTERS_CONFIG,
   FULL_VARIABLES_CLIMATE_PERIOD,
+  GRID_SIZE_VIEW_DEFAULTS,
+  GRIDS_FINEST_FIRST,
   MONTH_NUMBERS,
   PERIOD_RESTRICTED_VARIABLES,
   VARIABLES_NOTE_RULES,
@@ -33,6 +35,8 @@ import type {
   TFilterAvailabilityContext,
   TFilterOptionContext,
   TFilters,
+  TGridSizeContext,
+  TPeriodGridSize,
   TFilterUnavailabilityChecks,
   TFilterUnavailableReason,
   TMonthFilter,
@@ -92,10 +96,75 @@ export function isVariableOptionDisabled(variable: TVariable, context: TFilterOp
 /** The 30s grid exists only for the full-variables climate normals. */
 export function isGridSizeOffered(
   gridSize: TCellSize,
-  { dataset, climatePeriod }: Omit<TFilterOptionContext, "view">,
+  { dataset, climatePeriod }: TGridSizeContext,
 ) {
   if (gridSize !== CELL_SIZES.THIRTY_SECONDS) return true;
   return dataset === DATASETS.CLIMATE && climatePeriod === FULL_VARIABLES_CLIMATE_PERIOD;
+}
+
+/** What a view shows data for: Compare Periods' two climate periods, else the one dataset / period. */
+export function getGridSizeContexts(filters: TFilters, view: EFilterView): TGridSizeContext[] {
+  const { dataset } = filters;
+  const isPeriodPair = view === EFilterView.COMPARE_PERIODS && dataset === DATASETS.CLIMATE;
+  return isPeriodPair
+    ? [filters.climatePeriodA, filters.climatePeriodB].map((climatePeriod) => ({
+        dataset,
+        climatePeriod,
+      }))
+    : [{ dataset, climatePeriod: filters.climatePeriod }];
+}
+
+/** Whether a resolution is offered for everything the view shows (both compared periods). */
+export function isGridSizeOfferedInView(gridSize: TCellSize, filters: TFilters, view: EFilterView) {
+  return getGridSizeContexts(filters, view).every((context) =>
+    isGridSizeOffered(gridSize, context),
+  );
+}
+
+/** The finest resolution offered for every context — from the availability rule, not a list. */
+export function getFinestGridSize(contexts: readonly TGridSizeContext[]): TCellSize {
+  return (
+    GRIDS_FINEST_FIRST.find((size) =>
+      contexts.every((context) => isGridSizeOffered(size, context)),
+    ) ?? ALWAYS_OFFERED_GRID_SIZE
+  );
+}
+
+/**
+ * Where a view opens when no resolution was chosen: the finest offered for what it shows (30″ for
+ * the 1970–2000 normals, 2.5′ otherwise), or the view's own default where it has one (the heat map).
+ */
+export function getDefaultGridSize(filters: TFilters, view: EFilterView): TCellSize {
+  const viewDefault = GRID_SIZE_VIEW_DEFAULTS[view];
+  return viewDefault !== undefined && isGridSizeOfferedInView(viewDefault, filters, view)
+    ? viewDefault
+    : getFinestGridSize(getGridSizeContexts(filters, view));
+}
+
+/**
+ * The resolution a view loads: the chosen one while the view offers it, else its default. A
+ * choice the view doesn't offer stays in the URL, so a page that offers it gets it back.
+ */
+export function resolveGridSize(filters: TFilters, view: EFilterView): TCellSize {
+  const { gridSize } = filters;
+  return gridSize !== null && isGridSizeOfferedInView(gridSize, filters, view)
+    ? gridSize
+    : getDefaultGridSize(filters, view);
+}
+
+/**
+ * The resolution each climate period would load at if picked in this view — on Compare Periods
+ * the pair's, elsewhere the period's own (30″ for 1970–2000 while none was chosen, 2.5′ for the
+ * others). Which periods a place has data for depends on it.
+ */
+export function getGridSizeByPeriod(filters: TFilters, view: EFilterView): TPeriodGridSize[] {
+  return Object.values(CLIMATE_PERIODS).map((climatePeriod) => ({
+    climatePeriod,
+    gridSize: resolveGridSize(
+      view === EFilterView.COMPARE_PERIODS ? filters : { ...filters, climatePeriod },
+      view,
+    ),
+  }));
 }
 
 /** Months in calendar order, without duplicates; none or all twelve is "all". */
@@ -122,16 +191,20 @@ function normalizeWeatherPeriods(periods: readonly number[]) {
 }
 
 /**
- * Makes a filter set consistent: drops variables and the 30s grid the dataset/period lack
- * (none left = the default variables), orders months, dedupes years, and never compares a
- * climate period with itself.
+ * Makes a filter set consistent: drops variables and a chosen 30s grid the dataset/period lack
+ * (none left = the default variables; the grid back to the view's default), orders months,
+ * dedupes years, and never compares a climate period with itself.
  */
 export function normalizeFilters(filters: TFilters): TFilters {
   const arePeriodsEqual = filters.climatePeriodA === filters.climatePeriodB;
   return {
     ...filters,
     variables: normalizeVariables(filters),
-    gridSize: isGridSizeOffered(filters.gridSize, filters) ? filters.gridSize : FALLBACK_GRID_SIZE,
+    // * a choice the dataset or period no longer offers becomes none chosen: the default again
+    gridSize:
+      filters.gridSize !== null && isGridSizeOffered(filters.gridSize, filters)
+        ? filters.gridSize
+        : null,
     months: normalizeMonths(filters.months),
     climatePeriodA: arePeriodsEqual
       ? FILTER_DEFAULTS[EFilterKey.CLIMATE_PERIOD_A]
@@ -294,10 +367,10 @@ export function getVariableOptionStates(values: TFilters, { view }: TFilterAvail
   }));
 }
 
-export function getGridSizeOptionStates(values: TFilters) {
+export function getGridSizeOptionStates(values: TFilters, view: EFilterView) {
   return Object.values(CELL_SIZES).map((value) => ({
     value,
-    isDisabled: !isGridSizeOffered(value, values),
+    isDisabled: !isGridSizeOfferedInView(value, values, view),
   }));
 }
 

@@ -49,7 +49,8 @@ export const FILTER_CODECS: TFilterCodecs = {
   },
   [EFilterKey.GRID_SIZE]: {
     parse: (params) => parseCellSize(paramOf(EFilterKey.GRID_SIZE, params)),
-    encode: (value) => value,
+    // * none chosen is the default, never written
+    encode: (value) => value ?? "",
   },
   [EFilterKey.MONTHS]: {
     parse: (params) => parseMonths(paramOf(EFilterKey.MONTHS, params)),

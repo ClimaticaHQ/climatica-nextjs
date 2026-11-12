@@ -8,7 +8,12 @@ import type {
   TFilters,
   TTranslate,
 } from "@/types";
-import { getChipFilterKeys, getFilterAvailability, isFilterDefault } from "./filters.util";
+import {
+  getChipFilterKeys,
+  getFilterAvailability,
+  isFilterDefault,
+  resolveGridSize,
+} from "./filters.util";
 
 const formatClimatePeriod = (period: keyof typeof CLIMATE_PERIOD_LABELS) =>
   CLIMATE_PERIOD_LABELS[period];
@@ -28,7 +33,9 @@ const CHIP_FORMATTERS: TFilterChipFormatters = {
       ? t(`sidebar.variables.${first}`)
       : t("filters.chips.variablesCount", { count: variables.length });
   },
-  gridSize: (gridSize, t) => t(`cellSizesShort.${gridSize.replace(".", "_")}`),
+  // * getFilterChips resolves none chosen to the view's grid before formatting
+  gridSize: (gridSize, t) =>
+    gridSize === null ? "" : t(`cellSizesShort.${gridSize.replace(".", "_")}`),
   months: (months, t) => {
     if (months === ALL_MONTHS) return t("filters.chips.allMonths");
     const [only] = months;
@@ -62,19 +69,21 @@ export function getFilterChips(
   context: TFilterAvailabilityContext,
   t: TTranslate,
 ): TFilterChip[] {
+  // * the chip shows the grid the view loads; whether it's changed is whether one was chosen
+  const shown = { ...filters, gridSize: resolveGridSize(filters, context.view) };
   return getChipFilterKeys(context).map((key) => {
     const availability = getFilterAvailability(key, context);
     const reasonKey = FILTER_UNAVAILABLE_NOTE_KEYS[availability];
     const isDisabled = availability !== EFilterAvailability.AVAILABLE;
     return {
       key,
-      value: getFilterChipValue(key, filters, t),
+      value: getFilterChipValue(key, shown, t),
       // * a disabled chip is still a button — it opens the explanation — and its name says so:
       // * "Variables: Not available in Walter-Lieth view. Show why"
       ariaLabel:
         isDisabled && reasonKey !== undefined
           ? t("filters.chips.unavailable", { name: getFilterName(key, t), reason: t(reasonKey) })
-          : getFilterChipAriaLabel(key, filters, t),
+          : getFilterChipAriaLabel(key, shown, t),
       isChanged: !isDisabled && !isFilterDefault(key, filters[key]),
       isDisabled,
     };
