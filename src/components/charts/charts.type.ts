@@ -184,6 +184,8 @@ export type TResolveChartBodyArgs = {
   viewState: TChartViewState;
   model: TChartModel;
   rule: TSeriesKindRule;
+  /** the data are still loading: the layout asked for, not yet the data's fallback */
+  isLoading: boolean;
 };
 
 /** One body's legend items, from the block's context. */

@@ -7,7 +7,7 @@ import { OverlayChart } from "./OverlayChart";
 
 /**
  * Every drawn series in one chart, its blocks under it. A series chip hovered in the toolbar
- * (kinds with series chips) highlights its series.
+ * (kinds with series chips) highlights its series. While the data load, its chart draws its plot as a skeleton.
  */
 export function OverlayBody(props: TChartBodyProps) {
   const { model, viewState, features, highlightedId } = props;
@@ -17,18 +17,13 @@ export function OverlayBody(props: TChartBodyProps) {
     ? highlightedId
     : null;
 
-  return (
-    <OverlayChart
-      {...props}
-      drawn={drawn}
-      highlightedId={highlighted}
-      footer={
-        <ChartBlocks
-          context={getBlockContext(props, { entries: drawn, isCompact: false, shownPanel: null })}
-          placements={BLOCK_PLACEMENTS.ONE_PANEL}
-          hiddenBlocks={features.hiddenBlocks}
-        />
-      }
+  const footer = (
+    <ChartBlocks
+      context={getBlockContext(props, { entries: drawn, isCompact: false, shownPanel: null })}
+      placements={BLOCK_PLACEMENTS.ONE_PANEL}
+      hiddenBlocks={features.hiddenBlocks}
     />
   );
+
+  return <OverlayChart {...props} drawn={drawn} highlightedId={highlighted} footer={footer} />;
 }

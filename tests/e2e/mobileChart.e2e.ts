@@ -14,6 +14,16 @@ const tooltip = (page: Page) => card(page).locator(".recharts-tooltip-wrapper").
 async function openChart(page: Page, url: string) {
   await page.goto(url);
   await expect(tapLayer(page)).toBeVisible({ timeout: 30_000 });
+  // * the plots fade in as their data land: measure once that has ended (the loops aside)
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((animation) => animation.effect?.getTiming().iterations !== Infinity)
+        // * one cancelled (its element replaced) is over too
+        .map((animation) => animation.finished.catch(() => undefined)),
+    ),
+  );
 }
 
 // * a part's place in the card (the page may scroll between views)

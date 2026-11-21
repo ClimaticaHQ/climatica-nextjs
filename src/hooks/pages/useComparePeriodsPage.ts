@@ -28,7 +28,7 @@ import {
 } from "@/hooks/data";
 import { useFilters } from "@/hooks/filters";
 import { usePersistedCity } from "@/hooks/persisted";
-import { useGeolocation, useUrlStateSync } from "@/hooks/ui";
+import { useGeolocation, useUrlStateSync, useInitialUrlState } from "@/hooks/ui";
 import type { TChartMode, TChartViewState, TExpandedPanel, TVisibleSeries } from "@/types";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
@@ -52,17 +52,18 @@ export function useComparePeriodsPage(): TComparePeriodsPage {
   const gridSize = resolveGridSize(filters, EFilterView.COMPARE_PERIODS);
   const periods = filters.weatherPeriods;
   const isClimate = dataset === DATASETS.CLIMATE;
-  const [layout, setLayout] = useState<ECompareLayout>(DEFAULT_COMPARE_LAYOUT);
+  const initial = useInitialUrlState(COMPARE_PERIODS_URL_SCHEMA);
+  const [layout, setLayout] = useState<ECompareLayout>(initial.layout ?? DEFAULT_COMPARE_LAYOUT);
   const [wlShading, setWlShading] = useState<EWalterLiethShading>(
-    WALTER_LIETH_COMPARISON.DEFAULT_SHADING,
+    initial.wlShading ?? WALTER_LIETH_COMPARISON.DEFAULT_SHADING,
   );
-  const [chartMode, setChartMode] = useState<TChartMode>(DEFAULT_CHART_MODE);
+  const [chartMode, setChartMode] = useState<TChartMode>(initial.chartMode ?? DEFAULT_CHART_MODE);
   // * kept while overlay is shown, so going back to split restores it
-  const [expanded, setExpanded] = useState<TExpandedPanel>(null);
+  const [expanded, setExpanded] = useState<TExpandedPanel>(initial.expanded ?? null);
   const [visible, setVisible] = useState<TVisibleSeries | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const years = useWeatherYearsViewState({ years: periods, isWeather: !isClimate, chartMode });
-  const [sortOrder, setSortOrder] = useState<ESortOrder>(DEFAULT_SORT_ORDER);
+  const [sortOrder, setSortOrder] = useState<ESortOrder>(initial.sortOrder ?? DEFAULT_SORT_ORDER);
   // * each year's marker, kept through sorting, additions and removals
   const markers = useMarkerSlots(periods.map(String));
 

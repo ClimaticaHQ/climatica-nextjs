@@ -7,6 +7,9 @@ import { useLegendLabels } from "@/hooks/ui/useLegendLabels";
 import { useWalterLiethLegendItems } from "@/hooks/ui/useWalterLiethLegendItems";
 import { getEntityBarSwatch, getEntityShortLabels } from "@/utils";
 import { useTranslations } from "next-intl";
+import { useContext } from "react";
+import { ChartLoadingContext } from "./chartLoading.context";
+import { PENDING_MONTHS } from "./charts.constant";
 import type {
   TChartBlockDefinition,
   TChartBlockProps,
@@ -28,13 +31,15 @@ function ValuesTableBlock({ context }: TChartBlockProps) {
   const labels = getEntityShortLabels(entries.map(({ series }) => series));
   // * the mm row's swatches: only where the view draws each entity's bars
   const swatchStyle = getContextSwatchStyle(context);
+  // * while the data load: twelve months without values, so the table keeps its columns
+  const isLoading = useContext(ChartLoadingContext);
 
   return (
     <MonthlyValuesTable
       series={entries.map((entry) => ({
         key: entry.series.id,
         label: entry.series.label,
-        data: entry.chartData,
+        data: isLoading ? PENDING_MONTHS : entry.chartData,
       }))}
       {...(isOverlay
         ? {

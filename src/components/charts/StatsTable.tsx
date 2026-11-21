@@ -2,11 +2,13 @@
 
 import { Card } from "@/components/Card";
 import { MartonneBadge } from "@/components/MartonneBadge";
+import { Badge } from "@/components/UI/Badge";
 import { ScrollEdgeFades } from "@/components/ScrollEdgeFades";
-import { COMPARISON_METRIC_LABEL_KEYS } from "@/constants";
-import { ECardPadding } from "@/enums";
+import { COMPARISON_METRIC_LABEL_KEYS, PENDING_MARTONNE_CLASS } from "@/constants";
+import { EBadgeSize, ECardPadding } from "@/enums";
 import { useArrivalFlash } from "@/hooks/ui/useArrivalFlash";
 import { useScrollEdges } from "@/hooks/ui/useScrollEdges";
+import { TEXT_PLACEHOLDER_WIDTHS, TextPlaceholder } from "@/components/UI/TextPlaceholder";
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import {
@@ -37,6 +39,8 @@ export function StatsTable({
   const arrivalRef = useArrivalFlash<HTMLTableElement>(ids);
   const { difference } = table;
   const labels = table.columns.map(({ label }) => label);
+  // * a value still loading: its place, in its line
+  const pending = <TextPlaceholder widthClass={TEXT_PLACEHOLDER_WIDTHS.STAT} />;
   const minWidth = `${STATS_TABLE_MIN_REM.METRIC + table.columns.length * STATS_TABLE_MIN_REM.VALUE}rem`;
 
   return (
@@ -73,7 +77,18 @@ export function StatsTable({
                   {row.values.map((value, index) => (
                     <td key={ids[index]} className={C.VALUE_CELL}>
                       {value === null ? (
-                        <div className={C.LOADING_VALUE} />
+                        <span className={C.VALUE_LINE}>
+                          {row.metric === "martonne" && (
+                            <Badge
+                              tone={PENDING_MARTONNE_CLASS.tone}
+                              size={EBadgeSize.SM}
+                              isPending
+                            >
+                              {t(PENDING_MARTONNE_CLASS.labelKey)}
+                            </Badge>
+                          )}
+                          {pending}
+                        </span>
                       ) : (
                         <span className={C.VALUE_LINE}>
                           {value.badge && <MartonneBadge badge={value.badge} />}
@@ -81,11 +96,13 @@ export function StatsTable({
                         </span>
                       )}
                       {/* * below `sm` the difference's column is hidden: the last value carries it */}
-                      {difference && index === row.values.length - 1 && row.difference && (
-                        <span className={`${C.MUTED_LINE} ${C.DIFFERENCE_BELOW}`}>
-                          {row.difference}
-                        </span>
-                      )}
+                      {difference &&
+                        index === row.values.length - 1 &&
+                        (row.difference || value === null) && (
+                          <span className={`${C.MUTED_LINE} ${C.DIFFERENCE_BELOW}`}>
+                            {row.difference ?? pending}
+                          </span>
+                        )}
                     </td>
                   ))}
                   {difference && <td className={C.DIFFERENCE_CELL}>{row.difference}</td>}

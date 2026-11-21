@@ -10,12 +10,13 @@ import { useTextScale } from "@/hooks/ui/useTextScale";
 import { useSettingsStore } from "@/stores";
 import { NO_FLASH_KEYS, SM_MEDIA_QUERY } from "@/constants";
 import { ECardPadding, EChartBody } from "@/enums";
-import { useId, useState, type ComponentType } from "react";
+import { useContext, useId, useState, type ComponentType } from "react";
 import { ChartCardHeader } from "./ChartCardHeader";
 import { CHART_CARD_CLASS } from "./charts.constant";
 import type { TChartBodyProps, TChartCardProps } from "./charts.type";
 import { getSeriesKindRule, resolveChartBody } from "./charts.util";
 import { ChartDeviceContext } from "./chartDevice.context";
+import { ChartLoadingContext } from "./chartLoading.context";
 import { OverlayBody } from "./OverlayBody";
 import { SingleBody } from "./SingleBody";
 import { SplitBody } from "./SplitBody";
@@ -52,9 +53,11 @@ export function ChartCard({ model, viewState, features, onVisibleChange }: TChar
   const textScale = useTextScale();
   const syncId = useId();
   const { update } = useDataUpdate();
-  if (!model.hasData) return null;
+  // * while loading, the card and its header for real; the body's plots are skeletons
+  const isLoading = useContext(ChartLoadingContext);
+  if (!model.hasData && !isLoading) return null;
 
-  const body = resolveChartBody({ viewState, model, rule });
+  const body = resolveChartBody({ viewState, model, rule, isLoading });
   const Body = CHART_BODIES[body];
   const shared = {
     model,
@@ -83,7 +86,11 @@ export function ChartCard({ model, viewState, features, onVisibleChange }: TChar
       />
       <ChartDeviceContext.Provider value={{ isTouch, isNarrow, textScale }}>
         <DataUpdateFade>
-          <ChartTransition transitionKey={`${viewState.mode}-${body}-${update.id}`}>
+          {/* * the data's arrival swaps the plots in this same layer, fading it in */}
+          <ChartTransition
+            transitionKey={`${viewState.mode}-${body}-${update.id}`}
+            isPlaceholder={isLoading}
+          >
             <Body
               {...shared}
               body={body}

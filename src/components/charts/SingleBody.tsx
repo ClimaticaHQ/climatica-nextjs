@@ -4,12 +4,15 @@ import { WalterLiethIncompleteNotice } from "@/components/WalterLiethChart/compo
 import { isCompleteSeries } from "@/utils";
 import { ChartBlocks } from "./ChartBlocks";
 import { BLOCK_PLACEMENTS } from "./charts.constant";
+import { useContext } from "react";
+import { ChartLoadingContext } from "./chartLoading.context";
 import type { TChartBodyProps } from "./charts.type";
 import { getBlockContext } from "./charts.util";
 
 /** One series, one chart: its blocks under it. */
 export function SingleBody(props: TChartBodyProps) {
   const { model, viewState, features, visible, activeMonth } = props;
+  const isLoading = useContext(ChartLoadingContext);
   const [entry] = model.series;
   if (entry === undefined) return null;
 
@@ -23,7 +26,8 @@ export function SingleBody(props: TChartBodyProps) {
   );
 
   if (viewState.mode === "walter-lieth") {
-    return isCompleteSeries(walterLieth) ? (
+    // * while loading, the same chart with its plot a skeleton: the data swap the plot alone
+    return isLoading || isCompleteSeries(walterLieth) ? (
       <WalterLiethChart
         series={walterLieth}
         domain={model.domain}

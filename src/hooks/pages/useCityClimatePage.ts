@@ -25,7 +25,7 @@ import {
 } from "@/hooks/data";
 import { useFilters } from "@/hooks/filters";
 import { usePersistedCity } from "@/hooks/persisted";
-import { useUrlStateSync } from "@/hooks/ui";
+import { useUrlStateSync, useInitialUrlState } from "@/hooks/ui";
 import type { TChartMode, TChartSeries, TChartSubtitle, TVisibleSeries } from "@/types";
 import { getLocationName, resolveDataState } from "@/utils";
 import { useLocale, useTranslations } from "next-intl";
@@ -46,7 +46,8 @@ export function useCityClimatePage(): TCityClimatePage {
   const filters = useFilters();
   const { dataset, climatePeriod, weatherYear, variables } = filters;
   const gridSize = resolveGridSize(filters, EFilterView.CLIMATE_STATISTICS);
-  const [chartMode, setChartMode] = useState<TChartMode>(DEFAULT_CHART_MODE);
+  const initial = useInitialUrlState(CLIMATE_STATISTICS_URL_SCHEMA);
+  const [chartMode, setChartMode] = useState<TChartMode>(initial.chartMode ?? DEFAULT_CHART_MODE);
   const [visible, setVisible] = useState<TVisibleSeries | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 

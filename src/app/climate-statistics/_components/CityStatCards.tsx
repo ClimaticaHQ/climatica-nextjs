@@ -1,18 +1,24 @@
 import { StatCard } from "@/components/StatCard";
-import { StatCardsSkeleton } from "@/components/UI";
+import { TEXT_PLACEHOLDER_WIDTHS, TextPlaceholder } from "@/components/UI/TextPlaceholder";
 import { MISSING_VALUE_LABEL } from "@/constants";
 import { EDataStatus } from "@/enums";
 import { useTranslations } from "next-intl";
 import { CITY_STAT_CARDS_CLASSES as C, STAT_CARD_FLASH_KEYS } from "./ClimateStatistics.constant";
 import type { TCityStatCardsProps } from "./ClimateStatistics.type";
 
-/** The place's values for the month filter, above its chart; their skeleton while loading. */
+/**
+ * The place's values for the month filter, above its chart. While they load, the same cards
+ * with placeholders for the values, so nothing moves when they land.
+ */
 export function CityStatCards({ state, summary }: TCityStatCardsProps) {
   const t = useTranslations();
-  if (state.status === EDataStatus.LOADING) return <StatCardsSkeleton />;
-  if (!summary) return null;
+  const isLoading = state.status === EDataStatus.LOADING;
+  if (!isLoading && !summary) return null;
 
-  const { stats, isSingleMonth, filteredMonthNames, altitude } = summary;
+  const pending = <TextPlaceholder widthClass={TEXT_PLACEHOLDER_WIDTHS.STAT} />;
+  const isSingleMonth = summary?.isSingleMonth ?? false;
+  const filteredMonthNames = summary?.filteredMonthNames ?? null;
+  const altitude = summary?.altitude ?? null;
   const card = { flashKeys: STAT_CARD_FLASH_KEYS };
 
   return (
@@ -23,7 +29,7 @@ export function CityStatCards({ state, summary }: TCityStatCardsProps) {
           label={t(
             isSingleMonth ? "climateStatistics.stats.tmax" : "climateStatistics.stats.avgTmax",
           )}
-          value={stats.avgTmax}
+          value={summary ? summary.stats.avgTmax : pending}
           unit={t("units.celsius")}
         />
         <StatCard
@@ -31,20 +37,20 @@ export function CityStatCards({ state, summary }: TCityStatCardsProps) {
           label={t(
             isSingleMonth ? "climateStatistics.stats.tmin" : "climateStatistics.stats.avgTmin",
           )}
-          value={stats.avgTmin}
+          value={summary ? summary.stats.avgTmin : pending}
           unit={t("units.celsius")}
         />
         <StatCard
           {...card}
           label={t("climateStatistics.stats.totalPrec")}
-          value={stats.totalPrec}
+          value={summary ? summary.stats.totalPrec : pending}
           unit={isSingleMonth ? t("climateStatistics.stats.mmThisMonth") : t("units.mm")}
         />
         <StatCard
           {...card}
           label={t("climateStatistics.stats.altitude")}
-          value={altitude !== null ? String(altitude) : MISSING_VALUE_LABEL}
-          {...(altitude !== null ? { unit: t("units.meters") } : {})}
+          value={summary ? (altitude !== null ? String(altitude) : MISSING_VALUE_LABEL) : pending}
+          {...(altitude !== null || !summary ? { unit: t("units.meters") } : {})}
         />
       </div>
       {/* * the line keeps its height when empty, so the filter never moves the chart */}

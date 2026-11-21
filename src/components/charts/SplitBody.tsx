@@ -13,6 +13,8 @@ import type { TChartSeriesModel } from "@/types";
 import { isCompleteSeries, getSplitPair } from "@/utils";
 import { setPairSide, swapPair } from "@/utils/pair.util";
 import { useTranslations } from "next-intl";
+import { useContext } from "react";
+import { ChartLoadingContext } from "./chartLoading.context";
 import { ChartBlocks } from "./ChartBlocks";
 import type { TChartBodyProps } from "./charts.type";
 import { getBlockContext } from "./charts.util";
@@ -25,6 +27,7 @@ import { SidePicker } from "./SidePicker";
 export function SplitBody(props: TChartBodyProps) {
   const t = useTranslations();
   const { model, viewState, features, visible, activeMonth, syncId } = props;
+  const isLoading = useContext(ChartLoadingContext);
   const pair = getSplitPair(model, viewState);
   if (pair === null) return null;
 
@@ -89,14 +92,17 @@ export function SplitBody(props: TChartBodyProps) {
         />
       );
     }
-    return isCompleteSeries(entry.walterLieth) ? (
-      <Card
-        size={ECardSize.SM}
-        padding={ECardPadding.PANEL}
-        flashKeys={[entry.series.id]}
-        data-panel-series={entry.series.id}
-        className={SPLIT_PANEL_CARD_CLASS}
-      >
+    const card = {
+      size: ECardSize.SM,
+      padding: ECardPadding.PANEL,
+      flashKeys: [entry.series.id],
+      "data-panel-series": entry.series.id,
+      className: SPLIT_PANEL_CARD_CLASS,
+    };
+    // * while loading every diagram takes its place, complete or not (its plot a skeleton): the
+    // * same card and chart before and after, so the data swap the plot alone
+    return isLoading || isCompleteSeries(entry.walterLieth) ? (
+      <Card {...card}>
         <WalterLiethChart
           series={entry.walterLieth}
           domain={model.domain}

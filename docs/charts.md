@@ -80,8 +80,21 @@ flowchart TD
 ```
 
 [`ChartSection`](../src/components/charts/ChartSection.tsx) — the only export of
-`components/charts` — also draws the export menu and, while loading, the skeletons; empty and
-error messages are the page layout's. [`ChartCard`](../src/components/charts/ChartCard.tsx) draws
+`components/charts` — also draws the export menu; empty and error messages are the page
+layout's.
+
+**Loading:** the section renders for real from what is known (series, view state): the stats
+table, the card's header, toolbar and legend, the stats bar's cells. `ChartLoadingContext` makes
+each plot a [`ChartSkeleton`](../src/components/UI/ChartSkeleton/ChartSkeleton.tsx) in the plot's
+own height class (`getPlotHeightClass`, `CHART_PLOT.HEIGHT`) and each value a `TextPlaceholder`
+in its line (a Martonne class a pending `Badge`), so the plots match within 1px and the card
+moves only where real data wrap text differently. The charts render through frames without
+chart code (`WalterLiethFrame`, `StandardClimateChartFrame`; the overlays swap their plot in
+place), so the tree is the same before and after the data: only the plot is swapped, and
+nothing under it — a values table opened meanwhile — is remounted. The section is `aria-busy`
+with a hidden "Loading chart"; `ChartTransition` keeps its layer and fades it in as the data
+land (no fade with motion off). The body follows the URL's layout while loading, and a series
+still loading never turns an overlay into the side by side. [`ChartCard`](../src/components/charts/ChartCard.tsx) draws
 the header (title, switches, toolbar) above the body and crossfades when chart type, layout or
 data changes. Every page uses the same card and frame, with the `PANEL` padding (smaller below
 `sm`). A Walter-Lieth overlay of a shadable pair needs both series complete; otherwise the side by side

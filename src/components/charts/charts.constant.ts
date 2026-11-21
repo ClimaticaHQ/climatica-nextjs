@@ -6,15 +6,17 @@ import type { TPanelExpansion } from "@/types";
 export const CHART_SECTION_CLASSES = {
   ROOT: "flex flex-col gap-[var(--section-toolbar-gap)]",
   TOOLBAR: "flex h-10 items-center justify-end",
-  TOOLBAR_SKELETON: "h-8 w-28 animate-pulse rounded-[var(--radius-sm)] bg-[var(--color-border)]",
   CONTENT: "flex flex-col gap-[var(--section-gap)]",
 } as const;
 
-// * a chart section's loading table: the stats table's rough shape
-export const CHART_SECTION_TABLE_SKELETON = { ROWS: 5, COLS: 2 } as const;
-
 // * the chart card's layout — relative: the data update's progress bar runs along its top edge
 export const CHART_CARD_CLASS = "relative w-full";
+
+// * a skeleton filling a measured plot box (the standard overlay's) while its data load
+export const FULL_HEIGHT_CLASS = "h-full";
+
+// * a series' months while its data load (no values): the values table's twelve columns
+export const PENDING_MONTHS = WALTER_LIETH_DIAGRAM.CALENDAR_MONTH_ORDER.map(() => ({}));
 
 export const SIDE_PICKER_LABEL_KEYS = {
   [EPairSide.A]: "climateComparison.periodA",
@@ -96,7 +98,6 @@ export const STATS_TABLE_CLASSES = {
   VALUE_CELL: "px-3 py-2 text-right tabular-nums font-medium sm:px-4",
   // * a value and its class badge wrap onto two lines rather than cut the badge
   VALUE_LINE: "inline-flex max-w-full flex-wrap items-center justify-end gap-x-1.5 gap-y-0.5",
-  LOADING_VALUE: "ml-auto h-4 w-16 animate-pulse rounded bg-[var(--color-border)]",
   DIFFERENCE_CELL:
     "px-3 py-2 text-right tabular-nums text-[var(--color-text-secondary)] max-sm:hidden sm:px-4",
 } as const;

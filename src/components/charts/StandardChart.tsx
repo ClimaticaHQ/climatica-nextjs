@@ -27,7 +27,10 @@ import {
 import { useTranslations } from "next-intl";
 import { useContext, useId, useState } from "react";
 import { ComposedChart, ReferenceArea, ResponsiveContainer, Tooltip } from "recharts";
+import { ChartSkeleton } from "@/components/UI/ChartSkeleton";
+import { FULL_HEIGHT_CLASS } from "./charts.constant";
 import { ChartFocusContext } from "./chartFocus.context";
+import { ChartLoadingContext } from "./chartLoading.context";
 import { ChartScrollContext } from "./chartScroll.context";
 import {
   OVERLAY_SCROLL_CLASSES as S,
@@ -73,6 +76,7 @@ export function StandardChart({
   const { ref: plotRef, width: availableWidth } = useElementWidth<HTMLDivElement>();
   const { register } = useScrollSync();
   const patternPrefix = `hatch-${toSvgId(useId())}`;
+  const isLoading = useContext(ChartLoadingContext);
   const hidePrecBar = useDelayedHide(!visible.prec, seriesMotion.toggleMs);
   const hidden = {
     tmax: useDelayedHide(!visible.tmax, seriesMotion.toggleMs),
@@ -224,36 +228,48 @@ export function StandardChart({
           onEntityFocus: (id) => setFocus(id === null ? null : { id, target: "entity" }),
         }}
       >
-        <div ref={plotRef} className={`${S.ROOT} ${CHART_PLOT.HEIGHT.FULL}`}>
-          <svg aria-hidden width={0} height={0} className="absolute">
-            <defs>
-              {SERIES_HATCHES.map((hatch) => (
-                <SeriesHatchPattern key={hatch} id={`${patternPrefix}-${hatch}`} hatch={hatch} />
-              ))}
-            </defs>
-          </svg>
-          {scroll.isOverflowing ? (
+        {/* * the plot's box is measured (its width lays the bars out): it stays mounted, and while
+            the data load holds a skeleton — the data swap what's in it alone */}
+        <div ref={plotRef} data-chart-plot className={`${S.ROOT} ${CHART_PLOT.HEIGHT.FULL}`}>
+          {isLoading ? (
+            <ChartSkeleton heightClass={FULL_HEIGHT_CLASS} />
+          ) : (
             <>
-              <div
-                ref={register}
-                data-overlay-scroller
-                className={`h-full ${S.SCROLLER}`}
-                {...(isTouch
-                  ? { onScroll: (event) => setScrollLeft(event.currentTarget.scrollLeft) }
-                  : {})}
-              >
-                <div className="relative h-full" style={{ width: scroll.contentWidth }}>
+              <svg aria-hidden width={0} height={0} className="absolute">
+                <defs>
+                  {SERIES_HATCHES.map((hatch) => (
+                    <SeriesHatchPattern
+                      key={hatch}
+                      id={`${patternPrefix}-${hatch}`}
+                      hatch={hatch}
+                    />
+                  ))}
+                </defs>
+              </svg>
+              {scroll.isOverflowing ? (
+                <>
+                  <div
+                    ref={register}
+                    data-overlay-scroller
+                    className={`h-full ${S.SCROLLER}`}
+                    {...(isTouch
+                      ? { onScroll: (event) => setScrollLeft(event.currentTarget.scrollLeft) }
+                      : {})}
+                  >
+                    <div className="relative h-full" style={{ width: scroll.contentWidth }}>
+                      {chart}
+                      {tapLayer}
+                    </div>
+                  </div>
+                  <FixedYAxes scales={scales} rightMax={rightMax} rows={rows} />
+                </>
+              ) : (
+                <div className="relative h-full">
                   {chart}
                   {tapLayer}
                 </div>
-              </div>
-              <FixedYAxes scales={scales} rightMax={rightMax} rows={rows} />
+              )}
             </>
-          ) : (
-            <div className="relative h-full">
-              {chart}
-              {tapLayer}
-            </div>
           )}
         </div>
         {scroll.isOverflowing && <p className={S.HINT}>{t("chart.scrollHint")}</p>}

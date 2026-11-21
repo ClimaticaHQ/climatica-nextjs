@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
 import type { EStatLabelSize, EStatValueSize } from "@/enums";
 import type { TUpdateFlashKeys } from "@/types";
 
 export type TStatCardProps = {
   label: string;
-  value: string;
+  /** the value, or a placeholder while it loads */
+  value: ReactNode;
   /** a unit after the value, smaller: "°C", "mm" */
   unit?: string | undefined;
   /** a line under the value */

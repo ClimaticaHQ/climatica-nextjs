@@ -27,7 +27,7 @@ import { useChartModel, useComparisonChartExport } from "@/hooks/charts";
 import { useGetAltitude, useGetCompareData, useGetDatasetVersion } from "@/hooks/data";
 import { useFilters } from "@/hooks/filters";
 import { usePersistedComparisonCities } from "@/hooks/persisted";
-import { useUrlStateSync } from "@/hooks/ui";
+import { useUrlStateSync, useInitialUrlState } from "@/hooks/ui";
 import type {
   TChartMode,
   TChartSeries,
@@ -55,13 +55,14 @@ export function useCompareCitiesPage(): TCompareCitiesPage {
   const filters = useFilters();
   const { dataset, climatePeriod, weatherYear, months, variables } = filters;
   const gridSize = resolveGridSize(filters, EFilterView.COMPARE_CITIES);
-  const [layout, setLayout] = useState<ECompareLayout>(DEFAULT_COMPARE_LAYOUT);
+  const initial = useInitialUrlState(COMPARE_CITIES_URL_SCHEMA);
+  const [layout, setLayout] = useState<ECompareLayout>(initial.layout ?? DEFAULT_COMPARE_LAYOUT);
   const [wlShading, setWlShading] = useState<EWalterLiethShading>(
-    WALTER_LIETH_COMPARISON.DEFAULT_SHADING,
+    initial.wlShading ?? WALTER_LIETH_COMPARISON.DEFAULT_SHADING,
   );
-  const [chartMode, setChartMode] = useState<TChartMode>(DEFAULT_CHART_MODE);
+  const [chartMode, setChartMode] = useState<TChartMode>(initial.chartMode ?? DEFAULT_CHART_MODE);
   // * kept while overlay is shown, so going back to split restores it
-  const [expanded, setExpanded] = useState<TExpandedPanel>(null);
+  const [expanded, setExpanded] = useState<TExpandedPanel>(initial.expanded ?? null);
   const [visible, setVisible] = useState<TVisibleSeries | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 

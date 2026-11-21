@@ -11,7 +11,13 @@ import {
   MOTION_CSS_VAR,
   WALTER_LIETH_DASH,
 } from "@/constants";
-import { EChartBody, ESeriesKind, ESeriesTitleSource, EWalterLiethShading } from "@/enums";
+import {
+  EChartBody,
+  EDataStatus,
+  ESeriesKind,
+  ESeriesTitleSource,
+  EWalterLiethShading,
+} from "@/enums";
 import type {
   TChartFeatures,
   TChartModel,
@@ -53,19 +59,29 @@ export function getSeriesKindRule(series: readonly TChartSeries[]): TSeriesKindR
 }
 
 /** Every complete Walter-Lieth series: an overlay needs all of a shaded pair. */
-function isEveryComplete(model: TChartModel) {
-  return model.series.every(({ walterLieth }) => isCompleteSeries(walterLieth));
+// * a series still loading isn't incomplete yet: one landing before the other keeps the layout
+function isEveryLoadedComplete(model: TChartModel) {
+  return model.series.every(
+    ({ series, walterLieth }) =>
+      series.state.status === EDataStatus.LOADING || isCompleteSeries(walterLieth),
+  );
 }
 
 /**
  * The body for the page's layout. A Walter-Lieth overlay of a shadable pair needs both series
  * complete — otherwise the side by side shows the diagram next to the other's notice.
  */
-export function resolveChartBody({ viewState, model, rule }: TResolveChartBodyArgs): EChartBody {
+export function resolveChartBody({
+  viewState,
+  model,
+  rule,
+  isLoading,
+}: TResolveChartBodyArgs): EChartBody {
   if (viewState.layout === undefined) return EChartBody.SINGLE;
   const body = CHART_BODY_BY_LAYOUT[viewState.layout.value];
   const isWalterLiethOverlay = viewState.mode === "walter-lieth" && body === EChartBody.OVERLAY;
-  return isWalterLiethOverlay && rule.canShade && !isEveryComplete(model) ? EChartBody.SPLIT : body;
+  const isIncomplete = !isLoading && !isEveryLoadedComplete(model);
+  return isWalterLiethOverlay && rule.canShade && isIncomplete ? EChartBody.SPLIT : body;
 }
 
 /** The title's names: the series' own labels, or the page's (the city every series belongs to). */

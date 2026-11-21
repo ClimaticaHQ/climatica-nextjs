@@ -11,6 +11,7 @@ export { useMonthlyTableLabels } from "./useMonthlyTableLabels";
 export { useWalterLiethLegendItems } from "./useWalterLiethLegendItems";
 export { useHasMounted } from "./useHasMounted";
 export { useElementWidth } from "./useElementWidth";
+export { useInitialUrlState } from "./useInitialUrlState";
 export { useIsClient } from "./useIsClient";
 export { usePopover } from "./usePopover";
 export { useDelayedFlag } from "./useDelayedFlag";

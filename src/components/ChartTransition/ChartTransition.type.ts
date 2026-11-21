@@ -8,6 +8,8 @@ export type TChartTransitionProps = {
   transitionKey: string;
   /** set for a split panel expanding / switching: fade plus a slight scale from this side */
   enterOrigin?: TTransformOrigin | undefined;
+  /** the content stands in for what is loading: replaced without a crossfade, only a fade-in */
+  isPlaceholder?: boolean;
   children: ReactNode;
 };
 
@@ -15,6 +17,7 @@ export type TChartTransitionProps = {
 export type TTransitionLayer = {
   key: string;
   node: ReactNode;
+  isPlaceholder: boolean;
 };
 
 /** The entering and leaving layers' animation classes, and how long the leaving one stays. */

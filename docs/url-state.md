@@ -32,7 +32,10 @@ Compare Periods' `order` and `markers`) parse it read-only.
 - **ownWrite**: the URL caught up with the hook's own write; nothing to do.
 
 Nothing is read or written before the first client render (the persisted cities load then).
-Fields the URL carries win; the rest keep their persisted value or default.
+Fields the URL carries win; the rest keep their persisted value or default. The page's view
+fields (chart mode, layout, shading, expanded panel, sort order) start from
+[`useInitialUrlState`](../src/hooks/ui/useInitialUrlState.ts) — the URL as the first render,
+the server's too, finds it — so the first paint is already the view the URL asks for.
 
 Writes are scheduled and re-checked when they run
 ([`canWriteUrlState`](../src/utils/urlStateGuard.util.ts)): a write is dropped if the page is no
