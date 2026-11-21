@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, SidePanel } from "@/components/UI";
-import { AUTO_APPLY_DEBOUNCE_MS, LG_MEDIA_QUERY } from "@/constants";
+import { AUTO_APPLY_DEBOUNCE_MS } from "@/constants";
 import { EButtonVariant, EFilterApplyMode, EFilterAvailability } from "@/enums";
 import { useAutoApply } from "@/hooks/filters/useAutoApply";
 import { useCityClimatePeriods } from "@/hooks/filters/useCityClimatePeriods";
@@ -10,9 +10,8 @@ import { useFilterPageContext } from "@/hooks/filters/useFilterPageContext";
 import { useFilters } from "@/hooks/filters/useFilters";
 import { useFiltersDraft } from "@/hooks/filters/useFiltersDraft";
 import { useChartModeUrl } from "@/hooks/url/useChartModeUrl";
-import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 import { useSettingsStore } from "@/stores";
-import { getSectionFilterKeys, getSidebarFilterKeys } from "@/utils/filters.util";
+import { getSidebarFilterKeys } from "@/utils/filters.util";
 import { serializeFilters } from "@/utils/filtersUrl.util";
 import { useTranslations } from "next-intl";
 import { FilterSections } from "./FilterSections";
@@ -35,11 +34,10 @@ export function FiltersSidebar() {
   const filtersDraft = useFiltersDraft({ filters, heatmapBbox });
   const { draft, isApplyBlocked } = filtersDraft;
   const draftContext = { view, dataset: draft.dataset, isWalterLieth };
-  // * one render per breakpoint: below lg (this column hidden) the page has the period selectors
-  const isDesktop = useMediaQuery(LG_MEDIA_QUERY);
-  const sectionKeys = isDesktop
-    ? getSidebarFilterKeys(draftContext)
-    : getSectionFilterKeys(draftContext);
+  // * the same sections at every width: the column shows from lg only (its classes), and below lg
+  // * the page has its own copy of the period selectors — each copy hidden by CSS where the
+  // * other shows, so nothing is added or removed on hydration
+  const sectionKeys = getSidebarFilterKeys(draftContext);
 
   function commit(mode: EFilterApplyMode) {
     const next = filtersDraft.submit();

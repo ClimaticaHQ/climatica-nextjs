@@ -19,9 +19,13 @@ async function applySidebarOption(page: Page, label: string | RegExp, value: str
 }
 
 /** Picks a period in Compare Periods' own selector (side "a" or "b") — it applies at once. */
+/** Picks a period in the sidebar's copy (shown from lg; the page's is hidden by CSS). */
 async function selectPagePeriod(page: Page, side: "a" | "b", value: string) {
-  await page.getByTestId(`period-${side}-select`).click();
-  await page.getByTestId(`period-${side}-option-${value}`).click();
+  await page
+    .getByRole("complementary", { name: "Filters" })
+    .getByRole("button", { name: new RegExp(`^Period ${side.toUpperCase()}`) })
+    .click();
+  await page.getByTestId(`sidebar-period-${side}-option-${value}`).click();
 }
 
 test.describe("Data update feedback", () => {
@@ -51,7 +55,6 @@ test.describe("Data update feedback", () => {
     const panelA = page.locator('[data-panel-series="a"]:not([inert] *)');
     const panelB = page.locator('[data-panel-series="b"]:not([inert] *)');
     await expect(panelB).toBeVisible({ timeout: 30_000 });
-
     await selectPagePeriod(page, "b", "c1981-2010");
 
     await expect(panelB).toHaveAttribute("data-update-flash", "active");
@@ -130,7 +133,6 @@ test.describe("Animation settings", () => {
     await page.goto(PERIODS_URL);
     const panelB = page.locator('[data-panel-series="b"]:not([inert] *)');
     await expect(panelB).toBeVisible({ timeout: 30_000 });
-
     await selectPagePeriod(page, "b", "c1981-2010");
 
     await expect(panelB).toHaveAttribute("data-update-flash", "active");

@@ -26,12 +26,6 @@ export const FILTER_UNAVAILABLE_ACTION_CLASS =
   "mt-1 inline-flex items-center text-[length:var(--font-xs)] font-medium text-[var(--color-primary)] underline-offset-2 hover:underline max-lg:min-h-target max-lg:text-[length:var(--font-touch-body)]";
 
 // * a column from lg up; below lg the filters live in the filter bar's sheet
-export const FILTERS_SIDEBAR_CLASS =
-  "hidden w-80 shrink-0 flex-col overflow-hidden border-r border-[var(--color-border)] bg-[var(--color-surface)] lg:flex";
-
-// * the sidebar's filter sections, scrolling between the top bar and the Apply button
-export const FILTERS_SIDEBAR_SECTIONS_CLASS = "flex flex-1 flex-col gap-8 overflow-y-auto p-4";
-
 export const FILTER_BAR_CLASSES = {
   ROOT: "flex items-center gap-2",
   DIVIDER: "h-6 w-px shrink-0 bg-[var(--color-border)]",
@@ -53,8 +47,8 @@ export const RESOLUTION_LABEL_CLASS =
 export const COMPARED_PERIODS_CLASSES = {
   // * a year's badge frame: rounded like the badge, so its arrival flash follows its outline
   YEAR_FRAME: "inline-flex rounded-[var(--radius-full)]",
-  // * on the page below lg; hidden from lg by CSS too, so the server render (no viewport yet)
-  // * never flashes it on a desktop, where the sidebar has it as a section
+  // * on the page below lg, hidden from lg (display: none) where the sidebar's copy shows: both
+  // * copies are always rendered, each shown at its width by CSS alone
   PAGE: "w-full max-w-xl lg:hidden",
   // * compact (sidebar): one row from 20rem of room, stacked below it — the swap then turns
   // * to point up / down
@@ -104,3 +98,9 @@ export const PERIOD_PAIR_SIDES = [
     testId: "period-b",
   },
 ] as const;
+
+// * the two copies of Compare Periods' selectors, told apart in their test ids
+export const COMPARED_PERIODS_TEST_ID_PREFIX = {
+  PAGE: "page",
+  SIDEBAR: "sidebar",
+} as const;

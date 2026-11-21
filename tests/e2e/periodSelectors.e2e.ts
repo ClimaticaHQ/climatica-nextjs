@@ -3,17 +3,22 @@ import { expect, test, type Page } from "@playwright/test";
 const PERIODS_URL = "/compare-periods?city=Madrid&lat=40.4168&lng=-3.7038";
 const sidebar = (page: Page) => page.locator("aside");
 const param = (page: Page, name: string) => new URL(page.url()).searchParams.get(name);
+// * a copy's Period B select, by role: only the copy shown at this width answers
+const periodB = (scope: ReturnType<Page["locator"]>) =>
+  scope.getByRole("button", { name: /^Period B/ });
 
 test.describe("Compare Periods selectors from lg: a sidebar section", () => {
   test("Period B and swap in the sidebar, not on the page; applied by auto-apply", async ({
     page,
   }) => {
     await page.goto(PERIODS_URL);
-    await expect(sidebar(page).getByTestId("period-b-select")).toBeVisible({ timeout: 30_000 });
-    await expect(page.locator("main").getByTestId("period-b-select")).toHaveCount(0);
+    await expect(periodB(sidebar(page))).toBeVisible({ timeout: 30_000 });
+    // * the page's copy is there too, hidden from lg (display: none): no role answers for it
+    await expect(page.locator("main").getByTestId("page-period-b-select")).toBeHidden();
+    await expect(periodB(page.locator("main"))).toHaveCount(0);
 
-    await sidebar(page).getByTestId("period-b-select").click();
-    await page.getByTestId("period-b-option-c1981-2010").click();
+    await periodB(sidebar(page)).click();
+    await page.getByTestId("sidebar-period-b-option-c1981-2010").click();
     // * a draft change: auto-apply (on by default) writes it shortly after
     await expect(page).toHaveURL(/period2=c1981-2010/);
     expect(param(page, "period1")).toBeNull();
@@ -51,8 +56,8 @@ test.describe("Compare Periods selectors from lg: a sidebar section", () => {
       ),
     );
     await page.reload();
-    await sidebar(page).getByTestId("period-b-select").click();
-    await page.getByTestId("period-b-option-c1981-2010").click();
+    await periodB(sidebar(page)).click();
+    await page.getByTestId("sidebar-period-b-option-c1981-2010").click();
     await expect(page).not.toHaveURL(/period2=/);
     await page.getByRole("button", { name: "Apply filters" }).click();
     await expect(page).toHaveURL(/period2=c1981-2010/);
@@ -86,4 +91,33 @@ test("the sidebar's Cell Resolution says why 30 s is unavailable — and offers 
     "aria-describedby",
     /.+/,
   );
+});
+
+test.describe("Compare Periods selectors: both copies", () => {
+  test("the server's HTML has each copy once, and no id twice", async ({ request }) => {
+    const html = await (await request.get(PERIODS_URL)).text();
+    for (const testId of ["page-period-b-select", "sidebar-period-b-select"]) {
+      expect(html.match(new RegExp(`data-testid="${testId}"`, "g"))).toHaveLength(1);
+    }
+    const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map(([, id]) => id);
+    expect(ids.filter((id, index) => ids.indexOf(id) !== index)).toEqual([]);
+  });
+
+  test("a period changed in one copy shows in the other after a resize", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(PERIODS_URL);
+    await periodB(sidebar(page)).click();
+    await page.getByTestId("sidebar-period-b-option-c1981-2010").click();
+    await expect(page).toHaveURL(/period2=c1981-2010/);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    const onPage = periodB(page.locator("main"));
+    await expect(onPage).toContainText("1981–2010");
+    await onPage.click();
+    await page.getByTestId("page-period-b-option-c1961-1990").click();
+    await expect(page).toHaveURL(/period2=c1961-1990/);
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect(periodB(sidebar(page))).toContainText("1961–1990");
+  });
 });

@@ -15,10 +15,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 // * the page container's seams: the URL's filters, navigation, and the city's available periods
 const page = vi.hoisted(() => {
   const updates: { partial: unknown; mode: string }[] = [];
-  const state: { filters: TFilters | null; updates: typeof updates; isDesktop: boolean } = {
+  const state: { filters: TFilters | null; updates: typeof updates } = {
     filters: null,
     updates,
-    isDesktop: false,
   };
   return state;
 });
@@ -34,10 +33,8 @@ vi.mock("@/hooks/filters/useFilterNavigation", () => ({
     updateFilters: (partial: unknown, mode: string) => page.updates.push({ partial, mode }),
   }),
 }));
-// * the lg breakpoint: below it the page has the selectors, from it the sidebar
-vi.mock("@/hooks/ui/useMediaQuery", () => ({
-  useMediaQuery: () => page.isDesktop,
-}));
+// * jsdom has no matchMedia: the years editor's parts ask for a breakpoint (below lg here)
+vi.mock("@/hooks/ui/useMediaQuery", () => ({ useMediaQuery: () => false }));
 vi.mock("@/hooks/filters/useCityClimatePeriods", () => ({
   useCityClimatePeriods: () => null,
 }));
@@ -50,7 +47,6 @@ const PAIR: TClimatePeriodPair = {
 afterEach(() => {
   cleanup();
   page.updates.length = 0;
-  page.isDesktop = false;
 });
 
 function withIntl(node: ReactNode) {
@@ -76,8 +72,9 @@ function renderPair(onChange = vi.fn()) {
   return onChange;
 }
 
+// * the page's copy (isOnPage): its test ids carry its prefix
 const option = (side: "a" | "b", period: string) =>
-  screen.getByTestId(`period-${side}-option-${period}`);
+  screen.getByTestId(`page-period-${side}-option-${period}`);
 
 describe("ComparedPeriodsSection: the Climate A ↔ B pair", () => {
   it("disables each side's period in the other select", () => {
@@ -133,10 +130,11 @@ describe("ComparedPeriods (the page, below lg)", () => {
     expect(screen.getByText("2021")).toBeTruthy();
   });
 
-  it("renders nothing from lg — the sidebar has them as a section", () => {
-    page.isDesktop = true;
+  it("is always rendered, hidden from lg by CSS alone (the sidebar's copy shows there)", () => {
     page.filters = { ...FILTER_DEFAULTS, ...PAIR };
-    render(withIntl(<ComparedPeriods />));
-    expect(screen.queryByRole("button", { name: "Swap periods" })).toBeNull();
+    const { container } = render(withIntl(<ComparedPeriods />));
+    expect(screen.getByRole("button", { name: "Swap periods" })).toBeTruthy();
+    expect(container.firstElementChild?.className.split(" ")).toContain("lg:hidden");
+    expect(screen.getByTestId("page-period-b-select")).toBeTruthy();
   });
 });

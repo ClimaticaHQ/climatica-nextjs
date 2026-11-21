@@ -54,8 +54,12 @@ In [`src/components/filters/`](../src/components/filters):
   are listed in the page's order with each year's marker, read from the URL
   ([`useComparedYears`](../src/hooks/filters/useComparedYears.ts), [charts.md](charts.md#marker-identity)).
 
-Three containers, each rendered only at its breakpoint (`LG_MEDIA_QUERY`), so a control never
-exists twice:
+Three containers, each shown at its breakpoint. The sidebar and Compare Periods' page copy are
+always rendered — in the server's HTML too — each hidden by CSS (`display: none`) where the
+other shows, so nothing is added or removed on hydration and the hidden copy is out of the
+accessibility tree and the tab order. Their ids come from `useId`; their test ids carry their
+copy (`sidebar-` / `page-`, `COMPARED_PERIODS_TEST_ID_PREFIX`). Both read the URL, so a period
+changed in one is in the other.
 
 | Container                                                                                                             | Where                     | Applies                                                                       |
 | --------------------------------------------------------------------------------------------------------------------- | ------------------------- | ----------------------------------------------------------------------------- |

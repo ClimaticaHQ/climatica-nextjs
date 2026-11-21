@@ -15,6 +15,7 @@ const CHART_VIEWS = [
   },
 ];
 const WIDTHS = [390, 1440];
+const PERIODS_URL = "/compare-periods?city=Madrid&lat=40.4168&lng=-3.7038";
 const CLS_LIMIT = 0.02;
 // * long enough for the data and the charts to land, and any late shift to be counted
 const SETTLE_MS = 2500;
@@ -94,7 +95,7 @@ test.describe("Loading without jumps", () => {
   });
 
   for (const width of WIDTHS) {
-    for (const url of ["/about", CITY_URL]) {
+    for (const url of ["/about", CITY_URL, PERIODS_URL]) {
       test(`reloading ${url} at ${width}px shifts nothing (CLS < ${CLS_LIMIT})`, async ({
         page,
       }) => {

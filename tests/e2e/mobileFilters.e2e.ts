@@ -156,11 +156,13 @@ test.describe("Mobile filters", () => {
     page,
   }) => {
     await page.goto(PERIODS_URL);
-    // * below lg the selectors are on the page, applying at once — not in the (hidden) sidebar
-    await expect(page.locator("main").getByTestId("period-b-select")).toBeVisible();
-    await expect(page.locator("aside").getByTestId("period-b-select")).toHaveCount(0);
-    await page.getByTestId("period-b-select").click();
-    await page.getByTestId("period-b-option-c1981-2010").click();
+    // * below lg the page's copy shows, applying at once; the sidebar's is hidden (display: none)
+    const periodB = page.getByRole("button", { name: /^Period B/ });
+    await expect(periodB).toHaveCount(1);
+    await expect(page.locator("main").getByRole("button", { name: /^Period B/ })).toBeVisible();
+    await expect(page.locator("aside").getByTestId("sidebar-period-b-select")).toBeHidden();
+    await periodB.click();
+    await page.getByTestId("page-period-b-option-c1981-2010").click();
     await expect(page).toHaveURL(/period2=c1981-2010/);
     // * Period A is the default, so it isn't written
     expect(param(page, "period1")).toBeNull();

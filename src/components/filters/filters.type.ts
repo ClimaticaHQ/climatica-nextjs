@@ -96,6 +96,8 @@ export type TPeriodPairProps = {
   onChange: (periods: TClimatePeriodPair) => void;
   /** the sidebar's narrow column: A and B stacked when one row doesn't fit */
   isCompact: boolean;
+  /** which copy (COMPARED_PERIODS_TEST_ID_PREFIX): the page's or the sidebar's */
+  testIdPrefix: string;
 };
 
 export type TYearsEditorProps = {

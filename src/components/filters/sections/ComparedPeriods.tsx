@@ -10,7 +10,6 @@ import {
   ARRIVAL_FLASH_ATTRIBUTE,
   DATASETS,
   FILTER_WEATHER_PERIODS_LIMITS,
-  LG_MEDIA_QUERY,
   WEATHER_MAX_YEAR,
   WEATHER_MIN_YEAR,
 } from "@/constants";
@@ -27,7 +26,6 @@ import { useFilterNavigation } from "@/hooks/filters/useFilterNavigation";
 import { useFilters } from "@/hooks/filters/useFilters";
 import { useComparedYears } from "@/hooks/filters/useComparedYears";
 import { useArrivalFlash } from "@/hooks/ui/useArrivalFlash";
-import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 import type { TClimatePeriod } from "@/constants";
 import type { TFilterChangeHandler, TPair } from "@/types";
 import {
@@ -42,6 +40,7 @@ import { useId, useState } from "react";
 import { FilterNote, FilterSection } from "../FilterSection";
 import {
   COMPARED_PERIODS_CLASSES as C,
+  COMPARED_PERIODS_TEST_ID_PREFIX as TEST_ID_PREFIX,
   PERIOD_PAIR_SIDES,
   YEAR_BADGE_TONE,
 } from "../filters.constant";
@@ -53,15 +52,14 @@ import type {
 import { YearInput } from "../YearInput";
 
 /**
- * Compare Periods' own selectors on the page, below lg; every change applies at once. From lg
- * the sidebar has the same section, as part of its draft.
+ * Compare Periods' own selectors on the page, shown below lg; every change applies at once. From
+ * lg the sidebar's copy shows instead, as part of its draft. Both copies are always rendered
+ * (the server's HTML too), each hidden by CSS where the other shows; both read the URL.
  */
 export function ComparedPeriods() {
   const filters = useFilters();
   const { applyFilters, updateFilters } = useFilterNavigation();
   const availablePeriods = useCityClimatePeriods();
-  const isDesktop = useMediaQuery(LG_MEDIA_QUERY);
-  if (isDesktop) return null;
 
   const handleChange: TFilterChangeHandler = (key, value) =>
     applyFilters(setFilterValue(filters, key, value), EFilterApplyMode.QUICK);
@@ -99,12 +97,19 @@ export function ComparedPeriodsSection({
       availablePeriods={availablePeriods}
       onChange={onChangeMany}
       isCompact={!isOnPage}
+      testIdPrefix={isOnPage ? TEST_ID_PREFIX.PAGE : TEST_ID_PREFIX.SIDEBAR}
     />
   );
 }
 
 /** Period A and Period B, a swap button by B's label; a side never offers the other's period. */
-function PeriodPair({ periods, availablePeriods, onChange, isCompact }: TPeriodPairProps) {
+function PeriodPair({
+  periods,
+  availablePeriods,
+  onChange,
+  isCompact,
+  testIdPrefix,
+}: TPeriodPairProps) {
   const t = useTranslations();
   const labelId = useId();
   const pair: TPair<TClimatePeriod> = [periods.climatePeriodA, periods.climatePeriodB];
@@ -133,8 +138,8 @@ function PeriodPair({ periods, availablePeriods, onChange, isCompact }: TPeriodP
         ariaLabelledBy={`${labelId}-${side}`}
         isStretched
         className="w-full"
-        data-testid={`${testId}-select`}
-        optionTestIdPrefix={`${testId}-option`}
+        data-testid={`${testIdPrefix}-${testId}-select`}
+        optionTestIdPrefix={`${testIdPrefix}-${testId}-option`}
       />
     </div>
   ));
