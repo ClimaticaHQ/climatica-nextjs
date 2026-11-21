@@ -29,6 +29,7 @@ import {
   toWalterLiethMonths,
   getFrostMonths,
   getPrecipitationTicks,
+  getStandardTempAxis,
   formatLatLng,
   formatValue,
   roundForDisplay,
@@ -298,7 +299,8 @@ function buildStandardBody(
       chartBottom,
       precTicks,
       (tick) => tick,
-      undefined,
+      // * the screen's full-width °C axis: both ends on ticks
+      getStandardTempAxis({ scales: payload.scales, isNarrow: false }).ticks,
       // * the WL plot's axes: °C / mm above them, like the screen
       EXPORT_AXES_STYLE,
     ),
@@ -441,8 +443,7 @@ export function buildExportSvg(
 
   // Standard mode only — Walter-Lieth builds its own scale from getSharedDomain.
   const tempScale = createLinearScale(
-    payload.scales.tempMin,
-    payload.scales.tempMax,
+    ...getStandardTempAxis({ scales: payload.scales, isNarrow: false }).domain,
     chartBottom,
     L.chartTop,
   );

@@ -15,11 +15,12 @@ import type {
   TMonthLabelFormat,
   TMonthLabelFormatArgs,
   TPlotHeightArgs,
+  TStandardTempAxisArgs,
   TStandardYAxesArgs,
   TUnitTitlePlacementArgs,
   TWalterLiethScales,
 } from "@/types";
-import { getPrecipitationTicks, getTemperatureTicks } from "./axisTicks.util";
+import { getPrecipitationTicks, getTemperatureAxis } from "./axisTicks.util";
 import { scaleChartFont } from "./textSize.util";
 import { getFrostBandHeight } from "./walterLieth.util";
 
@@ -181,23 +182,29 @@ export function getAxisTicks({ min, max, count }: TAxisTicksArgs): number[] {
   return [min, max];
 }
 
+/** The standard chart's °C axis, on screen and in the export: ends on ticks, fewer on a phone. */
+export function getStandardTempAxis({ scales, isNarrow }: TStandardTempAxisArgs) {
+  const { STANDARD_TEMP_MAX_TICKS } = WALTER_LIETH_AXIS;
+  return getTemperatureAxis({
+    min: scales.tempMin,
+    max: scales.tempMax,
+    maxCount: isNarrow ? STANDARD_TEMP_MAX_TICKS.NARROW : STANDARD_TEMP_MAX_TICKS.WIDE,
+  });
+}
+
 /**
- * The standard chart's y axes: °C over the scales on round ticks (fewer on a phone), mm from 0
- * — on a phone exactly NARROW_TICK_COUNT round ticks, otherwise getPrecipitationTicks; the mm
- * domain always their span, so the axis ends on a tick.
+ * The standard chart's y axes, each ending on ticks: °C over the scales rounded outwards to its
+ * step (getTemperatureAxis; fewer ticks on a phone), mm from 0 — on a phone exactly
+ * NARROW_TICK_COUNT round ticks, otherwise getPrecipitationTicks.
  */
 export function getStandardYAxes({ scales, rightMax, isNarrow }: TStandardYAxesArgs) {
-  const temp = scales ? ([scales.tempMin, scales.tempMax] as const) : null;
   const ticks = (min: number, max: number) =>
     getAxisTicks({ min, max, count: WALTER_LIETH_AXIS.NARROW_TICK_COUNT });
   const precTicks = isNarrow ? ticks(0, rightMax) : getPrecipitationTicks(rightMax);
   const edges = (values: readonly number[]) => [values[0] ?? 0, values.at(-1) ?? 0] as const;
-  const tempMaxTicks = isNarrow
-    ? WALTER_LIETH_AXIS.NARROW_TICK_COUNT
-    : WALTER_LIETH_AXIS.TEMP_MAX_TICKS;
   return {
-    temp: temp
-      ? { domain: temp, ticks: getTemperatureTicks(...temp, tempMaxTicks) }
+    temp: scales
+      ? getStandardTempAxis({ scales, isNarrow })
       : { domain: ["auto", "auto"] as const },
     prec: { domain: edges(precTicks), ticks: precTicks },
   };

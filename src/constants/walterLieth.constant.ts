@@ -76,6 +76,9 @@ export const WALTER_LIETH_AXIS = {
   // * °C ticks, on both charts: multiples of one of these steps, at most TEMP_MAX_TICKS of them
   TEMP_TICK_STEPS: [5, 10, 20, 50],
   TEMP_MAX_TICKS: 7,
+  // * the standard chart's °C axis (screen and export) ends on ticks: room for 5 °C steps over a
+  // * 40 °C range on a full chart, 25 °C on a phone, before the step doubles
+  STANDARD_TEMP_MAX_TICKS: { WIDE: 9, NARROW: 6 },
   // * the standard chart's mm ticks (screen and export): multiples of one of these steps, at
   // * most PREC_MAX_TICKS, the axis ending on a tick
   PREC_TICK_STEPS: [10, 20, 25, 50, 100, 200, 250, 500, 1000],

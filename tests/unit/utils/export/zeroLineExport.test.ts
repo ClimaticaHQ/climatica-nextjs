@@ -33,6 +33,8 @@ const COLORS: TExportChartColors = {
 };
 
 const ZERO_LINE = "data-zero-line";
+// * px — a °C tick label's baseline below its tick
+const EXPORT_TICK_LABEL_OFFSET = 4;
 const scalesOf = (tempMin: number, tempMax: number): TWalterLiethScales => ({
   tempMin,
   tempMax,
@@ -146,5 +148,28 @@ describe("buildExportSvg — the 0 °C line", () => {
 
   it("leaves it out of the Walter-Lieth diagram", () => {
     expect(buildSvg("walter-lieth", scalesOf(-10, 30))).not.toContain(ZERO_LINE);
+  });
+
+  it("ends the standard chart's °C axis on labelled ticks, as on screen", () => {
+    const doc = new DOMParser().parseFromString(
+      buildSvg("standard", scalesOf(-5, 30)),
+      "image/svg+xml",
+    );
+    const labels = [
+      ...doc.querySelectorAll(`text[text-anchor="end"][fill="${COLORS.textSecondary}"]`),
+    ];
+    const values = labels.map((label) => Number(label.textContent?.replace("\u2212", "-")));
+    expect(values).toEqual([-5, 0, 5, 10, 15, 20, 25, 30]);
+    // * the lowest label on the plot's baseline, the highest on its top grid line
+    const ys = labels.map((label) => Number(label.getAttribute("y")) - EXPORT_TICK_LABEL_OFFSET);
+    const grid = [...doc.querySelectorAll('line[stroke-dasharray="3 3"]')].map((line) =>
+      Number(line.getAttribute("y1")),
+    );
+    const baselines = [...doc.querySelectorAll("line:not([stroke-dasharray])")]
+      .filter((line) => line.getAttribute("y1") === line.getAttribute("y2"))
+      .map((line) => Number(line.getAttribute("y1")));
+    expect(ys[0]).toBeCloseTo(Math.max(...grid));
+    expect(baselines.some((y) => Math.abs(y - (ys[0] ?? 0)) < 0.01)).toBe(true);
+    expect(ys.at(-1)).toBeCloseTo(Math.min(...grid));
   });
 });

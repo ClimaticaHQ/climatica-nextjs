@@ -1,5 +1,5 @@
 import { WALTER_LIETH_AXIS } from "@/constants";
-import type { TRoundTicksArgs } from "@/types";
+import type { TRoundTicksArgs, TTemperatureAxisArgs } from "@/types";
 
 /**
  * Round ticks at an even step: the multiples, inside [min, max], of the smallest allowed step
@@ -20,6 +20,32 @@ export function getTemperatureTicks(
   maxCount: number = WALTER_LIETH_AXIS.TEMP_MAX_TICKS,
 ) {
   return getRoundTicks({ min, max, maxCount, steps: WALTER_LIETH_AXIS.TEMP_TICK_STEPS });
+}
+
+/**
+ * The standard chart's °C axis: its range rounded outwards to the smallest allowed step whose
+ * rounded range keeps at most maxCount ticks — so both ends are labelled ticks, every value lies
+ * inside, and the finest step that fits leaves under one step of room at each end.
+ */
+export function getTemperatureAxis({ min, max, maxCount }: TTemperatureAxisArgs) {
+  const steps = WALTER_LIETH_AXIS.TEMP_TICK_STEPS;
+  // * + 0: never a -0 end
+  const rounded = (step: number) => {
+    const low = Math.floor(min / step) * step + 0;
+    // * a flat range still spans one step
+    const high = Math.max(Math.ceil(max / step) * step, low + step) + 0;
+    return [low, high] as const;
+  };
+  const countAt = (step: number) => {
+    const [low, high] = rounded(step);
+    return (high - low) / step + 1;
+  };
+  const step = steps.find((candidate) => countAt(candidate) <= maxCount) ?? steps.at(-1) ?? 1;
+  const domain = rounded(step);
+  return {
+    domain,
+    ticks: getRoundTicks({ min: domain[0], max: domain[1], maxCount: Infinity, steps: [step] }),
+  };
 }
 
 /**

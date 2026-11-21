@@ -13,6 +13,7 @@ import {
   MAP_MARKER,
   SERIES_SHAPES,
   TOUCH_MEDIA_QUERY,
+  WALTER_LIETH_AXIS,
 } from "@/constants";
 import { ECardPadding, ECompareLayout } from "@/enums";
 import { useChartModel } from "@/hooks/charts/useChartModel";
@@ -441,9 +442,11 @@ describe("the phone's y axes: round ticks, every value inside", () => {
         expect(value).toBeLessThanOrEqual(Number(high));
       }
     }
-    // * °C: round multiples at an even step, at most four on a phone (0 when crossed)
-    const phoneTicks = "ticks" in axes.temp ? (axes.temp.ticks ?? []) : [];
-    expect(phoneTicks.length).toBeLessThanOrEqual(4);
+    // * °C: round multiples at an even step, at most six on a phone (0 when crossed), the
+    // * domain's ends among them
+    const phoneTicks = "ticks" in axes.temp ? axes.temp.ticks : [];
+    expect(phoneTicks.length).toBeLessThanOrEqual(WALTER_LIETH_AXIS.STANDARD_TEMP_MAX_TICKS.NARROW);
+    expect([phoneTicks[0], phoneTicks.at(-1)]).toEqual([low, high]);
     expect(phoneTicks).toContain(0);
     expect(new Set(phoneTicks.slice(1).map((tick, i) => tick - (phoneTicks[i] ?? 0))).size).toBe(1);
     // * wider screens get the same round ticks, more of them
@@ -452,6 +455,6 @@ describe("the phone's y axes: round ticks, every value inside", () => {
       rightMax: 200,
       isNarrow: false,
     }).temp;
-    expect("ticks" in desktop && desktop.ticks?.every((tick) => tick % 5 === 0)).toBe(true);
+    expect("ticks" in desktop && desktop.ticks.every((tick) => tick % 5 === 0)).toBe(true);
   });
 });

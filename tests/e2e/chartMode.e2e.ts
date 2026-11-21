@@ -11,6 +11,7 @@ const CITIES_URL =
   "/compare-cities?cityA=Paris&latA=48.8566&lngA=2.3522&cityB=Oslo&latB=59.9139&lngB=10.7522";
 const PERIODS_URL = "/compare-periods?city=Madrid&lat=40.4168&lng=-3.7038";
 const FIVE_YEARS_URL = `${PERIODS_URL}&dataset=weather&periods=2021,1967,1990,2010,2000&layout=overlay&chart=standard`;
+const BOLZANO_URL = "/climate-statistics?city=Bolzano&lat=46.4983&lng=11.3548&chart=standard";
 const PHONE = { width: 390, height: 900 };
 const DESKTOP = { width: 1440, height: 900 };
 // * px — sub-pixel text edges; the shapes' ink must stay inside the axis column
@@ -350,6 +351,30 @@ test.describe("Compare Periods: weather years overlaid", () => {
     await expectShown(page, ["1967", "1990"], ["2021"]);
     await expect(page).toHaveURL(/shownYears=1967%2C1990/);
   });
+});
+
+test("the standard chart's °C axis ends on labelled ticks below 0 (Bolzano)", async ({ page }) => {
+  await page.goto(BOLZANO_URL);
+  await expect(page.locator(".recharts-bar").first()).toBeVisible({ timeout: 30_000 });
+  const axis = await page.evaluate(() => {
+    const [left] = [...document.querySelectorAll(".recharts-yAxis-tick-labels")];
+    const labels = [...(left?.querySelectorAll(".recharts-cartesian-axis-tick-value") ?? [])]
+      .map((label) => ({
+        value: Number(label.textContent?.replace("\u2212", "-")),
+        y: label.getBoundingClientRect().top + label.getBoundingClientRect().height / 2,
+      }))
+      .sort((a, b) => a.y - b.y);
+    const grid = [...document.querySelectorAll(".recharts-cartesian-grid-horizontal line")].map(
+      (line) => line.getBoundingClientRect().top,
+    );
+    return { labels, top: Math.min(...grid), bottom: Math.max(...grid) };
+  });
+  const values = axis.labels.map(({ value }) => value);
+  expect(values.at(-1)).toBeLessThan(0);
+  expect(new Set(values.slice(1).map((value, i) => (values[i] ?? 0) - value)).size).toBe(1);
+  // * the lowest label at the plot's bottom edge, the highest at its top
+  expect(Math.abs((axis.labels.at(-1)?.y ?? 0) - axis.bottom)).toBeLessThan(2);
+  expect(Math.abs((axis.labels[0]?.y ?? 0) - axis.top)).toBeLessThan(2);
 });
 
 test("the last selected variable stays on, without a hint", async ({ page }) => {

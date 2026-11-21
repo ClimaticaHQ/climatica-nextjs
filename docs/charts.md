@@ -111,8 +111,8 @@ under the chips in one sideways-scrolling row.
 
 - **Header:** title on the left, wrapping (a pair's names wrap whole, never cut); switches on the
   right, top-aligned.
-- **Plot:** about 1 : 1.1, narrow axes (`getAxisStyle(…, isNarrow)`), four round ticks per
-  standard axis whose span is the domain (`getStandardYAxes`), one-letter month initials from the
+- **Plot:** about 1 : 1.1, narrow axes (`getAxisStyle(…, isNarrow)`), at most six °C ticks and
+  four mm ticks, each axis ending on ticks (`getStandardYAxes`), one-letter month initials from the
   locale (`formatMonthLabel`), single-series bars 55 % of the month, curves 2.2 px. One series
   never scrolls.
 - **Comparison bars** (`PHONE_OVERLAY_BARS`): fixed widths instead of squeezing the year — 14 px
@@ -140,7 +140,14 @@ With a mouse: tooltips, hover focus and the month band, as usual.
 ### Standard chart
 
 A Recharts `ComposedChart` with °C left (the model's scales) and mm right from 0. The two axes
-aren't tied, unlike Walter-Lieth's ([climate-indices.md](climate-indices.md)). The mm ticks
+aren't tied, unlike Walter-Lieth's ([climate-indices.md](climate-indices.md)); the grid follows
+the °C ticks. The °C axis (`getStandardTempAxis` → `getTemperatureAxis`, screen and export) is
+the scales rounded outwards to the smallest step of 5, 10, 20, 50 whose rounded range keeps at
+most `STANDARD_TEMP_MAX_TICKS` ticks (9; 6 on a phone): both ends are labelled ticks, every
+value lies inside, and each end has less than one step of room (the scales are already rounded
+to 5 °C, so with 5 °C steps the domain is the scales themselves). Bolzano, −5…30 °C: every 5 °C;
+on a phone −10…30 every 10. A minimum exactly on a tick adds no step. The Walter-Lieth diagram
+keeps its own ticks. The mm ticks
 (`getPrecipitationTicks`, screen and export) are multiples of the smallest step of 10, 20, 25,
 50… that keeps at most 7, and the axis ends on the first one at or above `rightMax` (0, 20 …
 100, never … 80, 90); on a phone, four round ticks.

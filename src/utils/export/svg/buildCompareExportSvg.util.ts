@@ -28,6 +28,7 @@ import {
   getSwatchBarStyle,
   getMonthlyTableVariables,
   getPrecipitationTicks,
+  getStandardTempAxis,
   getSeriesLegendItems,
 } from "@/utils";
 import { buildHatchPatternDefs } from "./hatchExport.util";
@@ -192,12 +193,9 @@ function buildStandardChartBody(
   const plotLeft = payload.comparison ? L.paddingX + rowHeaders.gutter : W.overlayPlotMarginX;
   const plotRight = L.width - plotLeft;
   const chartBottom = top + W.overlayPlotHeight;
-  const tempScale = createLinearScale(
-    payload.scales.tempMin,
-    payload.scales.tempMax,
-    chartBottom,
-    top,
-  );
+  // * the screen's full-width °C axis: both ends on ticks
+  const tempAxis = getStandardTempAxis({ scales: payload.scales, isNarrow: false });
+  const tempScale = createLinearScale(...tempAxis.domain, chartBottom, top);
   const precTicks = getPrecipitationTicks(payload.rightMax);
   const precScale = createLinearScale(0, precTicks.at(-1) ?? 0, chartBottom, top);
   const monthCount = payload.series[0]?.data.length ?? WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR;
@@ -237,7 +235,7 @@ function buildStandardChartBody(
       chartBottom,
       precTicks,
       (tick) => tick,
-      undefined,
+      tempAxis.ticks,
       EXPORT_AXES_STYLE,
     ),
     buildZeroLine({ scales: payload.scales, tempScale, plotLeft, plotRight }),

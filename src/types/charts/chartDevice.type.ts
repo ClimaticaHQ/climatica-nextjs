@@ -28,6 +28,11 @@ export type TStandardYAxesArgs = {
   isNarrow: boolean;
 };
 
+export type TStandardTempAxisArgs = {
+  scales: TWalterLiethScales;
+  isNarrow: boolean;
+};
+
 export type TAxisTicksArgs = {
   min: number;
   max: number;
@@ -41,6 +46,13 @@ export type TRoundTicksArgs = {
   maxCount: number;
   /** the steps allowed, smallest first */
   steps: readonly number[];
+};
+
+/** A °C axis whose both ends are ticks: the values' range, and at most this many ticks. */
+export type TTemperatureAxisArgs = {
+  min: number;
+  max: number;
+  maxCount: number;
 };
 
 /** A plot's tooltip on this device: Recharts' own on hover, the tapped month's on touch. */

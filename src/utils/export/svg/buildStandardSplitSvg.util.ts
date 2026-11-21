@@ -16,7 +16,7 @@ import type {
   TWalterLiethSeriesInput,
   TWeatherYearsExport,
 } from "@/types";
-import { getPrecipitationTicks, getStandardLegendItems } from "@/utils";
+import { getPrecipitationTicks, getStandardLegendItems, getStandardTempAxis } from "@/utils";
 import { buildGridAndAxes, buildZeroLine } from "./buildExportSvg.util";
 import { buildGroupedBars, buildMonthLabels, buildSeriesLines } from "./compareChartParts.util";
 import { createLinearScale, monthBandX } from "./scales.util";
@@ -35,12 +35,9 @@ function buildStandardPlot(
   colors: TExportChartColors,
   box: TWalterLiethExportBox,
 ) {
-  const tempScale = createLinearScale(
-    payload.scales.tempMin,
-    payload.scales.tempMax,
-    box.bottom,
-    box.top,
-  );
+  // * the screen's full-width °C axis: both ends on ticks
+  const tempAxis = getStandardTempAxis({ scales: payload.scales, isNarrow: false });
+  const tempScale = createLinearScale(...tempAxis.domain, box.bottom, box.top);
   const precTicks = getPrecipitationTicks(payload.rightMax);
   const precScale = createLinearScale(0, precTicks.at(-1) ?? 0, box.bottom, box.top);
   const monthCount = series.data.length;
@@ -61,7 +58,7 @@ function buildStandardPlot(
       box.bottom,
       precTicks,
       (tick) => tick,
-      undefined,
+      tempAxis.ticks,
       EXPORT_AXES_STYLE,
     ),
     buildZeroLine({
