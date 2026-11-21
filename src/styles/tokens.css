@@ -29,7 +29,6 @@
   --dark-grey-18: #2c2c2c;
   --dark-grey-24: #3a3a3a;
   --dark-grey-26: #3d3d3d;
-  --dark-grey-36: #555555;
   --dark-grey-46: #6c6c6c;
   --dark-grey-66: #a0a0a0;
 
@@ -437,7 +436,7 @@ html.dark {
   --color-chart-bar-hatch: var(--dark-grey-6);
   --color-chart-context-line: var(--dark-grey-46);
   --color-chart-context-bar: var(--dark-grey-18);
-  --color-chart-reference-line: var(--dark-grey-36);
+  --color-chart-reference-line: var(--dark-grey-46);
 
   --color-series-marker: var(--dark-grey-66);
 

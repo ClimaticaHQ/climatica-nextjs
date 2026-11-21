@@ -164,6 +164,21 @@ describe("tokens.css: primitives, then semantic tokens", () => {
     expect(notPrimitives).toEqual([]);
   });
 
+  it("the 0 °C reference line: M2 grey 500 in light, an M2 dark-theme grey in dark", () => {
+    const lines = semanticBlocks.flatMap(({ selector, declarations }) =>
+      declarations
+        .filter(({ name }) => name === "--color-chart-reference-line")
+        .map(({ value }) => ({ isDark: selector.includes(".dark"), value })),
+    );
+    expect(lines.length).toBeGreaterThan(0);
+    for (const { isDark, value } of lines) {
+      expect(value).toBe(isDark ? "var(--dark-grey-46)" : "var(--grey-500)");
+    }
+    // * the primitives they name: M2 grey 500, and white at the disabled emphasis (38%) on #121212
+    expect(primitives.get("--grey-500")).toBe("#9e9e9e");
+    expect(primitives.get("--dark-grey-46")).toBe("#6c6c6c");
+  });
+
   it("nothing outside tokens.css reads a primitive — components use semantic tokens", () => {
     const names = [...primitives.keys()].map((name) => name.slice(2)).join("|");
     const direct = new RegExp(`var\\(--(?:${names})\\)`, "g");
