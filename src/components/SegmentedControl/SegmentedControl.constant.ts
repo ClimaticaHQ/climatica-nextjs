@@ -46,6 +46,10 @@ export const SEGMENTED_CONTROL_CLASSES = {
   LABEL: "max-w-48 truncate max-sm:sr-only",
   // * always shown, on one line, never broken: the layout makes room for it (useSegmentLayout)
   LABEL_SHOWN: "whitespace-nowrap",
+  // * always shown, cut to the room: the track and its segments may shrink below their labels
+  TRACK_TRUNCATED: "max-w-full",
+  OPTION_TRUNCATED: "min-w-0",
+  LABEL_TRUNCATED: "min-w-0 truncate",
 } as const;
 
 // * an icon's size in its segment's em (OPTION's [&>svg]:size-[1.15em])

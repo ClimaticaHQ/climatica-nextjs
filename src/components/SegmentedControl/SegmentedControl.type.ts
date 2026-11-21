@@ -21,6 +21,9 @@ export type TSegmentedControlProps<TValue extends string> = {
   /** below `sm` the options show only their icons (a dense chart toolbar); otherwise every label
    * shows, the segments equal */
   isIconOnlyBelowSm?: boolean | undefined;
+  /** labels always shown and cut with an ellipsis where the room is short, never a list: a
+   * control in a fixed box (the MiniMap's header); the full label stays the option's name */
+  isLabelTruncated?: boolean | undefined;
   /** the pill's height below `sm`; DEFAULT when absent */
   size?: ESegmentedSize | undefined;
   /** the id of a text describing every option (a settings row's description) */

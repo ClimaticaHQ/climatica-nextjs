@@ -25,7 +25,9 @@ const BROWSER_PX = 20;
 const MIN_TARGET_PX = 44;
 const LARGER = TEXT_SIZE_SCALES[ETextSize.LARGER];
 // * the Info breadcrumb's page name gives way to an ellipsis by design (docs/pages.md)
-const ALLOWED_ELLIPSIS = "[data-breadcrumb-page]";
+// * the mini map's place names are cut to its fixed-width header, each whole as its option's name
+const ALLOWED_ELLIPSIS =
+  '[data-breadcrumb-page], [role="group"][aria-label="Place highlighted on the map"] span';
 // * the inline swap sits in a label row between the filter bar and the period dropdowns: its target
 // * reaches as far as they allow (37px at the default size), short of 44px — the known exception
 const SMALL_TARGET_EXCEPTIONS = '[aria-label="Swap periods"]';

@@ -228,7 +228,8 @@
   "map": {
     "selectedFromMap": "Valgt fra kartet",
     "pointLabel": "Kartpunkt {lat}, {lng}",
-    "gridCell": "Rutenettcelle: {size}"
+    "gridCell": "Rutenettcelle: {size}",
+    "highlightedPlace": "Sted som er uthevet på kartet"
   },
   "cellSizes": {
     "10m": "10 min (~324 km²)",

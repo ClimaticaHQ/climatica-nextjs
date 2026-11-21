@@ -228,7 +228,8 @@
   "map": {
     "selectedFromMap": "Вибрано з мапи",
     "pointLabel": "Точка на мапі {lat}, {lng}",
-    "gridCell": "Комірка сітки: {size}"
+    "gridCell": "Комірка сітки: {size}",
+    "highlightedPlace": "Місце, виділене на мапі"
   },
   "cellSizes": {
     "10m": "10 хв (~324 км²)",

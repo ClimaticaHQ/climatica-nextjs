@@ -228,7 +228,8 @@
   "map": {
     "selectedFromMap": "Selecionado a partir do mapa",
     "pointLabel": "Ponto do mapa {lat}, {lng}",
-    "gridCell": "Célula da grelha: {size}"
+    "gridCell": "Célula da grelha: {size}",
+    "highlightedPlace": "Local destacado no mapa"
   },
   "cellSizes": {
     "10m": "10 min (~324 km²)",

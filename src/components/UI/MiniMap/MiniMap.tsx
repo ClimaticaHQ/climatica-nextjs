@@ -2,16 +2,19 @@
 
 import type { Map as LMap, Marker as LMarker } from "leaflet";
 import { Card } from "@/components/Card";
-import { ECardPadding } from "@/enums";
+import { SegmentedControl } from "@/components/SegmentedControl";
+import { ECardPadding, ESegmentedSize } from "@/enums";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import { OptionMarker } from "@/components/UI/Dropdown/OptionMarker";
-import { MINI_MAP_TOGGLE_CLASSES as T } from "./MiniMap.constant";
+import { MINI_MAP_TOGGLE_BAR_CLASS } from "./MiniMap.constant";
 import type { TMiniMapLocation, TMiniMapProps } from "./MiniMap.type";
 import { getMiniMapIcon } from "./MiniMap.util";
 
 export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
+  const t = useTranslations("map");
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LMap | null>(null);
   const markersRef = useRef<LMarker[]>([]);
@@ -112,20 +115,20 @@ export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
     >
       <div className="flex h-full flex-col">
         {showToggle && (
-          <div className={T.BAR}>
-            <div className={T.GROUP}>
-              {locations.map((loc, i) => (
-                <button
-                  key={loc.label}
-                  type="button"
-                  onClick={() => onToggle?.(i)}
-                  className={`${T.BUTTON} ${activeIndex === i ? T.ACTIVE : T.IDLE}`}
-                >
-                  {loc.shape && <OptionMarker shape={loc.shape} />}
-                  {loc.label}
-                </button>
-              ))}
-            </div>
+          <div className={MINI_MAP_TOGGLE_BAR_CLASS}>
+            {/* * values are the places' indexes: two places may share a label */}
+            <SegmentedControl
+              label={t("highlightedPlace")}
+              options={locations.map((loc, i) => ({
+                value: String(i),
+                label: loc.label,
+                icon: loc.shape && <OptionMarker shape={loc.shape} />,
+              }))}
+              value={String(activeIndex ?? 0)}
+              onChange={(value) => onToggle?.(Number(value))}
+              size={ESegmentedSize.COMPACT}
+              isLabelTruncated
+            />
           </div>
         )}
 

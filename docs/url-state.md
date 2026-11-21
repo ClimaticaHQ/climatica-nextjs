@@ -209,7 +209,9 @@ the request:
 
 ## Parameter reference
 
-A param at its default is left out.
+A param at its default is left out. `grid`'s default is none chosen, so it's written exactly
+when the reader picked one (or a link named one), even where it equals the view's default
+([filters.md](filters.md#resolution)).
 
 | Param                            | Owner   | Pages                                            | Default                                      | Allowed values                                       | Legacy            |
 | -------------------------------- | ------- | ------------------------------------------------ | -------------------------------------------- | ---------------------------------------------------- | ----------------- |
@@ -217,7 +219,7 @@ A param at its default is left out.
 | `period`                         | filters | City Climate, Compare Cities, Heat map (Climate) | `c1970-2000`                                 | a climate period (`CLIMATE_PERIODS`)                 |                   |
 | `year`                           | filters | City Climate, Compare Cities, Heat map (Weather) | `WEATHER_MAX_YEAR`                           | `WEATHER_MIN_YEAR`–`WEATHER_MAX_YEAR`                |                   |
 | `var`                            | filters | all                                              | `tmax,tmin,prec`                             | also `srad`, `wind`, `vapr` (Climate 1970–2000 only) |                   |
-| `grid`                           | filters | all                                              | `2.5m`                                       | `10m`, `5m`, `2.5m`, `30s` (Climate 1970–2000 only)  |                   |
+| `grid`                           | filters | all                                              | none chosen: the view's finest offered       | `10m`, `5m`, `2.5m`, `30s` (Climate 1970–2000 only)  |                   |
 | `months`                         | filters | all (disabled on the heat map)                   | `all`                                        | `all` or 1–12, comma list                            |                   |
 | `period1`, `period2`             | filters | Compare Periods (Climate)                        | `c1970-2000`, `c1991-2020`                   | climate periods, never equal                         |                   |
 | `periods`                        | filters | Compare Periods (Weather)                        | `2021,1967`                                  | 2–5 weather years, in the order added                | `year1` + `year2` |

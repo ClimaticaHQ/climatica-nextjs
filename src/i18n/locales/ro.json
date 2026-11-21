@@ -228,7 +228,8 @@
   "map": {
     "selectedFromMap": "Selectat de pe hartă",
     "pointLabel": "Punct pe hartă {lat}, {lng}",
-    "gridCell": "Celulă grilă: {size}"
+    "gridCell": "Celulă grilă: {size}",
+    "highlightedPlace": "Locul evidențiat pe hartă"
   },
   "cellSizes": {
     "10m": "10 min (~324 km²)",

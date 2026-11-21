@@ -42,6 +42,22 @@ A chip shows its value short (`CHIP_FORMATTERS`, [`filterChips.util.ts`](../src/
 one variable by name, several by count ("3 variables", locale plurals); one month by name, several
 by count.
 
+## Resolution
+
+`gridSize` is the reader's choice or `null`, meaning none was chosen ([`filters.util.ts`](../src/utils/filters.util.ts)):
+
+- **Offered:** `isGridSizeOffered` (30″ only for the 1970–2000 normals). A view checks every
+  dataset and period it shows (`getGridSizeContexts`: Compare Periods both of its periods).
+- **Default:** the finest offered there (`getDefaultGridSize`): 30″ for 1970–2000, 2.5′ for the
+  other normals, the weather years and any Compare Periods pair. The heat map keeps 2.5′
+  (`GRID_SIZE_VIEW_DEFAULTS`): at 30″ almost any region passes the cell cap.
+- **Loaded:** `resolveGridSize`: the choice while the view offers it, else the default. A choice a
+  page doesn't offer stays in the URL, so a page that offers it gets it back.
+- **None chosen** follows every dataset or period change. Any pick makes a choice, the shown option
+  too. A choice the dataset or period no longer offers becomes `null` again (`normalizeFilters`).
+- **Periods** a place has data for are checked at the grid each would load at
+  (`getGridSizeByPeriod`), one request per distinct grid.
+
 ## Components
 
 In [`src/components/filters/`](../src/components/filters):

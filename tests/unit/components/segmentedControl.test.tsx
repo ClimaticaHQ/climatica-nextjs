@@ -81,6 +81,50 @@ describe("SegmentedControl labels", () => {
     expect(labelClass(true)).toBe(C.LABEL);
     expect(C.LABEL).toContain("max-sm:sr-only");
   });
+
+  it("cuts them to the room when asked, never a list, the full label the option's name", () => {
+    const longLabel = "Valladolid de los Caballeros";
+    render(
+      <SegmentedControl
+        label="Place"
+        options={[
+          { value: "0", label: longLabel, icon: null },
+          { value: "1", label: "Oslo", icon: null },
+        ]}
+        value="0"
+        onChange={() => {}}
+        isLabelTruncated
+      />,
+    );
+    const group = screen.getByRole("group", { name: "Place" });
+    expect(group.getAttribute("data-layout")).toBe("inline");
+    expect(group.getAttribute("class")).toContain(C.TRACK_TRUNCATED);
+    const option = screen.getByRole("button", { name: longLabel });
+    expect(option.getAttribute("title")).toBe(longLabel);
+    expect(option.getAttribute("class")).toContain(C.OPTION_TRUNCATED);
+    expect(screen.getByText(longLabel).getAttribute("class")).toBe(C.LABEL_TRUNCATED);
+  });
+});
+
+describe("SegmentedControl option icons", () => {
+  it("draws each option's icon before its label, hidden from the accessible name", () => {
+    render(
+      <SegmentedControl
+        label="Place"
+        options={[
+          { value: "0", label: "Bolzano", icon: <svg data-testid="icon-0" aria-hidden="true" /> },
+          { value: "1", label: "Verona", icon: <svg data-testid="icon-1" aria-hidden="true" /> },
+        ]}
+        value="0"
+        onChange={() => {}}
+      />,
+    );
+    const option = screen.getByRole("button", { name: "Bolzano" });
+    expect(option.firstElementChild).toBe(screen.getByTestId("icon-0"));
+    expect(screen.getByRole("button", { name: "Verona" }).firstElementChild).toBe(
+      screen.getByTestId("icon-1"),
+    );
+  });
 });
 
 describe("whether the options fit inline", () => {

@@ -228,7 +228,8 @@
   "map": {
     "selectedFromMap": "Von der Karte ausgewählt",
     "pointLabel": "Kartenpunkt {lat}, {lng}",
-    "gridCell": "Rasterzelle: {size}"
+    "gridCell": "Rasterzelle: {size}",
+    "highlightedPlace": "Auf der Karte hervorgehobener Ort"
   },
   "cellSizes": {
     "10m": "10 Min (~324 km²)",

@@ -84,6 +84,8 @@ no filters, no data requests. Components are in `src/components/info/` by role (
 
 1. **Header** ([`PageHeader`](../src/components/PageHeader/PageHeader.tsx)): title and description.
 2. **Controls:** searches, mini maps, the filter bar, Compare Periods' periods, drawing tools.
+   With two places (Compare Cities) the mini map's header picks the one drawn larger: a compact
+   `SegmentedControl`, each option the place's marker (`OptionMarker`) and its name, cut to fit.
 3. **Map** (optional, City Climate).
 4. **Status:** the results' empty or error message ([`PageStatus`](../src/components/page/PageStatus.tsx));
    nothing while loading or ready.

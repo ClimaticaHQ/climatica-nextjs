@@ -6,7 +6,8 @@ import { useSegmentLayout } from "./hooks/useSegmentLayout";
 
 /**
  * A pill track of mutually exclusive options (icon + label; icon only below `sm` on request, or
- * one option per line below `sm` when a label doesn't fit inline). Each
+ * one option per line below `sm` when a label doesn't fit inline, or labels cut to the room on
+ * request). Each
  * option is a native toggle button, so Tab / Enter / Space work and aria-pressed reports it.
  * The active pill slides to the selected option.
  */
@@ -18,13 +19,18 @@ export function SegmentedControl<TValue extends string>({
   isDisabled = false,
   isFlat = false,
   isIconOnlyBelowSm = false,
+  isLabelTruncated = false,
   size = ESegmentedSize.DEFAULT,
   ariaDescribedBy,
 }: TSegmentedControlProps<TValue>) {
   const { trackRef, rect } = useIndicatorRect(value);
-  const { isList, roomWidth } = useSegmentLayout(trackRef, !isIconOnlyBelowSm);
+  const { isList, roomWidth } = useSegmentLayout(trackRef, !isIconOnlyBelowSm && !isLabelTruncated);
   const activeClass = isFlat ? C.ACTIVE_FLAT : C.ACTIVE;
-  const trackClass = isIconOnlyBelowSm ? C.TRACK : C.TRACK_LABELLED;
+  const trackClass = isIconOnlyBelowSm
+    ? C.TRACK
+    : `${C.TRACK_LABELLED} ${isLabelTruncated ? C.TRACK_TRUNCATED : ""}`;
+  const labelShownClass = isLabelTruncated ? C.LABEL_TRUNCATED : C.LABEL_SHOWN;
+  const labelClass = isIconOnlyBelowSm ? C.LABEL : labelShownClass;
   const roomStyle: TSegmentedRoomStyle = { "--segmented-room": `${roomWidth}px` };
 
   return (
@@ -65,10 +71,10 @@ export function SegmentedControl<TValue extends string>({
             aria-describedby={ariaDescribedBy}
             title={option.label}
             onClick={() => onChange(option.value)}
-            className={`${C.OPTION} ${C.SIZE[size]} ${isList ? C.OPTION_LIST : ""} ${isActive ? activeClass : C.INACTIVE}`}
+            className={`${C.OPTION} ${C.SIZE[size]} ${isList ? C.OPTION_LIST : ""} ${isLabelTruncated ? C.OPTION_TRUNCATED : ""} ${isActive ? activeClass : C.INACTIVE}`}
           >
             {option.icon}
-            <span className={isIconOnlyBelowSm ? C.LABEL : C.LABEL_SHOWN}>{option.label}</span>
+            <span className={labelClass}>{option.label}</span>
           </button>
         );
       })}

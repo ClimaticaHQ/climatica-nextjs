@@ -68,7 +68,9 @@ On-screen charts draw in SVG px, so they follow the scale in code: On-screen cha
 - **SegmentedControl layouts:** labels stay on one line, never broken. Below `sm`, when one label
   and its icon don't fit an equal segment of the most room the control can take, the whole control
   becomes a vertical list: one 44px option per line across that room (`useSegmentLayout`, from
-  widths alone, so it can't oscillate). Otherwise, and from `sm` up, inline.
+  widths alone, so it can't oscillate). Otherwise, and from `sm` up, inline. `isLabelTruncated`
+  (a control in a fixed box) never lists: the labels are cut with an ellipsis instead, each
+  option keeping its full label as its name and title.
 - **StepSlider** ([`UI/StepSlider`](../src/components/UI/StepSlider)): a native range input with a
   dot per step (`aria-valuetext` is the step's name), a flat thumb (`--color-slider-thumb`, 1px
   border, focus outline). It keeps one physical size at every text size, so it doesn't jump as the
