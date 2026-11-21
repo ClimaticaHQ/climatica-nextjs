@@ -18,7 +18,6 @@ export function MonthlyValuesTable({
   series,
   isCompact,
   markers = [],
-  hasSections = false,
   ...hover
 }: TMonthlyValuesTableProps) {
   const t = useTranslations();
@@ -38,18 +37,10 @@ export function MonthlyValuesTable({
   const variant = { rows, caption, markers, flashKeys: series.map(({ key }) => key), ...hover };
 
   // * under a scrolling overlay the aligned table scrolls with the plot at every width
-  if (scroll)
-    return (
-      <HorizontalValues isCompact={isCompact} hasSections={hasSections} isScrolling {...variant} />
-    );
+  if (scroll) return <HorizontalValues isCompact={isCompact} isScrolling {...variant} />;
   return (
     <div className={MONTHLY_VALUES_CLASSES.ROOT}>
-      <HorizontalValues
-        isCompact={isCompact}
-        hasSections={hasSections}
-        isScrolling={false}
-        {...variant}
-      />
+      <HorizontalValues isCompact={isCompact} isScrolling={false} {...variant} />
       <VerticalValues {...variant} />
     </div>
   );

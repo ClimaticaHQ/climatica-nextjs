@@ -289,8 +289,7 @@ function buildOverlayValues({
       ...getEntityBarSwatch(getExportSwatchStyle(payload), hatch, place),
       color: colors.seriesMarker,
     })),
-    // * each unit a section label, the rows headed by the series' labels (the legend holds the
-    // * markings)
+    // * the rows headed by their unit and the series' labels: an image has no tooltip
     rowHeaders: rowHeaders.labels,
     hatchPrefix: L.hatchPrefix,
     span: { left: plotLeft, right: plotRight },

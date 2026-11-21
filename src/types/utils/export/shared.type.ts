@@ -172,8 +172,21 @@ export type TExportMonthlyValuesArgs = {
   markers?: readonly TMonthlyTableMarker[] | undefined;
   /** an overlay's hatch patterns: the mm row shows each series' hatch beside its shape */
   hatchPrefix?: string | undefined;
-  /** the standard overlay: each unit a section label, the rows headed by these short labels */
+  /** the standard overlay: each row headed by its unit and these labels beside it */
   rowHeaders?: readonly string[] | undefined;
+};
+
+/** A standard overlay row's header in the export: its unit and the series' labels. */
+export type TExportRowHeaderArgs = {
+  row: TMonthlyValuesRow;
+  labels: readonly string[];
+  /** the gutter's left edge */
+  left: number;
+  /** the row's vertical centre */
+  cy: number;
+  /** the values' size — each label in its value's type */
+  fontSize: number;
+  colors: TExportChartColors;
 };
 
 /** An export's monthly values rows: its series, drawn in the export palette. */

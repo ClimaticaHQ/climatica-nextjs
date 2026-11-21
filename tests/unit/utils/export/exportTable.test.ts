@@ -177,7 +177,12 @@ describe("export row labels", () => {
     });
     expect(labels).toEqual(["SDC", "OSL"]);
     expect(labels.join("")).not.toContain("…");
-    expect(gutter).toBe(minGutter);
+    // * the unit and the short labels beside it
+    expect(gutter).toBeGreaterThanOrEqual(
+      measureExportText("°C", EXPORT_MONTHLY_VALUES.UNIT_FONT_SIZE) +
+        measureExportText("SDC", EXPORT_MONTHLY_VALUES.VALUE_FONT_SIZE.WIDE),
+    );
+    expect(gutter).toBeLessThan(EXPORT_MONTHLY_VALUES.ROW_HEADER_MAX_WIDTH);
   });
 
   it("widens the monthly table's label column to its longest row, never cutting it", () => {

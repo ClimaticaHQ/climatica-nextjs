@@ -132,10 +132,11 @@ export const EXPORT_MONTHLY_VALUES = {
   // * an overlay's markers beside the unit: the unit ends this far left of the gutter's centre,
   // * the markers start this far right of it
   UNIT_MARKER_GAP: 2,
-  // * the standard overlay's table: a section label (the unit, in the unit's type) over each row
-  SECTIONS: { PADDING_X: 6, HEIGHT: 14, BASELINE: 11 },
-  // * px — the widest label column a row header may take: past it, the series' short labels
-  // * (their full names are in the title and the legend)
+  // * the standard overlay's row headers: the unit at the gutter's left, the series' labels beside
+  // * it, one level with each value line
+  ROW_HEADER: { PADDING_X: 6, UNIT_GAP: 6 },
+  // * px — the widest the series' labels may take beside the unit: past it, their short labels
+  // * (their full names are in the legend)
   ROW_HEADER_MAX_WIDTH: 120,
   // * a line's baseline below its centre
   BASELINE: 4,

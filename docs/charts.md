@@ -260,10 +260,17 @@ month's mean temperature and precipitation, one column under each month of the p
 follows the width the chart gives it (a container query): below 30rem a disclosure opens a
 vertical table instead. It has no row hover: it highlights the hovered month's column.
 
-In the standard overlay (`hasSections`) each unit is a section, and rows are headed by short
-labels (`getEntityShortLabels`: 1967, ’70–’00, MAD). The header column is the plot's left axis
-width, so longer labels are cut, with the full name in the title. Hovering a header focuses its
-entity. The Walter-Lieth overlay keeps the unit in each row, with the entities' markers.
+In an overlay (standard and Walter-Lieth) each row is headed by its unit in its colour, with the
+series' markers stacked beside it, one level with each value line, the unit centred across them
+(`UnitLabel`): two rows, one divider. The header column is the plot's left axis width, so the
+markers show the shape only (`SeriesMarker`, the shape of the series' legend entry, chip and
+points); the hatch stays in the legend and the bars. On a phone "mm" and a shape just fill the
+33px column; centring is `safe`, so anything wider spills right, never past the left edge. In
+the standard overlay each marker is named (`HeaderMarker`): `role="img"` with the full name
+(1961–1990, 2021, Paris) as its `aria-label` and `title`; hovering or focusing it focuses its
+entity, and while another is focused it takes the context colour. The Walter-Lieth overlay's
+markers are decoration. The export heads these rows with the unit and text labels instead
+(`getRowHeaders`, docs/export.md).
 
 ## Chart blocks
 

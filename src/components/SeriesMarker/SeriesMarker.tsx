@@ -6,13 +6,14 @@ import type { TSeriesMarkerProps } from "./SeriesMarker.type";
  * An entity's marker: its shape in the neutral graphite — the same as its curves' points — and,
  * where it stands for the bars too, its hatch beside it.
  */
-export function SeriesMarker({ shape, hatch, fill }: TSeriesMarkerProps) {
+export function SeriesMarker({
+  shape,
+  hatch,
+  fill,
+  color = SERIES_MARKER_COLOR,
+}: TSeriesMarkerProps) {
   return (
-    <span
-      className="inline-flex items-center gap-0.5"
-      data-series-shape={shape}
-      style={{ color: SERIES_MARKER_COLOR }}
-    >
+    <span className="inline-flex items-center gap-0.5" data-series-shape={shape} style={{ color }}>
       {hatch && <SeriesHatchIcon hatch={hatch} fill={fill} />}
       <SeriesMarkerIcon shape={shape} />
     </span>

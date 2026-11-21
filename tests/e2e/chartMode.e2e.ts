@@ -3,7 +3,7 @@ import { LOCAL_STORAGE_KEYS } from "@/constants/localStorageKeys.constant";
 import { SERIES_HATCHES, SERIES_SHAPES } from "@/constants/seriesShape.constant";
 import { WALTER_LIETH_AXIS } from "@/constants/walterLieth.constant";
 import type { TBarStyle } from "@/types";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const PARIS = "city=Paris&lat=48.8566&lng=2.3522";
 const CITY_URL = `/climate-statistics?${PARIS}`;
@@ -12,6 +12,10 @@ const CITIES_URL =
 const PERIODS_URL = "/compare-periods?city=Madrid&lat=40.4168&lng=-3.7038";
 const FIVE_YEARS_URL = `${PERIODS_URL}&dataset=weather&periods=2021,1967,1990,2010,2000&layout=overlay&chart=standard`;
 const PHONE = { width: 390, height: 900 };
+const DESKTOP = { width: 1440, height: 900 };
+// * px — sub-pixel text edges; the shapes' ink must stay inside the axis column
+const FIT_TOLERANCE_PX = 0.5;
+const CENTRE_TOLERANCE_PX = 2;
 // * five years fit (with the sidebar) from 1121 px in plain (its gap adapts), 1145 px in shades
 const DESKTOPS = [
   { viewport: { width: 1280, height: 900 }, barStyle: "plain" },
@@ -27,12 +31,12 @@ const OVERLAY_URLS = {
   "five weather years": FIVE_YEARS_URL,
   cities: `${CITIES_URL}&chart=standard&layout=overlay`,
 };
-// * each page's values-table row headers (the °C section): short labels, the full name in the title
+// * each page's values-table row headers (the °C row): markers only, each named in full
 const OVERLAY_HEADERS = {
-  "climate periods": { texts: ["’70–’00", "’91–’20"], title: "1970–2000" },
+  "climate periods": ["1970–2000", "1991–2020"],
   // * Compare Periods lists its years oldest first
-  "five weather years": { texts: ["1967", "1990", "2000", "2010", "2021"], title: "1967" },
-  cities: { texts: ["PAR", "OSL"], title: "Paris" },
+  "five weather years": ["1967", "1990", "2000", "2010", "2021"],
+  cities: ["Paris", "Oslo"],
 };
 
 const walterLiethFigures = (page: Page) =>
@@ -496,7 +500,8 @@ test.describe("overlay: hover and sideways scroll", () => {
         const cells = [...(table?.querySelectorAll("td[tabindex]") ?? [])];
         return {
           value: font(cells[0] ?? null),
-          name: font(table?.querySelector("tbody th > span") ?? null),
+          // * the header's marker lines, as tall as the value lines
+          name: font(table?.querySelector("tbody th [role=img]")?.parentElement ?? null),
           stats: font(document.querySelector("[data-chart-block='statsTable'] table")),
           overflowing: cells.filter((cell) => cell.scrollWidth > cell.clientWidth).length,
         };
@@ -513,15 +518,32 @@ test.describe("overlay: hover and sideways scroll", () => {
     }) => {
       await page.goto(url);
       await expect(page.locator(".recharts-bar").first()).toBeVisible({ timeout: 30_000 });
-      // * text headers, no markings; hovering one focuses its entity
-      const { texts, title } = OVERLAY_HEADERS[name as keyof typeof OVERLAY_HEADERS];
+      // * marker headers, no text, each the shape the stats table (and legend / chips) gives its
+      // * series, named in full; hovering one focuses its entity
+      const names = OVERLAY_HEADERS[name as keyof typeof OVERLAY_HEADERS];
       const headers = page
         .locator('[data-chart-block="valuesTable"] tbody tr')
-        .nth(1)
+        .first()
         .locator("th [title]");
-      await expect(headers).toHaveText(texts);
-      await expect(headers.first()).toHaveAttribute("title", title);
-      await expect(page.locator('[data-chart-block="valuesTable"] tbody th svg')).toHaveCount(0);
+      await expect(headers).toHaveText(names.map(() => ""));
+      for (const [index, label] of names.entries()) {
+        await expect(headers.nth(index)).toHaveAttribute("title", label);
+        await expect(headers.nth(index)).toHaveAccessibleName(label);
+        await expect(headers.nth(index)).toHaveRole("img");
+      }
+      const shapesOf = (locator: Locator) =>
+        locator.evaluateAll((cells) =>
+          cells.map((cell) =>
+            cell.querySelector("[data-series-shape]")?.getAttribute("data-series-shape"),
+          ),
+        );
+      const statsShapes = await shapesOf(
+        page
+          .locator('[data-chart-block="statsTable"] thead th[scope=col]')
+          .filter({ has: page.locator("[data-series-shape]") }),
+      );
+      expect(await shapesOf(headers)).toEqual(statsShapes);
+      expect(new Set(statsShapes).size).toBe(names.length);
       await headers.first().hover();
       await expect
         .poll(() =>
@@ -564,6 +586,43 @@ test.describe("overlay: hover and sideways scroll", () => {
     });
   }
 
+  for (const [device, viewport] of Object.entries({ desktop: DESKTOP, phone: PHONE })) {
+    test(`${device}: each row's header — its unit beside the markers — fits the axis column`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      await page.goto(OVERLAY_URLS["climate periods"]);
+      const table = page.locator('[data-chart-block="valuesTable"] table').first();
+      await expect(table.locator("tbody th [role=img]")).toHaveCount(4, { timeout: 30_000 });
+      await expect(table.locator("tbody tr")).toHaveCount(2);
+      const fits = await table.locator("tbody th").evaluateAll(
+        (headers, { fit, centre }) =>
+          headers.map((th) => {
+            const column = th.getBoundingClientRect();
+            const unit = th.querySelector("[aria-hidden]")?.getBoundingClientRect();
+            // * the shapes' own ink, not their icons' empty padding
+            const shapes = [...th.querySelectorAll("svg path")].map((path) =>
+              path.getBoundingClientRect(),
+            );
+            return {
+              unit: th.querySelector("[aria-hidden]")?.textContent,
+              left: (unit?.left ?? 0) >= column.left - fit,
+              right: shapes.every(({ right }) => right <= column.right + fit),
+              // * the unit centred across its markers
+              centred:
+                Math.abs(
+                  (unit?.top ?? 0) + (unit?.height ?? 0) / 2 - (column.top + column.height / 2),
+                ) < centre,
+            };
+          }),
+        { fit: FIT_TOLERANCE_PX, centre: CENTRE_TOLERANCE_PX },
+      );
+      expect(fits).toEqual(
+        ["°C", "mm"].map((unit) => ({ unit, left: true, right: true, centred: true })),
+      );
+    });
+  }
+
   test("a value cell highlights its month; a header marker focuses its entity, no month", async ({
     page,
   }) => {
@@ -574,7 +633,8 @@ test.describe("overlay: hover and sideways scroll", () => {
     const hoveredCells = table.locator('td[style*="background-color"]');
     await table.locator("tbody tr").nth(1).locator("td").nth(HOVERED_MONTH).hover();
     await expect(band).toHaveCount(1);
-    await expect(hoveredCells).toHaveCount(4);
+    // * one cell per row: °C and mm, no unit-only rows
+    await expect(hoveredCells).toHaveCount(2);
     await expect(
       page.locator(".recharts-bar-rectangle rect[fill='var(--color-chart-context-bar)']"),
     ).toHaveCount(0);
@@ -640,7 +700,7 @@ test.describe("overlay: hover and sideways scroll", () => {
           HOVERED_MONTH,
         ),
       )
-      .toEqual(Array.from({ length: 4 }, () => hover));
+      .toEqual(Array.from({ length: 2 }, () => hover));
     const band = await table.evaluate((element, month) => {
       const cells = [...element.querySelectorAll("tbody tr")].map((row) => row.children[month + 1]);
       const boxes = cells.map((cell) => cell?.getBoundingClientRect());

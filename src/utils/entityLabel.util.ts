@@ -23,8 +23,9 @@ function getCityCodes(labels: readonly string[]) {
 }
 
 /**
- * The entities' short labels, in order (the values table's row headers): a weather year whole,
- * a climate period ’70–’00, a city its code — told apart from the other cities given.
+ * The entities' short labels, in order (the exported values table's row headers, where the full
+ * labels are too wide): a weather year whole, a climate period ’70–’00, a city its code — told
+ * apart from the other cities given.
  */
 export function getEntityShortLabels(entities: readonly TEntityLabelSource[]) {
   const cities = entities.flatMap(({ kind, label }, i) =>

@@ -62,8 +62,10 @@ DOM, which is why a payload is never built during render.
 - **Standard overlay:** the full year, never scrolled, always in the plain bar style
   (`EXPORT_BAR_STYLE`); a legend names every entity even where the page's chips stand in for it.
 - **Monthly values:** the screen's rows (`buildMonthlyValuesRows`), columns under the months. A
-  file can't switch to the vertical layout, so the font shrinks to fit (never below 8 px). Rows
-  use the full labels, or the short ones when too wide (`getRowHeaders`).
+  file can't switch to the vertical layout, so the font shrinks to fit (never below 8 px). In the
+  standard overlay each row is headed, as on screen, by its unit in the gutter, but with the
+  series' labels beside it instead of markers (an image has no tooltip): the full labels, or the
+  short ones when too wide, the gutter widened to fit (`getRowHeaders`). No unit-only rows.
 - **Legend:** the screen's items and swatches (`buildExportLegend`).
 - **Footer:** context, data attribution (creator and version read live from WorldClim,
   `useGetDatasetVersion`) and the view's share URL, wrapped only before "?" or "&" (`wrapUrl`).

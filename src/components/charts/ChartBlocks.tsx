@@ -5,7 +5,7 @@ import { COMPARISON_METRIC_LABEL_KEYS, SERIES_KIND_RULES } from "@/constants";
 import { useStatsTable } from "@/hooks/charts/useStatsTable";
 import { useLegendLabels } from "@/hooks/ui/useLegendLabels";
 import { useWalterLiethLegendItems } from "@/hooks/ui/useWalterLiethLegendItems";
-import { getEntityBarSwatch, getEntityShortLabels } from "@/utils";
+import { getEntityBarSwatch } from "@/utils";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 import { ChartLoadingContext } from "./chartLoading.context";
@@ -27,9 +27,8 @@ function ValuesTableBlock({ context }: TChartBlockProps) {
   const { entries, body, mode, isCompact, activeMonth } = context;
   const isOverlay = body === EChartBody.OVERLAY;
   const isStandard = mode === "standard";
-  // * the standard overlay's row headers: 1967, ’70–’00, MAD — the drawn cities told apart
-  const labels = getEntityShortLabels(entries.map(({ series }) => series));
-  // * the mm row's swatches: only where the view draws each entity's bars
+  // * the vertical table's values carry the bars' hatch: only where the view draws each entity's
+  // * bars (the header shows the shape only)
   const swatchStyle = getContextSwatchStyle(context);
   // * while the data load: twelve months without values, so the table keeps its columns
   const isLoading = useContext(ChartLoadingContext);
@@ -43,14 +42,13 @@ function ValuesTableBlock({ context }: TChartBlockProps) {
       }))}
       {...(isOverlay
         ? {
-            markers: entries.map((entry, index) => ({
+            markers: entries.map((entry) => ({
               ...getSeriesMarker(entry),
               ...getEntityBarSwatch(swatchStyle, entry.series.hatch, entry.series.markerSlot),
-              ...(isStandard ? { label: labels[index], title: entry.series.label } : {}),
+              ...(isStandard ? { title: entry.series.label } : {}),
             })),
           }
         : {})}
-      hasSections={isOverlay && isStandard}
       isCompact={isCompact}
       activeMonthIndex={activeMonth.activeMonthIndex}
       onActiveMonthIndexChange={activeMonth.onActiveMonthIndexChange}

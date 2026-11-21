@@ -36,9 +36,9 @@ export const CHART_BODY_BY_LAYOUT = {
 } as const satisfies Record<ECompareLayout, EChartBody>;
 
 /**
- * An entity's short label (the values table's row headers): a weather year whole, a climate
- * period as ’70–’00, a city as its first letters, uppercase — as many as tell it apart from the
- * other cities shown, at least CITY_CODE_LENGTH.
+ * An entity's short label (the exported values table's row headers): a weather year whole, a
+ * climate period as ’70–’00, a city as its first letters, uppercase — as many as tell it apart
+ * from the other cities shown, at least CITY_CODE_LENGTH.
  */
 export const ENTITY_SHORT_LABEL = {
   CITY_CODE_LENGTH: 3,

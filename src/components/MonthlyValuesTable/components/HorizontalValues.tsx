@@ -11,15 +11,13 @@ import {
   MONTHLY_VALUES_HOVER,
 } from "../MonthlyValuesTable.constant";
 import type { THorizontalValuesProps } from "../MonthlyValuesTable.type";
-import { RowHeaders } from "./RowHeaders";
 import { UnitLabel } from "./UnitLabel";
 import { ValueStack } from "./ValueStack";
 
 /**
  * The table under a plot, in the plot's own geometry: the label column is the plot's left
  * margin, a spacer the right one, and one column per month exactly under that month. Under a
- * scrolling overlay it takes the plot's width and scroll, its labels held like the y axis. The
- * standard overlay's: each unit a section label over its rows, headed by the series' short labels.
+ * scrolling overlay it takes the plot's width and scroll, its labels held like the y axis.
  */
 export function HorizontalValues({
   rows,
@@ -28,7 +26,6 @@ export function HorizontalValues({
   markers,
   flashKeys,
   isScrolling,
-  hasSections,
   activeMonthIndex,
   onActiveMonthIndexChange,
 }: THorizontalValuesProps) {
@@ -40,19 +37,18 @@ export function HorizontalValues({
   const margin = getPlotMargin({ isCompact, isNarrow, textScale }) - MONTHLY_VALUES_BORDER;
   const months = rows[0]?.cells ?? [];
   const fixed = scroll ? C.UNIT_FIXED : "";
-  // * the hovered month: one band from the table's top edge to its bottom — every row's cell
-  // * (section labels too), the divider between groups painted in the band's colour
-  const bandStyle = (i: number, hasDivider: boolean) =>
-    i === activeMonthIndex
-      ? {
-          backgroundColor: MONTHLY_VALUES_HOVER,
-          ...(hasDivider ? { borderTopColor: MONTHLY_VALUES_HOVER } : {}),
-        }
-      : undefined;
+  // * the hovered month: one band from the table's top edge to its bottom, the divider between
+  // * the groups painted in the band's colour
   const cellProps = (i: number, hasDivider: boolean) => ({
     tabIndex: 0,
     className: `${C.VALUE} ${hasDivider ? C.ROW_DIVIDER : ""}`,
-    style: bandStyle(i, hasDivider),
+    style:
+      i === activeMonthIndex
+        ? {
+            backgroundColor: MONTHLY_VALUES_HOVER,
+            ...(hasDivider ? { borderTopColor: MONTHLY_VALUES_HOVER } : {}),
+          }
+        : undefined,
     onMouseEnter: () => onActiveMonthIndexChange?.(i),
     onMouseLeave: () => onActiveMonthIndexChange?.(null),
     onFocus: () => onActiveMonthIndexChange?.(i),
@@ -94,45 +90,19 @@ export function HorizontalValues({
             </tr>
           </thead>
           <tbody>
-            {rows.flatMap((row, r) => {
-              const divider = r > 0 ? C.ROW_DIVIDER : undefined;
-              const isValuesDivided = !hasSections && r > 0;
-              const values = (
-                <tr key={row.variable} className={hasSections ? undefined : divider}>
-                  <th scope="row" className={`${hasSections ? C.HEADERS_CELL : C.UNIT} ${fixed}`}>
-                    {hasSections ? (
-                      <RowHeaders row={row} markers={markers} keys={flashKeys} />
-                    ) : (
-                      <UnitLabel row={row} markers={markers} />
-                    )}
-                  </th>
-                  {row.cells.map((entries, i) => (
-                    <td key={i} {...cellProps(i, isValuesDivided)}>
-                      <ValueStack entries={entries} className={C.STACK} />
-                    </td>
-                  ))}
-                  <td />
-                </tr>
-              );
-              if (!hasSections) return [values];
-              // * the unit over the header column only; screen readers get it in the row's header
-              return [
-                <tr key={`${row.variable}-unit`} aria-hidden className={divider}>
-                  <td className={`${C.SECTION} ${fixed}`} style={{ color: row.unitColor }}>
-                    {row.unit}
+            {rows.map((row, r) => (
+              <tr key={row.variable} className={r > 0 ? C.ROW_DIVIDER : undefined}>
+                <th scope="row" className={`${C.UNIT} ${fixed}`}>
+                  <UnitLabel row={row} markers={markers} keys={flashKeys} />
+                </th>
+                {row.cells.map((entries, i) => (
+                  <td key={i} {...cellProps(i, r > 0)}>
+                    <ValueStack entries={entries} className={C.STACK} />
                   </td>
-                  {months.map((_, i) => (
-                    <td
-                      key={i}
-                      className={`${C.SECTION_MONTH} ${r > 0 ? C.ROW_DIVIDER : ""}`}
-                      style={bandStyle(i, r > 0)}
-                    />
-                  ))}
-                  <td />
-                </tr>,
-                values,
-              ];
-            })}
+                ))}
+                <td />
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

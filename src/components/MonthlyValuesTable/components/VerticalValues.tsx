@@ -52,7 +52,7 @@ export function VerticalValues({
                 </th>
                 {rows.map((row) => (
                   <th key={row.variable} scope="col" className={C.VERTICAL_HEAD}>
-                    <UnitLabel row={row} markers={[]} />
+                    <UnitLabel row={row} markers={[]} keys={[]} />
                   </th>
                 ))}
               </tr>

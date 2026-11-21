@@ -315,10 +315,10 @@ describe("touch: a tapped month's tooltip", () => {
 });
 
 describe("touch: a chip only toggles its series", () => {
-  // * a focused entity mutes the others' headers in the values table
+  // * a focused entity mutes the others' header markers in the values table
   const mutedHeaders = (container: HTMLElement) =>
-    [...container.querySelectorAll("tbody th [title]")].filter((header) =>
-      header.getAttribute("style")?.includes(FOCUS_CONTEXT.TEXT),
+    [...container.querySelectorAll("tbody th [title] [data-series-shape]")].filter((marker) =>
+      marker.getAttribute("style")?.includes(FOCUS_CONTEXT.LINE),
     ).length;
 
   it("on touch hovering or focusing a chip never focuses its year", () => {

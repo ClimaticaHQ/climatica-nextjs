@@ -9,7 +9,7 @@ import {
 } from "@/components/charts/charts.constant";
 import type { TStandardChartEntry } from "@/components/charts/charts.type";
 import { MonthlyValuesTable } from "@/components/MonthlyValuesTable";
-import { FOCUS_CONTEXT, OVERLAY_FOCUS } from "@/constants";
+import { FOCUS_CONTEXT, OVERLAY_FOCUS, SERIES_MARKER_COLOR } from "@/constants";
 import messages from "@/i18n/locales/en.json";
 import type { TExportChartColors } from "@/types";
 import { buildMonthlyTableSvg } from "@/utils/export/svg/monthlyTableExport.util";
@@ -129,8 +129,8 @@ describe("the values table under a focus", () => {
     { key: "oslo", label: "Oslo", data: months(-5) },
   ];
   const markers = [
-    { shape: "circle", hatch: "solid", label: "VAL", title: series[0]!.label },
-    { shape: "square", hatch: "diagonal", label: "OSL", title: "Oslo" },
+    { shape: "circle", hatch: "solid", title: series[0]!.label },
+    { shape: "square", hatch: "diagonal", title: "Oslo" },
   ] as const;
 
   function renderTable(focusedId: string | null) {
@@ -140,7 +140,6 @@ describe("the values table under a focus", () => {
           <MonthlyValuesTable
             series={series}
             markers={markers}
-            hasSections
             isCompact={false}
             activeMonthIndex={null}
           />
@@ -149,7 +148,7 @@ describe("the values table under a focus", () => {
     );
   }
 
-  it("each header carries its series' full name in its title", () => {
+  it("each header carries its series' full name, never cut, in its title and accessible name", () => {
     const { container } = renderTable(null);
     const headers = [...container.querySelectorAll("tbody th [title]")];
     expect(headers.map((header) => header.getAttribute("title"))).toEqual([
@@ -158,7 +157,13 @@ describe("the values table under a focus", () => {
       "Valladolid de los Caballeros",
       "Oslo",
     ]);
-    expect(headers.map((header) => header.textContent)).toEqual(["VAL", "OSL", "VAL", "OSL"]);
+    expect(headers.map((header) => header.getAttribute("aria-label"))).toEqual([
+      "Valladolid de los Caballeros",
+      "Oslo",
+      "Valladolid de los Caballeros",
+      "Oslo",
+    ]);
+    expect(headers.every((header) => !header.textContent?.includes("…"))).toBe(true);
   });
 
   it("another series focused: this one's values muted, the focused one's not", () => {
@@ -168,11 +173,11 @@ describe("the values table under a focus", () => {
     expect(second?.getAttribute("style")).not.toContain(FOCUS_CONTEXT.TEXT);
   });
 
-  it("another series focused: its headers muted like its values", () => {
+  it("another series focused: its header's marker in the context curves' colour", () => {
     const { container } = renderTable("oslo");
-    const [muted, focused] = [...container.querySelectorAll("tbody th [title]")];
-    expect(muted?.getAttribute("style")).toContain(FOCUS_CONTEXT.TEXT);
-    expect(focused?.getAttribute("style")).toBeNull();
+    const [muted, focused] = [...container.querySelectorAll("tbody th [data-series-shape]")];
+    expect(muted?.getAttribute("style")).toContain(FOCUS_CONTEXT.LINE);
+    expect(focused?.getAttribute("style")).toContain(SERIES_MARKER_COLOR);
   });
 });
 

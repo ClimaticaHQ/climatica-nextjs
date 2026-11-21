@@ -1,4 +1,3 @@
-import { SECTION_LABEL_TEXT } from "@/components/UI/SectionLabel/SectionLabel.constant";
 import { CHART_HOVER_COLOR, FOCUS_RING_CLASS, WALTER_LIETH_COLORS } from "@/constants";
 
 // * the unit labels on screen: temperature in the WL red, precipitation in the WL blue
@@ -36,22 +35,15 @@ export const MONTHLY_VALUES_CLASSES = {
   VALUE: `${FOCUS_RING_CLASS} px-0 py-1 text-center font-medium tabular-nums whitespace-nowrap ${VALUE_TEXT} transition-colors duration-150`,
   STACK: "flex flex-col items-center leading-tight",
   // * an overlay's unit: the series' markers stacked beside it, each as tall as a value line
-  // * (the values' size and leading), so a marker sits level with its series' value
-  UNIT_WITH_MARKERS: "flex items-center justify-center gap-0.5",
+  // * (the values' size and leading), so a marker sits level with its series' value. No gap: the
+  // * marker icon's own padding parts them. Safe centring: where "mm" and a shape outgrow a phone's
+  // * axis column, they start at its edge and only the icon's empty padding spills right
+  UNIT_WITH_MARKERS: "flex items-center justify-center-safe",
   MARKER_STACK: `flex flex-col leading-tight ${VALUE_TEXT}`,
   MARKER_LINE: "flex h-[1.25em] items-center",
   VALUE_LINE: "inline-flex items-center gap-1",
-  // * the standard overlay's table: per variable a section label (its unit) over the header
-  // * column, then a row headed by each series' short label, level with its value line — in the
-  // * values' type, tabular numerals; a form wider than the plot's left axis is cut, never spills
-  // * into January
-  SECTION: `px-1.5 pt-1 pb-0 text-left leading-none ${SECTION_LABEL_TEXT}`,
-  // * a section row's month cell: empty, but in the hovered month's band — fading like the values
-  SECTION_MONTH: "transition-colors duration-150",
-  HEADERS_CELL: "p-0 text-left font-normal",
-  HEADERS: `flex flex-col px-0.5 leading-tight tabular-nums ${VALUE_TEXT}`,
-  HEADER: `${FOCUS_RING_CLASS} flex h-[1.25em] min-w-0 items-center rounded-[var(--radius-sm)]`,
-  HEADER_TEXT: "truncate",
+  // * a named marker (the standard overlay): focusable, as tall as its value line
+  HEADER_MARKER: `${FOCUS_RING_CLASS} flex h-[1.25em] items-center rounded-[var(--radius-sm)]`,
   // * on the row and on its month cells: a cell's own border wins, so the hovered month can paint
   // * its stretch of the divider in the band's colour
   ROW_DIVIDER: "border-t border-[var(--color-border)]",

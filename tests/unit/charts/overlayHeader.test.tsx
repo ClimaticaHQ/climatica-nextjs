@@ -5,7 +5,6 @@ import { StandardChartAxes } from "@/components/charts/StandardChartAxes";
 import { FIXED_Y_AXES } from "@/components/charts/charts.constant";
 import type { TStandardChartEntry } from "@/components/charts/charts.type";
 import { MonthlyValuesTable } from "@/components/MonthlyValuesTable";
-import { SECTION_LABEL_TEXT } from "@/components/UI/SectionLabel/SectionLabel.constant";
 import { MONTHLY_VALUES_HOVER } from "@/components/MonthlyValuesTable/MonthlyValuesTable.constant";
 import { ChartFocusContext } from "@/components/charts/chartFocus.context";
 import messages from "@/i18n/locales/en.json";
@@ -40,8 +39,8 @@ describe("the standard overlay's values table", () => {
     { key: "1967", label: "1967", data: months(-5) },
   ];
   const markers = [
-    { shape: "circle", hatch: "solid", label: "2021", title: "2021" },
-    { shape: "square", hatch: "diagonal", label: "1967", title: "1967" },
+    { shape: "circle", hatch: "solid", title: "2021" },
+    { shape: "square", hatch: "diagonal", title: "1967" },
   ] as const;
   const renderTable = (onEntityFocus = vi.fn(), onActiveMonthIndexChange = vi.fn()) =>
     render(
@@ -49,7 +48,6 @@ describe("the standard overlay's values table", () => {
         <MonthlyValuesTable
           series={series}
           markers={markers}
-          hasSections
           isCompact={false}
           activeMonthIndex={null}
           onActiveMonthIndexChange={onActiveMonthIndexChange}
@@ -58,38 +56,41 @@ describe("the standard overlay's values table", () => {
       { wrapper },
     );
 
-  it("each unit a section label row over its group, in the header column only", () => {
+  it("one row per unit, its unit in the header beside the markers — no unit-only rows", () => {
     const { container } = renderTable();
     const rows = [...container.querySelectorAll("tbody tr")];
-    expect(rows.map((row) => row.getAttribute("aria-hidden"))).toEqual([
-      "true",
-      null,
-      "true",
-      null,
+    expect(rows).toHaveLength(2);
+    expect(rows.map((row) => row.getAttribute("aria-hidden"))).toEqual([null, null]);
+    const units = rows.map((row) => row.querySelector("th [aria-hidden]"));
+    expect(units.map((unit) => unit?.textContent)).toEqual(["°C", "mm"]);
+    // * the unit keeps its chart colour
+    expect(units.map((unit) => unit?.getAttribute("style"))).toEqual([
+      expect.stringContaining("color"),
+      expect.stringContaining("color"),
     ]);
-    expect(rows[0]?.querySelector("td")?.textContent).toBe("°C");
-    expect(rows[2]?.querySelector("td")?.textContent).toBe("mm");
-    // * a cell per month (the hovered month's band runs through it), all empty
-    const cells = [...(rows[0]?.querySelectorAll("td") ?? [])];
-    expect(cells).toHaveLength(1 + 12 + 1);
-    expect(cells.slice(1).every((cell) => cell.textContent === "")).toBe(true);
+    expect(rows.map((row) => row.querySelectorAll("th [role=img]").length)).toEqual([2, 2]);
+    // * one divider, between the two groups
+    expect(rows.map((row) => row.className.includes("border-t"))).toEqual([false, true]);
   });
 
-  it("rows are headed by short labels as text — no shapes or hatches — the name in the title", () => {
-    const { container } = renderTable();
+  it("rows are headed by the series' markers — no text — the name as accessible name and title", () => {
+    const { container, getAllByRole } = renderTable();
     const headers = [...container.querySelectorAll("tbody th [title]")];
-    expect(headers.map((header) => header.textContent)).toEqual(["2021", "1967", "2021", "1967"]);
+    expect(headers.map((header) => header.textContent)).toEqual(["", "", "", ""]);
+    expect(
+      headers.map((header) =>
+        header.querySelector("[data-series-shape]")?.getAttribute("data-series-shape"),
+      ),
+    ).toEqual(["circle", "square", "circle", "square"]);
     expect(headers.map((header) => header.getAttribute("title"))).toEqual([
       "2021",
       "1967",
       "2021",
       "1967",
     ]);
-    expect(container.querySelectorAll("tbody th svg, tbody th [data-series-shape]")).toHaveLength(
-      0,
-    );
-    // * tabular numerals, the table's type
-    expect(container.querySelector("tbody th > span")?.className).toContain("tabular-nums");
+    expect(getAllByRole("img", { name: "1967" })).toHaveLength(2);
+    // * the shape only, in both rows: the axis-wide column has no room for the hatch
+    expect(headers.map((header) => header.querySelectorAll("svg").length)).toEqual([1, 1, 1, 1]);
   });
 
   it("hovering or focusing a header focuses its entity — never a month", () => {
@@ -112,21 +113,20 @@ describe("the standard overlay's values table", () => {
       <MonthlyValuesTable
         series={series}
         markers={markers}
-        hasSections
         isCompact={false}
         activeMonthIndex={HOVERED}
       />,
       { wrapper },
     );
     const rows = [...container.querySelectorAll("tbody tr")];
-    // * every row — section labels included — paints the month's cell (after the header cell)
+    // * every row paints the month's cell (after the header cell)
     const cells = rows.map((row) => row.children[HOVERED + 1]);
     cells.forEach((cell) =>
       expect(cell?.getAttribute("style")).toContain(`background-color: ${MONTHLY_VALUES_HOVER}`),
     );
     // * the divider between the groups: the band's colour across the hovered month
-    expect(cells[2]?.getAttribute("style")).toContain(`border-top-color: ${MONTHLY_VALUES_HOVER}`);
-    expect(rows[2]?.children[HOVERED]?.getAttribute("style")).toBeNull();
+    expect(cells[1]?.getAttribute("style")).toContain(`border-top-color: ${MONTHLY_VALUES_HOVER}`);
+    expect(rows[1]?.children[HOVERED]?.getAttribute("style")).toBeNull();
   });
 
   it("the header column is the plot's left axis area", () => {
@@ -136,11 +136,12 @@ describe("the standard overlay's values table", () => {
     );
   });
 
-  it("values, headers and section labels in the app's shared type — no size of their own", () => {
+  it("values and header markers in the app's shared type — no size of their own", () => {
     const { container } = renderTable();
     const value = container.querySelector("tbody td[tabindex]")?.className ?? "";
-    const headerLines = container.querySelector("tbody th > span")?.className ?? "";
-    const section = container.querySelector("tbody tr td")?.className ?? "";
+    // * the marker stack's lines as tall as the values'
+    const headerLines =
+      container.querySelector("tbody th [role=img]")?.parentElement?.className ?? "";
     // * the stats table's size from a full chart's width; the headers' lines as tall as the values'
     for (const className of [value, headerLines]) {
       expect(className).toContain("text-[length:var(--font-sm)]");
@@ -148,7 +149,6 @@ describe("the standard overlay's values table", () => {
     }
     expect(value).toContain("font-medium");
     expect(value).toContain("py-1");
-    expect(section).toContain(SECTION_LABEL_TEXT);
     // * only token sizes: no px font size anywhere in the table
     expect(container.innerHTML).not.toMatch(/text-\[\d+px\]/);
   });
