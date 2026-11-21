@@ -330,15 +330,3 @@ describe("weather years export: swatches only where its bars differ per entity",
     }
   });
 });
-
-describe("weather years export snapshots", () => {
-  it.each([
-    ["standard", ECompareLayout.OVERLAY, [2021, 1967, 1990]],
-    ["standard", ECompareLayout.SPLIT, [2021, 1967]],
-    ["walter-lieth", ECompareLayout.SPLIT, [2021, 1967]],
-  ] as const)("weather years export: %s, %s", async (chartMode, layout, drawn) => {
-    await expect(buildSvg(chartMode, layout, [...drawn], "plain")).toMatchFileSnapshot(
-      `./__snapshots__/years-${chartMode}-${layout}.svg`,
-    );
-  });
-});

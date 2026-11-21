@@ -105,5 +105,6 @@ row, map, colour scale. The map section
   its bottom; the next starts there).
 - A new colour: add it to `CSS_VAR_MAP` and `TExportChartColors`, or pass `var(--token)` and let
   `resolveCssVars` resolve it. Never a hex value in a builder.
-- Tests: builders are pure; test the SVG string ([`tests/unit/utils/export/`](../tests/unit/utils/export)).
-  Each export type has an SVG snapshot; update with `npx vitest run -u` when a change is meant.
+- Tests: builders are pure; test the SVG string ([`tests/unit/utils/export/`](../tests/unit/utils/export);
+  those guarding the protected conventions in [`tests/conventions/`](../tests/conventions)). No SVG
+  snapshots: export baselines will come as real-browser Playwright tests.

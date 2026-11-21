@@ -5,7 +5,9 @@ behaviour in a real browser, pytest for the Solr data script.
 
 ## Vitest
 
-Config: [`vitest.config.mjs`](../vitest.config.mjs); `tests/unit/**/*.test.{ts,tsx}`.
+Config: [`vitest.config.mjs`](../vitest.config.mjs); `tests/unit/**/*.test.{ts,tsx}`, and
+`tests/conventions/**/*.test.{ts,tsx}` — the tests guarding the protected conventions
+(AGENTS.md), changed only when the user's request names that change.
 
 - **Node by default;** a file that renders opts into jsdom with `// @vitest-environment jsdom` on
   its first line.

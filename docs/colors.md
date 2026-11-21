@@ -139,7 +139,7 @@ These hold colour literals, each one a primitive's value: `src/app/icon.svg`,
 
 ## The tests
 
-[`colorTokens.test.ts`](../tests/unit/styles/colorTokens.test.ts) fails on: a colour literal outside
+[`colorTokens.test.ts`](../tests/conventions/colorTokens.test.ts) fails on: a colour literal outside
 `tokens.css` and the allowlist (any CSS colour function, a Tailwind palette class, a named colour);
 an allowlisted colour that isn't a primitive; a primitive that isn't `#rrggbb`; a scale missing a
 step or out of lightness order; a semantic token holding a value or pointing to a non-primitive; a

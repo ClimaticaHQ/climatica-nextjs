@@ -12,7 +12,7 @@ import type { TChartMode, TChartSeries, TChartSeriesModel, TLegendLabels } from 
 import { deriveChartModel, getAridityByMonth, getPrecipBarFill } from "@/utils";
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { CITY_PAIR, months, PERIOD_PAIR, weatherYears } from "./chartFixtures";
+import { CITY_PAIR, months, PERIOD_PAIR, weatherYears } from "../unit/charts/chartFixtures";
 
 afterEach(cleanup);
 

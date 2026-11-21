@@ -24,6 +24,16 @@ export default defineConfig({
           environment: "node",
         },
       },
+      // * the protected conventions (AGENTS.md): Walter–Lieth colours and scale, semantic colours,
+      // * axis ticks, stats metrics
+      {
+        extends: true,
+        test: {
+          name: "conventions",
+          include: ["tests/conventions/**/*.test.{ts,tsx}"],
+          environment: "node",
+        },
+      },
     ],
     reporters: process.env["CI"] ? ["github-actions", "default"] : ["default"],
     env: loadEnv("", process.cwd(), ""),

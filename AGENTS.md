@@ -16,6 +16,20 @@ Rules for working in this repository. The explanations are in docs/ (start at do
 - No magic strings or numbers: name them as constants.
 - Debug by hypothesis: 1–3 causes, the most likely first.
 
+## Protected conventions
+
+These define the charts. A task never changes them or the tests that guard them
+(`tests/conventions/`), unless the user's own request names that exact change. If a task seems to
+need it, stop and ask instead. Snapshot updates (`-u`) are never run without showing the visual
+diff and asking. Export baselines will be added later as real-browser Playwright tests.
+
+- **Walter–Lieth diagram:** its colours, fills and patterns (humid hatching, arid dots, very
+  humid solid fill, frost band); the 10 °C = 20 mm scale and the 1:10 compression above 100 mm.
+- **Semantic chart colours:** Tmax red, Tmin blue, humid blue / arid amber bars; no entity
+  colours — series are told apart by marker shape.
+- **Colours** come from the MD2 colour system tokens only.
+- **Axis tick rules,** and the stats bar's metrics and their definitions.
+
 ## Commands
 
 - `npm run dev` — dev server (http://localhost:3000)
@@ -231,7 +245,7 @@ Tailwind v4. Components are styled with Tailwind classes; CSS custom properties 
 - Components use semantic tokens (`--color-*`) only: never a primitive, a hex / rgb() / hsl() / oklch() value, a Tailwind palette class (`bg-green-100`, `text-white`) or a named colour. TS passes tokens as `"var(--color-…)"` strings.
 - Charts use semantic colours only; an entity is told apart by its shape (seriesShape.util, by position), never a colour.
 - Files that can't read CSS (favicon, static logo, OG image, global-error) are an explicit allowlist, and their values must be primitives.
-- tests/unit/styles/colorTokens.test.ts enforces these.
+- tests/conventions/colorTokens.test.ts enforces these.
 
 ### Style files
 

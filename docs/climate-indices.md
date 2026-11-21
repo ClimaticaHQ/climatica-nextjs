@@ -120,4 +120,4 @@ can't disagree with the badges.
 2. For the stats table: a `TComparisonMetric`, its row in `COMPARISON_METRICS`, its label key, and
    its value in `getMetricValues` ([`comparisonTable.constant.ts`](../src/constants/comparisonTable.constant.ts));
    the page and both exports read the same rows.
-3. Labels in all 10 locales; tests beside [`walterLieth.test.ts`](../tests/unit/utils/walterLieth.test.ts).
+3. Labels in all 10 locales; tests beside [`walterLieth.test.ts`](../tests/conventions/walterLieth.test.ts).

@@ -703,22 +703,3 @@ describe("single-city export — monthly values table", () => {
     },
   );
 });
-
-describe("export snapshots", () => {
-  it.each([
-    ["walter-lieth", ECompareLayout.SPLIT],
-    ["walter-lieth", ECompareLayout.OVERLAY],
-    ["standard", ECompareLayout.SPLIT],
-    ["standard", ECompareLayout.OVERLAY],
-  ] as const)("compare export: %s, %s", async (chartMode, layout) => {
-    await expect(buildSvg({ chartMode, layout })).toMatchFileSnapshot(
-      `./__snapshots__/compare-${chartMode}-${layout}.svg`,
-    );
-  });
-
-  it.each(["standard", "walter-lieth"] as const)("City Climate export: %s", async (chartMode) => {
-    await expect(buildSingleSvg(chartMode)).toMatchFileSnapshot(
-      `./__snapshots__/city-${chartMode}.svg`,
-    );
-  });
-});
