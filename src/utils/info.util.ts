@@ -1,6 +1,7 @@
 import {
   ARC_UNITS,
   COPYRIGHT,
+  INFO_PAGES,
   CELL_SIZES,
   CELLS_PER_DEGREE,
   CLIMATE_PERIODS,
@@ -13,6 +14,11 @@ import {
 import { EDisplayMetric, EFilterKey } from "@/enums";
 import type { TCellSize, TCopyrightYearsArgs, TGridArc, TResolutionRow } from "@/types";
 import { getFinestGridSize, isGridSizeOffered } from "./filters.util";
+
+/** Whether a pathname is one of the Info pages. */
+export function isInfoRoute(pathname: string) {
+  return INFO_PAGES.some(({ route }) => route === pathname);
+}
 
 /**
  * A person's initials for an avatar: the first letters of their first two words — the given

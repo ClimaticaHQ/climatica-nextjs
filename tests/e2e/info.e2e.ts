@@ -1,6 +1,6 @@
 import { FIRST_RELEASE_YEAR, PROJECT_INFO } from "@/constants/project.constant";
 import { formatCopyrightYears } from "@/utils/info.util";
-import { devices, expect, test, type Page } from "@playwright/test";
+import { devices, expect, test, type Locator, type Page } from "@playwright/test";
 
 const LANGUAGE_COOKIE = "NEXT_LOCALE";
 const INFO_ROUTES = ["/about", "/about/guide", "/about/data"];
@@ -241,6 +241,92 @@ test.describe("Info pages", () => {
   });
 });
 
+// * How it works: its intro paragraph's, heading's and card grid's boxes, the Info column's
+// * width, the reading measure (measured in the paragraph's own font, as its max width is), and
+// * whether anything scrolls sideways
+const measureInfoLayout = (page: Page) =>
+  page.evaluate(() => {
+    const box = (selector: string) => {
+      const rect = document.querySelector(selector)?.getBoundingClientRect();
+      return { left: rect?.left ?? 0, width: rect?.width ?? 0 };
+    };
+    const paragraph = document.querySelector("#how-it-works > p");
+    const probe = document.createElement("div");
+    probe.style.width = "var(--reading-measure)";
+    paragraph?.append(probe);
+    const measure = probe.getBoundingClientRect().width;
+    probe.remove();
+    const scrollers = [document.documentElement, document.querySelector("main")];
+    return {
+      paragraph: box("#how-it-works > p"),
+      heading: box("#how-it-works > h2"),
+      grid: box("#how-it-works > ol"),
+      column: document.querySelector("#how-it-works")?.parentElement?.getBoundingClientRect().width,
+      measure,
+      hasSideScroll: scrollers.some(
+        (element) => element !== null && element.scrollWidth > element.clientWidth,
+      ),
+    };
+  });
+
+const panelBox = async (panel: Locator) => {
+  const box = await panel.boundingBox();
+  return { x: box?.x, width: box?.width };
+};
+
+test.describe("Info pages' layout", () => {
+  test("at 1440px the navigation sits in the filters' left panel", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(CITY_URL);
+    const filters = await panelBox(page.getByRole("complementary", { name: "Filters" }));
+    await page.goto("/about");
+    const info = await panelBox(page.getByRole("complementary").filter({ has: infoNav(page) }));
+    expect(info).toEqual(filters);
+  });
+
+  test("at 1440px the blocks share one left edge; prose keeps the reading measure", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/about");
+    const layout = await measureInfoLayout(page);
+    expect(layout.measure).toBeGreaterThan(0);
+    expect(layout.heading.left).toBeCloseTo(layout.paragraph.left, 0);
+    expect(layout.grid.left).toBeCloseTo(layout.paragraph.left, 0);
+    expect(layout.paragraph.width).toBeLessThanOrEqual(layout.measure + 1);
+    expect(layout.grid.width).toBeGreaterThan(layout.paragraph.width);
+    expect(layout.grid.width).toBeCloseTo(layout.column ?? 0, 0);
+    expect(layout.hasSideScroll).toBe(false);
+  });
+
+  test("a link to a section lands on it without shifting the panel", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    for (const [url, name] of [
+      ["/about#privacy", "Privacy"],
+      ["/about/data#references", "References"],
+    ] as const) {
+      await page.goto(url);
+      const heading = page.getByRole("heading", { name, level: 2 });
+      await expect(heading).toBeInViewport();
+      // * after the charts near it have mounted
+      await page.waitForTimeout(SETTLE_MS);
+      await expect(heading).toBeInViewport();
+      const panel = page.getByRole("complementary").filter({ has: infoNav(page) });
+      const main = await page.locator("main").boundingBox();
+      expect((await panel.boundingBox())?.y).toBe(main?.y);
+    }
+  });
+
+  test("at 1024px the paragraph and the card grid fit without overflow", async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await page.goto("/about");
+    const layout = await measureInfoLayout(page);
+    expect(layout.paragraph.width).toBeLessThanOrEqual(layout.measure + 1);
+    expect(layout.grid.width).toBeLessThanOrEqual((layout.column ?? 0) + 1);
+    expect(layout.hasSideScroll).toBe(false);
+  });
+});
+
 test.describe("Info pages on a phone", () => {
   // * the phone's screen and touch, not its browser type: that would need a worker of its own
   const { viewport, userAgent, deviceScaleFactor, isMobile, hasTouch } = devices["Pixel 7"];
@@ -371,5 +457,139 @@ test.describe("Info pages on a phone", () => {
     await page.goBack();
     await expect(page).toHaveURL(/\/about\/guide/);
     await expect(page.getByRole("dialog")).toHaveCount(0);
+  });
+});
+
+const scrollMainToEnd = (page: Page) =>
+  page
+    .locator("main")
+    .evaluate((main) => main.scrollTo({ top: main.scrollHeight, behavior: "instant" }));
+// * longer than a smooth scroll to a section takes, so the hold on a clicked one is tested
+const SETTLE_MS = 1500;
+const fontSizeOf = (locator: Locator) =>
+  locator.evaluateAll((elements) =>
+    elements.map((element) => parseFloat(getComputedStyle(element).fontSize)),
+  );
+
+test.describe("Info pages' rhythm and scroll spy", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test("at the end of the page the last section is current", async ({ page }) => {
+    await page.goto("/about");
+    await scrollMainToEnd(page);
+    await expect(sectionLink(page, "Privacy")).toHaveAttribute("aria-current", "location");
+  });
+
+  test("a clicked section stays current until the user scrolls", async ({ page }) => {
+    await page.goto("/about");
+    for (const name of ["Privacy", "Source code and versions"]) {
+      await sectionLink(page, name).click();
+      await expect(sectionLink(page, name)).toHaveAttribute("aria-current", "location");
+      await page.waitForTimeout(SETTLE_MS);
+      await expect(sectionLink(page, name)).toHaveAttribute("aria-current", "location");
+    }
+    const main = await page.locator("main").boundingBox();
+    await page.mouse.move((main?.x ?? 0) + 200, (main?.y ?? 0) + 200);
+    await page.mouse.wheel(0, -100_000);
+    await expect(sectionLink(page, "How it works")).toHaveAttribute("aria-current", "location");
+  });
+
+  test("sections are about 5rem apart", async ({ page }) => {
+    await page.goto("/about");
+    const gap = await page.evaluate(() => {
+      const first = document.getElementById("how-it-works")?.getBoundingClientRect();
+      const second = document.getElementById("data-sources")?.getBoundingClientRect();
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      return ((second?.top ?? 0) - (first?.bottom ?? 0)) / rem;
+    });
+    expect(gap).toBeCloseTo(5, 1);
+  });
+
+  test("card links are at least 16px, the tech pills at least 14px", async ({ page }) => {
+    await page.goto("/about");
+    const links = await fontSizeOf(page.locator("#data-sources a"));
+    expect(links.length).toBeGreaterThan(0);
+    for (const size of links) expect(size).toBeGreaterThanOrEqual(16);
+    const pills = await fontSizeOf(page.locator("#source-code [data-badge-size]"));
+    expect(pills.length).toBeGreaterThan(0);
+    for (const size of pills) expect(size).toBeGreaterThanOrEqual(14);
+  });
+
+  test("each question is at least as large as its answer", async ({ page }) => {
+    await page.goto("/about/guide");
+    const sizes = await page.locator("#questions details").evaluateAll((items) =>
+      items.map((item) => ({
+        question: parseFloat(getComputedStyle(item.querySelector("summary")!).fontSize),
+        answer: parseFloat(getComputedStyle(item.querySelector("p")!).fontSize),
+      })),
+    );
+    expect(sizes.length).toBeGreaterThan(0);
+    for (const { question, answer } of sizes) expect(question).toBeGreaterThanOrEqual(answer);
+  });
+
+  test("What a value describes: text and figure 2.5rem apart, the figure centred", async ({
+    page,
+  }) => {
+    await page.goto("/about/data");
+    const layout = await page.evaluate(() => {
+      const grid = document.querySelector("#cell-values > div");
+      const [text, figure] = [...(grid?.children ?? [])].map((child) =>
+        child.getBoundingClientRect(),
+      );
+      const box = grid?.getBoundingClientRect();
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const gap = parseFloat(getComputedStyle(grid!).columnGap);
+      const columnLeft = (text?.right ?? 0) + gap;
+      return {
+        gap: ((figure?.left ?? 0) - (text?.right ?? 0)) / rem,
+        offsetX:
+          (figure?.left ?? 0) + (figure?.width ?? 0) / 2 - (columnLeft + (box?.right ?? 0)) / 2,
+        offsetY:
+          (figure?.top ?? 0) +
+          (figure?.height ?? 0) / 2 -
+          ((box?.top ?? 0) + (box?.height ?? 0) / 2),
+      };
+    });
+    expect(layout.gap).toBeGreaterThanOrEqual(2.5);
+    expect(Math.abs(layout.offsetX)).toBeLessThanOrEqual(1);
+    expect(Math.abs(layout.offsetY)).toBeLessThanOrEqual(1);
+  });
+});
+
+test.describe("Info scroll spy on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+
+  test("at the end of the page the Contents bar names the last section", async ({ page }) => {
+    await page.goto("/about");
+    await scrollMainToEnd(page);
+    await expect(breadcrumb(page)).toHaveText("AboutPrivacy");
+  });
+
+  test("a section picked in the sheet stays current until the user scrolls", async ({ page }) => {
+    await page.goto("/about");
+    for (const name of ["Privacy", "Source code and versions"]) {
+      await contentsButton(page).click();
+      await page.getByRole("dialog").getByRole("link", { name, exact: true }).click();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await expect(breadcrumb(page)).toHaveText(`About${name}`);
+      await page.waitForTimeout(SETTLE_MS);
+      await expect(breadcrumb(page)).toHaveText(`About${name}`);
+    }
+  });
+});
+
+test.describe("Info cards on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+
+  test("card text and card links are at least 15px, the titles larger", async ({ page }) => {
+    await page.goto("/about");
+    const cards = page.locator("#data-sources li");
+    const texts = await fontSizeOf(cards.locator("p"));
+    const links = await fontSizeOf(cards.locator("a"));
+    const titles = await fontSizeOf(cards.locator("h3"));
+    expect(texts.length).toBeGreaterThan(0);
+    expect(links.length).toBeGreaterThan(0);
+    for (const size of [...texts, ...links]) expect(size).toBeGreaterThanOrEqual(15);
+    for (const size of titles) expect(size).toBeGreaterThan(Math.max(...texts));
   });
 });

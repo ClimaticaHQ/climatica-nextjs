@@ -1,14 +1,16 @@
 "use client";
 
 import { SCROLL_SPY } from "@/constants";
+import { getActiveSectionIndex } from "@/utils/activeSection.util";
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Scroll spy: which of these sections (element ids, in page order) is in view in the scrolling
- * <main> that holds them. The band starts at the sections' scroll margin, where an anchor jump
- * puts them; at the very end of the page the last section is current, short as it may be.
- * select() highlights a clicked section at once and holds it while the page scrolls there. On
- * a load with a hash, the browser's jump puts that section in the band.
+ * Scroll spy: which of these sections (element ids, in page order) is current in the scrolling
+ * <main> that holds them — the last whose top has crossed a line near the top; sections too near
+ * the end to reach it take turns as the scroll runs out, and at the very end the last is current
+ * (getActiveSectionIndex). select() marks a clicked section at once and holds it while the page
+ * scrolls there, until that scroll ends or the user scrolls. On a load with a hash, the browser's
+ * jump puts that section under the line.
  */
 export function useActiveSection(ids: readonly string[]) {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -21,58 +23,63 @@ export function useActiveSection(ids: readonly string[]) {
     const main = sections[0]?.closest("main");
     if (!sections[0] || !main) return;
     const root: HTMLElement = main;
-
     const margin = parseFloat(getComputedStyle(sections[0]).scrollMarginTop) || 0;
-    const inBand = new Set<string>();
+    let frame = 0;
 
     function update() {
-      if (lockedRef.current) return;
-      const isAtEnd =
-        root.scrollTop + root.clientHeight >= root.scrollHeight - SCROLL_SPY.END_TOLERANCE_PX;
-      const next = isAtEnd ? order[order.length - 1] : order.find((id) => inBand.has(id));
-      // * between two sections (their gap in the band) the last one stays current
+      const rootTop = root.getBoundingClientRect().top;
+      const index = getActiveSectionIndex({
+        tops: sections.map(
+          (section) => section.getBoundingClientRect().top - rootTop + root.scrollTop,
+        ),
+        scrollTop: root.scrollTop,
+        maxScroll: root.scrollHeight - root.clientHeight,
+        line: margin + ((root.clientHeight - margin) * SCROLL_SPY.LINE_PERCENT) / 100,
+        endTolerance: SCROLL_SPY.END_TOLERANCE_PX,
+      });
+      const next = sections[index]?.id;
       if (next !== undefined) setActiveId(next);
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const { target, isIntersecting } of entries) {
-          if (isIntersecting) inBand.add(target.id);
-          else inBand.delete(target.id);
-        }
-        update();
-      },
-      {
-        root,
-        rootMargin: `-${margin}px 0px -${SCROLL_SPY.BAND_BOTTOM_PERCENT}% 0px`,
-      },
-    );
-    sections.forEach((section) => observer.observe(section));
+    function handleScroll() {
+      if (lockedRef.current) return;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    }
 
-    // * the end of the page doesn't move any section across the band: check it on scroll's end
-    const handleScrollEnd = () => {
+    // * a clicked section's own scroll has ended: it stays current until the user scrolls on
+    function handleScrollEnd() {
+      if (lockedRef.current) lockedRef.current = false;
+      else update();
+    }
+
+    // * the user takes over a scroll to a clicked section
+    function handleUserScroll() {
       lockedRef.current = false;
-      update();
-    };
+    }
+
+    update();
+    root.addEventListener("scroll", handleScroll, { passive: true });
     root.addEventListener("scrollend", handleScrollEnd);
+    window.addEventListener("resize", handleScroll);
+    for (const type of SCROLL_SPY.USER_SCROLL_EVENTS)
+      root.addEventListener(type, handleUserScroll, { passive: true });
     return () => {
-      observer.disconnect();
+      cancelAnimationFrame(frame);
+      root.removeEventListener("scroll", handleScroll);
       root.removeEventListener("scrollend", handleScrollEnd);
+      window.removeEventListener("resize", handleScroll);
+      for (const type of SCROLL_SPY.USER_SCROLL_EVENTS)
+        root.removeEventListener(type, handleUserScroll);
     };
   }, [key]);
-
-  useEffect(() => {
-    if (!lockedRef.current) return;
-    const timer = setTimeout(() => (lockedRef.current = false), SCROLL_SPY.LOCK_MS);
-    return () => clearTimeout(timer);
-  }, [activeId]);
 
   function select(id: string) {
     lockedRef.current = true;
     setActiveId(id);
   }
 
-  // * before the observer reports (and after a page switch), the first section
+  // * before the first update (and after a page switch), the first section
   const current = activeId !== null && ids.includes(activeId) ? activeId : (ids[0] ?? null);
   return { activeId: current, select };
 }

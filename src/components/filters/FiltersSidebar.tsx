@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/UI";
+import { Button, SidePanel } from "@/components/UI";
 import { AUTO_APPLY_DEBOUNCE_MS, LG_MEDIA_QUERY } from "@/constants";
 import { EButtonVariant, EFilterApplyMode, EFilterAvailability } from "@/enums";
 import { useAutoApply } from "@/hooks/filters/useAutoApply";
@@ -9,14 +9,13 @@ import { useFilterNavigation } from "@/hooks/filters/useFilterNavigation";
 import { useFilterPageContext } from "@/hooks/filters/useFilterPageContext";
 import { useFilters } from "@/hooks/filters/useFilters";
 import { useFiltersDraft } from "@/hooks/filters/useFiltersDraft";
-import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 import { useChartModeUrl } from "@/hooks/url/useChartModeUrl";
+import { useMediaQuery } from "@/hooks/ui/useMediaQuery";
 import { useSettingsStore } from "@/stores";
 import { getSectionFilterKeys, getSidebarFilterKeys } from "@/utils/filters.util";
 import { serializeFilters } from "@/utils/filtersUrl.util";
 import { useTranslations } from "next-intl";
 import { FilterSections } from "./FilterSections";
-import { FILTERS_SIDEBAR_CLASS, FILTERS_SIDEBAR_SECTIONS_CLASS } from "./filters.constant";
 import { FilterUnavailableActionsContext } from "./filters.context";
 
 /**
@@ -55,24 +54,9 @@ export function FiltersSidebar() {
   });
 
   return (
-    <aside className={FILTERS_SIDEBAR_CLASS} aria-label={t("sidebar.filters")}>
-      <div className={FILTERS_SIDEBAR_SECTIONS_CLASS}>
-        <FilterUnavailableActionsContext.Provider value={unavailableActions}>
-          <FilterSections
-            keys={sectionKeys}
-            values={draft}
-            context={draftContext}
-            availablePeriods={availablePeriods}
-            weatherYearError={filtersDraft.weatherYearError}
-            cellCount={filtersDraft.cellCount}
-            isApplyBlocked={isApplyBlocked}
-            onChange={filtersDraft.setFilter}
-            onChangeMany={filtersDraft.setFilters}
-          />
-        </FilterUnavailableActionsContext.Provider>
-      </div>
-
-      <div className="shrink-0 border-t border-[var(--color-border)] p-4">
+    <SidePanel
+      label={t("sidebar.filters")}
+      footer={
         <Button
           variant={EButtonVariant.PRIMARY}
           onClick={() => commit(EFilterApplyMode.APPLY)}
@@ -81,7 +65,21 @@ export function FiltersSidebar() {
         >
           {t("sidebar.applyFilters")}
         </Button>
-      </div>
-    </aside>
+      }
+    >
+      <FilterUnavailableActionsContext.Provider value={unavailableActions}>
+        <FilterSections
+          keys={sectionKeys}
+          values={draft}
+          context={draftContext}
+          availablePeriods={availablePeriods}
+          weatherYearError={filtersDraft.weatherYearError}
+          cellCount={filtersDraft.cellCount}
+          isApplyBlocked={isApplyBlocked}
+          onChange={filtersDraft.setFilter}
+          onChangeMany={filtersDraft.setFilters}
+        />
+      </FilterUnavailableActionsContext.Provider>
+    </SidePanel>
   );
 }

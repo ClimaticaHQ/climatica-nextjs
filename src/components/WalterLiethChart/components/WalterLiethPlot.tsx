@@ -67,7 +67,7 @@ export function WalterLiethPlot({
   };
 
   return (
-    <div ref={ref} className={`relative ${getPlotHeightClass({ isCompact })}`}>
+    <div ref={ref} data-chart-plot className={`relative ${getPlotHeightClass({ isCompact })}`}>
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={rows}

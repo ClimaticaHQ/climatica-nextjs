@@ -4,7 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { INFO_CLASSES as C } from "../info.constant";
 
 /**
- * The Info pages' footer: "© 2025–2026 GSIC-EMIC research group • Universidad de Valladolid" on
+ * The Info pages' footer, in the Info column — each page renders it last, inside its own
+ * boundary, so it streams in with the page and is never shown above it first: "© 2025–2026 GSIC-EMIC research group • Universidad de Valladolid" on
  * one line from lg; below lg two centred lines, the "•" gone. A server component: the current
  * year is the server's at render, so it can't differ at hydration. Inside <main> a <footer>
  * isn't a landmark by itself, hence the role.
@@ -17,16 +18,18 @@ export async function InfoFooter() {
   });
 
   return (
-    <footer role="contentinfo" className={C.FOOTER}>
-      <p>
-        <span className={C.FOOTER_PART}>
-          {COPYRIGHT.SYMBOL} {years} {t("researchGroup", { group: PROPER_NAMES.RESEARCH_GROUP })}
-        </span>
-        <span aria-hidden="true" className={C.FOOTER_SEPARATOR}>
-          {COPYRIGHT.PARTS_SEPARATOR}
-        </span>
-        <span className={C.FOOTER_PART}>{PROPER_NAMES.UNIVERSITY}</span>
-      </p>
-    </footer>
+    <div className={C.COLUMN}>
+      <footer role="contentinfo" className={C.FOOTER}>
+        <p>
+          <span className={C.FOOTER_PART}>
+            {COPYRIGHT.SYMBOL} {years} {t("researchGroup", { group: PROPER_NAMES.RESEARCH_GROUP })}
+          </span>
+          <span aria-hidden="true" className={C.FOOTER_SEPARATOR}>
+            {COPYRIGHT.PARTS_SEPARATOR}
+          </span>
+          <span className={C.FOOTER_PART}>{PROPER_NAMES.UNIVERSITY}</span>
+        </p>
+      </footer>
+    </div>
   );
 }

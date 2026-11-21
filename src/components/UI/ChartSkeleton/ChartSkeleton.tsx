@@ -1,30 +1,38 @@
-import { Card } from "@/components/Card";
+import {
+  CHART_SKELETON_BARS,
+  CHART_SKELETON_CLASSES as C,
+  CHART_SKELETON_CURVE,
+  CHART_SKELETON_CURVE_STYLE as S,
+  CHART_SKELETON_GRID_LINES,
+} from "./ChartSkeleton.constant";
+import type { TChartSkeletonProps } from "./ChartSkeleton.type";
 
-const BAR_HEIGHTS = [60, 80, 45, 70, 90, 85, 95, 88, 75, 55, 50, 65] as const;
-
-export function ChartSkeleton() {
+/**
+ * A plot that is waiting for its data, in the plot's own box (its height class), so the chart
+ * replaces it without moving anything. Decorative: the region around it says it is loading.
+ */
+export function ChartSkeleton({ heightClass }: TChartSkeletonProps) {
   return (
-    <Card className="w-full animate-pulse">
-      <div className="mb-4 flex gap-2">
-        <div className="h-7 w-20 rounded-full bg-[var(--color-border)]" />
-        <div className="h-7 w-24 rounded-full bg-[var(--color-border)]" />
-      </div>
-      <div className="relative flex h-[300px] items-end justify-between px-2 sm:h-[360px] md:h-[420px] lg:h-[460px]">
-        {BAR_HEIGHTS.map((h, i) => (
-          <div
-            key={i}
-            className="w-6 rounded-sm bg-[var(--color-border)]"
-            style={{ height: `${h}%` }}
+    <div aria-hidden data-chart-skeleton className={`${C.ROOT} ${heightClass}`}>
+      <div className={C.PLOT}>
+        {CHART_SKELETON_GRID_LINES.map((top) => (
+          <div key={top} className={C.GRID} style={{ top }} />
+        ))}
+        <div className={C.BARS}>
+          {CHART_SKELETON_BARS.map((height, month) => (
+            <div key={month} className={C.BAR} style={{ height: `${height}%` }} />
+          ))}
+        </div>
+        <svg viewBox={S.VIEW_BOX} preserveAspectRatio="none" className={C.CURVE}>
+          <polyline
+            points={CHART_SKELETON_CURVE}
+            fill="none"
+            stroke={S.STROKE}
+            strokeWidth={S.STROKE_WIDTH}
+            vectorEffect="non-scaling-stroke"
           />
-        ))}
-        <div className="pointer-events-none absolute inset-x-0 top-[35%] h-px bg-[var(--color-border)] opacity-60" />
-        <div className="pointer-events-none absolute inset-x-0 top-[55%] h-px bg-[var(--color-border)] opacity-40" />
+        </svg>
       </div>
-      <div className="mt-2 flex justify-between px-2">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="h-3 w-6 rounded bg-[var(--color-border)]" />
-        ))}
-      </div>
-    </Card>
+    </div>
   );
 }

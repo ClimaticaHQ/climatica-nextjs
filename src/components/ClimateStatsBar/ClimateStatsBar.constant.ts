@@ -12,3 +12,11 @@ export const STATS_BAR_STYLE = {
   bar: "gap-px bg-[var(--color-border)]",
   cell: "bg-[var(--color-surface)] px-3",
 } as const;
+
+// * the values a pending bar is given: never shown (isPending draws placeholders), only typed
+export const PENDING_CLIMATE_STATS = {
+  meanTemp: 0,
+  annualPrecip: 0,
+  aridMonths: 0,
+  martonneIndex: null,
+} as const;

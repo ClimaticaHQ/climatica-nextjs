@@ -38,14 +38,45 @@ no filters, no data requests. Components are in `src/components/info/` by role (
   navigation (sidebar from `lg`, Contents bar and sheet below) and `InfoSection` both read it.
   State is [`useInfoNavigation`](../src/hooks/pages/useInfoNavigation.ts); the section in view
   comes from `useActiveSection`.
+- **Scroll spy:** the current section is the last whose top has crossed a line 30 % down
+  `<main>` (`SCROLL_SPY`). Sections too near the end to reach it share the scroll left after
+  the last one that can, in order; at the end the last is current
+  ([`getActiveSectionIndex`](../src/utils/activeSection.util.ts)). A clicked section is marked
+  at once and held until its scroll ends or the user scrolls.
 - **Pages are composition-only**: shared UI and item constants from `info.constant.ts`; their
   logic is in page hooks (`useAboutFacts`, `useGuidePage`, `useDataPage`).
 - **Facts come from the code** (resolutions, periods, languages, formulas, legends), never
   typed into prose. Project facts and the team are in `PROJECT_INFO` and `TEAM`; an empty value
   hides its element or section.
+- **Left panel, from `lg`:** the navigation tree is in the shared
+  [`SidePanel`](../src/components/UI/SidePanel/SidePanel.tsx), the filters' column, rendered by
+  AppLayout on an Info route (`InfoSidePanel`) and server-rendered: present from the first paint,
+  hidden below `lg` by its classes (the Contents bar is the reverse). `InfoNavigationProvider`
+  around the panel and `<main>` holds the one `useInfoNavigation` (scroll spy, sheet); only the
+  section in view follows on the client. A page opened on a section's hash lands there once the
+  streamed page is in.
+- **Footer:** each page renders `InfoFooter` last, inside its own boundary, so it streams in with
+  the page and never shows above it first.
+- **Widths, from `lg`:** `PageWrapper` and the shared `PageHeader` as on every page; under the
+  header one centred column (`COLUMN`, `--info-column-width`, 64rem) with one left edge. Prose
+  (`TEXT`, `LEAD`, `SMALL`, the lists, figure captions, `PROSE` for the questions) keeps
+  `--reading-measure` (80ch); wide blocks (card grids, key facts, tables, figures, the team, the
+  citation) take the column's width. The classes carry it, so a new section gets it by using
+  them. Below `lg` the whole page keeps the reading measure.
+- **Rhythm and sizes:** sections are 5rem apart from `lg`, 3.5rem below (the `COLUMN` gap).
+  Card text and links are 15px below `lg` (the touch scale), 16px from `lg`, under 18 / 20px card
+  titles. Links on their own line take their text's size (`ROW_LINK`, `CARD_LINK`); the pills are
+  `EBadgeSize.LG`, the questions `EDisclosureSize.LG`.
+- **What a value describes:** from `lg` text and callout beside the schematic, 3fr : 2fr, 3rem
+  apart, the schematic centred both ways with its caption under it at its width; below `lg`
+  stacked, the schematic centred.
 - **Figures** are the app's own charts on a fixture (`figures.constant.ts`), drawn with
   `isStatic` and an `overlay`; annotated months are picked from the data by their condition
-  (`infoFigure.util`), never typed in.
+  (`infoFigure.util`), never typed in. They mount at once; while the chart module loads (and on
+  the server) their skeleton holds their exact size: the charts' own frames, legends and stats
+  bar around a `ChartSkeleton` (`FigureFrames`, the parts without chart code). Annotation
+  numbers: a 20px disc in the primary colour, white digits from 14px (`ANNOTATION_STYLE`,
+  `INFO_FIGURE_CLASSES.MARKER`); brackets and leaders thin in the secondary text colour.
 
 ## PageLayout
 

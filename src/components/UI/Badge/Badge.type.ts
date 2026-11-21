@@ -11,5 +11,10 @@ export type TBadgeProps = {
   isTruncated?: boolean;
   /** the full text on hover — for a truncated badge */
   title?: string;
+  /**
+   * a value still loading: the badge's own size (its content sets the width, drawn in the
+   * skeleton colour like its fill), pulsing, hidden from screen readers
+   */
+  isPending?: boolean;
   children: ReactNode;
 };

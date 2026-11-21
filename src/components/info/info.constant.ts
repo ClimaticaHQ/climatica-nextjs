@@ -1,3 +1,4 @@
+import { CHART_TRANSITION_MOTION } from "@/components/ChartTransition/ChartTransition.constant";
 import { EXTERNAL_LINK_CLASS, EXTERNAL_LINK_TARGET_CLASS } from "@/components/UI/ExternalLink";
 import { AreaChartIcon, CodeIcon, DatabaseIcon } from "@/components/svg";
 import { OverlayLayoutIcon, SplitLayoutIcon } from "@/components/svg";
@@ -109,32 +110,47 @@ export const REFERENCES: readonly TReference[] = [
 // * Info typography: the app's sizes on phones; from lg the reading scale (typography.css) —
 // * body 17, lead 19, card titles 20, headings 32, card text 16, small labels 14
 const BODY = "lg:text-[length:var(--font-reading-body)]";
-const CARD_TEXT = "text-[length:var(--font-xs)] lg:text-[length:var(--font-sm)]";
+// * card text and links: the touch scale's 15 below lg (under the 18 px card titles), 16 from lg
+const CARD_TEXT = "text-[length:var(--font-touch-secondary)] lg:text-[length:var(--font-sm)]";
 // * a value or label that stands out from the secondary text around it
 const EMPHASIS = "font-medium text-[var(--color-text)]";
 const LABEL_TEXT = "text-[length:var(--font-xs)] lg:text-[length:var(--font-base)]";
+// * prose (paragraphs, lists, captions, answers) keeps the reading measure; everything else in
+// * the content column — grids, tables, figures, the citation — takes its whole width
+const PROSE = "max-w-[var(--reading-measure)]";
 
 export const INFO_CLASSES = {
-  LAYOUT: "mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12",
-  // * from lg only: below, the Contents bar and sheet take its place
-  SIDEBAR: "hidden lg:sticky lg:top-6 lg:block lg:self-start",
-  CONTENT: "flex min-w-0 max-w-[var(--reading-measure)] flex-col gap-12",
+  // * the page under the shared PageHeader; below lg it all keeps the reading measure
+  CONTENT: "flex min-w-0 max-w-[var(--reading-measure)] flex-col gap-12 lg:max-w-none",
+  // * everything under the header, from lg centred: its blocks share one left edge, prose keeps
+  // * the reading measure, the rest takes the column's width. The gap is the sections' rhythm
+  COLUMN: "flex w-full flex-col gap-14 lg:mx-auto lg:max-w-[var(--info-column-width)] lg:gap-20",
   // * below lg the sticky Contents bar covers the top: an anchor lands under it
   SECTION: "flex scroll-mt-20 flex-col gap-4 lg:scroll-mt-6",
   HEADING:
     "text-[length:var(--font-lg)] font-semibold text-[var(--color-text)] lg:text-[length:var(--font-reading-heading)] lg:leading-tight",
   SUBHEADING:
-    "text-[length:var(--font-sm)] font-semibold text-[var(--color-text)] lg:text-[length:var(--font-reading-card-title)]",
-  TEXT: `text-[var(--color-text-secondary)] ${BODY}`,
+    "text-[length:var(--font-touch-title)] font-semibold text-[var(--color-text)] lg:text-[length:var(--font-reading-card-title)]",
+  TEXT: `${PROSE} text-[var(--color-text-secondary)] ${BODY}`,
   // * an intro: 17 px on phones, 19 px from lg, left-aligned under the centred title
-  LEAD: "text-left text-[length:var(--font-reading-body)] text-[var(--color-text-secondary)] lg:text-[length:var(--font-reading-lead)]",
-  SMALL: `${CARD_TEXT} text-[var(--color-text-secondary)]`,
-  // * the app's inline link — the same as an external link's, with its target
+  LEAD: `${PROSE} text-left text-[length:var(--font-reading-body)] text-[var(--color-text-secondary)] lg:text-[length:var(--font-reading-lead)]`,
+  SMALL: `${PROSE} ${CARD_TEXT} text-[var(--color-text-secondary)]`,
+  // * the app's inline link — the same as an external link's, with its target; in the text's size
   LINK: `${EXTERNAL_LINK_CLASS} ${EXTERNAL_LINK_TARGET_CLASS}`,
+  // * a link on a line of its own, in the size of the text around it: the body's, or a card's
+  ROW_LINK: `${EXTERNAL_LINK_CLASS} ${BODY}`,
+  CARD_LINK: `${EXTERNAL_LINK_CLASS} ${CARD_TEXT}`,
   // * the key facts: 2 × 2 below lg
   GRID_4: "grid grid-cols-2 gap-3 lg:grid-cols-4",
-  // * What a value describes: text and callout on the left, the schematic on the right
-  CELL_LAYOUT: "grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]",
+  // * What a value describes: from lg text and callout (3 parts) beside the schematic (2),
+  // * centred both ways in its column; below lg stacked, the schematic centred
+  CELL_LAYOUT: "grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-center lg:gap-12",
+  CELL_TEXT: "flex flex-col gap-3",
+  // * the caption takes the schematic's width, centred under it
+  CELL_FIGURE: "mx-auto flex w-full max-w-[17rem] flex-col gap-2",
+  CELL_CAPTION: "text-center",
+  // * a block of prose that isn't one paragraph: the questions and their answers
+  PROSE,
   // * the About page's first block, under its header
   INTRO: "flex flex-col gap-6",
   // * a normal's years in its list
@@ -150,9 +166,9 @@ export const INFO_CLASSES = {
   CHIPS: "flex flex-wrap gap-2",
   CODE: `overflow-x-auto whitespace-pre-wrap break-words font-mono ${LABEL_TEXT} text-[var(--color-text)]`,
   FORMULA: `inline-block rounded-[var(--radius-xs)] bg-[var(--color-surface-secondary)] px-2 py-0.5 font-mono ${LABEL_TEXT} text-[var(--color-text)]`,
-  LIST: `flex list-disc flex-col gap-1.5 pl-5 text-[var(--color-text-secondary)] ${BODY}`,
-  LIST_SMALL: `flex list-disc flex-col gap-1 pl-5 ${CARD_TEXT} text-[var(--color-text-secondary)]`,
-  NUMBERED_LIST: `flex list-decimal flex-col gap-1.5 pl-5 text-[var(--color-text-secondary)] ${BODY}`,
+  LIST: `${PROSE} flex list-disc flex-col gap-1.5 pl-5 text-[var(--color-text-secondary)] ${BODY}`,
+  LIST_SMALL: `${PROSE} flex list-disc flex-col gap-1 pl-5 ${CARD_TEXT} text-[var(--color-text-secondary)]`,
+  NUMBERED_LIST: `${PROSE} flex list-decimal flex-col gap-1.5 pl-5 text-[var(--color-text-secondary)] ${BODY}`,
   ACTIONS: "flex flex-wrap items-center gap-x-6 gap-y-3",
   BUTTON: "inline-flex min-h-10 items-center px-4",
   // * the About intro's buttons: full width and stacked below lg
@@ -256,9 +272,10 @@ export const CLIMATE_INDICATORS = [
 ] as const;
 
 // * a team card: the avatar level with the name line, the text in three lines. Cards in a row
-// * stretch to one height (the grid's default), their content at the top
+// * stretch to one height (the grid's default), their content at the top. Two columns from lg;
+// * from xl a third when each card keeps 18rem (not at a larger text size), never a fourth
 export const TEAM_CARD_CLASSES = {
-  GRID: "grid gap-3 lg:grid-cols-2",
+  GRID: "grid gap-3 lg:grid-cols-2 xl:grid-cols-[repeat(auto-fill,minmax(max(min(18rem,calc((100%_-_0.75rem)/2)),calc((100%_-_1.5rem)/3)),1fr))]",
   ITEM: "flex",
   CARD: "flex w-full items-start gap-3",
   AVATAR:
@@ -287,20 +304,13 @@ export const INFO_CARD_CLASSES = {
   ROW_TEXT: "flex flex-col gap-1",
   TITLE_ROW: "flex flex-wrap items-center gap-x-3 gap-y-1",
   NOTE_ITALIC: "italic",
-  LINK: "mt-auto self-start text-[length:var(--font-xs)]",
+  LINK: "mt-auto self-start",
 } as const;
 
 // * InfoList: bullets, numbers, or (when its items have icons) a column of icon rows
 export const INFO_LIST_CLASSES = {
-  ICONS: "flex flex-col gap-2",
+  ICONS: `${PROSE} flex flex-col gap-2`,
   ICON_ITEM: "flex items-start gap-3",
-} as const;
-
-// * an Info figure: the visual (mounted near the viewport, its room held until then), its
-// * annotations, and the caption — touch sizes below lg, the reading scale from lg
-export const INFO_FIGURE = {
-  // * start mounting a chart this far before it scrolls into view
-  NEAR_MARGIN: "400px",
 } as const;
 
 // * the annotation band (px, at the default text size — scaleAnnotationLayout): room above the
@@ -321,7 +331,8 @@ export const ANNOTATION_STYLE = {
   STROKE_WIDTH: 1,
   LEADER_DASH: "3 3",
   RING_RADIUS: 4,
-  // * the numbers stand out in the primary colour, ringed in the surface's so they lift off lines
+  // * a number: a 20px disc in the primary colour, its digit in on-primary (white), ringed in the
+  // * surface's colour so it lifts off the lines under it
   NUMBER_FILL: "var(--color-primary)",
   NUMBER_TEXT: "var(--color-on-primary)",
   NUMBER_RING: "var(--color-surface)",
@@ -329,15 +340,16 @@ export const ANNOTATION_STYLE = {
   NUMBER_FONT_WEIGHT: 600,
 } as const;
 
+// * a figure's chart replacing its skeleton: the chart card's fade-in (none with motion off)
+export const FIGURE_PICTURE_CLASS = CHART_TRANSITION_MOTION.CROSSFADE.ENTER;
+
 export const INFO_FIGURE_CLASSES = {
   ROOT: "flex flex-col gap-3",
   VISUAL: "min-w-0",
-  PLACEHOLDER: "min-h-[24rem]",
-  CAPTION:
-    "flex flex-col gap-2 text-[length:var(--font-touch-secondary)] text-[var(--color-text-secondary)] lg:text-[length:var(--font-reading-body)]",
+  CAPTION: `${PROSE} flex flex-col gap-2 text-[length:var(--font-touch-secondary)] text-[var(--color-text-secondary)] lg:text-[length:var(--font-reading-body)]`,
   ITEMS: "flex flex-col gap-2",
   ITEM: "flex items-start gap-2.5",
-  // * the chart's number, in HTML: the caption's and a stats item's
+  // * the chart's number, in HTML (the caption's and a stats item's): as ANNOTATION_STYLE draws it
   MARKER:
     "inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-[length:var(--font-base)] font-semibold leading-none text-[var(--color-on-primary)] ring-2 ring-[var(--color-surface)]",
 } as const;

@@ -61,4 +61,33 @@ describe("Badge", () => {
     render(<Badge tone={TONE}>Fast</Badge>);
     expect(badgeOf("Fast")?.className).toContain("text-[length:var(--font-xs)]");
   });
+
+  it("is large beside reading text: 14px, with room to match", () => {
+    render(
+      <Badge tone={TONE} size={EBadgeSize.LG}>
+        React
+      </Badge>,
+    );
+    const badge = badgeOf("React");
+    expect(badge?.getAttribute("data-badge-size")).toBe(EBadgeSize.LG);
+    expect(badge?.className).toContain("text-[length:var(--font-base)]");
+    expect(badge?.className).toContain("px-3");
+    expect(badge?.className).not.toContain("text-[length:var(--font-xs)]");
+  });
+
+  it("pending: its own size from its content, in the skeleton colour, hidden from readers", () => {
+    render(
+      <Badge tone={TONE} size={EBadgeSize.SM} isPending title="Semi-arid">
+        Semi-arid
+      </Badge>,
+    );
+    const badge = badgeOf("Semi-arid");
+    expect(badge?.getAttribute("aria-hidden")).toBe("true");
+    expect(badge?.getAttribute("title")).toBeNull();
+    expect(badge?.className).toContain("animate-pulse");
+    expect(badge?.className).toContain("text-[length:max(0.625rem,10px)]");
+    for (const property of ["background-color", "border-color", "color"]) {
+      expect(badge?.getAttribute("style")).toContain(`${property}: var(--color-border)`);
+    }
+  });
 });

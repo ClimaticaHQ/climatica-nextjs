@@ -204,7 +204,8 @@
     "scrollHint": "Glisează pentru a vedea toate lunile"
   },
   "loading": {
-    "dataUpdated": "Date actualizate: {location}, {period}"
+    "dataUpdated": "Date actualizate: {location}, {period}",
+    "chart": "Se încarcă graficul"
   },
   "errors": {
     "fetchClimateData": "Eroare la preluarea datelor climatice",

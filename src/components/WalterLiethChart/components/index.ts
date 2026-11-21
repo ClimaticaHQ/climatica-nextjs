@@ -5,3 +5,4 @@ export { WalterLiethPlot } from "./WalterLiethPlot";
 export { WalterLiethTooltip } from "./WalterLiethTooltip";
 export { WalterLiethIncompleteNotice } from "./WalterLiethIncompleteNotice";
 export { WalterLiethGuide } from "./WalterLiethGuide/WalterLiethGuide";
+export { WalterLiethFrame } from "./WalterLiethFrame";

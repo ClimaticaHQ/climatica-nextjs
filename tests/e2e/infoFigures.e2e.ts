@@ -23,8 +23,23 @@ async function openFigure(page: Page, route: string, section: string) {
   await page.goto(route);
   const figure = page.locator(`${section} figure`).first();
   await figure.scrollIntoViewIfNeeded();
-  const visual = figure.locator("> div[aria-hidden=true]");
+  // * the picture: hidden from screen readers by itself, its caption carrying it
+  const visual = figure.locator("> div").first().locator("> div[aria-hidden=true]");
   await expect(visual.locator("svg.recharts-surface")).toBeVisible();
+  // * measure once the page holds still: on a phone the Contents bar's section label can wrap
+  // * onto a second line as the scroll spy reaches the figure's section, moving what's below
+  let previous = "";
+  await expect
+    .poll(
+      async () => {
+        const current = JSON.stringify(await visual.boundingBox());
+        const isStill = current === previous;
+        previous = current;
+        return isStill;
+      },
+      { intervals: [300] },
+    )
+    .toBe(true);
   return visual;
 }
 

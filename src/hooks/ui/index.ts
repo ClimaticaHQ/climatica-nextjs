@@ -34,4 +34,3 @@ export { useIsWrapped } from "./useIsWrapped";
 export { useCopyToClipboard } from "./useCopyToClipboard";
 export { useActiveSection } from "./useActiveSection";
 export { useGridArcLabel } from "./useGridArcLabel";
-export { useIsNearViewport } from "./useIsNearViewport";

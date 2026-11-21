@@ -1,3 +1,5 @@
+import { SIDE_PANEL_CLASSES } from "../SidePanel/SidePanel.constant";
+
 function ChipsRow({ widths }: { widths: string[] }) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -10,8 +12,8 @@ function ChipsRow({ widths }: { widths: string[] }) {
 
 export function SidebarSkeleton() {
   return (
-    <aside className="hidden w-80 shrink-0 animate-pulse flex-col overflow-hidden border-r border-[var(--color-border)] bg-[var(--color-surface)] lg:flex">
-      <div className="flex flex-1 flex-col overflow-y-auto p-4 gap-y-8">
+    <aside className={`${SIDE_PANEL_CLASSES.ROOT} animate-pulse`}>
+      <div className={SIDE_PANEL_CLASSES.BODY}>
         {/* Filters section — defaultOpen */}
         <div>
           <div className="mb-2 flex w-full items-center justify-between">

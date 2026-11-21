@@ -204,7 +204,8 @@
     "scrollHint": "Swipe to see every month"
   },
   "loading": {
-    "dataUpdated": "Data updated: {location}, {period}"
+    "dataUpdated": "Data updated: {location}, {period}",
+    "chart": "Loading chart"
   },
   "errors": {
     "fetchClimateData": "Failed to fetch climate data",

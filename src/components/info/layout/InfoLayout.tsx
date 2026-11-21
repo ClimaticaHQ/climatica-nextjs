@@ -3,20 +3,23 @@
 import { BottomSheet } from "@/components/UI/BottomSheet";
 import { PageWrapper } from "@/components/UI/PageWrapper";
 import { INFO_PAGES } from "@/constants";
-import { useInfoNavigation } from "@/hooks/pages/useInfoNavigation";
 import { useTranslations } from "next-intl";
+import { useContext } from "react";
 import { INFO_CLASSES as C } from "../info.constant";
 import type { TInfoLayoutProps } from "../info.type";
+import { InfoNavigationContext } from "../infoNavigation.context";
 import { InfoContentsBar } from "./InfoContentsBar";
 import { InfoNavTree } from "./InfoNavTree";
 
 /**
- * The Info pages' frame. From lg, the navigation tree beside the content; below, the Contents
- * bar above it and the same tree in a bottom sheet. One scroll spy serves both.
+ * The Info pages' content frame. Below lg the Contents bar above the content (hidden from lg by
+ * its classes) and the navigation tree in a bottom sheet; from lg the tree is the side panel's
+ * (InfoSidePanel). Both read the one navigation of InfoNavigationProvider.
  */
-export function InfoLayout({ children, footer }: TInfoLayoutProps) {
+export function InfoLayout({ children }: TInfoLayoutProps) {
   const t = useTranslations();
-  const nav = useInfoNavigation();
+  const nav = useContext(InfoNavigationContext);
+  if (nav === null) return null;
   const tree = {
     pages: INFO_PAGES,
     currentRoute: nav.currentPage?.route ?? null,
@@ -36,19 +39,7 @@ export function InfoLayout({ children, footer }: TInfoLayoutProps) {
         />
       )}
       <PageWrapper>
-        <div className={C.LAYOUT}>
-          <nav aria-label={t("info.nav.label")} className={C.SIDEBAR}>
-            <InfoNavTree
-              {...tree}
-              onSectionClick={(_, id) => nav.selectSection(id)}
-              hasLargeTargets={false}
-            />
-          </nav>
-          <div className={C.CONTENT}>
-            {children}
-            {footer}
-          </div>
-        </div>
+        <div className={C.CONTENT}>{children}</div>
       </PageWrapper>
       <BottomSheet
         isOpen={nav.isContentsOpen}

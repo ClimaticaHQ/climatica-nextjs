@@ -47,5 +47,8 @@ html {
   --font-touch-button: 1.0625rem; /* 17 */
   --touch-label-tracking: 0.06em;
   /* * a readable line for prose */
-  --reading-measure: 72ch;
+  --reading-measure: 80ch;
+  /* * the Info pages' column from lg: prose keeps the reading measure inside it, wide blocks
+     (grids, tables, figures) take its whole width */
+  --info-column-width: 64rem;
 }

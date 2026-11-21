@@ -204,7 +204,8 @@
     "scrollHint": "Σύρετε για να δείτε όλους τους μήνες"
   },
   "loading": {
-    "dataUpdated": "Τα δεδομένα ενημερώθηκαν: {location}, {period}"
+    "dataUpdated": "Τα δεδομένα ενημερώθηκαν: {location}, {period}",
+    "chart": "Φόρτωση γραφήματος"
   },
   "errors": {
     "fetchClimateData": "Δεν ήταν δυνατή η λήψη των κλιματικών δεδομένων",

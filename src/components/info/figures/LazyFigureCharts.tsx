@@ -1,15 +1,16 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { IndicatorsFigureSkeleton, WalterLiethFigureSkeleton } from "./FigureFrames";
 
-// * the figures' charts load with the figure, client-side only: Recharts measures the page, and
-// * InfoFigure mounts them near the viewport. One module: both figures share its chunk
+// * the figures' charts load client-side only (Recharts measures the page), their skeleton in
+// * place meanwhile — on the server too. One module: both figures share its chunk
 export const LazyWalterLiethFigureChart = dynamic(
   () => import("./FigureCharts").then(({ WalterLiethFigureChart }) => WalterLiethFigureChart),
-  { ssr: false },
+  { ssr: false, loading: () => <WalterLiethFigureSkeleton /> },
 );
 
 export const LazyIndicatorsFigureChart = dynamic(
   () => import("./FigureCharts").then(({ IndicatorsFigureChart }) => IndicatorsFigureChart),
-  { ssr: false },
+  { ssr: false, loading: () => <IndicatorsFigureSkeleton /> },
 );

@@ -204,7 +204,8 @@
     "scrollHint": "Проведіть, щоб побачити всі місяці"
   },
   "loading": {
-    "dataUpdated": "Дані оновлено: {location}, {period}"
+    "dataUpdated": "Дані оновлено: {location}, {period}",
+    "chart": "Завантаження графіка"
   },
   "errors": {
     "fetchClimateData": "Не вдалося завантажити кліматичні дані",

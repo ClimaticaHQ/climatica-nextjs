@@ -82,7 +82,7 @@ function InfoCard({ item, layout }: TInfoCardProps) {
       {body}
       {note !== undefined && <p className={`${C.SMALL} ${CARD.NOTE_ITALIC}`}>{note}</p>}
       {link !== undefined && (
-        <ExternalLink href={link.href} className={`${C.LINK} ${CARD.LINK}`}>
+        <ExternalLink href={link.href} className={`${C.CARD_LINK} ${CARD.LINK}`}>
           {link.label}
         </ExternalLink>
       )}

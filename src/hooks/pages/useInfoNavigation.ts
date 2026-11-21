@@ -2,7 +2,7 @@
 
 import { INFO_PAGES } from "@/constants";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useActiveSection } from "../ui/useActiveSection";
 import { useSheetHistory } from "../ui/useSheetHistory";
 import { useNavbarNavigation } from "../url/useNavbarNavigation";
@@ -19,6 +19,15 @@ export function useInfoNavigation() {
   const sections = currentPage?.sections.filter(({ isShown }) => isShown) ?? [];
   const { activeId, select } = useActiveSection(sections.map(({ id }) => id));
   const [isContentsOpen, setIsContentsOpen] = useState(false);
+  const sectionKey = sections.map(({ id }) => id).join(" ");
+
+  // * a page opened on a section's hash: the browser may try its jump while the streamed page is
+  // * still hidden, and not try again — land there once the sections are in
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (id === "" || !sectionKey.split(" ").includes(id)) return;
+    document.getElementById(id)?.scrollIntoView({ behavior: "instant" });
+  }, [sectionKey]);
   const { closeSheet } = useSheetHistory({
     isOpen: isContentsOpen,
     onClose: () => setIsContentsOpen(false),

@@ -1,3 +1,4 @@
+import type { TChartSummary } from "../components/chart";
 import type { TAnnotationBands, TChartOverlay } from "../charts/chartOverlay.type";
 import type { ReactNode } from "react";
 import type { EWalterLiethFrost, EWalterLiethRegime, EWalterLiethSeriesId } from "@/enums";
@@ -93,8 +94,22 @@ export type TWalterLiethBandBounds = {
   upper: number;
 };
 
+/** A Walter-Lieth diagram's figure (WalterLiethFrame): its header, plot slot and footer. */
+export type TWalterLiethFrameProps = Pick<
+  TWalterLiethChartProps,
+  "isCompact" | "isPanel" | "headerSlots" | "footer"
+> & {
+  series: TWalterLiethSeriesInput;
+  /** its stats bar's values; null while the data load (placeholders) */
+  summary: TChartSummary | null;
+  ariaLabel?: string | undefined;
+  /** absent while the data load: a ChartSkeleton in the plot's height */
+  plot?: ReactNode;
+};
+
 export type TWalterLiethChartProps = {
-  series: TWalterLiethSeries;
+  /** drawn once complete; until then (or while the data load) the plot is a skeleton */
+  series: TWalterLiethSeriesInput;
   domain: TWalterLiethDomain;
   /** smaller height and header, for one diagram of a split pair */
   isCompact?: boolean;
@@ -120,6 +135,11 @@ export type TWalterLiethChartProps = {
   overlay?: TChartOverlay;
   /** room kept above the plot and under the month labels for annotations */
   annotationBands?: TAnnotationBands;
+};
+
+/** WalterLiethChart's plot: the chart's props, its series complete. */
+export type TWalterLiethDiagramProps = Omit<TWalterLiethChartProps, "series"> & {
+  series: TWalterLiethSeries;
 };
 
 /** One chart row per month, in display order. */

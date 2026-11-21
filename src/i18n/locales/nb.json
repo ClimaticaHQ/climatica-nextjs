@@ -204,7 +204,8 @@
     "scrollHint": "Sveip for å se alle månedene"
   },
   "loading": {
-    "dataUpdated": "Data oppdatert: {location}, {period}"
+    "dataUpdated": "Data oppdatert: {location}, {period}",
+    "chart": "Laster inn diagram"
   },
   "errors": {
     "fetchClimateData": "Kunne ikke hente klimadata",

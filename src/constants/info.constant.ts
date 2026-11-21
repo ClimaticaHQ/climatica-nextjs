@@ -95,14 +95,14 @@ export const ARC_UNITS = {
 // * how long a copy button says "Copied" (or that copying failed)
 export const COPY_FEEDBACK_MS = TIME.IN_MILLISECONDS.SECOND * 2;
 
-// * the Info sidebar's scroll spy: a section is in view while it crosses the band from its
-// * scroll margin down to this share of <main>'s height; a clicked section stays highlighted
-// * while the page scrolls to it (until scrollend, or at most LOCK_MS)
+// * the Info navigation's scroll spy (useActiveSection): a section is current once its top
+// * crosses a line this share down <main>, under the sections' scroll margin
 export const SCROLL_SPY = {
-  BAND_BOTTOM_PERCENT: 70,
-  // * px from the bottom that counts as scrolled to the end: the last section is then current
-  END_TOLERANCE_PX: 2,
-  LOCK_MS: TIME.IN_MILLISECONDS.SECOND,
+  LINE_PERCENT: 30,
+  // * px from the bottom that count as scrolled to the end: the last section is then current
+  END_TOLERANCE_PX: 4,
+  // * the user scrolling (wheel, touch, keys, the scrollbar) ends the hold on a clicked section
+  USER_SCROLL_EVENTS: ["wheel", "touchmove", "keydown", "pointerdown"],
 } as const;
 
 // * where the Info figures' data come from (their fixture is in components/info)

@@ -1,25 +1,14 @@
 "use client";
 
-import { ChartLegend } from "@/components/ChartLegend";
-import {
-  ARIDITY_BAR_COLORS,
-  STANDARD_CHART_SINGLE_COLORS,
-} from "@/components/charts/charts.constant";
 import { ChartDeviceContext } from "@/components/charts/chartDevice.context";
 import { StandardClimateChart } from "@/components/charts/StandardClimateChart";
 import { WalterLiethChart } from "@/components/WalterLiethChart";
-import { CHART_LEGEND, SM_MEDIA_QUERY } from "@/constants";
-import { EFigureAnchor } from "@/enums";
+import { SM_MEDIA_QUERY } from "@/constants";
 import { useChartModel } from "@/hooks/charts/useChartModel";
-import {
-  useLegendLabels,
-  useMediaQuery,
-  useTextScale,
-  useWalterLiethLegendItems,
-} from "@/hooks/ui";
-import { getStandardLegendItems, isCompleteSeries } from "@/utils";
+import { useMediaQuery, useTextScale } from "@/hooks/ui";
+import { isCompleteSeries } from "@/utils";
 import { getAnnotationBands, scaleAnnotationLayout } from "@/utils/infoFigure.util";
-import { ANNOTATION_LAYOUT } from "../info.constant";
+import { ANNOTATION_LAYOUT, FIGURE_PICTURE_CLASS } from "../info.constant";
 import { FigureAnnotations } from "./FigureAnnotations";
 import {
   FIGURE_SERIES_LIST,
@@ -27,15 +16,19 @@ import {
   INDICATORS_FIGURE,
   WALTER_LIETH_FIGURE,
 } from "./figures.constant";
-import { InfoFigureMarker } from "./InfoFigure";
+import {
+  getIndicatorsStatsMarkers,
+  IndicatorsFigureLegend,
+  WalterLiethFigureLegend,
+} from "./FigureFrames";
 
 /**
  * The figures' pictures: the app's own charts of the fixture, static, annotated, with their
- * legends. A picture is never touch; it takes the phone's narrow axes, as the chart card does.
+ * legends — hidden from screen readers (the caption carries them). A picture is never touch; it
+ * takes the phone's narrow axes, as the chart card does.
  */
 export function WalterLiethFigureChart() {
   const model = useChartModel(FIGURE_SERIES_LIST);
-  const legendItems = useWalterLiethLegendItems();
   const isNarrow = !useMediaQuery(SM_MEDIA_QUERY);
   const textScale = useTextScale();
   const layout = scaleAnnotationLayout({ layout: ANNOTATION_LAYOUT, textScale });
@@ -44,32 +37,29 @@ export function WalterLiethFigureChart() {
   const { ANNOTATIONS } = WALTER_LIETH_FIGURE;
 
   return (
-    <ChartDeviceContext.Provider value={{ isTouch: false, isNarrow, textScale }}>
-      <WalterLiethChart
-        series={series}
-        domain={model.domain}
-        isStatic
-        annotationBands={getAnnotationBands({
-          annotations: ANNOTATIONS,
-          layout,
-        })}
-        overlay={(projection) => (
-          <FigureAnnotations annotations={ANNOTATIONS} projection={projection} layout={layout} />
-        )}
-        footer={
-          <div className={CHART_LEGEND.GAP_CLASS}>
-            <ChartLegend items={legendItems} />
-          </div>
-        }
-      />
-    </ChartDeviceContext.Provider>
+    <div aria-hidden className={FIGURE_PICTURE_CLASS}>
+      <ChartDeviceContext.Provider value={{ isTouch: false, isNarrow, textScale }}>
+        <WalterLiethChart
+          series={series}
+          domain={model.domain}
+          isStatic
+          annotationBands={getAnnotationBands({
+            annotations: ANNOTATIONS,
+            layout,
+          })}
+          overlay={(projection) => (
+            <FigureAnnotations annotations={ANNOTATIONS} projection={projection} layout={layout} />
+          )}
+          footer={<WalterLiethFigureLegend />}
+        />
+      </ChartDeviceContext.Provider>
+    </div>
   );
 }
 
 /** The standard chart's picture: its annotations on the chart, and on the stats bar by item. */
 export function IndicatorsFigureChart() {
   const model = useChartModel(FIGURE_SERIES_LIST);
-  const labels = useLegendLabels();
   const isNarrow = !useMediaQuery(SM_MEDIA_QUERY);
   const textScale = useTextScale();
   const layout = scaleAnnotationLayout({ layout: ANNOTATION_LAYOUT, textScale });
@@ -77,45 +67,29 @@ export function IndicatorsFigureChart() {
   if (entry === undefined) return null;
   const { ANNOTATIONS } = INDICATORS_FIGURE;
 
-  const statsMarkers = Object.fromEntries(
-    ANNOTATIONS.flatMap(({ anchor }, index) =>
-      anchor.kind === EFigureAnchor.STATS_ITEM
-        ? [[anchor.item, <InfoFigureMarker key={anchor.item} number={index + 1} />]]
-        : [],
-    ),
-  );
-  const legend = getStandardLegendItems({
-    labels,
-    colors: STANDARD_CHART_SINGLE_COLORS,
-    visible: FIGURE_VISIBLE_SERIES,
-    aridity: ARIDITY_BAR_COLORS,
-  });
-
   return (
-    <ChartDeviceContext.Provider value={{ isTouch: false, isNarrow, textScale }}>
-      <StandardClimateChart
-        chartData={entry.chartData}
-        aridity={entry.aridity}
-        summary={entry.summary}
-        scales={model.scales}
-        rightMax={model.rightMax}
-        visible={FIGURE_VISIBLE_SERIES}
-        {...(entry.series.altitude !== null ? { altitude: entry.series.altitude } : {})}
-        isStatic
-        annotationBands={getAnnotationBands({
-          annotations: ANNOTATIONS,
-          layout,
-        })}
-        statsMarkers={statsMarkers}
-        overlay={(projection) => (
-          <FigureAnnotations annotations={ANNOTATIONS} projection={projection} layout={layout} />
-        )}
-        footer={
-          <div className={CHART_LEGEND.GAP_CLASS}>
-            <ChartLegend items={legend} />
-          </div>
-        }
-      />
-    </ChartDeviceContext.Provider>
+    <div aria-hidden className={FIGURE_PICTURE_CLASS}>
+      <ChartDeviceContext.Provider value={{ isTouch: false, isNarrow, textScale }}>
+        <StandardClimateChart
+          chartData={entry.chartData}
+          aridity={entry.aridity}
+          summary={entry.summary}
+          scales={model.scales}
+          rightMax={model.rightMax}
+          visible={FIGURE_VISIBLE_SERIES}
+          {...(entry.series.altitude !== null ? { altitude: entry.series.altitude } : {})}
+          isStatic
+          annotationBands={getAnnotationBands({
+            annotations: ANNOTATIONS,
+            layout,
+          })}
+          statsMarkers={getIndicatorsStatsMarkers()}
+          overlay={(projection) => (
+            <FigureAnnotations annotations={ANNOTATIONS} projection={projection} layout={layout} />
+          )}
+          footer={<IndicatorsFigureLegend />}
+        />
+      </ChartDeviceContext.Provider>
+    </div>
   );
 }

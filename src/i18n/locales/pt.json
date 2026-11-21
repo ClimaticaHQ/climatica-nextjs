@@ -204,7 +204,8 @@
     "scrollHint": "Deslize para ver todos os meses"
   },
   "loading": {
-    "dataUpdated": "Dados atualizados: {location}, {period}"
+    "dataUpdated": "Dados atualizados: {location}, {period}",
+    "chart": "A carregar o gráfico"
   },
   "errors": {
     "fetchClimateData": "Não foi possível obter os dados climáticos",

@@ -23,6 +23,7 @@ export * from "./settingsControl.enum";
 export * from "./popover.enum";
 export * from "./sortOrder.enum";
 export * from "./copyStatus.enum";
+export * from "./disclosure.enum";
 export * from "./textScale.enum";
 export * from "./infoCard.enum";
 export * from "./infoFigure.enum";

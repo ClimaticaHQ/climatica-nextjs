@@ -422,6 +422,17 @@ export type TStandardClimateChartProps = {
   annotationBands?: TAnnotationBands;
 };
 
+/** A standard chart's frame (StandardClimateChartFrame): its stats bar, plot slot and footer. */
+export type TStandardClimateChartFrameProps = Pick<
+  TStandardClimateChartProps,
+  "isPanel" | "martonneYear" | "altitude" | "statsMarkers" | "footer"
+> & {
+  /** its stats bar's values; null while the data load (placeholders) */
+  summary?: TChartSummary | null | undefined;
+  /** absent while the data load: a ChartSkeleton in the plot's height */
+  plot?: ReactNode;
+};
+
 export type TStandardChartColors = {
   tmax: string;
   tmin: string;

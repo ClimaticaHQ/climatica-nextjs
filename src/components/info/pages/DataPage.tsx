@@ -43,124 +43,128 @@ export function DataPage() {
         title={t("info.pages.data.title")}
         description={t("info.pages.data.description")}
       />
-      <InfoSection id={ID.CELL_VALUES}>
-        <div className={C.CELL_LAYOUT}>
-          <div className="flex flex-col gap-3">
-            <p className={C.TEXT}>{t("info.data.cell.whole")}</p>
-            <p className={C.TEXT}>{t("info.data.cell.mixed")}</p>
-            <p className={C.TEXT}>
-              {t("info.data.cell.example", {
-                period: CLIMATE_PERIOD_LABELS[B.PERIOD],
-                valleyElevation: elevation(B.VALLEY_ELEVATION),
-                coarseGrid: arcLabel(B.COARSE.grid),
-                coarseElevation: elevation(B.COARSE.elevation),
-                coarseTemperature: temperature(B.COARSE.temperature),
-                fineGrid: arcLabel(B.FINE.grid),
-                fineElevation: elevation(B.FINE.elevation),
-                fineTemperature: temperature(B.FINE.temperature),
-              })}
-            </p>
-            <Card size={ECardSize.MD} background={ECardBackground.HIGHLIGHT}>
-              <p className="font-semibold text-[var(--color-text)]">
-                {t("info.data.cell.calloutTitle")}
+      <div className={C.COLUMN}>
+        <InfoSection id={ID.CELL_VALUES}>
+          <div className={C.CELL_LAYOUT}>
+            <div className={C.CELL_TEXT}>
+              <p className={C.TEXT}>{t("info.data.cell.whole")}</p>
+              <p className={C.TEXT}>{t("info.data.cell.mixed")}</p>
+              <p className={C.TEXT}>
+                {t("info.data.cell.example", {
+                  period: CLIMATE_PERIOD_LABELS[B.PERIOD],
+                  valleyElevation: elevation(B.VALLEY_ELEVATION),
+                  coarseGrid: arcLabel(B.COARSE.grid),
+                  coarseElevation: elevation(B.COARSE.elevation),
+                  coarseTemperature: temperature(B.COARSE.temperature),
+                  fineGrid: arcLabel(B.FINE.grid),
+                  fineElevation: elevation(B.FINE.elevation),
+                  fineTemperature: temperature(B.FINE.temperature),
+                })}
               </p>
-              <p className="text-[var(--color-text)]">{t("info.data.cell.calloutText")}</p>
-            </Card>
+              <Card size={ECardSize.MD} background={ECardBackground.HIGHLIGHT}>
+                <p className="font-semibold text-[var(--color-text)]">
+                  {t("info.data.cell.calloutTitle")}
+                </p>
+                <p className="text-[var(--color-text)]">{t("info.data.cell.calloutText")}</p>
+              </Card>
+            </div>
+            <figure className={C.CELL_FIGURE}>
+              <NestedCellsIllustration
+                ariaLabel={t("info.data.cell.illustrationLabel", {
+                  coarse: cellLabel(B.COARSE.grid),
+                  fine: cellLabel(B.FINE.grid),
+                })}
+                coarseLabel={cellLabel(B.COARSE.grid)}
+                fineLabel={cellLabel(B.FINE.grid)}
+                finePerCoarse={NESTED_CELLS_FINE_PER_COARSE}
+              />
+              <figcaption className={`${C.SMALL} ${C.CELL_CAPTION}`}>
+                {t("info.data.cell.illustrationCaption")}
+              </figcaption>
+            </figure>
           </div>
-          <figure className={C.STACK_SMALL}>
-            <NestedCellsIllustration
-              ariaLabel={t("info.data.cell.illustrationLabel", {
-                coarse: cellLabel(B.COARSE.grid),
-                fine: cellLabel(B.FINE.grid),
-              })}
-              coarseLabel={cellLabel(B.COARSE.grid)}
-              fineLabel={cellLabel(B.FINE.grid)}
-              finePerCoarse={NESTED_CELLS_FINE_PER_COARSE}
-            />
-            <figcaption className={C.SMALL}>{t("info.data.cell.illustrationCaption")}</figcaption>
-          </figure>
-        </div>
-      </InfoSection>
-      <ResolutionsTable />
-      <InfoSection id={ID.PERIODS}>
-        <InfoCardGrid
-          columns={2}
-          items={[
-            {
-              key: "climate",
-              title: t("sidebar.datasets.climate"),
-              text: t("info.data.periods.climateIntro"),
-              body: (
-                <>
-                  <ul className={C.LIST_SMALL}>
-                    {Object.values(CLIMATE_PERIODS).map((period) => (
-                      <li key={period}>
-                        <span className={C.PERIOD_LABEL}>{CLIMATE_PERIOD_LABELS[period]}</span>
-                        {" — "}
-                        {t(
-                          period === FULL_VARIABLES_CLIMATE_PERIOD
-                            ? "info.data.periods.fromWorldClim"
-                            : "info.data.periods.averaged",
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+        </InfoSection>
+        <ResolutionsTable />
+        <InfoSection id={ID.PERIODS}>
+          <InfoCardGrid
+            columns={2}
+            items={[
+              {
+                key: "climate",
+                title: t("sidebar.datasets.climate"),
+                text: t("info.data.periods.climateIntro"),
+                body: (
+                  <>
+                    <ul className={C.LIST_SMALL}>
+                      {Object.values(CLIMATE_PERIODS).map((period) => (
+                        <li key={period}>
+                          <span className={C.PERIOD_LABEL}>{CLIMATE_PERIOD_LABELS[period]}</span>
+                          {" — "}
+                          {t(
+                            period === FULL_VARIABLES_CLIMATE_PERIOD
+                              ? "info.data.periods.fromWorldClim"
+                              : "info.data.periods.averaged",
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className={C.SMALL}>
+                      {t("info.data.periods.climateVariables", {
+                        variables: variableNames(CLIMATE_VARIABLES),
+                        restricted: variableNames(PERIOD_RESTRICTED_VARIABLES),
+                        period: CLIMATE_PERIOD_LABELS[FULL_VARIABLES_CLIMATE_PERIOD],
+                      })}
+                    </p>
+                  </>
+                ),
+              },
+              {
+                key: "weather",
+                title: t("sidebar.datasets.weather"),
+                // * years are labels, never grouped ("1951", not "1,951")
+                text: t("info.data.periods.weatherIntro", {
+                  first: String(WEATHER_MIN_YEAR),
+                  last: String(WEATHER_MAX_YEAR),
+                }),
+                body: (
                   <p className={C.SMALL}>
-                    {t("info.data.periods.climateVariables", {
-                      variables: variableNames(CLIMATE_VARIABLES),
-                      restricted: variableNames(PERIOD_RESTRICTED_VARIABLES),
-                      period: CLIMATE_PERIOD_LABELS[FULL_VARIABLES_CLIMATE_PERIOD],
+                    {t("info.data.periods.weatherVariables", {
+                      variables: variableNames(WEATHER_VARIABLES),
                     })}
                   </p>
-                </>
-              ),
-            },
-            {
-              key: "weather",
-              title: t("sidebar.datasets.weather"),
-              // * years are labels, never grouped ("1951", not "1,951")
-              text: t("info.data.periods.weatherIntro", {
-                first: String(WEATHER_MIN_YEAR),
-                last: String(WEATHER_MAX_YEAR),
-              }),
-              body: (
-                <p className={C.SMALL}>
-                  {t("info.data.periods.weatherVariables", {
-                    variables: variableNames(WEATHER_VARIABLES),
-                  })}
-                </p>
-              ),
-            },
-          ]}
-        />
-      </InfoSection>
-      <InfoSection id={ID.INDICATORS} intro={t("info.data.indicators.intro")}>
-        <InfoCardGrid
-          columns={1}
-          items={CLIMATE_INDICATORS.map(({ key, formula }) => ({
-            key,
-            title: t(`info.data.indicators.${key}.title`),
-            formula,
-            text: t(`info.data.indicators.${key}.text`),
-          }))}
-        />
-        <InfoFigure
-          visual={<LazyIndicatorsFigureChart />}
-          annotations={INDICATORS_FIGURE.ANNOTATIONS}
-        />
-      </InfoSection>
-      <InfoSection id={ID.REFERENCES}>
-        <InfoList
-          isNumbered
-          items={REFERENCES.map(({ key, text, url }) => ({
-            key,
-            text,
-            ...(url !== undefined
-              ? { link: { href: url, label: url.replace("https://doi.org/", "doi:") } }
-              : {}),
-          }))}
-        />
-      </InfoSection>
+                ),
+              },
+            ]}
+          />
+        </InfoSection>
+        <InfoSection id={ID.INDICATORS} intro={t("info.data.indicators.intro")}>
+          <InfoCardGrid
+            columns={1}
+            items={CLIMATE_INDICATORS.map(({ key, formula }) => ({
+              key,
+              title: t(`info.data.indicators.${key}.title`),
+              formula,
+              text: t(`info.data.indicators.${key}.text`),
+            }))}
+          />
+          <InfoFigure
+            visual={<LazyIndicatorsFigureChart />}
+            annotations={INDICATORS_FIGURE.ANNOTATIONS}
+          />
+        </InfoSection>
+        <InfoSection id={ID.REFERENCES}>
+          <InfoList
+            isNumbered
+            items={REFERENCES.map(({ key, text, url }) => ({
+              key,
+              text,
+              ...(url !== undefined
+                ? { link: { href: url, label: url.replace("https://doi.org/", "doi:") } }
+                : {}),
+            }))}
+          />
+        </InfoSection>
+      </div>
     </>
   );
 }

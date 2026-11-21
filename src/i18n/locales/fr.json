@@ -204,7 +204,8 @@
     "scrollHint": "Faites glisser pour voir tous les mois"
   },
   "loading": {
-    "dataUpdated": "Données mises à jour : {location}, {period}"
+    "dataUpdated": "Données mises à jour : {location}, {period}",
+    "chart": "Chargement du graphique"
   },
   "errors": {
     "fetchClimateData": "Impossible de récupérer les données climatiques",

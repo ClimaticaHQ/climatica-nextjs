@@ -1,6 +1,8 @@
 import { Card } from "@/components/Card";
 import { MartonneBadge } from "@/components/MartonneBadge";
-import { ECardPadding, ECardSize, EDisplayMetric, EStatsBarItem } from "@/enums";
+import { EBadgeSize, ECardPadding, ECardSize, EDisplayMetric, EStatsBarItem } from "@/enums";
+import { PENDING_MARTONNE_CLASS } from "@/constants";
+import { Badge } from "@/components/UI/Badge";
 import { useDisplayFormat } from "@/hooks/ui/useDisplayFormat";
 import { buildMartonneTooltip, getMartonneBadge } from "@/utils";
 import { useTranslations } from "next-intl";
@@ -11,6 +13,7 @@ import {
 } from "./ClimateStatsBar.constant";
 import type { TClimateStatsBarProps } from "./ClimateStatsBar.type";
 import { StatCell } from "@/components/UI/StatCell";
+import { TEXT_PLACEHOLDER_WIDTHS, TextPlaceholder } from "@/components/UI/TextPlaceholder";
 
 /** One place's annual stats: under each chart, and the heat map's regional profile. */
 export function ClimateStatsBar({
@@ -21,11 +24,15 @@ export function ClimateStatsBar({
   martonneIndex,
   martonneYear,
   markers = {},
+  isPending = false,
 }: TClimateStatsBarProps) {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();
-  const showAltitude = altitude !== undefined;
-  const badge = martonneIndex !== null ? getMartonneBadge(martonneIndex) : null;
+  // * pending: the altitude's cell too — a place's altitude arrives with its data
+  const showAltitude = altitude !== undefined || isPending;
+  const badge = martonneIndex !== null && !isPending ? getMartonneBadge(martonneIndex) : null;
+  // * still loading: each value's place, in its line height
+  const pending = <TextPlaceholder widthClass={TEXT_PLACEHOLDER_WIDTHS.STAT} />;
   // * a single weather year: the index describes that year alone, and says so
   const martonneLabels =
     martonneYear === undefined
@@ -56,40 +63,67 @@ export function ClimateStatsBar({
           {...cell}
           marker={markers[EStatsBarItem.MEAN_TEMP]}
           label={t("chart.meanTemp")}
-          value={t("units.celsiusValue", {
-            value: formatValue(meanTemp, { metric: EDisplayMetric.TEMPERATURE }),
-          })}
+          value={
+            isPending
+              ? pending
+              : t("units.celsiusValue", {
+                  value: formatValue(meanTemp, { metric: EDisplayMetric.TEMPERATURE }),
+                })
+          }
         />
         <StatCell
           {...cell}
           marker={markers[EStatsBarItem.ANNUAL_PRECIP]}
           label={t("chart.annualPrec")}
-          value={t("units.mmValue", {
-            value: formatValue(annualPrecip, { metric: EDisplayMetric.PRECIPITATION }),
-          })}
+          value={
+            isPending
+              ? pending
+              : t("units.mmValue", {
+                  value: formatValue(annualPrecip, { metric: EDisplayMetric.PRECIPITATION }),
+                })
+          }
         />
         <StatCell
           {...cell}
           marker={markers[EStatsBarItem.ARID_MONTHS]}
           label={t("chart.aridMonths")}
-          value={formatValue(aridMonths, { metric: EDisplayMetric.MONTH_COUNT })}
+          value={
+            isPending ? pending : formatValue(aridMonths, { metric: EDisplayMetric.MONTH_COUNT })
+          }
         />
         {showAltitude && (
           <StatCell
             {...cell}
             marker={markers[EStatsBarItem.ALTITUDE]}
             label={t("chart.altitude")}
-            value={t("units.metersValue", {
-              value: formatValue(altitude, { metric: EDisplayMetric.ELEVATION }),
-            })}
+            value={
+              isPending
+                ? pending
+                : t("units.metersValue", {
+                    value: formatValue(altitude, { metric: EDisplayMetric.ELEVATION }),
+                  })
+            }
           />
         )}
         <StatCell
           {...cell}
           marker={markers[EStatsBarItem.MARTONNE]}
           {...martonneLabels}
-          meta={badge && <MartonneBadge badge={badge} />}
-          value={formatValue(martonneIndex, { metric: EDisplayMetric.MARTONNE })}
+          meta={
+            badge ? (
+              <MartonneBadge badge={badge} />
+            ) : (
+              isPending && (
+                // * the class's place while it loads: a badge as big, so the cell keeps its height
+                <Badge tone={PENDING_MARTONNE_CLASS.tone} size={EBadgeSize.SM} isPending>
+                  {t(PENDING_MARTONNE_CLASS.labelKey)}
+                </Badge>
+              )
+            )
+          }
+          value={
+            isPending ? pending : formatValue(martonneIndex, { metric: EDisplayMetric.MARTONNE })
+          }
         />
       </div>
     </Card>

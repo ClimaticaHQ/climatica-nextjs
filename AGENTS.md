@@ -129,12 +129,14 @@ Search these first; the code is the reference for their props. In src/components
 - PairLayout — `UI/PairLayout` — "A, swap, B": two sides with a control between.
 - Popover — `UI/Popover` — a trigger and a floating panel.
 - SectionLabel — `UI/SectionLabel` — a small uppercase section title.
+- SidePanel — `UI/SidePanel` — the left panel from lg (the filters, the Info navigation).
 - StatCell — `UI/StatCell` — one stat of a stats bar.
 - StatusMessage — `UI/StatusMessage` — a page's empty or error message, or a closable notice.
 - StepSlider — `UI/StepSlider` — a slider over named steps, applied on release (the text size).
 - SwapButton — `UI/SwapButton` — an icon button exchanging two sides.
 - ToggleSwitch — `UI/ToggleSwitch` — a labelled on / off switch.
-- Skeletons — `UI/ChartSkeleton`, `MapSkeleton`, `SidebarSkeleton`, `StatCardsSkeleton`, `TableSkeleton`, `TopbarSkeleton` — loading placeholders.
+- Skeletons — `UI/ChartSkeleton` (a plot waiting for its data, in the plot's own height class), `MapSkeleton`, `SidebarSkeleton`, `TopbarSkeleton` — loading placeholders.
+- TextPlaceholder — `UI/TextPlaceholder` — a value not loaded yet, in its line's height.
 
 Outside UI/:
 

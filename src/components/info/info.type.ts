@@ -6,6 +6,7 @@ import type {
   TInfoSection,
 } from "@/types";
 import type { EInfoCardLayout } from "@/enums";
+import type { useInfoNavigation } from "@/hooks/pages/useInfoNavigation";
 import type { ComponentType, MouseEvent, ReactNode } from "react";
 
 export type TInfoSectionProps = {
@@ -61,10 +62,16 @@ export type TInfoContentsBarProps = {
   onOpen: () => void;
 };
 
-export type TInfoLayoutProps = {
+/** The Info navigation's state (useInfoNavigation), shared by the side panel and the content. */
+export type TInfoNavigation = ReturnType<typeof useInfoNavigation>;
+
+export type TInfoNavigationProviderProps = {
   children: ReactNode;
-  /** under the content of every Info page (rendered on the server) */
-  footer: ReactNode;
+};
+
+export type TInfoLayoutProps = {
+  /** the page, its footer last (InfoFooter): both stream in together */
+  children: ReactNode;
 };
 
 /** One card of an InfoCardGrid. Every slot is optional but the title; they show in this order. */
@@ -121,12 +128,16 @@ export type TInfoListProps = {
 };
 
 export type TInfoFigureProps = {
-  /** the picture, hidden from screen readers: the caption says everything it shows */
+  /** the picture (hidden from screen readers by itself: the caption says all it shows) */
   visual: ReactNode;
   /** the numbered annotations: the n-th's marker and caption line both read n */
   annotations: readonly Pick<TFigureAnnotation, "key" | "captionKey">[];
   /** a last, unnumbered caption line */
   noteKey?: string;
+};
+
+export type TFigureChartLoadingProps = {
+  children: ReactNode;
 };
 
 export type TInfoFigureMarkerProps = {

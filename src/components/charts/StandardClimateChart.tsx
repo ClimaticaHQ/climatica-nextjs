@@ -1,4 +1,3 @@
-import { ClimateStatsBar } from "@/components";
 import { CHART_PLOT, CHART_LINE_DASH, CHART_HOVER_COLOR, MONTH_NAMES } from "@/constants";
 import {
   getAridityBarSwatch,
@@ -34,26 +33,40 @@ import { useStandardChartAxes } from "@/hooks/charts/useStandardChartAxes";
 import type { TDotRendererProps, TStandardClimateChartProps } from "./charts.type";
 import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle } from "./charts.util";
 import { ChartDeviceContext } from "./chartDevice.context";
+import { ChartLoadingContext } from "./chartLoading.context";
 import { MonthTapLayer } from "./MonthTapLayer";
+import { StandardClimateChartFrame } from "./StandardClimateChartFrame";
 
-export function StandardClimateChart({
+/**
+ * One standard chart: its stats bar (not in a split panel), the plot and its footer, in one
+ * frame. While its data load the plot is a skeleton in the same frame, so the data's arrival
+ * swaps the plot alone.
+ */
+export function StandardClimateChart(props: TStandardClimateChartProps) {
+  const isLoading = useContext(ChartLoadingContext);
+  return (
+    <StandardClimateChartFrame
+      {...props}
+      summary={isLoading ? null : props.summary}
+      plot={isLoading ? undefined : <Plot {...props} />}
+    />
+  );
+}
+
+/** The chart's plot. */
+function Plot({
   chartData,
   aridity,
   scales,
   rightMax,
-  summary,
   visible,
   selectedMonths,
-  altitude,
-  martonneYear,
   activeMonthIndex,
   onActiveMonthIndexChange,
   isPanel = false,
   syncId,
-  footer,
   isStatic = false,
   overlay,
-  statsMarkers,
   annotationBands,
 }: TStandardClimateChartProps) {
   const t = useTranslations();
@@ -117,159 +130,149 @@ export function StandardClimateChart({
   }
 
   return (
-    <>
-      {summary && (
-        <ClimateStatsBar
-          meanTemp={summary.annualAvgTemp}
-          annualPrecip={summary.totalPrec}
-          aridMonths={summary.aridCount}
-          martonneIndex={summary.martonne}
-          martonneYear={martonneYear}
-          markers={statsMarkers}
-          {...(altitude !== undefined ? { altitude } : {})}
-        />
-      )}
-      <div ref={plotRef} className={`relative ${getPlotHeightClass({ isCompact: isPanel })}`}>
-        <div className="h-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart
-              data={chartData}
-              margin={getChartMargin({ bands: annotationBands, textScale })}
-              // * static: a picture, so no keyboard layer — the chart takes no tab stop
-              accessibilityLayer={!isStatic}
-              {...(syncId !== undefined && !isStatic ? { syncId } : {})}
-              barGap={2}
-              barCategoryGap={
-                isNarrow ? CHART_PLOT.BAR_CATEGORY_GAP.NARROW : CHART_PLOT.BAR_CATEGORY_GAP.FULL
-              }
-              onMouseMove={(state) => {
-                if (!isStatic)
-                  onActiveMonthIndexChange?.(resolveActiveTooltipIndex(state.activeTooltipIndex));
-              }}
-              onMouseLeave={() => {
-                if (!isStatic) onActiveMonthIndexChange?.(null);
-              }}
-            >
-              <StandardChartAxes
-                scales={scales}
-                rightMax={rightMax}
-                isCompact={isPanel}
-                monthFormat={monthFormat}
+    <div
+      ref={plotRef}
+      data-chart-plot
+      className={`relative ${getPlotHeightClass({ isCompact: isPanel })}`}
+    >
+      <div className="h-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart
+            data={chartData}
+            margin={getChartMargin({ bands: annotationBands, textScale })}
+            // * static: a picture, so no keyboard layer — the chart takes no tab stop
+            accessibilityLayer={!isStatic}
+            {...(syncId !== undefined && !isStatic ? { syncId } : {})}
+            barGap={2}
+            barCategoryGap={
+              isNarrow ? CHART_PLOT.BAR_CATEGORY_GAP.NARROW : CHART_PLOT.BAR_CATEGORY_GAP.FULL
+            }
+            onMouseMove={(state) => {
+              if (!isStatic)
+                onActiveMonthIndexChange?.(resolveActiveTooltipIndex(state.activeTooltipIndex));
+            }}
+            onMouseLeave={() => {
+              if (!isStatic) onActiveMonthIndexChange?.(null);
+            }}
+          >
+            <StandardChartAxes
+              scales={scales}
+              rightMax={rightMax}
+              isCompact={isPanel}
+              monthFormat={monthFormat}
+            />
+
+            {activeMonthIndex !== null && activeMonthIndex !== undefined && (
+              // * the hovered month's band — the same color as the monthly values table's
+              <ReferenceArea
+                yAxisId="temp"
+                x1={MONTH_NAMES[activeMonthIndex]}
+                x2={MONTH_NAMES[activeMonthIndex]}
+                fill={CHART_HOVER_COLOR}
+                fillOpacity={1}
+                stroke="none"
               />
-
-              {activeMonthIndex !== null && activeMonthIndex !== undefined && (
-                // * the hovered month's band — the same color as the monthly values table's
-                <ReferenceArea
-                  yAxisId="temp"
-                  x1={MONTH_NAMES[activeMonthIndex]}
-                  x2={MONTH_NAMES[activeMonthIndex]}
-                  fill={CHART_HOVER_COLOR}
-                  fillOpacity={1}
-                  stroke="none"
-                />
-              )}
-              {/* * one series: each row after its variable's legend swatch, not a marker; on
+            )}
+            {/* * one series: each row after its variable's legend swatch, not a marker; on
                 touch, the tapped month's */}
-              {!isStatic && (
-                <Tooltip
-                  key={getTouchTooltipKey(tooltipState)}
-                  cursor={false}
-                  {...getTouchTooltipProps(tooltipState)}
-                  content={
-                    <StandardTooltip
-                      formatLabel={axes.localMonthName}
-                      swatchOf={(name) => swatchByName[name]}
-                    />
-                  }
-                />
-              )}
-
-              <Bar
-                isAnimationActive={seriesMotion.isAnimationActive}
-                yAxisId="prec"
-                dataKey={(entry: Record<string, unknown>) =>
-                  visible.prec ? Number(entry["prec"]) : 0
-                }
-                name={t("chart.precipitation")}
-                fill={colors.prec}
-                minPointSize={0}
-                background={false}
-                hide={hidePrecBar}
-                animationDuration={seriesMotion.toggleMs}
-                shape={
-                  <PrecipBarShape
-                    selectedMonths={selectedMonths}
-                    aridityByMonth={aridityByMonth}
-                    {...(activeMonthIndex !== undefined ? { activeMonthIndex } : {})}
+            {!isStatic && (
+              <Tooltip
+                key={getTouchTooltipKey(tooltipState)}
+                cursor={false}
+                {...getTouchTooltipProps(tooltipState)}
+                content={
+                  <StandardTooltip
+                    formatLabel={axes.localMonthName}
+                    swatchOf={(name) => swatchByName[name]}
                   />
                 }
               />
+            )}
 
-              <Line
-                isAnimationActive={seriesMotion.isAnimationActive}
-                yAxisId="temp"
-                type="monotone"
-                dataKey="tmax"
-                name={t("chart.maxTemperature")}
-                stroke={colors.tmax}
-                strokeWidth={curveWidth}
-                dot={makeDot(colors.tmax, visible.tmax)}
-                activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tmax ? 1 : 0) }}
-                hide={hideTmaxLine}
-                style={buildStrokeOpacityFadeStyle(visible.tmax ? 1 : 0)}
-              />
-
-              <Line
-                isAnimationActive={seriesMotion.isAnimationActive}
-                yAxisId="temp"
-                type="monotone"
-                dataKey="tavg"
-                name={t("chart.avgTemperature")}
-                stroke={colors.tavg}
-                strokeWidth={curveWidth}
-                strokeDasharray={CHART_LINE_DASH.STANDARD.tavg}
-                dot={makeDot(colors.tavg, visible.tavg)}
-                activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tavg ? 1 : 0) }}
-                hide={hideTavgLine}
-                style={buildStrokeOpacityFadeStyle(visible.tavg ? 1 : 0)}
-              />
-
-              <Line
-                isAnimationActive={seriesMotion.isAnimationActive}
-                yAxisId="temp"
-                type="monotone"
-                dataKey="tmin"
-                name={t("chart.minTemperature")}
-                stroke={colors.tmin}
-                strokeWidth={curveWidth}
-                strokeDasharray={CHART_LINE_DASH.STANDARD.tmin}
-                dot={makeDot(colors.tmin, visible.tmin)}
-                activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
-                hide={hideTminLine}
-                style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
-              />
-              {overlay !== undefined && (
-                <Customized
-                  component={ChartOverlayLayer}
-                  render={overlay}
-                  xValueOf={(month: number) => MONTH_NAMES[month - 1] ?? ""}
-                  temperatureAxisId="temp"
-                  precipitationAxisId="prec"
+            <Bar
+              isAnimationActive={seriesMotion.isAnimationActive}
+              yAxisId="prec"
+              dataKey={(entry: Record<string, unknown>) =>
+                visible.prec ? Number(entry["prec"]) : 0
+              }
+              name={t("chart.precipitation")}
+              fill={colors.prec}
+              minPointSize={0}
+              background={false}
+              hide={hidePrecBar}
+              animationDuration={seriesMotion.toggleMs}
+              shape={
+                <PrecipBarShape
+                  selectedMonths={selectedMonths}
+                  aridityByMonth={aridityByMonth}
+                  {...(activeMonthIndex !== undefined ? { activeMonthIndex } : {})}
                 />
-              )}
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-        {isTouch && !isStatic && (
-          <MonthTapLayer
-            activeMonthIndex={activeMonthIndex ?? null}
-            onActiveMonthIndexChange={onActiveMonthIndexChange}
-            inset={getPlotMargin({ isCompact: isPanel, isNarrow, textScale })}
-            canScrub
-          />
-        )}
+              }
+            />
+
+            <Line
+              isAnimationActive={seriesMotion.isAnimationActive}
+              yAxisId="temp"
+              type="monotone"
+              dataKey="tmax"
+              name={t("chart.maxTemperature")}
+              stroke={colors.tmax}
+              strokeWidth={curveWidth}
+              dot={makeDot(colors.tmax, visible.tmax)}
+              activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tmax ? 1 : 0) }}
+              hide={hideTmaxLine}
+              style={buildStrokeOpacityFadeStyle(visible.tmax ? 1 : 0)}
+            />
+
+            <Line
+              isAnimationActive={seriesMotion.isAnimationActive}
+              yAxisId="temp"
+              type="monotone"
+              dataKey="tavg"
+              name={t("chart.avgTemperature")}
+              stroke={colors.tavg}
+              strokeWidth={curveWidth}
+              strokeDasharray={CHART_LINE_DASH.STANDARD.tavg}
+              dot={makeDot(colors.tavg, visible.tavg)}
+              activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tavg ? 1 : 0) }}
+              hide={hideTavgLine}
+              style={buildStrokeOpacityFadeStyle(visible.tavg ? 1 : 0)}
+            />
+
+            <Line
+              isAnimationActive={seriesMotion.isAnimationActive}
+              yAxisId="temp"
+              type="monotone"
+              dataKey="tmin"
+              name={t("chart.minTemperature")}
+              stroke={colors.tmin}
+              strokeWidth={curveWidth}
+              strokeDasharray={CHART_LINE_DASH.STANDARD.tmin}
+              dot={makeDot(colors.tmin, visible.tmin)}
+              activeDot={{ r: 5, style: buildOpacityFadeStyle(visible.tmin ? 1 : 0) }}
+              hide={hideTminLine}
+              style={buildStrokeOpacityFadeStyle(visible.tmin ? 1 : 0)}
+            />
+            {overlay !== undefined && (
+              <Customized
+                component={ChartOverlayLayer}
+                render={overlay}
+                xValueOf={(month: number) => MONTH_NAMES[month - 1] ?? ""}
+                temperatureAxisId="temp"
+                precipitationAxisId="prec"
+              />
+            )}
+          </ComposedChart>
+        </ResponsiveContainer>
       </div>
-      {footer}
-    </>
+      {isTouch && !isStatic && (
+        <MonthTapLayer
+          activeMonthIndex={activeMonthIndex ?? null}
+          onActiveMonthIndexChange={onActiveMonthIndexChange}
+          inset={getPlotMargin({ isCompact: isPanel, isNarrow, textScale })}
+          canScrub
+        />
+      )}
+    </div>
   );
 }

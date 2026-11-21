@@ -72,6 +72,10 @@ export const MARTONNE_CLASSES = {
   },
 } as const;
 
+// * a Martonne class while its data load: a mid-length class's badge, pending — as wide as a
+// * real one in this language, so its cell wraps (and grows) as it will
+export const PENDING_MARTONNE_CLASS = MARTONNE_CLASSES.semiArid;
+
 export type TMartonnClass = keyof typeof MARTONNE_CLASSES;
 
 // * the tooltip's list of the classes, built from MARTONNE_CLASSES: "<10 Arid | 10–20 Semi-arid | … | >55 …"

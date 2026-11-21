@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { InfoFigure } from "@/components/info/figures/InfoFigure";
 import messages from "@/i18n/locales/en.json";
-import { act, cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 const wrap = (node: ReactNode) =>
   render(
@@ -13,41 +13,6 @@ const wrap = (node: ReactNode) =>
     </NextIntlClientProvider>,
   );
 
-let reportNear: (() => void) | undefined;
-
-// * jsdom has no IntersectionObserver: this one reports "near" when the test says so
-class NearObserver implements IntersectionObserver {
-  readonly root = null;
-  readonly rootMargin = "";
-  readonly thresholds = [];
-  constructor(callback: IntersectionObserverCallback) {
-    reportNear = () =>
-      callback(
-        [
-          {
-            isIntersecting: true,
-            intersectionRatio: 1,
-            boundingClientRect: new DOMRect(),
-            intersectionRect: new DOMRect(),
-            rootBounds: null,
-            target: document.body,
-            time: 0,
-          },
-        ],
-        this,
-      );
-  }
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-  takeRecords() {
-    return [];
-  }
-}
-
-beforeEach(() => {
-  window.IntersectionObserver = NearObserver;
-});
 afterEach(cleanup);
 
 const annotations = [
@@ -80,14 +45,14 @@ describe("InfoFigure", () => {
     expect(note?.closest("ol")).toBeNull();
   });
 
-  it("hides the picture from screen readers and mounts it only near the viewport", () => {
+  it("mounts its picture at once, the caption outside it", () => {
     const { container } = wrap(
       <InfoFigure visual={<svg data-testid="chart" />} annotations={annotations} />,
     );
-    const visual = container.querySelector("figure > div");
-    expect(visual?.getAttribute("aria-hidden")).toBe("true");
-    expect(screen.queryByTestId("chart")).toBeNull();
-    act(() => reportNear?.());
     expect(screen.getByTestId("chart")).toBeTruthy();
+    expect(container.querySelector("figure > div")?.contains(screen.getByTestId("chart"))).toBe(
+      true,
+    );
+    expect(container.querySelector("figcaption")?.getAttribute("aria-hidden")).toBeNull();
   });
 });

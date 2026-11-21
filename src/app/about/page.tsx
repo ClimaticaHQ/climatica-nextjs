@@ -1,4 +1,4 @@
-import { AboutPage as AboutPageContent } from "@/components/info";
+import { AboutPage as AboutPageContent, InfoFooter } from "@/components/info";
 import { ROUTES } from "@/constants";
 import { createInfoPageMetadata } from "@/utils";
 import { Suspense } from "react";
@@ -9,6 +9,7 @@ export default function AboutPage() {
   return (
     <Suspense>
       <AboutPageContent />
+      <InfoFooter />
     </Suspense>
   );
 }
