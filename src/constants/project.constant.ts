@@ -7,6 +7,12 @@ export const PROPER_NAMES = {
   UNIVERSITY: "Universidad de Valladolid",
   RESEARCH_GROUP: "GSIC-EMIC",
   IUFOR: "iuFOR",
+  SCRAPI_AUTHOR: "Guillermo Vega-Gorgojo",
+} as const;
+
+// * people's profile pages, each linked from more than one place (the team, the SCRAPI card)
+export const PROFILE_URLS = {
+  VEGA_GORGOJO: "https://www.gsic.uva.es/members/guiveg",
 } as const;
 
 // * the year Climatica was first released: the footer's copyright starts there
@@ -26,7 +32,8 @@ export const PROJECT_INFO: TProjectInfo = {
   changelogUrl: "https://github.com/ClimaticaHQ/climatica-nextjs/releases",
   // * package.json's license — a unit test keeps the two equal
   licence: "MIT",
-  scrapiAuthor: "Guillermo Vega-Gorgojo",
+  scrapiAuthor: PROPER_NAMES.SCRAPI_AUTHOR,
+  scrapiAuthorUrl: PROFILE_URLS.VEGA_GORGOJO,
   scrapiDocsUrl: "",
   // * the paper's, once it is published
   citation: "",

@@ -1,6 +1,5 @@
 "use client";
 
-import { FIGURE_PLACE } from "@/constants";
 import { useTranslations } from "next-intl";
 import { INFO_FIGURE_CLASSES as C } from "../info.constant";
 import type { TInfoFigureMarkerProps, TInfoFigureProps } from "../info.type";
@@ -10,12 +9,12 @@ import type { TInfoFigureMarkerProps, TInfoFigureProps } from "../info.type";
  * come from and, by the same numbers, what each marks. The picture hides itself from screen
  * readers (the caption carries it); while its chart loads, its skeleton says so.
  */
-export function InfoFigure({ visual, annotations, noteKey }: TInfoFigureProps) {
+export function InfoFigure({ visual, annotations, place }: TInfoFigureProps) {
   const t = useTranslations();
   const source = t("info.figures.source", {
-    place: FIGURE_PLACE.NAME,
-    period: FIGURE_PLACE.PERIOD,
-    grid: t(`cellSizesShort.${FIGURE_PLACE.GRID_KEY}`),
+    place: place.NAME,
+    period: place.PERIOD,
+    grid: t(`cellSizesShort.${place.GRID_KEY}`),
   });
 
   return (
@@ -31,7 +30,6 @@ export function InfoFigure({ visual, annotations, noteKey }: TInfoFigureProps) {
             </li>
           ))}
         </ol>
-        {noteKey !== undefined && <p>{t(noteKey)}</p>}
       </figcaption>
     </figure>
   );

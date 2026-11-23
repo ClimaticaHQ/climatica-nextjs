@@ -1,16 +1,18 @@
 import {
-  FIGURE_SERIES,
-  FIGURE_SERIES_LIST,
   INDICATORS_FIGURE,
+  INDICATORS_FIGURE_SERIES,
   WALTER_LIETH_FIGURE,
+  WALTER_LIETH_FIGURE_SERIES,
 } from "@/components/info/figures/figures.constant";
+import { WALTER_LIETH_DIAGRAM } from "@/constants";
 import { EAnnotationBand, EChartValueAxis, EFigureAnchor, EStatsBarItem } from "@/enums";
 import type {
   TAnnotationLayout,
   TChartProjection,
+  TChartSeries,
   TFigureAnchor,
   TFigureAnnotation,
-  TMonthlyTemperature,
+  TFigureMonthReading,
 } from "@/types";
 import {
   deriveChartModel,
@@ -24,16 +26,22 @@ import {
 } from "@/utils";
 import { describe, expect, it } from "vitest";
 
-const rowOf = (month: number): TMonthlyTemperature => {
-  const row = FIGURE_SERIES.data.find((data) => data.month === month);
-  if (row === undefined) throw new Error(`no fixture month ${month}`);
-  return row;
+const readingsOf = (series: TChartSeries): TFigureMonthReading[] =>
+  series.data.map((row) => ({
+    month: row.month,
+    tavg: getMonthlyMean(row) ?? Number.NaN,
+    prec: row.prec ?? Number.NaN,
+    tmin: row.tmin ?? Number.NaN,
+  }));
+const monthsWhere = (
+  readings: readonly TFigureMonthReading[],
+  condition: (reading: TFigureMonthReading) => boolean,
+) => readings.filter(condition).map(({ month }) => month);
+const readingOf = (readings: readonly TFigureMonthReading[], month: number) => {
+  const reading = readings.find((row) => row.month === month);
+  if (reading === undefined) throw new Error(`no fixture month ${month}`);
+  return reading;
 };
-const reading = (row: TMonthlyTemperature) => ({
-  tavg: getMonthlyMean(row) ?? Number.NaN,
-  prec: row.prec ?? Number.NaN,
-  tmin: row.tmin ?? Number.NaN,
-});
 const anchorOf = (annotations: readonly TFigureAnnotation[], key: string) => {
   const anchor = annotations.find((annotation) => annotation.key === key)?.anchor;
   if (anchor === undefined) throw new Error(`no annotation ${key}`);
@@ -43,56 +51,81 @@ const monthsOf = (annotations: readonly TFigureAnnotation[], key: string) => {
   const anchor = anchorOf(annotations, key);
   return anchor.kind === EFigureAnchor.SPAN ? [...anchor.months] : [];
 };
-const ALL_MONTHS = FIGURE_SERIES.data.map(({ month }) => month);
-const aridInFixture = ALL_MONTHS.filter((month) => isAridMonth(reading(rowOf(month))));
-const frostInFixture = ALL_MONTHS.filter((month) => reading(rowOf(month)).tmin < 0);
 
-describe("spans are computed from the fixture by their condition", () => {
-  it("the arid span is exactly the arid months (P < 2T), in both figures", () => {
-    expect(aridInFixture).toEqual([7, 8, 9]);
-    expect(monthsOf(WALTER_LIETH_FIGURE.ANNOTATIONS, "arid")).toEqual(aridInFixture);
-    expect(monthsOf(INDICATORS_FIGURE.ANNOTATIONS, "aridBars")).toEqual(aridInFixture);
+const isFrost = ({ tmin }: TFigureMonthReading) => tmin < 0;
+const isVeryHumid = ({ prec }: TFigureMonthReading) => prec > WALTER_LIETH_DIAGRAM.PREC_BREAKPOINT;
+const BEIJING = readingsOf(WALTER_LIETH_FIGURE_SERIES);
+const SORIA = readingsOf(INDICATORS_FIGURE_SERIES);
+
+describe("figure 1 (Beijing): its spans are its months meeting their condition", () => {
+  const annotations = WALTER_LIETH_FIGURE.ANNOTATIONS;
+
+  it("shows all four: humid, very humid, arid and frost, numbered in that order", () => {
+    expect(annotations.map(({ key }) => key)).toEqual(["humid", "veryHumid", "arid", "frost"]);
+    expect(monthsWhere(BEIJING, (month) => !isAridMonth(month) && !isFrost(month))).toEqual([
+      6, 7, 8, 9,
+    ]);
   });
 
-  it("the frost span is exactly the frost months, under the month labels", () => {
-    expect(frostInFixture).toEqual([1, 2, 12]);
-    expect(monthsOf(WALTER_LIETH_FIGURE.ANNOTATIONS, "frost")).toEqual(frostInFixture);
-    expect(anchorOf(WALTER_LIETH_FIGURE.ANNOTATIONS, "frost")).toMatchObject({
-      band: EAnnotationBand.BOTTOM,
-    });
+  it("very humid: exactly the months above 100 mm, over the plot", () => {
+    expect(monthsWhere(BEIJING, isVeryHumid)).toEqual([7, 8]);
+    expect(monthsOf(annotations, "veryHumid")).toEqual([7, 8]);
+    expect(anchorOf(annotations, "veryHumid")).toMatchObject({ band: EAnnotationBand.TOP });
   });
 
-  it("Dec–Feb wraps the year: two bracket runs, Jan–Feb and Dec", () => {
-    expect(toMonthRuns(frostInFixture)).toEqual([[1, 2], [12]]);
-    expect(toMonthRuns([7, 8, 9])).toEqual([[7, 8, 9]]);
+  it("arid: exactly the months with P < 2T", () => {
+    const arid = monthsWhere(BEIJING, (month) => isAridMonth(month));
+    expect(arid).toEqual([3, 4, 5, 10, 11]);
+    expect(monthsOf(annotations, "arid")).toEqual(arid);
+  });
+
+  it("frost: exactly the months with a mean minimum below 0 °C, under the month labels", () => {
+    const frost = monthsWhere(BEIJING, isFrost);
+    expect(frost).toEqual([1, 2, 11, 12]);
+    expect(monthsOf(annotations, "frost")).toEqual(frost);
+    expect(anchorOf(annotations, "frost")).toMatchObject({ band: EAnnotationBand.BOTTOM });
+    // * Nov–Feb wraps the year: two bracket runs
+    expect(toMonthRuns(frost)).toEqual([
+      [1, 2],
+      [11, 12],
+    ]);
+  });
+
+  it("humid: a point in a humid month's hatching, under the 100 mm line", () => {
+    const anchor = anchorOf(annotations, "humid");
+    if (anchor.kind !== EFigureAnchor.POINT) throw new Error("not a point");
+    const { tavg, prec } = readingOf(BEIJING, anchor.month);
+    expect(isAridMonth({ tavg, prec })).toBe(false);
+    expect(anchor.value).toBeGreaterThan(tavg);
+    expect(anchor.value).toBeLessThan(
+      Math.min(toPrecipAxisValue(prec), WALTER_LIETH_DIAGRAM.PREC_BREAKPOINT_AXIS_VALUE),
+    );
   });
 });
 
-describe("points sit on a month meeting their condition", () => {
-  it("figure 1, humid: between the wettest humid month's curves", () => {
-    const anchor = anchorOf(WALTER_LIETH_FIGURE.ANNOTATIONS, "humid");
-    if (anchor.kind !== EFigureAnchor.POINT) throw new Error("not a point");
-    const { tavg, prec } = reading(rowOf(anchor.month));
-    expect(isAridMonth({ tavg, prec })).toBe(false);
-    expect(anchor.value).toBeGreaterThan(tavg);
-    expect(anchor.value).toBeLessThan(toPrecipAxisValue(prec));
+describe("figure 2 (Soria): its marks are its months meeting their condition", () => {
+  it("the arid bars are exactly the arid months", () => {
+    const arid = monthsWhere(SORIA, (month) => isAridMonth(month));
+    expect(arid).toEqual([7, 8, 9]);
+    expect(monthsOf(INDICATORS_FIGURE.ANNOTATIONS, "aridBars")).toEqual(arid);
   });
 
-  it("figure 2, frost: the coldest frost month, at its minimum", () => {
+  it("frost: the coldest frost month, at its minimum", () => {
     const anchor = anchorOf(INDICATORS_FIGURE.ANNOTATIONS, "frostLine");
     if (anchor.kind !== EFigureAnchor.POINT) throw new Error("not a point");
-    const coldest = Math.min(...frostInFixture.map((month) => reading(rowOf(month)).tmin));
+    const frost = monthsWhere(SORIA, isFrost);
+    const coldest = Math.min(...frost.map((month) => readingOf(SORIA, month).tmin));
     expect(anchor).toMatchObject({ axis: EChartValueAxis.TEMPERATURE, value: coldest });
-    expect(frostInFixture).toContain(anchor.month);
+    expect(frost).toContain(anchor.month);
   });
 
-  it("figure 2's stats items exist in the fixture's stats bar", () => {
-    const summary = deriveChartModel(FIGURE_SERIES_LIST).series[0]?.summary;
+  it("its stats items exist in the fixture's stats bar", () => {
+    const summary = deriveChartModel(INDICATORS_FIGURE.SERIES_LIST).series[0]?.summary;
     const items = INDICATORS_FIGURE.ANNOTATIONS.flatMap(({ anchor }) =>
       anchor.kind === EFigureAnchor.STATS_ITEM ? [anchor.item] : [],
     );
     expect(items).toEqual([EStatsBarItem.ARID_MONTHS, EStatsBarItem.MARTONNE]);
-    expect(summary?.aridCount).toBe(aridInFixture.length);
+    expect(summary?.aridCount).toBe(monthsWhere(SORIA, (month) => isAridMonth(month)).length);
     expect(summary?.martonne).not.toBeNull();
   });
 });

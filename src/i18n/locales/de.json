@@ -498,7 +498,7 @@
     },
     "about": {
       "hero": {
-        "description": "Climatica macht aus dem WorldClim-Archiv Walter-Lieth-Diagramme, Grafiken und Karten. Wählen Sie einen beliebigen Punkt an Land und sehen Sie seine Klimanormalwerte oder das Wetter eines einzelnen Jahres, vergleichen Sie zwei Orte oder zwei Zeiträume und kartieren Sie eine ganze Region. Ohne Konto, ohne Installation.",
+        "description": "Mit Climatica erkunden Sie den globalen WorldClim-Datensatz interaktiv, in Walter-Lieth-Diagrammen, Klimagrafiken und Karten. Wählen Sie einen beliebigen Punkt an Land und sehen Sie seine Klimanormalwerte oder das Wetter eines einzelnen Jahres, vergleichen Sie zwei Orte oder zwei Zeiträume, oder sehen Sie auf einer Karte, wie das Klima innerhalb einer ganzen Region variiert. Ohne Konto, ohne Installation.",
         "openCityClimate": "Klima der Stadt öffnen",
         "readGuide": "Benutzerhandbuch lesen"
       },
@@ -522,7 +522,7 @@
           "scrapi": {
             "label": "Dienst",
             "title": "SCRAPI",
-            "text": "Eine API der {university}, die Fragen zu den Rastern beantwortet: die Werte einer Zelle, eines Rechtecks oder eines Polygons."
+            "text": "Eine API der {university}, die Fragen zu den Rastern beantwortet: die Werte einer Zelle, eines Rechtecks oder eines Polygons und die Kartenkacheln, die eine Variable über einer Region darstellen."
           },
           "climatica": {
             "label": "Oberfläche",
@@ -535,7 +535,7 @@
         "intro": "Climatica speichert keine eigenen Klimadaten. Die Werte, die Ortsnamen und die Karten stammen aus diesen Quellen.",
         "scrapi": {
           "text": "SCRAPI ist die API, aus der Climatica jeden Wert liest. Sie veröffentlicht die WorldClim-Raster als Linked Data und beantwortet Punkt-, Regions- und Metadatenabfragen.",
-          "author": "Entwickelt von {author}",
+          "author": "Entwickelt von <link>{author}</link>",
           "docs": "Zur SCRAPI-Dokumentation"
         },
         "worldclim": "Hochaufgelöste globale Klimaflächen: die Klimanormalwerte und das herunterskalierte monatliche Wetter.",
@@ -610,7 +610,7 @@
       },
       "filters": {
         "sidebar": "Die Filter (Datensatz, Zeitraum oder Jahr, Variablen, Auflösung und Monate) stehen auf breiten Bildschirmen in der Seitenleiste und auf dem Handy hinter dem Chip „Filter“. Ändern Sie sie und tippen Sie dann auf „{apply}“.",
-        "autoApply": "In den Einstellungen können Sie Filter sofort anwenden lassen und Ort und Filter über alle Seiten hinweg abgleichen."
+        "autoApply": "In den <link>Einstellungen</link> können Sie das automatische Anwenden ein- und ausschalten: Ist es an, wirken Filter, sobald Sie sie ändern; ist es aus, warten sie auf „{apply}“. Außerdem können Sie Ort und Filter über alle Seiten hinweg abgleichen."
       },
       "export": {
         "intro": "Das Exportmenü über jedem Diagramm speichert, was Sie sehen:",
@@ -627,15 +627,15 @@
         },
         "thirtySeconds": {
           "question": "Warum gibt es {finest} nicht für jeden Zeitraum?",
-          "answer": "WorldClim veröffentlicht {finest}-Raster nur für die Klimanormalwerte {period}. Die übrigen Normalperioden und die Wetterjahre reichen bis {fallback}."
+          "answer": "WorldClim veröffentlicht {finest}-Raster nur für seine Klimanormalwerte {period}. Die übrigen Normalperioden berechnet SCRAPI aus den jährlichen Wetterdaten von WorldClim, die bis {fallback} reichen – daher reichen auch diese Zeiträume nur so weit."
         }
       }
     },
     "data": {
       "cell": {
         "whole": "Jeder Wert in Climatica gehört zu der Rasterzelle, die Ihren Punkt enthält, nicht zum Punkt selbst. Die Karte umrandet diese Zelle.",
-        "mixed": "Eine grobe Zelle kann einen Talboden und die Hänge darüber umfassen oder eine Küste und das Hinterland. Ihr Wert ist deren Mittel und beschreibt womöglich keinen davon genau.",
-        "example": "Bozen (Normalperiode {period}) zeigt das gut. Die Stadt liegt in einem Alpental auf etwa {valleyElevation} m. Bei {coarseGrid} umfasst ihre Zelle auch die Hänge: mittlere Höhe {coarseElevation} m, Jahresmitteltemperatur {coarseTemperature} °C. Bei {fineGrid} enthält die Zelle nur den Talboden: {fineElevation} m und {fineTemperature} °C.",
+        "mixed": "Eine grobe Zelle kann einen Talboden und die Hänge darüber umfassen oder eine Küste und das Land dahinter. Ihr Wert ist der Mittelwert aus allem, sodass er womöglich zu keiner einzelnen Stelle genau passt.",
+        "example": "Bozen (Normalperiode {period}) ist ein gutes Beispiel. Die Stadt liegt auf dem Boden eines Alpentals, auf etwa {valleyElevation} m. Bei {coarseGrid} umfasst ihre Zelle neben dem Talboden auch die umliegenden Berge, deshalb liegt die mittlere Höhe der Zelle bei {coarseElevation} m und ihre Jahresmitteltemperatur bei {coarseTemperature} °C. Bei {fineGrid} umfasst die Zelle nur den Talboden: {fineElevation} m und {fineTemperature} °C, viel näher an der Stadt selbst.",
         "illustrationLabel": "Schema zweier Zellen, die denselben Punkt enthalten. {coarse}: die große Zelle, umgeben von ihren Nachbarn. {fine}: die kleine Zelle darin, mit dem Punkt.",
         "illustrationCaption": "Zellen, die denselben Punkt enthalten, bei zwei Auflösungen (schematisch, Größen am Äquator).",
         "calloutTitle": "Werte ändern sich mit der Auflösung – das ist zu erwarten.",

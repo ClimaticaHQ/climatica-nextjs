@@ -10,9 +10,17 @@ import {
   FILTER_DEFAULTS,
   FULL_VARIABLES_CLIMATE_PERIOD,
   GRID_DELTA,
+  REFERENCE_LINKS,
 } from "@/constants";
 import { EDisplayMetric, EFilterKey } from "@/enums";
-import type { TCellSize, TCopyrightYearsArgs, TGridArc, TResolutionRow } from "@/types";
+import type {
+  TCellSize,
+  TCopyrightYearsArgs,
+  TGridArc,
+  TReferenceLink,
+  TReferenceLinkArgs,
+  TResolutionRow,
+} from "@/types";
 import { getFinestGridSize, isGridSizeOffered } from "./filters.util";
 
 /** Whether a pathname is one of the Info pages. */
@@ -86,4 +94,23 @@ export function getFinestGridSizeBeyondFullPeriod(): TCellSize {
     ...otherNormals,
     { dataset: DATASETS.WEATHER, climatePeriod: FULL_VARIABLES_CLIMATE_PERIOD },
   ]);
+}
+
+/** A Google Scholar search for a work's exact title (quoted), not a record that can move. */
+export function getScholarSearchUrl(title: string) {
+  return `${REFERENCE_LINKS.SCHOLAR_SEARCH_URL}${encodeURIComponent(`"${title}"`)}`;
+}
+
+/** A reference's link: its DOI (shown as doi:…), else a Scholar search for its title, else none. */
+export function getReferenceLink({ url, title }: TReferenceLinkArgs): TReferenceLink | null {
+  if (url !== undefined) {
+    return {
+      href: url,
+      label: url.replace(REFERENCE_LINKS.DOI_PREFIX, REFERENCE_LINKS.DOI_LABEL_PREFIX),
+    };
+  }
+  if (title !== undefined) {
+    return { href: getScholarSearchUrl(title), label: REFERENCE_LINKS.SCHOLAR_LABEL };
+  }
+  return null;
 }

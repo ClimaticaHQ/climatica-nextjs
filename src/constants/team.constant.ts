@@ -1,5 +1,5 @@
 import type { TTeamMember } from "@/types";
-import { PROPER_NAMES } from "./project.constant";
+import { PROFILE_URLS, PROPER_NAMES } from "./project.constant";
 
 // * between an affiliation's parts; the team card breaks a line only here
 export const AFFILIATION_SEPARATOR = ", ";
@@ -23,10 +23,10 @@ export const TEAM: readonly TTeamMember[] = [
   },
   {
     id: "vega-gorgojo",
-    name: "Guillermo Vega-Gorgojo",
+    name: PROPER_NAMES.SCRAPI_AUTHOR,
     roleKey: "supervisionScrapi",
     affiliation: AFFILIATIONS.GSIC_EMIC,
-    profileUrl: "https://www.gsic.uva.es/members/guiveg",
+    profileUrl: PROFILE_URLS.VEGA_GORGOJO,
   },
   {
     id: "gomez-sanchez",

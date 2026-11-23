@@ -16,6 +16,7 @@ import {
 } from "@/constants";
 import { ECardBackground, ECardSize } from "@/enums";
 import { useDataPage } from "@/hooks/pages/useDataPage";
+import { getReferenceLink } from "@/utils/info.util";
 import { useTranslations } from "next-intl";
 import { INDICATORS_FIGURE } from "../figures/figures.constant";
 import {
@@ -150,18 +151,16 @@ export function DataPage() {
           <InfoFigure
             visual={<LazyIndicatorsFigureChart />}
             annotations={INDICATORS_FIGURE.ANNOTATIONS}
+            place={INDICATORS_FIGURE.PLACE}
           />
         </InfoSection>
         <InfoSection id={ID.REFERENCES}>
           <InfoList
             isNumbered
-            items={REFERENCES.map(({ key, text, url }) => ({
-              key,
-              text,
-              ...(url !== undefined
-                ? { link: { href: url, label: url.replace("https://doi.org/", "doi:") } }
-                : {}),
-            }))}
+            items={REFERENCES.map((reference) => {
+              const link = getReferenceLink(reference);
+              return { key: reference.key, text: reference.text, ...(link ? { link } : {}) };
+            })}
           />
         </InfoSection>
       </div>

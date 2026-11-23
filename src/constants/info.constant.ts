@@ -105,9 +105,27 @@ export const SCROLL_SPY = {
   USER_SCROLL_EVENTS: ["wheel", "touchmove", "keydown", "pointerdown"],
 } as const;
 
-// * where the Info figures' data come from (their fixture is in components/info)
-export const FIGURE_PLACE = {
-  NAME: "Soria",
-  PERIOD: CLIMATE_PERIOD_LABELS[CLIMATE_PERIODS.C1970_2000],
-  GRID_KEY: "2_5m",
+// * where each Info figure's data come from (their fixtures are in components/info): the Walter-
+// * Lieth figure a place with frost, arid, humid and very humid months; the indicators figure one
+// * with frost and arid months under 100 mm
+export const FIGURE_PLACES = {
+  WALTER_LIETH: {
+    NAME: "Beijing",
+    PERIOD: CLIMATE_PERIOD_LABELS[CLIMATE_PERIODS.C1970_2000],
+    GRID_KEY: "30s",
+  },
+  INDICATORS: {
+    NAME: "Soria",
+    PERIOD: CLIMATE_PERIOD_LABELS[CLIMATE_PERIODS.C1970_2000],
+    GRID_KEY: "2_5m",
+  },
+} as const;
+
+// * a reference's link: its DOI, or a Google Scholar search for its exact title where it has
+// * none (never a record or cluster URL, which can change). Proper names, not translated
+export const REFERENCE_LINKS = {
+  DOI_PREFIX: "https://doi.org/",
+  DOI_LABEL_PREFIX: "doi:",
+  SCHOLAR_SEARCH_URL: "https://scholar.google.com/scholar?q=",
+  SCHOLAR_LABEL: "Google Scholar",
 } as const;

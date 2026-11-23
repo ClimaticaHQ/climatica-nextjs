@@ -15,6 +15,7 @@ export { useInitialUrlState } from "./useInitialUrlState";
 export { useIsClient } from "./useIsClient";
 export { usePopover } from "./usePopover";
 export { useDelayedFlag } from "./useDelayedFlag";
+export { useDisclosureMotion } from "./useDisclosureMotion";
 export { useMotionPreference } from "./useMotionPreference";
 export { useMonthName } from "./useMonthName";
 export { useDisplayFormat } from "./useDisplayFormat";

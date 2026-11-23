@@ -88,3 +88,11 @@ export type TSpreadArgs = {
   /** the least distance between two centres */
   gap: number;
 };
+
+/** Where a figure's data come from: its caption's first line. */
+export type TFigurePlace = {
+  NAME: string;
+  PERIOD: string;
+  /** a key of cellSizesShort */
+  GRID_KEY: string;
+};

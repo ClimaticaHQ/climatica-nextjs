@@ -10,12 +10,7 @@ import { isCompleteSeries } from "@/utils";
 import { getAnnotationBands, scaleAnnotationLayout } from "@/utils/infoFigure.util";
 import { ANNOTATION_LAYOUT, FIGURE_PICTURE_CLASS } from "../info.constant";
 import { FigureAnnotations } from "./FigureAnnotations";
-import {
-  FIGURE_SERIES_LIST,
-  FIGURE_VISIBLE_SERIES,
-  INDICATORS_FIGURE,
-  WALTER_LIETH_FIGURE,
-} from "./figures.constant";
+import { FIGURE_VISIBLE_SERIES, INDICATORS_FIGURE, WALTER_LIETH_FIGURE } from "./figures.constant";
 import {
   getIndicatorsStatsMarkers,
   IndicatorsFigureLegend,
@@ -28,7 +23,7 @@ import {
  * takes the phone's narrow axes, as the chart card does.
  */
 export function WalterLiethFigureChart() {
-  const model = useChartModel(FIGURE_SERIES_LIST);
+  const model = useChartModel(WALTER_LIETH_FIGURE.SERIES_LIST);
   const isNarrow = !useMediaQuery(SM_MEDIA_QUERY);
   const textScale = useTextScale();
   const layout = scaleAnnotationLayout({ layout: ANNOTATION_LAYOUT, textScale });
@@ -59,7 +54,7 @@ export function WalterLiethFigureChart() {
 
 /** The standard chart's picture: its annotations on the chart, and on the stats bar by item. */
 export function IndicatorsFigureChart() {
-  const model = useChartModel(FIGURE_SERIES_LIST);
+  const model = useChartModel(INDICATORS_FIGURE.SERIES_LIST);
   const isNarrow = !useMediaQuery(SM_MEDIA_QUERY);
   const textScale = useTextScale();
   const layout = scaleAnnotationLayout({ layout: ANNOTATION_LAYOUT, textScale });

@@ -17,7 +17,7 @@ export function InfoSection({ id, intro, children }: TInfoSectionProps) {
       <h2 id={titleId} className={C.HEADING}>
         {t(section.labelKey)}
       </h2>
-      {intro !== undefined && <p className={C.LEAD}>{intro}</p>}
+      {intro !== undefined && <p className={C.TEXT}>{intro}</p>}
       {children}
     </section>
   );

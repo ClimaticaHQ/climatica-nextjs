@@ -14,7 +14,7 @@ import { useLegendLabels, useWalterLiethLegendItems } from "@/hooks/ui";
 import { getStandardLegendItems } from "@/utils";
 import { useTranslations } from "next-intl";
 import type { TFigureChartLoadingProps } from "../info.type";
-import { FIGURE_SERIES_LIST, FIGURE_VISIBLE_SERIES, INDICATORS_FIGURE } from "./figures.constant";
+import { FIGURE_VISIBLE_SERIES, INDICATORS_FIGURE, WALTER_LIETH_FIGURE } from "./figures.constant";
 import { InfoFigureMarker } from "./InfoFigure";
 
 /*
@@ -70,7 +70,7 @@ function FigureChartLoading({ children }: TFigureChartLoadingProps) {
 }
 
 export function WalterLiethFigureSkeleton() {
-  const series = useChartModel(FIGURE_SERIES_LIST).series[0]?.walterLieth;
+  const series = useChartModel(WALTER_LIETH_FIGURE.SERIES_LIST).series[0]?.walterLieth;
   if (series === undefined) return null;
   return (
     <FigureChartLoading>

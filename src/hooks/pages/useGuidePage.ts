@@ -19,12 +19,13 @@ import { useNavbarNavigation } from "../url/useNavbarNavigation";
 export function useGuidePage() {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();
-  const { getHref } = useNavbarNavigation();
+  const { getHref, settingsHref } = useNavbarNavigation();
   const count = (value: number) => formatValue(value, { metric: EDisplayMetric.COUNT });
   const { LINEAR_RATIO, PREC_BREAKPOINT, COMPRESSION_FACTOR } = WALTER_LIETH_DIAGRAM;
 
   return {
     getHref,
+    settingsHref,
     /** a numbered step's number: 1-based, in the locale's digits */
     stepNumber: (index: number) => count(index + 1),
     scaleValues: {

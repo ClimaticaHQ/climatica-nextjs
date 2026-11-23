@@ -498,7 +498,7 @@
     },
     "about": {
       "hero": {
-        "description": "Climatica gjør WorldClim-arkivet om til Walter-Lieth-diagrammer, grafer og kart. Velg et hvilket som helst punkt på land for å se klimanormalene eller været i ett enkelt år, sammenlign to steder eller to perioder, og kartlegg en hel region. Ingen konto, ingenting å installere.",
+        "description": "Med Climatica kan du utforske det globale WorldClim-datasettet interaktivt, gjennom Walter-Lieth-diagrammer, klimagrafer og kart. Velg et hvilket som helst punkt på land for å se klimanormalene eller været i ett enkelt år, sammenlign to steder eller to perioder, eller se på et kart hvordan klimaet varierer over en hel region. Ingen konto, ingenting å installere.",
         "openCityClimate": "Åpne Byklima",
         "readGuide": "Les brukerveiledningen"
       },
@@ -522,7 +522,7 @@
           "scrapi": {
             "label": "Tjeneste",
             "title": "SCRAPI",
-            "text": "Et API ved {university} som svarer på spørsmål om rasterne: verdiene i en celle, et rektangel eller et polygon."
+            "text": "Et API ved {university} som svarer på spørsmål om rasterne: verdiene i en celle, et rektangel eller et polygon, og kartflisene som tegner en variabel over en region."
           },
           "climatica": {
             "label": "Grensesnitt",
@@ -535,7 +535,7 @@
         "intro": "Climatica har ingen egne klimadata. Verdiene, stedsnavnene og kartene kommer fra disse kildene.",
         "scrapi": {
           "text": "SCRAPI er API-et Climatica leser hver verdi fra. Det publiserer WorldClim-rasterne som lenkede data og svarer på spørringer om punkter, regioner og metadata.",
-          "author": "Laget av {author}",
+          "author": "Laget av <link>{author}</link>",
           "docs": "Les dokumentasjonen for SCRAPI"
         },
         "worldclim": "Globale klimaflater med høy oppløsning: klimanormalene og det nedskalerte månedlige været.",
@@ -610,7 +610,7 @@
       },
       "filters": {
         "sidebar": "Filtrene (datasett, periode eller år, variabler, oppløsning og måneder) ligger i sidepanelet på brede skjermer og bak «Filtre»-brikken på mobil. Endre dem, og trykk deretter på «{apply}».",
-        "autoApply": "I Innstillinger kan du bruke filtrene med en gang du endrer dem, og holde stedet og filtrene i takt på tvers av sidene."
+        "autoApply": "I <link>Innstillinger</link> kan du slå automatisk bruk av filtre av eller på: når det er på, brukes filtrene med en gang du endrer dem; når det er av, venter de på «{apply}». Du kan også holde stedet og filtrene i takt på tvers av sidene."
       },
       "export": {
         "intro": "Eksportmenyen over hvert diagram lagrer det du ser:",
@@ -627,15 +627,15 @@
         },
         "thirtySeconds": {
           "question": "Hvorfor er ikke {finest} tilgjengelig for alle perioder?",
-          "answer": "WorldClim publiserer {finest}-rastere bare for klimanormalene {period}. De andre normalene og værårene går ned til {fallback}."
+          "answer": "WorldClim publiserer {finest}-rastere bare for sine klimanormaler {period}. SCRAPI beregner de andre normalene fra WorldClims årlige værdata, som går ned til {fallback}, så det gjør også disse periodene."
         }
       }
     },
     "data": {
       "cell": {
         "whole": "Hver verdi Climatica viser, hører til rastercellen som inneholder punktet ditt, ikke til selve punktet. Kartet tegner omrisset av den cellen.",
-        "mixed": "En grov celle kan spenne over en dalbunn og liene over den, eller en kyst og landet bak. Verdien er gjennomsnittet av dem og beskriver kanskje ingen av dem nøyaktig.",
-        "example": "Bolzano (normalperioden {period}) viser det godt. Byen ligger i en alpedal, på omtrent {valleyElevation} m. Ved {coarseGrid} dekker cellen også liene: gjennomsnittshøyde {coarseElevation} m, årsmiddeltemperatur {coarseTemperature} °C. Ved {fineGrid} inneholder cellen bare dalbunnen: {fineElevation} m og {fineTemperature} °C.",
+        "mixed": "En grov celle kan omfatte en dalbunn og liene over den, eller en kyst og landet bak. Verdien er gjennomsnittet av alt dette, så den stemmer kanskje ikke nøyaktig med noe enkelt sted.",
+        "example": "Bolzano (normalperioden {period}) er et godt eksempel. Byen ligger i bunnen av en alpedal, på omtrent {valleyElevation} m. Ved {coarseGrid} dekker cellen fjellene rundt i tillegg til dalbunnen, så cellens gjennomsnittshøyde er {coarseElevation} m og årsmiddeltemperaturen {coarseTemperature} °C. Ved {fineGrid} dekker cellen bare dalbunnen: {fineElevation} m og {fineTemperature} °C, mye nærmere selve byen.",
         "illustrationLabel": "Skisse av to celler som inneholder samme punkt. {coarse}: den store cellen, blant nabocellene. {fine}: den lille cellen inni den, med punktet.",
         "illustrationCaption": "Celler som inneholder samme punkt ved to oppløsninger (skisse, størrelser ved ekvator).",
         "calloutTitle": "Verdiene endres med oppløsningen – det er ventet.",

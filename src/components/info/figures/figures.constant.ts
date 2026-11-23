@@ -1,4 +1,4 @@
-import { FIGURE_PLACE, MONTH_NAMES } from "@/constants";
+import { FIGURE_PLACES, MONTH_NAMES } from "@/constants";
 import {
   EAnnotationBand,
   EChartValueAxis,
@@ -8,7 +8,7 @@ import {
   EStatsBarItem,
   EWalterLiethSeriesId,
 } from "@/enums";
-import type { TChartSeries, TFigureAnnotation, TMonthlyTemperature } from "@/types";
+import type { TChartSeries, TFigureAnnotation, TFigurePlace, TMonthlyTemperature } from "@/types";
 import { getPairMarker } from "@/utils/seriesShape.util";
 import {
   getCurvesMidpoint,
@@ -16,10 +16,28 @@ import {
   pickFrostMonth,
   pickFrostMonths,
   pickHumidMonth,
+  pickVeryHumidMonths,
 } from "@/utils/infoFigure.util";
 
-// * WorldClim 2.1 via SCRAPI, 2.5′ grid, Soria (41.7636, −2.4649), 1970–2000 normals; cell 1070 m
-// * — per month: mean maximum °C, mean minimum °C, precipitation mm
+// * WorldClim 2.1 via SCRAPI, 1970–2000 normals — per month: mean maximum °C, mean minimum °C,
+// * precipitation mm. Beijing (39.9042, 116.4074), 30″ grid, cell 54 m: frost Jan–Feb and
+// * Nov–Dec, arid Mar–May and Oct–Nov, the monsoon humid Jun–Sep, above 100 mm Jul–Aug
+const BEIJING_MONTHS = [
+  [1.7, -8.8, 5],
+  [5.1, -6.1, 4],
+  [11.7, 0, 10],
+  [20.8, 7.9, 16],
+  [26.5, 13.7, 31],
+  [30.6, 18.5, 75],
+  [31.3, 21.6, 206],
+  [30, 20.4, 157],
+  [26.2, 14.4, 45],
+  [19.4, 7.4, 17],
+  [10, -0.5, 7],
+  [3.6, -6.3, 5],
+] as const;
+
+// * Soria (41.7636, −2.4649), 2.5′ grid, cell 1070 m: frost and arid months, none above 100 mm
 const SORIA_MONTHS = [
   [6.5, -2.2, 40],
   [8.4, -1.2, 41],
@@ -35,38 +53,49 @@ const SORIA_MONTHS = [
   [7.3, -0.9, 44],
 ] as const;
 
-const SORIA_DATA: TMonthlyTemperature[] = SORIA_MONTHS.map(([tmax, tmin, prec], index) => ({
-  month: index + 1,
-  monthName: MONTH_NAMES[index] ?? "",
-  tmax,
-  tmin,
-  prec,
-}));
+const toMonthlyData = (months: typeof BEIJING_MONTHS | typeof SORIA_MONTHS) =>
+  months.map(([tmax, tmin, prec], index): TMonthlyTemperature => ({
+    month: index + 1,
+    monthName: MONTH_NAMES[index] ?? "",
+    tmax,
+    tmin,
+    prec,
+  }));
 
-// * the figures' one series: a City Climate series in all but its source
-export const FIGURE_SERIES: TChartSeries = {
-  id: "figure",
-  kind: ESeriesKind.CITY,
-  label: FIGURE_PLACE.NAME,
-  context: FIGURE_PLACE.PERIOD,
-  ...getPairMarker(EWalterLiethSeriesId.A),
-  data: SORIA_DATA,
-  altitude: 1070,
-  year: null,
-  state: { status: EDataStatus.READY },
-};
+const BEIJING_DATA = toMonthlyData(BEIJING_MONTHS);
+const SORIA_DATA = toMonthlyData(SORIA_MONTHS);
 
-// * as a series list, one stable reference for the chart model
-export const FIGURE_SERIES_LIST: readonly TChartSeries[] = [FIGURE_SERIES];
+// * a figure's one series: a City Climate series in all but its source
+const toFigureSeries = (place: TFigurePlace, data: TMonthlyTemperature[], altitude: number) =>
+  ({
+    id: "figure",
+    kind: ESeriesKind.CITY,
+    label: place.NAME,
+    context: place.PERIOD,
+    ...getPairMarker(EWalterLiethSeriesId.A),
+    data,
+    altitude,
+    year: null,
+    state: { status: EDataStatus.READY },
+  }) satisfies TChartSeries;
+
+export const WALTER_LIETH_FIGURE_SERIES: TChartSeries = toFigureSeries(
+  FIGURE_PLACES.WALTER_LIETH,
+  BEIJING_DATA,
+  54,
+);
+export const INDICATORS_FIGURE_SERIES: TChartSeries = toFigureSeries(
+  FIGURE_PLACES.INDICATORS,
+  SORIA_DATA,
+  1070,
+);
+
+// * each as a series list, one stable reference for the chart model
+const WALTER_LIETH_SERIES_LIST: readonly TChartSeries[] = [WALTER_LIETH_FIGURE_SERIES];
+const INDICATORS_SERIES_LIST: readonly TChartSeries[] = [INDICATORS_FIGURE_SERIES];
 
 // * the standard chart figure shows the lines and bars the indicators read: no mean line
 export const FIGURE_VISIBLE_SERIES = { tmax: true, tavg: false, tmin: true, prec: true } as const;
-
-// * the annotated months, chosen from the data by their condition — never typed in
-const HUMID = pickHumidMonth(SORIA_DATA);
-const FROST = pickFrostMonth(SORIA_DATA);
-const ARID_MONTHS = pickAridMonths(SORIA_DATA);
-const FROST_MONTHS = pickFrostMonths(SORIA_DATA);
 
 const span = (key: string, months: readonly number[], band: EAnnotationBand, captionKey: string) =>
   months.length === 0
@@ -79,10 +108,15 @@ const span = (key: string, months: readonly number[], band: EAnnotationBand, cap
         } satisfies TFigureAnnotation,
       ];
 
+// * the annotated months, chosen from the data by their condition — never typed in
+const HUMID = pickHumidMonth(BEIJING_DATA);
+
 // * figure 1, the Walter-Lieth diagram: its caption is the chart's own guide, numbered
 export const WALTER_LIETH_FIGURE = {
+  PLACE: FIGURE_PLACES.WALTER_LIETH,
+  SERIES_LIST: WALTER_LIETH_SERIES_LIST,
   ANNOTATIONS: [
-    // * a point between the wettest humid month's two curves: the middle of its hatching
+    // * a point in the widest humid hatching: between its curves, under the 100 mm line
     ...(HUMID === undefined
       ? []
       : [
@@ -97,18 +131,31 @@ export const WALTER_LIETH_FIGURE = {
             captionKey: "chart.wlGuide.humid",
           } satisfies TFigureAnnotation,
         ]),
-    ...span("arid", ARID_MONTHS, EAnnotationBand.TOP, "chart.wlGuide.arid"),
+    ...span(
+      "veryHumid",
+      pickVeryHumidMonths(BEIJING_DATA),
+      EAnnotationBand.TOP,
+      "chart.wlGuide.veryHumid",
+    ),
+    ...span("arid", pickAridMonths(BEIJING_DATA), EAnnotationBand.TOP, "chart.wlGuide.arid"),
     // * under the month labels, where the frost band is
-    ...span("frost", FROST_MONTHS, EAnnotationBand.BOTTOM, "chart.wlGuide.frost"),
+    ...span("frost", pickFrostMonths(BEIJING_DATA), EAnnotationBand.BOTTOM, "chart.wlGuide.frost"),
   ],
-  // * no month above 100 mm in the fixture: the compressed scale goes in an unnumbered line
-  NOTE_KEY: "chart.wlGuide.veryHumid",
 } as const;
+
+const FROST = pickFrostMonth(SORIA_DATA);
 
 // * figure 2, the standard chart and its stats bar: where each indicator shows
 export const INDICATORS_FIGURE = {
+  PLACE: FIGURE_PLACES.INDICATORS,
+  SERIES_LIST: INDICATORS_SERIES_LIST,
   ANNOTATIONS: [
-    ...span("aridBars", ARID_MONTHS, EAnnotationBand.TOP, "info.data.indicators.figure.aridBar"),
+    ...span(
+      "aridBars",
+      pickAridMonths(SORIA_DATA),
+      EAnnotationBand.TOP,
+      "info.data.indicators.figure.aridBar",
+    ),
     ...(FROST === undefined
       ? []
       : [

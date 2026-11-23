@@ -18,6 +18,8 @@ export type TProjectInfo = {
   changelogUrl: string;
   licence: string;
   scrapiAuthor: string;
+  /** their profile; empty: the name without a link */
+  scrapiAuthorUrl: string;
   scrapiDocsUrl: string;
   citation: string;
   bibtex: string;

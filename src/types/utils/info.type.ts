@@ -24,3 +24,9 @@ export type TCopyrightYearsArgs = {
   firstYear: number;
   currentYear: number;
 };
+
+/** What a reference's link is built from: a DOI link, or a title to search for. */
+export type TReferenceLinkArgs = { url?: string | undefined; title?: string | undefined };
+
+/** A reference's link: its href and its visible text. */
+export type TReferenceLink = { href: string; label: string };

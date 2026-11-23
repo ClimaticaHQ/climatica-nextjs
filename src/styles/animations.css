@@ -48,8 +48,9 @@
   overflow: hidden;
 }
 
+/* * rotate too: Tailwind's rotate-* is its own property (the Disclosure's chevron) */
 .accordion-indicator {
-  transition-property: transform, width, height;
+  transition-property: transform, rotate, width, height;
   transition-duration: var(--motion-accordion);
   transition-timing-function: var(--motion-indicator-slide-easing);
 }

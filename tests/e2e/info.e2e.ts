@@ -1,4 +1,4 @@
-import { FIRST_RELEASE_YEAR, PROJECT_INFO } from "@/constants/project.constant";
+import { FIRST_RELEASE_YEAR, PROFILE_URLS, PROJECT_INFO } from "@/constants/project.constant";
 import { formatCopyrightYears } from "@/utils/info.util";
 import { devices, expect, test, type Locator, type Page } from "@playwright/test";
 
@@ -191,11 +191,13 @@ test.describe("Info pages", () => {
   test("every team card: a profile link, a role and an affiliation", async ({ page }) => {
     await page.goto("/about#team");
     for (const { name, href, role, affiliation, initials } of TEAM_CARDS) {
-      const profile = page.getByRole("link", { name: `${name} (opens in a new tab)` });
+      const profile = page
+        .locator("#team")
+        .getByRole("link", { name: `${name} (opens in a new tab)` });
       await expect(profile).toHaveAttribute("href", href);
       await expect(profile).toHaveAttribute("target", "_blank");
       await expect(profile).toHaveAttribute("rel", "noopener noreferrer");
-      const card = page.locator("li", { has: profile });
+      const card = page.locator("#team li").filter({ hasText: name });
       await expect(card).toContainText(role);
       await expect(card).toContainText(affiliation);
       await expect(card).toContainText(initials);
@@ -210,12 +212,14 @@ test.describe("Info pages", () => {
       items.map((item) => {
         const card = item.firstElementChild?.getBoundingClientRect();
         const avatar = item.querySelector("[aria-hidden=true]")?.getBoundingClientRect();
-        const name = item.querySelector("a")?.getBoundingClientRect();
+        const link = item.querySelector("a");
+        const name = link?.getBoundingClientRect();
+        const lineHeight = link ? parseFloat(getComputedStyle(link).lineHeight) : 0;
         return {
           top: Math.round(card?.top ?? 0),
           height: Math.round(card?.height ?? 0),
-          avatarTop: Math.round(avatar?.top ?? 0),
-          nameTop: Math.round(name?.top ?? 0),
+          avatarMiddle: ((avatar?.top ?? 0) + (avatar?.bottom ?? 0)) / 2,
+          nameLineMiddle: (name?.top ?? 0) + lineHeight / 2,
         };
       }),
     );
@@ -225,9 +229,94 @@ test.describe("Info pages", () => {
     for (const row of rows.values()) {
       expect(new Set(row.map(({ height }) => height)).size).toBe(1);
     }
-    for (const { avatarTop, nameTop } of cards) {
-      // * top-aligned: the avatar starts with the name line, not centred down the card
-      expect(Math.abs(avatarTop - nameTop)).toBeLessThanOrEqual(4);
+    for (const { avatarMiddle, nameLineMiddle } of cards) {
+      // * the avatar centred on the name's first line, not down the card
+      expect(Math.abs(avatarMiddle - nameLineMiddle)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  test("team names take the card titles' size and weight", async ({ page }) => {
+    await page.goto("/about");
+    const style = (locator: Locator) =>
+      locator.evaluate((element) => {
+        const computed = getComputedStyle(element);
+        return { size: computed.fontSize, weight: computed.fontWeight };
+      });
+    const title = await style(page.locator("#how-it-works h3").first());
+    for (const name of await page.locator("#team li a").all()) {
+      expect(await style(name)).toEqual(title);
+    }
+  });
+
+  test("the SCRAPI card's author links to his profile, in a new tab", async ({ page }) => {
+    await page.goto("/about#data-sources");
+    const author = page
+      .locator("#data-sources")
+      .getByRole("link", { name: `${PROJECT_INFO.scrapiAuthor} (opens in a new tab)` });
+    await expect(author).toHaveAttribute("href", PROFILE_URLS.VEGA_GORGOJO);
+    await expect(author).toHaveAttribute("target", "_blank");
+  });
+
+  test("What a value describes: Bolzano's cells, their numbers from the example", async ({
+    page,
+  }) => {
+    await page.goto("/about/data#cell-values");
+    const section = page.locator("#cell-values");
+    await expect(section).toContainText(
+      "Its value is the average of all of them, so it may not match any one spot exactly.",
+    );
+    await expect(section).toContainText("so the cell's mean elevation is 638 m");
+    await expect(section).toContainText("252 m and 11.7 °C, much closer to the town itself.");
+  });
+
+  test("the 30 sec answer says how SCRAPI gets the other normals", async ({ page }) => {
+    await page.goto("/about/guide#questions");
+    const answer = page.locator("#questions details").filter({ hasText: "Why isn't 30 sec" });
+    await answer.locator("summary").click();
+    await expect(answer).toContainText(
+      "SCRAPI computes the other normals from WorldClim's yearly weather data, which goes down to 2.5 min, so those periods do too.",
+    );
+  });
+
+  test("references: DOIs for Fick and Harris, Google Scholar for Walter–Lieth and de Martonne", async ({
+    page,
+  }) => {
+    await page.goto("/about/data#references");
+    const links = page.locator("#references").getByRole("link");
+    await expect(links).toHaveText([
+      "doi:10.1002/joc.5086 (opens in a new tab)",
+      "doi:10.1038/s41597-020-0453-3 (opens in a new tab)",
+      "Google Scholar (opens in a new tab)",
+      "Google Scholar (opens in a new tab)",
+    ]);
+    const scholar = page.locator("#references").getByRole("link", { name: /Google Scholar/ });
+    await expect(scholar.first()).toHaveAttribute(
+      "href",
+      "https://scholar.google.com/scholar?q=%22Klimadiagramm-Weltatlas%22",
+    );
+    await expect(scholar.first()).toHaveAttribute("target", "_blank");
+  });
+
+  test("the User guide's Settings link opens the Settings page", async ({ page }) => {
+    await page.goto("/about/guide#filters");
+    await page.locator("#filters").getByRole("link", { name: "Settings" }).click();
+    await expect(page).toHaveURL(/\/settings(\?|$)/);
+  });
+
+  test("only the About page's opening paragraph is larger; every section paragraph is one size", async ({
+    page,
+  }) => {
+    for (const route of INFO_ROUTES) {
+      await page.goto(route);
+      const sizes = await fontSizeOf(page.locator("main section > p"));
+      expect(sizes.length).toBeGreaterThan(0);
+      expect(new Set(sizes).size).toBe(1);
+      if (route === "/about") {
+        const [lead] = await fontSizeOf(
+          page.locator("main p", { hasText: "Climatica lets you explore" }),
+        );
+        expect(lead).toBeGreaterThan(sizes[0] ?? 0);
+      }
     }
   });
 
@@ -513,7 +602,8 @@ test.describe("Info pages' rhythm and scroll spy", () => {
 
   test("card links are at least 16px, the tech pills at least 14px", async ({ page }) => {
     await page.goto("/about");
-    const links = await fontSizeOf(page.locator("#data-sources a"));
+    // * the card links on their own line; an inline link (a name in a sentence) takes its text's size
+    const links = await fontSizeOf(page.locator("#data-sources a:not(p a)"));
     expect(links.length).toBeGreaterThan(0);
     for (const size of links) expect(size).toBeGreaterThanOrEqual(16);
     const pills = await fontSizeOf(page.locator("#source-code [data-badge-size]"));

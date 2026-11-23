@@ -75,14 +75,27 @@ no filters, no data requests. Components are in `src/components/info/` by role (
   them. Below `lg` the whole page keeps the reading measure.
 - **Rhythm and sizes:** sections are 5rem apart from `lg`, 3.5rem below (the `COLUMN` gap).
   Card text and links are 15px below `lg` (the touch scale), 16px from `lg`, under 18 / 20px card
-  titles. Links on their own line take their text's size (`ROW_LINK`, `CARD_LINK`); the pills are
-  `EBadgeSize.LG`, the questions `EDisclosureSize.LG`.
+  titles; a team member's name takes the card title's style (`CARD_TITLE`), its first line centred
+  on the avatar. Only the About page's opening paragraph is `LEAD`; every paragraph in a section,
+  its intro too, is `TEXT`. Links on their own line take their text's size (`ROW_LINK`,
+  `CARD_LINK`); the pills are `EBadgeSize.LG`, the questions `EDisclosureSize.LG`.
+- **Questions** are `Disclosure`s: native `<details>`, so keyboard, screen readers and
+  find-in-page work. A click folds the answer's height and opacity (`useDisclosureMotion`, Web
+  Animations, `MOTION.ACCORDION_MS` and the indicators' easing), closing only once folded; a click
+  mid-way reverses it; the chevron turns with it (`data-expanded`). Opened any other way
+  (find-in-page, a script) or with motion off, it's the native toggle. Not `Collapsible`: its
+  shut content is inert, which find-in-page skips.
+- **References:** a DOI where the work has one; otherwise a Google Scholar search for its exact
+  title (`getReferenceLink`, `REFERENCE_LINKS`), never a record URL.
 - **What a value describes:** from `lg` text and callout beside the schematic, 3fr : 2fr, 3rem
   apart, the schematic centred both ways with its caption under it at its width; below `lg`
   stacked, the schematic centred.
 - **Figures** are the app's own charts on a fixture (`figures.constant.ts`), drawn with
   `isStatic` and an `overlay`; annotated months are picked from the data by their condition
-  (`infoFigure.util`), never typed in. They mount at once; while the chart module loads (and on
+  (`infoFigure.util`), never typed in. Each names its place in its caption (`FIGURE_PLACES`): the
+  Walter-Lieth figure Beijing (1970–2000, 30″), which has frost, arid, humid and very humid
+  months; the indicators figure Soria. The humid point sits in the hatching, under the 100 mm
+  line. They mount at once; while the chart module loads (and on
   the server) their skeleton holds their exact size: the charts' own frames, legends and stats
   bar around a `ChartSkeleton` (`FigureFrames`, the parts without chart code). Annotation
   numbers: a 20px disc in the primary colour, white digits from 14px (`ANNOTATION_STYLE`,

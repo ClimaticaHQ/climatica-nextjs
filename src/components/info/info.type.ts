@@ -2,6 +2,7 @@ import type {
   TAnnotationLayout,
   TChartProjection,
   TFigureAnnotation,
+  TFigurePlace,
   TInfoPage,
   TInfoSection,
 } from "@/types";
@@ -33,7 +34,10 @@ export type TDataSource = {
 export type TReference = {
   key: string;
   text: string;
+  /** its DOI link */
   url?: string;
+  /** its exact title, searched on Google Scholar where it has no DOI */
+  title?: string;
 };
 
 export type THowToCiteProps = {
@@ -140,8 +144,8 @@ export type TInfoFigureProps = {
   visual: ReactNode;
   /** the numbered annotations: the n-th's marker and caption line both read n */
   annotations: readonly Pick<TFigureAnnotation, "key" | "captionKey">[];
-  /** a last, unnumbered caption line */
-  noteKey?: string;
+  /** where its data come from: the caption's first line */
+  place: TFigurePlace;
 };
 
 export type TFigureChartLoadingProps = {

@@ -1,4 +1,4 @@
-import { CHART_TEXT_MIN_PX, WALTER_LIETH_FROST } from "@/constants";
+import { CHART_TEXT_MIN_PX, WALTER_LIETH_DIAGRAM, WALTER_LIETH_FROST } from "@/constants";
 import { EAnnotationBand, EFigureAnchor } from "@/enums";
 import type {
   TAnnotationBands,
@@ -37,12 +37,27 @@ const byLargest = <T>(items: readonly T[], value: (item: T) => number) =>
 
 const isFrostMonth = ({ tmin }: TFigureMonthReading) => tmin < WALTER_LIETH_FROST.THRESHOLD;
 
-/** The wettest humid month (P ≥ 2T): where the diagram's humid hatching is widest. */
+const isVeryHumidMonth = ({ prec }: TFigureMonthReading) =>
+  prec > WALTER_LIETH_DIAGRAM.PREC_BREAKPOINT;
+
+// * the top of a month's humid hatching on the °C axis: its precipitation, or the 100 mm line
+// * above which the diagram is a solid fill instead
+const getHatchingTop = (prec: number) =>
+  Math.min(toPrecipAxisValue(prec), WALTER_LIETH_DIAGRAM.PREC_BREAKPOINT_AXIS_VALUE);
+
+/** The humid month (P ≥ 2T) whose hatching is widest. */
 export function pickHumidMonth(data: readonly TMonthlyTemperature[]) {
   return byLargest(
     readMonths(data).filter((month) => !isAridMonth(month)),
-    ({ prec, tavg }) => toPrecipAxisValue(prec) - tavg,
+    ({ prec, tavg }) => getHatchingTop(prec) - tavg,
   );
+}
+
+/** Every very humid month (above 100 mm: the solid fill), in calendar order. */
+export function pickVeryHumidMonths(data: readonly TMonthlyTemperature[]) {
+  return readMonths(data)
+    .filter(isVeryHumidMonth)
+    .map(({ month }) => month);
 }
 
 /** The coldest frost month (mean minimum below the frost threshold). */
@@ -64,9 +79,10 @@ export function pickFrostMonths(data: readonly TMonthlyTemperature[]) {
     .map(({ month }) => month);
 }
 
-/** Between a month's two Walter-Lieth curves, on the °C axis: the middle of its hatching. */
+/** The middle of a humid month's hatching on the °C axis: between its temperature curve and
+ * its precipitation curve, or the 100 mm line where the solid fill starts. */
 export function getCurvesMidpoint({ tavg, prec }: Pick<TFigureMonthReading, "tavg" | "prec">) {
-  return (tavg + toPrecipAxisValue(prec)) / 2;
+  return (tavg + getHatchingTop(prec)) / 2;
 }
 
 /**

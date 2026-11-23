@@ -100,10 +100,12 @@ export const REFERENCES: readonly TReference[] = [
   {
     key: "walter",
     text: "Walter, H. & Lieth, H. (1960–1967). Klimadiagramm-Weltatlas. Jena: VEB Gustav Fischer Verlag.",
+    title: "Klimadiagramm-Weltatlas",
   },
   {
     key: "martonne",
     text: "de Martonne, E. (1926). Une nouvelle fonction climatologique : l'indice d'aridité. La Météorologie, 2, 449–458.",
+    title: "Une nouvelle fonction climatologique : l'indice d'aridité",
   },
 ];
 
@@ -119,6 +121,10 @@ const LABEL_TEXT = "text-[length:var(--font-xs)] lg:text-[length:var(--font-base
 // * the content column — grids, tables, figures, the citation — takes its whole width
 const PROSE = "max-w-[var(--reading-measure)]";
 
+// * a card's title, and a team member's name in their card: one size and weight
+const CARD_TITLE =
+  "text-[length:var(--font-touch-title)] font-semibold text-[var(--color-text)] lg:text-[length:var(--font-reading-card-title)]";
+
 export const INFO_CLASSES = {
   // * the page under the shared PageHeader; below lg it all keeps the reading measure
   CONTENT: "flex min-w-0 max-w-[var(--reading-measure)] flex-col gap-12 lg:max-w-none",
@@ -129,10 +135,10 @@ export const INFO_CLASSES = {
   SECTION: "flex scroll-mt-20 flex-col gap-4 lg:scroll-mt-6",
   HEADING:
     "text-[length:var(--font-lg)] font-semibold text-[var(--color-text)] lg:text-[length:var(--font-reading-heading)] lg:leading-tight",
-  SUBHEADING:
-    "text-[length:var(--font-touch-title)] font-semibold text-[var(--color-text)] lg:text-[length:var(--font-reading-card-title)]",
+  SUBHEADING: CARD_TITLE,
   TEXT: `${PROSE} text-[var(--color-text-secondary)] ${BODY}`,
-  // * an intro: 17 px on phones, 19 px from lg, left-aligned under the centred title
+  // * the About page's opening paragraph only (every paragraph in a section, its intro too, is
+  // * TEXT): 17 px on phones, 19 px from lg, left-aligned under the centred title
   LEAD: `${PROSE} text-left text-[length:var(--font-reading-body)] text-[var(--color-text-secondary)] lg:text-[length:var(--font-reading-lead)]`,
   SMALL: `${PROSE} ${CARD_TEXT} text-[var(--color-text-secondary)]`,
   // * the app's inline link — the same as an external link's, with its target; in the text's size
@@ -297,9 +303,10 @@ export const TEAM_CARD_CLASSES = {
   CARD: "flex w-full items-start gap-3",
   AVATAR:
     "flex size-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-muted)] font-semibold text-[var(--color-primary)]",
-  TEXT: "flex min-w-0 flex-col gap-0.5 pt-0.5",
-  // * inline, so a long name wraps with the icon after its last word
-  NAME: `${FOCUS_RING_CLASS} self-start rounded-[var(--radius-xs)] font-semibold text-[var(--color-text)] underline-offset-2 hover:underline focus-visible:underline`,
+  TEXT: "flex min-w-0 flex-col gap-0.5",
+  // * inline, so a long name wraps with the icon after its last word; its first line centred on
+  // * the avatar (size-11: 2.75rem) at every text size, from its own line height
+  NAME: `${FOCUS_RING_CLASS} ${CARD_TITLE} mt-[max(0px,calc((2.75rem-1lh)/2))] self-start rounded-[var(--radius-xs)] underline-offset-2 hover:underline focus-visible:underline`,
   NAME_ICON: "ml-1 inline-block size-3.5 align-[-0.125em] text-[var(--color-text-secondary)]",
   DETAIL:
     "text-[length:var(--font-xs)] text-[var(--color-text-secondary)] lg:text-[length:var(--font-sm)]",

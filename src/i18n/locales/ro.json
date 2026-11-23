@@ -498,7 +498,7 @@
     },
     "about": {
       "hero": {
-        "description": "Climatica transformă arhiva WorldClim în diagrame Walter-Lieth, grafice și hărți. Alege orice punct de pe uscat pentru a-i vedea normalele climatice sau vremea dintr-un singur an, compară două locuri sau două perioade și cartografiază o regiune întreagă. Fără cont, fără nimic de instalat.",
+        "description": "Climatica îți permite să explorezi interactiv setul global de date WorldClim, prin diagrame Walter-Lieth, grafice climatice și hărți. Alege orice punct de pe uscat pentru a-i vedea normalele climatice sau vremea dintr-un singur an, compară două locuri sau două perioade ori vezi pe o hartă cum variază clima într-o regiune întreagă. Fără cont, fără nimic de instalat.",
         "openCityClimate": "Deschide Clima orașului",
         "readGuide": "Citește ghidul de utilizare"
       },
@@ -522,7 +522,7 @@
           "scrapi": {
             "label": "Serviciu",
             "title": "SCRAPI",
-            "text": "Un API de la {university} care răspunde la întrebări despre rastere: valorile unei celule, ale unui dreptunghi sau ale unui poligon."
+            "text": "Un API de la {university} care răspunde la întrebări despre rastere: valorile unei celule, ale unui dreptunghi sau ale unui poligon, precum și dalele de hartă care desenează o variabilă peste o regiune."
           },
           "climatica": {
             "label": "Interfață",
@@ -535,7 +535,7 @@
         "intro": "Climatica nu păstrează date climatice proprii. Valorile, numele locurilor și hărțile provin din aceste surse.",
         "scrapi": {
           "text": "SCRAPI este API-ul din care Climatica citește fiecare valoare. Publică rasterele WorldClim ca date legate și răspunde la interogări despre puncte, regiuni și metadate.",
-          "author": "Creat de {author}",
+          "author": "Creat de <link>{author}</link>",
           "docs": "Citește documentația SCRAPI"
         },
         "worldclim": "Suprafețe climatice globale de înaltă rezoluție: normalele climatice și vremea lunară redusă la scară.",
@@ -610,7 +610,7 @@
       },
       "filters": {
         "sidebar": "Filtrele (setul de date, perioada sau anul, variabilele, rezoluția și lunile) se află în bara laterală pe ecranele late și în spatele butonului „Filtre” pe telefon. Modifică-le, apoi apasă „{apply}”.",
-        "autoApply": "În Setări poți aplica filtrele pe măsură ce le schimbi și poți păstra locul și filtrele sincronizate între pagini."
+        "autoApply": "În <link>Setări</link> poți activa sau dezactiva aplicarea automată: când e activată, filtrele se aplică pe măsură ce le schimbi; când e dezactivată, așteaptă „{apply}”. Poți păstra și locul și filtrele sincronizate între pagini."
       },
       "export": {
         "intro": "Meniul de export de deasupra fiecărui grafic salvează ce vezi:",
@@ -627,15 +627,15 @@
         },
         "thirtySeconds": {
           "question": "De ce {finest} nu este disponibil pentru fiecare perioadă?",
-          "answer": "WorldClim publică rastere la {finest} doar pentru normalele climatice {period}. Celelalte normale și anii de date meteo merg până la {fallback}."
+          "answer": "WorldClim publică rastere la {finest} doar pentru normalele sale climatice {period}. SCRAPI calculează celelalte normale din datele meteo anuale WorldClim, care merg până la {fallback}, așa că și acele perioade merg tot până acolo."
         }
       }
     },
     "data": {
       "cell": {
         "whole": "Fiecare valoare afișată de Climatica aparține celulei rasterului care conține punctul tău, nu punctului în sine. Harta conturează acea celulă.",
-        "mixed": "O celulă mare poate cuprinde fundul unei văi și versanții de deasupra, sau o coastă și uscatul din spatele ei. Valoarea ei este media lor și poate să nu descrie exact niciuna dintre ele.",
-        "example": "Bolzano (normala {period}) arată bine acest lucru. Orașul se află într-o vale alpină, la circa {valleyElevation} m. La {coarseGrid}, celula sa cuprinde și versanții: altitudine medie {coarseElevation} m, temperatură medie anuală {coarseTemperature} °C. La {fineGrid}, celula conține doar fundul văii: {fineElevation} m și {fineTemperature} °C.",
+        "mixed": "O celulă mare poate cuprinde fundul unei văi și versanții de deasupra, sau o coastă și uscatul din spatele ei. Valoarea ei este media tuturor acestora, așa că se poate să nu corespundă exact niciunui loc anume.",
+        "example": "Bolzano (normala {period}) este un bun exemplu. Orașul se află pe fundul unei văi alpine, la circa {valleyElevation} m. La {coarseGrid}, celula sa cuprinde munții din jur pe lângă fundul văii, așa că altitudinea medie a celulei este de {coarseElevation} m, iar temperatura medie anuală de {coarseTemperature} °C. La {fineGrid}, celula cuprinde doar fundul văii: {fineElevation} m și {fineTemperature} °C, mult mai aproape de oraș.",
         "illustrationLabel": "Schema a două celule care conțin același punct. {coarse}: celula mare, printre vecinele ei. {fine}: celula mică din interiorul ei, cu punctul.",
         "illustrationCaption": "Celulele care conțin același punct la două rezoluții (schemă, dimensiuni la ecuator).",
         "calloutTitle": "Valorile se schimbă odată cu rezoluția — este de așteptat.",

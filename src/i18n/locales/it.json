@@ -498,7 +498,7 @@
     },
     "about": {
       "hero": {
-        "description": "Climatica trasforma l'archivio WorldClim in diagrammi di Walter-Lieth, grafici e mappe. Scegli un punto qualsiasi sulla terraferma per vederne le normali climatiche o il meteo di un singolo anno, confronta due luoghi o due periodi e mappa un'intera regione. Senza account e senza installare nulla.",
+        "description": "Climatica ti permette di esplorare in modo interattivo il set di dati globale WorldClim, attraverso diagrammi di Walter-Lieth, grafici climatici e mappe. Scegli un punto qualsiasi sulla terraferma per vederne le normali climatiche o il meteo di un singolo anno, confronta due luoghi o due periodi, oppure guarda su una mappa come varia il clima in un'intera regione. Senza account e senza installare nulla.",
         "openCityClimate": "Apri Clima della Città",
         "readGuide": "Leggi la guida all'uso"
       },
@@ -522,7 +522,7 @@
           "scrapi": {
             "label": "Servizio",
             "title": "SCRAPI",
-            "text": "Un'API della {university} che risponde a domande sui raster: i valori di una cella, di un rettangolo o di un poligono."
+            "text": "Un'API della {university} che risponde a domande sui raster: i valori di una cella, di un rettangolo o di un poligono, e le tessere di mappa che disegnano una variabile su una regione."
           },
           "climatica": {
             "label": "Interfaccia",
@@ -535,7 +535,7 @@
         "intro": "Climatica non conserva dati climatici propri. I valori, i nomi dei luoghi e le mappe provengono da queste fonti.",
         "scrapi": {
           "text": "SCRAPI è l'API da cui Climatica legge ogni valore. Pubblica i raster di WorldClim come linked data e risponde a interrogazioni su punti, regioni e metadati.",
-          "author": "Creata da {author}",
+          "author": "Creata da <link>{author}</link>",
           "docs": "Leggi la documentazione di SCRAPI"
         },
         "worldclim": "Superfici climatiche globali ad alta risoluzione: le normali climatiche e il meteo mensile ottenuto per downscaling.",
@@ -610,7 +610,7 @@
       },
       "filters": {
         "sidebar": "I filtri (set di dati, periodo o anno, variabili, risoluzione e mesi) sono nella barra laterale sugli schermi larghi e dietro il chip «Filtri» sul telefono. Modificali e poi premi «{apply}».",
-        "autoApply": "Nelle Impostazioni puoi applicare i filtri mentre li cambi e mantenere luogo e filtri allineati tra le pagine."
+        "autoApply": "Nelle <link>Impostazioni</link> puoi attivare o disattivare l'applicazione automatica: se è attiva, i filtri si applicano mentre li cambi; se è disattivata, attendono «{apply}». Puoi anche mantenere luogo e filtri allineati tra le pagine."
       },
       "export": {
         "intro": "Il menu di esportazione sopra ogni grafico salva ciò che vedi:",
@@ -627,15 +627,15 @@
         },
         "thirtySeconds": {
           "question": "Perché {finest} non è disponibile per tutti i periodi?",
-          "answer": "WorldClim pubblica raster a {finest} solo per le normali climatiche {period}. Le altre normali e gli anni meteo arrivano fino a {fallback}."
+          "answer": "WorldClim pubblica raster a {finest} solo per le sue normali climatiche {period}. SCRAPI calcola le altre normali dai dati meteo annuali di WorldClim, che arrivano fino a {fallback}, e quindi lo stesso vale per quei periodi."
         }
       }
     },
     "data": {
       "cell": {
         "whole": "Ogni valore che Climatica mostra appartiene alla cella raster che contiene il tuo punto, non al punto in sé. La mappa ne traccia il contorno.",
-        "mixed": "Una cella grossolana può comprendere il fondovalle e i versanti sopra di esso, o una costa e l'entroterra. Il suo valore ne è la media e può non descriverne esattamente nessuno.",
-        "example": "Bolzano (normale {period}) lo mostra bene. La città si trova in una valle alpina, a circa {valleyElevation} m. A {coarseGrid} la sua cella comprende anche i versanti: altitudine media {coarseElevation} m, temperatura media annua {coarseTemperature} °C. A {fineGrid} la cella contiene solo il fondovalle: {fineElevation} m e {fineTemperature} °C.",
+        "mixed": "Una cella grossolana può comprendere un fondovalle e i versanti sopra di esso, o una costa e l'entroterra alle sue spalle. Il suo valore è la media di tutto questo, quindi può non corrispondere esattamente a nessun punto preciso.",
+        "example": "Bolzano (normale {period}) è un buon esempio. La città si trova sul fondo di una valle alpina, a circa {valleyElevation} m. A {coarseGrid} la sua cella comprende le montagne circostanti oltre al fondovalle, quindi l'altitudine media della cella è di {coarseElevation} m e la temperatura media annua di {coarseTemperature} °C. A {fineGrid} la cella comprende solo il fondovalle: {fineElevation} m e {fineTemperature} °C, molto più vicini alla città stessa.",
         "illustrationLabel": "Schema di due celle che contengono lo stesso punto. {coarse}: la cella grande, tra le celle vicine. {fine}: la cella piccola al suo interno, con il punto.",
         "illustrationCaption": "Celle che contengono lo stesso punto a due risoluzioni (schema, dimensioni all'equatore).",
         "calloutTitle": "I valori cambiano con la risoluzione: è normale.",

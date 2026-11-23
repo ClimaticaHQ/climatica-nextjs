@@ -2,8 +2,17 @@
 import { Disclosure } from "@/components/UI";
 import { EDisclosureSize } from "@/enums";
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+beforeEach(() => {
+  // * the fold reads the motion preference; jsdom has no matchMedia
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  }));
+});
 afterEach(cleanup);
 
 const summaryOf = (text: string) => screen.getByText(text).closest("summary");

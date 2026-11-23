@@ -37,7 +37,8 @@ import { Team } from "../parts/Team";
 export function AboutPage() {
   const t = useTranslations();
   const { facts, codeFacts } = useAboutFacts();
-  const { scrapiAuthor, scrapiDocsUrl, repositoryUrl, changelogUrl } = PROJECT_INFO;
+  const { scrapiAuthor, scrapiAuthorUrl, scrapiDocsUrl, repositoryUrl, changelogUrl } =
+    PROJECT_INFO;
   const { getHref, getPlainHref } = useNavbarNavigation();
 
   return (
@@ -105,7 +106,17 @@ export function AboutPage() {
                     <p className={C.TEXT}>{t("info.about.sources.scrapi.text")}</p>
                     {scrapiAuthor !== "" && (
                       <p className={C.SMALL}>
-                        {t("info.about.sources.scrapi.author", { author: scrapiAuthor })}
+                        {t.rich("info.about.sources.scrapi.author", {
+                          author: scrapiAuthor,
+                          link: (chunks) =>
+                            scrapiAuthorUrl === "" ? (
+                              chunks
+                            ) : (
+                              <ExternalLink href={scrapiAuthorUrl} className={C.LINK}>
+                                {chunks}
+                              </ExternalLink>
+                            ),
+                        })}
                       </p>
                     )}
                     {scrapiDocsUrl !== "" && (

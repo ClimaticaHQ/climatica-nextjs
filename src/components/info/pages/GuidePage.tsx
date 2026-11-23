@@ -26,7 +26,7 @@ import { InfoSection } from "../parts/InfoSection";
 /** User guide: finding a place, reading the diagram, comparing, filtering and exporting. */
 export function GuidePage() {
   const t = useTranslations();
-  const { getHref, stepNumber, scaleValues, questionValues } = useGuidePage();
+  const { getHref, settingsHref, stepNumber, scaleValues, questionValues } = useGuidePage();
 
   return (
     <>
@@ -53,7 +53,7 @@ export function GuidePage() {
           <InfoFigure
             visual={<LazyWalterLiethFigureChart />}
             annotations={WALTER_LIETH_FIGURE.ANNOTATIONS}
-            noteKey={WALTER_LIETH_FIGURE.NOTE_KEY}
+            place={WALTER_LIETH_FIGURE.PLACE}
           />
         </InfoSection>
         <InfoSection id={ID.COMPARE}>
@@ -78,7 +78,16 @@ export function GuidePage() {
           <p className={C.TEXT}>
             {t("info.guide.filters.sidebar", { apply: t("sidebar.applyFilters") })}
           </p>
-          <p className={C.TEXT}>{t("info.guide.filters.autoApply")}</p>
+          <p className={C.TEXT}>
+            {t.rich("info.guide.filters.autoApply", {
+              apply: t("sidebar.applyFilters"),
+              link: (chunks) => (
+                <Link href={settingsHref} className={C.LINK}>
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </p>
         </InfoSection>
         <InfoSection id={ID.EXPORT} intro={t("info.guide.export.intro")}>
           <ul className={C.CHIPS}>

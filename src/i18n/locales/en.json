@@ -498,7 +498,7 @@
     },
     "about": {
       "hero": {
-        "description": "Climatica turns the WorldClim archive into Walter–Lieth diagrams, charts and maps. Pick any point on land to see its climate normals or the weather of a single year, compare two places or two periods, and map a whole region. No account, nothing to install.",
+        "description": "Climatica lets you explore the global WorldClim dataset interactively, through Walter–Lieth diagrams, climate charts and maps. Pick any point on land to see its climate normals or the weather of a single year, compare two places or two periods, or see on a map how the climate varies across a whole region. No account, nothing to install.",
         "openCityClimate": "Open City Climate",
         "readGuide": "Read the user guide"
       },
@@ -522,7 +522,7 @@
           "scrapi": {
             "label": "Service",
             "title": "SCRAPI",
-            "text": "An API from the {university} that answers questions about the rasters: the values of a cell, a box or a polygon."
+            "text": "An API from the {university} that answers questions about the rasters: the values of a cell, a box or a polygon, and the map tiles that draw a variable over a region."
           },
           "climatica": {
             "label": "Interface",
@@ -535,7 +535,7 @@
         "intro": "Climatica keeps no climate data of its own. The values, the place names and the maps come from these sources.",
         "scrapi": {
           "text": "SCRAPI is the API Climatica reads every value from. It publishes the WorldClim rasters as linked data and answers point, region and metadata queries.",
-          "author": "Created by {author}",
+          "author": "Created by <link>{author}</link>",
           "docs": "Read the SCRAPI documentation"
         },
         "worldclim": "High-resolution global climate surfaces: the climate normals and the downscaled monthly weather.",
@@ -610,7 +610,7 @@
       },
       "filters": {
         "sidebar": "The filters (dataset, period or year, variables, resolution and months) are in the sidebar on wide screens and behind the Filters chip on phones. Change them, then press “{apply}”.",
-        "autoApply": "In Settings you can apply filters as you change them, and keep the place and the filters in step across pages."
+        "autoApply": "In <link>Settings</link> you can turn auto-apply on or off: when it is on, filters apply as you change them; when it is off, they wait for “{apply}”. You can also keep the place and the filters in step across pages."
       },
       "export": {
         "intro": "The export menu above each chart saves what you see:",
@@ -627,15 +627,15 @@
         },
         "thirtySeconds": {
           "question": "Why isn't {finest} available for every period?",
-          "answer": "WorldClim publishes {finest} rasters only for the {period} climate normals. The other normals and the weather years go down to {fallback}."
+          "answer": "WorldClim publishes {finest} rasters only for its {period} climate normals. SCRAPI computes the other normals from WorldClim's yearly weather data, which goes down to {fallback}, so those periods do too."
         }
       }
     },
     "data": {
       "cell": {
         "whole": "Every value Climatica shows belongs to the raster cell that contains your point, not to the point itself. The map outlines that cell.",
-        "mixed": "A coarse cell can span a valley floor and the slopes above it, or a coast and the land behind it. Its value is their average, and may describe none of them exactly.",
-        "example": "Bolzano ({period} normal) shows it well. The town lies in an Alpine valley at about {valleyElevation} m. At {coarseGrid}, its cell also covers the slopes: mean elevation {coarseElevation} m, mean annual temperature {coarseTemperature} °C. At {fineGrid}, the cell holds only the valley floor: {fineElevation} m and {fineTemperature} °C.",
+        "mixed": "A coarse cell can take in a valley floor and the slopes above it, or a coast and the land behind it. Its value is the average of all of them, so it may not match any one spot exactly.",
+        "example": "Bolzano ({period} normal) is a good example. The town sits on the floor of an Alpine valley, at about {valleyElevation} m. At {coarseGrid} its cell covers the surrounding mountains as well as the valley floor, so the cell's mean elevation is {coarseElevation} m and its mean annual temperature {coarseTemperature} °C. At {fineGrid} the cell covers only the valley floor: {fineElevation} m and {fineTemperature} °C, much closer to the town itself.",
         "illustrationLabel": "Schematic of two cells containing the same point. {coarse}: the large cell, among its neighbours. {fine}: the small cell inside it, holding the point.",
         "illustrationCaption": "Cells containing the same point at two resolutions (schematic, sizes at the equator).",
         "calloutTitle": "Values change with the resolution — this is expected.",

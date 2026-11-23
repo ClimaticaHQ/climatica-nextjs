@@ -498,7 +498,7 @@
     },
     "about": {
       "hero": {
-        "description": "Climatica transforme l'archive WorldClim en diagrammes de Walter-Lieth, graphiques et cartes. Choisissez n'importe quel point sur terre pour voir ses normales climatiques ou la météo d'une année donnée, comparez deux lieux ou deux périodes, et cartographiez une région entière. Sans compte, sans rien à installer.",
+        "description": "Climatica vous permet d'explorer de façon interactive le jeu de données mondial WorldClim, à travers des diagrammes de Walter-Lieth, des graphiques climatiques et des cartes. Choisissez n'importe quel point sur terre pour voir ses normales climatiques ou la météo d'une année donnée, comparez deux lieux ou deux périodes, ou voyez sur une carte comment le climat varie sur toute une région. Sans compte, sans rien à installer.",
         "openCityClimate": "Ouvrir Climat de la Ville",
         "readGuide": "Lire le guide d'utilisation"
       },
@@ -522,7 +522,7 @@
           "scrapi": {
             "label": "Service",
             "title": "SCRAPI",
-            "text": "Une API de la {university} qui répond aux questions sur les rasters : les valeurs d'une cellule, d'un rectangle ou d'un polygone."
+            "text": "Une API de la {university} qui répond aux questions sur les rasters : les valeurs d'une cellule, d'un rectangle ou d'un polygone, et les tuiles cartographiques qui représentent une variable sur une région."
           },
           "climatica": {
             "label": "Interface",
@@ -535,7 +535,7 @@
         "intro": "Climatica ne conserve aucune donnée climatique propre. Les valeurs, les noms de lieux et les cartes proviennent de ces sources.",
         "scrapi": {
           "text": "SCRAPI est l'API dont Climatica lit chaque valeur. Elle publie les rasters de WorldClim sous forme de données liées et répond aux requêtes sur des points, des régions et des métadonnées.",
-          "author": "Créée par {author}",
+          "author": "Créée par <link>{author}</link>",
           "docs": "Lire la documentation de SCRAPI"
         },
         "worldclim": "Des surfaces climatiques mondiales à haute résolution : les normales climatiques et la météo mensuelle à échelle réduite.",
@@ -610,7 +610,7 @@
       },
       "filters": {
         "sidebar": "Les filtres (jeu de données, période ou année, variables, résolution et mois) se trouvent dans la barre latérale sur les grands écrans et derrière la puce « Filtres » sur mobile. Modifiez-les, puis appuyez sur « {apply} ».",
-        "autoApply": "Dans les Paramètres, vous pouvez appliquer les filtres dès que vous les modifiez, et garder le lieu et les filtres synchronisés entre les pages."
+        "autoApply": "Dans les <link>Paramètres</link>, vous pouvez activer ou désactiver l'application automatique : activée, les filtres s'appliquent dès que vous les modifiez ; désactivée, ils attendent « {apply} ». Vous pouvez aussi garder le lieu et les filtres synchronisés entre les pages."
       },
       "export": {
         "intro": "Le menu d'export au-dessus de chaque graphique enregistre ce que vous voyez :",
@@ -627,15 +627,15 @@
         },
         "thirtySeconds": {
           "question": "Pourquoi {finest} n'est-il pas disponible pour toutes les périodes ?",
-          "answer": "WorldClim ne publie des rasters à {finest} que pour les normales climatiques {period}. Les autres normales et les années météo descendent jusqu'à {fallback}."
+          "answer": "WorldClim ne publie des rasters à {finest} que pour ses normales climatiques {period}. SCRAPI calcule les autres normales à partir des données météo annuelles de WorldClim, qui descendent jusqu'à {fallback} ; ces périodes aussi, donc."
         }
       }
     },
     "data": {
       "cell": {
         "whole": "Chaque valeur affichée par Climatica appartient à la cellule du raster qui contient votre point, et non au point lui-même. La carte trace le contour de cette cellule.",
-        "mixed": "Une cellule grossière peut couvrir un fond de vallée et les versants au-dessus, ou une côte et l'arrière-pays. Sa valeur en est la moyenne et peut n'en décrire aucun exactement.",
-        "example": "Bolzano (normale {period}) l'illustre bien. La ville se trouve dans une vallée alpine, à environ {valleyElevation} m. À {coarseGrid}, sa cellule couvre aussi les versants : altitude moyenne {coarseElevation} m, température annuelle moyenne {coarseTemperature} °C. À {fineGrid}, la cellule ne contient que le fond de la vallée : {fineElevation} m et {fineTemperature} °C.",
+        "mixed": "Une cellule grossière peut englober un fond de vallée et les versants qui le dominent, ou une côte et les terres en arrière. Sa valeur est la moyenne de l'ensemble et peut donc ne correspondre exactement à aucun endroit précis.",
+        "example": "Bolzano (normale {period}) en est un bon exemple. La ville se trouve au fond d'une vallée alpine, à environ {valleyElevation} m. À {coarseGrid}, sa cellule couvre les montagnes alentour en plus du fond de vallée : son altitude moyenne est donc de {coarseElevation} m et sa température annuelle moyenne de {coarseTemperature} °C. À {fineGrid}, la cellule ne couvre que le fond de vallée : {fineElevation} m et {fineTemperature} °C, bien plus proche de la ville elle-même.",
         "illustrationLabel": "Schéma de deux cellules contenant le même point. {coarse} : la grande cellule, parmi ses voisines. {fine} : la petite cellule à l'intérieur, qui contient le point.",
         "illustrationCaption": "Cellules contenant le même point à deux résolutions (schéma, tailles à l'équateur).",
         "calloutTitle": "Les valeurs changent avec la résolution : c'est normal.",
