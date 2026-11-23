@@ -9,8 +9,8 @@ import { INFO_NAV_CLASSES as C } from "../info.constant";
 import type { TInfoSectionListProps } from "../info.type";
 
 /**
- * The current page's sections behind their rule, one bar on it sliding to the section in view —
- * mounted with its page, so a new page's bar starts in place.
+ * A page's sections behind their rule, one bar on it sliding to the section in view. With no
+ * section active (a page not open) it has no bar, so an opened page's bar starts in place.
  */
 export function InfoSectionList({
   sections,

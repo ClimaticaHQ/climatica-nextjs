@@ -23,7 +23,8 @@ export function InfoLayout({ children }: TInfoLayoutProps) {
   const tree = {
     pages: INFO_PAGES,
     currentRoute: nav.currentPage?.route ?? null,
-    sections: nav.sections,
+    // * the sheet closes when a page is picked: it only ever shows the current one open
+    openRoute: nav.currentPage?.route ?? null,
     activeId: nav.activeId,
     getPageHref: nav.getPageHref,
   };
@@ -53,9 +54,9 @@ export function InfoLayout({ children }: TInfoLayoutProps) {
               event.preventDefault();
               void nav.goToSection(id);
             }}
-            onPageClick={(event, href) => {
+            onPageClick={(event, route) => {
               event.preventDefault();
-              void nav.goToPage(href);
+              void nav.goToPage(nav.getPageHref(route));
             }}
             hasLargeTargets
           />

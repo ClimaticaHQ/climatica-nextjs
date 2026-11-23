@@ -44,7 +44,15 @@ no filters, no data requests. Components are in `src/components/info/` by role (
   ([`getActiveSectionIndex`](../src/utils/activeSection.util.ts)). A clicked section is marked
   at once and held until its scroll ends or the user scrolls. One bar on the sections' rule
   slides to it (`InfoSectionList`, `SlidingIndicator`), in the side panel and the Contents sheet
-  alike; a page's list mounts with its bar already in place.
+  alike.
+- **Switching pages in the side panel:** the tree renders every page's sections, each in a
+  `Collapsible` open only under the open page (in the server's HTML too; shut lists are inert).
+  A click opens the page at once (`openingRoute`, the navbar's pending approach; back to the
+  current page if the navigation is dropped): its list folds open, the other shut, and one pill
+  goes straight to where its name lands once they've folded (`getFoldedRect`), all in
+  `MOTION.ACCORDION_MS`. A click mid-way retargets from where everything is. An opened list's bar
+  starts in place on its first section. The Contents sheet closes on a page pick, so it shows
+  the current page open and doesn't animate.
 - **Pages are composition-only**: shared UI and item constants from `info.constant.ts`; their
   logic is in page hooks (`useAboutFacts`, `useGuidePage`, `useDataPage`).
 - **Facts come from the code** (resolutions, periods, languages, formulas, legends), never

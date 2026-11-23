@@ -82,9 +82,15 @@ test.describe("Info pages", () => {
     await expect(current).toHaveCount(1);
     await expect(current).toHaveText("User guide");
     await expect(topbarAbout(page)).toHaveAttribute("aria-current", "page");
-    // * the guide's own sections, nested under it — not another page's; no headings in the nav
+    // * the guide's own sections open under it; another page's folded shut and inert (rendered,
+    // * so a page switch can fold them); no headings in the nav
     await expect(sectionLink(page, "Questions")).toBeVisible();
-    await expect(sectionLink(page, "Spatial resolutions")).toHaveCount(0);
+    await expect(sectionLink(page, "Questions").locator("xpath=ancestor::*[@inert]")).toHaveCount(
+      0,
+    );
+    await expect(
+      sectionLink(page, "Spatial resolutions").locator("xpath=ancestor::*[@inert]"),
+    ).toHaveCount(1);
     await expect(infoNav(page).getByRole("heading")).toHaveCount(0);
     // * the first section is current before any scrolling
     await expect(sectionLink(page, "Find a place")).toHaveAttribute("aria-current", "location");

@@ -1,5 +1,11 @@
 import { ESlidingIndicatorAxis } from "@/enums";
-import type { TIndicatorRect, TIndicatorRectArgs, TIndicatorStyleArgs } from "@/types";
+import { COLLAPSIBLE_OPEN_ATTRIBUTE, COLLAPSIBLE_SELECTOR } from "@/constants";
+import type {
+  TIndicatorRect,
+  TIndicatorRectArgs,
+  TIndicatorStyleArgs,
+  TIndicatorTargetArgs,
+} from "@/types";
 import type { CSSProperties } from "react";
 
 /**
@@ -21,8 +27,39 @@ export function getIndicatorRect({ container, item }: TIndicatorRectArgs): TIndi
   };
 }
 
+// * px — float noise in a projected place (getFoldedRect), never a move
+const SAME_RECT_TOLERANCE_PX = 0.01;
+
 export function isSameIndicatorRect(a: TIndicatorRect, b: TIndicatorRect) {
-  return a.left === b.left && a.top === b.top && a.width === b.width && a.height === b.height;
+  const sides = [a.left - b.left, a.top - b.top, a.width - b.width, a.height - b.height];
+  return sides.every((side) => Math.abs(side) < SAME_RECT_TOLERANCE_PX);
+}
+
+/** A Collapsible's height once its fold has ended: its content's, or none. */
+function getFoldedHeight(collapsible: Element) {
+  const isOpen = collapsible.getAttribute(COLLAPSIBLE_OPEN_ATTRIBUTE) === "true";
+  return isOpen ? (collapsible.firstElementChild?.scrollHeight ?? 0) : 0;
+}
+
+/**
+ * Where an item lands once every fold in its list has ended (a Collapsible opening or shutting
+ * above it): its box now, moved by what the folds above it still have to grow or shrink. The same
+ * at any moment of the folds, so an indicator sent there arrives with its item, and a new target
+ * mid-way starts from the folds' current state.
+ */
+export function getFoldedRect({ rect, container, item }: TIndicatorTargetArgs): TIndicatorRect {
+  const shift = [...container.querySelectorAll(COLLAPSIBLE_SELECTOR)]
+    .filter(
+      (collapsible) =>
+        !collapsible.contains(item) &&
+        Boolean(collapsible.compareDocumentPosition(item) & Node.DOCUMENT_POSITION_FOLLOWING),
+    )
+    .reduce(
+      (sum, collapsible) =>
+        sum + getFoldedHeight(collapsible) - collapsible.getBoundingClientRect().height,
+      0,
+    );
+  return { ...rect, top: rect.top + shift };
 }
 
 const STYLE_BY_AXIS: Record<ESlidingIndicatorAxis, (rect: TIndicatorRect) => CSSProperties> = {

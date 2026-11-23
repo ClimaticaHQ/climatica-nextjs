@@ -18,6 +18,13 @@ export type TSlidingIndicatorArgs = {
   activeKey: string | null;
   /** finds the active item inside the list (its aria-current, aria-pressed or data attribute) */
   activeSelector: string;
+  /** where the item will be rather than where it is (getFoldedRect: once the folds have ended) */
+  toTargetRect?: ((args: TIndicatorTargetArgs) => TIndicatorRect) | undefined;
+};
+
+export type TIndicatorTargetArgs = TIndicatorRectArgs & {
+  /** the item's box now (getIndicatorRect) */
+  rect: TIndicatorRect;
 };
 
 export type TIndicatorRectArgs = {

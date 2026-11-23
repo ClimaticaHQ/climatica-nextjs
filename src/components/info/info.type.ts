@@ -42,23 +42,23 @@ export type THowToCiteProps = {
 };
 
 export type TInfoNavTreeProps = {
+  /** each with its sections, folded open under it while it's the open page */
   pages: readonly TInfoPage[];
+  /** the page shown (aria-current) */
   currentRoute: string | null;
-  /** the current page's sections, nested under it */
-  sections: readonly TInfoSection[];
+  /** the page highlighted, its sections open: the one being opened, else the current one */
+  openRoute: string | null;
+  /** the current page's section in view */
   activeId: string | null;
   getPageHref: (route: string) => string;
   onSectionClick: (event: MouseEvent<HTMLAnchorElement>, id: string) => void;
-  /** absent: a plain link */
-  onPageClick?: ((event: MouseEvent<HTMLAnchorElement>, href: string) => void) | undefined;
+  onPageClick: (event: MouseEvent<HTMLAnchorElement>, route: string) => void;
   /** finger-sized rows (the Contents sheet): 48 px pages, 44 px sections */
   hasLargeTargets: boolean;
 };
 
-export type TInfoSectionListProps = Pick<
-  TInfoNavTreeProps,
-  "sections" | "activeId" | "onSectionClick"
-> & {
+export type TInfoSectionListProps = Pick<TInfoNavTreeProps, "activeId" | "onSectionClick"> & {
+  sections: readonly TInfoSection[];
   /** the tree's section link size (REGULAR or LARGE) */
   linkSizeClass: string;
 };

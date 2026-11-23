@@ -10,11 +10,12 @@ import { useNavbarNavigation } from "../url/useNavbarNavigation";
 /**
  * The Info pages' navigation, for the sidebar (from lg) and the Contents bar and sheet (below):
  * the current page, its shown sections, the one in view (one scroll spy for both), and the
- * sheet. Links keep the shared filters, like the navbar's.
+ * sheet. Links keep the shared filters, like the navbar's. A page picked in the side panel is
+ * `openingRoute` from the click until it's in (null again if the navigation is dropped).
  */
 export function useInfoNavigation() {
   const pathname = usePathname();
-  const { getPlainHref, pushHref } = useNavbarNavigation();
+  const { getPlainHref, pushHref, navigatePlain, pendingRoute } = useNavbarNavigation();
   const currentPage = INFO_PAGES.find(({ route }) => pathname === route) ?? null;
   const sections = currentPage?.sections.filter(({ isShown }) => isShown) ?? [];
   const { activeId, select } = useActiveSection(sections.map(({ id }) => id));
@@ -56,6 +57,8 @@ export function useInfoNavigation() {
     activeId,
     activeSection: sections.find(({ id }) => id === activeId) ?? null,
     getPageHref: getPlainHref,
+    openingRoute: pendingRoute,
+    openPage: navigatePlain,
     selectSection: select,
     isContentsOpen,
     openContents: () => setIsContentsOpen(true),

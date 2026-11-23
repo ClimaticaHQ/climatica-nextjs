@@ -12,7 +12,8 @@ const infoPanel = (page: Page) =>
   page
     .getByRole("complementary")
     .filter({ has: page.getByRole("navigation", { name: "Info pages" }) });
-const sectionBar = (page: Page) => infoPanel(page).locator("[data-sliding-indicator]");
+const sectionBar = (page: Page) =>
+  infoPanel(page).locator('[data-collapsible][data-open="true"] [data-sliding-indicator]');
 
 /** How far the indicator's box is from its item's, the largest side. */
 const offsetFrom = async (indicator: Locator, item: Locator, isVertical = false) => {
@@ -97,5 +98,70 @@ test.describe("sliding indicators", () => {
     expect(
       await pill(page).evaluate((element) => getComputedStyle(element).transitionDuration),
     ).toBe("0s");
+  });
+});
+
+test.describe("switching Info pages in the side panel", () => {
+  test.use({ viewport: DESKTOP });
+
+  const pageLink = (page: Page, name: string) =>
+    infoPanel(page).getByRole("link", { name, exact: true });
+  const pagePill = (page: Page) => infoPanel(page).locator("nav > div > [data-sliding-indicator]");
+  // * a page's section list: the fold after its link
+  const foldOf = (page: Page, name: string) =>
+    infoPanel(page)
+      .locator("li")
+      .filter({ has: page.locator(`> a:text-is("${name}")`) })
+      .locator("[data-collapsible]");
+  const foldMotion = (page: Page) =>
+    infoPanel(page)
+      .locator("[data-collapsible], nav > div > [data-sliding-indicator]")
+      .evaluateAll((elements) => elements.flatMap((element) => element.getAnimations()).length);
+
+  test("About → Data & methods: the highlight lands on it, its list open, About's shut and unfocusable", async ({
+    page,
+  }) => {
+    await page.goto("/about");
+    await expect(pagePill(page)).toBeAttached();
+    await pageLink(page, "Data & methods").click();
+    await page.waitForURL("**/about/data");
+    const data = pageLink(page, "Data & methods");
+    await expect
+      .poll(() => offsetFrom(pagePill(page), data), POLL)
+      .toBeLessThan(ALIGN_TOLERANCE_PX);
+    await expect(foldOf(page, "Data & methods")).toHaveAttribute("data-open", "true");
+    await expect(foldOf(page, "About")).toHaveAttribute("data-open", "false");
+    await expect.poll(() => foldOf(page, "About").evaluate((fold) => fold.clientHeight)).toBe(0);
+    // * shut: out of the tab order and the accessibility tree
+    const aboutSection = foldOf(page, "About").locator("a").first();
+    await aboutSection.evaluate((link: HTMLElement) => link.focus());
+    await expect(aboutSection).not.toBeFocused();
+    await expect(foldOf(page, "About")).toHaveJSProperty("inert", true);
+    await expect(infoPanel(page).getByRole("link", { name: "References" })).toBeVisible();
+  });
+
+  test("on a reload the pages are already folded, with no transition running", async ({ page }) => {
+    await page.goto("/about/guide");
+    await page.reload();
+    await expect(pagePill(page)).toBeAttached();
+    expect(await foldMotion(page)).toBe(0);
+    expect(await offsetFrom(pagePill(page), pageLink(page, "User guide"))).toBeLessThan(
+      ALIGN_TOLERANCE_PX,
+    );
+  });
+
+  test("with reduced motion a page switch folds and moves at once", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/about");
+    await expect(pagePill(page)).toBeAttached();
+    await pageLink(page, "User guide").click();
+    await expect(foldOf(page, "User guide")).toHaveAttribute("data-open", "true");
+    expect(await foldMotion(page)).toBe(0);
+    const durations = await infoPanel(page)
+      .locator("[data-collapsible], nav > div > [data-sliding-indicator]")
+      .evaluateAll((elements) =>
+        elements.map((element) => getComputedStyle(element).transitionDuration),
+      );
+    expect(new Set(durations)).toEqual(new Set(["0s"]));
   });
 });

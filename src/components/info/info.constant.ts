@@ -193,15 +193,24 @@ export const INFO_CLASSES = {
 // * the navigation tree: sidebar sizes from lg (pages 17 px, sections 16 px) or the Contents
 // * sheet's finger-sized rows (48 px pages, 44 px sections) in the touch scale
 export const INFO_NAV_CLASSES = {
+  // * the pages and their highlight: one pill behind the open page, moving with the folds
+  PAGES_FRAME: "relative",
   PAGES: "flex flex-col gap-1",
-  PAGE_LINK: `${FOCUS_RING_CLASS} flex items-center rounded-[var(--radius-sm)] px-3 font-medium transition-colors duration-150`,
-  PAGE_LINK_ACTIVE: "bg-[var(--color-primary-muted)] text-[var(--color-primary)]",
+  PAGE_PILL:
+    "pointer-events-none absolute top-0 left-0 rounded-[var(--radius-sm)] bg-[var(--color-primary-muted)]",
+  PAGE_PILL_MOTION: "accordion-indicator",
+  // * its colours crossfade as the pill arrives; positioned, over the pill
+  PAGE_LINK: `${FOCUS_RING_CLASS} accordion-indicator-text relative flex items-center rounded-[var(--radius-sm)] px-3 font-medium`,
+  PAGE_LINK_ACTIVE: "text-[var(--color-primary)]",
+  // * the highlight in the server's HTML, until the pill is measured and takes over
+  PAGE_LINK_ACTIVE_STATIC: "bg-[var(--color-primary-muted)]",
   PAGE_LINK_IDLE:
     "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]",
   // * the sections hang off the current page: indented behind a 2px rule
   SECTIONS: "flex flex-col border-l-2 border-[var(--color-border)]",
-  // * the list and its bar: the bar is placed in this box (a list holds items only)
-  SECTIONS_FRAME: "relative my-1 ml-3",
+  // * the list and its bar: the bar is placed in this box (a list holds items only). Padding, not
+  // * margin, so its fold's full height is its content's (getFoldedRect)
+  SECTIONS_FRAME: "relative ml-3 py-1",
   // * -ml-0.5: the link's own 2px rule lies over the list's, so the marker replaces it
   SECTION_LINK: `${FOCUS_RING_CLASS} -ml-0.5 flex items-center border-l-2 pl-3 transition-colors duration-150`,
   SECTION_LINK_ACTIVE: "font-medium text-[var(--color-primary)]",

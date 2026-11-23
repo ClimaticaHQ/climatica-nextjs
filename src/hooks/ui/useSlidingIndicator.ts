@@ -9,10 +9,12 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
  * hydration it takes over from the item's static highlight in the same frame. It slides only to
  * a new active item once placed; on its first placement, a resize, a text size change or a font
  * arriving it jumps. Null while no item is active. The container must stay mounted with the hook.
+ * `toTargetRect` sends it where its item will be (a list folding around it), not where it is now.
  */
 export function useSlidingIndicator<TContainer extends HTMLElement>({
   activeKey,
   activeSelector,
+  toTargetRect,
 }: TSlidingIndicatorArgs) {
   const containerRef = useRef<TContainer>(null);
   const [indicator, setIndicator] = useState<TSlidingIndicatorState | null>(null);
@@ -27,7 +29,8 @@ export function useSlidingIndicator<TContainer extends HTMLElement>({
         setIndicator(null);
         return;
       }
-      const rect = getIndicatorRect({ container, item });
+      const current = getIndicatorRect({ container, item });
+      const rect = toTargetRect ? toTargetRect({ rect: current, container, item }) : current;
       const isAnimated = canSlide && isPlacedRef.current;
       isPlacedRef.current = true;
       // * the same place keeps the same state: a relayout mid-slide never cuts the slide short
@@ -35,7 +38,7 @@ export function useSlidingIndicator<TContainer extends HTMLElement>({
         previous && isSameIndicatorRect(previous, rect) ? previous : { ...rect, isAnimated },
       );
     },
-    [activeSelector],
+    [activeSelector, toTargetRect],
   );
 
   useLayoutEffect(() => {

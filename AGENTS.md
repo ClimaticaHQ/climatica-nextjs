@@ -136,6 +136,7 @@ Search these first; the code is the reference for their props. In src/components
 - Button — `UI/Button` — the app's button; with `href`, a link that looks like one.
 - Chip — `UI/Chip` — every chip: toggle, filter value, all filters.
 - ChipScroller — `UI/ChipScroller` — a row of chips scrolling sideways with faded ends.
+- Collapsible — `UI/Collapsible` — content folding open and shut (rows 0fr → 1fr), inert while shut.
 - Disclosure — `UI/Disclosure` — a question and its answer, closed until opened (details / summary).
 - DotLabel — `UI/DotLabel` — a label, with an entity's shape when it names one.
 - Dropdown — `UI/Dropdown` — the app's select; OptionMarker (`UI/Dropdown/OptionMarker`) is an entity's shape before a label.

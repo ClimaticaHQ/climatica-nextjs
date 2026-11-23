@@ -89,6 +89,9 @@ On-screen charts draw in SVG px, so they follow the scale in code: On-screen cha
   item once placed (`nav-indicator` 220 ms, `section-indicator` 200 ms, the SegmentedControl's
   pill; `MOTION.INDICATOR_SLIDE_EASING`, retargeting mid-flight) and jumps on its first
   placement, a resize, a text size change or a font arriving. Motion off: it always jumps.
+  `toTargetRect` sends it where its item will be: `getFoldedRect` for a list of `Collapsible`s
+  ([`UI/Collapsible`](../src/components/UI/Collapsible): rows 0fr → 1fr, `accordion` in
+  animations.css), with `accordion-indicator` on the same duration and curve.
 
 ## Breakpoints
 

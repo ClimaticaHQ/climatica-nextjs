@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 import { ESlidingIndicatorAxis } from "@/enums";
+import { COLLAPSIBLE_ATTRIBUTE, COLLAPSIBLE_OPEN_ATTRIBUTE } from "@/constants";
 import {
+  getFoldedRect,
   getIndicatorRect,
   getIndicatorStyle,
   isSameIndicatorRect,
@@ -83,9 +85,78 @@ describe("getIndicatorStyle", () => {
 });
 
 describe("isSameIndicatorRect", () => {
-  it("compares the boxes only", () => {
+  it("compares the boxes only, float noise aside", () => {
     const rect = { left: 1, top: 2, width: 3, height: 4 };
     expect(isSameIndicatorRect(rect, { ...rect })).toBe(true);
+    expect(isSameIndicatorRect(rect, { ...rect, top: 2 + 1e-9 })).toBe(true);
     expect(isSameIndicatorRect(rect, { ...rect, top: 2.5 })).toBe(false);
+  });
+});
+
+/** A Collapsible as the tree draws it: its height now, its content's full height. */
+const collapsible = ({
+  isOpen,
+  height,
+  content,
+}: {
+  isOpen: boolean;
+  height: number;
+  content: number;
+}) => {
+  const frame = element({ left: 0, top: 0, width: 200, height });
+  frame.setAttribute(COLLAPSIBLE_ATTRIBUTE, "");
+  frame.setAttribute(COLLAPSIBLE_OPEN_ATTRIBUTE, String(isOpen));
+  const inner = document.createElement("div");
+  Object.defineProperty(inner, "scrollHeight", { value: content });
+  frame.append(inner);
+  return frame;
+};
+
+describe("getFoldedRect: where an item lands once the folds have ended", () => {
+  const RECT = { left: 0, top: 120, width: 200, height: 40 };
+  const setup = (folds: HTMLElement[], before = folds.length) => {
+    const container = document.createElement("div");
+    const item = document.createElement("a");
+    folds.forEach((fold, index) => {
+      if (index === before) container.append(item);
+      container.append(fold);
+    });
+    if (before >= folds.length) container.append(item);
+    return { container, item };
+  };
+
+  it("moves by what the folds above it still have to grow or shrink", () => {
+    // * About shutting (90 of 150 px left), User guide opening (30 of 200 px so far)
+    const { container, item } = setup([
+      collapsible({ isOpen: false, height: 90, content: 150 }),
+      collapsible({ isOpen: true, height: 30, content: 200 }),
+    ]);
+    expect(getFoldedRect({ rect: RECT, container, item })).toEqual({
+      ...RECT,
+      top: 120 - 90 + (200 - 30),
+    });
+  });
+
+  it("ignores the folds below it, and is its place now once they've ended", () => {
+    const { container, item } = setup(
+      [
+        collapsible({ isOpen: true, height: 150, content: 150 }),
+        collapsible({ isOpen: false, height: 80, content: 200 }),
+      ],
+      1,
+    );
+    expect(getFoldedRect({ rect: RECT, container, item })).toEqual(RECT);
+  });
+
+  it("is the same at any moment of the folds", () => {
+    const at = (progress: number) => {
+      const { container, item } = setup([
+        collapsible({ isOpen: false, height: 150 * (1 - progress), content: 150 }),
+      ]);
+      // * the item rises with the shutting fold
+      const rect = { ...RECT, top: 200 - 150 * progress };
+      return getFoldedRect({ rect, container, item }).top;
+    };
+    expect([at(0), at(0.3), at(1)]).toEqual([50, 50, 50]);
   });
 });

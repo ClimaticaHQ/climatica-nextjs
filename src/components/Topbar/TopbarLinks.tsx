@@ -1,7 +1,7 @@
 "use client";
 
 import { SlidingIndicator } from "@/components/UI/SlidingIndicator";
-import { NAV_INDICATOR_ACTIVE_ATTRIBUTE, SLIDING_INDICATOR_SELECTORS } from "@/constants";
+import { INDICATOR_ACTIVE_ATTRIBUTE, SLIDING_INDICATOR_SELECTORS } from "@/constants";
 import { ESlidingIndicatorAxis } from "@/enums";
 import { useSlidingIndicator } from "@/hooks/ui/useSlidingIndicator";
 import Link from "next/link";
@@ -15,7 +15,7 @@ import type { TTopbarLinksProps } from "./Topbar.type";
 export function TopbarLinks({ links, navRef, isCollapsed }: TTopbarLinksProps) {
   const { containerRef, indicator } = useSlidingIndicator<HTMLDivElement>({
     activeKey: links.find(({ isHighlighted }) => isHighlighted)?.key ?? null,
-    activeSelector: SLIDING_INDICATOR_SELECTORS.NAV,
+    activeSelector: SLIDING_INDICATOR_SELECTORS.MARKED,
   });
 
   return (
@@ -37,7 +37,7 @@ export function TopbarLinks({ links, navRef, isCollapsed }: TTopbarLinksProps) {
             href={href}
             {...(onNavigate ? { onClick: onNavigate } : {})}
             aria-current={isActive ? "page" : undefined}
-            {...{ [NAV_INDICATOR_ACTIVE_ATTRIBUTE]: isHighlighted }}
+            {...{ [INDICATOR_ACTIVE_ATTRIBUTE]: isHighlighted }}
             className={`${L.DESKTOP} ${isHighlighted ? `${L.DESKTOP_ACTIVE} ${indicator ? "" : L.DESKTOP_ACTIVE_STATIC}` : L.IDLE}`}
           >
             {label}

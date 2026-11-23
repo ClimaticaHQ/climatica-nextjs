@@ -31,6 +31,35 @@
   transition-timing-function: var(--motion-indicator-slide-easing);
 }
 
+/* * Collapsible: a row from 0fr to 1fr, its content clipped while it folds; a fold reversed
+   mid-way turns back from where it is. An indicator moving with the fold takes its time */
+.accordion {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--motion-accordion) var(--motion-indicator-slide-easing);
+}
+
+.accordion[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+
+.accordion > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.accordion-indicator {
+  transition-property: transform, width, height;
+  transition-duration: var(--motion-accordion);
+  transition-timing-function: var(--motion-indicator-slide-easing);
+}
+
+.accordion-indicator-text {
+  transition-property: color, background-color;
+  transition-duration: var(--motion-accordion);
+  transition-timing-function: var(--motion-indicator-slide-easing);
+}
+
 /* * SwapButton: the icon turning half a turn on each press */
 .swap-icon-turn {
   transition: transform var(--motion-control-slide) var(--motion-control-slide-easing);

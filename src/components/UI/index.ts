@@ -4,6 +4,7 @@ export { ChartSkeleton } from "./ChartSkeleton";
 export { TextPlaceholder } from "./TextPlaceholder";
 export { Chip } from "./Chip";
 export { DotLabel } from "./DotLabel/DotLabel";
+export { Collapsible } from "./Collapsible";
 export { Disclosure } from "./Disclosure";
 export { Dropdown } from "./Dropdown";
 export { MapSkeleton } from "./MapSkeleton";
