@@ -1,7 +1,9 @@
-import { ESegmentedSize } from "@/enums";
+import { SlidingIndicator } from "@/components/UI/SlidingIndicator";
+import { SLIDING_INDICATOR_SELECTORS } from "@/constants";
+import { ESegmentedSize, ESlidingIndicatorAxis } from "@/enums";
+import { useSlidingIndicator } from "@/hooks/ui/useSlidingIndicator";
 import { SEGMENTED_CONTROL_CLASSES as C } from "./SegmentedControl.constant";
 import type { TSegmentedControlProps, TSegmentedRoomStyle } from "./SegmentedControl.type";
-import { useIndicatorRect } from "./hooks/useIndicatorRect";
 import { useSegmentLayout } from "./hooks/useSegmentLayout";
 
 /**
@@ -23,7 +25,10 @@ export function SegmentedControl<TValue extends string>({
   size = ESegmentedSize.DEFAULT,
   ariaDescribedBy,
 }: TSegmentedControlProps<TValue>) {
-  const { trackRef, rect } = useIndicatorRect(value);
+  const { containerRef: trackRef, indicator } = useSlidingIndicator<HTMLDivElement>({
+    activeKey: value,
+    activeSelector: SLIDING_INDICATOR_SELECTORS.SEGMENT,
+  });
   const { isList, roomWidth } = useSegmentLayout(trackRef, !isIconOnlyBelowSm && !isLabelTruncated);
   const activeClass = isFlat ? C.ACTIVE_FLAT : C.ACTIVE;
   const trackClass = isIconOnlyBelowSm
@@ -43,22 +48,12 @@ export function SegmentedControl<TValue extends string>({
       className={`${trackClass} ${isList ? C.TRACK_LIST : ""} ${isDisabled ? C.DISABLED : ""}`}
       style={isList ? roomStyle : undefined}
     >
-      {/* * drawn once measured, so it never slides in from the track's edge on mount */}
-      {rect && (
-        <span
-          aria-hidden
-          className={`${C.INDICATOR} ${isFlat ? C.INDICATOR_FLAT : C.INDICATOR_RAISED} ${isList ? C.INDICATOR_LIST : ""}`}
-          style={
-            isList
-              ? {
-                  width: rect.width,
-                  height: rect.height,
-                  transform: `translate(${rect.left}px, ${rect.top}px)`,
-                }
-              : { width: rect.width, transform: `translateX(${rect.left}px)` }
-          }
-        />
-      )}
+      <SlidingIndicator
+        indicator={indicator}
+        axis={ESlidingIndicatorAxis.BOTH}
+        className={`${C.INDICATOR} ${isFlat ? C.INDICATOR_FLAT : C.INDICATOR_RAISED} ${isList ? C.INDICATOR_LIST : ""}`}
+        motionClass={C.INDICATOR_MOTION}
+      />
       {options.map((option) => {
         const isActive = option.value === value;
         return (

@@ -199,10 +199,18 @@ export const INFO_NAV_CLASSES = {
   PAGE_LINK_IDLE:
     "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]",
   // * the sections hang off the current page: indented behind a 2px rule
-  SECTIONS: "my-1 ml-3 flex flex-col border-l-2 border-[var(--color-border)]",
+  SECTIONS: "flex flex-col border-l-2 border-[var(--color-border)]",
+  // * the list and its bar: the bar is placed in this box (a list holds items only)
+  SECTIONS_FRAME: "relative my-1 ml-3",
   // * -ml-0.5: the link's own 2px rule lies over the list's, so the marker replaces it
   SECTION_LINK: `${FOCUS_RING_CLASS} -ml-0.5 flex items-center border-l-2 pl-3 transition-colors duration-150`,
-  SECTION_LINK_ACTIVE: "border-[var(--color-primary)] font-medium text-[var(--color-primary)]",
+  SECTION_LINK_ACTIVE: "font-medium text-[var(--color-primary)]",
+  // * the marker in the server's HTML, until the bar is measured and takes over
+  SECTION_LINK_ACTIVE_STATIC: "border-[var(--color-primary)]",
+  SECTION_LINK_ACTIVE_BARRED: "border-transparent",
+  // * one bar over the list's rule, sliding to the section in view
+  SECTION_BAR: "pointer-events-none absolute left-0 top-0 w-0.5 bg-[var(--color-primary)]",
+  SECTION_BAR_MOTION: "section-indicator",
   SECTION_LINK_IDLE:
     "border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text)]",
   REGULAR: {

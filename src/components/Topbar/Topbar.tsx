@@ -27,6 +27,7 @@ export function Topbar() {
         <div className={C.CONTROLS}>
           <Link
             href={settings.href}
+            {...(settings.onNavigate ? { onClick: settings.onNavigate } : {})}
             aria-label={settings.label}
             aria-current={settings.isActive ? "page" : undefined}
             className={`${C.SETTINGS} ${settings.isActive ? C.SETTINGS_ACTIVE : L.IDLE}`}

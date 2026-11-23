@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { INFO_NAV_CLASSES as C } from "../info.constant";
 import type { TInfoNavTreeProps } from "../info.type";
+import { InfoSectionList } from "./InfoSectionList";
 
 /**
  * The Info pages as one tree — the sidebar's from lg, the Contents sheet's below: the pages,
@@ -39,23 +40,12 @@ export function InfoNavTree({
               {t(labelKey)}
             </Link>
             {isCurrent && sections.length > 0 && (
-              <ul className={C.SECTIONS}>
-                {sections.map(({ id, labelKey: sectionKey }) => {
-                  const isActive = id === activeId;
-                  return (
-                    <li key={id}>
-                      <a
-                        href={`#${id}`}
-                        onClick={(event) => onSectionClick(event, id)}
-                        aria-current={isActive ? "location" : undefined}
-                        className={`${C.SECTION_LINK} ${size.SECTION_LINK} ${isActive ? C.SECTION_LINK_ACTIVE : C.SECTION_LINK_IDLE}`}
-                      >
-                        {t(sectionKey)}
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
+              <InfoSectionList
+                sections={sections}
+                activeId={activeId}
+                onSectionClick={onSectionClick}
+                linkSizeClass={size.SECTION_LINK}
+              />
             )}
           </li>
         );

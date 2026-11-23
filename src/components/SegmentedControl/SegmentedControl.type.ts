@@ -30,13 +30,5 @@ export type TSegmentedControlProps<TValue extends string> = {
   ariaDescribedBy?: string | undefined;
 };
 
-/** The active pill's box inside the track, in px. */
-export type TIndicatorRect = {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-};
-
 /** The list's width: the room the control can take (TRACK_LIST). */
 export type TSegmentedRoomStyle = CSSProperties & Record<"--segmented-room", string>;

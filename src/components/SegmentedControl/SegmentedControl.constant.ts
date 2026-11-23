@@ -14,15 +14,15 @@ export const SEGMENTED_CONTROL_CLASSES = {
   // * gaps and paddings stay as inline, so the measurement never changes with the layout
   TRACK_LIST:
     "max-sm:min-w-[var(--segmented-room)] max-sm:grid-flow-row max-sm:auto-rows-auto max-sm:rounded-[var(--radius-md)]",
-  // * one pill behind the options, slid to the active one (transform + width, never top/left;
-  // * the slide is in animations.css)
-  INDICATOR:
-    "pointer-events-none absolute top-0.5 bottom-0.5 left-0 rounded-full segmented-indicator",
+  // * one pill behind the options, placed on the active one by transform and sized by width and
+  // * height (SlidingIndicator); the slide is in animations.css
+  INDICATOR: "pointer-events-none absolute top-0 left-0 rounded-full",
+  INDICATOR_MOTION: "segmented-indicator",
   INDICATOR_RAISED: "bg-[var(--color-control-active)] shadow-[var(--shadow-sm)]",
   // * flat (Settings): the card surface in a thin outline, no shadow
   INDICATOR_FLAT: "border border-[var(--color-border)] bg-[var(--color-surface)]",
-  // * in the list: placed by its top too (translateY), its height the option's
-  INDICATOR_LIST: "max-sm:bottom-auto max-sm:top-0 max-sm:rounded-[var(--radius-sm)]",
+  // * in the list: a line's corners
+  INDICATOR_LIST: "max-sm:rounded-[var(--radius-sm)]",
   // * the icon sized by the label's text (SEGMENT_ICON_EM; it grows with the text size), centred on it, the gap
   // * proportional
   OPTION: `${FOCUS_RING_CLASS} relative flex items-center justify-center gap-[0.4em] rounded-full px-3 py-1 text-[length:var(--font-sm)] font-medium transition-colors duration-150 max-sm:min-w-target max-sm:px-2 [&>svg]:size-[1.15em] [&>svg]:shrink-0`,

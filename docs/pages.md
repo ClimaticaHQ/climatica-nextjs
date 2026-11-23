@@ -42,7 +42,9 @@ no filters, no data requests. Components are in `src/components/info/` by role (
   `<main>` (`SCROLL_SPY`). Sections too near the end to reach it share the scroll left after
   the last one that can, in order; at the end the last is current
   ([`getActiveSectionIndex`](../src/utils/activeSection.util.ts)). A clicked section is marked
-  at once and held until its scroll ends or the user scrolls.
+  at once and held until its scroll ends or the user scrolls. One bar on the sections' rule
+  slides to it (`InfoSectionList`, `SlidingIndicator`), in the side panel and the Contents sheet
+  alike; a page's list mounts with its bar already in place.
 - **Pages are composition-only**: shared UI and item constants from `info.constant.ts`; their
   logic is in page hooks (`useAboutFacts`, `useGuidePage`, `useDataPage`).
 - **Facts come from the code** (resolutions, periods, languages, formulas, legends), never

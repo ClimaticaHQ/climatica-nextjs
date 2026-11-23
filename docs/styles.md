@@ -77,7 +77,18 @@ On-screen charts draw in SVG px, so they follow the scale in code: On-screen cha
   size it sets changes: px for the thumb and track, rem ÷ `--text-scale` for its width and "A"
   glyphs (`--font-xs-unscaled`, `--font-xl-unscaled`). Its input is 44px tall below lg.
 - **Navbar:** from lg its links collapse into the menu when they no longer fit on one line,
-  measured (`useNavbarFit`), whatever the language or text size.
+  measured (`useNavbarFit`), whatever the language or text size. One pill slides under the
+  highlighted link: the page being opened from the click (`pendingRoute` in
+  `useNavbarNavigation`, a transition), the current one once it's in or if the navigation is
+  dropped. The links' colours crossfade with it. The menu doesn't slide.
+- **Sliding indicators** ([`useSlidingIndicator`](../src/hooks/ui/useSlidingIndicator.ts),
+  [`UI/SlidingIndicator`](../src/components/UI/SlidingIndicator)): one absolute element on a
+  list's active item, placed by `transform` and sized by width / height from the item's rendered
+  box (`getIndicatorRect`), measured before paint. The server's HTML keeps the item's static
+  highlight; the indicator takes over in the same frame after hydration. It slides only to a new
+  item once placed (`nav-indicator` 220 ms, `section-indicator` 200 ms, the SegmentedControl's
+  pill; `MOTION.INDICATOR_SLIDE_EASING`, retargeting mid-flight) and jumps on its first
+  placement, a resize, a text size change or a font arriving. Motion off: it always jumps.
 
 ## Breakpoints
 

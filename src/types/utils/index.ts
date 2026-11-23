@@ -21,3 +21,4 @@ export type * from "./navbarFit.type";
 export type * from "./textSize.type";
 export type * from "./stepSlider.type";
 export type * from "./segmentedControl.type";
+export type * from "./slidingIndicator.type";

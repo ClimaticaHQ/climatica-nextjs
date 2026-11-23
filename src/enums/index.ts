@@ -28,3 +28,4 @@ export * from "./textScale.enum";
 export * from "./infoCard.enum";
 export * from "./infoFigure.enum";
 export * from "./textSize.enum";
+export * from "./slidingIndicator.enum";

@@ -1,15 +1,25 @@
 // * a navbar link's look: in the desktop row, and in the mobile menu (filled when current)
 export const TOPBAR_LINK_CLASSES = {
-  // * the desktop row's gap; narrower from lg to xl, so five links fit at 1024 px in most languages.
-  // * One line, never squeezed: when it doesn't fit (useNavbarFit) it collapses into the menu
-  DESKTOP_ROW: "hidden shrink-0 gap-1 lg:flex xl:gap-3",
+  // * the desktop row: one line, never squeezed — when it doesn't fit (useNavbarFit) it collapses
+  // * into the menu
+  DESKTOP_ROW: "hidden shrink-0 lg:flex",
+  // * its links over the pill; the gap narrower from lg to xl, so five links fit at 1024 px in most
+  // * languages
+  DESKTOP_LIST: "relative flex gap-1 xl:gap-3",
+  // * one pill behind the highlighted link, sliding to the next (SlidingIndicator)
+  DESKTOP_PILL:
+    "pointer-events-none absolute top-0 left-0 rounded-[var(--radius-sm)] bg-[var(--color-primary-muted)]",
+  DESKTOP_PILL_MOTION: "nav-indicator",
   // * collapsed: out of the flow and unseen, still measured — so it can come back when it fits
   DESKTOP_ROW_COLLAPSED: "lg:invisible lg:absolute",
   // * the menu button and the menu: below lg, and from lg while the links are collapsed
   MENU_ONLY_BELOW_LG: "lg:hidden",
+  // * its colours crossfade with the pill's slide
   DESKTOP:
-    "whitespace-nowrap rounded-[var(--radius-sm)] px-2.5 py-2 text-[length:var(--font-sm)] font-medium transition-colors duration-150 xl:px-4",
-  DESKTOP_ACTIVE: "bg-[var(--color-primary-muted)] font-medium text-[var(--color-primary)]",
+    "nav-indicator-text relative whitespace-nowrap rounded-[var(--radius-sm)] px-2.5 py-2 text-[length:var(--font-sm)] font-medium xl:px-4",
+  DESKTOP_ACTIVE: "text-[var(--color-primary)]",
+  // * the highlight in the server's HTML, until the pill is measured and takes over
+  DESKTOP_ACTIVE_STATIC: "bg-[var(--color-primary-muted)]",
   MOBILE:
     "flex min-h-target w-full items-center rounded-[var(--radius-sm)] px-4 py-3 text-[length:var(--font-sm)] transition-colors duration-150",
   MOBILE_ACTIVE: "bg-[var(--color-primary)] font-medium text-[var(--color-on-primary)]",

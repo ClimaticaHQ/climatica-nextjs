@@ -7,6 +7,11 @@ export const MOTION = {
   // * a SegmentedControl's active pill sliding to the selected option
   CONTROL_SLIDE_MS: 200,
   CONTROL_SLIDE_EASING: "cubic-bezier(0, 0, 0.2, 1)",
+  // * the navbar's pill sliding to the page being opened, its links' colours crossfading with it,
+  // * and the Info sections' bar sliding to the section in view: ease-out, no overshoot
+  NAV_INDICATOR_SLIDE_MS: 220,
+  SECTION_INDICATOR_SLIDE_MS: 200,
+  INDICATOR_SLIDE_EASING: "cubic-bezier(0.2, 0.8, 0.2, 1)",
   // * a chart card crossfading its content when the chart type or layout changes; the new
   // * content rises into place from this offset
   CHART_CROSSFADE_MS: 180,
@@ -77,6 +82,9 @@ export const MOTION_OFF = "off";
 export const MOTION_CSS_VAR = {
   CONTROL_SLIDE: "--motion-control-slide",
   CONTROL_SLIDE_EASING: "--motion-control-slide-easing",
+  NAV_INDICATOR_SLIDE: "--motion-nav-indicator-slide",
+  SECTION_INDICATOR_SLIDE: "--motion-section-indicator-slide",
+  INDICATOR_SLIDE_EASING: "--motion-indicator-slide-easing",
   CHART_CROSSFADE: "--motion-chart-crossfade",
   CHART_CROSSFADE_EASING: "--motion-chart-crossfade-easing",
   CHART_CROSSFADE_OFFSET: "--motion-chart-crossfade-offset",
@@ -106,6 +114,9 @@ const percent = (share: number) => `${share * 100}%`;
 export const MOTION_CSS_VARIABLES: TMotionCssVariables = {
   [MOTION_CSS_VAR.CONTROL_SLIDE]: ms(MOTION.CONTROL_SLIDE_MS),
   [MOTION_CSS_VAR.CONTROL_SLIDE_EASING]: MOTION.CONTROL_SLIDE_EASING,
+  [MOTION_CSS_VAR.NAV_INDICATOR_SLIDE]: ms(MOTION.NAV_INDICATOR_SLIDE_MS),
+  [MOTION_CSS_VAR.SECTION_INDICATOR_SLIDE]: ms(MOTION.SECTION_INDICATOR_SLIDE_MS),
+  [MOTION_CSS_VAR.INDICATOR_SLIDE_EASING]: MOTION.INDICATOR_SLIDE_EASING,
   [MOTION_CSS_VAR.CHART_CROSSFADE]: ms(MOTION.CHART_CROSSFADE_MS),
   [MOTION_CSS_VAR.CHART_CROSSFADE_EASING]: MOTION.CHART_CROSSFADE_EASING,
   [MOTION_CSS_VAR.CHART_CROSSFADE_OFFSET]: px(MOTION.CHART_CROSSFADE_OFFSET_PX),

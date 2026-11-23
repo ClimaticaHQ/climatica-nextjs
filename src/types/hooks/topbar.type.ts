@@ -5,7 +5,10 @@ export type TTopbarLink = {
   key: string;
   href: string;
   label: string;
+  /** the current page (aria-current) */
   isActive: boolean;
+  /** drawn as current: the page being opened, or with none the current one (the navbar's pill) */
+  isHighlighted: boolean;
   /** a page link's own navigation (useNavbarNavigation); absent: a plain link */
   onNavigate?: (event: MouseEvent<HTMLAnchorElement>) => void;
 };

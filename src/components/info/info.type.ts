@@ -55,6 +55,14 @@ export type TInfoNavTreeProps = {
   hasLargeTargets: boolean;
 };
 
+export type TInfoSectionListProps = Pick<
+  TInfoNavTreeProps,
+  "sections" | "activeId" | "onSectionClick"
+> & {
+  /** the tree's section link size (REGULAR or LARGE) */
+  linkSizeClass: string;
+};
+
 export type TInfoContentsBarProps = {
   pageLabel: string;
   sectionLabel: string | null;

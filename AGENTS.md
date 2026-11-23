@@ -146,6 +146,7 @@ Search these first; the code is the reference for their props. In src/components
 - Popover — `UI/Popover` — a trigger and a floating panel.
 - SectionLabel — `UI/SectionLabel` — a small uppercase section title.
 - SidePanel — `UI/SidePanel` — the left panel from lg (the filters, the Info navigation).
+- SlidingIndicator — `UI/SlidingIndicator` — one pill or bar sliding to a list's active item (with useSlidingIndicator).
 - StatCell — `UI/StatCell` — one stat of a stats bar.
 - StatusMessage — `UI/StatusMessage` — a page's empty or error message, or a closable notice.
 - StepSlider — `UI/StepSlider` — a slider over named steps, applied on release (the text size).

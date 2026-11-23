@@ -29,6 +29,7 @@ export { useThemeSync } from "./useThemeSync";
 export { useTextScale } from "./useTextScale";
 export { useTextSizeSync } from "./useTextSizeSync";
 export { useNavbarFit } from "./useNavbarFit";
+export { useSlidingIndicator } from "./useSlidingIndicator";
 export { useTopbarMenu } from "./useTopbarMenu";
 export { useIsTruncated } from "./useIsTruncated";
 export { useIsWrapped } from "./useIsWrapped";

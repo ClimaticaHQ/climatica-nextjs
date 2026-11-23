@@ -11,6 +11,26 @@
   transition-timing-function: var(--motion-control-slide-easing);
 }
 
+/* * The navbar's pill and the Info sections' bar (SlidingIndicator), sliding once placed: a new
+   target mid-slide retargets from where they are. The navbar links' colours crossfade with it */
+.nav-indicator {
+  transition-property: transform, width, height;
+  transition-duration: var(--motion-nav-indicator-slide);
+  transition-timing-function: var(--motion-indicator-slide-easing);
+}
+
+.nav-indicator-text {
+  transition-property: color, background-color;
+  transition-duration: var(--motion-nav-indicator-slide);
+  transition-timing-function: var(--motion-indicator-slide-easing);
+}
+
+.section-indicator {
+  transition-property: transform, height;
+  transition-duration: var(--motion-section-indicator-slide);
+  transition-timing-function: var(--motion-indicator-slide-easing);
+}
+
 /* * SwapButton: the icon turning half a turn on each press */
 .swap-icon-turn {
   transition: transform var(--motion-control-slide) var(--motion-control-slide-easing);
