@@ -33,7 +33,12 @@ export async function fetchTileDataUrl(x: number, y: number, z: number): Promise
   const timeout = setTimeout(() => controller.abort(), HEATMAP_EXPORT_TILE_LIMITS.fetchTimeoutMs);
 
   try {
-    const response = await fetch(buildTileUrl(x, y, z), { signal: controller.signal });
+    // * our origin as the Referer (OSM tile usage policy); the default cache mode, so the live
+    // * map's tiles are reused and no no-cache header is sent
+    const response = await fetch(buildTileUrl(x, y, z), {
+      signal: controller.signal,
+      referrerPolicy: MAP_TILE_CONFIG.referrerPolicy,
+    });
     // OSM signals a tile-usage-policy block via this header on an otherwise-200
     // response whose body is a PNG *of* the block notice, not a non-2xx status —
     // treat it the same as a failed fetch rather than embedding that image.

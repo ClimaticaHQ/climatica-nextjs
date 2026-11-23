@@ -1,4 +1,5 @@
 import type { PathOptions } from "leaflet";
+import { REFERRER_POLICY } from "./referrerPolicy.constant";
 
 // * a selected place's marker on every map: the brand green, a white outline, a soft shadow
 export const MAP_MARKER = {
@@ -15,13 +16,15 @@ export const RASTER_SELECTION_PATH_OPTIONS: PathOptions = {
   weight: 2,
 };
 
-/** Shared base — tile source is identical across every Leaflet map in the app.
+/** The one tile source of every map and the heat map export: change the provider here.
  * No {s} subdomains: OSM deprecated a/b/c and now serves everything from the
  * bare hostname, which also means the export's tile fetches always hit the
- * exact URL the live map already requested (no subdomain to guess/rotate). */
+ * exact URL the live map already requested (no subdomain to guess/rotate).
+ * Every tile request sends our origin as its Referer (OSM tile usage policy). */
 export const MAP_TILE_CONFIG = {
   url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  referrerPolicy: REFERRER_POLICY,
 } as const;
 
 /** LeafletMap.tsx — single-point city view (climate-statistics, compare pages). */

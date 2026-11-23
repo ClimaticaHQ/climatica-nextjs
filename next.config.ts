@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { version } from "./package.json";
+import { REFERRER_POLICY } from "./src/constants/referrerPolicy.constant";
 
 const withNextIntl = createNextIntlPlugin("./src/libs/I18n.ts");
 
@@ -15,6 +16,10 @@ const nextConfig: NextConfig = {
   experimental: {
     webpackMemoryOptimizations: true,
     preloadEntriesOnStart: false,
+  },
+  // * explicit, never the browser's guess: map tiles must carry our origin (OSM tile usage policy)
+  async headers() {
+    return [{ source: "/:path*", headers: [{ key: "Referrer-Policy", value: REFERRER_POLICY }] }];
   },
   logging: {
     incomingRequests: {

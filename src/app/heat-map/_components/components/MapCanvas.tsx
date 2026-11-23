@@ -39,6 +39,7 @@ export function MapCanvas({
           <TileLayer
             attribution={HEATMAP_MAP_CONFIG.attribution}
             url={HEATMAP_MAP_CONFIG.url}
+            referrerPolicy={HEATMAP_MAP_CONFIG.referrerPolicy}
             crossOrigin={true}
           />
 

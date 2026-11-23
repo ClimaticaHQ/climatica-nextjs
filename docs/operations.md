@@ -1,7 +1,7 @@
 # Operations
 
 Running the app locally and keeping an environment current: Docker services, environment
-variables, the Solr city index, npm scripts, CI and deployment.
+variables, the Solr city index, npm scripts, OpenStreetMap's tile policy, CI and deployment.
 
 ## Docker services
 
@@ -94,6 +94,22 @@ deploys; after a change to what an API returns, `docker exec climatica-redis red
 Node's version is [`.nvmrc`](../.nvmrc), read locally and by CI; npm's is `packageManager`. The
 lock must be written by that npm: npm 10's `npm ci` rejects a lock written by npm 11 that omits an
 optional peer dependency.
+
+## OpenStreetMap tile usage policy
+
+Only the browser asks OSM for anything: map tiles on every map and the heat map export's tile
+fetches. The server makes no OSM request (no tiles, no Nominatim), so no User-Agent of ours is
+involved; a future server-side OSM request must send one identifying the app and a contact.
+
+- **One tile source:** `MAP_TILE_CONFIG` ([`map.constant.ts`](../src/constants/map.constant.ts)):
+  URL, attribution, referrer policy. Changing the provider is one edit there.
+- **Referer:** every response sends `Referrer-Policy: strict-origin-when-cross-origin`
+  (`REFERRER_POLICY`, [`referrerPolicy.constant.ts`](../src/constants/referrerPolicy.constant.ts),
+  set in `next.config.ts`); each tile layer and export fetch sets it too, so OSM gets our origin.
+  A proxy in front must not replace it with `no-referrer`.
+- **Caching:** tiles use the browser's default cache; nothing sends `no-cache`.
+- **Attribution:** "© OpenStreetMap" on every map (the mini map's too) and in the heat map export.
+- Guarded by [`osmTiles.e2e.ts`](../tests/e2e/osmTiles.e2e.ts) (tiles answered locally).
 
 ## CI and deployment
 

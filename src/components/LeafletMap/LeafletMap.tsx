@@ -46,6 +46,7 @@ export function LeafletMap({
 
     L.tileLayer(CLIMATE_MAP_CONFIG.url, {
       attribution: CLIMATE_MAP_CONFIG.attribution,
+      referrerPolicy: CLIMATE_MAP_CONFIG.referrerPolicy,
     }).addTo(map);
 
     const marker = L.marker([lat, lng], { icon: MARKER_ICON });

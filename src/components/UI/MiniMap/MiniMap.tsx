@@ -3,6 +3,7 @@
 import type { Map as LMap, Marker as LMarker } from "leaflet";
 import { Card } from "@/components/Card";
 import { SegmentedControl } from "@/components/SegmentedControl";
+import { MAP_TILE_CONFIG } from "@/constants";
 import { ECardPadding, ESegmentedSize } from "@/enums";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -35,7 +36,6 @@ export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
         center: initialCenter,
         zoom: 6,
         zoomControl: false,
-        attributionControl: false,
         scrollWheelZoom: false,
         dragging: false,
         doubleClickZoom: false,
@@ -44,7 +44,10 @@ export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
         touchZoom: false,
       });
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+      L.tileLayer(MAP_TILE_CONFIG.url, {
+        attribution: MAP_TILE_CONFIG.attribution,
+        referrerPolicy: MAP_TILE_CONFIG.referrerPolicy,
+      }).addTo(map);
       mapRef.current = map;
 
       setTimeout(() => map?.invalidateSize(), 0);
