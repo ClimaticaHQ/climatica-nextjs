@@ -24,6 +24,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
+    "preview": "next build && next start -p 3100",
     "solr:schema": "node docker/solr/scripts/apply-schema.mjs",
     "solr:import": "docker cp docker/solr/data/cities.csv climatica-solr:/var/solr/data/cities.csv && docker exec climatica-solr post -c cities -params 'f.names.split=true&f.names.separator=%7C' /var/solr/data/cities.csv",
     "solr:reindex": "npm run solr:schema && npm run solr:import",
@@ -37,6 +38,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
+    "test:e2e:prod": "E2E_SERVER=prod playwright test",
     "test:python": "./.venv/bin/pytest docker/solr/scripts/",
     "type-check": "tsc --noEmit"
   },

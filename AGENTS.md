@@ -37,6 +37,8 @@ diff and asking. Export baselines will be added later as real-browser Playwright
 - `npm run check` — type-check + lint + format:check (`npm run format` writes)
 - `npm run test` — Vitest
 - `npm run test:e2e` — Playwright (needs the Docker services; reuses a running dev server or starts one)
+- `npm run test:e2e:prod` — the same on a fresh production build, port 3100 (first load, hydration, CLS)
+- `npm run preview` — build and serve on 3100
 
 Before reporting a task as done: `npm run check`, `npm run test`, `npm run build`, `npm run test:e2e`.
 

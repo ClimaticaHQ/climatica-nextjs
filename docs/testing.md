@@ -56,6 +56,10 @@ Config: [`playwright.config.ts`](../playwright.config.ts); `tests/e2e/*.e2e.ts`.
 - One Chromium project ("Desktop Chrome", from lg up), one worker, serial.
 - Reuses a dev server on `PORT` or starts one. The Docker services and a real
   `WORLDCLIM_API_KEY` are needed: tests load real data through the proxy.
+- `npm run test:e2e:prod` runs the same suite on a fresh production build (`next build`, then
+  `next start` on 3100, never reused): what dev can't show — layout shift, hydration, prerendered
+  and streamed pages, effects run once. Before a release, or for a first-load change. The dev
+  server on 3000 can keep running. `npm run preview` builds and serves the same way, by hand.
 - Screenshot and trace on failure; 1 retry on CI. Files testing races (navigation, URL state) set
   `retries: 0`, so a flaky pass can't hide a bug.
 
