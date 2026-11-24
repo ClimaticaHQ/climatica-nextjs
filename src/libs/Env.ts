@@ -13,6 +13,10 @@ export const env = createEnv({
     NEXT_PUBLIC_SITE_URL: zod.url().default("https://climatica.gsic.uva.es"),
     // * set by next.config from package.json; empty outside a Next build (unit tests)
     NEXT_PUBLIC_APP_VERSION: zod.string().default(""),
+    NEXT_PUBLIC_GA_ID: zod
+      .string()
+      .regex(/^(G-[A-Z0-9]+)?$/, "Expected a GA4 measurement ID like G-XXXXXXXXXX")
+      .default(""),
   },
   runtimeEnv: {
     PORT: process.env["PORT"],
@@ -22,5 +26,6 @@ export const env = createEnv({
     SOLR_URL: process.env["SOLR_URL"],
     NEXT_PUBLIC_SITE_URL: process.env["NEXT_PUBLIC_SITE_URL"],
     NEXT_PUBLIC_APP_VERSION: process.env["NEXT_PUBLIC_APP_VERSION"],
+    NEXT_PUBLIC_GA_ID: process.env["NEXT_PUBLIC_GA_ID"],
   },
 });
