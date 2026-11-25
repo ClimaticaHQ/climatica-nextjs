@@ -1,3 +1,4 @@
+import { CookieSettingsButton } from "@/components/consent";
 import { COPYRIGHT, FIRST_RELEASE_YEAR, PROPER_NAMES } from "@/constants";
 import { formatCopyrightYears } from "@/utils/info.util";
 import { getTranslations } from "next-intl/server";
@@ -8,10 +9,11 @@ import { INFO_CLASSES as C } from "../info.constant";
  * boundary, so it streams in with the page and is never shown above it first: "© 2025–2026 GSIC-EMIC research group • Universidad de Valladolid" on
  * one line from lg; below lg two centred lines, the "•" gone. A server component: the current
  * year is the server's at render, so it can't differ at hydration. Inside <main> a <footer>
- * isn't a landmark by itself, hence the role.
+ * isn't a landmark by itself, hence the role. Cookie settings under it, with analytics only.
  */
 export async function InfoFooter() {
   const t = await getTranslations("info.footer");
+  const tConsent = await getTranslations("consent");
   const years = formatCopyrightYears({
     firstYear: FIRST_RELEASE_YEAR,
     currentYear: new Date().getFullYear(),
@@ -29,6 +31,9 @@ export async function InfoFooter() {
           </span>
           <span className={C.FOOTER_PART}>{PROPER_NAMES.UNIVERSITY}</span>
         </p>
+        <CookieSettingsButton className={C.FOOTER_COOKIE_SETTINGS}>
+          {tConsent("cookieSettings")}
+        </CookieSettingsButton>
       </footer>
     </div>
   );

@@ -403,7 +403,8 @@
     "sections": {
       "language": "Langue",
       "appearance": "Apparence",
-      "chartsAndFilters": "Graphiques et filtres"
+      "chartsAndFilters": "Graphiques et filtres",
+      "privacy": "Confidentialité"
     },
     "theme": "Thème",
     "themeOptions": {
@@ -447,11 +448,13 @@
       "syncCity": "Une ville choisie sur une page s’ouvre aussi sur les autres pages",
       "syncFilters": "Les filtres choisis sur une page s’appliquent aussi aux autres pages",
       "autoScroll": "Fait défiler jusqu’aux résultats après le choix d’une ville",
-      "chartBarStyle": "Comment les villes ou les périodes se distinguent dans les graphiques superposés"
+      "chartBarStyle": "Comment les villes ou les périodes se distinguent dans les graphiques superposés",
+      "analytics": "Permet à Google Analytics de compter les visites et de voir quelles pages et fonctions sont utilisées. Le désactiver ne change rien au fonctionnement de Climatica."
     },
     "hints": {
       "turnOnAnimations": "Activez les animations pour choisir une mise en évidence"
-    }
+    },
+    "analytics": "Statistiques"
   },
   "info": {
     "externalLink": "(s'ouvre dans un nouvel onglet)",
@@ -568,10 +571,12 @@
         "failed": "Copie impossible. Sélectionnez le texte et copiez-le vous-même."
       },
       "privacy": {
-        "account": "Aucun compte n'est nécessaire, et rien ne vous identifie.",
+        "account": "Aucun compte n'est nécessaire, et Climatica ne vous demande pas qui vous êtes. Si vous acceptez les statistiques, Google Analytics enregistre un identifiant aléatoire dans un cookie pour distinguer les visites répétées.",
         "storage": "Vos paramètres et vos lieux récents restent dans le stockage de ce navigateur, et votre langue dans un cookie. Effacer les données du site les réinitialise.",
         "location": "« Utiliser ma position » ne demande votre position au navigateur que lorsque vous appuyez dessus, et n'envoie que les coordonnées, pour récupérer leurs données.",
-        "tracking": "Climatica n'utilise ni statistiques d'audience, ni publicité, ni pistage."
+        "analytics": "Climatica n'utilise Google Analytics que si vous l'acceptez, pour compter les visites et voir quelles pages et fonctions sont utilisées.",
+        "analyticsData": "Sont recueillis : les pages consultées, le défilement jusqu'en bas d'une page, les clics sur des liens vers d'autres sites, les recherches faites dans l'application, les interactions avec les champs de recherche, les téléchargements de fichiers, la langue que vous utilisez dans Climatica, votre position approximative d'après l'adresse IP, ainsi que le type d'appareil et de navigateur. Google traite ces données.",
+        "analyticsChoice": "Refuser ne change rien au fonctionnement de Climatica. Vous pouvez modifier votre choix à tout moment dans les <settings>Paramètres</settings> ou via <cookies>Paramètres des cookies</cookies>."
       }
     },
     "guide": {
@@ -688,5 +693,13 @@
     "figures": {
       "source": "{place}, normale {period}, grille de {grid} :"
     }
+  },
+  "consent": {
+    "label": "Consentement aux statistiques",
+    "text": "Climatica souhaite utiliser Google Analytics pour compter les visites et voir quelles pages et fonctions sont utilisées. Rien n'est envoyé à Google sans votre accord.",
+    "privacy": "Confidentialité",
+    "accept": "Accepter",
+    "reject": "Refuser",
+    "cookieSettings": "Paramètres des cookies"
   }
 }

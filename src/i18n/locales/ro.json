@@ -403,7 +403,8 @@
     "sections": {
       "language": "Limbă",
       "appearance": "Aspect",
-      "chartsAndFilters": "Grafice și filtre"
+      "chartsAndFilters": "Grafice și filtre",
+      "privacy": "Confidențialitate"
     },
     "theme": "Temă",
     "themeOptions": {
@@ -447,11 +448,13 @@
       "syncCity": "Orașul ales pe o pagină se deschide și pe celelalte pagini",
       "syncFilters": "Filtrele alese pe o pagină se aplică și pe celelalte pagini",
       "autoScroll": "Derulează la rezultate după ce alegi un oraș",
-      "chartBarStyle": "Cum se deosebesc orașele sau perioadele în graficele suprapuse"
+      "chartBarStyle": "Cum se deosebesc orașele sau perioadele în graficele suprapuse",
+      "analytics": "Permite Google Analytics să numere vizitele și să vadă ce pagini și funcții sunt folosite. Dacă o dezactivezi, Climatica funcționează la fel."
     },
     "hints": {
       "turnOnAnimations": "Pornește animațiile ca să alegi o evidențiere"
-    }
+    },
+    "analytics": "Statistici"
   },
   "info": {
     "externalLink": "(se deschide într-o filă nouă)",
@@ -568,10 +571,12 @@
         "failed": "Nu s-a putut copia. Selectează textul și copiază-l manual."
       },
       "privacy": {
-        "account": "Nu ai nevoie de cont și nimic nu te identifică.",
+        "account": "Nu ai nevoie de cont, iar Climatica nu te întreabă cine ești. Dacă accepți statisticile, Google Analytics stochează un identificator aleatoriu într-un cookie, ca să deosebească vizitele repetate.",
         "storage": "Setările tale și locurile recente rămân în spațiul de stocare al acestui browser, iar limba într-un cookie. Ștergerea datelor site-ului le resetează.",
         "location": "„Folosește locația mea” îi cere browserului poziția ta doar când apeși, și trimite doar coordonatele, pentru a obține datele lor.",
-        "tracking": "Climatica nu folosește analiză de trafic, reclame sau urmărire."
+        "analytics": "Climatica folosește Google Analytics doar dacă accepți, pentru a număra vizitele și a vedea ce pagini și funcții sunt folosite.",
+        "analyticsData": "Colectează paginile pe care le vezi, derularea până la finalul unei pagini, clicurile pe linkuri către alte site-uri, căutările făcute în aplicație, interacțiunile cu câmpurile de căutare, descărcările de fișiere, limba pe care o folosești în Climatica, locația ta aproximativă după adresa IP și tipul de dispozitiv și de browser. Google prelucrează aceste date.",
+        "analyticsChoice": "Dacă refuzi, nu se schimbă nimic în funcționarea Climatica. Îți poți schimba alegerea oricând din <settings>Setări</settings> sau din <cookies>Setări cookie</cookies>."
       }
     },
     "guide": {
@@ -688,5 +693,13 @@
     "figures": {
       "source": "{place}, normala {period}, grilă de {grid}:"
     }
+  },
+  "consent": {
+    "label": "Consimțământ pentru statistici",
+    "text": "Climatica ar vrea să folosească Google Analytics pentru a număra vizitele și a vedea ce pagini și funcții sunt folosite. Nimic nu este trimis către Google dacă nu accepți.",
+    "privacy": "Confidențialitate",
+    "accept": "Accept",
+    "reject": "Refuz",
+    "cookieSettings": "Setări cookie"
   }
 }

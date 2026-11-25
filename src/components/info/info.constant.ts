@@ -194,6 +194,8 @@ export const INFO_CLASSES = {
   // * below lg each part is a line of its own; from lg they share one, kept whole, "•" between
   FOOTER_PART: "block lg:inline lg:whitespace-nowrap",
   FOOTER_SEPARATOR: "hidden lg:inline",
+  // * Cookie settings (a link-look Button), on a line of its own
+  FOOTER_COOKIE_SETTINGS: "mt-2 inline-block",
 } as const;
 
 // * the navigation tree: sidebar sizes from lg (pages 17 px, sections 16 px) or the Contents
@@ -272,7 +274,14 @@ export const COPY_FEEDBACK_KEYS = {
 } as const;
 
 // * keys of info.about.privacy
-export const PRIVACY_POINTS = ["account", "storage", "location", "tracking"] as const;
+export const PRIVACY_POINTS = [
+  "account",
+  "storage",
+  "location",
+  "analytics",
+  "analyticsData",
+  "analyticsChoice",
+] as const;
 
 // * keys of info.guide.compare
 export const COMPARE_PAGES = [

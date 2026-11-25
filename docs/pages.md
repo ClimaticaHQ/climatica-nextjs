@@ -66,7 +66,11 @@ no filters, no data requests. Components are in `src/components/info/` by role (
   section in view follows on the client. A page opened on a section's hash lands there once the
   streamed page is in.
 - **Footer:** each page renders `InfoFooter` last, inside its own boundary, so it streams in with
-  the page and never shows above it first.
+  the page and never shows above it first. With analytics, Cookie settings under it.
+- **Privacy:** the analytics lines say what GA collects and how to change the choice; their
+  Settings link and Cookie settings are rich-text tags. Cookie settings is a `Button` in its
+  `LINK` variant (an action in a text link's look), wired by `CookieSettingsButton` for the
+  server-rendered footer ([settings.md](settings.md#analytics-consent)).
 - **Widths, from `lg`:** `PageWrapper` and the shared `PageHeader` as on every page; under the
   header one centred column (`COLUMN`, `--info-column-width`, 64rem) with one left edge. Prose
   (`TEXT`, `LEAD`, `SMALL`, the lists, figure captions, `PROSE` for the questions) keeps

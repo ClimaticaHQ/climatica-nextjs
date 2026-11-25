@@ -403,7 +403,8 @@
     "sections": {
       "language": "Språk",
       "appearance": "Utseende",
-      "chartsAndFilters": "Diagrammer og filtre"
+      "chartsAndFilters": "Diagrammer og filtre",
+      "privacy": "Personvern"
     },
     "theme": "Tema",
     "themeOptions": {
@@ -447,11 +448,13 @@
       "syncCity": "En by du velger på én side, åpnes også på de andre sidene",
       "syncFilters": "Filtre du velger på én side, gjelder også på de andre sidene",
       "autoScroll": "Ruller ned til resultatene når du har valgt en by",
-      "chartBarStyle": "Hvordan byer eller perioder skilles fra hverandre i overlagte diagrammer"
+      "chartBarStyle": "Hvordan byer eller perioder skilles fra hverandre i overlagte diagrammer",
+      "analytics": "Lar Google Analytics telle besøk og se hvilke sider og funksjoner som brukes. Slår du det av, endrer det ingenting i hvordan Climatica fungerer."
     },
     "hints": {
       "turnOnAnimations": "Slå på animasjoner for å velge fremheving"
-    }
+    },
+    "analytics": "Statistikk"
   },
   "info": {
     "externalLink": "(åpnes i en ny fane)",
@@ -568,10 +571,12 @@
         "failed": "Kunne ikke kopiere. Merk teksten og kopier den selv."
       },
       "privacy": {
-        "account": "Du trenger ingen konto, og ingenting identifiserer deg.",
+        "account": "Du trenger ingen konto, og Climatica spør ikke hvem du er. Godtar du statistikk, lagrer Google Analytics en tilfeldig identifikator i en informasjonskapsel for å skille gjentatte besøk fra hverandre.",
         "storage": "Innstillingene og de siste stedene dine blir værende i denne nettleserens lagring, og språket i en informasjonskapsel. Sletter du nettstedsdataene, tilbakestilles de.",
         "location": "«Bruk min posisjon» spør nettleseren om posisjonen din bare når du trykker på den, og sender bare koordinatene, for å hente dataene deres.",
-        "tracking": "Climatica bruker ingen analyse, reklame eller sporing."
+        "analytics": "Climatica bruker Google Analytics bare hvis du godtar det, for å telle besøk og se hvilke sider og funksjoner som brukes.",
+        "analyticsData": "Det registrerer sidene du ser på, rulling til bunnen av en side, klikk på lenker til andre nettsteder, søk i appen, bruk av søkefeltene, nedlastinger av filer, språket du bruker i Climatica, omtrentlig posisjon ut fra IP-adressen og typen enhet og nettleser. Google behandler disse dataene.",
+        "analyticsChoice": "Avviser du, endrer det ingenting i hvordan Climatica fungerer. Du kan når som helst endre valget ditt i <settings>Innstillinger</settings> eller under <cookies>Innstillinger for informasjonskapsler</cookies>."
       }
     },
     "guide": {
@@ -688,5 +693,13 @@
     "figures": {
       "source": "{place}, normalperioden {period}, {grid}-rutenett:"
     }
+  },
+  "consent": {
+    "label": "Samtykke til statistikk",
+    "text": "Climatica vil gjerne bruke Google Analytics til å telle besøk og se hvilke sider og funksjoner som brukes. Ingenting sendes til Google med mindre du godtar.",
+    "privacy": "Personvern",
+    "accept": "Godta",
+    "reject": "Avvis",
+    "cookieSettings": "Innstillinger for informasjonskapsler"
   }
 }

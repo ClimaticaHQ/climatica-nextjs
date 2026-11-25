@@ -1,4 +1,5 @@
 import { createEnv } from "@t3-oss/env-nextjs";
+import { gaIdSchema } from "@/validators/env.validator";
 import { z as zod } from "zod";
 
 export const env = createEnv({
@@ -13,10 +14,8 @@ export const env = createEnv({
     NEXT_PUBLIC_SITE_URL: zod.url().default("https://climatica.gsic.uva.es"),
     // * set by next.config from package.json; empty outside a Next build (unit tests)
     NEXT_PUBLIC_APP_VERSION: zod.string().default(""),
-    NEXT_PUBLIC_GA_ID: zod
-      .string()
-      .regex(/^(G-[A-Z0-9]+)?$/, "Expected a GA4 measurement ID like G-XXXXXXXXXX")
-      .default(""),
+    // * inlined at build time: empty unless `next build` finds it (.env.production)
+    NEXT_PUBLIC_GA_ID: gaIdSchema,
   },
   runtimeEnv: {
     PORT: process.env["PORT"],

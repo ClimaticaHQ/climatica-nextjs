@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { AppearanceSettings } from "./components/AppearanceSettings";
 import { BehaviourSettings } from "./components/BehaviourSettings";
 import { LanguageSettings } from "./components/LanguageSettings";
+import { PrivacySettings } from "./components/PrivacySettings";
 import { SETTINGS_CLASSES as C } from "./Settings.constant";
 import type { TSettingsViewProps } from "./Settings.type";
 
@@ -22,6 +23,7 @@ export function SettingsView({ page }: TSettingsViewProps) {
           <LanguageSettings page={page} />
           <AppearanceSettings page={page} />
           <BehaviourSettings page={page} />
+          {page.analytics.isShown && <PrivacySettings page={page} />}
         </Card>
       }
     />

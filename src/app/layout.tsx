@@ -7,7 +7,6 @@ import {
 import { AppLayout } from "@/layouts";
 import { env } from "@/libs/Env";
 import "@/styles/global.css";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
@@ -50,7 +49,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </NextIntlClientProvider>
         </Providers>
       </body>
-      <GoogleAnalytics gaId="G-XYZ" />
     </html>
   );
 }

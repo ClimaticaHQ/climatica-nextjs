@@ -403,7 +403,8 @@
     "sections": {
       "language": "Language",
       "appearance": "Appearance",
-      "chartsAndFilters": "Charts and filters"
+      "chartsAndFilters": "Charts and filters",
+      "privacy": "Privacy"
     },
     "theme": "Theme",
     "themeOptions": {
@@ -447,11 +448,13 @@
       "syncCity": "A city you pick on one page opens on the other pages too",
       "syncFilters": "Filters you set on one page apply on the other pages too",
       "autoScroll": "Scrolls down to the results after you pick a city",
-      "chartBarStyle": "How cities or periods are told apart in overlaid charts"
+      "chartBarStyle": "How cities or periods are told apart in overlaid charts",
+      "analytics": "Lets Google Analytics count visits and see which pages and features are used. Turning it off changes nothing in how Climatica works."
     },
     "hints": {
       "turnOnAnimations": "Turn on animations to choose a highlight"
-    }
+    },
+    "analytics": "Analytics"
   },
   "info": {
     "externalLink": "(opens in a new tab)",
@@ -568,10 +571,12 @@
         "failed": "Couldn't copy. Select the text and copy it instead."
       },
       "privacy": {
-        "account": "No account is needed, and nothing identifies you.",
+        "account": "No account is needed, and Climatica doesn't ask who you are. If you accept analytics, Google Analytics stores a random identifier in a cookie to tell repeat visits apart.",
         "storage": "Your settings and recent places stay in this browser's storage, and your language in a cookie. Clearing the site's data resets them.",
         "location": "“Use my location” asks your browser for your position only when you press it, and sends only the coordinates, to fetch their data.",
-        "tracking": "Climatica uses no analytics, advertising or tracking."
+        "analytics": "Climatica uses Google Analytics only if you accept, to count visits and see which pages and features are used.",
+        "analyticsData": "It collects the pages you view, scrolling to the end of a page, clicks on links to other sites, searches made in the app, interactions with the search fields, file downloads, the language you use in Climatica, your approximate location from your IP address, and your device and browser type. Google processes these data.",
+        "analyticsChoice": "Rejecting changes nothing in how Climatica works. You can change your choice at any time in <settings>Settings</settings> or with <cookies>Cookie settings</cookies>."
       }
     },
     "guide": {
@@ -688,5 +693,13 @@
     "figures": {
       "source": "{place}, {period} normal, {grid} grid:"
     }
+  },
+  "consent": {
+    "label": "Analytics consent",
+    "text": "Climatica would like to use Google Analytics to count visits and see which pages and features are used. Nothing is sent to Google unless you accept.",
+    "privacy": "Privacy",
+    "accept": "Accept",
+    "reject": "Reject",
+    "cookieSettings": "Cookie settings"
   }
 }

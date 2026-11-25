@@ -12,6 +12,7 @@ What the app remembers about a reader, where, and the settings themselves. URL r
 | `climatica:lastSelectedCity`  | City Climate's and Compare Periods' city                                        | [`persistedLocationStores`](../src/stores/persistedLocationStores.ts)  | the pages, when the URL names no city   |
 | `climatica:compareCityA`, `B` | Compare Cities' cities                                                          | `persistedLocationStores`                                              | Compare Cities, when the URL names none |
 | `climatica:lastPageParams`    | each page's own params, last seen                                               | [`useLastPageParamsSync`](../src/hooks/url/useLastPageParamsSync.ts)   | navbar links, at click time             |
+| `climatica:analyticsConsent`  | the analytics choice, its consent version and time                              | [`analyticsConsentStore`](../src/stores/analyticsConsentStore.ts)      | GA's loader, the banner, Settings       |
 | `NEXT_LOCALE` cookie          | the language                                                                    | [`setLocale`](../src/libs/actions/setLocale.action.ts) (server action) | the server, every request               |
 | memory                        | fetched data, the navigation intent, the inactive dataset's selection, UI state | —                                                                      | —                                       |
 
@@ -90,10 +91,33 @@ Motion runs only while the setting is on and the device doesn't ask for reduced 
 - **Timing:** every duration and easing is in `MOTION`
   ([`motion.constant.ts`](../src/constants/motion.constant.ts)), exposed as `--motion-*`.
 
+## Analytics consent
+
+Only with `NEXT_PUBLIC_GA_ID` set ([operations.md](operations.md#google-analytics-id)); without
+it there's no banner, no Settings row, no Cookie settings and no GA code.
+
+- [`AnalyticsConsent`](../src/components/consent/AnalyticsConsent.tsx), mounted once in
+  `AppLayout`, renders GA (`@next/third-parties`) only once accepted: before that no script and no
+  request to Google. Our defaults are queued before GA's config: ads storage and personalisation
+  denied, no Google signals, no automatic page view. One page view per pathname is ours, with
+  the query and hash stripped ([operations.md](operations.md#google-analytics-id)); the rest is
+  GA4's enhanced measurement, set in the property.
+- Rejecting or withdrawing sets GA's opt-out flag (`ga-disable-<ID>`, a loaded gtag stops) and
+  expires `_ga` / `_ga_*` on the host and every domain above it.
+- The choice ([`useAnalyticsConsent`](../src/hooks/persisted/useAnalyticsConsent.ts)) is stored
+  with `ANALYTICS_CONSENT.VERSION` and its time; a different version or one over 12 months old
+  reads as none, and the banner asks again. Raise the version when what's collected changes.
+- [`ConsentBanner`](../src/components/consent/ConsentBanner.tsx): a labelled region, not a dialog
+  (no focus taken or trapped); fixed, so it shifts nothing; Accept and Reject alike. Below the
+  bottom sheets (a sheet's buttons stay reachable); `<main>` gets its height as end padding
+  (`--consent-banner-height`), so nothing stays under it.
+- Changed later in Settings (Privacy → Analytics), or with Cookie settings (the Info footer and
+  the Privacy section), which reopens the banner (`consentBannerStore`).
+
 ## Settings page
 
 `/settings` ([`useSettingsPage`](../src/hooks/pages/useSettingsPage.ts)) is one `Card`, centred and at
-most 40rem wide: Language, Appearance, Charts and filters, each an h2 (`SettingsGroup`), a hairline
+most 40rem wide: Language, Appearance, Charts and filters, Privacy (with analytics only), each an h2 (`SettingsGroup`), a hairline
 between sections. It writes the store directly, so changes apply at once. Flat: no shadows. Below
 `sm`: 1rem card padding, smaller headings, tighter rows.
 

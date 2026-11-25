@@ -53,9 +53,20 @@ a non-JSON body: each must give the error status and no Redis write
 
 Config: [`playwright.config.ts`](../playwright.config.ts); `tests/e2e/*.e2e.ts`.
 
-- One Chromium project ("Desktop Chrome", from lg up), one worker, serial.
-- Reuses a dev server on `PORT` or starts one. The Docker services and a real
-  `WORLDCLIM_API_KEY` are needed: tests load real data through the proxy.
+- Two Chromium projects ("Desktop Chrome", from lg up), one worker, serial: `chromium` (every
+  file but `analytics.e2e.ts`) and `analytics` (only it).
+- Reuses a dev server on `PORT` or starts one, with `NEXT_PUBLIC_GA_ID` empty. The `analytics`
+  project gets its own `next dev` on 3001, built with a test ID (`E2E_GA_ID`) into
+  `.next-analytics` (`NEXT_DIST_DIR`): the ID is inlined at build time, and a second dev server
+  can't share `.next`. Its tests answer every Google request themselves; no request leaves the
+  machine. The Docker services and a real `WORLDCLIM_API_KEY` are needed: tests load real data
+  through the proxy.
+- **Real gtag.js (opt-in):** the tests tagged `@real-gtag` load gtag.js from Google and capture
+  every hit it would send: one page view per path, no query string, hash or place, English page
+  names in German too. `npm run test:e2e:analytics` runs them (`E2E_REAL_GTAG=1`); the default
+  run and CI skip them (`grepInvert`), and it starts only the analytics server. Run them before
+  a release. Each records its page views in the report (annotation `page_views`). Google's
+  script isn't kept in the repository.
 - `npm run test:e2e:prod` runs the same suite on a fresh production build (`next build`, then
   `next start` on 3100, never reused): what dev can't show — layout shift, hydration, prerendered
   and streamed pages, effects run once. Before a release, or for a first-load change. The dev

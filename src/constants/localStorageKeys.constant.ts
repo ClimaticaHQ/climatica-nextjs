@@ -1,17 +1,12 @@
 export const LOCAL_STORAGE_KEYS = {
   COMPARE_CITY_A: "climatica:compareCityA",
   COMPARE_CITY_B: "climatica:compareCityB",
-
-  // * every user setting, one object (the settings store)
   SETTINGS: "climatica:settings",
-
   LAST_SELECTED_CITY: "climatica:lastSelectedCity",
-  // * each page's own params, last seen — read only by navbar links
   LAST_PAGE_PARAMS: "climatica:lastPageParams",
+  ANALYTICS_CONSENT: "climatica:analyticsConsent",
 } as const;
 
-// * where older versions saved the theme, the newer key first — the settings store reads them
-// * once (migration) and the inline theme script falls back to them until it has
 export const LEGACY_THEME_STORAGE_KEYS = ["climatica:theme", "theme"] as const;
 
 // * what older versions kept in localStorage: filters and the heat map box (the URL holds them

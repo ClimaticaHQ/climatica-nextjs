@@ -29,6 +29,40 @@ Validated at startup in [`src/libs/Env.ts`](../src/libs/Env.ts); copy
 | `PORT`                    | server | `3000`                          | dev port; the server-side axios base URL             |
 | `NEXT_PUBLIC_SITE_URL`    | client | `https://climatica.gsic.uva.es` | absolute URLs: metadata, share links, OG images      |
 | `NEXT_PUBLIC_APP_VERSION` | client | set by `next.config.ts`         | package.json's version (About page); not set by hand |
+| `NEXT_PUBLIC_GA_ID`       | client | empty                           | GA4 measurement ID; empty: no analytics at all       |
+
+`NODE_ENV` isn't set by hand: Next sets it.
+
+### Google Analytics ID
+
+`NEXT_PUBLIC_*` values are inlined into the bundle when `next build` runs, so the ID must be present
+where the build runs: the self-hosted runner. It comes from the committed
+[`.env.production`](../.env.production) (public values only), which `next build` and `next start`
+read and `next dev` doesn't. Keep it out of `.env` and `.example.env`: local dev, the tests and CI
+build without it, so they load no analytics code and show no consent banner or Settings row. A
+value in the shell wins over the file, even an empty one (the e2e servers pass `""`). Consent and
+what loads when: [settings.md](settings.md#analytics-consent).
+
+**Page views: the one event of our own.** gtag sends no automatic page view
+(`send_page_view: false`) and the property's "page changes based on browser history events" is
+off: Climatica's URL changes on every filter, chart mode or place, which would count one page many
+times. [`useGaPageViews`](../src/hooks/ui/useGaPageViews.ts) sends exactly one `page_view` per
+pathname, the first right after consent, and never the same pathname twice in a row
+(`gaPageViewTracker`: Strict Mode, remounts, consent or language changes resend nothing). Before each it sets `page_location` and `page_referrer`
+to origin + path ([`getPageUrl`](../src/utils/analyticsConsent.util.ts)) and `page_title` to the
+page's English name (`GA_PAGE_TITLES`, never `document.title`, which names the place), so
+nothing sent to Google carries a query string, a hash or a place — enhanced-measurement events
+(scrolls, outbound clicks, downloads, form interactions) included. No other custom events.
+
+**English only.** Every value our code sets on GA hits — the page names now, anything added
+later — comes from English constants, never from translated messages, whatever the UI language:
+one name per page in the reports.
+
+**App language.** After consent, the interface's locale code (`en`, `de`, `uk`…) is set as the user
+property `app_language` before the first page view, and again on a language switch
+([`useGaAppLanguage`](../src/hooks/ui/useGaAppLanguage.ts)). Register it in the GA property as a
+custom dimension, user scope, or it won't appear in reports. GA's own Language dimension is the
+browser's language (gtag sends it itself), not the app's.
 
 ## First-time setup
 

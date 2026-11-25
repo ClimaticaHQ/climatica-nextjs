@@ -6,7 +6,7 @@ const require = createRequire(import.meta.url);
 const nextConfig = require("eslint-config-next");
 
 const config = [
-  { ignores: ["dist", "node_modules", "build", "src/_archive"] },
+  { ignores: ["dist", "node_modules", "build", "src/_archive", ".next-analytics"] },
 
   ...nextConfig,
 

@@ -156,13 +156,13 @@ The comparison pages run the same steps per series.
 
 ## State
 
-| Kind                               | Where                                                                                                                          |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Server data                        | TanStack Query                                                                                                                 |
-| Filters and page view state        | the URL ([url-state.md](url-state.md))                                                                                         |
-| Client state that isn't page state | Zustand: `settingsStore`, `lastPageParamsStore`, `navigationIntentStore`, `datasetSelectionStore` ([settings.md](settings.md)) |
-| Persisted cities                   | [`persistedLocationStores`](../src/stores/persistedLocationStores.ts) (`useSyncExternalStore`, not Zustand)                    |
-| UI only (open, hover, drafts)      | `useState`                                                                                                                     |
+| Kind                               | Where                                                                                                                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Server data                        | TanStack Query                                                                                                                                                                 |
+| Filters and page view state        | the URL ([url-state.md](url-state.md))                                                                                                                                         |
+| Client state that isn't page state | Zustand: `settingsStore`, `lastPageParamsStore`, `navigationIntentStore`, `datasetSelectionStore`, `consentBannerStore` ([settings.md](settings.md))                           |
+| Persisted cities, analytics choice | [`persistedLocationStores`](../src/stores/persistedLocationStores.ts), [`analyticsConsentStore`](../src/stores/analyticsConsentStore.ts) (`useSyncExternalStore`, not Zustand) |
+| UI only (open, hover, drafts)      | `useState`                                                                                                                                                                     |
 
 ## Shared UI
 

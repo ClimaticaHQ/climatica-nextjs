@@ -8,6 +8,7 @@ export const SETTINGS_SECTION_IDS = {
   LANGUAGE: "settings-language",
   APPEARANCE: "settings-appearance",
   CHARTS_AND_FILTERS: "settings-charts-and-filters",
+  PRIVACY: "settings-privacy",
 } as const;
 
 export const THEME_OPTIONS = [
@@ -16,7 +17,6 @@ export const THEME_OPTIONS = [
   { value: ETheme.SYSTEM, labelKey: "settings.themeOptions.system", Icon: MonitorIcon },
 ] as const;
 
-// * the text size slider's steps, smallest first
 export const TEXT_SIZE_OPTIONS = [
   {
     value: ETextSize.SMALLER,
@@ -53,7 +53,6 @@ export const UPDATE_HIGHLIGHT_OPTIONS = [
   },
 ] as const;
 
-// * the charts and filters section's switches, in order
 export const BEHAVIOUR_SETTINGS = [
   {
     key: "autoApplyFilters",
@@ -77,7 +76,6 @@ export const BEHAVIOUR_SETTINGS = [
   },
 ] as const;
 
-// * the bar style cards, in BAR_STYLES' order: the default first
 export const BAR_STYLE_OPTIONS = [
   {
     value: "plain",
@@ -96,13 +94,11 @@ export const BAR_STYLE_OPTIONS = [
   },
 ] as const satisfies readonly TBarStyleOption[];
 
-// * a bar style card's thumbnail (px, at the real chart's scale, so its gaps and hatches are the
-// * chart's): three months of three entities' bars, a Tmax and a Tmin curve over them
+// * a bar style card's thumbnail
 export const BAR_STYLE_PREVIEW = {
   WIDTH: 120,
   HEIGHT: 76,
   PLOT: { LEFT: 6, RIGHT: 6, TOP: 8, BOTTOM: 6 },
-  // * per month, each entity's bar: its height (a share of the plot) and whether it's arid
   MONTHS: [
     [
       { height: 0.5, isArid: false },
@@ -120,7 +116,6 @@ export const BAR_STYLE_PREVIEW = {
       { height: 0.56, isArid: false },
     ],
   ],
-  // * each curve at the months' centres: a share of the plot from its top
   CURVES: [
     { variable: "tmax", points: [0.2, 0.08, 0.24] },
     { variable: "tmin", points: [0.52, 0.42, 0.58] },
@@ -135,7 +130,6 @@ export const SETTINGS_ROW_IDS = {
   BAR_STYLE: "settings-chart-bar-style",
 } as const;
 
-// * each row's description id — its control is described by it
 export const SETTINGS_DESCRIPTION_IDS = {
   TEXT_SIZE: "settings-text-size-description",
   UPDATE_HIGHLIGHT: "settings-update-highlight-description",
@@ -148,29 +142,17 @@ export const SETTINGS_DESCRIPTION_IDS = {
 const HAIRLINE =
   "bg-[linear-gradient(var(--color-divider),var(--color-divider))] bg-[length:100%_var(--divider-width)] bg-top bg-no-repeat first:bg-none";
 
-// * a row's least height, whatever its control: a label and a description, or a 44px target in
-// * its track
 const ROW_MIN_HEIGHT = "min-h-[max(3rem,48px)]";
 
-// * flat: one card, no shadows anywhere
+// * flat, one card, no shadows anywhere
 export const SETTINGS_CLASSES = {
-  // * one readable column — a label this far from its control is hard to follow on a wide screen
   CARD: "mx-auto w-full max-w-[40rem] px-4 sm:px-7 sm:py-1",
   SECTION: `${HAIRLINE} py-4 sm:py-5`,
   HEADING:
     "mb-1 text-[length:var(--font-md)] font-semibold text-[var(--color-text)] sm:text-[length:var(--font-reading-card-title)]",
   ROW: `${HAIRLINE} py-2.5 sm:py-3`,
-  // * a switch labels itself across the whole row
   ROW_SELF_LABELLED: `grid ${ROW_MIN_HEIGHT}`,
   ROW_CONTENT: `flex ${ROW_MIN_HEIGHT} justify-between gap-x-4 gap-y-1 sm:gap-y-3`,
-  // * FIT (a wide control): it sits beside the label while both fit at their natural widths (the
-  // * label's basis is its own width), else it goes under it and takes the row's width (it grows;
-  // * beside the label, the label takes the free space). Below `sm` the text block dissolves
-  // * (contents): label and control on one line, the description under both across the row —
-  // * under the control once that has wrapped. The control's line is the label's line height,
-  // * the control centred on it and overflowing it, so it never pushes the description down (its
-  // * 44px target is touch-target's); wrapped, it takes its own height. BESIDE (a narrow control): always on the right of the
-  // * stacked label and description. BELOW: always under them
   PLACEMENT: {
     [ESettingsControlPlacement.FIT]: {
       CONTENT: "flex-wrap items-center *:last:grow",
@@ -178,7 +160,6 @@ export const SETTINGS_CLASSES = {
       LABEL: "max-sm:flex-[1000_1_auto]",
       DESCRIPTION: "max-sm:order-last max-sm:basis-full",
       CONTROL: "*:grow max-sm:flex max-sm:items-center sm:contents",
-      // * measured (useIsWrapped): CSS can't tell a wrapped flex item from one beside
       CONTROL_BESIDE: "max-sm:h-[calc(var(--font-sm)*1.6)]",
       CONTROL_WRAPPED: "max-sm:mt-1",
     },
@@ -203,19 +184,13 @@ export const SETTINGS_CLASSES = {
   },
   TEXT: "flex min-w-0 flex-[1000_1_auto] flex-col gap-0.5",
   LABEL: "text-[length:var(--font-sm)] text-[var(--color-text)]",
-  // * no width of its own (w-0, then the text's): it wraps under the label instead of widening the
-  // * text past the control
   DESCRIPTION: "w-0 min-w-full text-[length:var(--font-xs)] text-[var(--color-text-secondary)]",
   DISABLED_LABEL: "opacity-50",
 } as const;
 
 const BAR_STYLE_NAME = "whitespace-nowrap text-center text-[length:var(--font-xs)]";
 
-// * the bar style cards: from `sm` macOS Appearance-style (the selected thumbnail ringed — an
-// * outline: no shadow); below `sm` iOS-style, a round indicator under each name. The selected
-// * name in primary at every width; below ~22rem the cards shrink
 export const BAR_STYLE_PICKER_CLASSES = {
-  // * equal thirds, each at least as wide as its name on one line (a word is never broken)
   GROUP: "grid grid-cols-[repeat(3,minmax(min-content,1fr))] gap-2",
   CARD: `${FOCUS_RING_CLASS} group flex min-h-target min-w-0 cursor-pointer flex-col items-center gap-1.5 rounded-[var(--radius-sm)] p-1`,
   PREVIEW: "block h-auto w-full",

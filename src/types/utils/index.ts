@@ -22,3 +22,4 @@ export type * from "./textSize.type";
 export type * from "./stepSlider.type";
 export type * from "./segmentedControl.type";
 export type * from "./slidingIndicator.type";
+export type * from "./analyticsConsent.type";

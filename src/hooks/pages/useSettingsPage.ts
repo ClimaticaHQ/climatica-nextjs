@@ -1,5 +1,6 @@
 import { TEXT_SIZE_OPTIONS } from "@/app/settings/_components/Settings.constant";
 import type { TSettingsPage } from "@/app/settings/_components/Settings.type";
+import { useAnalyticsConsent } from "@/hooks/persisted/useAnalyticsConsent";
 import { useMotionPreference } from "@/hooks/ui/useMotionPreference";
 import { useLocaleSwitch } from "@/hooks/url/useLocaleSwitch";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -15,6 +16,7 @@ export function useSettingsPage(): TSettingsPage {
   const state = useSettingsStore();
   // * live: the device's reduced motion can change while the page is open
   const { isReducedMotion, isMotionEnabled } = useMotionPreference();
+  const consent = useAnalyticsConsent();
 
   useDocumentTitle({ pageTitle: t("pages.settings.title"), places: [], details: null });
 
@@ -44,6 +46,11 @@ export function useSettingsPage(): TSettingsPage {
       ),
     },
     textSizeDescription: textSize ? t(textSize.labelKey) : "",
+    analytics: {
+      isShown: consent.isAvailable,
+      isChecked: consent.isGranted,
+      onChange: consent.setGranted,
+    },
     onSettingChange: state.setSetting,
   };
 }

@@ -17,6 +17,8 @@
 
 # next.js
 /.next/
+# the analytics e2e server's build (playwright.config.ts)
+/.next-analytics/
 /out/
 
 # production

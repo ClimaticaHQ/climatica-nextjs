@@ -6,6 +6,9 @@ import { REFERRER_POLICY } from "./src/constants/referrerPolicy.constant";
 const withNextIntl = createNextIntlPlugin("./src/libs/I18n.ts");
 
 const nextConfig: NextConfig = {
+  // * the analytics e2e server (playwright.config.ts) builds apart: a second `next dev` can't
+  // * share .next (its lockfile), and its inlined GA ID mustn't reach the usual build
+  distDir: process.env["NEXT_DIST_DIR"] ?? ".next",
   devIndicators: false,
   poweredByHeader: false,
   // * package.json's version, inlined at build time: importing package.json from app code would

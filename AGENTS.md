@@ -101,7 +101,7 @@ All env vars are validated in `src/libs/Env.ts`. Never read `process.env` or `im
   - The last-page-params store is written only by useLastPageParamsSync and read only by useNavbarNavigation at click time. Pages read the URL, never the store.
 - **State (docs/architecture.md, docs/settings.md)**
   - TanStack Query for server state; the URL for filters and page view state; useState for UI-only state (open, hover, drafts).
-  - Zustand (src/stores/) only for client state that isn't page state: settingsStore (every preference but the language), lastPageParamsStore, navigationIntentStore, datasetSelectionStore (the inactive dataset's selection per scope, written only by useFilterNavigation, read only by useFiltersDraft). Persisted cities use persistedLocationStores.
+  - Zustand (src/stores/) only for client state that isn't page state: settingsStore (every preference but the language), lastPageParamsStore, navigationIntentStore, datasetSelectionStore (the inactive dataset's selection per scope, written only by useFilterNavigation, read only by useFiltersDraft), consentBannerStore (Cookie settings reopening the consent banner). Persisted cities and the analytics choice use createPersistedJsonStore (persistedLocationStores, analyticsConsentStore).
   - Never store derived data in state.
 - **Page pattern (docs/pages.md, docs/charts.md)**
   - A page is a page hook in src/hooks/pages/ (everything that differs between pages), a one-line container calling it, and a view filling PageLayout.

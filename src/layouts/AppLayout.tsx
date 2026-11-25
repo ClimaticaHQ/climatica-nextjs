@@ -1,6 +1,7 @@
 "use client";
 
 import { MotionRoot, NavigationIntentTracker, TextSizeRoot, ThemeRoot, Topbar } from "@/components";
+import { AnalyticsConsent } from "@/components/consent";
 import { FiltersSidebar } from "@/components/filters";
 import { InfoNavigationProvider, InfoSidePanel } from "@/components/info";
 import { SidebarSkeleton, TopbarSkeleton } from "@/components/UI";
@@ -25,7 +26,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </Suspense>
       )}
       {isInfoPage && <InfoSidePanel />}
-      <main className="flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+      {/* * room under the content for the consent banner while it's shown: padding at the end
+          moves nothing, and whatever the banner would cover can be scrolled above it */}
+      <main className="flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+var(--consent-banner-height,0px))] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
         {children}
       </main>
     </div>
@@ -46,6 +49,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* * the Info pages' navigation: around the side panel and <main>, in the page's first
           HTML (outside the page's own boundary, so it streams with the shell) */}
       {isInfoPage ? <InfoNavigationProvider>{row}</InfoNavigationProvider> : row}
+      <AnalyticsConsent />
     </div>
   );
 }

@@ -403,7 +403,8 @@
     "sections": {
       "language": "Idioma",
       "appearance": "Aparência",
-      "chartsAndFilters": "Gráficos e filtros"
+      "chartsAndFilters": "Gráficos e filtros",
+      "privacy": "Privacidade"
     },
     "theme": "Tema",
     "themeOptions": {
@@ -447,11 +448,13 @@
       "syncCity": "A cidade que escolhe numa página abre também nas outras",
       "syncFilters": "Os filtros que escolhe numa página aplicam-se também nas outras",
       "autoScroll": "Desce até aos resultados depois de escolher uma cidade",
-      "chartBarStyle": "Como as cidades ou os períodos se distinguem nos gráficos sobrepostos"
+      "chartBarStyle": "Como as cidades ou os períodos se distinguem nos gráficos sobrepostos",
+      "analytics": "Permite ao Google Analytics contar as visitas e ver que páginas e funcionalidades são usadas. Desativá-lo não muda nada no funcionamento do Climatica."
     },
     "hints": {
       "turnOnAnimations": "Ative as animações para escolher um destaque"
-    }
+    },
+    "analytics": "Estatísticas"
   },
   "info": {
     "externalLink": "(abre num novo separador)",
@@ -568,10 +571,12 @@
         "failed": "Não foi possível copiar. Selecione o texto e copie-o manualmente."
       },
       "privacy": {
-        "account": "Não é preciso conta e nada o identifica.",
+        "account": "Não precisa de conta, e o Climatica não pergunta quem é. Se aceitar as estatísticas, o Google Analytics guarda um identificador aleatório num cookie para distinguir as visitas repetidas.",
         "storage": "As suas definições e locais recentes ficam no armazenamento deste navegador, e o idioma num cookie. Apagar os dados do site repõe-nos.",
         "location": "«Usar a minha localização» pede a sua posição ao navegador apenas quando o prime, e envia só as coordenadas, para obter os respetivos dados.",
-        "tracking": "O Climatica não usa análises, publicidade nem rastreamento."
+        "analytics": "O Climatica usa o Google Analytics apenas se aceitar, para contar as visitas e ver que páginas e funcionalidades são usadas.",
+        "analyticsData": "Recolhe as páginas que vê, o deslocamento até ao fim de uma página, os cliques em ligações para outros sites, as pesquisas feitas na aplicação, as interações com os campos de pesquisa, as transferências de ficheiros, o idioma que usa no Climatica, a sua localização aproximada a partir do endereço IP e o tipo de dispositivo e de navegador. A Google trata estes dados.",
+        "analyticsChoice": "Rejeitar não muda nada no funcionamento do Climatica. Pode mudar a sua escolha a qualquer momento nas <settings>Definições</settings> ou em <cookies>Definições de cookies</cookies>."
       }
     },
     "guide": {
@@ -688,5 +693,13 @@
     "figures": {
       "source": "{place}, normal {period}, grelha de {grid}:"
     }
+  },
+  "consent": {
+    "label": "Consentimento para estatísticas",
+    "text": "O Climatica gostaria de usar o Google Analytics para contar as visitas e ver que páginas e funcionalidades são usadas. Nada é enviado à Google se não aceitar.",
+    "privacy": "Privacidade",
+    "accept": "Aceitar",
+    "reject": "Rejeitar",
+    "cookieSettings": "Definições de cookies"
   }
 }

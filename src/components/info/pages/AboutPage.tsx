@@ -1,5 +1,6 @@
 "use client";
 
+import { CookieSettingsButton } from "@/components/consent";
 import { PageHeader } from "@/components/PageHeader";
 import { StatCard } from "@/components/StatCard";
 import { Badge, Button } from "@/components/UI";
@@ -16,6 +17,7 @@ import { EBadgeSize, EButtonVariant, EStatLabelSize, EStatValueSize } from "@/en
 import { useAboutFacts } from "@/hooks/pages/useAboutFacts";
 import { useNavbarNavigation } from "@/hooks/url";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { HowToCite } from "../parts/HowToCite";
 import {
   DATA_SOURCES,
@@ -39,7 +41,7 @@ export function AboutPage() {
   const { facts, codeFacts } = useAboutFacts();
   const { scrapiAuthor, scrapiAuthorUrl, scrapiDocsUrl, repositoryUrl, changelogUrl } =
     PROJECT_INFO;
-  const { getHref, getPlainHref } = useNavbarNavigation();
+  const { getHref, getPlainHref, settingsHref } = useNavbarNavigation();
 
   return (
     <>
@@ -182,7 +184,19 @@ export function AboutPage() {
         )}
         <InfoSection id={ID.PRIVACY}>
           <InfoList
-            items={PRIVACY_POINTS.map((key) => ({ key, text: t(`info.about.privacy.${key}`) }))}
+            items={PRIVACY_POINTS.map((key) => ({
+              key,
+              text: t.rich(`info.about.privacy.${key}`, {
+                settings: (chunks) => (
+                  <Link href={settingsHref} className={C.LINK}>
+                    {chunks}
+                  </Link>
+                ),
+                cookies: (chunks) => (
+                  <CookieSettingsButton fallback={chunks}>{chunks}</CookieSettingsButton>
+                ),
+              }),
+            }))}
           />
         </InfoSection>
       </div>

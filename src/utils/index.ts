@@ -68,3 +68,4 @@ export * from "./entityLabel.util";
 export * from "./info.util";
 export * from "./infoFigure.util";
 export * from "./axisTicks.util";
+export * from "./analyticsConsent.util";
