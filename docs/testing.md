@@ -67,6 +67,10 @@ Config: [`playwright.config.ts`](../playwright.config.ts); `tests/e2e/*.e2e.ts`.
   run and CI skip them (`grepInvert`), and it starts only the analytics server. Run them before
   a release. Each records its page views in the report (annotation `page_views`). Google's
   script isn't kept in the repository.
+- The dev servers Playwright starts run without Turbopack's file cache (`NEXT_DEV_FILE_CACHE=off`,
+  next.config.ts): it grows across sessions (120 GB seen in `.next/dev/cache/turbopack`), and on
+  a bloated one a long run stalls the server — pages that never hydrate, reloads that never
+  load. A reused dev server keeps its cache: if a run slows down, stop it and delete that folder.
 - `npm run test:e2e:prod` runs the same suite on a fresh production build (`next build`, then
   `next start` on 3100, never reused): what dev can't show — layout shift, hydration, prerendered
   and streamed pages, effects run once. Before a release, or for a first-load change. The dev

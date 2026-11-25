@@ -15,6 +15,8 @@ const baseURL = `http://localhost:${PORT}`;
 const ANALYTICS_PORT = "3001";
 const ANALYTICS_URL = `http://localhost:${ANALYTICS_PORT}`;
 const ANALYTICS_TEST_FILE = "analytics.e2e.ts";
+// * the dev servers started here run without Turbopack's file cache (next.config.ts)
+const E2E_DEV_ENV = { NEXT_DEV_FILE_CACHE: "off" };
 
 // * npm run test:e2e:analytics: the opt-in real-gtag group, on the analytics server only
 const isRealGtagOnly = Boolean(process.env["E2E_REAL_GTAG"]);
@@ -24,7 +26,7 @@ const MAIN_SERVER = {
   reuseExistingServer: !process.env["CI"] && !isProd,
   timeout: isProd ? PROD_SERVER_TIMEOUT_MS : DEV_SERVER_TIMEOUT_MS,
   // * empty, not unset: an empty value wins over .env.production's ID in a production build
-  env: { PORT, NEXT_PUBLIC_GA_ID: "" },
+  env: { PORT, NEXT_PUBLIC_GA_ID: "", ...E2E_DEV_ENV },
 };
 
 export default defineConfig({
@@ -71,6 +73,7 @@ export default defineConfig({
         PORT: ANALYTICS_PORT,
         NEXT_PUBLIC_GA_ID: E2E_GA_ID,
         NEXT_DIST_DIR: ".next-analytics",
+        ...E2E_DEV_ENV,
       },
     },
   ],

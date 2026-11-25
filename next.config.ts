@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
   // react-leaflet 4.x is incompatible with React Strict Mode (double-invokes refs)
   reactStrictMode: false,
   experimental: {
+    // * off for the e2e servers (playwright.config.ts): Turbopack's dev cache grows across
+    // * sessions (120 GB seen) and a long run on a bloated one stalls the server
+    turbopackFileSystemCacheForDev: process.env["NEXT_DEV_FILE_CACHE"] !== "off",
     webpackMemoryOptimizations: true,
     preloadEntriesOnStart: false,
   },
