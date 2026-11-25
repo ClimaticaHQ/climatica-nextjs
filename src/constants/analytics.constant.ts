@@ -44,5 +44,3 @@ export const GA_PAGE_TITLES: Readonly<Record<string, string>> = {
   [ROUTES.ABOUT_DATA]: "Data & methods",
   [ROUTES.SETTINGS]: "Settings",
 };
-
-export const CONSENT_BANNER_HEIGHT_VARIABLE = "--consent-banner-height";

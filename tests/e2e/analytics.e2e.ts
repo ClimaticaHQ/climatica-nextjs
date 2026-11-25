@@ -22,6 +22,18 @@ const LANGUAGE_COOKIE = "NEXT_LOCALE";
 const GERMAN = { accept: "Akzeptieren", about: "Über" };
 const GA_COOKIES = ["_ga", `_ga_${E2E_GA_ID.slice(2)}`];
 
+// * long pages: the document's and the app's scroll container (<main>) must not grow with the banner
+const SCROLL_HEIGHT_PAGES = ["/compare-cities", "/about"];
+const SCROLL_VIEWPORTS = [
+  { name: "a desktop", viewport: { width: 1440, height: 900 }, isMobile: false },
+  { name: "a phone", viewport: { width: 390, height: 844 }, isMobile: true },
+];
+const scrollHeights = (page: Page) =>
+  page.evaluate(() => ({
+    document: document.scrollingElement?.scrollHeight ?? 0,
+    main: document.querySelector("main")?.scrollHeight ?? 0,
+  }));
+
 const banner = (page: Page) => page.getByRole("region", { name: "Analytics consent" });
 const analyticsSwitch = (page: Page) => page.getByRole("checkbox", { name: /^Analytics/ });
 // * the switch's input is visually hidden: its label is what a reader presses
@@ -423,6 +435,28 @@ test.describe("Google Analytics, asked first", () => {
     });
   });
 
+  for (const { name, viewport, isMobile } of SCROLL_VIEWPORTS) {
+    test.describe(`on ${name}`, () => {
+      test.use({ viewport, isMobile, hasTouch: isMobile });
+
+      test("the banner overlays the page: no scroll height of its own", async ({ page }) => {
+        for (const url of SCROLL_HEIGHT_PAGES) {
+          await page.goto(url);
+          await expect(banner(page)).toBeVisible();
+          await settle(page);
+          expect(await banner(page).evaluate((element) => element.parentElement?.tagName)).toBe(
+            "BODY",
+          );
+          const withBanner = await scrollHeights(page);
+          await banner(page).getByRole("button", { name: "Reject" }).click();
+          await expect(banner(page)).toHaveCount(0);
+          expect(await scrollHeights(page)).toEqual(withBanner);
+          await page.evaluate((key) => localStorage.removeItem(key), CONSENT_KEY);
+        }
+      });
+    });
+  }
+
   test.describe("on a 360px phone", () => {
     test.use({ viewport: { width: 360, height: 740 }, hasTouch: true, isMobile: true });
 
@@ -452,12 +486,6 @@ test.describe("Google Analytics, asked first", () => {
       await expect(banner(page)).toBeVisible();
       // * trial: Playwright's hit test, nothing clicked
       await page.getByRole("button", { name: "Contents" }).click({ trial: true });
-      const main = page.locator("main");
-      await main.evaluate((element) => element.scrollTo(0, element.scrollHeight));
-      const footer = page.getByRole("contentinfo");
-      await footer.getByRole("button", { name: "Cookie settings" }).click({ trial: true });
-      const bannerTop = (await banner(page).boundingBox())?.y ?? 0;
-      expect(((await footer.boundingBox())?.y ?? Infinity) + 1).toBeLessThan(bannerTop);
 
       await page.goto(CITY_URL);
       await expect(banner(page)).toBeVisible();

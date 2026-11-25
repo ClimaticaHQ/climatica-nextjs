@@ -108,9 +108,9 @@ it there's no banner, no Settings row, no Cookie settings and no GA code.
   with `ANALYTICS_CONSENT.VERSION` and its time; a different version or one over 12 months old
   reads as none, and the banner asks again. Raise the version when what's collected changes.
 - [`ConsentBanner`](../src/components/consent/ConsentBanner.tsx): a labelled region, not a dialog
-  (no focus taken or trapped); fixed, so it shifts nothing; Accept and Reject alike. Below the
-  bottom sheets (a sheet's buttons stay reachable); `<main>` gets its height as end padding
-  (`--consent-banner-height`), so nothing stays under it.
+  (no focus taken or trapped); Accept and Reject alike. Portalled to `<body>` and fixed, outside
+  the app's scroll container: it overlays the page and changes no layout or scroll height. Above
+  the map, below the bottom sheets (a sheet's buttons stay reachable).
 - Changed later in Settings (Privacy → Analytics), or with Cookie settings (the Info footer and
   the Privacy section), which reopens the banner (`consentBannerStore`).
 

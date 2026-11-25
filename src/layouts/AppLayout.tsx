@@ -23,8 +23,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </Suspense>
       )}
       {isInfoPage && <InfoSidePanel />}
-      {/* end padding for the consent banner: it moves nothing, and anything the banner covers scrolls above it */}
-      <main className="flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+var(--consent-banner-height,0px))] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+      <main className="flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
         {children}
       </main>
     </div>
