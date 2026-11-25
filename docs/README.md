@@ -22,6 +22,7 @@ New to the project: read the first six in order. To run the app first, see
 | [colors.md](colors.md)                       | colour layers, entities by shape, precipitation bars, contrast, dark theme, the tests           |
 | [styles.md](styles.md)                       | typography.css, the rem type scale, text size in charts, what stays in px, breakpoints          |
 | [settings.md](settings.md)                   | what is stored where, the settings store, theme, animations, the settings page                  |
+| [analytics.md](analytics.md)                 | Google Analytics: consent, what is sent, the GA property, the tests                             |
 | [localization-i18n.md](localization-i18n.md) | locales, choosing the locale, key conventions, adding a language                                |
 | [testing.md](testing.md)                     | Vitest, Playwright and pytest conventions                                                       |
 | [operations.md](operations.md)               | Docker, environment, the Solr index, npm scripts, CI and deployment                             |
