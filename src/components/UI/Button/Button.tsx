@@ -12,7 +12,7 @@ export function Button({
   ariaLabel,
   href,
 }: TButtonProps) {
-  const classes = `rounded-[var(--radius-sm)] font-medium transition-colors duration-150 ${getButtonVariantStyles(variant)}${className ? ` ${className}` : ""}`;
+  const classes = `font-medium transition-colors duration-150 ${getButtonVariantStyles(variant)}${className ? ` ${className}` : ""}`;
 
   if (href !== undefined) {
     return (

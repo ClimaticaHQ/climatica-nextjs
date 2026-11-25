@@ -133,7 +133,7 @@ Search these first; the code is the reference for their props. In src/components
 
 - Badge — `UI/Badge` — a non-interactive label in a tint set (Martonne, cell count, year).
 - BottomSheet — `UI/BottomSheet` — a modal sheet from the bottom edge (with useSheetHistory).
-- Button — `UI/Button` — the app's button; with `href`, a link that looks like one.
+- Button — `UI/Button` — the app's button; with `href`, a link that looks like one; `LINK` variant: an action in a text link's look.
 - Chip — `UI/Chip` — every chip: toggle, filter value, all filters.
 - ChipScroller — `UI/ChipScroller` — a row of chips scrolling sideways with faded ends.
 - Collapsible — `UI/Collapsible` — content folding open and shut (rows 0fr → 1fr), inert while shut.
