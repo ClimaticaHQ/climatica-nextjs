@@ -145,8 +145,6 @@ describe("the page title sent to Google", () => {
     expect(getGaPageTitle(pathname)).toBe(title);
   });
 
-  // * the map is English on its own, apart from the messages: it still names each page as
-  // * the English UI does
   it("names every page as its English title does", () => {
     const pages = [
       ...NAV_LINKS.map(({ to, labelKey }) => ({ route: to, labelKey })),

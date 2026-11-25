@@ -6,10 +6,6 @@ import { useChartWidth, usePlotArea } from "recharts";
 import { CHART_UNIT_TITLES } from "./ChartUnitTitles.constant";
 import type { TChartUnitTitlesProps } from "./ChartUnitTitles.type";
 
-/**
- * °C and mm above the plot, placed from the shared plot geometry: °C starts at the left
- * axis, mm ends at the right one — inside the chart at every width, WL and standard alike.
- */
 export function ChartUnitTitles({
   isCompact,
   isNarrow = false,

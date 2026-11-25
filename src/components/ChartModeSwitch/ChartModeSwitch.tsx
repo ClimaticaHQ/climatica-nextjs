@@ -7,7 +7,6 @@ import type { TChartMode } from "@/types";
 import { useTranslations } from "next-intl";
 import type { TChartModeSwitchProps } from "./ChartModeSwitch.type";
 
-/** Walter-Lieth / Standard — writes the `chart` param; the page follows it. */
 export function ChartModeSwitch({ value }: TChartModeSwitchProps) {
   const t = useTranslations();
   const { setChartMode } = useChartModeUrl();

@@ -32,13 +32,6 @@ import { useComparisonExportBlock } from "./useComparisonExportBlock";
 import { useComparisonTable } from "./useComparisonTable";
 import { useYearsExportBlock } from "./useYearsExportBlock";
 
-/**
- * The export menu for compared series — a pair or the weather years: CSV of their stats, PNG /
- * SVG of the chart as shown (chart type, layout, shading, expanded panel or drawn years, chips).
- * The file is titled like the chart and named after the page's place and the exported series;
- * its overlay's bars are always the default bar style (EXPORT_BAR_STYLE), whatever the setting.
- * Disabled while data is replaced.
- */
 export function useComparisonChartExport(args: TUseComparisonChartExportArgs): ExportMenuProps {
   const { model, viewState, features, fileStem, isFetching } = args;
   const t = useTranslations();
@@ -61,10 +54,8 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
 
   const labels = model.series.map(({ series }) => series.label);
   const [labelA = "", labelB = ""] = labels;
-  // * the chart's title: the series' names, or the page's place they all belong to
   const pageNames = rule.titleSource === ESeriesTitleSource.PAGE ? features.title.names : [];
   const titleNames = rule.titleSource === ESeriesTitleSource.PAGE ? pageNames : labels;
-  // * PNG / SVG show the expanded panel, or the drawn years — the file name says which
   const exportedLabels = comparison
     ? getExportedSeriesLabels({ expanded: comparison.expanded, labelA, labelB })
     : drawn.map(({ series }) => series.label);
@@ -114,7 +105,6 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
         statsLabels: {
           ...statsLabels,
           altitude: t("chart.altitude"),
-          // * a weather year's index describes that year alone
           martonne: rule.isSingleYear ? t("chart.martonnePerYear") : t("chart.martonne"),
         },
       },
@@ -145,7 +135,6 @@ export function useComparisonChartExport(args: TUseComparisonChartExportArgs): E
       ...stats.map((entry) => {
         const index = entry?.martonneIndex ?? null;
         if (index === null) return MISSING_VALUE_LABEL;
-        // * a weather year's column gives the index alone
         const value = formatCsvNumber(index, CSV_DECIMALS.MARTONNE);
         return rule.isSingleYear ? value : `${value} (${martonneClass(index)})`;
       }),

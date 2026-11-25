@@ -10,18 +10,15 @@ import { buildTableFrame, buildTableRule } from "./exportTable.util";
 import { buildHatchPatternDefs, buildHatchSwatch } from "./hatchExport.util";
 import { measureExportText } from "./textWrap.util";
 
-/** A row's series marker — its shape in graphite, like the screen table's. */
 export function buildMarker({ shape, color }: TMonthlyTableMarker, x: number, cy: number) {
   const d = getMarkerPath({ shape, cx: x + M.MARKER_SIZE / 2, cy, size: M.MARKER_SIZE });
   return `<path d="${d}" fill="${color}" />`;
 }
 
-/** A row's swatches before its label: the precipitation row's hatch, then the series' shape. */
 const getSwatchesWidth = (row: TMonthlyTableRow) =>
   (row.variable === "prec" && row.marker?.hatch ? M.MARKER_SIZE + M.MARKER_GAP : 0) +
   (row.marker ? M.MARKER_SIZE + M.MARKER_GAP : 0);
 
-/** The label column: as wide as its widest row (swatches and label) needs, never cut. */
 export const getMonthlyTableLabelWidth = (rows: readonly TMonthlyTableRow[]) =>
   Math.max(
     M.LABEL_MIN_WIDTH,
@@ -33,10 +30,6 @@ export const getMonthlyTableLabelWidth = (rows: readonly TMonthlyTableRow[]) =>
     ),
   );
 
-/**
- * A row's label: "Avg Temp (°C)" with the unit in its chart color (temperature red,
- * precipitation blue), then the series — whole: the label column fits it.
- */
 function buildRowLabel({ row, colors }: TExportTableRowLabelArgs) {
   const full = getMonthlyTableRowLabel(row);
   const unitColor = row.variable === "prec" ? colors.wlPrec : colors.wlTemp;
@@ -44,10 +37,6 @@ function buildRowLabel({ row, colors }: TExportTableRowLabelArgs) {
   return `${escapeXml(row.variableLabel)} (<tspan font-weight="${M.UNIT_FONT_WEIGHT}" fill="${unitColor}">${escapeXml(row.unit)}</tspan>)${escapeXml(series)}`;
 }
 
-/**
- * The export's monthly table — the screen table's rows (buildMonthlyTableRows) as SVG: a
- * month header row, then one row per variable and series, labels on the left.
- */
 export function buildMonthlyTableSvg({
   rows,
   monthNames,
@@ -81,7 +70,6 @@ export function buildMonthlyTableSvg({
   const body = rows
     .map((row, r) => {
       const cy = rowMid(r + 1);
-      // * a precipitation row: the series' bar hatch before its shape, as on screen
       const hatch = row.variable === "prec" ? row.marker?.hatch : undefined;
       const hatchX = left + M.LABEL_PADDING_X;
       const markerX = hatch ? hatchX + M.MARKER_SIZE + M.MARKER_GAP : hatchX;

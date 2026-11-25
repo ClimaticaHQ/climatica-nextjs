@@ -11,7 +11,6 @@ const months = (tmin: number, tmax: number, prec: number): TMonthlyTemperature[]
   Array.from({ length: 12 }, (_, i) => ({
     month: i + 1,
     monthName: `M${i + 1}`,
-    // * winter months (Jan, Feb, Dec) 8 °C colder
     tmin: [0, 1, 11].includes(i) ? tmin - 8 : tmin,
     tmax,
     prec,
@@ -52,7 +51,6 @@ describe("buildComparisonTable", () => {
   });
 
   it("counts frost months by the WL rule and badges the Martonne index", () => {
-    // * A: only the three winter months (5 − 8 °C) dip below 0 °C; B: every month
     expect(row("frostMonths")?.a.text).toBe("3");
     expect(row("frostMonths")?.b.text).toBe("12");
     expect(row("martonne")?.a.badge).toBeDefined();
@@ -78,8 +76,6 @@ describe("buildComparisonTable", () => {
   });
 });
 
-// * Bolzano, 1961–1990 vs 1991–2020 at 2.5′: the values shown were 4.9 / 6.0 °C (avg min) and
-// * 37.3 / 36.6 (Martonne), but the differences read +1.0 and −0.6 — taken from the exact values
 describe("differences of the displayed values", () => {
   const flat = (tmin: number, tmax: number, prec: number): TMonthlyTemperature[] =>
     Array.from({ length: 12 }, (_, i) => ({
@@ -135,7 +131,6 @@ describe("differences of the displayed values", () => {
   });
 });
 
-/** The difference a reader would work out from two shown one-decimal values. */
 function formatShownDifference(minuend: number, subtrahend: number) {
   const tenths = Math.round(minuend * 10) - Math.round(subtrahend * 10);
   const sign = tenths > 0 ? "+" : tenths < 0 ? "−" : "±";

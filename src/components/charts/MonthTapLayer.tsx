@@ -4,12 +4,6 @@ import { useEffect, useRef, type PointerEvent } from "react";
 import { MONTH_TAP_LAYER_CLASSES as C } from "./charts.constant";
 import type { TMonthGesture, TMonthTapLayerProps } from "./charts.type";
 
-/**
- * A touch plot's months, over the whole plot: a tap anywhere in a month's column selects it —
- * its tooltip opens — and the selection stays; a second tap on it, or a tap outside the plot,
- * clears it. A horizontal drag scrubs through the months while a vertical one still scrolls the
- * page (pan-y); a plot that scrolls sideways keeps its own drag, and takes taps only.
- */
 export function MonthTapLayer({
   activeMonthIndex,
   onActiveMonthIndexChange,
@@ -21,7 +15,6 @@ export function MonthTapLayer({
   const layerRef = useRef<HTMLDivElement>(null);
   const isSelected = activeMonthIndex !== null;
 
-  // * a tap anywhere outside the plot closes the month (and its tooltip)
   useEffect(() => {
     if (!isSelected) return;
     const handleOutside = (event: globalThis.PointerEvent) => {

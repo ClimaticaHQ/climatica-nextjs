@@ -1,6 +1,5 @@
 import type { TIconProps } from "./svg.type";
 
-/** A box with an arrow leaving it — a link to another site. */
 export function ExternalLinkIcon({ className }: TIconProps) {
   return (
     <svg

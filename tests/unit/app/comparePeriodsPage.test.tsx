@@ -143,7 +143,6 @@ describe("Compare Periods (Weather) through its page hook", () => {
   it("titles the chart by the city and the years, each a single year", () => {
     renderWeather(`${WEATHER}&chart=standard`, YEARS);
     expect(screen.getByRole("heading", { level: 3 }).textContent).toBe("Madrid");
-    // * oldest first, the page's default order
     expect(screen.getByText("Weather 1967, 1990, 2021 · each a single year")).toBeTruthy();
   });
 
@@ -170,8 +169,6 @@ describe("Compare Periods (Weather) through its page hook", () => {
 });
 
 describe("Compare Periods: one order for every list, each entity's marker its own", () => {
-  // * the years added out of order: 2021, then 1967, then 1990
-  // * the series' columns: those headed by a marker (not the metric, not the difference)
   const seriesHeads = () =>
     [...(blocks(EChartBlock.STATS_TABLE)[0]?.querySelectorAll("thead th[scope=col]") ?? [])].filter(
       (cell) => cell.querySelector("[data-series-shape]") !== null,
@@ -211,7 +208,6 @@ describe("Compare Periods: one order for every list, each entity's marker its ow
   it("the corner's toggle flips the whole page; every year keeps its marker", () => {
     renderWeather(OVERLAY, YEARS);
     const before = statsShapes();
-    // * each year's marker from when it was added: 2021 first, 1967 second, 1990 third
     expect(before).toEqual({ "2021": "circle", "1967": "square", "1990": "triangle" });
     const toggle = screen.getByRole("button", { name: "Sort by year, ascending" });
     act(() => fireEvent.click(toggle));
@@ -222,7 +218,6 @@ describe("Compare Periods: one order for every list, each entity's marker its ow
   });
 
   it("a markers param keeps a year's marker after another was removed", () => {
-    // * 1967 removed earlier: 1990 kept its third slot, 2010 took the freed second one
     renderWeather(
       `city=Madrid&lat=40.4168&lng=-3.7038&grid=10m&dataset=weather&periods=2021,1990,2010&markers=2021:0,1990:2,2010:1&chart=standard&layout=overlay`,
       [2021, 1990, 2010],
@@ -236,7 +231,6 @@ describe("Compare Periods: one order for every list, each entity's marker its ow
       { dataA: months(0), dataB: months(2) },
     );
     expect(statsYears()).toEqual(["1970–2000", "1991–2020"]);
-    // * A (1991–2020) keeps A's circle, B its square, whichever comes first
     expect(statsShapes()).toEqual({ "1991–2020": "circle", "1970–2000": "square" });
   });
 });

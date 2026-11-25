@@ -11,12 +11,10 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { CITY, CITY_PAIR, PERIOD_PAIR, weatherYears } from "./chartFixtures";
 import { stubChartEnvironment } from "./chartTestEnv";
 
-// * the chart type switch writes the URL — not under test here
 vi.mock("@/hooks/url/useChartModeUrl", () => ({
   useChartModeUrl: () => ({ chartMode: "standard", setChartMode: vi.fn() }),
 }));
-// * the charts reach the hooks barrel, whose URL hooks import next-intl's navigation — which
-// * can't resolve next/navigation under Vitest; nothing here navigates
+// * next-intl's navigation can't resolve next/navigation under Vitest; nothing here navigates
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
   usePathname: () => "/",
@@ -32,13 +30,11 @@ const noop = () => undefined;
 type TPageFixture = {
   page: string;
   series: readonly TChartSeries[];
-  /** the layouts the page offers; none: one panel */
   layouts: readonly ECompareLayout[];
   viewState?: Partial<TChartViewState>;
   features?: Partial<TChartFeatures>;
 };
 
-// * every chart page's series, as its page hook will build them
 const PAGES: readonly TPageFixture[] = [
   { page: "City Climate", series: [CITY], layouts: [] },
   {
@@ -98,7 +94,6 @@ function renderCard(fixture: TPageFixture, mode: TChartMode, layout?: ECompareLa
   );
 }
 
-/** As a page does: the model derived once from the series, then the card. */
 function CardWithModel({
   series,
   ...props
@@ -129,10 +124,8 @@ describe("chart blocks: added once, under every chart of every page", () => {
       const tables = blocks(container, EChartBlock.VALUES_TABLE);
       const legends = blocks(container, EChartBlock.LEGEND);
 
-      // * side by side: one table per panel; otherwise one chart
       expect(tables).toHaveLength(layout === ECompareLayout.SPLIT ? 2 : 1);
       expect(legends).toHaveLength(1);
-      // * each block drew something, not just its frame
       for (const block of [...tables, ...legends])
         expect(block.childElementCount).toBeGreaterThan(0);
     },

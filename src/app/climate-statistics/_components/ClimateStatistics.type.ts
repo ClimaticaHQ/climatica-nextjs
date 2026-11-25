@@ -14,12 +14,9 @@ export type TClimateStats = {
   totalPrec: string;
 };
 
-/** The stat cards above the chart: the place's values under the month filter. */
 export type TCityStatsSummary = {
   stats: TClimateStats;
-  /** one month picked: the cards name single values ("Max temp", "mm this month") */
   isSingleMonth: boolean;
-  /** "Jan, Feb" under the cards; null without a month filter */
   filteredMonthNames: string | null;
   altitude: number | null;
 };
@@ -40,14 +37,11 @@ export type TCityStatCardsProps = {
 
 export type TComputeClimateStatsArgs = {
   data: readonly TMonthlyTemperature[];
-  /** the month filter — every month when null or empty */
   months: number[] | null;
-  /** the UI's locale — the stats' decimal separator */
   locale: string;
 };
 
 export type TBuildCityStatsSummaryArgs = TComputeClimateStatsArgs & {
   altitude: number | null;
-  /** each month's name, January first */
   monthNames: readonly string[];
 };

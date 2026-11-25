@@ -2,10 +2,7 @@
 
 import { useEffect } from "react";
 
-/**
- * Stops the page scrolling while locked. The scrollbar's width goes to the body's right
- * padding, so nothing shifts when it disappears; the previous inline styles come back after.
- */
+/** the scrollbar's width goes to the body's right padding, so nothing shifts */
 export function useBodyScrollLock(isLocked: boolean) {
   useEffect(() => {
     if (!isLocked) return;

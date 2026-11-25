@@ -98,12 +98,7 @@ describe("SolrService.searchCities", () => {
     expect(results[0].label).toBe("Roma");
   });
 
-  // Regression test: a hardcoded per-language config (Solr's solrconfig.xml "fl"
-  // request-handler default) once stripped label_<lang> for any locale beyond
-  // en/uk/es out of the Solr response entirely, so doc.label_el was always
-  // undefined and this fell through to label_en regardless of lang. This test
-  // proves mapToCity actually reads label_el when the doc has one, not just
-  // that getLabelField *resolves* to the right field name.
+  // regression: solrconfig.xml's fl default once stripped label_<lang> beyond en/uk/es
   it("uses label_el when lang is el and the doc has a distinct Greek label", async () => {
     stubFetch(
       makeSolrResponse([makeSolrDoc({ label_en: "Andorra la Vella", label_el: "Ανδόρρα" })]),

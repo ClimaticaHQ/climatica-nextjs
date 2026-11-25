@@ -45,10 +45,6 @@ type TPageProps = {
   onVisibleChange: (visible: TVisibleSeries) => void;
 };
 
-/**
- * As a page renders the card: the view state rebuilt on every render, its variables a new
- * array each time (the filters are re-parsed on any URL change), as the page hook does.
- */
 function Page({ series, view, onVisibleChange }: TPageProps) {
   const model = useChartModel(series);
   return (

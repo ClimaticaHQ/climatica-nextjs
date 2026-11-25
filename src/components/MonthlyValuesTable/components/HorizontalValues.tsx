@@ -14,11 +14,6 @@ import type { THorizontalValuesProps } from "../MonthlyValuesTable.type";
 import { UnitLabel } from "./UnitLabel";
 import { ValueStack } from "./ValueStack";
 
-/**
- * The table under a plot, in the plot's own geometry: the label column is the plot's left
- * margin, a spacer the right one, and one column per month exactly under that month. Under a
- * scrolling overlay it takes the plot's width and scroll, its labels held like the y axis.
- */
 export function HorizontalValues({
   rows,
   caption,
@@ -32,13 +27,9 @@ export function HorizontalValues({
   const t = useTranslations();
   const scroll = useContext(ChartScrollContext);
   const { isNarrow, textScale } = useContext(ChartDeviceContext);
-  // * the plot's own margins (its axes) — the frame's border given back, so the months line up
-  // * exactly
   const margin = getPlotMargin({ isCompact, isNarrow, textScale }) - MONTHLY_VALUES_BORDER;
   const months = rows[0]?.cells ?? [];
   const fixed = scroll ? C.UNIT_FIXED : "";
-  // * the hovered month: one band from the table's top edge to its bottom, the divider between
-  // * the groups painted in the band's colour
   const cellProps = (i: number, hasDivider: boolean) => ({
     tabIndex: 0,
     className: `${C.VALUE} ${hasDivider ? C.ROW_DIVIDER : ""}`,

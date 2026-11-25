@@ -2,7 +2,6 @@ import { SIDEBAR_PARAMS } from "@/constants";
 import type { TBbox } from "@/types";
 import { getWktBounds } from "./cellCount.util";
 
-/** The heat map box a URL selects, or null unless all four edges are there. */
 export function parseBboxParams(params: URLSearchParams): TBbox | null {
   const north = params.get(SIDEBAR_PARAMS.BBOX_NORTH);
   const south = params.get(SIDEBAR_PARAMS.BBOX_SOUTH);
@@ -12,7 +11,6 @@ export function parseBboxParams(params: URLSearchParams): TBbox | null {
   return { north: Number(north), south: Number(south), west: Number(west), east: Number(east) };
 }
 
-/** The bounds of the heat map region a URL selects: its polygon's box, or its box. */
 export function parseHeatmapBoundsParams(params: URLSearchParams): TBbox | null {
   const polygon = params.get(SIDEBAR_PARAMS.POLYGON);
   return polygon !== null ? getWktBounds(polygon) : parseBboxParams(params);

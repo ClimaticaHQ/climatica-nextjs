@@ -13,11 +13,6 @@ import type {
 import { formatMonthLabel, getExportedPanel } from "@/utils";
 import { useLocale, useTranslations } from "next-intl";
 
-/**
- * The two-series block of a comparison export: the stats table, the pair's Walter-Lieth series
- * and their panels — so the file follows the chart type, layout, shading, expanded panel and
- * chips on screen. Undefined without both series' data.
- */
 export function useComparisonExportBlock({
   model,
   viewState,

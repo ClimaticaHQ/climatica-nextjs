@@ -16,10 +16,6 @@ import type {
   TValueChipProps,
 } from "./Chip.type";
 
-/**
- * A chip: a toggle (filters, years, chart variables), or — in the filter bar — a filter's value
- * or the all-filters chip, each opening a sheet.
- */
 export function Chip(props: TChipProps) {
   if (props.variant === EChipVariant.VALUE) return <ValueChip {...props} />;
   if (props.variant === EChipVariant.ALL_FILTERS) return <AllFiltersChip {...props} />;

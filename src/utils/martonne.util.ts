@@ -22,7 +22,6 @@ function getMartonnClass(idm: number): TMartonnClass {
   return "extremelyHumid";
 }
 
-/** A class's bounds as the tooltip writes them: "<10", "10–20", ">55". */
 function formatClassBounds(martonneClass: (typeof MARTONNE_CLASSES)[TMartonnClass]): string {
   const { BELOW, ABOVE, RANGE } = MARTONNE_SCALE_TEXT;
   const min = "min" in martonneClass ? martonneClass.min : null;
@@ -32,7 +31,6 @@ function formatClassBounds(martonneClass: (typeof MARTONNE_CLASSES)[TMartonnClas
   return `${min}${RANGE}${max}`;
 }
 
-/** Every De Martonne class with its bounds and translated label, in MARTONNE_CLASSES' order. */
 export function formatMartonneScale(translate: TTranslate): string {
   return Object.values(MARTONNE_CLASSES)
     .map(
@@ -41,7 +39,6 @@ export function formatMartonneScale(translate: TTranslate): string {
     .join(MARTONNE_SCALE_TEXT.CLASS_SEPARATOR);
 }
 
-/** The stats bar's tooltip: the locale's sentence about the index, then its classes. */
 export function buildMartonneTooltip(sentence: string, translate: TTranslate): string {
   return `${sentence}${MARTONNE_SCALE_TEXT.LEAD_SEPARATOR}${formatMartonneScale(translate)}`;
 }

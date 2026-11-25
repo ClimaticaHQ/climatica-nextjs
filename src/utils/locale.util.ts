@@ -5,15 +5,10 @@ export function isSupportedLocale(value: string | null | undefined): value is TL
   return LOCALES.some((locale) => locale === value);
 }
 
-/** A supported locale, or the default for anything else. */
 export function parseLocale(value: string | null | undefined): TLocale {
   return isSupportedLocale(value) ? value : DEFAULT_LOCALE;
 }
 
-/**
- * The browser's most preferred supported language from an Accept-Language header: tags by
- * their q weight (ties keep their order), each matched by its language part ("pt-BR" → pt).
- */
 export function matchAcceptLanguage(header: string | null | undefined): TLocale | null {
   if (!header) return null;
   const tags = header
@@ -33,16 +28,11 @@ export function matchAcceptLanguage(header: string | null | undefined): TLocale 
   return null;
 }
 
-/** The request's language: the visitor's cookie, else the browser's, else the default. */
 export function resolveRequestLocale({ cookieLocale, acceptLanguage }: TResolveRequestLocaleArgs) {
   if (isSupportedLocale(cookieLocale)) return cookieLocale;
   return matchAcceptLanguage(acceptLanguage) ?? DEFAULT_LOCALE;
 }
 
-/**
- * The same path without a leading locale segment ("/ro/compare-cities" → "/compare-cities"),
- * or null when it has none — an old link to redirect.
- */
 export function stripLocalePrefix(pathname: string): string | null {
   const [, first, ...rest] = pathname.split("/");
   if (!isSupportedLocale(first)) return null;

@@ -15,7 +15,6 @@ const infoPanel = (page: Page) =>
 const sectionBar = (page: Page) =>
   infoPanel(page).locator('[data-collapsible][data-open="true"] [data-sliding-indicator]');
 
-/** How far the indicator's box is from its item's, the largest side. */
 const offsetFrom = async (indicator: Locator, item: Locator, isVertical = false) => {
   const [a, b] = await Promise.all([indicator.boundingBox(), item.boundingBox()]);
   if (!a || !b) return Infinity;
@@ -24,7 +23,6 @@ const offsetFrom = async (indicator: Locator, item: Locator, isVertical = false)
   return Math.max(...[...vertical, ...horizontal].map(Math.abs));
 };
 
-/** Holds every navigation's page data until the returned function is called. */
 async function holdNavigations(page: Page) {
   let release!: () => void;
   const gate = new Promise<void>((resolve) => (release = resolve));
@@ -107,7 +105,6 @@ test.describe("switching Info pages in the side panel", () => {
   const pageLink = (page: Page, name: string) =>
     infoPanel(page).getByRole("link", { name, exact: true });
   const pagePill = (page: Page) => infoPanel(page).locator("nav > div > [data-sliding-indicator]");
-  // * a page's section list: the fold after its link
   const foldOf = (page: Page, name: string) =>
     infoPanel(page)
       .locator("li")
@@ -132,7 +129,6 @@ test.describe("switching Info pages in the side panel", () => {
     await expect(foldOf(page, "Data & methods")).toHaveAttribute("data-open", "true");
     await expect(foldOf(page, "About")).toHaveAttribute("data-open", "false");
     await expect.poll(() => foldOf(page, "About").evaluate((fold) => fold.clientHeight)).toBe(0);
-    // * shut: out of the tab order and the accessibility tree
     const aboutSection = foldOf(page, "About").locator("a").first();
     await aboutSection.evaluate((link: HTMLElement) => link.focus());
     await expect(aboutSection).not.toBeFocused();

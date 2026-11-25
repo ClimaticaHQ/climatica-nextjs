@@ -5,10 +5,7 @@ import { EButtonVariant } from "@/enums";
 import { useAnalyticsConsent } from "@/hooks/persisted/useAnalyticsConsent";
 import type { TCookieSettingsButtonProps } from "./consent.type";
 
-/**
- * Cookie settings: a link-look Button reopening the consent banner. Only the consent wiring
- * lives here, for the server-rendered Info footer, which can't hand Button an onClick.
- */
+/** only the consent wiring: the server-rendered Info footer can't hand Button an onClick */
 export function CookieSettingsButton({
   children,
   className,

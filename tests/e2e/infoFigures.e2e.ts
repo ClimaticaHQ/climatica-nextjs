@@ -18,16 +18,13 @@ const FIGURES = [
 
 type TBox = { left: number; right: number; top: number; bottom: number };
 
-/** Opens a figure's page, scrolls the figure in and waits for its chart; returns its picture. */
 async function openFigure(page: Page, route: string, section: string) {
   await page.goto(route);
   const figure = page.locator(`${section} figure`).first();
   await figure.scrollIntoViewIfNeeded();
-  // * the picture: hidden from screen readers by itself, its caption carrying it
   const visual = figure.locator("> div").first().locator("> div[aria-hidden=true]");
   await expect(visual.locator("svg.recharts-surface")).toBeVisible();
-  // * measure once the page holds still: on a phone the Contents bar's section label can wrap
-  // * onto a second line as the scroll spy reaches the figure's section, moving what's below
+  // * measure once the page holds still: the Contents bar's label can wrap as the scroll spy moves
   let previous = "";
   await expect
     .poll(
@@ -49,7 +46,6 @@ const boxOf = (locator: Locator) =>
     return { left, right, top, bottom };
   });
 
-/** The month axis: each month's centre (screen px) and a month's width, from the tick labels. */
 async function readMonthAxis(visual: Locator) {
   const centres = await visual
     .locator(".recharts-xAxis-tick-labels .recharts-cartesian-axis-tick-value")
@@ -62,7 +58,6 @@ async function readMonthAxis(visual: Locator) {
   return { centres, width: (centres[1] ?? 0) - (centres[0] ?? 0) };
 }
 
-/** The °C axis (the left one) as a value → screen y map, from its tick labels. */
 async function readTemperatureAxis(visual: Locator) {
   const ticks = await visual
     .locator(".recharts-yAxis-tick-labels")
@@ -82,7 +77,6 @@ async function readTemperatureAxis(visual: Locator) {
   return (value: number) => a.y + ((value - a.value) * (b.y - a.y)) / (b.value - a.value);
 }
 
-/** A leader's end (its line's x2, y2) in screen px. */
 const leaderEnd = (leader: Locator) =>
   leader.locator("line").evaluate((line) => {
     if (!(line instanceof SVGLineElement)) return { x: 0, y: 0 };
@@ -96,7 +90,6 @@ for (const width of [360, 1440])
   for (const textSize of Object.values(ETextSize)) {
     test.describe(`Info figures at ${width}px, ${textSize} text`, () => {
       test.use({ viewport: { width, height: 900 } });
-      // * the numbers and their bands grow with the text: the anchors must hold at every size
       test.beforeEach(async ({ page }) => {
         await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), {
           key: LOCAL_STORAGE_KEYS.SETTINGS,
@@ -114,7 +107,6 @@ for (const width of [360, 1440])
           expect(apiCalls).toEqual([]);
           await expect(visual.locator(FOCUSABLE)).toHaveCount(0);
 
-          // * every number wholly inside the chart, none over another
           const chart = await boxOf(visual.locator("svg.recharts-surface").first());
           const numbers = await visual.locator("[data-annotation-number]").evaluateAll((groups) =>
             groups.map((group) => {
@@ -144,14 +136,12 @@ for (const width of [360, 1440])
           for (const [index, { anchor }] of annotations.entries()) {
             const number = index + 1;
             if (anchor.kind === EFigureAnchor.POINT) {
-              // * the leader ends on the anchor: its month's centre, its value on the °C axis
               const end = await leaderEnd(visual.locator(`[data-annotation-leader="${number}"]`));
               expect(Math.abs(end.x - (months.centres[anchor.month - 1] ?? 0))).toBeLessThanOrEqual(
                 TOLERANCE_PX,
               );
               expect(Math.abs(end.y - yOf(anchor.value))).toBeLessThanOrEqual(TOLERANCE_PX);
             } else if (anchor.kind === EFigureAnchor.SPAN) {
-              // * the brackets cover exactly the span's months, edge to edge
               const brackets = visual.locator(`[data-annotation-bracket="${number}"]`);
               const segments = await brackets.evaluateAll((paths) =>
                 paths.map((path) => {
@@ -178,7 +168,6 @@ for (const width of [360, 1440])
               }
               await expect(visual.locator(`[data-annotation-number="${number}"]`)).toHaveCount(1);
             } else {
-              // * a stats marker sits in its own item's cell
               const marker = visual.locator(`[data-figure-marker="${number}"]`);
               await expect(marker).toBeVisible();
               const label = STATS_LABELS[anchor.item] ?? "";

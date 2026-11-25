@@ -13,20 +13,17 @@ import {
 import type { TCoordinates } from "@/types";
 import { parseLocale } from "./locale.util";
 
-/** Edits a word of this many characters may have in the typo-tolerant clause: 0, 1 or 2. */
 export function getFuzzyEdits(word: string): number {
   const length = [...word].length;
   return SOLR_FUZZY_EDITS.find(({ minLength }) => length >= minLength)?.edits ?? 0;
 }
 
-/** A word as a fuzzy term: escaped, then `~N` when it's long enough to allow edits. */
 export function toFuzzyTerm(word: string): string {
   const escaped = word.replace(SOLR_SPECIAL_CHARACTERS, "\\$&");
   const edits = getFuzzyEdits(word);
   return edits > 0 ? `${escaped}~${edits}` : escaped;
 }
 
-/** The fuzzy clause's text: every word, split on whitespace and hyphens, as a fuzzy term. */
 export function toFuzzyText(text: string): string {
   return text
     .split(SOLR_FUZZY_WORD_SEPARATOR)
@@ -37,13 +34,6 @@ export function toFuzzyText(text: string): string {
 
 const populationBoost = (weight: number) => `product(${weight},${SOLR_POPULATION_LOG})`;
 
-/**
- * The /cities query: two clauses on every search name of a city, either of which may match.
- * An exact/prefix match (whole names, names typed halfway, the reader's label in their locale)
- * scores its relevance plus a tier above any typo match, plus population; a typo-only match
- * (names within one or two edits) scores its closeness plus a smaller population boost. Every
- * ranking rule is sent here, so the handler's defaults don't shape the order.
- */
 export function buildSolrQueryParams(query: string, lang: string): URLSearchParams {
   const text = query.trim();
   const uiLocale = parseLocale(lang);
@@ -76,12 +66,6 @@ export function buildSolrQueryParams(query: string, lang: string): URLSearchPara
   });
 }
 
-/**
- * The nearest-place query: the populated place nearest the point within RADIUS_KM. A box on the
- * coordinate fields narrows the candidates; the distance filter keeps the radius a circle and
- * the sort picks the nearest. None of it is cached: every point is its own filter. A box crossing
- * the antimeridian stops at ±180°, so a place just across it isn't found.
- */
 export function buildNearestPlaceParams({ lat, lng }: TCoordinates): URLSearchParams {
   const { RADIUS_KM, EARTH_RADIUS_KM, KM_PER_DEGREE, MAX_LNG_DELTA, COORDINATE_DECIMALS } =
     SOLR_NEAREST_PLACE;

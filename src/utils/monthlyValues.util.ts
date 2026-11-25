@@ -7,7 +7,6 @@ import type {
 } from "@/types";
 import { formatValue } from "./displayFormat.util";
 
-/** A table value: temperature to one decimal with a real minus, precipitation whole, or "—". */
 export function formatMonthlyValuesValue({
   variable,
   value,
@@ -20,11 +19,6 @@ export function formatMonthlyValuesValue({
   });
 }
 
-/**
- * The monthly values table's two rows — mean temperature and precipitation — with, per month,
- * one entry per series (overlay: A above B), each in the text colour — the series show by shape. The screen
- * and the export draw these rows.
- */
 export function buildMonthlyValuesRows({
   series,
   palette,

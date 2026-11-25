@@ -1,8 +1,6 @@
 import type { TColorScale, TColorStopToken } from "@/types";
 
-// * the heat map's scales: stops at their place (0–1) on the value range, colours from the tokens
 export const COLOR_SCALE_STOPS: Readonly<Record<TColorScale, readonly TColorStopToken[]>> = {
-  // * 9-stop RdYlBu diverging scale: blue (cold) → red (hot)
   temperature: [
     { t: 0, token: "--color-heat-temp-1" },
     { t: 0.125, token: "--color-heat-temp-2" },
@@ -14,7 +12,6 @@ export const COLOR_SCALE_STOPS: Readonly<Record<TColorScale, readonly TColorStop
     { t: 0.875, token: "--color-heat-temp-8" },
     { t: 1, token: "--color-heat-temp-9" },
   ],
-  // * sequential brown scale for precipitation: low = light, high = dark
   precipitation: [
     { t: 0, token: "--color-heat-prec-1" },
     { t: 0.33, token: "--color-heat-prec-2" },

@@ -49,12 +49,7 @@ export const WorldClimService = {
     return response.data;
   },
 
-  /**
-   * SCRAPI returns every climate period's rasters in one response for a point — no period param
-   * to send. Callers narrow to one period (filterPointBindingsByPeriod) or read them all
-   * (extractAvailableClimatePeriods, which tells the periods a place has no data for) from the
-   * same cached fetch.
-   */
+  /** SCRAPI returns every period's rasters for a point at once: no period param to send */
   async getClimateDataForPoint(
     lat: number,
     lng: number,
@@ -123,11 +118,6 @@ export const WorldClimService = {
     return response.data;
   },
 
-  /**
-   * Every cell's monthly values in a region, fetched as strips WorldClim answers in full and
-   * merged. A polygon is read from the strips of the box around it, keeping the cells whose
-   * centroid lies inside — the same cells as WorldClim's polygon query.
-   */
   async getRegionPixelValues({
     area,
     gridSize,
@@ -158,7 +148,6 @@ export const WorldClimService = {
     };
   },
 
-  /** The region's monthly averages, one binding per variable: WorldClim averages the cells. */
   async getRegionAverages({
     area,
     gridSize,

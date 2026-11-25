@@ -18,8 +18,6 @@ function buildHeader(payload: THeatmapExportPayload, colors: TExportChartColors)
   `;
 }
 
-/** One bordered row of stat blocks — the export counterpart to StatsLegendBar.tsx's
- * min/max/avg/median/stdDev/cells grid. */
 function buildStatsRow(payload: THeatmapExportPayload, colors: TExportChartColors): string {
   const tableWidth = L.width - L.paddingX * 2;
   const colWidth = tableWidth / payload.stats.length;

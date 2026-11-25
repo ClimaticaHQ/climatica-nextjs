@@ -96,7 +96,6 @@ describe("update flash", () => {
   });
 
   it("never fires for a chart type or layout switch after the update's commit", () => {
-    // * the switch mounts new cards once the provider has consumed the update
     expect(shouldFlash({ update, isFresh: false, handledId: null, keys: ["b"] })).toBe(false);
   });
 

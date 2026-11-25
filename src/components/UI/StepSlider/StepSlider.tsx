@@ -5,11 +5,6 @@ import { useStepSlider } from "./hooks/useStepSlider";
 import { STEP_SLIDER, STEP_SLIDER_CLASSES as C } from "./StepSlider.constant";
 import type { TStepFillStyle, TStepSliderProps } from "./StepSlider.type";
 
-/**
- * A stepped slider, like the system text size controls: a small and a large "A" around a track
- * with a dot per step. A native range input, so it takes the keyboard and screen readers hear the
- * step's name (aria-valuetext).
- */
 export function StepSlider<TValue extends string>({
   label,
   steps,

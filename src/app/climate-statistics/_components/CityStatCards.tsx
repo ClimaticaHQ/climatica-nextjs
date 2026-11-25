@@ -6,10 +6,6 @@ import { useTranslations } from "next-intl";
 import { CITY_STAT_CARDS_CLASSES as C, STAT_CARD_FLASH_KEYS } from "./ClimateStatistics.constant";
 import type { TCityStatCardsProps } from "./ClimateStatistics.type";
 
-/**
- * The place's values for the month filter, above its chart. While they load, the same cards
- * with placeholders for the values, so nothing moves when they land.
- */
 export function CityStatCards({ state, summary }: TCityStatCardsProps) {
   const t = useTranslations();
   const isLoading = state.status === EDataStatus.LOADING;

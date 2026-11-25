@@ -11,11 +11,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-/**
- * Rasterizes an SVG string via Image → canvas.drawImage → toBlob — no dom-to-image-more,
- * no live DOM traversal. The PNG is pixel-derived from the exact same SVG document
- * buildExportSvg() produced, so PNG and SVG can never visually diverge.
- */
+/** the PNG is rasterized from the same SVG document, so PNG and SVG can't diverge */
 export async function svgToPng(params: TSvgToPngParams): Promise<void> {
   const { svg, width, height, filename } = params;
   const scale = params.scale ?? 2;

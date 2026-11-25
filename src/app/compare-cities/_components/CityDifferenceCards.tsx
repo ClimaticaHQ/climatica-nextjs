@@ -8,7 +8,6 @@ import type { TDiffStats, TValuePair } from "@/types";
 import { displayDifference } from "@/utils/displayFormat.util";
 import type { TCityDifferenceCardsProps } from "./CompareCities.type";
 
-/** Under the chart: the warmer and the wetter city, and both cities' hottest and coldest month. */
 export function CityDifferenceCards({ differences }: TCityDifferenceCardsProps) {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();

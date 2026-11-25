@@ -40,3 +40,4 @@ export { useGridArcLabel } from "./useGridArcLabel";
 export { useHeightVariable } from "./useHeightVariable";
 export { useGaPageViews } from "./useGaPageViews";
 export { useGaAppLanguage } from "./useGaAppLanguage";
+export { useLandOnHashSection } from "./useLandOnHashSection";

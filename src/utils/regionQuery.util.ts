@@ -16,12 +16,7 @@ import type {
 import { countCellsInBounds, getCellIndexRange } from "./cellCount.util";
 import { buildGridIri, buildRasterIri, buildVariableIris, iriToCellBounds } from "./worldclim.util";
 
-/**
- * A region's bounds as latitude strips WorldClim answers in full (at most WORLDCLIM_MAX_ROWS
- * rows each). Inner strip edges are grid lines, half a cell from any centroid, so every cell
- * falls in exactly one strip. A region too wide for even one row of cells per strip is also
- * split by longitude, on grid lines too.
- */
+/** strips WorldClim answers in full: at most WORLDCLIM_MAX_ROWS rows each */
 export function splitRegionIntoStrips({ bounds, gridSize, rowsPerCell }: TSplitRegionArgs) {
   const size = GRID_DELTA[gridSize] ?? GRID_DELTA["10m"];
   const { firstRow, lastRow, firstCol, lastCol } = getCellIndexRange(bounds, gridSize);
@@ -49,20 +44,15 @@ export function splitRegionIntoStrips({ bounds, gridSize, rowsPerCell }: TSplitR
   return strips;
 }
 
-/** Rows WorldClim returns per cell for these variables: one per month and variable. */
 export function getRowsPerCell(variables: readonly TVariable[]) {
   return MONTHS_IN_YEAR * variables.length;
 }
 
-/** The strip's `limit`: every row its cells return — never more than WORLDCLIM_MAX_ROWS. */
 export function getStripRowLimit(strip: TBbox, gridSize: TCellSize, rowsPerCell: number) {
   return countCellsInBounds(strip, gridSize) * rowsPerCell;
 }
 
-/**
- * The query params naming the grid, variables and rasters. A climate query names the selected
- * period's rasters: otherwise every normals period comes back, five times the rows.
- */
+/** a climate query names the selected period's rasters, or every normals period comes back (five times the rows) */
 export function buildRegionQueryParams(
   gridSize: TCellSize,
   variables: readonly TVariable[],
@@ -78,7 +68,6 @@ export function buildRegionQueryParams(
     : { ...common, isWeather: true, year: dataset.year };
 }
 
-/** The strips' rows as one list; a row two strips both returned is kept once. */
 export function mergeStripBindings(strips: readonly (readonly TRawPixelValueBinding[])[]) {
   const rows = new Map<string, TRawPixelValueBinding>();
   for (const binding of strips.flat()) {
@@ -87,7 +76,6 @@ export function mergeStripBindings(strips: readonly (readonly TRawPixelValueBind
   return [...rows.values()];
 }
 
-/** Ray casting over [lat, lng] vertices. */
 export function isPointInPolygon([lat, lng]: [number, number], polygon: TPolygon) {
   let isInside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -100,10 +88,7 @@ export function isPointInPolygon([lat, lng]: [number, number], polygon: TPolygon
   return isInside;
 }
 
-/**
- * The rows of cells whose centroid lies in the polygon — what WorldClim's polygon query
- * selects, read here from strips of the box around it.
- */
+/** what WorldClim's polygon query selects, read from strips of the box around it */
 export function keepCellsInPolygon(
   bindings: readonly TRawPixelValueBinding[],
   polygon: TPolygon,

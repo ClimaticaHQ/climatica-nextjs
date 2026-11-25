@@ -4,10 +4,6 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { applyTextSize } from "@/utils/textSize.util";
 import { useEffect } from "react";
 
-/**
- * Keeps <html>'s --text-scale matching the text size setting. The inline head script set it
- * before the first paint.
- */
 export function useTextSizeSync() {
   const textSize = useSettingsStore((state) => state.textSize);
   const hasHydrated = useSettingsStore((state) => state.hasHydrated);

@@ -1,10 +1,7 @@
 import { env } from "@/libs/Env";
 import type { TUpstreamResult } from "@/types";
 
-/**
- * Calls the WorldClim API with the server-side key. An error status, a network failure
- * or a body that isn't JSON all come back as a failure, so a route never passes them on as data.
- */
+/** an error status, a network failure or a non-JSON body all come back as a failure, never as data */
 export async function fetchWorldClimJson(url: string): Promise<TUpstreamResult> {
   try {
     const response = await fetch(url, {

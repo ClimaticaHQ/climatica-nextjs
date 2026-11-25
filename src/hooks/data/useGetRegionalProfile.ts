@@ -38,7 +38,6 @@ export function useGetRegionalProfile({
   return {
     profileData: data ?? null,
     isProfileLoading: hasSelection && isEnabled && isLoading,
-    // * a failed request is an error, never a profile — the panel isn't drawn from it
     profileError: error ?? null,
   };
 }

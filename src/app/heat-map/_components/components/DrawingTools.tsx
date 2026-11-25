@@ -24,10 +24,6 @@ import type {
 
 const CLOSE_PX = 14;
 
-/**
- * The cells the shape being drawn would load at the current resolution — for a polygon, its
- * whole box, which is what's read — turning into a warning past the cap.
- */
 function DrawingCellCount({ vertices, gridSize }: TDrawingCellCountProps) {
   return (
     <Tooltip permanent direction="top" className={DRAWING_CELL_COUNT_TOOLTIP_CLASS}>

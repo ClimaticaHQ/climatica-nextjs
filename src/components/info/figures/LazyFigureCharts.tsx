@@ -3,8 +3,7 @@
 import dynamic from "next/dynamic";
 import { IndicatorsFigureSkeleton, WalterLiethFigureSkeleton } from "./FigureFrames";
 
-// * the figures' charts load client-side only (Recharts measures the page), their skeleton in
-// * place meanwhile — on the server too. One module: both figures share its chunk
+// * client-side only: Recharts measures the page
 export const LazyWalterLiethFigureChart = dynamic(
   () => import("./FigureCharts").then(({ WalterLiethFigureChart }) => WalterLiethFigureChart),
   { ssr: false, loading: () => <WalterLiethFigureSkeleton /> },

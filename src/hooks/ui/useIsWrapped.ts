@@ -2,12 +2,6 @@
 
 import { useLayoutEffect, useState } from "react";
 
-/**
- * Whether an item of a wrapping flex row has gone to a line below its first item, kept current as
- * the row resizes. Callback refs for the row and the item; the first item is the row's first
- * element child laid out (its box, or its first child's under `display: contents`). The answer
- * comes from widths alone, so styling the item by it never changes it.
- */
 export function useIsWrapped<TRow extends HTMLElement, TItem extends HTMLElement>() {
   const [row, setRow] = useState<TRow | null>(null);
   const [item, setItem] = useState<TItem | null>(null);

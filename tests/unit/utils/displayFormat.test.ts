@@ -147,7 +147,6 @@ describe("formatDifference", () => {
   });
 
   it("signs negative values and crossings of zero with a real minus", () => {
-    // * −3.6 and −1.3 shown
     expect(difference(-3.64, -1.26)).toBe(`${MINUS}2.3`);
     expect(difference(0.04, -0.06)).toBe("+0.1");
     // * −5.55 is stored just above −5.55, so it shows as −5,5

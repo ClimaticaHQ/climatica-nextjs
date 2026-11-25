@@ -20,7 +20,6 @@ import {
 const PREC_AXIS_STEP_MM = 10;
 const DEFAULT_PREC_AXIS_MAX_MM = 100;
 
-/** The Walter-Lieth identity (A green, B orange) of a series; anything but "B" draws as A. */
 export function toWalterLiethSeriesId(id: string): EWalterLiethSeriesId {
   return id === EWalterLiethSeriesId.B ? EWalterLiethSeriesId.B : EWalterLiethSeriesId.A;
 }
@@ -50,7 +49,6 @@ function deriveSeries(series: TChartSeries): TChartSeriesModel {
   };
 }
 
-/** The precipitation axis' top: the wettest month rounded up to 10 mm, 100 mm without data. */
 function getPrecipitationAxisMax(series: readonly TChartSeries[]) {
   const values = series.flatMap(({ data }) => data.map(({ prec }) => prec));
   const present = values.filter((value): value is number => value !== null);
@@ -58,7 +56,6 @@ function getPrecipitationAxisMax(series: readonly TChartSeries[]) {
   return Math.ceil(max / PREC_AXIS_STEP_MM) * PREC_AXIS_STEP_MM || DEFAULT_PREC_AXIS_MAX_MM;
 }
 
-/** Everything a chart draws, derived from its series. Pure: no React, no translations. */
 export function deriveChartModel(series: readonly TChartSeries[]): TChartModel {
   const derived = series.map(deriveSeries);
   const rows = series.flatMap(({ data }) => data);
@@ -72,10 +69,6 @@ export function deriveChartModel(series: readonly TChartSeries[]): TChartModel {
   };
 }
 
-/**
- * The split's two series: the page's pair (side pickers), or the first two. A picked series
- * that's gone (a removed year) falls back to the first two.
- */
 export function getSplitPair(model: TChartModel, viewState: TChartViewState): TSplitPair | null {
   const find = (id: string | undefined) => model.series.find(({ series }) => series.id === id);
   const picked = viewState.pair?.value;
@@ -86,7 +79,6 @@ export function getSplitPair(model: TChartModel, viewState: TChartViewState): TS
   return { ids: [a.series.id, b.series.id], entries: [a, b] };
 }
 
-/** The overlay's drawn series: those the page shows (series chips), else every one. */
 export function getDrawnSeries(model: TChartModel, viewState: TChartViewState) {
   const shown = viewState.shown?.value;
   return shown === undefined

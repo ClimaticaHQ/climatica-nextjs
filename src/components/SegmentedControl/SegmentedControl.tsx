@@ -6,13 +6,6 @@ import { SEGMENTED_CONTROL_CLASSES as C } from "./SegmentedControl.constant";
 import type { TSegmentedControlProps, TSegmentedRoomStyle } from "./SegmentedControl.type";
 import { useSegmentLayout } from "./hooks/useSegmentLayout";
 
-/**
- * A pill track of mutually exclusive options (icon + label; icon only below `sm` on request, or
- * one option per line below `sm` when a label doesn't fit inline, or labels cut to the room on
- * request). Each
- * option is a native toggle button, so Tab / Enter / Space work and aria-pressed reports it.
- * The active pill slides to the selected option.
- */
 export function SegmentedControl<TValue extends string>({
   label,
   options,

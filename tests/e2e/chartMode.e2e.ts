@@ -17,7 +17,6 @@ const DESKTOP = { width: 1440, height: 900 };
 // * px — sub-pixel text edges; the shapes' ink must stay inside the axis column
 const FIT_TOLERANCE_PX = 0.5;
 const CENTRE_TOLERANCE_PX = 2;
-// * five years fit (with the sidebar) from 1121 px in plain (its gap adapts), 1145 px in shades
 const DESKTOPS = [
   { viewport: { width: 1280, height: 900 }, barStyle: "plain" },
   { viewport: { width: 1280, height: 900 }, barStyle: "shades" },
@@ -25,17 +24,14 @@ const DESKTOPS = [
   { viewport: { width: 1920, height: 1000 }, barStyle: "plain" },
 ] as const;
 const HOVERED_MONTH = 5;
-// * the plot's left margin: the °C axis' own width (WALTER_LIETH_AXIS.WIDTH)
 const AXIS_WIDTH = WALTER_LIETH_AXIS.WIDTH;
 const OVERLAY_URLS = {
   "climate periods": `${PERIODS_URL}&layout=overlay&chart=standard`,
   "five weather years": FIVE_YEARS_URL,
   cities: `${CITIES_URL}&chart=standard&layout=overlay`,
 };
-// * each page's values-table row headers (the °C row): markers only, each named in full
 const OVERLAY_HEADERS = {
   "climate periods": ["1970–2000", "1991–2020"],
-  // * Compare Periods lists its years oldest first
   "five weather years": ["1967", "1990", "2000", "2010", "2021"],
   cities: ["Paris", "Oslo"],
 };
@@ -44,7 +40,6 @@ const walterLiethFigures = (page: Page) =>
   page.locator('figure[aria-label^="Walter-Lieth diagram,"]');
 const chartTypeButton = (page: Page, name: string) =>
   page.getByRole("group", { name: "Chart type" }).getByRole("button", { name });
-// * CSS colours ("var(--…)") as the page resolves them
 const resolveColors = (page: Page, colors: readonly string[]) =>
   page.evaluate(
     (values) =>
@@ -58,8 +53,6 @@ const resolveColors = (page: Page, colors: readonly string[]) =>
       }),
     colors,
   );
-// * the bars' semantic fills (humid, arid), as the page resolves them
-// * a bar style, saved before the app loads
 const saveBarStyle = (page: Page, barStyle: TBarStyle) =>
   page.addInitScript(
     ({ key, value }) => {
@@ -70,11 +63,8 @@ const saveBarStyle = (page: Page, barStyle: TBarStyle) =>
     },
     { key: LOCAL_STORAGE_KEYS.SETTINGS, value: barStyle },
   );
-// * the hatch style: these tests tell the bars apart by hatch
 const saveHatchStyle = (page: Page) => saveBarStyle(page, "hatch");
 const aridityFills = (page: Page) => resolveColors(page, [PRECIP_BAR.HUMID, PRECIP_BAR.ARID]);
-// * each bar series' fills and its hatch (the pattern's suffix; solid: none drawn), by its first
-// * bar's x; and whether anything is drawn above its bars
 const barLayers = (page: Page) =>
   page.locator(".recharts-bar").evaluateAll((layers) =>
     layers
@@ -98,7 +88,6 @@ const hasBarMarkers = async (page: Page) =>
 const barFills = async (page: Page) => [
   ...new Set((await barLayers(page)).flatMap(({ fills }) => fills)),
 ];
-// * every fill is humid or arid: never an entity's colour
 const expectAridityFills = async (page: Page) => {
   const allowed = await aridityFills(page);
   expect((await barFills(page)).every((fill) => allowed.includes(fill))).toBe(true);
@@ -118,7 +107,6 @@ test.describe("Walter-Lieth with Weather data (a single year)", () => {
     );
     await expect(figure.getByText("Arid months")).toBeVisible();
     await expect(figure.getByText("Martonne (M) · 2024")).toBeVisible();
-    // * drawn as Walter-Lieth, so variables and months follow its rule
     await expect(
       page.locator("aside").getByRole("button", { name: "Jan", exact: true }),
     ).toBeDisabled();
@@ -136,7 +124,6 @@ test.describe("Walter-Lieth with Weather data (a single year)", () => {
   test("Compare Cities draws a diagram per city", async ({ page }) => {
     await page.goto(`${CITIES_URL}&dataset=weather`);
     await expect(walterLiethFigures(page)).toHaveCount(2, { timeout: 30_000 });
-    // * the comparison table's Martonne row says which year it describes
     await expect(page.getByRole("rowheader", { name: "Martonne (M) · 2024" })).toBeVisible();
   });
 
@@ -183,13 +170,11 @@ test.describe("Compare Periods: which two weather years are drawn", () => {
     await expect.poll(() => yearsShown(page)).toEqual(["2021", "1967"]);
 
     await page.getByTestId("year-b-select").click();
-    // * A's year can't be picked for B
     await expect(page.getByTestId("year-b-option-2021")).toBeDisabled();
     await page.getByTestId("year-b-option-1990").click();
     await expect(page).toHaveURL(/pair=2021%2C1990/);
     await expect.poll(() => yearsShown(page)).toEqual(["2021", "1990"]);
 
-    // * on Weather the page shows the years editor, so this is the diagrams' swap
     await page.getByRole("button", { name: "Swap periods" }).click();
     await expect(page).toHaveURL(/pair=1990%2C2021/);
     await expect.poll(() => yearsShown(page)).toEqual(["1990", "2021"]);
@@ -222,7 +207,6 @@ test.describe("Compare Periods: which two weather years are drawn", () => {
 
     await page.getByRole("button", { name: "Remove 1990" }).click();
     await expect(page).not.toHaveURL(/periods=[^&]*1990/);
-    // * 2021 stays; B falls back to 1967 — the default pair now, so the param goes
     await expect.poll(() => yearsShown(page)).toEqual(["2021", "1967"]);
     await expect(page).not.toHaveURL(/wlYears=|pair=/);
   });
@@ -251,9 +235,7 @@ test.describe("Compare Periods: weather years overlaid", () => {
       .getByRole("button", { name: "Overlay" })
       .click();
     await expect(page).toHaveURL(/layout=overlay/);
-    // * one diagram: the side-by-side pair, not all five — the readable default
     await expect(walterLiethFigures(page)).toHaveCount(1);
-    // * the pair (the first two added), drawn oldest first
     await expect(walterLiethFigures(page)).toHaveAttribute("aria-label", /1967.*2021/);
     await expect(walterLiethFigures(page)).not.toHaveAttribute("aria-label", /1990/);
     await expectShown(page, ["2021", "1967"], ["1990"]);
@@ -273,7 +255,6 @@ test.describe("Compare Periods: weather years overlaid", () => {
     // * aria-disabled, so Playwright won't click it without force — a tap does nothing
     await chip(page, "1990").click({ force: true });
     await expect(chip(page, "1990")).toHaveAttribute("aria-pressed", "true");
-    // * back to the default (the pair): the param goes
     for (const year of ["2021", "1967", "1990"]) await chip(page, year).click();
     await expectShown(page, ["2021", "1967"], ["1990"]);
     await expect(page).not.toHaveURL(/shownYears=/);
@@ -303,8 +284,6 @@ test.describe("Compare Periods: weather years overlaid", () => {
     await saveHatchStyle(page);
     await page.goto(`${WEATHER}&layout=overlay&chart=standard`);
     await expect(page.locator(".recharts-bar")).toHaveCount(3, { timeout: 30_000 });
-    // * oldest first (1967, 1990, 2021), each with the hatch it was added with (2021 the first,
-    // * 1967 the second, 1990 the third); fills by aridity; nothing drawn above the bars
     const [solid, diagonal, dots] = SERIES_HATCHES;
     const listOrder = [diagonal, dots, solid];
     await expect.poll(() => barHatches(page)).toEqual(listOrder);
@@ -330,7 +309,6 @@ test.describe("Compare Periods: weather years overlaid", () => {
       .boundingBox();
     expect(years && variable).toBeTruthy();
     if (!years || !variable) return;
-    // * same row (centred), years on the left, the chart's chips on the right
     expect(Math.abs(years.y + years.height / 2 - (variable.y + variable.height / 2))).toBeLessThan(
       4,
     );
@@ -372,7 +350,6 @@ test("the standard chart's °C axis ends on labelled ticks below 0 (Bolzano)", a
   const values = axis.labels.map(({ value }) => value);
   expect(values.at(-1)).toBeLessThan(0);
   expect(new Set(values.slice(1).map((value, i) => (values[i] ?? 0) - value)).size).toBe(1);
-  // * the lowest label at the plot's bottom edge, the highest at its top
   expect(Math.abs((axis.labels.at(-1)?.y ?? 0) - axis.bottom)).toBeLessThan(2);
   expect(Math.abs((axis.labels[0]?.y ?? 0) - axis.top)).toBeLessThan(2);
 });
@@ -394,8 +371,6 @@ test("a middle year loading last never shifts the other years' colours", async (
     await held;
     await route.continue();
   });
-  // * the stats table's header marks each year with its colour
-  // * the stats table's header marks each year with its shape
   const headerShape = (year: string) =>
     page
       .getByRole("columnheader", { name: year })
@@ -406,10 +381,7 @@ test("a middle year loading last never shifts the other years' colours", async (
   await page.goto(
     `${PERIODS_URL}&dataset=weather&periods=2021,1990,2010&layout=overlay&chart=standard&grid=10m`,
   );
-  // * each year's marker from the order it was added in: 2021 first, 1990 second (held back),
-  // * 2010 third — the bars' hatches and the table's header shapes alike; listed oldest first
   const [first, second, third] = SERIES_HATCHES;
-  // * 1990 still loading: 2010 and 2021 keep their own markers — chart and table
   await expect.poll(() => barHatches(page), { timeout: 30_000 }).toEqual([third, first]);
   expect(await headerShape("2010")).toBe(SERIES_SHAPES[2]);
 
@@ -430,7 +402,6 @@ test.describe("precipitation bars on the comparison charts", () => {
       await page.goto(url);
       await expect(page.locator(".recharts-bar")).toHaveCount(2, { timeout: 30_000 });
       await expectAridityFills(page);
-      // * side by side: no hatch at all
       await expect(page.locator("rect[data-bar-hatch]")).toHaveCount(0);
 
       await page
@@ -449,7 +420,6 @@ test.describe("overlay: hover and sideways scroll", () => {
     await page.goto(`${CITIES_URL}&chart=standard&layout=overlay`);
     const dots = page.locator('path[data-series-dot="circle"]');
     await expect(dots.first()).toBeVisible({ timeout: 30_000 });
-    // * Paris (circle), July's point of its first curve — max temperature
     await page.waitForLoadState("networkidle");
     // * the chart remounts once both cities' data are in, its curves drawing in: let them settle
     await page.waitForTimeout(1500);
@@ -477,11 +447,8 @@ test.describe("overlay: hover and sideways scroll", () => {
       element.scrollLeft = 200;
       element.dispatchEvent(new Event("scroll"));
     });
-    // * the table follows the plot
     const table = page.locator("[data-values-scroller]");
     await expect.poll(() => table.evaluate((element) => element.scrollLeft)).toBe(200);
-    // * July's column sits under July's label on the plot (a phone: initials, July the 7th;
-    // * the entities' own hidden x axes have no labels)
     const label = await scroller.evaluate((element) => {
       const labels = [...element.querySelectorAll(".recharts-xAxis-tick-labels text")].filter(
         (text) => text.textContent !== "",
@@ -492,14 +459,11 @@ test.describe("overlay: hover and sideways scroll", () => {
     const cell = await table.locator("tbody tr").nth(1).locator("td").nth(6).boundingBox();
     if (!label || !cell) throw new Error("no July");
     expect(Math.abs(label.x + label.width / 2 - (cell.x + cell.width / 2))).toBeLessThan(3);
-    // * the header column is the fixed left axis' width
     const header = await table.locator("tbody th").first().boundingBox();
     const axis = await page.locator('[data-fixed-axis="left"] > div').first().boundingBox();
     if (!header || !axis) throw new Error("no header");
     expect(Math.abs(header.width + 1 - axis.width)).toBeLessThan(1.5);
-    // * oldest first: 1967 heads the rows
     await expect(table.locator("tbody th [title]").first()).toHaveAttribute("title", "1967");
-    // * only the fixed axes draw °C: the plot's own would slide out under them
     await expect(page.locator("svg text").getByText("°C", { exact: true })).toHaveCount(1);
   });
 
@@ -517,7 +481,6 @@ test.describe("overlay: hover and sideways scroll", () => {
       await expect(
         page.locator("svg.recharts-surface").getByText("Dec", { exact: true }),
       ).toBeVisible();
-      // * the values table in the stats table's type, every value inside its month's column
       const type = await page.evaluate(() => {
         const font = (element: Element | null) =>
           element ? getComputedStyle(element).fontSize : "";
@@ -525,7 +488,6 @@ test.describe("overlay: hover and sideways scroll", () => {
         const cells = [...(table?.querySelectorAll("td[tabindex]") ?? [])];
         return {
           value: font(cells[0] ?? null),
-          // * the header's marker lines, as tall as the value lines
           name: font(table?.querySelector("tbody th [role=img]")?.parentElement ?? null),
           stats: font(document.querySelector("[data-chart-block='statsTable'] table")),
           overflowing: cells.filter((cell) => cell.scrollWidth > cell.clientWidth).length,
@@ -543,8 +505,6 @@ test.describe("overlay: hover and sideways scroll", () => {
     }) => {
       await page.goto(url);
       await expect(page.locator(".recharts-bar").first()).toBeVisible({ timeout: 30_000 });
-      // * marker headers, no text, each the shape the stats table (and legend / chips) gives its
-      // * series, named in full; hovering one focuses its entity
       const names = OVERLAY_HEADERS[name as keyof typeof OVERLAY_HEADERS];
       const headers = page
         .locator('[data-chart-block="valuesTable"] tbody tr')
@@ -602,8 +562,6 @@ test.describe("overlay: hover and sideways scroll", () => {
           ),
         };
       });
-      // * the left margin is the °C axis' own width — and the table's header column (its frame's
-      // * border given back)
       expect(geometry.axisArea).toBeCloseTo(AXIS_WIDTH, 0);
       expect(Math.abs(geometry.header + 1 - AXIS_WIDTH)).toBeLessThan(1.5);
       expect(geometry.offsets).toHaveLength(12);
@@ -625,7 +583,6 @@ test.describe("overlay: hover and sideways scroll", () => {
           headers.map((th) => {
             const column = th.getBoundingClientRect();
             const unit = th.querySelector("[aria-hidden]")?.getBoundingClientRect();
-            // * the shapes' own ink, not their icons' empty padding
             const shapes = [...th.querySelectorAll("svg path")].map((path) =>
               path.getBoundingClientRect(),
             );
@@ -633,7 +590,6 @@ test.describe("overlay: hover and sideways scroll", () => {
               unit: th.querySelector("[aria-hidden]")?.textContent,
               left: (unit?.left ?? 0) >= column.left - fit,
               right: shapes.every(({ right }) => right <= column.right + fit),
-              // * the unit centred across its markers
               centred:
                 Math.abs(
                   (unit?.top ?? 0) + (unit?.height ?? 0) / 2 - (column.top + column.height / 2),
@@ -658,12 +614,10 @@ test.describe("overlay: hover and sideways scroll", () => {
     const hoveredCells = table.locator('td[style*="background-color"]');
     await table.locator("tbody tr").nth(1).locator("td").nth(HOVERED_MONTH).hover();
     await expect(band).toHaveCount(1);
-    // * one cell per row: °C and mm, no unit-only rows
     await expect(hoveredCells).toHaveCount(2);
     await expect(
       page.locator(".recharts-bar-rectangle rect[fill='var(--color-chart-context-bar)']"),
     ).toHaveCount(0);
-    // * 1967's marker in the °C row: the others turn gray, no month is highlighted
     await table.locator("tbody th [title='1967']").first().hover();
     await expect(band).toHaveCount(0);
     await expect(hoveredCells).toHaveCount(0);
@@ -697,7 +651,6 @@ test.describe("overlay: hover and sideways scroll", () => {
     const standard = await chipsBox(FIVE_YEARS_URL);
     const walterLieth = await chipsBox(FIVE_YEARS_URL.replace("&chart=standard", ""));
     expect(Math.abs(walterLieth.y - standard.y)).toBeLessThan(1);
-    // * the guide on the chips' row, on the right
     const guide = await page
       .getByRole("button", { name: "How to read this diagram" })
       .boundingBox();
@@ -713,7 +666,6 @@ test.describe("overlay: hover and sideways scroll", () => {
     const table = page.locator('[data-chart-block="valuesTable"] table').first();
     await table.locator("tbody tr").nth(1).locator("td").nth(HOVERED_MONTH).hover();
     const [hover] = await resolveColors(page, ["var(--color-state-hover)"]);
-    // * once the cells' fade has settled: every row's cell of the month in the band's colour
     await expect
       .poll(() =>
         table.evaluate(
@@ -731,7 +683,6 @@ test.describe("overlay: hover and sideways scroll", () => {
       const boxes = cells.map((cell) => cell?.getBoundingClientRect());
       const tableBox = element.getBoundingClientRect();
       return {
-        // * each cell starts where the one above ends: no gap in the band
         gaps: boxes.slice(1).map((box, i) => Math.abs((box?.top ?? 0) - (boxes[i]?.bottom ?? 0))),
         top: Math.abs((boxes[0]?.top ?? 0) - tableBox.top),
         bottom: Math.abs((boxes.at(-1)?.bottom ?? 0) - tableBox.bottom),
@@ -749,7 +700,6 @@ test.describe("overlay: hover and sideways scroll", () => {
       .getByRole("group", { name: "Years shown" })
       .getByRole("button", { name: "1990", exact: true })
       .hover();
-    // * the four other years' bars plain gray; only 1990 keeps its points (its shape)
     await expect
       .poll(() =>
         page
@@ -799,7 +749,6 @@ test.describe("overlay: hover and sideways scroll", () => {
     }
     await expect.poll(barWidth).toBeGreaterThan(fiveWide * 2);
     await page.waitForTimeout(1500);
-    // * 1967 (the squares), first of the two left (oldest first): July's point over its bar
     const centres = await page.evaluate(() => {
       const centreOf = (element: Element | undefined) => {
         const box = element?.getBoundingClientRect();
@@ -826,7 +775,6 @@ test.describe("overlay: hover and sideways scroll", () => {
     await expect(page.locator(".recharts-bar")).toHaveCount(2, { timeout: 30_000 });
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(1500);
-    // * B (Oslo, the squares): July's point over July's B bar
     const centres = await page.evaluate(() => {
       const centreOf = (element: Element | undefined) => {
         const box = element?.getBoundingClientRect();

@@ -5,7 +5,6 @@ import { useId } from "react";
 import { toSvgId } from "@/components/charts/charts.util";
 import type { TEntitySwatchProps } from "../ChartLegend.type";
 
-/** An overlay entity: its bars' hatch (on the humid fill), then its curves' shape. */
 export function EntitySwatch({ color, shape, hatch, fill, size }: TEntitySwatchProps) {
   const id = `legend-${toSvgId(useId())}`;
   const side = size.height;

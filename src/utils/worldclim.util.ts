@@ -58,7 +58,6 @@ export function buildGridIri(gridSize: TCellSize): string {
   return `${WORLDCLIM_GRID_BASE}${gridSize}`;
 }
 
-/** "2.5 min" from "2.5 min (~20.25 km²)" */
 export function shortGridLabel(gridSize: TCellSize): string {
   return CELL_SIZE_OPTIONS[gridSize]?.split(" (~")[0] ?? gridSize;
 }
@@ -67,8 +66,7 @@ export function buildVariableIris(variables: readonly string[]): string[] {
   return variables.map((v) => `${WORLDCLIM_VARIABLE_BASE}${v}`);
 }
 
-/** Mirrors the raster IRI shape SCRAPI names rasters with: "Raster_{grid}_{variable}_{period}",
- * where period is a climate period (already "c1970-2000"-shaped) or "w{year}" for weather. */
+/** mirrors SCRAPI's raster IRI shape: "Raster_{grid}_{variable}_{period}" */
 export function buildRasterIri(
   gridSize: TCellSize,
   variable: TVariable,
@@ -84,8 +82,7 @@ export function validateResponseData(response: { data: unknown }): void {
   }
 }
 
-/** null means no bindings matched (e.g. this grid has no raster for the
- * requested period) — callers must treat that as "unavailable", not zero. */
+/** null: no raster for this period at this grid; callers treat it as unavailable */
 export function buildMonthlyTemperaturesFromPointValues(
   bindings: TWorldClimPointValueBinding[],
 ): TMonthlyTemperature[] | null {
@@ -110,8 +107,7 @@ export function buildMonthlyTemperaturesFromPointValues(
   }));
 }
 
-/** SCRAPI's climate point-value endpoint returns every period's rasters
- * together — this narrows to the one the caller actually wants. */
+/** SCRAPI returns every period's rasters together: this narrows to the one wanted */
 export function filterPointBindingsByPeriod(
   bindings: TWorldClimPointValueBinding[],
   period: TClimatePeriod,
@@ -119,8 +115,6 @@ export function filterPointBindingsByPeriod(
   return bindings.filter((b) => b.raster.value.includes(period));
 }
 
-/** Which climate periods this specific grid/point combination actually has
- * rasters for — e.g. Grid_30s only ever has c1970-2000. */
 export function extractAvailableClimatePeriods(
   bindings: TWorldClimPointValueBinding[],
 ): TClimatePeriod[] {
@@ -132,11 +126,6 @@ export function extractAvailableClimatePeriods(
   return Object.values(CLIMATE_PERIODS).filter((period) => present.has(period));
 }
 
-/**
- * Same Map-walk as buildMonthlyTemperaturesFromPointValues, but keeps every
- * variable present in the bindings instead of narrowing to tmin/tmax/prec —
- * for the "raw" export, which requests all of CLIMATE_VARIABLES from SCRAPI.
- */
 export function extractAllVariablesFromPointValues(
   bindings: TWorldClimPointValueBinding[],
 ): TFullVariableMonthRow[] {
@@ -160,17 +149,12 @@ export function extractAllVariablesFromPointValues(
   });
 }
 
-/** Parses XSD gMonth "--01" → 1, "--12" → 12. Returns null if invalid. */
 function parseGMonth(gMonth: string | undefined): number | null {
   if (!gMonth) return null;
   const m = parseInt(gMonth.replace(/^--/, ""), 10);
   return m >= 1 && m <= 12 ? m : null;
 }
 
-/**
- * Transforms raw per-month pixel rows from pixelvaluesinbox into one
- * TWorldClimBoxBinding per unique pixel IRI (with valueMonth01..12 populated).
- */
 export function groupPixelBindings(raw: TRawPixelValueBinding[]): TWorldClimBoxBinding[] {
   const map = new Map<
     string,
@@ -197,10 +181,6 @@ export function groupPixelBindings(raw: TRawPixelValueBinding[]): TWorldClimBoxB
   return result;
 }
 
-/**
- * Transforms raw per-month avg rows from avgpixelvaluesinbox into one
- * TWorldClimAvgBoxBinding per unique raster IRI (with valueMonth01..12 populated).
- */
 export function groupAvgBindings(raw: TRawAvgValueBinding[]): TWorldClimAvgBoxBinding[] {
   const map = new Map<string, Map<number, TSparqlValue>>();
 

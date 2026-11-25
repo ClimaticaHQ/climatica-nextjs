@@ -13,11 +13,6 @@ import {
 } from "./SplitPanels.constant";
 import type { TPanelFocusTarget, TSplitPanelsProps } from "./SplitPanels.type";
 
-/**
- * The split comparison's panels, for either chart type: both side by side, or one expanded
- * across the card (its plot as tall as in the split, on the same shared domains). Each header
- * gets an expand button; the expanded one a series switch and "Show both".
- */
 export function SplitPanels({
   expansion,
   labels,

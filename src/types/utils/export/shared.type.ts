@@ -14,9 +14,7 @@ export type TExportChartColors = {
   tavg: string;
   arid: string;
   humid: string;
-  /** Only the heat-map export's selection outline uses this. */
   brand: string;
-  /** Walter-Lieth convention colors — resolved from the same CSS vars the live diagram uses. */
   wlTemp: string;
   wlPrec: string;
   wlHumidHatch: string;
@@ -24,15 +22,11 @@ export type TExportChartColors = {
   wlCompressedFill: string;
   wlFrost: string;
   wlFrostOutline: string;
-  /** WL overlay series identity (A green, B orange) */
-  /** every entity marker's graphite: entities differ by shape */
   seriesMarker: string;
 };
 
-/** Axis placement for buildGridAndAxes — WL panels put °C / mm above the axes. */
 export type TGridAxesStyle = {
   tickGap: number;
-  /** offset of °C / mm above the plot top */
   unitTitlesAbove: number;
 };
 
@@ -67,7 +61,6 @@ export type TSvgToPngParams = {
   filename: string;
 };
 
-/** Height is derived from how many lines the footer actually wrapped to. */
 export type TSvgExportResult = {
   svg: string;
   height: number;
@@ -78,7 +71,6 @@ export type TExportPoint = {
   y: number;
 };
 
-/** A monthly table in an export: its rows (shared with the screen table), where it goes. */
 export type TExportMonthlyTableArgs = {
   rows: readonly TMonthlyTableRow[];
   monthNames: readonly string[];
@@ -88,7 +80,6 @@ export type TExportMonthlyTableArgs = {
   colors: TExportChartColors;
 };
 
-/** A plot's x span in the export — the strip's months sit exactly under it. */
 export type TExportPlotSpan = {
   left: number;
   right: number;
@@ -103,7 +94,6 @@ export type TExportComparisonTableArgs = {
   colors: TExportChartColors;
 };
 
-/** A box of the export's tables: square, unfilled, in the border colour. */
 export type TExportTableFrameArgs = {
   left: number;
   top: number;
@@ -112,7 +102,6 @@ export type TExportTableFrameArgs = {
   colors: TExportChartColors;
 };
 
-/** One grid line of the export's tables. */
 export type TExportTableRuleArgs = {
   x1: number;
   y1: number;
@@ -121,17 +110,13 @@ export type TExportTableRuleArgs = {
   colors: TExportChartColors;
 };
 
-/** A data column of an export table: its head (a series' shape before it), a muted column's values. */
 export type TExportTableColumn = {
   label: string;
-  /** a second, smaller line under the head (the difference's direction) */
   subtitle?: string;
   shape?: TSeriesShape;
-  /** values in the secondary text colour (the difference) */
   isMuted?: boolean;
 };
 
-/** A row of an export table: its label, then one value per column. */
 export type TExportTableRow = {
   label: string;
   cells: readonly string[];
@@ -146,13 +131,11 @@ export type TExportTableArgs = {
   colors: TExportChartColors;
 };
 
-/** A monthly-table row's label in the export: the unit colored, whole. */
 export type TExportTableRowLabelArgs = {
   row: TMonthlyTableRow;
   colors: TExportChartColors;
 };
 
-/** An overlay row's markers beside its unit. */
 export type TExportUnitMarkersArgs = {
   row: TMonthlyValuesRow;
   markers: readonly TMonthlyTableMarker[];
@@ -164,53 +147,39 @@ export type TExportUnitMarkersArgs = {
 export type TExportMonthlyValuesArgs = {
   rows: readonly TMonthlyValuesRow[];
   span: TExportPlotSpan;
-  /** the y axes' room either side of the plot — the unit labels sit in the left one */
   gutter: number;
   top: number;
   colors: TExportChartColors;
-  /** an overlay: each series' marker, in series order, beside the unit level with its values */
   markers?: readonly TMonthlyTableMarker[] | undefined;
-  /** an overlay's hatch patterns: the mm row shows each series' hatch beside its shape */
   hatchPrefix?: string | undefined;
-  /** the standard overlay: each row headed by its unit and these labels beside it */
   rowHeaders?: readonly string[] | undefined;
 };
 
-/** A standard overlay row's header in the export: its unit and the series' labels. */
 export type TExportRowHeaderArgs = {
   row: TMonthlyValuesRow;
   labels: readonly string[];
-  /** the gutter's left edge */
   left: number;
-  /** the row's vertical centre */
   cy: number;
-  /** the values' size — each label in its value's type */
   fontSize: number;
   colors: TExportChartColors;
 };
 
-/** An export's monthly values rows: its series, drawn in the export palette. */
 export type TExportValuesRowsArgs = {
   series: readonly TMonthlyValuesSeries[];
   colors: TExportChartColors;
-  /** the UI's locale — the export shows the numbers as the screen does */
   locale: string;
 };
 
-/** A series' two names for a values-table row: its full label and its short one. */
 export type TRowHeaderSeries = { label: string; shortLabel: string };
 
 export type TRowHeadersArgs = {
   series: readonly TRowHeaderSeries[];
-  /** the label column's least width: the plot's own side margin */
   minGutter: number;
 };
 
-/** The values table's row headers and the label column they need. */
 export type TRowHeaders = { labels: readonly string[]; gutter: number };
 
 export type TWrapUrlArgs = {
   url: string;
-  /** the most characters a line holds at the footer's size */
   maxChars: number;
 };

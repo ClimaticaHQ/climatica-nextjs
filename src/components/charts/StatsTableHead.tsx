@@ -13,7 +13,6 @@ const SORT_LABEL_KEYS = {
   [ESortOrder.DESC]: "comparePeriods.sort.descending",
 } as const satisfies Record<ESortOrder, string>;
 
-/** The corner's sort toggle: "Year" and its direction, flipping the whole page's order. */
 function SortButton({ sort }: TSortButtonProps) {
   const t = useTranslations();
   const isDescending = sort.order === ESortOrder.DESC;
@@ -31,7 +30,6 @@ function SortButton({ sort }: TSortButtonProps) {
   );
 }
 
-/** A series' name, wrapped to two lines at most; only when it's cut it opens its full name. */
 function SeriesHeadLabel({ label }: TSeriesHeadLabelProps) {
   const { ref, isTruncated } = useIsTruncated<HTMLSpanElement>(label);
   const text = (
@@ -48,7 +46,6 @@ function SeriesHeadLabel({ label }: TSeriesHeadLabelProps) {
   );
 }
 
-/** The stats table's header row: the metric, each series by name, and a pair's difference. */
 export function StatsTableHead({ table, columns, differenceMeaning, sort }: TStatsTableHeadProps) {
   const t = useTranslations();
   const { difference } = table;

@@ -1,4 +1,3 @@
-/** Smooth cubic-Bézier curve matching recharts "monotone" style */
 export function catmullRomPath(points: { x: number; y: number }[]): string {
   if (points.length === 0) return "";
   if (points.length === 1) return `M ${points[0].x.toFixed(2)},${points[0].y.toFixed(2)}`;

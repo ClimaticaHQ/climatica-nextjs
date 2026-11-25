@@ -37,7 +37,6 @@ describe("Walter-Lieth with Weather data", () => {
     expect(
       screen.getByTitle(/^De Martonne aridity index for 2024 alone, from that year's data/),
     ).toBeTruthy();
-    // * the value and its class stay, as for Climate
     expect(screen.getByText("20.0")).toBeTruthy();
   });
 });

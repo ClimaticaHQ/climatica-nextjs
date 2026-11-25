@@ -6,7 +6,6 @@ import {
   WALTER_LIETH_GUIDE_ITEMS,
 } from "./WalterLiethGuide.constant";
 
-/** "How to read this diagram": the WL conventions in a small popover. */
 export function WalterLiethGuide() {
   const t = useTranslations();
   const title = t("chart.wlGuideButton");

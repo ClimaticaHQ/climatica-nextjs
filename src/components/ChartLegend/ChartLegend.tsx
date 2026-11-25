@@ -5,11 +5,6 @@ import { CHART_LEGEND_CLASSES as C } from "./ChartLegend.constant";
 import type { TChartLegendProps } from "./ChartLegend.type";
 import { LegendSwatch } from "./components";
 
-/**
- * The legend under every chart and split pair: items are data (see chartLegend.util), so the
- * export draws the same entries at the base size; on screen the text and its swatches grow with
- * the text scale.
- */
 export function ChartLegend({ items, fontSize = CHART_LEGEND.FONT_SIZE }: TChartLegendProps) {
   const scaledFontSize = scaleChartFont({
     size: fontSize,

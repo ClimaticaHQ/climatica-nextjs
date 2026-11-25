@@ -2,10 +2,6 @@ import { MONTHLY_VALUES_CLASSES as C } from "../MonthlyValuesTable.constant";
 import type { TUnitLabelProps } from "../MonthlyValuesTable.type";
 import { HeaderMarker } from "./HeaderMarker";
 
-/**
- * A row's header: its unit in its chart color — the full name for screen readers. In an overlay,
- * the series' markers beside it, one level with each value line, the unit centred across them.
- */
 export function UnitLabel({ row, markers, keys }: TUnitLabelProps) {
   const unit = (
     <>

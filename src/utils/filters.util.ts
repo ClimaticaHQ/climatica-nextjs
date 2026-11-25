@@ -48,13 +48,11 @@ import { disableOtherSide } from "./pair.util";
 
 const RESTRICTED_VARIABLES = new Set<TVariable>(PERIOD_RESTRICTED_VARIABLES);
 
-// * what makes each unavailability reason apply in a view
 const UNAVAILABILITY_CHECKS: TFilterUnavailabilityChecks = {
   [EFilterAvailability.WALTER_LIETH]: ({ isWalterLieth }) => isWalterLieth,
   [EFilterAvailability.HEAT_MAP]: ({ view }) => view === EFilterView.HEAT_MAP,
 };
 
-/** The filter view a route shows, or null on a page without filters. */
 export function getFilterView(pathname: string): EFilterView | null {
   const match = Object.entries(FILTER_VIEW_BY_ROUTE).find(
     ([route]) => pathname === route || pathname.startsWith(`${route}/`),
@@ -62,13 +60,11 @@ export function getFilterView(pathname: string): EFilterView | null {
   return match?.[1] ?? null;
 }
 
-/** Whether the filter means anything with this dataset (a climate period doesn't with Weather). */
 export function isFilterRelevant(key: EFilterKey, dataset: TDataset) {
   const filterDataset = FILTERS_CONFIG[key].dataset;
   return filterDataset === undefined || filterDataset === dataset;
 }
 
-/** Whether the dataset and period carry this variable at all. */
 export function isVariableOffered(
   variable: TVariable,
   { dataset, climatePeriod }: Omit<TFilterOptionContext, "view">,
@@ -79,12 +75,10 @@ export function isVariableOffered(
   return climatePeriod === FULL_VARIABLES_CLIMATE_PERIOD || !RESTRICTED_VARIABLES.has(variable);
 }
 
-/** The variable chips to render: Weather has only its three. */
 export function getVariableOptions(dataset: TDataset): readonly TVariable[] {
   return dataset === DATASETS.WEATHER ? WEATHER_VARIABLES : CLIMATE_VARIABLES;
 }
 
-/** A rendered variable that can't be picked here — the heat map lacks the restricted ones too. */
 export function isVariableOptionDisabled(variable: TVariable, context: TFilterOptionContext) {
   const isHeatMapRestricted =
     context.view === EFilterView.HEAT_MAP &&
@@ -93,7 +87,6 @@ export function isVariableOptionDisabled(variable: TVariable, context: TFilterOp
   return isHeatMapRestricted || !isVariableOffered(variable, context);
 }
 
-/** The 30s grid exists only for the full-variables climate normals. */
 export function isGridSizeOffered(
   gridSize: TCellSize,
   { dataset, climatePeriod }: TGridSizeContext,
@@ -102,7 +95,6 @@ export function isGridSizeOffered(
   return dataset === DATASETS.CLIMATE && climatePeriod === FULL_VARIABLES_CLIMATE_PERIOD;
 }
 
-/** What a view shows data for: Compare Periods' two climate periods, else the one dataset / period. */
 export function getGridSizeContexts(filters: TFilters, view: EFilterView): TGridSizeContext[] {
   const { dataset } = filters;
   const isPeriodPair = view === EFilterView.COMPARE_PERIODS && dataset === DATASETS.CLIMATE;
@@ -114,14 +106,12 @@ export function getGridSizeContexts(filters: TFilters, view: EFilterView): TGrid
     : [{ dataset, climatePeriod: filters.climatePeriod }];
 }
 
-/** Whether a resolution is offered for everything the view shows (both compared periods). */
 export function isGridSizeOfferedInView(gridSize: TCellSize, filters: TFilters, view: EFilterView) {
   return getGridSizeContexts(filters, view).every((context) =>
     isGridSizeOffered(gridSize, context),
   );
 }
 
-/** The finest resolution offered for every context — from the availability rule, not a list. */
 export function getFinestGridSize(contexts: readonly TGridSizeContext[]): TCellSize {
   return (
     GRIDS_FINEST_FIRST.find((size) =>
@@ -130,10 +120,6 @@ export function getFinestGridSize(contexts: readonly TGridSizeContext[]): TCellS
   );
 }
 
-/**
- * Where a view opens when no resolution was chosen: the finest offered for what it shows (30″ for
- * the 1970–2000 normals, 2.5′ otherwise), or the view's own default where it has one (the heat map).
- */
 export function getDefaultGridSize(filters: TFilters, view: EFilterView): TCellSize {
   const viewDefault = GRID_SIZE_VIEW_DEFAULTS[view];
   return viewDefault !== undefined && isGridSizeOfferedInView(viewDefault, filters, view)
@@ -141,10 +127,7 @@ export function getDefaultGridSize(filters: TFilters, view: EFilterView): TCellS
     : getFinestGridSize(getGridSizeContexts(filters, view));
 }
 
-/**
- * The resolution a view loads: the chosen one while the view offers it, else its default. A
- * choice the view doesn't offer stays in the URL, so a page that offers it gets it back.
- */
+/** a choice the view doesn't offer stays in the URL, so a page that offers it gets it back */
 export function resolveGridSize(filters: TFilters, view: EFilterView): TCellSize {
   const { gridSize } = filters;
   return gridSize !== null && isGridSizeOfferedInView(gridSize, filters, view)
@@ -152,11 +135,6 @@ export function resolveGridSize(filters: TFilters, view: EFilterView): TCellSize
     : getDefaultGridSize(filters, view);
 }
 
-/**
- * The resolution each climate period would load at if picked in this view — on Compare Periods
- * the pair's, elsewhere the period's own (30″ for 1970–2000 while none was chosen, 2.5′ for the
- * others). Which periods a place has data for depends on it.
- */
 export function getGridSizeByPeriod(filters: TFilters, view: EFilterView): TPeriodGridSize[] {
   return Object.values(CLIMATE_PERIODS).map((climatePeriod) => ({
     climatePeriod,
@@ -167,7 +145,6 @@ export function getGridSizeByPeriod(filters: TFilters, view: EFilterView): TPeri
   }));
 }
 
-/** Months in calendar order, without duplicates; none or all twelve is "all". */
 export function normalizeMonths(months: TMonthFilter): TMonthFilter {
   if (months === ALL_MONTHS) return months;
   const picked = MONTH_NUMBERS.filter((month) => months.includes(month));
@@ -190,17 +167,11 @@ function normalizeWeatherPeriods(periods: readonly number[]) {
     : [...FILTER_DEFAULTS[EFilterKey.WEATHER_PERIODS]];
 }
 
-/**
- * Makes a filter set consistent: drops variables and a chosen 30s grid the dataset/period lack
- * (none left = the default variables; the grid back to the view's default), orders months,
- * dedupes years, and never compares a climate period with itself.
- */
 export function normalizeFilters(filters: TFilters): TFilters {
   const arePeriodsEqual = filters.climatePeriodA === filters.climatePeriodB;
   return {
     ...filters,
     variables: normalizeVariables(filters),
-    // * a choice the dataset or period no longer offers becomes none chosen: the default again
     gridSize:
       filters.gridSize !== null && isGridSizeOffered(filters.gridSize, filters)
         ? filters.gridSize
@@ -225,7 +196,6 @@ export function isFilterDefault<K extends EFilterKey>(key: K, value: TFilters[K]
   return isSameFilterValue(key, value, FILTERS_CONFIG[key].defaultValue);
 }
 
-/** Hidden (not part of this view or dataset), disabled with a reason, or available. */
 export function getFilterAvailability(key: EFilterKey, context: TFilterAvailabilityContext) {
   const config = FILTERS_CONFIG[key];
   if (!config.views.includes(context.view) || !isFilterRelevant(key, context.dataset)) {
@@ -237,7 +207,6 @@ export function getFilterAvailability(key: EFilterKey, context: TFilterAvailabil
   return reason ?? EFilterAvailability.AVAILABLE;
 }
 
-/** The full sheet's sections (and the chips'), in order — disabled ones included, Compare Periods' periods and years not. */
 export function getSectionFilterKeys(context: TFilterAvailabilityContext) {
   return FILTER_ORDER.filter(
     (key) =>
@@ -246,24 +215,18 @@ export function getSectionFilterKeys(context: TFilterAvailabilityContext) {
   );
 }
 
-/**
- * The desktop sidebar's sections, in order: the sections, plus Compare Periods' periods or
- * years (on the page below lg) — after Dataset, as FILTER_ORDER puts them.
- */
 export function getSidebarFilterKeys(context: TFilterAvailabilityContext) {
   return FILTER_ORDER.filter(
     (key) => getFilterAvailability(key, context) !== EFilterAvailability.HIDDEN,
   );
 }
 
-/** Mobile chips, in order — see FILTER_CHIP_AVAILABILITIES for which. */
 export function getChipFilterKeys(context: TFilterAvailabilityContext) {
   return getSectionFilterKeys(context).filter((key) =>
     FILTER_CHIP_AVAILABILITIES.includes(getFilterAvailability(key, context)),
   );
 }
 
-/** The "all filters" badge: changeable chip filters whose value isn't the default. */
 export function countChangedFilters(filters: TFilters, context: TFilterAvailabilityContext) {
   return getChipFilterKeys(context).filter(
     (key) =>
@@ -272,7 +235,6 @@ export function countChangedFilters(filters: TFilters, context: TFilterAvailabil
   ).length;
 }
 
-/** The filters with one value replaced. */
 export function setFilterValue<K extends EFilterKey>(
   filters: TFilters,
   key: K,
@@ -283,42 +245,35 @@ export function setFilterValue<K extends EFilterKey>(
   return next;
 }
 
-/** A multi-choice list with the option added, or removed when it's there. */
 export function toggleFilterOption<T>(selected: readonly T[], option: T): T[] {
   return selected.includes(option)
     ? selected.filter((item) => item !== option)
     : [...selected, option];
 }
 
-/** Whether an availability is a reason a filter is disabled (not available, not hidden). */
 export function isFilterUnavailableReason(
   availability: EFilterAvailability,
 ): availability is TFilterUnavailableReason {
   return availability in FILTER_UNAVAILABLE_LAYOUTS;
 }
 
-/** How a section disabled for this reason looks, or null when it isn't disabled. */
 export function getFilterUnavailableLayout(availability: EFilterAvailability) {
   return isFilterUnavailableReason(availability) ? FILTER_UNAVAILABLE_LAYOUTS[availability] : null;
 }
 
-/** Whether a section's controls are disabled: whenever the filter is unavailable here. */
 export function areFilterControlsDisabled(availability: EFilterAvailability) {
   return getFilterUnavailableLayout(availability) !== null;
 }
 
-/** The translation key of what's wrong with a typed weather year, or null when it's valid. */
 export function getWeatherYearError(year: number) {
   const result = weatherYearSchema.safeParse(year);
   return result.success ? null : (result.error.issues[0]?.message ?? null);
 }
 
-/** The climate period a dropdown value names, or undefined for anything else. */
 export function findClimatePeriod(value: string): TClimatePeriod | undefined {
   return Object.values(CLIMATE_PERIODS).find((period) => period === value);
 }
 
-/** A dropdown's change handler that passes on only values naming a climate period. */
 export function toClimatePeriodHandler(onChange: (period: TClimatePeriod) => void) {
   return (value: string) => {
     const period = findClimatePeriod(value);
@@ -326,7 +281,6 @@ export function toClimatePeriodHandler(onChange: (period: TClimatePeriod) => voi
   };
 }
 
-/** A dropdown's change handler that passes on only values naming a grid size. */
 export function toCellSizeHandler(onChange: (gridSize: TCellSize) => void) {
   return (value: string) => {
     const gridSize = Object.values(CELL_SIZES).find((size) => size === value);
@@ -334,10 +288,6 @@ export function toCellSizeHandler(onChange: (gridSize: TCellSize) => void) {
   };
 }
 
-/**
- * Climate period dropdown options; null availability = unknown yet, so none is disabled for
- * it. excludedPeriod — the one picked on the other side of a comparison — is disabled too.
- */
 export function getClimatePeriodOptions(
   availablePeriods: readonly TClimatePeriod[] | null,
   excludedPeriod?: TClimatePeriod,
@@ -350,7 +300,6 @@ export function getClimatePeriodOptions(
   return excludedPeriod === undefined ? options : disableOtherSide(options, excludedPeriod);
 }
 
-/** The translation key of why a year can't join the compared years, or null when it can. */
 export function getAddedWeatherPeriodError(year: number | undefined, periods: readonly number[]) {
   if (year === undefined || getWeatherYearError(year) !== null) {
     return "comparePeriods.weather.invalidYear";
@@ -358,7 +307,6 @@ export function getAddedWeatherPeriodError(year: number | undefined, periods: re
   return periods.includes(year) ? "comparePeriods.weather.duplicateYear" : null;
 }
 
-/** The variable chips of a dataset, each disabled where the climate period lacks it. */
 export function getVariableOptionStates(values: TFilters, { view }: TFilterAvailabilityContext) {
   const context = { view, dataset: values.dataset, climatePeriod: values.climatePeriod };
   return getVariableOptions(values.dataset).map((value) => ({
@@ -378,7 +326,6 @@ export function getVariablesNotes(context: TFilterAvailabilityContext) {
   return VARIABLES_NOTE_RULES.filter(({ isShown }) => isShown(context)).map(({ note }) => note);
 }
 
-/** One-option filters apply as soon as an option is picked; lists and typed values need Apply. */
 export function isAppliedOnSelect(key: EFilterKey) {
   return FILTERS_CONFIG[key].choice === EFilterChoice.SINGLE;
 }

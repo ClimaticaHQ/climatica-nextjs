@@ -2,7 +2,6 @@ import { SERIES_HATCH_COLOR, SERIES_HATCH_GEOMETRY as H } from "@/constants";
 import { getHatchTile } from "@/utils/seriesShape.util";
 import type { TSeriesHatchPatternProps } from "./svg.type";
 
-/** One hatch as an SVG pattern (in a <defs>): its tile knocked out in the card's surface colour. */
 export function SeriesHatchPattern({ id, hatch }: TSeriesHatchPatternProps) {
   const tile = getHatchTile(hatch);
   if (!tile) return null;

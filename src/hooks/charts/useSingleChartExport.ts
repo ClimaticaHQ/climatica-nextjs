@@ -17,12 +17,6 @@ import {
 import { useTranslations } from "next-intl";
 import { useSingleExportLabels } from "./useSingleExportLabels";
 
-/**
- * The export menu for a single-series chart: CSV of the monthly values, PNG / SVG of the chart
- * as shown (chart type, chips, month filter), and — where the page offers it and the data has
- * every variable — the raw CSV / JSON. Disabled, saying why, while data is replaced or a month
- * is missing.
- */
 export function useSingleChartExport(args: TUseSingleChartExportArgs): ExportMenuProps {
   const { model, viewState, features, place, subtitle, isFetching } = args;
   const t = useTranslations();
@@ -38,7 +32,6 @@ export function useSingleChartExport(args: TUseSingleChartExportArgs): ExportMen
   const data = entry?.series.data ?? [];
   const isRawAvailable =
     features.hasRawExport && isFullVariableDataAvailable(subtitle.dataset, subtitle.climatePeriod);
-  // * Walter-Lieth plots every month, so its export does too
   const selectedMonths = viewState.mode === "walter-lieth" ? null : viewState.selectedMonths;
   const payload = entry
     ? buildExportPayload({
@@ -62,7 +55,6 @@ export function useSingleChartExport(args: TUseSingleChartExportArgs): ExportMen
         shareUrl: args.shareUrl,
       })
     : null;
-  // * the export needs every month (its stats table, the Walter-Lieth diagram)
   const hasIncompleteMonths = entry !== undefined && entry.chartData.length > 0 && !entry.summary;
   const disabledReason = isFetching
     ? t("exportMenu.updating")

@@ -8,16 +8,8 @@ import type {
   TPrintNumberArgs,
 } from "@/types";
 
-/*
- * The only way a number is formatted for display. Rounding is defined once, per metric
- * (DISPLAY_PRECISION); a value is rounded before it's printed, and a difference is taken between
- * the rounded values, so it always equals the difference of the numbers shown beside it. CSV
- * files don't use this: they keep "." and their own decimals for machines.
- */
-
 const formatters = new Map<string, Intl.NumberFormat>();
 
-/** One Intl.NumberFormat per locale / decimals / grouping — charts format many values. */
 function getFormatter(locale: string, { digits, hasGrouping }: TDisplayPrecision) {
   const key = `${locale}|${digits}|${hasGrouping}`;
   const cached = formatters.get(key);
@@ -36,7 +28,6 @@ function getFormatter(locale: string, { digits, hasGrouping }: TDisplayPrecision
 const signOf = (value: number) =>
   value > 0 ? DIFFERENCE_SIGN.PLUS : value < 0 ? DIFFERENCE_SIGN.MINUS : DIFFERENCE_SIGN.NONE;
 
-/** An already rounded number in the locale's digits, with its sign style. */
 function printNumber(value: number, { locale, precision, sign }: TPrintNumberArgs): string {
   const formatter = getFormatter(locale, precision);
   if (sign === ENumberSign.AUTO) return formatter.format(value);
@@ -48,21 +39,14 @@ function printNumber(value: number, { locale, precision, sign }: TPrintNumberArg
 const isKnown = (value: number | null | undefined): value is number =>
   value !== null && value !== undefined && !Number.isNaN(value);
 
-/**
- * The value as it's displayed: rounded to its metric's decimals, half away from zero on the
- * exact value — as Intl.NumberFormat rounds, so a rounded value always prints as the value did.
- */
+/** half away from zero, as Intl.NumberFormat rounds, so a rounded value prints as the value did */
 export function roundForDisplay(value: number, metric: EDisplayMetric): number {
   const rounded = Number(value.toFixed(DISPLAY_PRECISION[metric].digits));
   // * never a negative zero
   return rounded === 0 ? 0 : rounded;
 }
 
-/**
- * minuend − subtrahend as the reader sees it: the difference of the two displayed values, null
- * when either is unknown. Taken in whole units of the last shown decimal, so 6.0 − 4.9 is 1.1,
- * never 1.0999999999999996.
- */
+/** taken in whole units of the last decimal, so 6.0 − 4.9 is 1.1, never 1.0999999999999996 */
 export function displayDifference({
   minuend,
   subtrahend,
@@ -75,7 +59,6 @@ export function displayDifference({
   return difference === 0 ? 0 : difference;
 }
 
-/** A value in the locale's digits, to its metric's decimals; "—" when unknown. */
 export function formatValue(
   value: number | null | undefined,
   { metric, locale, sign = ENumberSign.AUTO }: TFormatValueArgs,
@@ -85,7 +68,6 @@ export function formatValue(
   return printNumber(roundForDisplay(value, metric), { locale, precision, sign });
 }
 
-/** The displayed difference, always signed: "+1,1", "−0,7", "±0,0"; "—" when either is unknown. */
 export function formatDifference({ locale, ...difference }: TFormatDifferenceArgs): string {
   const value = displayDifference(difference);
   if (value === null) return MISSING_VALUE_LABEL;

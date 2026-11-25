@@ -6,15 +6,10 @@ export type TToggleChipProps = {
   label: string;
   isActive?: boolean;
   disabled?: boolean;
-  /** active, but can't be turned off — a not-allowed cursor, announced as disabled */
   isLocked?: boolean;
-  /** an entity's shape before the label — e.g. a compared year's */
   markerShape?: TSeriesShape;
-  /** its bars' hatch beside the shape — entity chips that are the chart's legend */
   markerHatch?: TSeriesHatch | undefined;
-  /** the hatch swatch's fill; absent: the humid fill */
   markerFill?: string | undefined;
-  /** TOUCH: the touch scale below lg (a filter section in a sheet); DEFAULT otherwise */
   textScale?: ETextScale;
   onClick: () => void;
 };
@@ -22,18 +17,14 @@ export type TToggleChipProps = {
 export type TValueChipProps = {
   variant: EChipVariant.VALUE;
   value: string;
-  /** "Climate period: 1961–1990" */
   ariaLabel: string;
-  /** not the default value: drawn in the light green variant */
   isChanged: boolean;
-  /** not changeable here: drawn muted; the click opens the explanation instead */
   isDisabled: boolean;
   onClick: () => void;
 };
 
 export type TAllFiltersChipProps = {
   variant: EChipVariant.ALL_FILTERS;
-  /** filters set away from their default — the badge, hidden at 0 */
   changedCount: number;
   onClick: () => void;
 };

@@ -2,8 +2,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 
-// * colour values live in tokens.css only (docs/colors.md); these files can't read CSS, so they
-// * hold literals — each must be one of the primitives
+// * these files can't read CSS, so they hold literals: each must be a primitive
 const ALLOWLIST: Readonly<Record<string, string>> = {
   "src/app/icon.svg": "the favicon — a static file",
   "src/assets/climatica-logo.svg": "the static logo — a static file",

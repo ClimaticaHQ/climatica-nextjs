@@ -7,10 +7,6 @@ import {
 } from "./StatusMessage.constant";
 import type { TStatusMessageProps } from "./StatusMessage.type";
 
-/**
- * A page's empty or error message — the one way every page shows either. With onDismiss, a
- * compact notice by its control that the reader can close.
- */
 export function StatusMessage({
   variant,
   message,

@@ -33,7 +33,6 @@ import { LazyIndicatorsFigureChart } from "../figures/LazyFigureCharts";
 import { InfoSection } from "../parts/InfoSection";
 import { ResolutionsTable } from "../parts/ResolutionsTable";
 
-/** Data & methods: what a value describes (its raster cell's, not the point's), the grids, periods, variables and indicators. */
 export function DataPage() {
   const t = useTranslations();
   const { arcLabel, elevation, temperature, cellLabel, variableNames } = useDataPage();
@@ -122,7 +121,6 @@ export function DataPage() {
               {
                 key: "weather",
                 title: t("sidebar.datasets.weather"),
-                // * years are labels, never grouped ("1951", not "1,951")
                 text: t("info.data.periods.weatherIntro", {
                   first: String(WEATHER_MIN_YEAR),
                   last: String(WEATHER_MAX_YEAR),

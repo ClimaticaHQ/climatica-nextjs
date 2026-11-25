@@ -20,28 +20,18 @@ function readBlobAsDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-/**
- * Fetches one tile and inlines it as a data URI — external hrefs don't load
- * once the SVG is rasterized to PNG, so every tile image must be embedded.
- * `crossOrigin` on the live TileLayer (MapCanvas.tsx) means this often hits
- * the browser's HTTP cache instead of re-downloading. Returns null (never
- * throws) on any failure — a slow, missing or errored tile just means the
- * export falls back to a neutral rect for that one cell, not an aborted export.
- */
+/** external hrefs don't load once the SVG is rasterized: every tile is inlined */
 export async function fetchTileDataUrl(x: number, y: number, z: number): Promise<string | null> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), HEATMAP_EXPORT_TILE_LIMITS.fetchTimeoutMs);
 
   try {
-    // * our origin as the Referer (OSM tile usage policy); the default cache mode, so the live
-    // * map's tiles are reused and no no-cache header is sent
+    // * our origin as the Referer (OSM tile usage policy); the default cache mode, so the live map's tiles are reused
     const response = await fetch(buildTileUrl(x, y, z), {
       signal: controller.signal,
       referrerPolicy: MAP_TILE_CONFIG.referrerPolicy,
     });
-    // OSM signals a tile-usage-policy block via this header on an otherwise-200
-    // response whose body is a PNG *of* the block notice, not a non-2xx status —
-    // treat it the same as a failed fetch rather than embedding that image.
+    // OSM signals a policy block with this header on a 200 whose body is the notice: treated as a failed fetch
     if (!response.ok || response.headers.has("x-blocked")) return null;
     return await readBlobAsDataUrl(await response.blob());
   } catch {
@@ -51,9 +41,6 @@ export async function fetchTileDataUrl(x: number, y: number, z: number): Promise
   }
 }
 
-/** Fetches every tile in `[minX..maxX] × [minY..maxY]` at `zoom` in parallel,
- * keyed by "x,y". A failed/timed-out tile's entry is null, not omitted, so
- * callers can still iterate the full expected grid and fall back per-tile. */
 export async function fetchTileGrid(
   minX: number,
   maxX: number,

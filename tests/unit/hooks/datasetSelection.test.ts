@@ -15,7 +15,6 @@ import type { TDataset, TFilters } from "@/types";
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// * the router seam: one address, which replace and push rewrite
 const url = vi.hoisted(() => ({ pathname: "/compare-periods", search: "" }));
 
 vi.mock("next/navigation", () => ({
@@ -33,7 +32,6 @@ const CLIMATE_PAIR = {
   climatePeriodB: CLIMATE_PERIODS.C1961_1990,
 };
 
-/** The sidebar as it works: a draft of the URL's filters, applied through the one writer. */
 function renderSidebar() {
   return renderHook(() => {
     const filters = useFilters();
@@ -63,7 +61,6 @@ function switchTo(sidebar: TSidebar, dataset: TDataset) {
   apply(sidebar);
 }
 
-/** A page opened from a link: its route and URL, a fresh sidebar. */
 function openPage(pathname: string, search: string) {
   cleanup();
   url.pathname = pathname;
@@ -187,7 +184,6 @@ describe("dataset switch: each dataset keeps its last selection", () => {
     url.search = "dataset=weather&periods=2021,1967,1998";
     const sidebar = renderSidebar();
     expect(sidebar.result.current.draft.draft.weatherPeriods).toEqual([2021, 1967, 1998]);
-    // * switching away and back within the draft keeps the draft's own years, not the memory's
     act(() => sidebar.result.current.draft.setFilter(EFilterKey.DATASET, "climate"));
     act(() => sidebar.result.current.draft.setFilter(EFilterKey.DATASET, "weather"));
     expect(sidebar.result.current.draft.draft.weatherPeriods).toEqual([2021, 1967, 1998]);
@@ -202,7 +198,6 @@ describe("dataset switch: each dataset keeps its last selection", () => {
 });
 
 describe("dataset switch: the scope follows syncFilters", () => {
-  // * Heat map on Climate 1991–2020 → Weather; then City Climate on Weather 2021 → Climate
   function leaveClimateOnHeatMap() {
     const heatMap = openPage(ROUTES.HEAT_MAP, `period=${CLIMATE_PERIODS.C1991_2020}`);
     switchTo(heatMap, "weather");
@@ -221,7 +216,6 @@ describe("dataset switch: the scope follows syncFilters", () => {
     switchTo(cityClimate, "climate");
     expect(cityClimate.result.current.filters.climatePeriod).toBe(FILTER_DEFAULTS.climatePeriod);
 
-    // * City Climate's own Weather 2021 comes back on City Climate, the heat map's period there
     switchTo(cityClimate, "weather");
     expect(cityClimate.result.current.filters.weatherYear).toBe(2021);
     const heatMap = openPage(ROUTES.HEAT_MAP, "dataset=weather");
@@ -247,7 +241,6 @@ describe("dataset switch: the scope follows syncFilters", () => {
     expect(url.search).toBe("dataset=weather&year=1990&var=tmax");
     expect(sidebar.result.current.draft.draft).toEqual(sidebar.result.current.filters);
 
-    // * this page's scope starts empty: switching still works, and comes back within it
     switchTo(sidebar, "climate");
     expect(sidebar.result.current.filters.dataset).toBe("climate");
     switchTo(sidebar, "weather");

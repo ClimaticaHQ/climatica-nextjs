@@ -7,12 +7,6 @@ import { useDataUpdate } from "./useDataUpdate";
 
 const INERT_SELECTOR = "[inert]";
 
-/**
- * A card's update flash: put the ref on the bordered element. It flashes when a fresh update
- * changed one of the card's series — also right after the update's crossfade remounted it,
- * never on the first load or a chart type / layout switch. None with motion off. The
- * variant (glow or border only) is read when the flash starts.
- */
 export function useUpdateFlash<T extends HTMLElement>(
   keys: TUpdateFlashKeys,
   variant: EUpdateFlashVariant,

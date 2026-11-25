@@ -28,14 +28,12 @@ import { buildExportValuesRows } from "./monthlyValuesExport.util";
 const contentLeft = L.paddingX;
 const contentWidth = L.width - L.paddingX * 2;
 
-/** One standard chart in a panel's box: shared domains, this series' bars and lines. */
 function buildStandardPlot(
   payload: TCompareExportPayload,
   series: TCompareExportSeries,
   colors: TExportChartColors,
   box: TWalterLiethExportBox,
 ) {
-  // * the screen's full-width °C axis: both ends on ticks
   const tempAxis = getStandardTempAxis({ scales: payload.scales, isNarrow: false });
   const tempScale = createLinearScale(...tempAxis.domain, box.bottom, box.top);
   const precTicks = getPrecipitationTicks(payload.rightMax);
@@ -68,7 +66,6 @@ function buildStandardPlot(
       plotRight: box.right,
     }),
     buildGroupedBars(payload, precScale, monthBands, box.bottom, { seriesList: [series] }),
-    // * the single-city chart's dashes, like the split panels on screen
     buildSeriesLines({
       payload,
       series,
@@ -81,7 +78,6 @@ function buildStandardPlot(
   ].join("\n");
 }
 
-/** Every panel in the same semantic colours and bars by aridity: one legend, as on screen. */
 function getSplitLegendItems(payload: TCompareExportPayload, colors: TExportChartColors) {
   return getStandardLegendItems({
     labels: { ...payload.labels.seriesLabels, ...payload.labels.aridityLegend },
@@ -103,17 +99,12 @@ function buildSplitLegend({ payload, colors, y }: TStandardSplitLegendArgs) {
   });
 }
 
-/**
- * Compare export body for the standard chart in split layout: the WL split's panel cards and
- * headers, each with one series' standard chart on the shared domains, one legend below.
- */
 export function buildStandardSplitBody(
   payload: TCompareExportPayload,
   comparison: TComparisonExport,
   colors: TExportChartColors,
   top: number,
 ): TCompareWalterLiethBody {
-  // * payload.series is always [A, B]; an expanded panel may be either
   const exportSeriesOf = (series: TWalterLiethSeriesInput) =>
     payload.series[series.id === EWalterLiethSeriesId.A ? 0 : 1];
   const panels = buildComparisonPanels({
@@ -144,17 +135,12 @@ export function buildStandardSplitBody(
   return { body: panels.body + legend.svg, bottom: legend.bottom };
 }
 
-/**
- * Weather years side by side in the standard chart, as on screen: the pair's two panels, each
- * year in the semantic colours (the header names the year) on the shared scales.
- */
 export function buildStandardYearPairBody(
   payload: TCompareExportPayload,
   years: TWeatherYearsExport,
   colors: TExportChartColors,
   top: number,
 ): TCompareWalterLiethBody {
-  // * a panel is a single-city chart: its mean line too, when its chip is on
   const panelPayload = { ...payload, showTavgLine: true };
   const exportSeriesOf = (series: TWalterLiethSeriesInput): TCompareExportSeries | undefined => {
     const exportSeries = payload.series.find(({ label }) => label === series.label);

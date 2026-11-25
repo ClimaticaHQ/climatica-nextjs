@@ -33,14 +33,12 @@ const COLORS: TExportChartColors = {
   seriesMarker: "#555555",
 };
 
-// * each year its own shape and hatch, by its place in the list
 const YEARS = [2021, 1967, 1990, 2010].map((year, i) => ({
   year,
   shape: getSeriesShape(i),
   hatch: getSeriesHatch(i),
 }));
 const months = (shift: number) =>
-  // * January's 1 mm: an arid month (and a very low bar); the wet end of the year humid
   Array.from({ length: 12 }, (_, i) => ({ tavg: 12 + shift + i, prec: i === 0 ? 1 : 20 + i * 9 }));
 
 const yearSeries: TWalterLiethSeriesInput[] = YEARS.map(({ year, shape }) => ({
@@ -126,10 +124,8 @@ function buildSvg(
 }
 
 const count = (svg: string, needle: string) => svg.split(needle).length - 1;
-// * the precipitation bars (rx 1.5), and the markers above them (graphite paths, faded by month)
 const barRect =
   /<rect x="[^"]+" y="[^"]+" width="[^"]+" height="([\d.]+)" fill="([^"]+)" fill-opacity="[^"]+" rx="1.5"/g;
-// * a bar's hatch over it: which hatch, and the pattern it fills with
 const barHatches = (svg: string) =>
   [...svg.matchAll(/<rect data-bar-hatch="([a-z]+)"[^>]*fill="url\(#([^)]+)\)"/g)].map(
     ([, hatch, id]) => ({ hatch, id }),
@@ -141,7 +137,6 @@ const barMarkers = (svg: string) =>
       new RegExp(`<path d="([^"]+)" fill="${COLORS.seriesMarker}" fill-opacity="[^"]+" />`, "g"),
     ),
   ].map(([, d]) => d);
-// * every stroke the chart draws — lines and curves: only the semantic colours
 const strokes = (svg: string) =>
   new Set([...svg.matchAll(/stroke="(#[0-9a-f]+)"/g)].map(([, c]) => c));
 const SEMANTIC_STROKES = [
@@ -155,7 +150,6 @@ const SEMANTIC_STROKES = [
   COLORS.textSecondary,
   COLORS.wlFrostOutline,
 ];
-// * the stats table names every year once, in its header row (font-size 13, bold)
 const statsHeaders = (svg: string) =>
   [...svg.matchAll(/font-size="13" font-weight="700" fill="[^"]+">(\d{4})</g)].map(([, y]) => y);
 
@@ -190,12 +184,10 @@ describe("weather years export: what's on screen", () => {
     const svg = buildSvg("standard", ECompareLayout.OVERLAY, [1967, 2010]);
     expect([...strokes(svg)].every((color) => SEMANTIC_STROKES.includes(color))).toBe(true);
     expect(new Set(barFills(svg))).toEqual(new Set([PRECIP_BAR.ARID, PRECIP_BAR.HUMID]));
-    // * no marker above the bars: every bar of 1967 (diagonal) and 2010 (horizontal) hatched
     expect(barMarkers(svg)).toEqual([]);
     const hatches = barHatches(svg);
     expect(hatches).toHaveLength(barFills(svg).length);
     expect(new Set(hatches.map(({ hatch }) => hatch))).toEqual(new Set(["diagonal", "horizontal"]));
-    // * each pattern drawn in the card's colour, at full width (the export never scrolls)
     for (const { id } of hatches) {
       expect(svg).toMatch(
         new RegExp(`<pattern id="${id}"[^>]*><path d="[^"]+" stroke="${COLORS.bg}"`),
@@ -205,7 +197,6 @@ describe("weather years export: what's on screen", () => {
 
   it("the legend names every year by its hatch and shape, chips or not", () => {
     const svg = buildSvg("standard", ECompareLayout.OVERLAY, [1967, 2010]);
-    // * the legend's entity swatches: a hatch square with its own pattern, then the shape
     expect(svg.match(/<pattern id="cmp-legend-[^"]+-hatch"/g)).toHaveLength(2);
     expect(svg).toContain(">1967</text>");
     expect(svg).toContain(">2010</text>");
@@ -221,7 +212,6 @@ describe("weather years export: what's on screen", () => {
   });
 });
 
-// * the x of each bar in the first month, in entity order
 const firstMonthBarXs = (svg: string) =>
   [
     ...svg.matchAll(
@@ -251,7 +241,6 @@ describe("weather years export: the bar style setting, as on screen", () => {
     }
     expect(fills.has(PRECIP_BAR.HUMID)).toBe(false);
     expect(barHatches(svg)).toEqual([]);
-    // * the legend and the monthly table: each year's humid step beside its shape
     for (const place of [0, 1, 2, 3]) {
       expect(count(svg, `fill="${getBarShades(place).humid}"`)).toBeGreaterThan(
         barFills(svg).filter((fill) => fill === getBarShades(place).humid).length,
@@ -260,7 +249,6 @@ describe("weather years export: the bar style setting, as on screen", () => {
   });
 
   it("shades keep each year's step by its place among every year, as on screen", () => {
-    // * 1967 is second of the page's years: its step is the second, drawn alone or not
     const svg = buildSvg("standard", ECompareLayout.OVERLAY, [1967, 2010], "shades");
     const fills = new Set(barFills(svg));
     expect(
@@ -287,7 +275,6 @@ describe("weather years export: the bar style setting, as on screen", () => {
     };
     expect(gapOf("hatch")).toBeCloseTo(1);
     expect(gapOf("shades")).toBeCloseTo(2);
-    // * plain's adapts as on screen (getOverlayGap): between its floor and its full 3 px
     expect(gapOf("plain")).toBeGreaterThan(1.5);
     expect(gapOf("plain")).toBeLessThanOrEqual(3);
   });

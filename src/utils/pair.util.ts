@@ -1,17 +1,14 @@
 import { EPairSide } from "@/enums";
 import type { TDefaultShownYearsArgs, TPair, TPairOption, TResolveShownYearsArgs } from "@/types";
 
-/** The pair the other way round — the swap button. */
 export function swapPair<T>([a, b]: TPair<T>): TPair<T> {
   return [b, a];
 }
 
-/** The pair with one side changed, the other kept. */
 export function setPairSide<T>([a, b]: TPair<T>, side: EPairSide, value: T): TPair<T> {
   return side === EPairSide.A ? [value, b] : [a, value];
 }
 
-/** A side's options with the other side's value disabled, so both never match. */
 export function disableOtherSide<T, O extends TPairOption<T>>(
   options: readonly O[],
   other: T,
@@ -19,11 +16,6 @@ export function disableOtherSide<T, O extends TPairOption<T>>(
   return options.map((option) => (option.value === other ? { ...option, disabled: true } : option));
 }
 
-/**
- * The weather years shown as the two diagrams. Default: the first two compared years. A year
- * no longer compared falls back to the first one that isn't on the other side. Null with
- * fewer than two years.
- */
 export function resolveYearPair(
   years: readonly number[],
   requested: TPair<number> | null,
@@ -39,18 +31,11 @@ export function resolveYearPair(
   return [a, b];
 }
 
-/**
- * The overlay's years until the reader picks some: Walter-Lieth the side-by-side pair (five
- * overlaid diagrams are hard to read), the standard chart every year.
- */
+/** Walter-Lieth: the side-by-side pair, since five overlaid diagrams are hard to read */
 export function getDefaultShownYears({ years, pair, isWalterLieth }: TDefaultShownYearsArgs) {
   return isWalterLieth && pair !== null ? years.filter((year) => pair.includes(year)) : years;
 }
 
-/**
- * The weather years drawn in the overlay: the requested ones still compared, in the page's
- * order; the default when none is requested or none is left.
- */
 export function resolveShownYears({
   years,
   requested,
@@ -60,7 +45,6 @@ export function resolveShownYears({
   return shown.length > 0 ? shown : years.filter((year) => defaultYears.includes(year));
 }
 
-/** Whether two lists hold the same years, in any order. */
 export function isSameYears(a: readonly number[], b: readonly number[]) {
   return a.length === b.length && a.every((year) => b.includes(year));
 }

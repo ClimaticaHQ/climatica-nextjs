@@ -1,4 +1,4 @@
-/** Every filter the app knows. Values double as the TFilters field names. */
+/** values double as the TFilters field names */
 export enum EFilterKey {
   DATASET = "dataset",
   CLIMATE_PERIOD = "climatePeriod",
@@ -11,7 +11,6 @@ export enum EFilterKey {
   WEATHER_PERIODS = "weatherPeriods",
 }
 
-/** The pages that render filters. */
 export enum EFilterView {
   CLIMATE_STATISTICS = "climateStatistics",
   COMPARE_CITIES = "compareCities",
@@ -19,52 +18,40 @@ export enum EFilterView {
   HEAT_MAP = "heatMap",
 }
 
-/** How a filter is picked: one option (applies at once), several, or typed in (needs Apply). */
 export enum EFilterChoice {
   SINGLE = "single",
   MULTI = "multi",
   INPUT = "input",
 }
 
-/** Where a filter lives. */
 export enum EFilterPlacement {
-  // * a section: the sidebar, the mobile chips and sheets
   SECTION = "section",
-  // * Compare Periods' periods and years: on the page below lg (applied at once), a sidebar
-  // * section from lg (part of its draft) — never a chip or a sheet section
   PAGE_BELOW_LG = "pageBelowLg",
 }
 
-/** Whether a filter can be used in the current view, and if not, why. */
 export enum EFilterAvailability {
   AVAILABLE = "available",
-  // * not part of this view or dataset at all — never rendered
   HIDDEN = "hidden",
-  // * rendered disabled, with an explanation
   WALTER_LIETH = "walterLieth",
   HEAT_MAP = "heatMap",
 }
 
-/** A quick single-filter change, or an explicit Apply of several. */
 export enum EFilterApplyMode {
   QUICK = "quick",
   APPLY = "apply",
 }
 
-/** The router method a filter change navigates with. */
 export enum EFilterNavigation {
   REPLACE = "replace",
   PUSH = "push",
 }
 
-/** How a note under a filter reads: a plain explanation, a muted aside, or an error. */
 export enum EFilterNoteVariant {
   INFO = "info",
   MUTED = "muted",
   ERROR = "error",
 }
 
-/** What the filters sheet shows: every filter, one filter's section, or why chips are disabled. */
 export enum EFiltersSheetMode {
   ALL = "all",
   SINGLE = "single",

@@ -17,11 +17,6 @@ import { useTranslations } from "next-intl";
 import { FilterSections } from "./FilterSections";
 import { FilterUnavailableActionsContext } from "./filters.context";
 
-/**
- * The filters column, lg and up (below it, the filter bar and its sheet). It edits a draft,
- * applied with Apply (a new history entry) or — with auto-apply — shortly after each change
- * (replacing it).
- */
 export function FiltersSidebar() {
   const t = useTranslations();
   const filters = useFilters();
@@ -34,9 +29,6 @@ export function FiltersSidebar() {
   const filtersDraft = useFiltersDraft({ filters, heatmapBbox });
   const { draft, isApplyBlocked } = filtersDraft;
   const draftContext = { view, dataset: draft.dataset, isWalterLieth };
-  // * the same sections at every width: the column shows from lg only (its classes), and below lg
-  // * the page has its own copy of the period selectors — each copy hidden by CSS where the
-  // * other shows, so nothing is added or removed on hydration
   const sectionKeys = getSidebarFilterKeys(draftContext);
 
   function commit(mode: EFilterApplyMode) {

@@ -12,7 +12,6 @@ export const STAT_LABEL_SIZE_CLASSES: Record<EStatLabelSize, string> = {
   [EStatLabelSize.BASE]: "text-[length:var(--font-base)]",
 };
 
-// * a number sits on one line; text (a city name) may wrap
 export const STAT_VALUE_CLASSES: Record<EStatValueSize, string> = {
   [EStatValueSize.XL]:
     "text-[length:var(--font-xl)] font-bold leading-none text-[var(--color-text)]",

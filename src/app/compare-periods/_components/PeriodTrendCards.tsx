@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 import { PERIOD_TREND_CARDS_CLASS } from "./ComparePeriods.constant";
 import type { TPeriodTrendCardsProps } from "./ComparePeriods.type";
 
-/** Under a climate comparison: how the max temperature and the precipitation changed, B vs A. */
 export function PeriodTrendCards({ trend }: TPeriodTrendCardsProps) {
   const t = useTranslations();
   const { formatDifference } = useDisplayFormat();

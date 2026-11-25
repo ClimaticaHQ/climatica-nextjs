@@ -1,4 +1,3 @@
-// * name and subtitle on one line each, so both panels of a split pair are equally tall
 export const SPLIT_PANEL_HEADER_CLASSES = {
   FRAME: "mb-2 flex items-start justify-between gap-2",
   TITLE_BLOCK: "min-w-0",

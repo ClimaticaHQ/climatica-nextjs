@@ -8,10 +8,6 @@ import Link from "next/link";
 import { TOPBAR_LINK_CLASSES as L } from "./Topbar.constant";
 import type { TTopbarLinksProps } from "./Topbar.type";
 
-/**
- * The navbar's links in one row, from lg — inert and unseen while they don't fit. One pill slides
- * under the highlighted link: the page being opened as soon as it's clicked, then the current one.
- */
 export function TopbarLinks({ links, navRef, isCollapsed }: TTopbarLinksProps) {
   const { containerRef, indicator } = useSlidingIndicator<HTMLDivElement>({
     activeKey: links.find(({ isHighlighted }) => isHighlighted)?.key ?? null,

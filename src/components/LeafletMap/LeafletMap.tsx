@@ -38,7 +38,7 @@ export function LeafletMap({
     onMapClickRef.current = onMapClick;
   }, [onMapClick]);
 
-  // Init once — guard prevents React Strict Mode double-invoke
+  // init once: guards against Strict Mode's double invoke
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 

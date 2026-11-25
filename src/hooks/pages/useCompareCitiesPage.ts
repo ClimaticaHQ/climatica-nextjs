@@ -45,10 +45,6 @@ import { useDocumentTitle } from "./useDocumentTitle";
 import { useNoPeriodDataMessage } from "./useNoPeriodDataMessage";
 import { useScrollToResults } from "./useScrollToResults";
 
-/**
- * Compare Cities: two cities' series (A, then B), each picked by its own search; their stats
- * table with the difference B − A, and the difference cards under the chart.
- */
 export function useCompareCitiesPage(): TCompareCitiesPage {
   const t = useTranslations();
   const { cityA, cityB, selectCityA, selectCityB } = usePersistedComparisonCities();
@@ -147,7 +143,6 @@ export function useCompareCitiesPage(): TCompareCitiesPage {
   };
   const features = {
     title: { names: [], subtitle: periodLabel },
-    // * the difference reads B − A: the second city against the first
     difference: { minuendId: EWalterLiethSeriesId.B, meaning: EDifferenceMeaning.CITIES },
     hasSidePickers: false,
     hasMonthBadge: false,

@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-// * every page's header: its title (the navbar's name for it) and its one-line description
 const PAGES = [
   {
     path: "/climate-statistics",
@@ -32,7 +31,6 @@ test.describe("PageHeader on every page", () => {
       await expect(header.getByRole("heading", { level: 1 })).toHaveText(title);
       await expect(header.locator("p")).toHaveText(description);
       await expect(page.locator("header nav").getByRole("link", { name: title })).toBeVisible();
-      // * no "Auto resolution" line by the header any more — the resolution is the filter's
       await expect(page.getByText(/Auto resolution/)).toHaveCount(0);
     });
   }

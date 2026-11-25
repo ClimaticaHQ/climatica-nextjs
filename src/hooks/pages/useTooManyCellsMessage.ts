@@ -9,12 +9,6 @@ import {
 } from "@/utils";
 import { useTranslations } from "next-intl";
 
-/**
- * Why a heat map region isn't loaded: its box holds more cells than the cap at this resolution
- * (a polygon is read from its whole box). Names the finest resolution it fits at, or asks for a
- * smaller region when even the coarsest is too fine. A polygon's message tells its own cells
- * from its box's, so a thin one within the cap says why it still can't load.
- */
 export function useTooManyCellsMessage(gridSize: TCellSize) {
   const t = useTranslations();
   return (area: TRegionArea) => {

@@ -4,10 +4,6 @@ import type { TWalterLiethHoverBandProps } from "../WalterLiethChart.type";
 
 const HALF_MONTH = WALTER_LIETH_DIAGRAM.MONTH_EDGE_PADDING;
 
-/**
- * The card's hovered month as a band over the plot — hovered here, in another panel or in a
- * monthly values table. Drawn under the curves, in the table's highlight color.
- */
 export function WalterLiethHoverBand({ activeMonthIndex, yMin, yMax }: TWalterLiethHoverBandProps) {
   const xScale = useXAxisScale();
   const yScale = useYAxisScale("left");

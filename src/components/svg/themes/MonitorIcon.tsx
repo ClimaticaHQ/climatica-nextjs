@@ -1,4 +1,3 @@
-/** A screen — the theme follows the device. */
 export default function MonitorIcon() {
   return (
     <svg viewBox="0 0 20 20" fill="none" width="14" height="14" aria-hidden="true">

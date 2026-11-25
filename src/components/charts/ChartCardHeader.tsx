@@ -11,13 +11,6 @@ import { SeriesChips } from "./SeriesChips";
 import { ShadingControl } from "./ShadingControl";
 import { VariableChips } from "./VariableChips";
 
-/**
- * The card's top: the title block with the chart type and layout switches (beside it, or under
- * it when the card is narrow — a container query), then the toolbar, the same row in every view:
- * the series chips (an overlay of a kind with them) on the left, the view's controls on the
- * right — the variable chips (standard) or the guide (Walter-Lieth), the shading control over it
- * in an overlay of a shadable pair.
- */
 export function ChartCardHeader({
   model,
   rule,

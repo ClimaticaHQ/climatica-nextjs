@@ -12,7 +12,6 @@ import {
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-/** Every user setting but the language, saved as one object. */
 export const useSettingsStore = create<TSettingsState>()(
   persist(
     (set) => ({

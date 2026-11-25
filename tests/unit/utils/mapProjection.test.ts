@@ -28,7 +28,6 @@ describe("projectLatLngToPixel", () => {
   });
 });
 
-/** The tiles a box covers, the way the export computes them from its projected corners. */
 function computeTileRange(bbox: TCellBounds, zoom: number) {
   return computeTileRangeFromPixelBounds(
     projectLatLngToPixel(bbox.north, bbox.west, zoom),
@@ -135,20 +134,15 @@ describe("tile placement matches overlay projection at the same lat/lng", () => 
     const { tileZoom, zoomDelta, tileDrawSizePx } = resolveTileZoom(fittedZoom, 2, tileSizePx);
     expect(zoomDelta).toBe(1);
 
-    // (0,0) lands exactly on a tile's world-pixel corner at any zoom (no rounding),
-    // making it an exact reference point for this cross-check.
     const worldPixelAtTileZoom = projectLatLngToPixel(0, 0, tileZoom, tileSizePx);
     const tileX = Math.floor(worldPixelAtTileZoom.x / tileSizePx);
     const tileY = Math.floor(worldPixelAtTileZoom.y / tileSizePx);
-    expect(tileX * tileSizePx).toBe(worldPixelAtTileZoom.x); // exact tile-boundary sanity check
+    expect(tileX * tileSizePx).toBe(worldPixelAtTileZoom.x);
 
-    // "Tile path": where the tile draws on the fittedZoom canvas, plus the point's
-    // offset within that (now-scaled-down) tile image.
     const tileDrawX = tileX * tileDrawSizePx - origin.x;
     const tileDrawY = tileY * tileDrawSizePx - origin.y;
-    const offsetWithinTile = { x: 0, y: 0 }; // (0,0) sits exactly at this tile's own origin
+    const offsetWithinTile = { x: 0, y: 0 };
 
-    // "Overlay path": project the same lat/lng directly at fittedZoom.
     const overlayPixel = projectToMapPixel(0, 0, fittedZoom, origin);
 
     expect(tileDrawX + offsetWithinTile.x).toBeCloseTo(overlayPixel.x, 9);

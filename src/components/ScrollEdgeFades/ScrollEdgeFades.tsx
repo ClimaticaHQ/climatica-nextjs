@@ -1,10 +1,6 @@
 import { SCROLL_EDGE_FADE_CLASSES as C } from "./ScrollEdgeFades.constant";
 import type { TScrollEdgeFadesProps } from "./ScrollEdgeFades.type";
 
-/**
- * The faded ends of a horizontal scroller (edges from useScrollEdges) — inside a relative frame
- * around it. Decorative: the content itself stays reachable by scrolling.
- */
 export function ScrollEdgeFades({ isStartHidden, isEndHidden, startInset }: TScrollEdgeFadesProps) {
   return (
     <>

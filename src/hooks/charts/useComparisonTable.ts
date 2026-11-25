@@ -10,10 +10,6 @@ const toTableSeries = ({ series }: TChartSeriesModel) => ({
   altitude: series.altitude,
 });
 
-/**
- * A compared pair's table for its export: every metric for both series and their difference,
- * from the page's minuend. Null without the difference feature or without both series' data.
- */
 export function useComparisonTable(model: TChartModel, features: TChartFeatures) {
   const locale = useLocale();
   const units = useUnitLabels();

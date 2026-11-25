@@ -78,7 +78,6 @@ describe("PageLayout", () => {
         />
       </NextIntlClientProvider>,
     );
-    // * no child draws anything: the frame isn't laid out (its :has rule), so no gap remains
     const results = screen.getByTestId("page-results");
     expect(results.matches(":has(> :not(:empty))")).toBe(false);
     expect(results.className).toContain("has-[>:not(:empty)]:flex");

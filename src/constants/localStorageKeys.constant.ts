@@ -9,8 +9,7 @@ export const LOCAL_STORAGE_KEYS = {
 
 export const LEGACY_THEME_STORAGE_KEYS = ["climatica:theme", "theme"] as const;
 
-// * what older versions kept in localStorage: filters and the heat map box (the URL holds them
-// * now), the theme (the settings store), an unused language key — removed on load
+// * what older versions kept in localStorage, removed on load
 export const LEGACY_STORAGE_KEYS = [
   "climatica:filters",
   "climatica:comparePeriods",

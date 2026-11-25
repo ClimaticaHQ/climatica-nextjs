@@ -28,10 +28,6 @@ import { useHeatMapSelection } from "./useHeatMapSelection";
 import { useNoPeriodDataMessage } from "./useNoPeriodDataMessage";
 import { useTooManyCellsMessage } from "./useTooManyCellsMessage";
 
-/**
- * Region Heatmap: one variable over a drawn box or polygon — the region's stats, its cells on
- * the map and its climate profile. A picked city moves the map; it doesn't select a region.
- */
 export function useHeatMapPage(): THeatMapPage {
   const t = useTranslations();
   const filters = useFilters();
@@ -48,7 +44,6 @@ export function useHeatMapPage(): THeatMapPage {
   const { bbox, polygon } = region.selection;
   const area = polygon ? { polygon } : bbox ? { bbox } : null;
   const bounds = polygon ? getPolygonBounds(polygon) : bbox;
-  // * a region over the cell cap isn't loaded: the page suggests a coarser resolution instead
   const isTooLarge = isHeatmapCellLimitExceeded(bounds, gridSize);
   const regionData = {
     area: isTooLarge ? null : area,
@@ -80,7 +75,6 @@ export function useHeatMapPage(): THeatMapPage {
   const tooManyCells = useTooManyCellsMessage(gridSize);
   const state = resolveDataState({
     isLoading: cells.isLoading,
-    // * the page's one message also reports a failed regional profile
     error: cells.error ?? profileError,
     hasData,
     emptyMessages: !region.hasSelection
@@ -132,7 +126,6 @@ export function useHeatMapPage(): THeatMapPage {
 
   return {
     state,
-    // * the region's stats: none while empty, so only new stats replacing shown ones flash
     update: {
       series: { [DATA_UPDATE_REGION_SERIES]: hasData ? stats : null },
       isFetching: cells.isFetching,
@@ -188,10 +181,7 @@ export function useHeatMapPage(): THeatMapPage {
   };
 }
 
-/**
- * With syncCity on, a city picked on another page moves this map to it. Only a change does:
- * on the first render the map keeps its own view.
- */
+/** only a change moves the map: on the first render it keeps its own view */
 function usePersistedCityFollow(onMove: (target: TMapTarget) => void) {
   const { city } = usePersistedCity();
   const { syncCity, hasHydrated } = useSettingsStore();

@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-// worldclim.util.ts imports `env` from @/libs/Env (used by createWorldClimAuthHeaders).
-// The pure functions under test don't use env, but the module-level import runs on load.
+// the module imports env on load, though these functions don't use it
 vi.mock("@/libs/Env", () => ({ env: { WORLDCLIM_API_KEY: "test-key" } }));
 
 import {

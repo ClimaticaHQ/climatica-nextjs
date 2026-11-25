@@ -2,10 +2,9 @@ import type { ESettingsControlPlacement } from "@/enums";
 import type { TAridityPalette, TBarStyle, TSeriesHatch, TSettings } from "@/types";
 import type { ReactNode } from "react";
 
-/** What the settings page's hook gives its view. */
 export type TSettingsPage = {
   locale: string;
-  isLocaleSwitching: boolean; // the page renders again in the new language
+  isLocaleSwitching: boolean;
   onLocaleChange: (locale: string) => void;
   settings: TSettings;
   animations: TAnimationsSetting;

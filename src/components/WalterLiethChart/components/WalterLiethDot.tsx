@@ -2,7 +2,7 @@ import { WALTER_LIETH_DOT } from "@/constants";
 import { getMarkerPath } from "@/utils/seriesShape.util";
 import type { TWalterLiethDotProps } from "../WalterLiethChart.type";
 
-/** Temperature marker; its shape tells the series apart — charts never use colour for that. */
+/** its shape tells the series apart: charts never use colour for that (a protected convention) */
 export function WalterLiethDot({
   x,
   y,

@@ -22,10 +22,6 @@ import {
 import type { NextRequest } from "next/server";
 import { fetchWorldClimJson } from "../../@utils";
 
-/**
- * Point queries are cached by the cell holding the point; region queries one strip at a time,
- * each strip under its own query string. Anything else isn't cached.
- */
 function resolveCacheEntry(queryId: string, params: URLSearchParams): TWorldClimCacheEntry | null {
   const point = buildPointCacheParts(queryId, params);
   if (point) {

@@ -8,9 +8,7 @@ import { LineSwatch } from "./LineSwatch";
 import { EntitySwatch } from "./EntitySwatch";
 import { MarkerSwatch } from "./MarkerSwatch";
 
-/** One swatch's shape inside its box. */
 export function SwatchShape({ swatch, size }: TLegendSwatchProps) {
-  // * a switch narrows the descriptor union without casts
   switch (swatch.kind) {
     case ELegendSwatch.LINE:
       return <LineSwatch color={swatch.color} dash={swatch.dash} size={size} />;

@@ -3,7 +3,6 @@ import { expect, test, type Page } from "@playwright/test";
 const CITY_URL = "/climate-statistics?city=Paris&lat=48.8566&lng=2.3522";
 const PAIR_URL =
   "/compare-cities?cityA=Paris&latA=48.8566&lngA=2.3522&cityB=London&latB=51.5074&lngB=-0.1278";
-// * the default views a chart page opens in, each with the plots its skeleton stands in for
 const CHART_VIEWS = [
   { name: "City Climate, Walter-Lieth", url: CITY_URL },
   { name: "City Climate, standard", url: `${CITY_URL}&chart=standard` },
@@ -29,8 +28,7 @@ const readBoxes = (page: Page, selector: string) =>
       return { width, height };
     }),
   );
-// * the boxes once the section has settled: no crossfade's leaving layer (inert), and the same
-// * boxes twice in a row
+// * settled: no crossfade's leaving layer, and the same boxes twice in a row
 const boxesOf = async (page: Page, selector: string) => {
   let previous = "";
   await expect
@@ -46,7 +44,6 @@ const boxesOf = async (page: Page, selector: string) => {
   return readBoxes(page, selector);
 };
 
-/** Holds every WorldClim request until the returned function is called. */
 async function holdChartData(page: Page) {
   let release!: () => void;
   const gate = new Promise<void>((resolve) => (release = resolve));
@@ -57,7 +54,6 @@ async function holdChartData(page: Page) {
   return release;
 }
 
-/** The page's cumulative layout shift, counted from the first paint (none after input). */
 async function trackLayoutShift(page: Page) {
   await page.addInitScript(() => {
     const target = window as Window & { __cls?: number };
@@ -166,7 +162,6 @@ test.describe("Loading without jumps", () => {
     await expect(
       chartSection(page).getByRole("button", { name: "Hide monthly values" }),
     ).toBeVisible();
-    // * and it now holds the values
     await expect(
       table.locator("tbody tr").first().getByRole("cell").filter({ hasText: /\d/ }),
     ).not.toHaveCount(0);
@@ -191,7 +186,6 @@ test.describe("Loading without jumps", () => {
       return {
         primary: colourOf("--color-primary"),
         onPrimary: colourOf("--color-on-primary"),
-        // * the plot band's discs (SVG) and the stats cells' and caption's markers (HTML)
         discs: [...document.querySelectorAll("[data-annotation-number]")].map((number) => ({
           fill: getComputedStyle(number.querySelector("circle")!).fill,
           text: getComputedStyle(number.querySelector("text")!).fill,

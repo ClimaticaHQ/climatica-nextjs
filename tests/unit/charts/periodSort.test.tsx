@@ -142,7 +142,6 @@ describe("one sort direction", () => {
       ? element.props.entries
       : [];
     expect(entries.map(({ id }) => id)).toEqual(["2021", "2000", "1999", "1987", "1967"]);
-    // * 2021's shade is the first slot's, whatever its place in the order
     expect(entries[0]?.barFills).toEqual(getOverlayBarFills("shades", 0));
   });
 });
@@ -163,7 +162,6 @@ describe("the sidebar's years (useComparedYears)", () => {
     const { result } = renderHook(() => useComparedYears([2021, 1990, 1950]));
     expect(result.current.years).toEqual([2021, 1990, 1950]);
     expect(result.current.markerOf(1990).markerSlot).toBe(2);
-    // * the freed second slot
     expect(result.current.markerOf(1950).markerSlot).toBe(1);
   });
 });

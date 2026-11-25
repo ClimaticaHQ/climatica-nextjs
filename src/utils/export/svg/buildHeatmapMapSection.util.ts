@@ -21,11 +21,9 @@ import { escapeXml } from "./buildExportSvg.util";
 import { fetchTileGrid } from "./mapTiles.util";
 
 const MAP_CLIP_ID = "heatmap-export-map-clip";
-// RASTER_SELECTION_PATH_OPTIONS (map.constant.ts) — the live map's bbox/polygon
-// outline style, replicated here since colors must be literal in the export.
 const SELECTION_FILL_OPACITY = 0.2;
 const SELECTION_STROKE_WIDTH = 2;
-// HeatmapLayer.tsx's L.rectangle fillOpacity for each cell.
+// matches HeatmapLayer.tsx's L.rectangle fillOpacity
 const CELL_FILL_OPACITY = 0.55;
 
 function buildAttribution(
@@ -39,7 +37,6 @@ function buildAttribution(
   const fontSize = 10;
   const paddingX = 6;
   const paddingY = 4;
-  // Same avg-char-width heuristic the footer's own URL-fitting math uses.
   const boxWidth = text.length * fontSize * 0.55 + paddingX * 2;
   const boxHeight = fontSize + paddingY * 2;
   const boxX = rectX + rectWidth - boxWidth;
@@ -82,8 +79,6 @@ function buildTiles(
   return parts.join("");
 }
 
-/** Axis-aligned — a lat/lng bounding rect stays axis-aligned in Web Mercator
- * pixel space, since x depends only on lng and y only on lat. */
 function buildCells(
   section: THeatmapExportMapSection,
   zoom: number,
@@ -139,13 +134,7 @@ function buildSelection(
   return `<polygon points="${points}" ${shared} />`;
 }
 
-/**
- * Draws the heat-map export's map section: basemap tiles (fetched live and
- * inlined as data URIs — external hrefs don't survive rasterization), the
- * heatmap cells and the selection outline, all projected through the exact
- * same fittedZoom/origin so nothing drifts between layers, clipped to the
- * section rect, plus the OSM attribution required by the ODbL.
- */
+/** tiles are inlined as data URIs: external hrefs don't survive rasterization; the OSM attribution is required by the ODbL */
 export async function buildHeatmapMapSection(
   section: THeatmapExportMapSection,
   colors: TExportChartColors,

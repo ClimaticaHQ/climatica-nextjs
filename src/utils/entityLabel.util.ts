@@ -2,7 +2,6 @@ import { ENTITY_SHORT_LABEL as E } from "@/constants";
 import { ESeriesKind } from "@/enums";
 import type { TEntityLabelSource } from "@/types";
 
-/** A climate period's short form: "1970–2000" → ’70–’00; anything else as it is. */
 function getShortPeriod(label: string) {
   const [from, to] = label.match(E.PERIOD_YEARS) ?? [];
   if (from === undefined || to === undefined) return label;
@@ -10,7 +9,6 @@ function getShortPeriod(label: string) {
   return `${short(from)}${E.PERIOD_SEPARATOR}${short(to)}`;
 }
 
-/** Each city's code: its first letters, uppercase — more than three only where two would match. */
 function getCityCodes(labels: readonly string[]) {
   const letters = labels.map((label) => label.replace(E.NON_LETTERS, "").toUpperCase());
   return letters.map((own, i) => {
@@ -22,11 +20,6 @@ function getCityCodes(labels: readonly string[]) {
   });
 }
 
-/**
- * The entities' short labels, in order (the exported values table's row headers, where the full
- * labels are too wide): a weather year whole, a climate period ’70–’00, a city its code — told
- * apart from the other cities given.
- */
 export function getEntityShortLabels(entities: readonly TEntityLabelSource[]) {
   const cities = entities.flatMap(({ kind, label }, i) =>
     kind === ESeriesKind.CITY ? [{ i, label }] : [],

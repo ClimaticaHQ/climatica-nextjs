@@ -1,7 +1,6 @@
 import { SRGB_LUMINANCE } from "@/constants/contrast.constant";
 import { hexToRgb } from "./colorScale.util";
 
-/** WCAG relative luminance of "#rrggbb", 0 (black) to 1 (white). */
 export function relativeLuminance(hex: string) {
   const {
     CHANNEL_MAX,
@@ -22,7 +21,6 @@ export function relativeLuminance(hex: string) {
     .reduce((sum, channel, index) => sum + channel * (WEIGHTS[index] ?? 0), 0);
 }
 
-/** WCAG contrast ratio of two "#rrggbb" colours, 1 to 21, in either order. */
 export function contrastRatio(first: string, second: string) {
   const [lighter, darker] = [relativeLuminance(first), relativeLuminance(second)].sort(
     (a, b) => b - a,

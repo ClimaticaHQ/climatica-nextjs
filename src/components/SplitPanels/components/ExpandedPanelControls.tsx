@@ -7,7 +7,6 @@ import { SPLIT_PANEL_ORDER, SPLIT_PANELS_CLASSES as C } from "../SplitPanels.con
 import type { TExpandedPanelControlsProps } from "../SplitPanels.type";
 import { PanelIconButton } from "./PanelIconButton";
 
-/** The expanded panel's header controls: which series is shown (by shape and name), and "Show both". */
 export function ExpandedPanelControls({
   shown,
   labels,

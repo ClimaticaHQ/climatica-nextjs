@@ -8,12 +8,6 @@ import { MONTHLY_VALUES_CLASSES, MONTHLY_VALUES_PALETTE } from "./MonthlyValuesT
 import type { TMonthlyValuesTableProps } from "./MonthlyValuesTable.type";
 import { HorizontalValues, VerticalValues } from "./components";
 
-/**
- * The monthly values under every chart: mean temperature and precipitation, one column per
- * month exactly under the plot's (A above B in overlay). Hovering or focusing a month
- * highlights it in every chart and table of the card. Where twelve columns can't fit a value
- * each (phones, split panels): a vertical table behind a disclosure. The export draws the same rows (buildMonthlyValuesRows).
- */
 export function MonthlyValuesTable({
   series,
   isCompact,
@@ -36,7 +30,6 @@ export function MonthlyValuesTable({
 
   const variant = { rows, caption, markers, flashKeys: series.map(({ key }) => key), ...hover };
 
-  // * under a scrolling overlay the aligned table scrolls with the plot at every width
   if (scroll) return <HorizontalValues isCompact={isCompact} isScrolling {...variant} />;
   return (
     <div className={MONTHLY_VALUES_CLASSES.ROOT}>

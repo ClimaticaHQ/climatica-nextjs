@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 
 const LANGUAGE_COOKIE = "NEXT_LOCALE";
 
-/** Picks a language on the settings page. */
 async function chooseLanguage(page: import("@playwright/test").Page, code: string) {
   await page.getByTestId("language-switcher").click();
   await page.getByTestId(`language-option-${code}`).click();

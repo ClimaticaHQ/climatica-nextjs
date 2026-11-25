@@ -10,7 +10,6 @@ const SMALLEST_SCALE = Math.min(...Object.values(TEXT_SIZE_SCALES));
 const FONT_TOKEN = /--font-[\w-]+:\s*([^;]+);/g;
 const REM = /^([\d.]+)rem$/;
 const FLOORED = /^max\(([\d.]+)rem,\s*([\d.]+)px\)$/;
-// * a class's rem font size, alone or with a px floor: text-[0.625rem], text-[length:max(0.625rem,10px)]
 const CLASS_REM = /text-\[(?:length:)?(?:max\()?([\d.]+)rem(?:,([\d.]+)px\))?\]/g;
 
 function sourceFiles(dir: string): string[] {
@@ -39,7 +38,6 @@ describe("typography at the smallest text size", () => {
       expect(Math.max(rem * REM_PX * SMALLEST_SCALE, floor), value).toBeGreaterThanOrEqual(
         MIN_TEXT_PX,
       );
-      // * a floor never changes the default size
       expect(rem * REM_PX, value).toBeGreaterThanOrEqual(floor);
     }
   });

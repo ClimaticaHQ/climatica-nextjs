@@ -9,11 +9,6 @@ import { useStandardChartAxes } from "@/hooks/charts/useStandardChartAxes";
 import type { TStandardChartAxesProps } from "./charts.type";
 import { ChartDeviceContext } from "./chartDevice.context";
 
-/**
- * Grid and axes of every standard chart (single, split panel, overlay): the WL geometry — °C
- * left and mm right in the same widths, units above, months without a title. On a phone the
- * axes are narrower, with four round ticks each. A dashed 0 °C line when the °C axis crosses 0.
- */
 export function StandardChartAxes({
   scales,
   rightMax,
@@ -25,7 +20,6 @@ export function StandardChartAxes({
   const axes = useStandardChartAxes(isCompact, monthFormat, isNarrow);
   const y = getStandardYAxes({ scales, rightMax, isNarrow: isNarrow && !isCompact });
   const { formatValue } = useDisplayFormat();
-  // * whole degrees and millimetres, in the locale's digits
   const roundTick = (v: unknown) => formatValue(Number(v), { metric: EDisplayMetric.AXIS_TICK });
 
   return (

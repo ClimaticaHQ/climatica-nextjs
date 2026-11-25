@@ -20,11 +20,6 @@ import { BottomSheetBackdrop } from "./BottomSheetBackdrop";
 import { BottomSheetHandle } from "./BottomSheetHandle";
 import { BottomSheetHeader } from "./BottomSheetHeader";
 
-/**
- * A modal panel sliding up from the bottom edge, rendered into <body>. Escape, the backdrop,
- * the close button and a swipe down on its header ask it to close (onClose); the owner closes
- * it by setting isOpen. It knows nothing about what it shows — pair it with useSheetHistory.
- */
 export function BottomSheet({
   isOpen,
   onClose,

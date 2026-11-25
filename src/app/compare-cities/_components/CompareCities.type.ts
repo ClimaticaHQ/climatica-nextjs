@@ -31,7 +31,6 @@ export type TCitySearchRowProps = {
   onCitySelect: (city: TCity) => void;
 };
 
-/** The difference cards under the chart: which city is warmer, wetter, and the extreme months. */
 export type TCityDifferences = {
   diff: TDiffStats;
   labelA: string;

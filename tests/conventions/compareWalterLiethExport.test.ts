@@ -30,7 +30,6 @@ const UNITS = { celsius: "°C", mm: "mm", meters: "m" };
 const toMonths = (rows: readonly (readonly [number, number])[]) =>
   rows.map(([tavg, prec]) => ({ tavg, prec }));
 
-// * Madrid-like (summer drought) vs Mumbai-like (monsoon far above 100 mm)
 const seriesA: TWalterLiethSeries = {
   id: EWalterLiethSeriesId.A,
   label: "Madrid",
@@ -93,7 +92,6 @@ const COLORS: TExportChartColors = {
   seriesMarker: "#555555",
 };
 
-/** A WL series' months as the page's monthly rows (tmax / tmin around the mean). */
 const rowsOf = (series: TWalterLiethSeries) =>
   series.months.map(({ tavg, prec }, i) => ({
     month: i + 1,
@@ -216,7 +214,6 @@ function buildSvg(overrides: Partial<TComparisonExport>) {
 
 const count = (svg: string, needle: string) => svg.split(needle).length - 1;
 const MONTH_LABEL = /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Mo?\d+)$/;
-/** The values tables' row units, in order: "°C" in the WL red, "mm" in the WL blue. */
 const valuesUnits = (svg: string) =>
   [
     ...svg.matchAll(
@@ -225,7 +222,6 @@ const valuesUnits = (svg: string) =>
   ]
     .filter((m) => m[1] === COLORS.wlTemp || m[1] === COLORS.wlPrec)
     .map((m) => m[2]);
-/** y of the values table's first unit label, the plot's x-axis line, the legend's first entry. */
 const valuesY = (svg: string) =>
   Number(
     svg.match(
@@ -238,12 +234,10 @@ const plotBottom = (svg: string) =>
   );
 const legendY = (svg: string) =>
   Number(svg.match(/<text x="[^"]+" y="([\d.]+)" font-size="13" fill="#666">(Avg|Max)</)?.[1]);
-/** The comparison table's header: the series names and "Difference". */
 const tableHeader = (svg: string) =>
   [
     ...svg.matchAll(/text-anchor="middle" font-size="13" font-weight="700" fill="#000">([^<]+)</g),
   ].map((m) => m[1]);
-/** Each plot's month label centres, twelve at a time. */
 function monthLabelCenters(svg: string) {
   const xs = [
     ...svg.matchAll(
@@ -254,7 +248,6 @@ function monthLabelCenters(svg: string) {
     .map((m) => Number(m[1]));
   return Array.from({ length: xs.length / 12 }, (_, i) => xs.slice(i * 12, i * 12 + 12));
 }
-/** Each values table line's value centres — twelve per plot (overlay: two lines per row). */
 function valueLines(svg: string) {
   const lines = new Map<string, { x: number[]; fill: string[] }>();
   for (const m of svg.matchAll(
@@ -265,7 +258,6 @@ function valueLines(svg: string) {
     line.fill.push(m[3] ?? "");
     lines.set(m[2] ?? "", line);
   }
-  // * split panels share a line's y: 24 values are two tables side by side
   return [...lines.values()].flatMap(({ x, fill }) =>
     Array.from({ length: x.length / 12 }, (_, i) => ({
       x: x.slice(i * 12, i * 12 + 12),
@@ -274,7 +266,6 @@ function valueLines(svg: string) {
   );
 }
 const leftTickLabels = (svg: string) =>
-  // * the °C ticks (11 px) — not the comparison table's right-aligned counts (13 px)
   [...svg.matchAll(/text-anchor="end" font-size="11"[^>]*>(-?\d+)</g)].map((m) => Number(m[1]));
 const rightTickLabels = (svg: string) =>
   [...svg.matchAll(/text-anchor="start" font-size="11"[^>]*>(\d+)</g)].map((m) => Number(m[1]));
@@ -291,7 +282,6 @@ describe("compare export — Walter-Lieth split", () => {
   });
 
   it("puts both panels on the one shared domain", () => {
-    // * identical °C ticks, twice — once per panel
     expect(leftTickLabels(svg)).toEqual([...domainTicks, ...domainTicks]);
   });
 
@@ -307,7 +297,6 @@ describe("compare export — Walter-Lieth split", () => {
     ];
     expect(cards).toHaveLength(2);
     expect(cards[0]?.[1]).toBe(cards[1]?.[1]);
-    // * A a circle (an arc), B a square (a polygon) — the page's markers, both graphite
     const markers = [
       ...svg.matchAll(new RegExp(`<path d="([^"]+)" fill="${COLORS.seriesMarker}" />`, "g")),
     ].map(([, d]) => d ?? "");
@@ -406,10 +395,8 @@ describe("compare export — standard chart", () => {
     const cards = svg.match(new RegExp(`rx="10" fill="${COLORS.bg}" stroke`, "g")) ?? [];
 
     expect(cards).toHaveLength(2);
-    // * standard plots, not WL ones: no WL clip paths or hatching
     expect(svg).not.toContain('clipPath id="wl-');
     expect(svg).not.toContain("url(#wl-");
-    // * one legend below both panels, by variable; the bars as humid / arid
     expect(svg).toContain(">Max</text>");
     expect(svg).toContain(">Humid period</text>");
     expect(svg).toContain(">Arid period</text>");
@@ -419,13 +406,11 @@ describe("compare export — standard chart", () => {
   it("overlay: one standard chart in the WL overlay's geometry — no cards, no month title", () => {
     const svg = standard(ECompareLayout.OVERLAY);
     expect(svg).not.toContain(">Month</text>");
-    // * °C / mm upright above the axes, as in the WL exports
     expect(svg).not.toMatch(/rotate\(-?90[^>]*>(°C|mm)</);
     expect(svg).toContain(">°C</text>");
   });
 });
 
-/** A single-city export of B's months — climate-statistics' export, for the plot box. */
 function buildSingleSvg(chartMode: TExportPayload["chartMode"]) {
   const monthlyData = seriesB.months.map(({ tavg, prec }, i) => ({
     month: i + 1,
@@ -474,10 +459,6 @@ function buildSingleSvg(chartMode: TExportPayload["chartMode"]) {
   return buildExportSvg(payload, COLORS).svg;
 }
 
-/**
- * The plot box of an export with one plot, read from what every plot draws: °C / mm above
- * the axes (left / right / top) and the solid x-axis line along the bottom.
- */
 function plotBoxOf(svg: string) {
   const celsius = svg.match(
     /<text x="([\d.-]+)" y="([\d.-]+)" text-anchor="start" [^>]*>°C<\/text>/,
@@ -515,12 +496,10 @@ describe("compare export — one panel expanded", () => {
         layout: ECompareLayout.SPLIT,
         expanded: EWalterLiethSeriesId.B,
       });
-      // * laid out like the single export: no panel card
       expect(cardWidths(svg)).toEqual([]);
       expect(svg).toContain("Climate 1970–2000 · 17 m</text>");
       expect(svg).not.toContain("Climate 1970–2000 · 658 m</text>");
       expect(valuesUnits(svg)).toEqual(["°C", "mm"]);
-      // * the comparison table on top keeps both series and the difference
       expect(tableHeader(svg)).toEqual(["Madrid", "Mumbai", "Difference"]);
     },
   );
@@ -534,7 +513,6 @@ describe("compare export — one panel expanded", () => {
         expect(plotBoxOf(svg)).toEqual(plotBoxOf(single));
         expect(svgWidth(svg)).toBe(svgWidth(single));
       }
-      // * the screen's full plot margins inside the page padding
       const { paddingX, width, chartHeight } = EXPORT_SVG_LAYOUT;
       const left = paddingX + WALTER_LIETH_AXIS.WIDTH;
       expect(plotBoxOf(single)).toEqual({
@@ -570,7 +548,6 @@ describe("compare export — frost band", () => {
         ),
       ),
     ].map((m) => m[1]);
-  // * Lviv-like winter: Dec–Feb mean minima below 0 °C, March exactly at 0, one unknown month
   const tmins = [-6, -5, 0, 5, 10, 13, 15, 14, 10, 5, 1, null];
   const frosty: TWalterLiethSeries = {
     ...seriesA,
@@ -586,7 +563,6 @@ describe("compare export — frost band", () => {
       ...Array(9).fill("none"),
       COLORS.border,
     ]);
-    // * B has no tmin at all: every month unknown, none frost
     expect(cells.slice(12)).toEqual(Array(12).fill(COLORS.border));
   });
 
@@ -622,9 +598,7 @@ describe("compare export — comparison table and monthly strips", () => {
     expect(svg).toContain(">Frost months</text>");
     expect(svg).toMatch(new RegExp(`fill="${COLORS.text}">\\d+ mm</text>`));
     expect(svg).not.toMatch(new RegExp(`fill="${COLORS.seriesMarker}">\\d+ mm</text>`));
-    // * the class as plain text after the value, no pill
     expect(svg).toMatch(/>[\d.]+ \(Semi-arid\)<\/text>/);
-    // * above the chart
     expect(svg.indexOf(">Difference</text>")).toBeLessThan(svg.indexOf('clipPath id="wl-cmp-a'));
   });
 
@@ -641,8 +615,6 @@ describe("compare export — comparison table and monthly strips", () => {
     (chartMode) => {
       const svg = buildSvg({ chartMode, layout: ECompareLayout.OVERLAY });
       if (chartMode === "walter-lieth") {
-        // * two rows: each unit followed by the series' shapes in graphite, A's above B's — the
-        // * mm row's each after its hatch swatch
         const markedUnits = [
           ...svg.matchAll(
             new RegExp(
@@ -653,15 +625,12 @@ describe("compare export — comparison table and monthly strips", () => {
         ].map((m) => m[1]);
         expect(markedUnits).toEqual(["°C", "mm"]);
       } else {
-        // * each unit a section label, then the row headed by the series' names, whole (they
-        // * fit); the legend holds the markings
         expect(svg).toMatch(/>°C<\/text><text [^>]*>Madrid<\/text><text [^>]*>Mumbai<\/text>/);
         expect(svg).toMatch(/>mm<\/text><text [^>]*>Madrid<\/text><text [^>]*>Mumbai<\/text>/);
         expect(svg).toMatch(/>Madrid<\/text>/);
         expect(svg).toMatch(/>Mumbai<\/text>/);
       }
       const lines = valueLines(svg);
-      // * two rows × (A line + B line)
       expect(lines.map(({ fill }) => fill[0])).toEqual([
         COLORS.text,
         COLORS.text,

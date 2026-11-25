@@ -14,7 +14,6 @@ import {
 import { FilterSectionTitleContext, FilterUnavailableActionsContext } from "./filters.context";
 import type { TFilterNoteProps, TFilterSectionProps, TUnavailableNoteProps } from "./filters.type";
 
-/** One filter's block: its label, its controls, and why it's disabled when it is. */
 export function FilterSection({
   title,
   availability = EFilterAvailability.AVAILABLE,
@@ -37,7 +36,6 @@ export function FilterSection({
   );
 }
 
-/** A short note under a filter — an explanation, a muted aside or an error — and a way out. */
 export function FilterNote({ text, variant, className, id, action }: TFilterNoteProps) {
   return (
     <>

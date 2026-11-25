@@ -9,7 +9,6 @@ import { TOPBAR_CLASSES as C, TOPBAR_LINK_CLASSES as L } from "./Topbar.constant
 import { TopbarLinks } from "./TopbarLinks";
 import { TopbarMenu } from "./TopbarMenu";
 
-/** The app's bar: the logo, the page links (or the menu when they don't fit) and Settings. */
 export function Topbar() {
   const t = useTranslations();
   const { pages, settings, home } = useTopbarLinks();

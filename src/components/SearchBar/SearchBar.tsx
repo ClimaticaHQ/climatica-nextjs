@@ -19,9 +19,7 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [lastConfig, setLastConfig] = useState({ len: 0, open: false });
 
-  /** Render-phase sync, not an effect — only applies while the user isn't
-   * mid-edit, so external city changes (back/forward, map click, geolocation,
-   * cross-page sync) don't clobber typing. */
+  /** render-phase sync, not an effect: applied only while the reader isn't editing, so outside city changes never clobber typing */
   if (cityLabel !== prevCityLabel) {
     setPrevCityLabel(cityLabel);
     if (!isEditing) setQuery(cityLabel);
@@ -31,13 +29,11 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
   const searchQuery = !dirty || coordResult !== null ? "" : debouncedQuery;
   const { data, isLoading, error } = useSearchCity(searchQuery);
   const errorMessage = useErrorMessage();
-  // * the typed text isn't searched yet: until it is, the results (or the error) belong to the
-  // * previous text — never shown, never picked; the search shows it's loading instead
+  // * until the typed text is searched, the results belong to the previous text: never shown
   const isStale = dirty && coordResult === null && query.trim() !== debouncedQuery.trim();
   const results = isStale ? [] : (data ?? []);
   const isSearching =
     dirty && coordResult === null && query.trim().length >= 2 && (isStale || isLoading);
-  // * the search failed (not "no cities found"): the dropdown says why, by cause
   const searchError =
     error && !isStale && !dismissed && coordResult === null && debouncedQuery.length >= 2
       ? errorMessage(error, "errors.searchUnavailable")
@@ -66,7 +62,6 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
 
   useEffect(() => {
     if (activeIndex !== -1 && containerRef.current) {
-      // * scroll the active result into view
       const listItems = containerRef.current.querySelectorAll("li");
       const activeElement = listItems[activeIndex];
 
@@ -111,8 +106,7 @@ export function SearchBar({ onCitySelect, cityLabel = "" }: TSearchBarProps) {
     });
   }
 
-  /** relatedTarget sits inside our own dropdown when the user is clicking (or
-   * tabbing to) a result — skip the revert so that selection can go through. */
+  /** relatedTarget inside our dropdown: the reader is picking a result, so skip the revert */
   function handleBlur(e: FocusEvent<HTMLInputElement>) {
     if (containerRef.current?.contains(e.relatedTarget)) return;
     if (!isEditing) return;

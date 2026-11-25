@@ -9,7 +9,6 @@ import { FilterNote, FilterSection } from "../FilterSection";
 import type { TFilterSectionRenderProps } from "../filters.type";
 import { YearInput } from "../YearInput";
 
-/** A climate normals period (dropdown) or a weather year (typed in), by dataset. */
 export function PeriodFilter({
   values,
   availablePeriods,

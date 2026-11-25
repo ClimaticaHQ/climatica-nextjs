@@ -9,10 +9,7 @@ import type {
 const browserStorage = (): TKeyValueStorage | null =>
   typeof window !== "undefined" ? window.localStorage : null;
 
-/**
- * A JSON value in storage, shared by all its readers. Snapshots are cached by the raw string,
- * so an unchanged value keeps its identity (useSyncExternalStore requires that).
- */
+/** snapshots are cached by the raw string: useSyncExternalStore needs an unchanged value to keep its identity */
 export function createPersistedJsonStore<T>({
   key,
   defaultValue,
@@ -91,10 +88,7 @@ export function isCity(value: unknown): value is TCity {
   );
 }
 
-/**
- * Renames a picked place in its store only while the store still holds that pick: a place
- * lookup answering after the reader picked something else never overwrites the newer pick.
- */
+/** only while the store still holds that pick: a lookup answering late never overwrites a newer pick */
 export function renameIfStillPicked(
   store: TPersistedJsonStore<TCity>,
   { picked, renamed }: TPlaceRename,

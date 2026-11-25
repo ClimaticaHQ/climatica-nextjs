@@ -7,7 +7,6 @@ const CITY_URL = "/climate-statistics?city=Paris&lat=48.8566&lng=2.3522&dataset=
 const PERIODS_URL =
   "/compare-periods?city=Madrid&lat=40.4168&lng=-3.7038&dataset=climate&period1=c1970-2000&period2=c1991-2020";
 
-/** Picks an option in the sidebar dropdown that follows the given label, then applies. */
 async function applySidebarOption(page: Page, label: string | RegExp, value: string) {
   const dropdown = page
     .locator("aside")
@@ -18,8 +17,6 @@ async function applySidebarOption(page: Page, label: string | RegExp, value: str
   await page.getByRole("button", { name: "Apply filters" }).click();
 }
 
-/** Picks a period in Compare Periods' own selector (side "a" or "b") — it applies at once. */
-/** Picks a period in the sidebar's copy (shown from lg; the page's is hidden by CSS). */
 async function selectPagePeriod(page: Page, side: "a" | "b", value: string) {
   await page
     .getByRole("complementary", { name: "Filters" })
@@ -55,8 +52,7 @@ test.describe("Data update feedback", () => {
     const panelA = page.locator('[data-panel-series="a"]:not([inert] *)');
     const panelB = page.locator('[data-panel-series="b"]:not([inert] *)');
     await expect(panelB).toBeVisible({ timeout: 30_000 });
-    // * the first data landed: a change before them is part of the first load, which never
-    // * flashes (the skeleton panel is visible already)
+    // * the first data landed: a change before them is part of the first load, which never flashes
     await expect(page.getByTestId("climate-chart")).toHaveAttribute("aria-busy", "false", {
       timeout: 30_000,
     });
@@ -70,13 +66,11 @@ test.describe("Data update feedback", () => {
   });
 });
 
-/** Opens the settings page — settings are saved as they change, then apply on every page. */
 async function openSettings(page: Page) {
   await page.goto("/settings");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Settings");
 }
 
-/** Records every card that starts an update flash from now on. */
 async function recordFlashes(page: Page) {
   await page.evaluate(() => {
     const flashes: string[] = [];
@@ -102,7 +96,6 @@ test.describe("Animation settings", () => {
     await openSettings(page);
     await page.getByText("Animations", { exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
-    // * the highlight choice needs animations: still shown, but disabled, saying why
     await expect(page.getByRole("button", { name: "Border", exact: true })).toBeDisabled();
     await expect(page.getByText("Turn on animations to choose a highlight")).toBeVisible();
 
@@ -117,7 +110,6 @@ test.describe("Animation settings", () => {
     });
     await applySidebarOption(page, "Cell resolution", "5m");
 
-    // * the loading state stays visible, only without motion
     await expect(page.locator("[data-update-progress]")).toBeVisible();
     await expect(page.locator("[aria-live=polite]")).toHaveText(
       "Data updated: Paris, Climate 1970–2000",
@@ -138,8 +130,7 @@ test.describe("Animation settings", () => {
     await page.goto(PERIODS_URL);
     const panelB = page.locator('[data-panel-series="b"]:not([inert] *)');
     await expect(panelB).toBeVisible({ timeout: 30_000 });
-    // * the first data landed: a change before them is part of the first load, which never
-    // * flashes (the skeleton panel is visible already)
+    // * the first data landed: a change before them is part of the first load, which never flashes
     await expect(page.getByTestId("climate-chart")).toHaveAttribute("aria-busy", "false", {
       timeout: 30_000,
     });

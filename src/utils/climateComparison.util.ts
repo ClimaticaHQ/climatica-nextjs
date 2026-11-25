@@ -10,7 +10,6 @@ export function computeCompareStats(data: TMonthlyTemperature[]): TCompareStats 
     avgTmax: meanOf(data.map((d) => d.tmax)),
     avgTmin: meanOf(data.map((d) => d.tmin)),
     totalPrec: sumOf(data.map((d) => d.prec)),
-    // * WL rule on the mean temperature, same as every other arid-month count in the app
     aridMonths: summary?.aridCount ?? null,
     martonneIndex: summary?.martonne ?? null,
   };
@@ -24,7 +23,7 @@ export function computeDiffStats(
   const statsB = computeCompareStats(dataB);
   const tmaxA = allPresent(dataA.map((d) => d.tmax));
   const tmaxB = allPresent(dataB.map((d) => d.tmax));
-  // * a comparison over a gap would be wrong, not just incomplete — no diff cards then
+  // * a comparison over a gap would be wrong, not just incomplete: no difference cards then
   if (
     statsA.avgTmax === null ||
     statsB.avgTmax === null ||

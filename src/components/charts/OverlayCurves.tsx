@@ -16,12 +16,6 @@ import {
 import type { TDotRendererProps, TOverlayCurvesProps } from "./charts.type";
 import { buildOpacityFadeStyle, buildStrokeOpacityFadeStyle, seriesDataKey } from "./charts.util";
 
-/**
- * The overlay's curves: per entity its max, mean and min, each point at the centre of the
- * entity's own bar (its own hidden x axis, shifted by a constant offset), in the semantic colours
- * with its shape on every point. While another entity is focused: thin gray, no points; the
- * focused one thicker and on top. Each curve has a wide invisible hit area that focuses it.
- */
 export function OverlayCurves({
   entries,
   lines,
@@ -43,7 +37,6 @@ export function OverlayCurves({
       const month = index >= 0 ? index + 1 : -1;
       const isSelected =
         !selectedMonths || selectedMonths.length === 0 || selectedMonths.includes(month);
-      // * the card's hovered month wins over the month filter
       const isActive = index === activeMonthIndex;
       const isHighlighted = (selectedMonths?.length === 1 && isSelected) || isActive;
       const isDimmed = isHovering ? !isActive : !isSelected;
@@ -123,13 +116,11 @@ export function OverlayCurves({
             stroke={color}
             strokeWidth={strokeWidth}
             {...(dash !== undefined ? { strokeDasharray: dash } : {})}
-            // * context curves carry no points: only the focused entity keeps its shape
             dot={role === "context" ? false : makeDot(color, marker.shape, opacity)}
             activeDot={role === "context" ? false : makeActiveDot(color, marker.shape, opacity)}
             hide={isLineHidden}
             style={buildStrokeOpacityFadeStyle(opacity)}
           />,
-          // * the curve's hit area: wider than its stroke, invisible, out of the tooltip
           <Line
             key={`${id}-${variable}-hit`}
             xAxisId={xAxisId}

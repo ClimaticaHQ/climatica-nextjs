@@ -21,7 +21,6 @@ export function useGetMultiPeriodData(
       },
       enabled,
       staleTime: Infinity,
-      // * a filter change keeps each period's data on screen until its refetch lands
       keepPreviousData: true,
     })),
   });

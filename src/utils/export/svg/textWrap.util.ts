@@ -1,12 +1,10 @@
 import { EXPORT_FONT_FAMILY, EXPORT_TEXT, URL_BREAK_PATTERN } from "@/constants";
 import type { TWrapUrlArgs } from "@/types";
 
-/** Rough width of a string at a font size — the fallback where no canvas can measure it. */
 export function estimateTextWidth(text: string, fontSize: number): number {
   return text.length * fontSize * EXPORT_TEXT.AVG_CHAR_WIDTH_RATIO;
 }
 
-// * one lazily created 2D context for every measurement (null outside a browser)
 let measureContext: CanvasRenderingContext2D | null | undefined;
 
 function getMeasureContext() {
@@ -17,10 +15,6 @@ function getMeasureContext() {
   return measureContext;
 }
 
-/**
- * A string's width in the export's own font stack, measured with canvas measureText —
- * falling back to the estimate where there's no canvas (server, unit tests).
- */
 export function measureExportText(text: string, fontSize: number): number {
   const context = getMeasureContext();
   if (!context) return estimateTextWidth(text, fontSize);
@@ -28,7 +22,6 @@ export function measureExportText(text: string, fontSize: number): number {
   return context.measureText(text).width;
 }
 
-/** Greedy word wrap to lines no wider than maxWidth at the given font size. */
 export function wrapWords(text: string, maxWidth: number, fontSize: number): string[] {
   return text.split(" ").reduce<string[]>((lines, word) => {
     const last = lines.at(-1);
@@ -40,17 +33,12 @@ export function wrapWords(text: string, maxWidth: number, fontSize: number): str
   }, []);
 }
 
-/** A part cut into even pieces of at most maxChars — never a short last piece. */
 function splitEvenly(part: string, maxChars: number) {
   const count = Math.ceil(part.length / maxChars);
   const size = Math.ceil(part.length / count);
   return Array.from({ length: count }, (_, i) => part.slice(i * size, (i + 1) * size));
 }
 
-/**
- * A URL in lines of at most maxChars, broken only before "?" or "&" (a part longer than a line
- * is cut evenly). A lone character never makes a line: it joins the line before.
- */
 export function wrapUrl({ url, maxChars }: TWrapUrlArgs): string[] {
   const parts = url
     .split(URL_BREAK_PATTERN)

@@ -13,11 +13,7 @@ import {
 } from "@/utils/bottomSheet.util";
 import { useEffect, useRef } from "react";
 
-/**
- * While the sheet is open, a same-URL history entry marks it, so system back closes it instead
- * of leaving the page. closeSheet() goes back off that entry and resolves after the popstate —
- * navigate only then, or the back and the navigation race. Off: closeSheet just closes.
- */
+/** a same-URL history entry marks the open sheet, so system back closes it instead of leaving the page */
 export function useSheetHistory({ isOpen, onClose }: TSheetHistoryOptions) {
   const markerRef = useRef<string | null>(null);
   const pendingCloseRef = useRef<TDeferred | null>(null);

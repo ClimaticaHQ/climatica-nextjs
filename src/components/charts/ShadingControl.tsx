@@ -11,10 +11,8 @@ const SHADING_BY_SERIES = {
   [EWalterLiethSeriesId.B]: EWalterLiethShading.B,
 } satisfies Record<EWalterLiethSeriesId, EWalterLiethShading>;
 
-/** Which series gets the humid/arid hatching in overlay: A, B or none. */
 export function ShadingControl({ seriesA, seriesB, shading, onChange }: TShadingControlProps) {
   const t = useTranslations();
-  // * each option shades its own series, whichever side the page lists it on
   const options: TSegmentedOption<EWalterLiethShading>[] = [
     ...[seriesA, seriesB].map((series) => ({
       value: SHADING_BY_SERIES[series.id],

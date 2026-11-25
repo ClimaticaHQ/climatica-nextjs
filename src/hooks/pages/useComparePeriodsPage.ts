@@ -39,11 +39,6 @@ import { useScrollToResults } from "./useScrollToResults";
 import { useWeatherYearsChart } from "./useWeatherYearsChart";
 import { useWeatherYearsViewState } from "./useWeatherYearsViewState";
 
-/**
- * Compare Periods: one city's climate periods A and B, or — with Weather — its compared years.
- * Each dataset's series, state and features come from its own hook; the view state, the city
- * and the URL are the page's.
- */
 export function useComparePeriodsPage(): TComparePeriodsPage {
   const t = useTranslations();
   const { city, selectCity, renameCity } = usePersistedCity();
@@ -64,7 +59,6 @@ export function useComparePeriodsPage(): TComparePeriodsPage {
   const resultsRef = useRef<HTMLDivElement>(null);
   const years = useWeatherYearsViewState({ years: periods, isWeather: !isClimate, chartMode });
   const [sortOrder, setSortOrder] = useState<ESortOrder>(initial.sortOrder ?? DEFAULT_SORT_ORDER);
-  // * each year's marker, kept through sorting, additions and removals
   const markers = useMarkerSlots(periods.map(String));
 
   const { pushUrlState, shareUrl } = useUrlStateSync({

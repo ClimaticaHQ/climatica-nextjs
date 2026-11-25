@@ -23,7 +23,6 @@ test.describe("navbar links remember each page's own params", () => {
 
     await navLink(page, "City Climate").click();
     await expect(page).toHaveURL(/\/climate-statistics/);
-    // * the years are Compare Periods' own — City Climate's URL doesn't carry them
     await expect(page).not.toHaveURL(/periods=/);
     await expect(page).toHaveURL(/dataset=weather/);
 
@@ -31,7 +30,6 @@ test.describe("navbar links remember each page's own params", () => {
     await expect(page).toHaveURL(/\/compare-periods/);
     await expectFiveYears(page);
 
-    // * remembered across a reload (persisted), then the same trip again
     await page.reload();
     await navLink(page, "City Climate").click();
     await expect(page).toHaveURL(/\/climate-statistics/);
@@ -63,7 +61,6 @@ test.describe("navbar links remember each page's own params", () => {
     await expectFiveYears(page);
 
     await page.goto("/compare-periods?dataset=weather");
-    // * the two default years, side by side (the default layout)
     const diagrams = page.locator('figure[aria-label^="Walter-Lieth diagram,"]');
     await expect(diagrams).toHaveCount(2, { timeout: 30_000 });
     await expect(diagrams.nth(0)).toHaveAttribute("aria-label", /2021/);

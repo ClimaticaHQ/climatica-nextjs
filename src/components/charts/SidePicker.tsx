@@ -7,7 +7,6 @@ import { useId } from "react";
 import { SIDE_PICKER_LABEL_KEYS } from "./charts.constant";
 import type { TSidePickerProps } from "./charts.type";
 
-/** Which series a split panel shows — the other panel's series disabled. */
 export function SidePicker({ side, entries, value, otherId, onChange }: TSidePickerProps) {
   const t = useTranslations();
   const labelId = useId();

@@ -13,8 +13,7 @@ import {
 } from "@/utils/urlFields.util";
 import type { TComparePeriodsUrlState } from "./ComparePeriods.type";
 
-// * what the navbar remembers of this page (useLastPageParamsSync) — its URL state but the
-// * city, which the persisted city stores (and the sync-city setting) own
+// * its URL state but the city: the persisted city stores own that
 export const COMPARE_PERIODS_REMEMBERED_URL_SCHEMA: TUrlSchema<
   Omit<TComparePeriodsUrlState, "city">
 > = {
@@ -45,5 +44,4 @@ export const PERIOD_CITY_SEARCH_CLASSES = {
 
 export const PERIOD_TREND_CARDS_CLASS = "grid grid-cols-2 gap-3";
 
-// * a picked city scrolls the chart's bottom into view
 export const COMPARE_PERIODS_SCROLL_OPTIONS = { toBottom: true } as const;

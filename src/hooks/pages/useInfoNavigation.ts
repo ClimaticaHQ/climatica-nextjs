@@ -2,8 +2,10 @@
 
 import { INFO_PAGES } from "@/constants";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { scrollToSectionAfterSheetClose } from "@/utils/scroll.util";
+import { useState } from "react";
 import { useActiveSection } from "../ui/useActiveSection";
+import { useLandOnHashSection } from "../ui/useLandOnHashSection";
 import { useSheetHistory } from "../ui/useSheetHistory";
 import { useNavbarNavigation } from "../url/useNavbarNavigation";
 
@@ -12,26 +14,11 @@ export function useInfoNavigation() {
   const { getPlainHref, pushHref, navigatePlain, pendingRoute } = useNavbarNavigation();
   const currentPage = INFO_PAGES.find(({ route }) => pathname === route) ?? null;
   const sections = currentPage?.sections.filter(({ isShown }) => isShown) ?? [];
-  const { activeId, select } = useActiveSection(sections.map(({ id }) => id));
+  const sectionIds = sections.map(({ id }) => id);
+  const { activeId, select } = useActiveSection(sectionIds);
   const [isContentsOpen, setIsContentsOpen] = useState(false);
-  const sectionKey = sections.map(({ id }) => id).join(" ");
 
-  // * the browser's #hash jump fires while the streamed page is still a fallback and is never retried
-  useEffect(() => {
-    const id = decodeURIComponent(window.location.hash.slice(1));
-    if (id === "" || !sectionKey.split(" ").includes(id)) return;
-    const land = () => {
-      const section = document.getElementById(id);
-      section?.scrollIntoView({ behavior: "instant" });
-      return section !== null;
-    };
-    if (land()) return;
-    const observer = new MutationObserver(() => {
-      if (land()) observer.disconnect();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
-  }, [sectionKey]);
+  useLandOnHashSection(sectionIds);
 
   const { closeSheet } = useSheetHistory({
     isOpen: isContentsOpen,
@@ -43,8 +30,7 @@ export function useInfoNavigation() {
     select(id);
     const hash = `#${id}`;
     if (window.location.hash !== hash) window.location.hash = hash;
-    // * the hash jump is lost while the sheet unmounts, so scroll on the next frame
-    requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView());
+    scrollToSectionAfterSheetClose(id);
   }
 
   async function goToPage(href: string) {

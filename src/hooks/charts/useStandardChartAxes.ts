@@ -5,10 +5,6 @@ import { formatMonthLabel, getAxisStyle } from "@/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useContext } from "react";
 
-/**
- * The standard chart's axes — the WL diagram's: same widths (so the same plot area), no month
- * axis title. Compact = one panel of a split pair.
- */
 export function useStandardChartAxes(
   isCompact: boolean,
   monthFormat: TMonthLabelFormat,

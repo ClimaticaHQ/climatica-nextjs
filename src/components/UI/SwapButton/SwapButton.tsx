@@ -5,7 +5,6 @@ import { useState } from "react";
 import { SWAP_BUTTON_CLASSES as C, SWAP_ICON_TURN_DEG } from "./SwapButton.constant";
 import type { TSwapButtonProps } from "./SwapButton.type";
 
-/** An icon button exchanging two sides — Period A and B, or the two years side by side. */
 export function SwapButton({ label, onClick, isInline = false, className = "" }: TSwapButtonProps) {
   const [turns, setTurns] = useState(0);
 

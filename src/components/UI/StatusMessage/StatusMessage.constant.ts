@@ -6,7 +6,6 @@ export const STATUS_MESSAGE_CLASSES = {
     "rounded-[var(--radius-md)] border border-[var(--color-error-border)] bg-[var(--color-error-bg)] px-4 py-3 text-center text-[var(--color-error)]",
 } as const satisfies Record<EStatusMessageVariant, string>;
 
-// * a notice by its control, compact and closable
 export const DISMISSIBLE_MESSAGE_CLASSES = {
   ROOT: "flex items-start gap-2 rounded-[var(--radius-sm)] border border-[var(--color-error-border)] bg-[var(--color-error-bg)] px-3 py-2",
   TEXT: "flex-1 text-[length:var(--font-sm)] text-[var(--color-error)]",

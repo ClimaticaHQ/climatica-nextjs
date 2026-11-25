@@ -9,7 +9,6 @@ import { useTranslations } from "next-intl";
 import { FilterSection } from "../FilterSection";
 import type { TFilterSectionRenderProps } from "../filters.type";
 
-/** "All" or any months; deselecting the last month means all again. */
 export function MonthsFilter({ values, availability, onChange }: TFilterSectionRenderProps) {
   const t = useTranslations();
   const isDisabled = areFilterControlsDisabled(availability);

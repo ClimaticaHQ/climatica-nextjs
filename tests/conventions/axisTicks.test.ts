@@ -114,7 +114,6 @@ describe("getTemperatureAxis: the domain rounded outwards to the tick step", () 
 
   it("every range: nice even steps within the cap, ends on ticks, every value inside", () => {
     for (let min = -60; min <= 30; min += 3.7) {
-      // * a flat range is the case above: one whole step
       for (let max = min + 4.3; max <= min + 70; max += 4.3) {
         for (const maxCount of [WIDE, NARROW]) {
           const { domain, ticks } = axis(min, max, maxCount);
@@ -125,7 +124,6 @@ describe("getTemperatureAxis: the domain rounded outwards to the tick step", () 
           expect([ticks[0], ticks.at(-1)]).toEqual([...domain]);
           expect(domain[0]).toBeLessThanOrEqual(min);
           expect(domain[1]).toBeGreaterThanOrEqual(max);
-          // * under one step of room at each end
           expect(min - domain[0]).toBeLessThan(step);
           expect(domain[1] - max).toBeLessThan(step);
         }

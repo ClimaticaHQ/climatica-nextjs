@@ -14,7 +14,6 @@ const month = (i: number, tmin: number | null, tmax: number | null, prec: number
   prec,
 });
 const complete: TMonthlyTemperature[] = Array.from({ length: 12 }, (_, i) => month(i, 5, 15, 40));
-// * one month (March) without precipitation
 const oneMissing: TMonthlyTemperature[] = complete.map((row, i) =>
   i === 2 ? { ...row, prec: null } : row,
 );
@@ -35,7 +34,6 @@ describe("a series with one missing month", () => {
       data: withMonthlyMean(oneMissing),
     });
     expect(isCompleteSeries(series)).toBe(false);
-    // * name and period stay — the standard split still plots the series under them
     expect(series).toEqual({
       id: EWalterLiethSeriesId.A,
       label: "Gapville",

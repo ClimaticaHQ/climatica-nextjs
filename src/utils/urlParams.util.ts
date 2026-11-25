@@ -100,7 +100,6 @@ export function serializeUrlState<TState extends Record<string, unknown>>(
   return params;
 }
 
-// * one field read and written back — absent or invalid values write nothing
 function roundTripUrlField<TValue>(
   field: TUrlField<TValue>,
   from: URLSearchParams,
@@ -110,7 +109,6 @@ function roundTripUrlField<TValue>(
   if (value !== undefined) field.serialize(value, to);
 }
 
-/** The URL's values for these fields, written canonically; invalid ones are dropped. */
 export function normalizeUrlState<TState extends Record<string, unknown>>(
   schema: TUrlSchema<TState>,
   params: URLSearchParams,
@@ -132,8 +130,7 @@ export function parseUrlState<TState extends Record<string, unknown>>(
   return result;
 }
 
-/** searchParamsChanged distinguishes "URL not caught up to our own push yet"
- * (not external) from an actual back/forward or hand-edited URL (external). */
+/** tells "the URL hasn't caught up with our own push" from a real back/forward or hand-edited URL */
 export function decideUrlSyncAction(input: {
   searchParamsChanged: boolean;
   searchParamsString: string;

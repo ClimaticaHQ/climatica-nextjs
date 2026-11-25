@@ -17,10 +17,6 @@ import { RESOLUTION_HELP_LINK_CLASS, RESOLUTION_LABEL_CLASS } from "../filters.c
 import { FilterSectionTitleContext } from "../filters.context";
 import type { TFilterSectionRenderProps } from "../filters.type";
 
-/**
- * The grid resolution, with a link to what the resolutions mean; on the heat map, also how many
- * cells it loads and whether that's too many.
- */
 export function ResolutionFilter({
   values,
   context,
@@ -52,8 +48,6 @@ export function ResolutionFilter({
         )}
         <Dropdown
           options={options}
-          // * the grid the view loads: the choice, or (none chosen) the view's default. Picking
-          // * any option, the shown one too, makes it the reader's choice
           value={resolveGridSize(values, context.view)}
           onChange={toCellSizeHandler((gridSize) => onChange(EFilterKey.GRID_SIZE, gridSize))}
           className="w-full"

@@ -113,7 +113,6 @@ describe("chip selection per view", () => {
     const disabled = chips.filter(({ isDisabled }) => isDisabled);
     expect(disabled.map(({ key }) => key)).toEqual(["variables", "months"]);
     expect(disabled[0]?.ariaLabel).toBe("Variables: Not available in Walter-Lieth view. Show why");
-    // * a disabled filter isn't counted as changed, even when its value isn't the default
     expect(disabled.some(({ isChanged }) => isChanged)).toBe(false);
   });
 

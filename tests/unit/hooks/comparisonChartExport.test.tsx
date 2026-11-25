@@ -12,7 +12,6 @@ import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CITY_PAIR, weatherYears } from "../charts/chartFixtures";
 
-// * the payload each export builds, captured before any file is drawn or saved
 const built = vi.hoisted(() => ({ payloads: [] as TCompareExportPayload[] }));
 
 vi.mock("@/utils", async (importOriginal) => {
@@ -103,7 +102,6 @@ describe("the comparison export: always the default bar style, the best for prin
   });
 
   it("the page's order, each series with its own marker slot (not its place in the order)", () => {
-    // * newest first, as the page lists them; 1967 keeps the slot it was added with
     const [y2021, y1967, y1981] = weatherYears([2021, 1967, 1981]);
     const { result } = renderExport([y2021!, y1981!, y1967!]);
     result.current.onExportSVG?.();

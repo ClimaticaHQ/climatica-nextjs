@@ -8,11 +8,6 @@ import type {
 } from "@/types";
 import type { CSSProperties } from "react";
 
-/**
- * An item's box in its container's padding box (where an absolute child starts), from their
- * rendered boxes: sub-pixel exact, scrolled content included, and unscaled when an ancestor is
- * scaled for a moment (a panel expanding).
- */
 export function getIndicatorRect({ container, item }: TIndicatorRectArgs): TIndicatorRect {
   const box = container.getBoundingClientRect();
   const target = item.getBoundingClientRect();
@@ -35,18 +30,11 @@ export function isSameIndicatorRect(a: TIndicatorRect, b: TIndicatorRect) {
   return sides.every((side) => Math.abs(side) < SAME_RECT_TOLERANCE_PX);
 }
 
-/** A Collapsible's height once its fold has ended: its content's, or none. */
 function getFoldedHeight(collapsible: Element) {
   const isOpen = collapsible.getAttribute(COLLAPSIBLE_OPEN_ATTRIBUTE) === "true";
   return isOpen ? (collapsible.firstElementChild?.scrollHeight ?? 0) : 0;
 }
 
-/**
- * Where an item lands once every fold in its list has ended (a Collapsible opening or shutting
- * above it): its box now, moved by what the folds above it still have to grow or shrink. The same
- * at any moment of the folds, so an indicator sent there arrives with its item, and a new target
- * mid-way starts from the folds' current state.
- */
 export function getFoldedRect({ rect, container, item }: TIndicatorTargetArgs): TIndicatorRect {
   const shift = [...container.querySelectorAll(COLLAPSIBLE_SELECTOR)]
     .filter(
@@ -74,7 +62,6 @@ const STYLE_BY_AXIS: Record<ESlidingIndicatorAxis, (rect: TIndicatorRect) => CSS
   }),
 };
 
-/** The indicator's inline style: its place by transform, its size by width / height. */
 export function getIndicatorStyle({ rect, axis }: TIndicatorStyleArgs) {
   return STYLE_BY_AXIS[axis](rect);
 }

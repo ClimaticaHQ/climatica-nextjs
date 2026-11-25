@@ -3,11 +3,9 @@ import { CalendarIcon } from "@/components/svg/CalendarIcon";
 import type { TMonthBadgeProps } from "./charts.type";
 import { CHART_TITLE_CLASSES as C } from "./charts.constant";
 
-/** The month filter in the standard single-city chart: one month's name, or how many. */
 export function MonthBadge({ selectedMonths }: TMonthBadgeProps) {
   const t = useTranslations();
   const count = selectedMonths?.length ?? 0;
-  // * none or all twelve selected = no filter
   if (count === 0 || count >= 12) return null;
 
   return (

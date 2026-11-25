@@ -11,11 +11,6 @@ import { useTranslations } from "next-intl";
 import { useDisplayFormat } from "../ui/useDisplayFormat";
 import { useNavbarNavigation } from "../url/useNavbarNavigation";
 
-/**
- * The User guide's logic, so the page only composes: numbers in the locale's digits, the
- * Walter-Lieth scale's and the questions' message arguments, and links that keep the shared
- * filters.
- */
 export function useGuidePage() {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();
@@ -26,7 +21,6 @@ export function useGuidePage() {
   return {
     getHref,
     settingsHref,
-    /** a numbered step's number: 1-based, in the locale's digits */
     stepNumber: (index: number) => count(index + 1),
     scaleValues: {
       ratio: count(LINEAR_RATIO),

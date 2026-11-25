@@ -7,7 +7,6 @@ import { getCurrentSheetMarker } from "@/utils/bottomSheet.util";
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// * the router seam: records each navigation, and whether a sheet's entry was still current then
 const navigation = vi.hoisted(() => {
   const calls: { mode: string; markerAtCall: string | null }[] = [];
   return { calls };

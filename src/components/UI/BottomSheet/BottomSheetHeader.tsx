@@ -5,7 +5,6 @@ import { FOCUS_RING_CLASS } from "@/constants";
 import { useTranslations } from "next-intl";
 import type { TBottomSheetHeaderProps } from "./BottomSheet.type";
 
-/** The sheet's title (labelling the dialog) and its close button. */
 export function BottomSheetHeader({ title, titleId, onClose }: TBottomSheetHeaderProps) {
   const t = useTranslations();
 

@@ -3,7 +3,6 @@ import type { TUseGetHeatmapDataArgs, TWorldClimBoxResponse } from "@/types";
 import { groupPixelBindings } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 
-/** A region's cells for one variable, from a box or a polygon. */
 export function useGetHeatmapData({ area, gridSize, variable, dataset }: TUseGetHeatmapDataArgs) {
   const enabled = area !== null;
 
@@ -21,7 +20,6 @@ export function useGetHeatmapData({ area, gridSize, variable, dataset }: TUseGet
     enabled,
     staleTime: Infinity,
     retry: 1,
-    // * the old region's cells stay on the map while the new ones load
     keepPreviousData: true,
   });
 

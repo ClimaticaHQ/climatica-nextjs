@@ -6,7 +6,6 @@ import type {
   TWalterLiethSourceRow,
 } from "@/types";
 
-/** Mean monthly temperature — null when either extreme is missing. */
 export function getMonthlyMean({ tmin, tmax }: Pick<TMonthlyTemperature, "tmin" | "tmax">) {
   return tmin !== null && tmax !== null ? (tmin + tmax) / 2 : null;
 }
@@ -17,7 +16,7 @@ export function withMonthlyMean(
   return rows.map((row) => ({ ...row, tavg: getMonthlyMean(row) }));
 }
 
-/** The values, or null if any is missing — a statistic over a gap would be silently wrong. */
+/** a statistic over a gap would be silently wrong */
 export function allPresent(values: readonly (number | null)[]): number[] | null {
   const present = values.filter((value): value is number => value !== null);
   return present.length === values.length ? present : null;
@@ -33,10 +32,6 @@ export function meanOf(values: readonly (number | null)[]): number | null {
   return sum !== null && values.length > 0 ? sum / values.length : null;
 }
 
-/**
- * WL months, or null when the series is incomplete: all 12 months need both a mean
- * temperature and precipitation, otherwise the diagram must not be drawn.
- */
 export function toWalterLiethMonths(
   rows: readonly TWalterLiethSourceRow[],
 ): TWalterLiethMonth[] | null {
@@ -48,14 +43,11 @@ export function toWalterLiethMonths(
   return months.length === rows.length ? months : null;
 }
 
-/** A number for a CSV file: always "." and fixed decimals, never the locale's digits. */
 export const formatCsvNumber = (value: number, decimals: number) => value.toFixed(decimals);
 
-/** "12.3 °C", or "—" when unknown — for CSV files: always "." (the screen uses formatValue). */
 export const formatTemp = (value: number | null) =>
   value !== null ? `${value.toFixed(1)} °C` : MISSING_VALUE_LABEL;
 
-/** "405 mm", or "—" when unknown — for CSV files, like formatTemp. */
 export const formatPrec = (value: number | null) =>
   value !== null ? `${value.toFixed(0)} mm` : MISSING_VALUE_LABEL;
 

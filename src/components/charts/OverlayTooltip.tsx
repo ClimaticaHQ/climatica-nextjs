@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import { TOOLTIP_CLASSES as C } from "./charts.constant";
 import type { TOverlayTooltipProps } from "./charts.type";
 
-/** The hovered month for every overlaid series: its marker and name, then its values. */
 export function OverlayTooltip({ active, payload, entries }: TOverlayTooltipProps) {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();

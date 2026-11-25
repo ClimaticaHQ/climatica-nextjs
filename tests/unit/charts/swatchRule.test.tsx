@@ -78,7 +78,6 @@ const chipSwatches = (props: TCardProps, barStyle: TBarStyle) => {
     </NextIntlClientProvider>,
   );
   const swatches = container.querySelectorAll("[data-toolbar-chips] [data-series-hatch]").length;
-  // * every other icon in a chip is its shape (no chip is locked: every year is shown)
   const shapes = container.querySelectorAll(
     "[data-toolbar-chips] svg:not([data-series-hatch])",
   ).length;

@@ -29,7 +29,6 @@ describe("monthly values rows", () => {
     expect(format("tavg", 4)).toBe("4.0");
     expect(format("prec", 36.6)).toBe("37");
     expect(format("prec", null)).toBe(MISSING_VALUE_LABEL);
-    // * the UI's locale: a decimal comma
     expect(format("tavg", -3.64, "es")).toBe("−3,6");
   });
 

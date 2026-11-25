@@ -14,7 +14,6 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("@/libs/actions/setLocale.action", () => ({ setLocale: vi.fn() }));
 
-// * a device whose reduced-motion preference the test can change while the page is open
 const device = vi.hoisted(() => ({ isReducedMotion: false, listeners: new Set<() => void>() }));
 
 function setReducedMotion(isReducedMotion: boolean) {
@@ -104,9 +103,7 @@ describe("Settings page under the device's reduced motion", () => {
     expect(isAnimationsChecked()).toBe(false);
     expect(animationsDescription()).toBe(text.reducedMotionNotice);
     expect(highlightOptions().every((option) => option.hasAttribute("disabled"))).toBe(true);
-    // * turning animations on isn't the reader's to do, so no hint telling them to
     expect(highlightDescription()).toBe(text.descriptions.updateHighlight);
-    // * the saved choice is kept for when the device stops asking
     expect(useSettingsStore.getState().animationsEnabled).toBe(true);
   });
 

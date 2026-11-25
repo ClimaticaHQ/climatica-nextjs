@@ -22,7 +22,6 @@ function isNearEdge(index: number, perDegree: number): boolean {
   return Math.min(fraction, 1 - fraction) / perDegree < POINT_CELL_EDGE_MARGIN_DEG;
 }
 
-/** The cell holding a point, or null when the point is too near an edge to be sure which */
 export function pointToCell({ lat, lng }: TCoordinates, size: TCellSize): TPointCell | null {
   const perDegree = CELLS_PER_DEGREE[size];
   const y = (90 - lat) * perDegree;
@@ -51,7 +50,6 @@ function readPoint(params: URLSearchParams): TCoordinates | null {
   return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
 }
 
-/** "climate" or "weather:<year>"; null for any other mix of the dataset params */
 function readDataset(params: URLSearchParams): string | null {
   const isClimate = readSingle(params, IS_CLIMATE) === "true" && !params.has(IS_WEATHER);
   if (isClimate && !params.has(YEAR)) return "climate";
@@ -101,10 +99,6 @@ const POINT_PARTS_BUILDERS: Record<string, (params: URLSearchParams) => TPointCa
   [WORLDCLIM_POINT_QUERY_IDS.CELL]: buildCellParts,
 };
 
-/**
- * The cell-based Redis key parts for a point query, so every point in one cell shares an entry.
- * null (fetch, don't cache) for other query ids, unexpected params, or a point near a cell edge.
- */
 export function buildPointCacheParts(
   queryId: string,
   params: URLSearchParams,
@@ -114,7 +108,6 @@ export function buildPointCacheParts(
 
 const cellIriSuffix = ({ size, row, col }: TPointCell) => `/Cell_${size}_r${row}c${col}`;
 
-/** Whether every binding of an answer names one of the expected cells: only then is it stored */
 export function isAnswerForCells(data: unknown, expectedCells: readonly TPointCell[]): boolean {
   const results = isRecord(data) ? data["results"] : null;
   const bindings = isRecord(results) ? results["bindings"] : null;

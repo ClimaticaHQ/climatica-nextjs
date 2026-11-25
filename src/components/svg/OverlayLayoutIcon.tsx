@@ -1,4 +1,3 @@
-/** Two curves in one diagram — WL comparison "overlay" layout. Sized to match the chart-mode toggle icons. */
 export function OverlayLayoutIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">

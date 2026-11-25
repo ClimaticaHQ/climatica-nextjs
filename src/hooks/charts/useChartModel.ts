@@ -4,10 +4,6 @@ import { deriveChartModel } from "@/utils";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
-/**
- * The chart model for a series list, with the text the kind rules add: a weather year's panel
- * says "single year" under its name.
- */
 export function useChartModel(series: readonly TChartSeries[]) {
   const t = useTranslations();
   const singleYear = t("chart.weatherSingleYear");

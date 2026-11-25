@@ -9,17 +9,12 @@ import { getSeriesHatch } from "@/utils/seriesShape.util";
 import { BAR_STYLE_PREVIEW as P } from "./Settings.constant";
 import type { TBarStylePreview } from "./Settings.type";
 
-/**
- * A bar style's thumbnail, laid out as the real overlay lays out its months (getOverlayBarLayout,
- * the style's gap): each entity's bars in its fills and hatch, by its place.
- */
 export function getBarStylePreview(barStyle: TBarStyle): TBarStylePreview {
   const plotWidth = P.WIDTH - P.PLOT.LEFT - P.PLOT.RIGHT;
   const plotHeight = P.HEIGHT - P.PLOT.TOP - P.PLOT.BOTTOM;
   const bottom = P.HEIGHT - P.PLOT.BOTTOM;
   const bandWidth = plotWidth / P.MONTHS.length;
   const entityCount = P.MONTHS[0].length;
-  // * the band the real chart would give a month of a year this wide
   const layout = getOverlayBarLayout({
     plotWidth: bandWidth * WALTER_LIETH_DIAGRAM.MONTHS_PER_YEAR,
     entityCount,

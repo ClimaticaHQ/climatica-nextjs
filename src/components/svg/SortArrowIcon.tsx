@@ -1,6 +1,5 @@
 import type { TSortArrowIconProps } from "./svg.type";
 
-/** An arrow up (ascending) or down (descending) — a list's sort direction. */
 export function SortArrowIcon({ isDescending }: TSortArrowIconProps) {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">

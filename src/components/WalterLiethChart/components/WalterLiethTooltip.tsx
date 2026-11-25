@@ -6,10 +6,6 @@ import { getSwatchSize, isAridMonth } from "@/utils";
 import { useTranslations } from "next-intl";
 import type { TWalterLiethTooltipProps } from "../WalterLiethChart.type";
 
-/**
- * One series' hovered month: its values and period in the text colour, each after its legend
- * swatch (temperature and precipitation lines, the humid or arid hatching).
- */
 export function WalterLiethTooltip({ active, payload }: TWalterLiethTooltipProps) {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();

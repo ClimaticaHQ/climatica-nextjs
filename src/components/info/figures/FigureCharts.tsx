@@ -17,11 +17,6 @@ import {
   WalterLiethFigureLegend,
 } from "./FigureFrames";
 
-/**
- * The figures' pictures: the app's own charts of the fixture, static, annotated, with their
- * legends — hidden from screen readers (the caption carries them). A picture is never touch; it
- * takes the phone's narrow axes, as the chart card does.
- */
 export function WalterLiethFigureChart() {
   const model = useChartModel(WALTER_LIETH_FIGURE.SERIES_LIST);
   const isNarrow = !useMediaQuery(SM_MEDIA_QUERY);
@@ -52,7 +47,6 @@ export function WalterLiethFigureChart() {
   );
 }
 
-/** The standard chart's picture: its annotations on the chart, and on the stats bar by item. */
 export function IndicatorsFigureChart() {
   const model = useChartModel(INDICATORS_FIGURE.SERIES_LIST);
   const isNarrow = !useMediaQuery(SM_MEDIA_QUERY);

@@ -196,7 +196,6 @@ describe("bar style: gaps", () => {
     expect(layout.gap).toBe(gap);
     const steps = layout.offsets.slice(1).map((offset, i) => offset - (layout.offsets[i] ?? 0));
     for (const step of steps) expect(step).toBeCloseTo(layout.barSize + gap);
-    // * the group stays centred in the month
     expect((layout.offsets[0] ?? 0) + (layout.offsets[4] ?? 0)).toBeCloseTo(0);
   });
 
@@ -207,7 +206,6 @@ describe("bar style: gaps", () => {
     for (const count of [2, 3, 4, 5]) {
       const min = (barStyle: TBarStyle) =>
         getMinOverlayBand(count, OVERLAY_BAR_STYLES[barStyle].minGap);
-      // * the default fits as many entities as shades, at every count
       expect(min("plain")).toBeLessThan(min("shades"));
       const { gap, minGap } = OVERLAY_BAR_STYLES.plain;
       const scroll = (availableWidth: number) =>
@@ -244,7 +242,6 @@ describe("plain's adaptive gap", () => {
   it("its floor near the minimum bar width, the full 3 px once the bars can afford it", () => {
     expect(at(getMinOverlayBand(5, FLOOR))).toBe(FLOOR);
     expect(at(200)).toBe(FULL);
-    // * full exactly where bars at the floor would be FULL_GAP_WIDTH wide (the share's room)
     const full = (5 * OVERLAY_BARS.FULL_GAP_WIDTH + 4 * FLOOR) / OVERLAY_BARS.GROUP_SHARE;
     expect(at(full)).toBeCloseTo(FULL);
     expect(at(full - 5)).toBeLessThan(FULL);

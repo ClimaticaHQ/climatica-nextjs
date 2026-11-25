@@ -9,10 +9,7 @@ import Link from "next/link";
 import { CONSENT_CLASSES as C } from "./consent.constant";
 import type { TConsentBannerProps } from "./consent.type";
 
-/**
- * The analytics question: Accept and Reject alike, and the Privacy section. A labelled region,
- * not a dialog — it takes no focus and traps none; <main> keeps room under its content for it.
- */
+/** a labelled region, not a dialog: it takes no focus and traps none */
 export function ConsentBanner({ onAccept, onReject }: TConsentBannerProps) {
   const t = useTranslations("consent");
   const ref = useHeightVariable<HTMLElement>(CONSENT_BANNER_HEIGHT_VARIABLE);

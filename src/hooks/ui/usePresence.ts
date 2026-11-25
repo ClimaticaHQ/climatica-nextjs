@@ -2,10 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-/**
- * Keeps something rendered for exitMs after it closes, so it can animate out. isLeaving is
- * true over that time; an exitMs of 0 (motion off) unmounts at once.
- */
 export function usePresence(isOpen: boolean, exitMs: number) {
   const [isLeaving, setIsLeaving] = useState(false);
   const [wasOpen, setWasOpen] = useState(isOpen);

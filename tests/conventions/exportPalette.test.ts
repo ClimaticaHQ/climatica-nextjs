@@ -8,7 +8,6 @@ import { resolveExportColors } from "@/utils/export/svg/resolveExportColors.util
 import { getSharedDomain } from "@/utils/walterLieth.util";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-// * light tokens (:root / [data-export-palette]) vs the dark overrides (html.dark)
 const LIGHT: Record<string, string> = {
   [WALTER_LIETH_COLOR_VARS.TEMP]: "#dc2626",
   [WALTER_LIETH_COLOR_VARS.PREC]: "#2563eb",
@@ -33,11 +32,6 @@ type TFakeElement = {
   hidden: boolean;
 };
 
-/**
- * A DOM where the dark theme is active: the document root computes to the dark tokens, and
- * only an element carrying the export-palette attribute computes to the light ones — which
- * is exactly what global.css does with `html.dark` and `[data-export-palette]`.
- */
 function stubDarkThemeDom() {
   const makeElement = (): TFakeElement => {
     const attributes = new Set<string>();

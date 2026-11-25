@@ -97,7 +97,6 @@ describe("Region Heatmap through its page hook", () => {
   });
 
   it("doesn't load a region over the cell cap, and suggests a resolution it fits at", () => {
-    // * 3° × 3° at 2.5′: 5,184 cells; at 5′ 1,296
     renderPage("dataset=climate&var=tmax&grid=2.5m&north=50&south=47&west=20&east=23");
     expect(page.requestedArea).toBeNull();
     expect(screen.getByText(/Choose 5 min or a coarser resolution/)).toBeTruthy();

@@ -3,7 +3,6 @@ import { DATA_UPDATE_SINGLE_SERIES, MONTH_NAMES } from "@/constants";
 import { EDataStatus, ESeriesKind, EWalterLiethSeriesId } from "@/enums";
 import type { TChartSeries, TMonthlyTemperature } from "@/types";
 
-/** Twelve months, shifted so each series differs; a gap (null) where asked. */
 export function months(shift: number, gapMonth?: number): TMonthlyTemperature[] {
   return MONTH_NAMES.map((monthName, i) => ({
     month: i + 1,

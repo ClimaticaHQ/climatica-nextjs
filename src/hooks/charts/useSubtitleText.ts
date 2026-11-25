@@ -2,7 +2,6 @@ import { CLIMATE_PERIOD_LABELS, DATASETS } from "@/constants";
 import type { TChartSubtitle } from "@/types";
 import { useTranslations } from "next-intl";
 
-/** The dataset / period line under the chart title — also each WL series' period. */
 export function useSubtitleText(subtitle: TChartSubtitle | undefined): string | null {
   const t = useTranslations();
   if (!subtitle) return null;

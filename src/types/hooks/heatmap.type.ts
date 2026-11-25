@@ -12,7 +12,6 @@ export type TBbox = {
 export type TPolygon = [number, number][];
 
 export type TUseRegionDataArgs = {
-  /** null: no region, nothing to load */
   area: TRegionArea | null;
   gridSize: TCellSize;
   dataset: TRegionDataset;
@@ -23,7 +22,6 @@ export type TUseGetHeatmapDataArgs = TUseRegionDataArgs & {
 };
 
 export type TUseGetRegionalProfileArgs = TUseRegionDataArgs & {
-  /** the profile waits for the region's cells */
   isEnabled: boolean;
 };
 

@@ -1,4 +1,3 @@
-/** A card with a strong outline and no halo — the "Border" update highlight. Sized to the segmented icons. */
 export function FlashBorderIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">

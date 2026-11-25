@@ -4,10 +4,6 @@ import { useUrlStateSync } from "@/hooks/ui";
 import type { TBbox, TPolygon } from "@/types";
 import { useState } from "react";
 
-/**
- * The heat map's region — a box or a polygon, kept in the URL — and the drawing tools that
- * pick it. Starting a new shape clears the current one.
- */
 export function useHeatMapSelection() {
   const [drawMode, setDrawMode] = useState<TDrawMode>("none");
   const [bbox, setBbox] = useState<TBbox | null>(null);

@@ -19,11 +19,6 @@ import {
 import type { TStatsTableProps } from "./charts.type";
 import { StatsTableHead } from "./StatsTableHead";
 
-/**
- * Every series side by side, metric by metric, in its colour — and a pair's difference (its
- * formula in the header's popover; below `sm` a line under the second value). A loading series' cells
- * wait; more series than fit scroll sideways, the metrics pinned. Flashes when a series updates.
- */
 export function StatsTable({
   table,
   columns,
@@ -35,11 +30,9 @@ export function StatsTable({
   const scrollerRef = useRef<HTMLDivElement>(null);
   const ids = table.columns.map(({ id }) => id);
   const edges = useScrollEdges(scrollerRef, ids.join("|"));
-  // * a column just added flashes where it landed in the order
   const arrivalRef = useArrivalFlash<HTMLTableElement>(ids);
   const { difference } = table;
   const labels = table.columns.map(({ label }) => label);
-  // * a value still loading: its place, in its line
   const pending = <TextPlaceholder widthClass={TEXT_PLACEHOLDER_WIDTHS.STAT} />;
   const minWidth = `${STATS_TABLE_MIN_REM.METRIC + table.columns.length * STATS_TABLE_MIN_REM.VALUE}rem`;
 
@@ -95,7 +88,6 @@ export function StatsTable({
                           {value.text}
                         </span>
                       )}
-                      {/* * below `sm` the difference's column is hidden: the last value carries it */}
                       {difference &&
                         index === row.values.length - 1 &&
                         (row.difference || value === null) && (

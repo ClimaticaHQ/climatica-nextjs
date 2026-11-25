@@ -4,7 +4,6 @@ import type { TKeyValueStorage } from "./persistedStore.type";
 export type TStoredConsent = {
   choice: EAnalyticsConsent;
   version: number;
-  // * ms since the epoch
   decidedAt: number;
 };
 

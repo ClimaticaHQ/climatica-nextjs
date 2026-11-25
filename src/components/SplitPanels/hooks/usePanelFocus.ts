@@ -3,7 +3,6 @@ import type { TExpandedPanel } from "@/types";
 import { useEffect, useRef } from "react";
 import type { TPanelFocusRefs, TPanelFocusTarget } from "../SplitPanels.type";
 
-/** The element a focus target names, once the new panels are in the DOM. */
 function resolveTarget(target: TPanelFocusTarget, refs: TPanelFocusRefs) {
   if (target === "collapse") return refs.collapseRef.current;
   if (target === "switch") {
@@ -13,11 +12,6 @@ function resolveTarget(target: TPanelFocusTarget, refs: TPanelFocusRefs) {
   return refs.expandRefs.current[target] ?? null;
 }
 
-/**
- * Keeps keyboard focus on the controls across expand / switch / collapse: the panels are
- * re-rendered (and the old ones made inert), so focus is moved to the matching new control.
- * Only after a user action — a panel restored from the URL leaves focus alone.
- */
 export function usePanelFocus(shown: TExpandedPanel) {
   const pendingRef = useRef<TPanelFocusTarget | null>(null);
   const collapseRef = useRef<HTMLButtonElement>(null);

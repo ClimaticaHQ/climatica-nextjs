@@ -1,4 +1,3 @@
-// * every page's header: centred, the title in the primary colour, a short description below
 export const PAGE_HEADER_CLASSES = {
   ROOT: "text-center",
   TITLE:

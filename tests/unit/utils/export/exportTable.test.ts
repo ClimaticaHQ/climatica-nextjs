@@ -177,7 +177,6 @@ describe("export row labels", () => {
     });
     expect(labels).toEqual(["SDC", "OSL"]);
     expect(labels.join("")).not.toContain("…");
-    // * the unit and the short labels beside it
     expect(gutter).toBeGreaterThanOrEqual(
       measureExportText("°C", EXPORT_MONTHLY_VALUES.UNIT_FONT_SIZE) +
         measureExportText("SDC", EXPORT_MONTHLY_VALUES.VALUE_FONT_SIZE.WIDE),

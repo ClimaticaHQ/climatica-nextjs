@@ -20,7 +20,6 @@ function csvEscape(value: string): string {
   return value;
 }
 
-/** Returns a full filename including extension: "compare-cities-rome-oslo-2024-01-15.png" */
 export function buildFilename(
   page: string,
   parts: string[],

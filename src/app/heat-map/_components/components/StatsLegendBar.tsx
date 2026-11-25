@@ -9,11 +9,6 @@ import { useTranslations } from "next-intl";
 import { STATS_LEGEND_BAR_CLASSES as C, STATS_LEGEND_GRADIENT_STOPS } from "../HeatMap.constant";
 import type { TStatsLegendBarProps } from "../HeatMap.type";
 
-/**
- * The region's stats — min, max, average, median, spread, cells — and the colour scale's
- * gradient. While the cells load the values wait in their places; a region without data has
- * no bar (the page says why).
- */
 export function StatsLegendBar({
   isLoading,
   hasData,

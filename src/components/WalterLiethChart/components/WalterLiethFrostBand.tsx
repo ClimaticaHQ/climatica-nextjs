@@ -3,11 +3,6 @@ import { getFrostBand } from "@/utils";
 import { useXAxisScale, useYAxisScale } from "recharts";
 import type { TWalterLiethFrostBandProps } from "../WalterLiethChart.type";
 
-/**
- * The frost band directly under the x axis, in the room getXAxisProps reserves: a cell per
- * month (filled where the mean minimum is below 0 °C), dividers that rise above the axis as
- * ticks, and a frame. The export draws the same getFrostBand shapes.
- */
 export function WalterLiethFrostBand({ frost, axisValue, isCompact }: TWalterLiethFrostBandProps) {
   const xScale = useXAxisScale();
   const yScale = useYAxisScale("left");

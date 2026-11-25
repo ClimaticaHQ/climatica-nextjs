@@ -53,12 +53,10 @@ import type { TSeriesMarkerProps } from "@/components/SeriesMarker/SeriesMarker.
 import { motionVar } from "@/utils/motion.util";
 import type { CSSProperties } from "react";
 
-/** A chart's series share one kind; an empty list draws as cities (nothing to draw anyway). */
 export function getSeriesKindRule(series: readonly TChartSeries[]): TSeriesKindRule {
   return SERIES_KIND_RULES[series[0]?.kind ?? ESeriesKind.CITY];
 }
 
-/** Every complete Walter-Lieth series: an overlay needs all of a shaded pair. */
 // * a series still loading isn't incomplete yet: one landing before the other keeps the layout
 function isEveryLoadedComplete(model: TChartModel) {
   return model.series.every(
@@ -67,10 +65,6 @@ function isEveryLoadedComplete(model: TChartModel) {
   );
 }
 
-/**
- * The body for the page's layout. A Walter-Lieth overlay of a shadable pair needs both series
- * complete — otherwise the side by side shows the diagram next to the other's notice.
- */
 export function resolveChartBody({
   viewState,
   model,
@@ -84,7 +78,6 @@ export function resolveChartBody({
   return isWalterLiethOverlay && rule.canShade && isIncomplete ? EChartBody.SPLIT : body;
 }
 
-/** The title's names: the series' own labels, or the page's (the city every series belongs to). */
 export function getTitleNames(
   model: TChartModel,
   rule: TSeriesKindRule,
@@ -95,19 +88,13 @@ export function getTitleNames(
     : features.title.names;
 }
 
-/** An entity's marker: its shape, in graphite — in its panel header, the tooltip, the tables. */
 export function getSeriesMarker({ series }: TChartSeriesModel): TSeriesMarkerProps {
   return { shape: series.shape };
 }
 
-/** The swatch style a block shows its entities in: the view's (getSwatchBarStyle). */
 export const getContextSwatchStyle = ({ mode, body, barStyle, visible }: TChartBlockContext) =>
   getSwatchBarStyle({ mode, body, barStyle, isPrecVisible: visible.prec });
 
-/**
- * The legend's entities: by shape, and their bars beside it where the view draws them per
- * entity (getSwatchBarStyle) — none where the chips above name them.
- */
 function getLegendSeries(context: TChartBlockContext) {
   const { entries, rule } = context;
   const swatchStyle = getContextSwatchStyle(context);
@@ -121,7 +108,6 @@ function getLegendSeries(context: TChartBlockContext) {
       }));
 }
 
-/** The hatched series' id in a Walter-Lieth overlay — none for kinds that can't be shaded. */
 export function getShadedId(
   model: TChartModel,
   rule: TSeriesKindRule,
@@ -135,7 +121,6 @@ export function getShadedId(
   );
 }
 
-// * every standard chart: the semantic line colours and the bars by aridity — one entity or many
 const standardLegend: TLegendBuilder = ({ visible }, labels) =>
   getStandardLegendItems({
     labels,
@@ -173,7 +158,6 @@ const WALTER_LIETH_LEGENDS = {
     }),
 } satisfies Record<EChartBody, TLegendBuilder>;
 
-/** The legend under a chart: by chart type and body, from the series it describes. */
 export function getChartLegendItems(
   context: TChartBlockContext,
   labels: TLegendLabels,
@@ -183,7 +167,6 @@ export function getChartLegendItems(
   return builders[context.body](context, labels, walterLieth);
 }
 
-/** A block's context under one spot of a body: the body's shared state and the spot's series. */
 export function getBlockContext(
   props: TChartBodyProps,
   part: TBlockContextPart,
@@ -200,7 +183,6 @@ export function getBlockContext(
   };
 }
 
-/** Each shown entity's curve offset, in months: its bar's centre in the month's group. */
 export function getCurveOffsets(
   shown: readonly Pick<TStandardChartEntry, "id">[],
   layout: TOverlayBarLayout,
@@ -210,15 +192,13 @@ export function getCurveOffsets(
   );
 }
 
-/** A React id as an SVG id, usable in url(#…): only letters, digits and dashes. */
+/** only letters, digits and dashes: a React id isn't usable in url(#…) as it is */
 export const toSvgId = (reactId: string) => reactId.replace(/[^a-zA-Z0-9-]/g, "");
 
-/** Where the standard chart reads a series' variable in a month's row. */
 export function seriesDataKey(id: string, variable: TSeriesKey) {
   return `${id}:${variable}`;
 }
 
-/** One row per month, every series' values side by side — the standard chart's data. */
 export function buildStandardChartRows(entries: readonly TChartSeriesModel[]) {
   const base = entries.find(({ hasData }) => hasData)?.chartData ?? [];
   return base.map(({ month, monthName }, index) => {
@@ -240,11 +220,7 @@ const SERIES_TOGGLE_TRANSITION = {
   transitionTimingFunction: motionVar(MOTION_CSS_VAR.CHART_SERIES_TOGGLE_EASING),
 };
 
-/**
- * Value + transition live in the same style object — required for the browser to treat
- * the property change as a single animatable CSS value (same fix as PrecipBarShape's
- * fillOpacity). Lines and bars fade over the same time (MOTION.CHART_SERIES_TOGGLE_MS).
- */
+/** value and transition in one style object, so the browser animates the change as one value */
 export function buildOpacityFadeStyle(opacity: number): CSSProperties {
   return { opacity, transitionProperty: "opacity", ...SERIES_TOGGLE_TRANSITION };
 }
@@ -257,10 +233,6 @@ export function buildFillOpacityFadeStyle(fillOpacity: number): CSSProperties {
   return { fillOpacity, transitionProperty: "fill-opacity", ...SERIES_TOGGLE_TRANSITION };
 }
 
-/**
- * Overlay: every series in the diagram's semantic colours, told apart by its dots' shape; line
- * style = variable (solid temperature, dashed precipitation). Only the shaded series is hatched.
- */
 export function toOverlayLayer({
   isShaded,
   shape,

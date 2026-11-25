@@ -12,10 +12,6 @@ import { BarStylePicker } from "./BarStylePicker";
 import { SettingsGroup } from "./SettingsGroup";
 import { SettingsRow } from "./SettingsRow";
 
-/**
- * How the charts and filters behave: auto-apply, the city and the filters across pages,
- * scrolling to results, and how a comparison overlay's bars tell its series apart.
- */
 export function BehaviourSettings({ page }: TSettingsViewProps) {
   const t = useTranslations();
   const { settings, onSettingChange } = page;

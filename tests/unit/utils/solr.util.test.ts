@@ -126,15 +126,12 @@ describe("buildSolrQueryParams", () => {
 });
 
 describe("SOLR_RANKING.EXACT_TIER", () => {
-  // * An exact match scores at least the tier; a typo-only match at most its fuzzy score plus
-  // * its population boost. Both bounds use the larger population weight, to stay generous.
   it("exceeds the largest population boost plus the largest possible fuzzy score", () => {
     const { MAX_DOCUMENTS, MAX_POPULATION, MAX_QUERY_WORDS, MAX_FUZZY_EXPANSIONS, BM25_K1 } =
       SOLR_SCORE_BOUNDS;
     const maxPopulationBoost =
       Math.max(SOLR_RANKING.EXACT_POPULATION_WEIGHT, SOLR_RANKING.FUZZY_POPULATION_WEIGHT) *
       Math.log10(MAX_POPULATION + 1);
-    // * BM25's idf peaks for a term in one document; a term scores at most idf × (k1 + 1)
     const maxIdf = Math.log(1 + (MAX_DOCUMENTS - 1 + 0.5) / (1 + 0.5));
     const maxTermScore = maxIdf * (BM25_K1 + 1);
     const maxFieldWeight = Math.max(SOLR_SEARCH_WEIGHTS.FUZZY_NAMES, 1);

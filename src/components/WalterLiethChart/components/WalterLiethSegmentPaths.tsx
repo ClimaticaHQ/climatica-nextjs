@@ -2,7 +2,6 @@ import { EWalterLiethRegime } from "@/enums";
 import { getRegimeFill, toSvgPath } from "@/utils";
 import type { TWalterLiethSegmentPathsProps } from "../WalterLiethChart.type";
 
-/** Segment polygons in their regime fill: hatch lines, arid dots or the solid perhumid fill. */
 export function WalterLiethSegmentPaths({
   segments,
   patternIds,

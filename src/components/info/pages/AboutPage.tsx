@@ -32,10 +32,6 @@ import { InfoList } from "../parts/InfoList";
 import { InfoSection } from "../parts/InfoSection";
 import { Team } from "../parts/Team";
 
-/**
- * About: what Climatica is, how its data flows, who makes it, and how to cite it. Sections with
- * no configuration yet (team, citation, SCRAPI's author and docs, links) are left out.
- */
 export function AboutPage() {
   const t = useTranslations();
   const { facts, codeFacts } = useAboutFacts();

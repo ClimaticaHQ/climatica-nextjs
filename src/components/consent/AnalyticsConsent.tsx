@@ -9,11 +9,6 @@ import { useEffect, useLayoutEffect } from "react";
 import { ConsentBanner } from "./ConsentBanner";
 import type { TGoogleAnalyticsScriptsProps } from "./consent.type";
 
-/**
- * Google Analytics, only once accepted: before that no script is rendered and nothing is
- * requested from Google. Rejecting or withdrawing stops a loaded gtag and removes its cookies.
- * Mounted once in AppLayout; renders nothing without a measurement ID.
- */
 export function AnalyticsConsent() {
   const consent = useAnalyticsConsent();
   const { isAvailable, isGranted, gaId } = consent;
@@ -34,10 +29,7 @@ export function AnalyticsConsent() {
   );
 }
 
-/**
- * GA's scripts, with its defaults queued first (a layout effect runs before next/script's), then
- * the page views, after GA's config (a later sibling's effect runs after the script's).
- */
+/** a layout effect queues GA's defaults before next/script's; the page views come after GA's config */
 function GoogleAnalyticsScripts({ gaId }: TGoogleAnalyticsScriptsProps) {
   useLayoutEffect(() => enableAnalytics(gaId), [gaId]);
   return (

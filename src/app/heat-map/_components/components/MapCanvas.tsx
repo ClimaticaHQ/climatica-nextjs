@@ -26,8 +26,6 @@ export function MapCanvas({
 }: TMapCanvasProps) {
   return (
     <Card padding={ECardPadding.NONE} shouldClip className="relative h-[70vh] sm:h-[520px]">
-      {/* * loading: the map dims and the progress bar runs along its top edge, like a chart card;
-          the previous cells stay until the new ones arrive */}
       <DataUpdateProgress />
       <DataUpdateFade isFullHeight>
         <MapContainer

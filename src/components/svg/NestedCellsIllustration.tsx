@@ -6,10 +6,6 @@ import { scaleChartFont } from "@/utils/textSize.util";
 import { NESTED_CELLS as N } from "./svg.constant";
 import type { TNestedCellsIllustrationProps } from "./svg.type";
 
-/**
- * A schematic, not a map: the cells holding one point at two resolutions — a coarse cell among
- * its neighbours, the fine cell inside it, the point in that. Every colour is a theme token.
- */
 export function NestedCellsIllustration({
   ariaLabel,
   coarseLabel,
@@ -21,7 +17,6 @@ export function NestedCellsIllustration({
   const fine = size / finePerCoarse;
   const fineX = x + fine * N.POINT_CELL.col;
   const fineY = y + fine * N.POINT_CELL.row;
-  // * the neighbours' grid lines, continuing the coarse cell's edges to the drawing's borders
   const columns = [x - size, x, x + size, x + size * 2];
   const rows = [y - size, y, y + size, y + size * 2];
 

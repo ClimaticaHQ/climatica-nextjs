@@ -36,7 +36,6 @@ describe("extractPageParams (what the store remembers)", () => {
       CP,
       params("dataset=weather&periods=1700,abc&layout=diagonal&pair=2021,2021&chart=standard"),
     );
-    // * no valid years: the default pair of years, which is left out
     expect(remembered.toString()).toBe("chart=standard&dataset=weather");
   });
 });
@@ -96,7 +95,6 @@ describe("buildNavbarHref, filters synced", () => {
 
 describe("buildNavbarHref, filters not synced", () => {
   const HM = ROUTES.HEAT_MAP;
-  // * the heat map left on Climate 1991–2020, City Climate on Weather 2021
   const heatMap = extractPageParams(HM, params("period=c1991-2020&var=tmax")).toString();
   const cityClimate = extractPageParams(
     CS,

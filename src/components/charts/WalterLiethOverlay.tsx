@@ -12,11 +12,6 @@ import { OverlayTooltip } from "./OverlayTooltip";
 
 const { CALENDAR_MONTH_ORDER } = WALTER_LIETH_DIAGRAM;
 
-/**
- * Any number of series in one diagram on the shared domain — Climate A / B, or up to five
- * weather years. Semantic colours, shape = series, line style = variable; hatching only for the
- * shaded series.
- */
 export function WalterLiethOverlay({
   entries,
   domain,
@@ -33,7 +28,6 @@ export function WalterLiethOverlay({
   });
   const shaded = drawn.find(({ isShaded }) => isShaded);
   const [first] = drawn;
-  // * while the data load: the same figure, its plot a skeleton — the data swap the plot alone
   const isLoading = useContext(ChartLoadingContext);
   if (!first && !isLoading) return null;
 
@@ -55,7 +49,6 @@ export function WalterLiethOverlay({
           domain={domain}
           layers={layers}
           isCompact={false}
-          // * the shaded series' frost band — none when no series is shaded
           frost={shaded ? getFrostMonths(shaded.series.months) : null}
           tooltip={
             <OverlayTooltip

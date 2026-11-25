@@ -3,7 +3,6 @@ import type { TSettings } from "@/types";
 import { DEFAULT_BAR_STYLE } from "./chartPlot.constant";
 import { DEFAULT_UPDATE_FLASH_VARIANT } from "./motion.constant";
 
-// * a new visitor's settings; a saved one keeps each value it has
 export const SETTINGS_DEFAULTS: TSettings = {
   theme: ETheme.SYSTEM,
   textSize: ETextSize.DEFAULT,
@@ -16,6 +15,4 @@ export const SETTINGS_DEFAULTS: TSettings = {
   chartBarStyle: DEFAULT_BAR_STYLE,
 };
 
-// * the saved object's shape: 0 had no theme (it had its own key), 1 holds every setting, 2 adds
-// * the text size
 export const SETTINGS_STORE_VERSION = 2;

@@ -40,7 +40,6 @@ describe("ChartSkeleton", () => {
   it("shimmers by a CSS animation, which motion off and reduced motion stop", () => {
     const { container } = render(<ChartSkeleton heightClass={CHART_PLOT.HEIGHT.FULL} />);
     expect(skeletonOf(container)?.querySelector(".animate-pulse")).not.toBeNull();
-    // * the motion-off rules end every animation: the setting's and the device's
     const offRule = /:root\[data-motion="off"\] \*,[\s\S]*?animation: none !important;/;
     const reducedRule =
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\*,[\s\S]*?animation: none !important;/;

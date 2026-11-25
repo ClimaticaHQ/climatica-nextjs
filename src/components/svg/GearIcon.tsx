@@ -1,6 +1,5 @@
 import type { TIconProps } from "./svg.type";
 
-/** A cog — opens the settings. Eight teeth on the 20 × 20 grid of the theme and filter icons. */
 export function GearIcon({ className = "h-5 w-5" }: TIconProps) {
   return (
     <svg viewBox="0 0 20 20" fill="none" className={className} aria-hidden="true">

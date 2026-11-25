@@ -19,7 +19,6 @@ import { getFrostMonths } from "./walterLieth.util";
 
 const withUnit = (text: string, unit: string | null) => (unit ? `${text} ${unit}` : text);
 
-/** Frost months by the WL rule (mean min < 0 °C); null when any month's minimum is unknown. */
 function countFrostMonths(data: TComparisonTableSeries["data"]) {
   const months = toWalterLiethMonths(withMonthlyMean(data));
   const frost = months ? getFrostMonths(months) : null;
@@ -27,7 +26,6 @@ function countFrostMonths(data: TComparisonTableSeries["data"]) {
   return frost.filter((state) => state === EWalterLiethFrost.FROST).length;
 }
 
-/** Every row's raw number for one series — null when it can't be computed from the data. */
 function getMetricValues({
   data,
   altitude,
@@ -51,13 +49,11 @@ function formatValue(
   { locale, unit }: TFormatComparisonValueOptions,
 ): TComparisonTableValue {
   if (value === null) return { text: MISSING_VALUE_LABEL };
-  // * every value with a real minus sign ("−3,6"), in the locale's decimals
   const formatted = formatDisplayValue(value, { metric: display, locale, sign: ENumberSign.MINUS });
   const text = withUnit(formatted, unit);
   return metric === "martonne" ? { text, badge: getMartonneBadge(value) } : { text };
 }
 
-/** The row's difference of the displayed values, minuend − subtrahend; null when either is unknown. */
 function formatRowDifference(
   [minuend, subtrahend]: readonly [number | null | undefined, number | null | undefined],
   { display }: TComparisonMetricFormat,
@@ -74,11 +70,6 @@ function formatRowDifference(
   return withUnit(formatDifference({ minuend, subtrahend, metric: display, locale }), unit);
 }
 
-/**
- * The comparison table: every metric for both series and their difference, minuend −
- * subtrahend (B − A for cities, the later period for periods). A missing value reads as "—";
- * its difference is left out. The page and the export draw these rows.
- */
 export function buildComparisonTable({
   seriesA,
   seriesB,
@@ -111,11 +102,6 @@ export function buildComparisonTable({
   };
 }
 
-/**
- * The stats table: every metric for each series, a loading series' cells left empty (null), and
- * — for a pair with a minuend — the difference, minuend − the other. The page draws these rows;
- * a pair's export draws buildComparisonTable's.
- */
 export function buildStatsTable({
   series,
   minuendId,

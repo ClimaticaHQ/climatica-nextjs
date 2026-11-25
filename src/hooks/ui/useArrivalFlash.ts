@@ -6,11 +6,6 @@ import { playUpdateFlash } from "@/utils";
 import { useEffect, useRef } from "react";
 import { useMotionPreference } from "./useMotionPreference";
 
-/**
- * A list's newly added entities flash once where they landed — the update flash, in the chosen
- * variant, none with motion off or on the first render. Put the ref on the list and
- * ARRIVAL_FLASH_ATTRIBUTE (its key) on each entity's element.
- */
 export function useArrivalFlash<T extends HTMLElement>(keys: readonly string[]) {
   const ref = useRef<T>(null);
   const previousRef = useRef<readonly string[] | null>(null);

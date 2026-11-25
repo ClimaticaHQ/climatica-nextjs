@@ -3,7 +3,6 @@ import { OptionMarker } from "../Dropdown/OptionMarker";
 import { BADGE_CLASSES as C, PENDING_BADGE_TONE } from "./Badge.constant";
 import type { TBadgeProps } from "./Badge.type";
 
-/** A non-interactive label in one tint set's colours: background, 1px border and text. */
 export function Badge({
   tone,
   size = EBadgeSize.MD,

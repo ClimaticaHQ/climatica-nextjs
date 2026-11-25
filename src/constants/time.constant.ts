@@ -1,19 +1,3 @@
-/**
- * Time constants both in milliseconds and seconds.
- *
- * Example usage:
- * ```typescript
- * import { TIME } from "@/constants";
- *
- * // Set default timeout in milliseconds for 5 minutes
- * setTimeout(() => {
- *   console.log("This will run after 5 minutes");
- * }, TIME.IN_MILLISECONDS.FIVE_MINUTES);
- *
- * // Set cache duration in seconds for 30 minutes
- * const cacheDuration = TIME.IN_SECONDS.THIRTY_MINUTES;
- * ```
- */
 export namespace TIME {
   const SECOND_MS = 1000;
   const MINUTE_MS = 60 * SECOND_MS;

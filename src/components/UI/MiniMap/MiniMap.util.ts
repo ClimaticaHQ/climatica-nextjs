@@ -4,10 +4,6 @@ import { getMarkerPath } from "@/utils/seriesShape.util";
 import L from "leaflet";
 import { MINI_MAP_MARKER as M } from "./MiniMap.constant";
 
-/**
- * A place's map icon: its shape (the first one for a place that is no entity), as on the charts,
- * in the main map marker's green and white outline.
- */
 export function getMiniMapIcon(shape: TSeriesShape = SERIES_SHAPES[0], isActive: boolean) {
   const size = isActive ? M.ACTIVE_SIZE : M.SIZE;
   const box = size + M.OUTLINE_WIDTH * 2;

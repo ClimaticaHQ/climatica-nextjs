@@ -1,6 +1,5 @@
 import type { ESlidingIndicatorAxis } from "@/enums";
 
-/** An item's box inside its list's padding box, in px: where a sliding indicator sits. */
 export type TIndicatorRect = {
   left: number;
   top: number;
@@ -8,27 +7,21 @@ export type TIndicatorRect = {
   height: number;
 };
 
-/** A sliding indicator's place, and whether it slides there or jumps (resize, fonts, first). */
 export type TSlidingIndicatorState = TIndicatorRect & {
   isAnimated: boolean;
 };
 
 export type TSlidingIndicatorArgs = {
-  /** changes when another item becomes active: the indicator slides to it */
   activeKey: string | null;
-  /** finds the active item inside the list (its aria-current, aria-pressed or data attribute) */
   activeSelector: string;
-  /** where the item will be rather than where it is (getFoldedRect: once the folds have ended) */
   toTargetRect?: ((args: TIndicatorTargetArgs) => TIndicatorRect) | undefined;
 };
 
 export type TIndicatorTargetArgs = TIndicatorRectArgs & {
-  /** the item's box now (getIndicatorRect) */
   rect: TIndicatorRect;
 };
 
 export type TIndicatorRectArgs = {
-  /** the list the indicator is positioned in */
   container: HTMLElement;
   item: HTMLElement;
 };

@@ -104,7 +104,6 @@ describe("getAridHumidSegments", () => {
 
     const [humid] = ofRegime(segments, EWalterLiethRegime.HUMID);
     expect(segments).toHaveLength(1);
-    // * upper edge = precipitation (60 mm → 30) forward, lower edge = temperature back
     expect(humid.points).toHaveLength(24);
     expect(humid.points[0]).toEqual({ x: 0, y: 30 });
     expect(humid.points.at(-1)).toEqual({ x: 0, y: -10 });
@@ -120,7 +119,6 @@ describe("getAridHumidSegments", () => {
   });
 
   it("switches regime at the exact interpolated crossing, not at month boundaries", () => {
-    // * P axis 30 / 10 / 30… against T = 20 → crosses at x = 0.5 and x = 1.5
     const prec = [60, 20, ...Array<number>(10).fill(60)];
     const segments = getAridHumidSegments({ months: toMonths(constant(20), prec) });
 
@@ -138,7 +136,7 @@ describe("getAridHumidSegments", () => {
 
   it("REGRESSION: a month exactly at P = 2T between arid months stays inside one arid region", () => {
     const prec = constant(10);
-    prec[5] = 40; // * axis 20 = T
+    prec[5] = 40;
     const segments = getAridHumidSegments({ months: toMonths(constant(20), prec) });
 
     const arid = ofRegime(segments, EWalterLiethRegime.ARID);
@@ -151,7 +149,6 @@ describe("getAridHumidSegments", () => {
   });
 
   it("splits precipitation above 100 mm into a solid perhumid region, crossing the 100 mm line between months", () => {
-    // * 80 mm → 40, 140 mm → 52; the 100 mm line (axis 50) is crossed at x = 5/6 and 13/6
     const prec = [80, 140, 140, ...Array<number>(9).fill(80)];
     const segments = getAridHumidSegments({ months: toMonths(constant(10), prec) });
 
@@ -175,7 +172,6 @@ describe("getAridHumidSegments", () => {
   });
 
   it("lays months out in the given order, so a Jul–Jun diagram needs no geometry change", () => {
-    // * Jan–Jun arid (T 30 > P axis 15), Jul–Dec humid (T 10 < 15)
     const months = toMonths(
       [...constant(30).slice(0, 6), ...constant(10).slice(0, 6)],
       constant(30),
@@ -206,7 +202,6 @@ describe("getSharedDomain", () => {
   );
 
   it("covers both series, so the two diagrams share one set of axes", () => {
-    // * tempMin −12 → −15, tempMax 34 → 35, 180 mm → axis 54 → 55 (strictly outward)
     const expected = { tempMin: -15, tempMax: 35, precMax: 55, plotMax: 55 };
 
     expect(getSharedDomain([coldWet, hotDry])).toEqual(expected);
@@ -266,7 +261,6 @@ describe("getWalterLiethPrecTicks", () => {
   });
 
   it("adds no compressed tick that would crowd the 100 mm anchor", () => {
-    // * precMax 55 → 200 mm: the next round tick (300 mm+) is out of range
     expect(getWalterLiethPrecTicks(domain(55))).toEqual([0, 20, 40, 60, 80, 100]);
   });
 
@@ -356,7 +350,6 @@ describe("getFrostMonths", () => {
 });
 
 describe("getFrostBand", () => {
-  // * the plot spans 0–600 px: month i centred at 25 + 50i, x domain [-0.5, 11.5]
   const scaleX = (x: number) => (x + 0.5) * 50;
   const palette = { frost: "frost", outline: "outline", unknown: "unknown" };
   const frost = [

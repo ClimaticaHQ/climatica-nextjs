@@ -93,7 +93,6 @@ describe("isSameIndicatorRect", () => {
   });
 });
 
-/** A Collapsible as the tree draws it: its height now, its content's full height. */
 const collapsible = ({
   isOpen,
   height,
@@ -126,7 +125,6 @@ describe("getFoldedRect: where an item lands once the folds have ended", () => {
   };
 
   it("moves by what the folds above it still have to grow or shrink", () => {
-    // * About shutting (90 of 150 px left), User guide opening (30 of 200 px so far)
     const { container, item } = setup([
       collapsible({ isOpen: false, height: 90, content: 150 }),
       collapsible({ isOpen: true, height: 30, content: 200 }),
@@ -153,7 +151,6 @@ describe("getFoldedRect: where an item lands once the folds have ended", () => {
       const { container, item } = setup([
         collapsible({ isOpen: false, height: 150 * (1 - progress), content: 150 }),
       ]);
-      // * the item rises with the shutting fold
       const rect = { ...RECT, top: 200 - 150 * progress };
       return getFoldedRect({ rect, container, item }).top;
     };

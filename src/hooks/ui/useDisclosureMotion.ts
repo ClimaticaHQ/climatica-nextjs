@@ -4,17 +4,10 @@ import { MOTION } from "@/constants";
 import { useRef, useState, type MouseEvent } from "react";
 import { useMotionPreference } from "./useMotionPreference";
 
-/**
- * A <details> that folds instead of jumping: on its summary's click its content's height and
- * opacity animate (MOTION.ACCORDION_MS, the indicators' easing), and it closes only once folded.
- * A click mid-way reverses the running animation from where it is. Anything else that opens or
- * closes it (find-in-page, a script, motion off) stays native; `isExpanded` follows it.
- */
 export function useDisclosureMotion() {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<Animation | null>(null);
-  // * where it's heading: the chevron's state, and what a finished fold leaves
   const isExpandedRef = useRef(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { isMotionEnabled } = useMotionPreference();
@@ -28,7 +21,7 @@ export function useDisclosureMotion() {
     if (animationRef.current !== animation) return;
     animationRef.current = null;
     if (!isExpandedRef.current && detailsRef.current) detailsRef.current.open = false;
-    // * its height back to the content's own
+    // * cancel() returns its height to the content's own
     animation.cancel();
   };
 

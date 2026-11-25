@@ -10,15 +10,10 @@ import { COPY_FEEDBACK_KEYS as FEEDBACK_KEYS, INFO_CLASSES as C } from "../info.
 import type { THowToCiteProps } from "../info.type";
 import { InfoSection } from "./InfoSection";
 
-/**
- * The paper's citation and two copy buttons, the citation and its BibTeX; the BibTeX button
- * only when that is configured.
- */
 export function HowToCite({ citation, bibtex }: THowToCiteProps) {
   const t = useTranslations();
   const citationCopy = useCopyToClipboard();
   const bibtexCopy = useCopyToClipboard();
-  // * one live message for both buttons
   const feedbackKey =
     FEEDBACK_KEYS[citationCopy.status] ?? FEEDBACK_KEYS[bibtexCopy.status] ?? null;
 

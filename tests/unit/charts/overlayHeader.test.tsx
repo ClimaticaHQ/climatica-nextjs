@@ -27,7 +27,6 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 
 const YEARS = ["2021", "1967", "1990", "2010", "2000"];
 const HOVERED = 5;
-// * the plot's left axis area: the header column's width, the table frame's border given back
 const AXIS = getPlotMargin({ isCompact: false });
 const FRAME_BORDER = 1;
 
@@ -63,13 +62,11 @@ describe("the standard overlay's values table", () => {
     expect(rows.map((row) => row.getAttribute("aria-hidden"))).toEqual([null, null]);
     const units = rows.map((row) => row.querySelector("th [aria-hidden]"));
     expect(units.map((unit) => unit?.textContent)).toEqual(["°C", "mm"]);
-    // * the unit keeps its chart colour
     expect(units.map((unit) => unit?.getAttribute("style"))).toEqual([
       expect.stringContaining("color"),
       expect.stringContaining("color"),
     ]);
     expect(rows.map((row) => row.querySelectorAll("th [role=img]").length)).toEqual([2, 2]);
-    // * one divider, between the two groups
     expect(rows.map((row) => row.className.includes("border-t"))).toEqual([false, true]);
   });
 
@@ -89,7 +86,6 @@ describe("the standard overlay's values table", () => {
       "1967",
     ]);
     expect(getAllByRole("img", { name: "1967" })).toHaveLength(2);
-    // * the shape only, in both rows: the axis-wide column has no room for the hatch
     expect(headers.map((header) => header.querySelectorAll("svg").length)).toEqual([1, 1, 1, 1]);
   });
 
@@ -119,12 +115,10 @@ describe("the standard overlay's values table", () => {
       { wrapper },
     );
     const rows = [...container.querySelectorAll("tbody tr")];
-    // * every row paints the month's cell (after the header cell)
     const cells = rows.map((row) => row.children[HOVERED + 1]);
     cells.forEach((cell) =>
       expect(cell?.getAttribute("style")).toContain(`background-color: ${MONTHLY_VALUES_HOVER}`),
     );
-    // * the divider between the groups: the band's colour across the hovered month
     expect(cells[1]?.getAttribute("style")).toContain(`border-top-color: ${MONTHLY_VALUES_HOVER}`);
     expect(rows[1]?.children[HOVERED]?.getAttribute("style")).toBeNull();
   });
@@ -139,24 +133,20 @@ describe("the standard overlay's values table", () => {
   it("values and header markers in the app's shared type — no size of their own", () => {
     const { container } = renderTable();
     const value = container.querySelector("tbody td[tabindex]")?.className ?? "";
-    // * the marker stack's lines as tall as the values'
     const headerLines =
       container.querySelector("tbody th [role=img]")?.parentElement?.className ?? "";
-    // * the stats table's size from a full chart's width; the headers' lines as tall as the values'
     for (const className of [value, headerLines]) {
       expect(className).toContain("text-[length:var(--font-sm)]");
       expect(className).toContain("text-[length:var(--font-xs)]");
     }
     expect(value).toContain("font-medium");
     expect(value).toContain("py-1");
-    // * only token sizes: no px font size anywhere in the table
     expect(container.innerHTML).not.toMatch(/text-\[\d+px\]/);
   });
 });
 
 describe("the plot's margins are its axes'", () => {
   type TElementProps = Record<string, unknown> & { children?: ReactNode };
-  // * every element in a tree, depth first
   const elementsOf = (node: unknown): unknown[] => {
     if (Array.isArray(node)) return node.flatMap(elementsOf);
     if (!isValidElement<TElementProps>(node)) return [];
@@ -187,12 +177,10 @@ describe("the plot's margins are its axes'", () => {
         }),
       { wrapper },
     );
-    // * no width measured yet: laid out at the minimum and scrolling, the fixed axes shown
     const types = elementsOf(result.current).flatMap((element) =>
       isValidElement(element) ? [element.type] : [],
     );
     expect(types).toContain(FixedYAxes);
-    // * scrolling: only the fixed axes draw °C and mm — the plot's own would slide out under them
     const axes = elementsOf(result.current).find(
       (element) => isValidElement(element) && element.type === StandardChartAxes,
     );

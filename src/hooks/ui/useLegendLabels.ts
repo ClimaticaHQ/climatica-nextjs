@@ -1,7 +1,6 @@
 import type { TLegendLabels } from "@/types";
 import { useTranslations } from "next-intl";
 
-/** The legend's translated texts — the export builds the same object from its payload labels. */
 export function useLegendLabels(): TLegendLabels {
   const t = useTranslations();
   return {

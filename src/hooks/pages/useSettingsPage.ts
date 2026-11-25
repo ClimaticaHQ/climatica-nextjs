@@ -8,7 +8,6 @@ import { getPersistedSettings } from "@/utils/settings.util";
 import { useLocale, useTranslations } from "next-intl";
 import { useDocumentTitle } from "./useDocumentTitle";
 
-/** The settings page: every setting, applied as it changes — no save step. */
 export function useSettingsPage(): TSettingsPage {
   const t = useTranslations();
   const locale = useLocale();
@@ -27,8 +26,7 @@ export function useSettingsPage(): TSettingsPage {
     isLocaleSwitching: isSwitching,
     onLocaleChange: switchLocale,
     settings: getPersistedSettings(state),
-    // * the switch shows what applies: off and locked while the device asks for less motion,
-    // * the saved choice back as soon as it stops asking
+    // * the switch shows what applies: off and locked while the device asks for less motion
     animations: {
       isChecked: isMotionEnabled,
       isDisabled: isReducedMotion,

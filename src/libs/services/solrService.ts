@@ -8,7 +8,7 @@ import { buildNearestPlaceParams, buildSolrQueryParams, getCityDescription } fro
 
 const SOLR_BASE_URL = env.SOLR_URL;
 
-/** Throws when Solr is unreachable or answers with an error — an outage is not "no results" */
+/** an outage throws: it isn't "no results" */
 async function querySolr(params: URLSearchParams): Promise<TSolrCityDoc[]> {
   const response = await fetch(`${SOLR_BASE_URL}/solr/cities/cities?${params}`, {
     next: { revalidate: 0 },
@@ -29,7 +29,7 @@ function logFailure(operation: string, error: unknown) {
 }
 
 export const SolrService = {
-  /** Throws when Solr is unreachable or answers with an error — an outage is not "no results" */
+  /** an outage throws: it isn't "no results" */
   async searchCities(query: string, lang: string): Promise<TCity[]> {
     const start = Date.now();
     try {
@@ -51,10 +51,6 @@ export const SolrService = {
     }
   },
 
-  /**
-   * The populated place nearest a point, named in `lang` (each index row carries every locale's
-   * label); null when none is within the radius. Throws on an outage, like searchCities.
-   */
   async findNearestCity({ lat, lng, lang }: TNearestCityParams): Promise<TCity | null> {
     try {
       const [doc] = await querySolr(buildNearestPlaceParams({ lat, lng }));

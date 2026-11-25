@@ -4,7 +4,6 @@ const CITY_URL = "/climate-statistics?city=Madrid&lat=40.4168&lng=-3.7038";
 const CITIES_URL =
   "/compare-cities?cityA=Guadalajara&latA=20.6774&lngA=-103.3475&cityB=Rome&latB=41.9028&lngB=12.4964&layout=overlay";
 
-// * a phone with a touchscreen: no hover, a coarse pointer
 test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 
 const card = (page: Page) => page.getByTestId("climate-chart");
@@ -26,14 +25,12 @@ async function openChart(page: Page, url: string) {
   );
 }
 
-// * a part's place in the card (the page may scroll between views)
 const placeOf = async (page: Page, locator: Locator) => {
   const [box, frame] = [await locator.boundingBox(), await card(page).boundingBox()];
   if (!box || !frame) throw new Error("not laid out");
   return { y: Math.round(box.y - frame.y), height: Math.round(box.height) };
 };
 
-/** A tap on the visible plot, at a share of its width. */
 async function tapPlot(page: Page, share: number) {
   const layer = tapLayer(page);
   await layer.scrollIntoViewIfNeeded();
@@ -60,7 +57,6 @@ test.describe("charts on a phone, by touch", () => {
     await expect(tapLayer(page)).toBeVisible({ timeout: 30_000 });
     await expect.poll(measure).toEqual(standard);
 
-    // * the guide fills the toolbar row, right under the header — no empty band
     const guide = toolbar.getByRole("button", { name: "How to read this diagram" });
     await expect(guide).toBeVisible();
     const [headerBox, toolbarBox, guideBox] = [
@@ -87,7 +83,6 @@ test.describe("charts on a phone, by touch", () => {
       await tapLayer(page).boundingBox(),
       await card(page).boundingBox(),
     ];
-    // * at the plot's top, not under the finger — and inside the card
     expect(tip!.y - plot!.y).toBeLessThan(40);
     expect(tip!.x).toBeGreaterThanOrEqual(frame!.x);
     expect(tip!.x + tip!.width).toBeLessThanOrEqual(frame!.x + frame!.width + 1);
@@ -111,7 +106,6 @@ test.describe("charts on a phone, by touch", () => {
     }));
     expect(scrollLeft).toBe(0);
     expect(overflow).toBeGreaterThan(100);
-    // * the bars at their phone width
     const width = await card(page)
       .locator(".recharts-bar-rectangle rect:not([data-bar-hatch])")
       .first()

@@ -12,7 +12,6 @@ import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-// * the page container's seams: the URL's filters, navigation, and the city's available periods
 const page = vi.hoisted(() => {
   const updates: { partial: unknown; mode: string }[] = [];
   const state: { filters: TFilters | null; updates: typeof updates } = {
@@ -22,7 +21,6 @@ const page = vi.hoisted(() => {
   return state;
 });
 
-// * the page's own params (order, markers) — none: oldest first, each year its place in the list
 vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams() }));
 vi.mock("@/hooks/filters/useFilters", () => ({
   useFilters: () => page.filters,
@@ -72,7 +70,6 @@ function renderPair(onChange = vi.fn()) {
   return onChange;
 }
 
-// * the page's copy (isOnPage): its test ids carry its prefix
 const option = (side: "a" | "b", period: string) =>
   screen.getByTestId(`page-period-${side}-option-${period}`);
 

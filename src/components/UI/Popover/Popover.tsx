@@ -7,10 +7,6 @@ import {
 } from "./Popover.constant";
 import type { TPopoverProps } from "./Popover.type";
 
-/**
- * A button that shows a small panel below it, right-aligned. Escape or a press outside closes
- * it; Escape puts focus back on the button.
- */
 export function Popover({
   trigger,
   label,

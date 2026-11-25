@@ -20,11 +20,9 @@ export type TExportLocation = {
   altitude: number | null;
 };
 
-/** tavg is null whenever tmin or tmax is missing. */
 export type TExportMonthlyRow = TMonthlyTemperature & { tavg: number | null };
 
 export type TExportLabels = {
-  /** the UI's locale — the export's numbers read as on screen */
   locale: string;
   periodLabel: string;
   monthNames: string[];
@@ -36,17 +34,13 @@ export type TExportLabels = {
     altitude: string;
     martonne: string;
   };
-  /** Omitted when summary.martonne is null. */
   martonneClassLabel?: string;
   aridityLegend: {
     arid: string;
     humid: string;
-    /** Walter-Lieth only: the solid region above 100 mm */
     perhumid: string;
-    /** Walter-Lieth only: the frost band's legend entry */
     frost: string;
   };
-  /** Walter-Lieth only: shown instead of the diagram when a month's data is missing */
   walterLiethIncomplete: string;
 };
 
@@ -65,7 +59,6 @@ export type TExportPayload = {
   chartMode: TChartMode;
   labels: TExportLabels;
   shareUrl: string;
-  /** Null while useGetDatasetVersion() is still loading. */
   datasetAttribution: TDatasetAttribution | null;
   rawData?: TExportRawData;
 };
@@ -91,6 +84,4 @@ export type TBuildExportPayloadParams = {
   shareUrl: string;
 };
 
-/** Narrows rawData from optional to required — guarantees the lazy fetch ran
- * before a raw CSV/JSON export, instead of a redundant runtime null-check. */
 export type TExportPayloadWithRawData = TExportPayload & { rawData: TExportRawData };

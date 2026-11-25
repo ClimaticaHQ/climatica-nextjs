@@ -2,11 +2,6 @@ import { CACHE_STATUS_HEADER, SERVER_TIMING_DECIMALS, SERVER_TIMING_HEADER } fro
 import type { TCacheInfo, TTimedUpstream, TUpstreamSource } from "@/types";
 import { NextResponse } from "next/server";
 
-/**
- * A successful data response with its cache status in X-Cache and, when the route called
- * upstream, that call's duration in Server-Timing — so server time and network time can be told
- * apart. Error and rate-limit responses don't use it.
- */
 export function cachedJsonResponse(data: unknown, { status, upstream }: TCacheInfo): NextResponse {
   const headers = new Headers({ [CACHE_STATUS_HEADER]: status });
   if (upstream) {
@@ -16,7 +11,6 @@ export function cachedJsonResponse(data: unknown, { status, upstream }: TCacheIn
   return NextResponse.json(data, { headers });
 }
 
-/** Times an upstream call; a rejection passes through untimed */
 export async function timeUpstream<T>(
   source: TUpstreamSource,
   call: () => Promise<T>,

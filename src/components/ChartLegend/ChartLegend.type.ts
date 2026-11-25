@@ -3,7 +3,6 @@ import type { TLegendItem, TSeriesHatch, TSeriesShape, TLegendSwatch, TSwatchSiz
 
 export type TChartLegendProps = {
   items: readonly TLegendItem[];
-  /** px; swatches scale with it */
   fontSize?: number;
 };
 
@@ -28,7 +27,6 @@ export type TLineSwatchProps = TSwatchShapeProps & {
 };
 
 export type TFillSwatchProps = TSwatchShapeProps & {
-  /** box width; the full swatch width when omitted (a bar is narrower) */
   width?: number;
 };
 

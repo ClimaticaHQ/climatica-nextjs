@@ -1,7 +1,6 @@
 import { EDifferenceMeaning, EDisplayMetric } from "@/enums";
 import type { TComparisonMetric, TComparisonMetricFormat } from "@/types";
 
-/** The rows in order, each with its unit and display metric; the Martonne row gets its badge. */
 export const COMPARISON_METRICS: readonly TComparisonMetricFormat[] = [
   { metric: "meanTemp", unit: "celsius", display: EDisplayMetric.TEMPERATURE },
   { metric: "avgTmax", unit: "celsius", display: EDisplayMetric.TEMPERATURE },
@@ -13,7 +12,6 @@ export const COMPARISON_METRICS: readonly TComparisonMetricFormat[] = [
   { metric: "martonne", unit: null, display: EDisplayMetric.MARTONNE },
 ];
 
-// * the i18n key of each row's label
 export const COMPARISON_METRIC_LABEL_KEYS: Record<TComparisonMetric, string> = {
   meanTemp: "chart.meanTemp",
   avgTmax: "climateComparison.stats.avgTmax",
@@ -25,10 +23,8 @@ export const COMPARISON_METRIC_LABEL_KEYS: Record<TComparisonMetric, string> = {
   martonne: "chart.martonneShort",
 };
 
-// * "Lviv − Valladolid": the difference's direction, with a real minus
 export const DIFFERENCE_DIRECTION_SEPARATOR = " − ";
 
-// * the difference header's explanation of its formula and sign, by what the pair compares
 export const DIFFERENCE_NOTE_KEYS: Record<EDifferenceMeaning, string> = {
   [EDifferenceMeaning.CITIES]: "climateComparison.differenceNote.cities",
   [EDifferenceMeaning.PERIODS]: "climateComparison.differenceNote.periods",

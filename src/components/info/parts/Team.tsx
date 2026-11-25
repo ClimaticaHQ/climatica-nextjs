@@ -11,10 +11,6 @@ import { ExternalLink } from "@/components/UI/ExternalLink";
 import { TEAM_CARD_CLASSES as C } from "../info.constant";
 import { InfoSection } from "./InfoSection";
 
-/**
- * The people behind Climatica, one card each, all alike: initials, then name (a link to their
- * profile), role and affiliation. Cards in a row are the same height; content stays at the top.
- */
 export function Team() {
   const t = useTranslations();
   return (

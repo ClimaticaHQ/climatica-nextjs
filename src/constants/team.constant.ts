@@ -1,18 +1,13 @@
 import type { TTeamMember } from "@/types";
 import { PROFILE_URLS, PROPER_NAMES } from "./project.constant";
 
-// * between an affiliation's parts; the team card breaks a line only here
 export const AFFILIATION_SEPARATOR = ", ";
 
-// * the affiliations, from the proper names: "GSIC-EMIC, Universidad de Valladolid"
 const AFFILIATIONS = {
   GSIC_EMIC: [PROPER_NAMES.RESEARCH_GROUP, PROPER_NAMES.UNIVERSITY].join(AFFILIATION_SEPARATOR),
   IUFOR: [PROPER_NAMES.IUFOR, PROPER_NAMES.UNIVERSITY].join(AFFILIATION_SEPARATOR),
 } as const;
 
-// * the About page's team: the developer, the supervisors, those advising the work, then
-// * external contributors. Names, affiliations and links aren't translated; roles are keys of
-// * info.about.team.roles
 export const TEAM: readonly TTeamMember[] = [
   {
     id: "kononenko",

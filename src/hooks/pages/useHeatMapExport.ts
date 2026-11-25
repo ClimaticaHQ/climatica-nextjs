@@ -39,7 +39,6 @@ import {
 } from "@/utils";
 import { useTranslations } from "next-intl";
 
-/** The heat map's CSV, PNG and SVG exports — none while the region has no data. */
 export function useHeatMapExport({
   selection: { bbox, polygon },
   bindings,
@@ -75,7 +74,7 @@ export function useHeatMapExport({
     exportTableToCsv(buildFilename("heatmap", fileParts, "csv"), ["lat", "lng", "value"], rows);
   }
 
-  /** Colors are resolved from the live DOM, so this only ever runs inside a click handler. */
+  /** colours are resolved from the live DOM, so this runs only inside a click handler */
   function buildPayload(): THeatmapExportPayload | null {
     const selectionBounds = bbox ?? (polygon ? getPolygonBounds(polygon) : null);
     const exportSelection: THeatmapExportSelection | null = bbox
@@ -85,8 +84,7 @@ export function useHeatMapExport({
         : null;
     if (!selectionBounds || !exportSelection) return null;
 
-    // * mirrors HeatmapLayer's own values and range, so the export's cells match the live map —
-    // * also with a month filter, while the stats and the gradient stay annual, as on the page
+    // * mirrors HeatmapLayer's values and range, so the export's cells match the live map
     const cellSize = gridDelta(gridSize);
     const getCellValue = (b: TWorldClimBoxBinding) =>
       selectedMonths.length > 0 ? pixelSelectedAvg(b, selectedMonths) : pixelAnnualAvg(b);
@@ -94,7 +92,6 @@ export function useHeatMapExport({
     const cellMin = cellValues.length > 0 ? Math.min(...cellValues) : 0;
     const cellMax = cellValues.length > 0 ? Math.max(...cellValues) : 0;
 
-    // * the light palette's colours, as every export
     const stops = readExportPalette((style) => resolveColorScale(colorScale, style));
     const cells: THeatmapExportCell[] = [];
     for (const binding of bindings) {

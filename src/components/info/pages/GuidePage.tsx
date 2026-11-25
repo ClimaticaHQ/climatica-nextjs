@@ -23,7 +23,6 @@ import { InfoCardGrid } from "../parts/InfoCardGrid";
 import { InfoList } from "../parts/InfoList";
 import { InfoSection } from "../parts/InfoSection";
 
-/** User guide: finding a place, reading the diagram, comparing, filtering and exporting. */
 export function GuidePage() {
   const t = useTranslations();
   const { getHref, settingsHref, stepNumber, scaleValues, questionValues } = useGuidePage();

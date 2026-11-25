@@ -8,10 +8,7 @@ import { ROUTES } from "./route.constant";
 
 // * not in the constants barrel: the pages' URL schemas import the barrel themselves
 
-/**
- * Per page, the URL state the navbar remembers, re-read through the page's own URL fields — so
- * a stale or hand-edited value is dropped exactly as the page would drop it.
- */
+/** re-read through the page's own URL fields, so a stale or hand-edited value is dropped as the page would drop it */
 export const REMEMBERED_PAGE_PARAMS: TPageParamsNormalizers = {
   [ROUTES.CLIMATE_STATISTICS]: (params) =>
     normalizeUrlState(CLIMATE_STATISTICS_REMEMBERED_URL_SCHEMA, params),
@@ -19,6 +16,5 @@ export const REMEMBERED_PAGE_PARAMS: TPageParamsNormalizers = {
     normalizeUrlState(COMPARE_CITIES_REMEMBERED_URL_SCHEMA, params),
   [ROUTES.COMPARE_PERIODS]: (params) =>
     normalizeUrlState(COMPARE_PERIODS_REMEMBERED_URL_SCHEMA, params),
-  // * the heat map's selection (bbox or polygon) is all its URL state
   [ROUTES.HEAT_MAP]: (params) => normalizeUrlState(HEAT_MAP_URL_SCHEMA, params),
 };

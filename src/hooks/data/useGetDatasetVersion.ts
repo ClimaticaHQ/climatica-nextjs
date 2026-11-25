@@ -4,11 +4,7 @@ import type { TCellSize, TDatasetAttribution } from "@/types";
 import { buildRasterIri } from "@/utils";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
-// Creator/version are dataset-wide constants (verified identical across every
-// grid/year/period), not tied to what the user currently has selected -- so any
-// working grid/variable/year fetches the same values. 2024 matches WEATHER_RASTERS'
-// latest ingested year (FILTER_DEFAULTS' weatherYear); 10m supports both the
-// WorldClim climate baseline and CRU-TS weather rasters.
+// creator and version are dataset-wide (verified across grids, years and periods): any working grid fetches them
 const REPRESENTATIVE_GRID: TCellSize = "10m";
 const REPRESENTATIVE_VARIABLE = WEATHER_VARIABLES[0];
 const REPRESENTATIVE_WEATHER_YEAR = 2024;

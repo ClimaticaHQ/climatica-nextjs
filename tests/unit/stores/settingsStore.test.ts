@@ -2,7 +2,6 @@ import { LOCAL_STORAGE_KEYS } from "@/constants";
 import { ETextSize, ETheme, EUpdateFlashVariant } from "@/enums";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-/** A localStorage for the node test environment. */
 function createMemoryStorage() {
   const items = new Map<string, string>();
   return {
@@ -19,7 +18,6 @@ function createMemoryStorage() {
 
 let storage: ReturnType<typeof createMemoryStorage>;
 
-/** A fresh store, rehydrated from whatever the storage holds now. */
 async function loadStore() {
   vi.resetModules();
   const { useSettingsStore } = await import("@/stores/settingsStore");

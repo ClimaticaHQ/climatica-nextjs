@@ -58,10 +58,6 @@ import {
 import { buildMonthlyTableSvg } from "./monthlyTableExport.util";
 import { createLinearScale, monthBandX } from "./scales.util";
 
-/**
- * The swatch style of the export's entities — its standard overlay's, by the screen's rule
- * (getSwatchBarStyle): the bar style while precipitation is drawn, the shape alone otherwise.
- */
 const getExportSwatchStyle = (payload: TCompareExportPayload) =>
   getSwatchBarStyle({
     mode: "standard",
@@ -78,12 +74,10 @@ function buildHeader(payload: TCompareExportPayload, colors: TExportChartColors)
   `;
 }
 
-/** The weather years' stats table, one column per year, in the export table style. */
 function buildStatsTable(payload: TCompareExportPayload, colors: TExportChartColors) {
   const { series, labels } = payload;
   const hasAltitude = series.some((s) => s.altitude !== null);
   const { locale } = labels;
-  // * a value in the locale's digits with its unit, "—" when unknown
   const withUnit = (value: number | null, unit: string, metric: EDisplayMetric) =>
     value === null ? MISSING_VALUE_LABEL : `${formatValue(value, { metric, locale })} ${unit}`;
 
@@ -134,13 +128,10 @@ function buildStatsTable(payload: TCompareExportPayload, colors: TExportChartCol
   });
 }
 
-/** The standard overlay's legend — the same items ChartLegend shows for it. */
 function buildLegend(payload: TCompareExportPayload, colors: TExportChartColors, y: number) {
   return buildExportLegend({
     items: getSeriesLegendItems({
       labels: { ...payload.labels.seriesLabels, ...payload.labels.aridityLegend },
-      // * an export has no chips: the legend names every series, by shape and its bars as the
-      // * bar style draws them
       series: payload.series.map(({ label, shape, hatch, place }) => ({
         key: label,
         label,
@@ -175,17 +166,11 @@ function renderFooterLines(
     .join("\n");
 }
 
-/**
- * The standard overlay chart in the WL overlay's geometry: the same plot box, °C / mm above
- * the axes, no month axis title, the legend the same gap below the months.
- */
 function buildStandardChartBody(
   payload: TCompareExportPayload,
   colors: TExportChartColors,
   top: number,
 ): TCompareWalterLiethBody {
-  // * a pair's values table heads its rows with the series' labels: the plot's margins widen to
-  // * the label column they need
   const rowHeaders = getRowHeaders({
     series: payload.series,
     minGutter: W.overlayPlotMarginX - L.paddingX,
@@ -193,7 +178,6 @@ function buildStandardChartBody(
   const plotLeft = payload.comparison ? L.paddingX + rowHeaders.gutter : W.overlayPlotMarginX;
   const plotRight = L.width - plotLeft;
   const chartBottom = top + W.overlayPlotHeight;
-  // * the screen's full-width °C axis: both ends on ticks
   const tempAxis = getStandardTempAxis({ scales: payload.scales, isNarrow: false });
   const tempScale = createLinearScale(...tempAxis.domain, chartBottom, top);
   const precTicks = getPrecipitationTicks(payload.rightMax);
@@ -205,8 +189,6 @@ function buildStandardChartBody(
   });
   const barStyle = OVERLAY_BAR_STYLES[payload.barStyle];
   const barLayout = getExportBarLayout(monthBands, payload.series.length, payload.barStyle);
-  // * two-series comparisons: the values table under the plot (weather years keep theirs
-  // * below the chart)
   const strip = buildOverlayValues({
     payload,
     colors,
@@ -262,7 +244,6 @@ function buildStandardChartBody(
   return { body, bottom: legend.bottom };
 }
 
-/** The standard overlay's values table — both series, A's value above B's. */
 function buildOverlayValues({
   payload,
   colors,
@@ -287,21 +268,15 @@ function buildOverlayValues({
       ...getEntityBarSwatch(getExportSwatchStyle(payload), hatch, place),
       color: colors.seriesMarker,
     })),
-    // * the rows headed by their unit and the series' labels: an image has no tooltip
     rowHeaders: rowHeaders.labels,
     hatchPrefix: L.hatchPrefix,
     span: { left: plotLeft, right: plotRight },
-    // * the table spans the content width: its gutters are the plot margins inside the padding
     gutter: rowHeaders.gutter,
     top: getValuesTableTop(chartBottom, T.MONTH_LABEL_OFFSET),
     colors,
   });
 }
 
-/**
- * The chart body the page shows: WL (split or overlay), standard split, or standard overlay —
- * for weather years, of the years drawn (`payload` holds only those).
- */
 function buildChartBody(payload: TCompareExportPayload, colors: TExportChartColors, top: number) {
   const { comparison, weatherYears } = payload;
   if (weatherYears?.chartMode === "walter-lieth") {
@@ -318,17 +293,11 @@ function buildChartBody(payload: TCompareExportPayload, colors: TExportChartColo
     : buildStandardChartBody(payload, colors, top);
 }
 
-/**
- * The monthly table under the chart, as on the page: every series, or only the expanded split
- * panel's; WL's two variables, or the standard chart's chips.
- */
 function buildTable(payload: TCompareExportPayload, colors: TExportChartColors, top: number) {
   const { comparison } = payload;
   const series = payload.series.flatMap((series, i) => {
-    // * two-series comparisons are always [A, B]
     const id = i === 0 ? EWalterLiethSeriesId.A : EWalterLiethSeriesId.B;
     if (comparison?.expanded && comparison.expanded !== id) return [];
-    // * the precipitation row's swatch: the series' bars as the bar style draws them
     const marker = {
       shape: series.shape,
       ...getEntityBarSwatch(getExportSwatchStyle(payload), series.hatch, series.place),
@@ -354,10 +323,6 @@ function buildTable(payload: TCompareExportPayload, colors: TExportChartColors, 
   });
 }
 
-/**
- * What sits between the header and the chart: a two-series comparison's table (the page's,
- * complete even when a panel is expanded), or the weather years' stats table.
- */
 function buildTopTable(payload: TCompareExportPayload, colors: TExportChartColors) {
   const { comparison } = payload;
   const table = comparison
@@ -373,7 +338,6 @@ function buildTopTable(payload: TCompareExportPayload, colors: TExportChartColor
   return { svg: table.svg, chartTop: table.bottom + EXPORT_TABLE.GAP_BELOW };
 }
 
-/** For weather years, the payload with only the series the screen draws (pair or shown years). */
 function getDrawnPayload(payload: TCompareExportPayload): TCompareExportPayload {
   const { weatherYears } = payload;
   if (!weatherYears) return payload;
@@ -398,13 +362,9 @@ export function buildCompareExportSvg(
     shareUrl: payload.shareUrl,
     layout: L,
   });
-  // * every body sets its own height (panels, strips, legend rows); the footer follows it
-  // * the stats table keeps every year; the chart and its monthly table only the years drawn
   const top = buildTopTable(payload, colors);
   const drawn = getDrawnPayload(payload);
   const chartBody = buildChartBody(drawn, colors, top.chartTop);
-  // * the standard weather-years overlay keeps its monthly table below it; the rest carry their
-  // * values in each panel or under the overlay
   const table = hasTableBelow(payload)
     ? buildTable(drawn, colors, chartBody.bottom + EXPORT_MONTHLY_TABLE.GAP_ABOVE)
     : { svg: "", bottom: chartBody.bottom };

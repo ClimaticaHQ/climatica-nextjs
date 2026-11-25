@@ -227,9 +227,11 @@ return SIZE_LABELS.find(({ maxBytes }) => bytes < maxBytes)?.label;
 
 ## Comments
 
-- Comments explain why, not what; never restate the code.
-- No narration or section-divider comments.
-- Comment only non-obvious decisions, workarounds (with their reason) and public APIs whose behaviour isn't clear from types and names.
+- By default code has no comments: names, types and small functions say what it does.
+- A comment only for what a reader would otherwise "fix" or forget: a workaround for a browser, framework or library behaviour, a deliberate ordering or timing, a constraint from an external service, a protected convention.
+- Such a comment is one short line saying why, never what.
+- Never a comment restating a name or a type: enum members, constants, props, JSDoc on obvious functions, section dividers, a line repeating the next one.
+- Prefer extracting non-obvious code into a function or hook whose name states its purpose over commenting it.
 - Remove outdated comments in every file you touch.
 
 ## i18n

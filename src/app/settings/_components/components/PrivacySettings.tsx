@@ -5,7 +5,6 @@ import type { TSettingsViewProps } from "../Settings.type";
 import { SettingsGroup } from "./SettingsGroup";
 import { SettingsRow } from "./SettingsRow";
 
-/** The analytics choice, the same one the consent banner asks for. */
 export function PrivacySettings({ page }: TSettingsViewProps) {
   const t = useTranslations();
   const { isChecked, onChange } = page.analytics;

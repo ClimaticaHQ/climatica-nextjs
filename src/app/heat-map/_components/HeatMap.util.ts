@@ -14,10 +14,6 @@ import type {
 export { GRID_DELTA, iriToCellBounds };
 export type { TCellBounds, TCellSize };
 
-/** A cell's bounds either come straight off the binding's own lat/lng (± half a
- * cell), or — when those aren't present — get derived from its cell IRI. Shared
- * by the live HeatmapLayer and the SVG export, so both draw the exact same
- * rectangles from the exact same bindings. */
 export function resolveCellBounds(
   binding: TWorldClimBoxBinding,
   cellSize: number,
@@ -38,7 +34,7 @@ export function resolveCellBounds(
   return iri ? iriToCellBounds(iri, cellSize) : null;
 }
 
-/** Candidate key sets — SPARQL variable names are API-defined; fallbacks cover naming variants */
+/** SPARQL variable names are API-defined: the fallbacks cover naming variants */
 const KEY_SETS = [
   Array.from({ length: 12 }, (_, i) => `valueMonth${String(i + 1).padStart(2, "0")}`),
   Array.from({ length: 12 }, (_, i) => `valueMonth${i + 1}`),
@@ -132,7 +128,6 @@ function extractMonthlyValues(binding: TWorldClimAvgBoxBinding | null): (number 
   });
 }
 
-/** The shared annual summary — null while any month lacks a value, as on every other page. */
 export function computeRegionalProfile(
   tmax: TWorldClimAvgBoxBinding | null,
   tmin: TWorldClimAvgBoxBinding | null,
@@ -163,7 +158,6 @@ export function gridDelta(gridSize: string): number {
   return GRID_DELTA[gridSize] ?? GRID_DELTA["10m"];
 }
 
-/** Inverse of polygonToWkt — returns null for invalid WKT */
 export function wktToPolygon(wkt: string): TPolygon | null {
   const match = /^POLYGON\(\((.+)\)\)$/i.exec(wkt);
   if (!match) return null;
@@ -177,7 +171,7 @@ export function wktToPolygon(wkt: string): TPolygon | null {
   return vertices;
 }
 
-/** Polygon and bbox are mutually exclusive — polygon (if present) always wins on parse. */
+/** polygon and bbox are mutually exclusive: a polygon wins on parse */
 export const selectionUrlField: TUrlField<THeatMapSelectionValue> = {
   serialize(value, params) {
     if (value.kind === "polygon") {
@@ -208,7 +202,6 @@ export const selectionUrlField: TUrlField<THeatMapSelectionValue> = {
   },
 };
 
-/** A short list of the selected months: [] → "", [2] → "Feb", [1,2,3] → "Jan, Feb, Mar", six or more → "6 months". */
 export function formatSelectedMonths(selectedMonths: number[]): string {
   if (selectedMonths.length === 0) return "";
   if (selectedMonths.length <= 3)

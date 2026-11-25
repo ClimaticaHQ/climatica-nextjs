@@ -13,7 +13,6 @@ const STEPS = [
 ] as const;
 type TStepValue = (typeof STEPS)[number]["value"];
 
-/** A slider holding its value, as a page would, reporting every change. */
 function Harness({ onChange }: { onChange: (value: TStepValue) => void }) {
   const [value, setValue] = useState<TStepValue>("default");
   return (

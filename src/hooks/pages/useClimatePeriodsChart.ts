@@ -12,10 +12,6 @@ import { computeCompareStats, resolveDataState, sortByYear } from "@/utils";
 import { useTranslations } from "next-intl";
 import { useNoPeriodDataMessage } from "./useNoPeriodDataMessage";
 
-/**
- * Compare Periods with Climate: periods A and B of the city, titled by the city with "A vs B"
- * under it; the stats table's difference reads later − earlier; the trend cards under the chart.
- */
 export function useClimatePeriodsChart(
   args: TUseClimatePeriodsChartArgs,
 ): TPeriodsChart<TPeriodTrend | null> {
@@ -35,7 +31,6 @@ export function useClimatePeriodsChart(
     emptyMessages: missing.length > 0 ? missing : [t("climateComparison.noDataPeriods")],
   });
 
-  // * in the page's order, by each period's start year; A and B keep their own markers
   const sides = sortByYear(
     [
       { id: EWalterLiethSeriesId.A, label: labelA, data: dataA, period: periodA },

@@ -20,7 +20,6 @@ import { describe, expect, it } from "vitest";
 const MONTHLY = 12;
 const SIZE = GRID_DELTA["10m"] ?? 1 / 6;
 
-/** every cell index the strips cover, so a cell in two strips shows up twice */
 function coveredCells(strips: TBbox[]) {
   return strips.flatMap((strip) => {
     const { firstRow, lastRow, firstCol, lastCol } = getCellIndexRange(strip, "10m");
@@ -69,7 +68,6 @@ describe("splitRegionIntoStrips", () => {
     let most = 0;
     for (let rows = 1; rows <= FILTER_MAX_HEATMAP_CELLS; rows++) {
       const cols = Math.floor(FILTER_MAX_HEATMAP_CELLS / rows);
-      // * a region exactly rows × cols cells, its edges a quarter cell inside the grid lines
       const bounds = {
         north: 60 - SIZE / 4,
         south: 60 - rows * SIZE + SIZE / 4,
@@ -135,7 +133,6 @@ describe("cell counts", () => {
   });
 
   it("suggests the finest resolution a region fits at, or none", () => {
-    // * 3° × 3°: 324 cells at 10′, 1,296 at 5′, 5,184 at 2.5′
     expect(getFinestLoadableGrid({ north: 50, south: 47, west: 20, east: 23 })).toBe(
       CELL_SIZES.FIVE_MINUTES,
     );
@@ -143,8 +140,6 @@ describe("cell counts", () => {
   });
 });
 
-// * a band about one cell wide from 43° N 0° E to 50° N 7° E: few cells, a 7° × 7° box. Its
-// * vertices are off the grid lines, so no centroid sits exactly on an edge
 const THIN_DIAGONAL: [number, number][] = [
   [43.013, 0.021],
   [50.007, 7.033],
@@ -153,7 +148,6 @@ const THIN_DIAGONAL: [number, number][] = [
 ];
 
 describe("a thin diagonal polygon", () => {
-  /** every cell of the box as a row, through the same filter the service uses */
   function cellsKeptByFilter(polygon: [number, number][], gridSize: "10m" | "5m") {
     const { firstRow, lastRow, firstCol, lastCol } = getCellIndexRange(
       getPolygonBounds(polygon),

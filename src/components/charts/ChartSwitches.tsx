@@ -5,10 +5,6 @@ import { ECompareLayout } from "@/enums";
 import { useTranslations } from "next-intl";
 import type { TChartSwitchesProps } from "./charts.type";
 
-/**
- * The chart card's switches: chart type (Walter-Lieth / Standard, both drawn for every dataset)
- * and, where a page compares — Climate A / B, two cities, weather years — Side by side / Overlay.
- */
 export function ChartSwitches({ chartMode, layout, onLayoutChange }: TChartSwitchesProps) {
   const t = useTranslations();
 

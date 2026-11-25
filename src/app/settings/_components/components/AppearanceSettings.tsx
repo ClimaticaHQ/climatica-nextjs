@@ -14,7 +14,6 @@ import type { TSettingsViewProps } from "../Settings.type";
 import { SettingsGroup } from "./SettingsGroup";
 import { SettingsRow } from "./SettingsRow";
 
-/** The theme, the text size, animations and how an update is highlighted — which needs animations. */
 export function AppearanceSettings({ page }: TSettingsViewProps) {
   const t = useTranslations();
   const { settings, animations, updateHighlight, onSettingChange } = page;

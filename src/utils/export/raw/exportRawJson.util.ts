@@ -2,8 +2,6 @@ import type { TExportPayloadWithRawData, TRawJsonExport } from "@/types";
 import { buildFilename } from "@/utils/export.util";
 import { triggerDownload } from "../shared/download.util";
 
-/** Full SCRAPI response (all variables) for downstream analysis — not just the
- * currently-toggled ones exportToCSV (export.util.ts) writes for the on-screen chart. */
 export function exportRawJson(payload: TExportPayloadWithRawData): void {
   const { rawData, location, gridSize, subtitle } = payload;
 

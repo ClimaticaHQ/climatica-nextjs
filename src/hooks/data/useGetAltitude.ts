@@ -4,7 +4,6 @@ import { extractCellBySize } from "@/utils";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { useGetPointCells } from "./useGetPointCells";
 
-/** The elevation of the point's cell; keyed by the cell, so points in one cell share it */
 export function useGetAltitude(
   lat: number,
   lng: number,

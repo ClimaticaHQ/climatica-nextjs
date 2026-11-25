@@ -12,10 +12,6 @@ const MiniMap = dynamic(
   { ssr: false, loading: () => <MapSkeleton variant="mini" /> },
 );
 
-/**
- * The one city both periods belong to: its search (and your location), and the mini map. The
- * city is no compared entity, so its label has no marker.
- */
 export function PeriodCitySearch({ city, ...search }: TPeriodCitySearchProps) {
   const t = useTranslations();
   return (

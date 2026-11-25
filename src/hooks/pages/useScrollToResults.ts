@@ -4,10 +4,7 @@ import type { TUseScrollToResultsArgs } from "@/types";
 import { scrollToSection } from "@/utils";
 import { useCallback, useEffect, useRef } from "react";
 
-/**
- * After the reader picks a city, scroll to the results once they're shown (settings:
- * autoScroll). A city from the URL or storage never scrolls. Returns the "picked" marker.
- */
+/** a city from the URL or storage never scrolls */
 export function useScrollToResults({
   targetRef,
   results,

@@ -10,7 +10,6 @@ const CITY_URL = "/climate-statistics?city=Paris&lat=48.8566&lng=2.3522";
 const BELOW_LG_PX = 1200;
 const ABOVE_LG_PX = 1300;
 
-/** The browser's own default font size, as set in its preferences (Chromium, through CDP). */
 async function setBrowserFontSize(page: Page, px: number) {
   const session = await page.context().newCDPSession(page);
   await session.send("Page.enable");

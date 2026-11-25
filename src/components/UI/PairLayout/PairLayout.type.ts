@@ -5,7 +5,6 @@ export type TPairLayoutProps = {
   variant: EPairLayoutVariant;
   first: ReactNode;
   second: ReactNode;
-  /** between the two — e.g. the swap button */
   between?: ReactNode;
 };
 

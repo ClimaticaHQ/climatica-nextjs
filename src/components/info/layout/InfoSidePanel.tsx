@@ -7,11 +7,6 @@ import { useContext } from "react";
 import { InfoNavigationContext } from "../infoNavigation.context";
 import { InfoNavTree } from "./InfoNavTree";
 
-/**
- * The Info pages' navigation in the app's left panel, from lg (hidden below by its classes):
- * rendered on the server with every page and its sections; the section in view and a page
- * being opened follow on the client.
- */
 export function InfoSidePanel() {
   const t = useTranslations();
   const nav = useContext(InfoNavigationContext);

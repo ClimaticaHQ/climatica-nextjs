@@ -35,10 +35,6 @@ import { useDocumentTitle } from "./useDocumentTitle";
 import { useNoPeriodDataMessage } from "./useNoPeriodDataMessage";
 import { useScrollToResults } from "./useScrollToResults";
 
-/**
- * City Climate: one city's series, picked by search, location or a click on the map; stat
- * cards for the month filter above its chart; the raw export.
- */
 export function useCityClimatePage(): TCityClimatePage {
   const t = useTranslations();
   const locale = useLocale();
@@ -82,7 +78,7 @@ export function useCityClimatePage(): TCityClimatePage {
   });
 
   const isWalterLieth = chartMode === "walter-lieth";
-  // * Walter-Lieth plots every month: the stats then cover every month too (the filter stays)
+  // * Walter-Lieth plots every month, so the stats cover every month too (the filter stays)
   const selectedMonths = isWalterLieth || !Array.isArray(filters.months) ? null : filters.months;
   const subtitle: TChartSubtitle =
     dataset === DATASETS.CLIMATE ? { dataset, climatePeriod } : { dataset, weatherYear };
@@ -95,7 +91,6 @@ export function useCityClimatePage(): TCityClimatePage {
     isLoading: climate.isLoading,
     error: climate.error,
     hasData: data !== null,
-    // * only a climate period can lack data at a resolution; none while a refetch runs
     emptyMessages:
       dataset === DATASETS.CLIMATE && !isFetching
         ? [noPeriodData(CLIMATE_PERIOD_LABELS[climatePeriod], gridSize)]
@@ -122,7 +117,6 @@ export function useCityClimatePage(): TCityClimatePage {
     hasSidePickers: false,
     hasMonthBadge: true,
     hasRawExport: true,
-    // * one place: its stat cards and the chart's stats bar, no stats table
     hiddenBlocks: [EChartBlock.STATS_TABLE],
   };
   const summary =
@@ -154,7 +148,6 @@ export function useCityClimatePage(): TCityClimatePage {
     update: {
       series: {
         [DATA_UPDATE_SINGLE_SERIES]: data,
-        // * none in Walter-Lieth (every month): switching chart type is never an update
         [FILTERED_STATS_SERIES]: isWalterLieth ? null : (summary?.stats ?? null),
       },
       isFetching,

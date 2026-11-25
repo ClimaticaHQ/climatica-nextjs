@@ -24,7 +24,6 @@ function CitySearchRow({ label, markerShape, cityLabel, onCitySelect }: TCitySea
   );
 }
 
-/** City A's and city B's searches, and the mini map showing both (one active at a time). */
 export function CityPairSearch({
   cityA,
   cityB,

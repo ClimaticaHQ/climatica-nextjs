@@ -20,10 +20,7 @@ function trapTab(event: KeyboardEvent, container: HTMLElement) {
   (event.shiftKey ? last : first).focus();
 }
 
-/**
- * While active: focus moves into the container (onto the container itself, so a dialog's
- * label is read first) and Tab cycles inside it. When it ends, focus returns to what had it.
- */
+/** focus goes onto the container itself, so a dialog's label is read first */
 export function useFocusTrap({ containerRef, isActive }: TFocusTrapOptions) {
   useEffect(() => {
     const container = containerRef.current;
@@ -38,8 +35,7 @@ export function useFocusTrap({ containerRef, isActive }: TFocusTrapOptions) {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      // * without scrolling: the trigger was in view when it opened the sheet, and a move made
-      // * from the sheet (the Info Contents jumping to a section) must not be undone
+      // * without scrolling: a move made from the sheet (Contents to a section) must not be undone
       if (trigger?.isConnected) trigger.focus({ preventScroll: true });
     };
   }, [isActive, containerRef]);

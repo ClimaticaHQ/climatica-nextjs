@@ -6,11 +6,6 @@ import { resolveDataState, sortYears } from "@/utils";
 import { getEntityMarker } from "@/utils/seriesShape.util";
 import { useTranslations } from "next-intl";
 
-/**
- * Compare Periods with Weather: one series per compared year, listed in the page's order (by
- * year), each with the marker assigned when it was added; loading one by one; side pickers once
- * there are more years than panels.
- */
 export function useWeatherYearsChart(args: TUseWeatherYearsChartArgs): TPeriodsChart<null> {
   const { city, years, periodsData, loadingYears, markerSlots } = args;
   const t = useTranslations();
@@ -31,8 +26,7 @@ export function useWeatherYearsChart(args: TUseWeatherYearsChartArgs): TPeriodsC
       kind: ESeriesKind.WEATHER_YEAR,
       label: String(year),
       context: city.label,
-      // * its own slot, never its place in the list: sorting, a year still loading, one added
-      // * or removed never changes the others' markers
+      // * its own slot, never its place in the list, so sorting or a year loading never changes the others' markers
       ...getEntityMarker(markerSlots[String(year)] ?? years.indexOf(year)),
       data: entry?.rows ?? [],
       altitude: args.altitude,
@@ -55,7 +49,6 @@ export function useWeatherYearsChart(args: TUseWeatherYearsChartArgs): TPeriodsC
         subtitle: t("chart.subtitle.weatherYears", { years: yearList }),
       },
       difference: null,
-      // * more years than panels: each panel picks its year
       hasSidePickers: years.length > 2,
       hasMonthBadge: true,
       hasRawExport: false,

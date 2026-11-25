@@ -4,7 +4,6 @@ import { SEGMENT_ICON_EM } from "../SegmentedControl.constant";
 
 const px = (value: string) => parseFloat(value) || 0;
 
-/** A label's width on one line, in the segment's own font: a hidden unwrapped copy beside it. */
 function measureLabel(button: HTMLElement) {
   const probe = document.createElement("span");
   probe.textContent = button.textContent;
@@ -15,7 +14,6 @@ function measureLabel(button: HTMLElement) {
   return width;
 }
 
-/** The most room the control can take: the nearest ancestor holding more than the control. */
 function getRoom(track: HTMLElement) {
   let room = track.parentElement;
   while (room && (getComputedStyle(room).display === "contents" || room.childElementCount === 1)) {
@@ -24,12 +22,6 @@ function getRoom(track: HTMLElement) {
   return room;
 }
 
-/**
- * Whether the options go in a vertical list: when one label doesn't fit on one line beside its
- * icon in an equal segment at the most room the control can take — decided for the whole control,
- * from widths alone (the room and the labels, never the control's own layout), so it can't
- * oscillate. Also that room's width, for the list to take it.
- */
 export function useSegmentLayout(trackRef: RefObject<HTMLDivElement | null>, isEnabled: boolean) {
   const [layout, setLayout] = useState({ isList: false, roomWidth: 0 });
 

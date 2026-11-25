@@ -1,7 +1,6 @@
 import { useTranslations } from "next-intl";
 import type { TWalterLiethIncompleteNoticeProps } from "../WalterLiethChart.type";
 
-/** Shown instead of a diagram when a month lacks temperature or precipitation. */
 export function WalterLiethIncompleteNotice({ label }: TWalterLiethIncompleteNoticeProps) {
   const t = useTranslations();
   return (

@@ -2,10 +2,6 @@ import { useEffect, useId, useRef, useState } from "react";
 
 const CLOSE_KEY = "Escape";
 
-/**
- * A disclosure popover's state: toggled by its button, closed by Escape or a press outside it
- * — focus goes back to the button, unless the press itself focused something else.
- */
 export function usePopover() {
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);

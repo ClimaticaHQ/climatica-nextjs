@@ -6,11 +6,7 @@ import { mergePersistedPageParams } from "@/utils/lastPageParams.util";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-/**
- * Each page's own params as last seen in its URL — a cache for navbar links, never a source of
- * truth: written only by useLastPageParamsSync, read only by useNavbarNavigation at click time.
- * Pages keep reading their state from the URL.
- */
+/** a cache for navbar links, never a source of truth */
 export const useLastPageParamsStore = create<TLastPageParamsState>()(
   persist(
     (set) => ({

@@ -1,4 +1,3 @@
-// * the guide's points, in reading order — keys of chart.wlGuide
 export const WALTER_LIETH_GUIDE_ITEMS = ["scale", "humid", "arid", "veryHumid", "frost"] as const;
 
 export const WALTER_LIETH_GUIDE_CLASSES = {

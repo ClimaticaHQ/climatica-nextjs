@@ -24,25 +24,18 @@ const BASE_PX = 16;
 const BROWSER_PX = 20;
 const MIN_TARGET_PX = 44;
 const LARGER = TEXT_SIZE_SCALES[ETextSize.LARGER];
-// * the Info breadcrumb's page name gives way to an ellipsis by design (docs/pages.md)
-// * the mini map's place names are cut to its fixed-width header, each whole as its option's name
 const ALLOWED_ELLIPSIS =
   '[data-breadcrumb-page], [role="group"][aria-label="Place highlighted on the map"] span';
-// * the inline swap sits in a label row between the filter bar and the period dropdowns: its target
-// * reaches as far as they allow (37px at the default size), short of 44px — the known exception
 const SMALL_TARGET_EXCEPTIONS = '[aria-label="Swap periods"]';
 const MIN_TEXT_PX = 11;
-// * the small badge (the De Martonne class) is 10px at the default size already, and keeps it
 const SMALL_TEXT_EXCEPTIONS = `[data-badge-size="${EBadgeSize.SM}"] *, [data-badge-size="${EBadgeSize.SM}"]`;
 
-/** The text size saved before the page loads, as a returning visitor's would be. */
 const saveTextSize = (page: Page, textSize: ETextSize) =>
   page.addInitScript(({ key, value }) => localStorage.setItem(key, value), {
     key: LOCAL_STORAGE_KEYS.SETTINGS,
     value: JSON.stringify({ state: { textSize }, version: SETTINGS_STORE_VERSION }),
   });
 
-/** The browser's own default font size (Chromium, through CDP). */
 async function setBrowserFontSize(page: Page, px: number) {
   const session = await page.context().newCDPSession(page);
   await session.send("Page.enable");
@@ -57,10 +50,8 @@ const fontSizeOf = (page: Page, selector: string) =>
 
 const textSizeSlider = (page: Page) => page.getByRole("slider", { name: "Text size" });
 
-/** A y axis' tick label on the page's chart. */
 const TICK = ".recharts-yAxis-tick-labels .recharts-cartesian-axis-tick-value";
 
-/** The font sizes an exported SVG uses, in order of appearance. */
 async function exportSvgFontSizes(page: Page) {
   await page.goto(CITY_URL);
   const exportButton = page.getByRole("button", { name: "Export data" });
@@ -74,7 +65,6 @@ async function exportSvgFontSizes(page: Page) {
   return [...svg.matchAll(/font-size="([\d.]+)"/g)].map(([, size]) => size);
 }
 
-/** What breaks at a larger text size: sideways scroll, cut or clipped text, small targets. */
 const findLayoutProblems = (page: Page, isPhone: boolean) =>
   page.evaluate(
     ({ isPhone, minTarget, allowedEllipsis, smallTargets }) => {
@@ -128,7 +118,6 @@ const findLayoutProblems = (page: Page, isPhone: boolean) =>
     },
   );
 
-/** The smallest rendered text: HTML, chart tick labels, and other chart text. */
 const findSmallestText = (page: Page) =>
   page.evaluate((exceptions) => {
     const sizes = { html: Infinity, tick: Infinity, chart: Infinity };
@@ -277,10 +266,8 @@ test.describe("the navbar at lg", () => {
 
 const rootFontSize = (page: Page) => fontSizeOf(page, "html");
 
-/** The slider's track (the range input), its root, and its row and label, in px. */
 const sliderBoxes = (page: Page) =>
   page.locator("[data-step-slider]").evaluate((root) => {
-    // * the row's content: the slider sits in a wrapper of its own
     const row = root.closest("section > div > div")?.firstElementChild ?? null;
     const box = (element: Element | null) => {
       const { left, right, top, bottom, width, height } =
@@ -291,7 +278,6 @@ const sliderBoxes = (page: Page) =>
       root: box(root),
       input: box(root.querySelector("input")),
       row: box(row),
-      // * the label itself: below `sm` its text block is display: contents (no box)
       text: box(row?.querySelector("span") ?? null),
     };
   });
@@ -342,7 +328,6 @@ test.describe("the text size slider", () => {
 test.describe("the text size slider on a phone", () => {
   test.use({ viewport: { width: 360, height: 800 }, hasTouch: true, isMobile: true });
 
-  // * at 430px Smaller the label and the slider fit side by side; at 360px Larger they don't
   for (const [width, textSize] of [
     [430, ETextSize.SMALLER],
     [360, ETextSize.LARGER],
@@ -372,7 +357,6 @@ test.describe("the text size slider on a phone", () => {
   });
 });
 
-/** A chip's state and its visible pill. */
 const chipOf = (page: Page, name: string) =>
   page.getByRole("button", { name, exact: true }).first();
 const pressed = (page: Page, name: string) => chipOf(page, name).getAttribute("aria-pressed");
@@ -392,7 +376,6 @@ for (const textSize of [ETextSize.DEFAULT, ETextSize.LARGER]) {
       const box = await chipOf(page, "Min temp").boundingBox();
       if (box === null) throw new Error("no chip");
       const before = { min: await pressed(page, "Min temp"), max: await pressed(page, "Max temp") };
-      // * 2px below the pill: inside its 44px target, outside every neighbour's
       await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height + 2);
       await expect(chipOf(page, "Min temp")).not.toHaveAttribute("aria-pressed", before.min ?? "");
       expect(await pressed(page, "Max temp")).toBe(before.max);

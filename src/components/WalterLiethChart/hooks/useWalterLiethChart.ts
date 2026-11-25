@@ -2,7 +2,6 @@ import { buildWalterLiethRows, getAridHumidSegments, getFrostMonths } from "@/ut
 import { useId, useMemo } from "react";
 import type { TUseWalterLiethChartArgs } from "../WalterLiethChart.type";
 
-/** One series' geometry: rows, segments, frost, pattern ids (useWalterLiethSummary: its stats). */
 export function useWalterLiethChart({ series, monthOrder }: TUseWalterLiethChartArgs) {
   const id = useId();
 

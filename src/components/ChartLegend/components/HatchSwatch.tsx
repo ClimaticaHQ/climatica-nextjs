@@ -5,7 +5,6 @@ import { getHatchGeometry } from "@/utils";
 import { useId } from "react";
 import type { THatchSwatchProps } from "../ChartLegend.type";
 
-/** WL humid / arid hatching — the diagram's own patterns, one month's worth at swatch width. */
 export function HatchSwatch({ color, regime, size }: THatchSwatchProps) {
   const id = useId();
   const ids = { humid: `${id}-humid`, arid: `${id}-arid` };

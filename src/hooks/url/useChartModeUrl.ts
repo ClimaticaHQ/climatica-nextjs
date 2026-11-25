@@ -7,11 +7,6 @@ import { replaceUrlParams } from "@/utils/navigation.util";
 import { chartModeUrlField } from "@/utils/urlFields.util";
 import { useSearchParams } from "next/navigation";
 
-/**
- * The chart mode — a page view param, not a filter — read from and written to the URL. The
- * only writer of `chart`: the page's own state follows it (useUrlStateSync restores outside
- * changes). A write replaces the entry and keeps every other param.
- */
 export function useChartModeUrl() {
   const router = useRouter();
   const pathname = usePathname();

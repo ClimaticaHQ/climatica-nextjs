@@ -43,7 +43,6 @@ describe("the default resolution: the finest offered for what the view shows", (
     expect(getDefaultGridSize(mixed, COMPARE_PERIODS)).toBe("2.5m");
     const swapped = filtersWith({ climatePeriodA: "c1991-2020", climatePeriodB: "c1970-2000" });
     expect(getDefaultGridSize(swapped, COMPARE_PERIODS)).toBe("2.5m");
-    // * the single period (another page's) doesn't count here
     expect(getDefaultGridSize({ ...mixed, climatePeriod: "c1970-2000" }, COMPARE_PERIODS)).toBe(
       "2.5m",
     );
@@ -81,7 +80,6 @@ describe("none chosen vs a choice", () => {
     const changed = normalizeFilters(filtersWith({ gridSize: "30s", climatePeriod: "c1991-2020" }));
     expect(changed.gridSize).toBeNull();
     expect(resolveGridSize(changed, CLIMATE_STATISTICS)).toBe("2.5m");
-    // * so going back to 1970–2000 follows the default again
     const back = normalizeFilters({ ...changed, climatePeriod: "c1970-2000" });
     expect(resolveGridSize(back, CLIMATE_STATISTICS)).toBe("30s");
   });

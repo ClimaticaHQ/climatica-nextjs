@@ -20,7 +20,6 @@ beforeAll(() => {
 
 afterEach(cleanup);
 
-/** A trigger that opens the sheet; the sheet closes through onClose, like a real owner. */
 function Harness({ onClose }: { onClose?: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const close = () => {
@@ -95,7 +94,6 @@ describe("BottomSheet", () => {
     fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
     expect(document.activeElement).toBe(last);
 
-    // * from the dialog itself (where focus lands on open), Shift+Tab wraps to the end too
     dialog.focus();
     fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
     expect(document.activeElement).toBe(last);
@@ -113,7 +111,6 @@ describe("BottomSheet", () => {
     const onClose = vi.fn();
     const { dialog } = openSheet(onClose);
     fireEvent.keyDown(dialog, { key: "Escape" });
-    // * still on screen, sliding out
     const leaving = screen.queryByRole("dialog");
     if (leaving !== null) fireEvent.keyDown(leaving, { key: "Escape" });
     expect(onClose).toHaveBeenCalledTimes(1);

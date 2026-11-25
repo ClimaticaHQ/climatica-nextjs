@@ -8,10 +8,7 @@ import {
 } from "@/constants";
 import type { TBbox, TCellCountStatus, TCellIndexRange, TCellSize, TPolygon } from "@/types";
 
-/**
- * The grid's cell rows (from the north pole) and columns (from 180° W) whose centroids lie in
- * the bounds — the cells a region query returns. Centroids sit half a cell from the grid lines.
- */
+/** the cells whose centroids lie in the bounds: the cells WorldClim returns */
 export function getCellIndexRange(bounds: TBbox, gridSize: TCellSize): TCellIndexRange {
   const size = GRID_DELTA[gridSize] ?? GRID_DELTA["10m"];
   return {
@@ -22,16 +19,12 @@ export function getCellIndexRange(bounds: TBbox, gridSize: TCellSize): TCellInde
   };
 }
 
-/** How many cells a region's bounds hold at this resolution. */
 export function countCellsInBounds(bounds: TBbox, gridSize: TCellSize): number {
   const { firstRow, lastRow, firstCol, lastCol } = getCellIndexRange(bounds, gridSize);
   return Math.max(0, lastRow - firstRow + 1) * Math.max(0, lastCol - firstCol + 1);
 }
 
-/**
- * How many cells have their centroid inside the polygon — the cells it shows, while loading it
- * reads its whole box. A scanline per cell row, matching isPointInPolygon's edge rule.
- */
+/** a scanline per cell row, matching isPointInPolygon's edge rule */
 export function countCellsInPolygon(polygon: TPolygon, gridSize: TCellSize): number {
   const size = GRID_DELTA[gridSize] ?? GRID_DELTA["10m"];
   const { firstRow, lastRow } = getCellIndexRange(getPolygonBounds(polygon), gridSize);
@@ -59,12 +52,10 @@ export function getCellCountStatus(count: number): TCellCountStatus {
   return CELL_COUNT_STATUSES.find(({ max }) => count <= max)!.status;
 }
 
-/** Whether the heat map region holds more cells at this resolution than can be loaded. */
 export function isHeatmapCellLimitExceeded(bounds: TBbox | null, gridSize: TCellSize) {
   return bounds !== null && countCellsInBounds(bounds, gridSize) > FILTER_MAX_HEATMAP_CELLS;
 }
 
-/** The finest resolution at which the region can be loaded; null if none can. */
 export function getFinestLoadableGrid(bounds: TBbox): TCellSize | null {
   return (
     GRIDS_FINEST_FIRST.find(

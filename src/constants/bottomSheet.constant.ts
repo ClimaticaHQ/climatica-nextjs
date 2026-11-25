@@ -1,15 +1,11 @@
 import { EBottomSheetHeight } from "@/enums";
 
-// * the sheet pushes a history entry while open, so system back closes it — the one switch
 export const BOTTOM_SHEET_HISTORY_ENABLED = true;
 
-// * the history.state field marking the entry a sheet pushed
 export const BOTTOM_SHEET_HISTORY_KEY = "__climaticaSheet";
 
-// * px — dragging the handle / header further down than this closes the sheet on release
 export const BOTTOM_SHEET_SWIPE_CLOSE_PX = 80;
 
-// * pointer downs on these start no drag — they're the header's own controls
 export const BOTTOM_SHEET_NO_DRAG_SELECTOR = "button, a, input, select, textarea";
 
 export const BOTTOM_SHEET_HEIGHT_CLASSES: Record<EBottomSheetHeight, string> = {
@@ -28,7 +24,6 @@ export const BOTTOM_SHEET_CLASSES = {
   FOOTER: "shrink-0 border-t border-[var(--color-border)] px-4 py-3",
 } as const;
 
-// * what a focus trap cycles through
 export const FOCUSABLE_SELECTOR = [
   "a[href]",
   "button:not([disabled])",

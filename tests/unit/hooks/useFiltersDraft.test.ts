@@ -6,8 +6,6 @@ import type { TBbox, TFilters, TFiltersDraftOptions } from "@/types";
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-// * 10° × 10°: 240 × 240 cells at 2.5m (blocked), 60 × 60 at 10m (allowed)
-// * 6° × 6°: 20,736 cells at 2.5′, 1,296 at 10′
 const LARGE_BBOX: TBbox = { north: 50, south: 44, west: 0, east: 6 };
 
 function filtersWith(overrides: Partial<TFilters>): TFilters {

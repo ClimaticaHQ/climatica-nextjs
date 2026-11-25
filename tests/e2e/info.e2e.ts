@@ -11,10 +11,8 @@ const COPYRIGHT_YEARS = formatCopyrightYears({
 const CITY_URL = "/climate-statistics?city=Paris&lat=48.8566&lng=2.3522";
 
 const infoNav = (page: Page) => page.getByRole("navigation", { name: "Info pages" });
-// * a section of the current page, nested in the Info navigation (only visible ones count)
 const sectionLink = (page: Page, name: string) =>
   infoNav(page).getByRole("link", { name, exact: true });
-// * the Contents bar's breadcrumb, by its accessible label
 const breadcrumb = (page: Page) => page.getByRole("navigation", { name: "You are here" });
 const TEAM_CARDS = [
   {
@@ -82,8 +80,6 @@ test.describe("Info pages", () => {
     await expect(current).toHaveCount(1);
     await expect(current).toHaveText("User guide");
     await expect(topbarAbout(page)).toHaveAttribute("aria-current", "page");
-    // * the guide's own sections open under it; another page's folded shut and inert (rendered,
-    // * so a page switch can fold them); no headings in the nav
     await expect(sectionLink(page, "Questions")).toBeVisible();
     await expect(sectionLink(page, "Questions").locator("xpath=ancestor::*[@inert]")).toHaveCount(
       0,
@@ -92,7 +88,6 @@ test.describe("Info pages", () => {
       sectionLink(page, "Spatial resolutions").locator("xpath=ancestor::*[@inert]"),
     ).toHaveCount(1);
     await expect(infoNav(page).getByRole("heading")).toHaveCount(0);
-    // * the first section is current before any scrolling
     await expect(sectionLink(page, "Find a place")).toHaveAttribute("aria-current", "location");
   });
 
@@ -120,7 +115,6 @@ test.describe("Info pages", () => {
       "aria-current",
       "location",
     );
-    // * back up: the first section again
     await page.locator("main").evaluate((main) => main.scrollTo({ top: 0 }));
     await expect(sectionLink(page, "What a value describes")).toHaveAttribute(
       "aria-current",
@@ -230,7 +224,6 @@ test.describe("Info pages", () => {
       expect(new Set(row.map(({ height }) => height)).size).toBe(1);
     }
     for (const { avatarMiddle, nameLineMiddle } of cards) {
-      // * the avatar centred on the name's first line, not down the card
       expect(Math.abs(avatarMiddle - nameLineMiddle)).toBeLessThanOrEqual(1);
     }
   });
@@ -336,9 +329,6 @@ test.describe("Info pages", () => {
   });
 });
 
-// * How it works: its intro paragraph's, heading's and card grid's boxes, the Info column's
-// * width, the reading measure (measured in the paragraph's own font, as its max width is), and
-// * whether anything scrolls sideways
 const measureInfoLayout = (page: Page) =>
   page.evaluate(() => {
     const box = (selector: string) => {
@@ -431,8 +421,7 @@ test.describe("Info pages on a phone", () => {
     page,
   }) => {
     await page.goto(CITY_URL);
-    // * hydrated: the chip is in the server's HTML, and a tap before hydration does nothing; the
-    // * chart turns not busy only on the client, once its data are in
+    // * hydrated: a tap before hydration does nothing, and the chart turns not busy only on the client
     await expect(page.getByTestId("climate-chart")).toHaveAttribute("aria-busy", "false", {
       timeout: 30_000,
     });
@@ -503,7 +492,6 @@ test.describe("Info pages on a phone", () => {
     const bar = contentsButton(page);
     await expect(bar).toBeVisible();
     await expect(infoNav(page)).toHaveCount(0);
-    // * page, then the section in view, from the same scroll spy as the sidebar
     await expect(breadcrumb(page)).toHaveText("User guideFind a place");
     await expect(breadcrumb(page).locator("[aria-current=page]")).toHaveText("User guide");
     const separator = breadcrumb(page).locator("svg");
@@ -607,7 +595,6 @@ test.describe("Info pages' rhythm and scroll spy", () => {
 
   test("card links are at least 16px, the tech pills at least 14px", async ({ page }) => {
     await page.goto("/about");
-    // * the card links on their own line; an inline link (a name in a sentence) takes its text's size
     const links = await fontSizeOf(page.locator("#data-sources a:not(p a)"));
     expect(links.length).toBeGreaterThan(0);
     for (const size of links) expect(size).toBeGreaterThanOrEqual(16);

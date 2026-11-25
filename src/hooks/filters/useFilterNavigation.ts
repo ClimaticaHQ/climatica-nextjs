@@ -16,11 +16,6 @@ const NAVIGATE = {
   [EFilterNavigation.REPLACE]: replaceUrlParams,
 };
 
-/**
- * Writes filters to the URL — the only way they change. The mode decides the history entry
- * (see FILTER_NAVIGATION_MODES); the page's own params are kept. A dataset switch first
- * remembers the selection being left, which the URL drops.
- */
 export function useFilterNavigation() {
   const router = useRouter();
   const pathname = usePathname();

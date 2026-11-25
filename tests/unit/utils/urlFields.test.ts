@@ -157,7 +157,6 @@ describe("expandedPanelUrlField", () => {
     const params = new URLSearchParams();
     expandedPanelUrlField.serialize(null, params);
     expect(params.has("expanded")).toBe(false);
-    // * absent = both panels (the page restores null)
     expect(expandedPanelUrlField.parse(params)).toBeUndefined();
   });
 

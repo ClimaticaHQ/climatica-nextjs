@@ -7,6 +7,5 @@ export type TUseGetClimateDataReturn = {
   isLoading: boolean;
   isFetching: boolean;
   isError: boolean;
-  /** shown by its cause, never its text */
   error: Error | null;
 };

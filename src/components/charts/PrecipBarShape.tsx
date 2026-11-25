@@ -3,16 +3,7 @@ import { CHART_COLORS, STANDARD_CHART_HOVER_DIMMED_BAR_OPACITY } from "./charts.
 import type { TBarShape } from "./charts.type";
 import { buildFillOpacityFadeStyle } from "./charts.util";
 
-/**
- * Opacity is driven by month + selectedMonths (passed via shape prop), not via Cell children,
- * so it updates correctly when the filter changes without relying on Recharts Cell merging.
- *
- * Uses Recharts' own animated x/y/width/height rather than recomputing them from
- * yAxis.scale(value) — the latter always resolves to the bar's final value on every
- * frame (Recharts doesn't animate `value`), which silently defeated the mount/toggle
- * animation. Every prec-axis domain in this codebase is [0, max], so Recharts' own
- * geometry is already correct — no need to recompute it.
- */
+/** opacity comes through the shape prop, not Cell children, so it follows the filter without relying on Recharts' Cell merging */
 export function PrecipBarShape(props: TBarShape) {
   const {
     x = 0,
@@ -57,7 +48,6 @@ export function PrecipBarShape(props: TBarShape) {
   );
   if (hatchFill === undefined || height <= 0) return bar;
 
-  // * the overlay: the entity's hatch knocked out of the semantic fill, in the card's colour
   return (
     <g>
       {bar}

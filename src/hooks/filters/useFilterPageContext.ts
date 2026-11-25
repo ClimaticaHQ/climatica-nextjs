@@ -9,7 +9,6 @@ import { isWalterLiethShown } from "@/utils/chartMode.util";
 import { getFilterView } from "@/utils/filters.util";
 import { useSearchParams } from "next/navigation";
 
-/** What the current page means for the filters: its view, Walter-Lieth, the heat map region's bounds. */
 export function useFilterPageContext(): TFilterPageContext {
   const pathname = usePathname();
   const searchParams = useSearchParams();

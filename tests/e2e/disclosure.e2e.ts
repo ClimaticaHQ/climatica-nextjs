@@ -3,7 +3,6 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 const QUESTIONS_URL = "/about/guide#questions";
 
 const question = (page: Page, index = 0) => page.locator("#questions details").nth(index);
-// * the box that folds: the summary's sibling
 const answerBox = (details: Locator) => details.locator("summary + div");
 const runningAnimations = (box: Locator) =>
   box.evaluate((element) => element.getAnimations().length);

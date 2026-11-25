@@ -1,9 +1,6 @@
 import { useCallback, useRef } from "react";
 
-/**
- * Scrollers that move together sideways: each one registered follows the others' scrollLeft —
- * set on the elements directly, so scrolling never re-renders the chart.
- */
+/** scrollLeft is set on the elements directly, so scrolling never re-renders the chart */
 export function useScrollSync() {
   const elements = useRef(new Set<HTMLElement>());
   const isSyncing = useRef(false);
@@ -19,7 +16,6 @@ export function useScrollSync() {
     requestAnimationFrame(() => (isSyncing.current = false));
   }, []);
 
-  /** A ref callback: joins an element (at the group's position), or leaves on unmount. */
   const register = useCallback(
     (element: HTMLElement | null) => {
       elements.current.forEach((known) => {

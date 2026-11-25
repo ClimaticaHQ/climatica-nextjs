@@ -5,10 +5,6 @@ import { PAGE_LAYOUT_CLASSES as C } from "./page.constant";
 import type { TPageLayoutProps } from "./page.type";
 import { PageStatus } from "./PageStatus";
 
-/**
- * Every page's frame, in one order: header, controls, the results' status, then the results
- * (summary, main content, details). A block every page shows is added here, once.
- */
 export function PageLayout({
   title,
   description,

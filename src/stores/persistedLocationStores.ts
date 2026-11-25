@@ -8,9 +8,6 @@ import {
 } from "@/constants";
 import { createPersistedJsonStore, isCity } from "@/utils/persistedJsonStore.util";
 
-// * one store per persisted location, shared by every component that reads it — a city picked
-// * or restored from the URL anywhere shows everywhere (titles, search bars, sidebar)
-
 export const selectedCityStore = createPersistedJsonStore({
   key: LOCAL_STORAGE_KEYS.LAST_SELECTED_CITY,
   defaultValue: DEFAULT_CITY,

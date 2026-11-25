@@ -122,13 +122,11 @@ describe("WorldClimService.getRegionPixelValues", () => {
       north: 50,
       south: 49,
       raster: ["http://climate.gsic.uva.es/data/Raster_10m_tmax_c1970-2000"],
-      // * 6 × 6 cells × 12 months
       limit: 432,
     });
   });
 
-  // * regression: WorldClim stops at 10,000 rows whatever the limit, so one request for a
-  // * region past ~830 cells silently lost the rest
+  // * regression: WorldClim stops at 10,000 rows whatever the limit, so a large region lost cells
   it("splits a region past WorldClim's row cap into strips that each fit", async () => {
     await WorldClimService.getRegionPixelValues({
       area: { bbox: { north: 50, south: 45, west: 20, east: 26 } },
@@ -139,7 +137,6 @@ describe("WorldClimService.getRegionPixelValues", () => {
     const limits = requests().map(({ params }) => Number(params?.limit));
     expect(limits.length).toBeGreaterThan(1);
     expect(Math.max(...limits)).toBeLessThanOrEqual(WORLDCLIM_MAX_ROWS);
-    // * 30 × 36 cells × 12 months, every cell in exactly one strip
     expect(limits.reduce((sum, limit) => sum + limit, 0)).toBe(30 * 36 * 12);
   });
 
@@ -161,7 +158,6 @@ describe("WorldClimService.getRegionPixelValues", () => {
       pixel: { type: "uri", value: `Pixel_${cell}` },
       cell: { type: "uri", value: `http://climate.gsic.uva.es/data/Cell_10m_${cell}` },
     });
-    // * r240c1218 is the cell at 49.92° N 23.08° E; r245c1223 at 49.08° N 23.92° E
     mockGet.mockResolvedValue(
       makeAxiosResponse({ results: { bindings: [row("r240c1218"), row("r245c1223")] } }),
     );

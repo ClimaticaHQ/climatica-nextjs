@@ -77,7 +77,6 @@ function renderCard(props: TCardProps) {
 const setBarStyle = (barStyle: TBarStyle) =>
   act(() => useSettingsStore.getState().setSetting("chartBarStyle", barStyle));
 
-/** The standard chart the overlay draws, with its entries — what its bars are built from. */
 function overlayEntries(series: readonly TChartSeries[], barStyle: TBarStyle) {
   const model = deriveChartModel(series);
   const element = OverlayChart({
@@ -105,7 +104,6 @@ describe("the bar style setting: every comparison overlay's bars", () => {
   it.each(KINDS)("%s: the bars take the style — its gap, fills and hatch", (_name, series) => {
     for (const barStyle of BAR_STYLES) {
       const { entries, barStyle: drawn } = overlayEntries(series, barStyle);
-      // * the chart takes the style itself: its gap and hatches (OVERLAY_BAR_STYLES)
       expect(drawn).toBe(barStyle);
       expect(entries.map(({ barFills }) => barFills)).toEqual(
         series.map((_, place) => getOverlayBarFills(barStyle, place)),
@@ -135,7 +133,6 @@ describe("the bar style setting: the chart card reads it, live", () => {
       mode: "standard",
       layout: ECompareLayout.OVERLAY,
     });
-    // * the default, plain: the shape alone
     expect(chipSwatches(container)).toEqual([]);
 
     setBarStyle("shades");
@@ -158,7 +155,6 @@ describe("the bar style setting: the chart card reads it, live", () => {
     const fills = () =>
       [...(legend()?.querySelectorAll("rect") ?? [])].map((rect) => rect.getAttribute("fill"));
 
-    // * plain: no bar swatch beside the shapes
     expect(legend()?.querySelectorAll("pattern")).toHaveLength(0);
     expect(fills()).not.toContain(getBarShades(0).humid);
 
@@ -166,7 +162,6 @@ describe("the bar style setting: the chart card reads it, live", () => {
     expect(fills()).toEqual(expect.arrayContaining([getBarShades(0).humid, getBarShades(1).humid]));
 
     setBarStyle("hatch");
-    // * B's hatch (A's is solid)
     expect(legend()?.querySelectorAll("pattern")).toHaveLength(1);
   });
 

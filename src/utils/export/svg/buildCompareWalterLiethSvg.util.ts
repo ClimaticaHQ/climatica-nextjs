@@ -50,7 +50,6 @@ import {
 const contentLeft = L.paddingX;
 const contentWidth = L.width - L.paddingX * 2;
 
-/** The WL plot of one split panel, or the notice when its series is incomplete. */
 function renderWalterLiethPlot(
   series: TWalterLiethSeriesInput,
   wl: TComparisonExport,
@@ -89,7 +88,6 @@ function buildSplit(
     colors,
     top,
     renderPlot: (series) => renderWalterLiethPlot(series, wl, { domain, colors }),
-    // * a panel showing its "incomplete data" notice has no table
     valuesRows: (series) =>
       isCompleteSeries(series)
         ? buildExportValuesRows({
@@ -100,7 +98,6 @@ function buildSplit(
         : [],
   });
 
-  // * no legend when neither series could be drawn; it sits below the cards, outside them
   const drawn = getExportPanels(wl).find(isCompleteSeries);
   const legendY = panels.bottom + EXPORT_LEGEND.GAP;
   const legend = drawn
@@ -120,11 +117,6 @@ function buildSplit(
   return { body: panels.body + legend.svg, bottom: legend.bottom };
 }
 
-/**
- * One WL overlay diagram of any number of series — Climate A / B, or the shown weather years —
- * as on screen: semantic colours, shape = series, hatching only for the shaded one, their values
- * table below.
- */
 export function buildWalterLiethOverlay({
   entries,
   domain,
@@ -150,7 +142,6 @@ export function buildWalterLiethOverlay({
     top,
     bottom: top + W.overlayPlotHeight,
   };
-  // * the values table: every series, one above the other
   const table = buildMonthlyValuesSvg({
     rows: buildExportValuesRows({
       series: entries.map(({ key, series }) => ({ key, label: series.label, data: series.months })),
@@ -159,7 +150,6 @@ export function buildWalterLiethOverlay({
     }),
     markers: entries.map(({ shape }) => ({ shape, color: colors.seriesMarker })),
     span: box,
-    // * the table spans the content width: its gutters are the plot margins inside the padding
     gutter: W.overlayPlotMarginX - L.paddingX,
     top: getValuesTableTop(box.bottom, T.MONTH_LABEL_OFFSET),
     colors,
@@ -173,13 +163,11 @@ export function buildWalterLiethOverlay({
     box,
     clipId: "wl-ovl-clip",
     monthLabels,
-    // * the shaded series' frost band — none when no series is shaded
     frost: shaded ? getFrostMonths(shaded.series.months) : null,
   });
   const legend = buildExportLegend({
     items: getWalterLiethOverlayLegendItems({
       labels,
-      // * no chips in an export: the legend names every series
       series: entries.map(({ key, series, shape }) => ({ key, label: series.label, shape })),
       palette: getWalterLiethExportPalette(colors),
       isShaded: shaded !== undefined,
@@ -195,11 +183,6 @@ export function buildWalterLiethOverlay({
   return { body: panel + table.svg + legend.svg, bottom: legend.bottom };
 }
 
-/**
- * Compare export body in WL mode: split panels or one overlay panel, on one shared domain of
- * the complete series — every panel is a buildWalterLiethPanel, as in the single export.
- * Overlay needs both series; otherwise split shows the notice.
- */
 export function buildCompareWalterLiethBody(
   wl: TComparisonExport,
   colors: TExportChartColors,
@@ -228,7 +211,6 @@ export function buildCompareWalterLiethBody(
     : buildSplit(wl, domain, colors, top);
 }
 
-/** One weather year's WL plot — ids prefixed by the year, so the panels' defs never collide. */
 function renderYearPlot(
   series: TWalterLiethSeriesInput,
   years: TWalterLiethYearsExport,
@@ -257,11 +239,6 @@ function renderYearPlot(
       : buildNotice({ text: years.labels.incomplete[series.label] ?? "", box, colors });
 }
 
-/**
- * Compare Periods with weather years in WL mode, as on screen: one diagram per year — two to a
- * row, on one shared domain (the same 10 °C = 20 mm scaling), each with its values strip —
- * then one legend below the cards.
- */
 export function buildWalterLiethYearsBody(
   years: TWalterLiethYearsExport,
   colors: TExportChartColors,
@@ -300,14 +277,9 @@ export function buildWalterLiethYearsBody(
   return { body: panels.body + legend.svg, bottom: legend.bottom };
 }
 
-// * the weather years drawn, in the order drawn (the pair A, B; the shown years)
 export const getDrawnYearSeries = (years: TWeatherYearsExport) =>
   years.drawn.flatMap((year) => years.series.filter(({ singleYear }) => singleYear === year));
 
-/**
- * Weather years in WL mode, as on screen: side by side the pair's two diagrams (on the pair's
- * domain); overlaid, one diagram of the shown years on every compared year's domain.
- */
 export function buildWeatherYearsWalterLiethBody(
   years: TWeatherYearsExport,
   colors: TExportChartColors,
@@ -322,7 +294,6 @@ export function buildWeatherYearsWalterLiethBody(
       key: series.label,
       series,
       shape: seriesShape(series),
-      // * as on screen: no hatching with several years
       isShaded: false,
     })),
     domain: getSharedDomain(years.series.filter(isCompleteSeries)),

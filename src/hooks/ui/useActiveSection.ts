@@ -4,14 +4,6 @@ import { SCROLL_SPY } from "@/constants";
 import { getActiveSectionIndex } from "@/utils/activeSection.util";
 import { useEffect, useRef, useState } from "react";
 
-/**
- * Scroll spy: which of these sections (element ids, in page order) is current in the scrolling
- * <main> that holds them — the last whose top has crossed a line near the top; sections too near
- * the end to reach it take turns as the scroll runs out, and at the very end the last is current
- * (getActiveSectionIndex). select() marks a clicked section at once and holds it while the page
- * scrolls there, until that scroll ends or the user scrolls. On a load with a hash, the browser's
- * jump puts that section under the line.
- */
 export function useActiveSection(ids: readonly string[]) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const lockedRef = useRef(false);
@@ -47,13 +39,11 @@ export function useActiveSection(ids: readonly string[]) {
       frame = requestAnimationFrame(update);
     }
 
-    // * a clicked section's own scroll has ended: it stays current until the user scrolls on
     function handleScrollEnd() {
       if (lockedRef.current) lockedRef.current = false;
       else update();
     }
 
-    // * the user takes over a scroll to a clicked section
     function handleUserScroll() {
       lockedRef.current = false;
     }
@@ -79,7 +69,6 @@ export function useActiveSection(ids: readonly string[]) {
     setActiveId(id);
   }
 
-  // * before the first update (and after a page switch), the first section
   const current = activeId !== null && ids.includes(activeId) ? activeId : (ids[0] ?? null);
   return { activeId: current, select };
 }

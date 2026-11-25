@@ -84,7 +84,6 @@ describe("figure 1 (Beijing): its spans are its months meeting their condition",
     expect(frost).toEqual([1, 2, 11, 12]);
     expect(monthsOf(annotations, "frost")).toEqual(frost);
     expect(anchorOf(annotations, "frost")).toMatchObject({ band: EAnnotationBand.BOTTOM });
-    // * Nov–Feb wraps the year: two bracket runs
     expect(toMonthRuns(frost)).toEqual([
       [1, 2],
       [11, 12],
@@ -158,7 +157,6 @@ const LAYOUT: TAnnotationLayout = {
   numberGap: 4,
   bracketTick: 5,
 };
-// * a month every 10px (January centred at 10), °C straight down from y 100
 const PROJECTION: TChartProjection = {
   x: (month) => month * 10,
   y: (_, value) => 100 - value,

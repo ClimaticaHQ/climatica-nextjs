@@ -6,11 +6,8 @@ export type TCardProps = Omit<ComponentPropsWithoutRef<"div">, "className" | "st
   size?: ECardSize | undefined;
   padding?: ECardPadding | undefined;
   background?: ECardBackground | undefined;
-  /** the series whose data updates flash the card; none by default */
   flashKeys?: TUpdateFlashKeys | undefined;
-  /** clip the content to the rounded corners (tables, bars, the map, the progress bar) */
   shouldClip?: boolean | undefined;
-  /** layout only (grid, spacing, positioning) — the card's frame comes from the props above */
   className?: string | undefined;
   children: ReactNode;
 };

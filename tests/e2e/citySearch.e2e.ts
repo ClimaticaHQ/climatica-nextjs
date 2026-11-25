@@ -44,7 +44,6 @@ test.describe("City search", () => {
     await expect(results.getByRole("button").first()).toContainText("Paris");
 
     await input.fill("Lisbon");
-    // * at once: Paris is gone and the search shows it's loading
     await expect(results).toBeHidden({ timeout: 100 });
     await expect(page.getByTestId("city-search-loading").first()).toBeVisible({ timeout: 100 });
     await expect(results.getByRole("button").first()).toContainText("Lisbon");

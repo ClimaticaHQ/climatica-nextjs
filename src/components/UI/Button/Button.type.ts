@@ -9,6 +9,5 @@ export type TButtonProps = {
   type?: "button" | "submit" | "reset";
   className?: string | undefined;
   ariaLabel?: string;
-  /** a link styled as the button (next/link): a navigation, not an action */
   href?: string;
 };

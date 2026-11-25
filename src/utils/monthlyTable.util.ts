@@ -8,12 +8,10 @@ import type {
 } from "@/types";
 import { formatValue } from "./displayFormat.util";
 
-/** A monthly value as the table shows it: its variable's display metric, "—" when missing. */
 export function formatMonthlyValue({ variable, value, locale }: TFormatMonthlyValueArgs) {
   return formatValue(value, { metric: SERIES_DISPLAY_METRIC[variable], locale });
 }
 
-/** The variables the table lists: WL's mean temperature and precipitation, or the chips. */
 export function getMonthlyTableVariables({
   chartMode,
   visible,
@@ -23,10 +21,6 @@ export function getMonthlyTableVariables({
     : CHART_VARIABLE_ORDER.filter((key) => visible[key]);
 }
 
-/**
- * The monthly table's rows, grouped by variable: each variable once per series (Avg Temp — A,
- * Avg Temp — B, Precip — A, …). The screen table and the export draw exactly these rows.
- */
 export function buildMonthlyTableRows({
   series,
   variables,
@@ -46,7 +40,6 @@ export function buildMonthlyTableRows({
   );
 }
 
-/** A row's full label: the variable with its unit, then the series when there is one. */
 export function getMonthlyTableRowLabel({ variableLabel, unit, seriesLabel }: TMonthlyTableRow) {
   const label = `${variableLabel} (${unit})`;
   return seriesLabel !== undefined

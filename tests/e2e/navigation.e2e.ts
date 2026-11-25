@@ -27,13 +27,10 @@ test.describe("Navigation", () => {
     const chart = page.getByTestId("climate-chart");
     await expect(chart.getByRole("heading", { name: "Paris" })).toBeVisible({ timeout: 30_000 });
 
-    // * one page-only field and one shared filter (months — enabled on the standard chart),
-    // * both written to the URL by the sync
     await chart.getByRole("button", { name: "Standard chart" }).click();
     await page.getByRole("button", { name: "Jul", exact: true }).click();
     await page.getByRole("button", { name: "Apply filters" }).click();
     await expect(page).toHaveURL(/chart=standard/);
-    // * defaults are omitted from the URL, so wait for the picked month itself
     await expect(page).toHaveURL(/months=7(&|$)/);
     const filteredUrl = page.url();
 
@@ -51,7 +48,6 @@ test.describe("Navigation", () => {
       "aria-pressed",
       "true",
     );
-    // * after the restored page has settled, no late write has replaced its entry
     await expect(chart.getByRole("button", { name: "Standard chart" })).toBeVisible();
     expect(page.url()).toBe(filteredUrl);
   });

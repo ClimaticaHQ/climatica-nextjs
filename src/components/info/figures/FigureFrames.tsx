@@ -17,12 +17,6 @@ import type { TFigureChartLoadingProps } from "../info.type";
 import { FIGURE_VISIBLE_SERIES, INDICATORS_FIGURE, WALTER_LIETH_FIGURE } from "./figures.constant";
 import { InfoFigureMarker } from "./InfoFigure";
 
-/*
- * The figures' frames without chart code (so they stay out of the lazy chart module): the
- * legends and the stats bar's numbers the pictures (FigureCharts) draw, and the pictures'
- * skeletons — the same frames around a ChartSkeleton — while that module loads.
- */
-
 export function WalterLiethFigureLegend() {
   const items = useWalterLiethLegendItems();
   return (
@@ -47,7 +41,6 @@ export function IndicatorsFigureLegend() {
   );
 }
 
-/** The indicators figure's numbers on its stats bar, by item. */
 export function getIndicatorsStatsMarkers() {
   return Object.fromEntries(
     INDICATORS_FIGURE.ANNOTATIONS.flatMap(({ anchor }, index) =>
@@ -58,7 +51,6 @@ export function getIndicatorsStatsMarkers() {
   );
 }
 
-/** A figure's picture while its chart module loads (on the server too); the region says so. */
 function FigureChartLoading({ children }: TFigureChartLoadingProps) {
   const t = useTranslations();
   return (

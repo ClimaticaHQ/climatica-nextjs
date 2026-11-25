@@ -8,7 +8,6 @@ import {
 } from "./Card.constant";
 import type { TCardClassArgs } from "./Card.type";
 
-/** The card's frame from its variants, then the caller's layout classes. */
 export function getCardClassName({
   size = CARD_DEFAULTS.SIZE,
   padding = CARD_DEFAULTS.PADDING,

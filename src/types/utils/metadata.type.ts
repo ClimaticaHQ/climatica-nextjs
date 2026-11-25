@@ -45,5 +45,4 @@ export type TCommonClimateParams = {
   period: string;
 };
 
-/** An Info page: its key under info.nav and info.pages. */
 export type TInfoPageKey = "about" | "guide" | "data";

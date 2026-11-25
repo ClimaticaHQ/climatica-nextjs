@@ -40,12 +40,10 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 );
 
 describe("getOverlayScroll", () => {
-  // * the two axes' own widths: the values table's header column is the left one
   const AXES = getPlotMargin({ isCompact: false }) * 2;
   const MONTHS = 12;
   const scroll = (availableWidth: number, entityCount: number) =>
     getOverlayScroll({ availableWidth, entityCount });
-  // * the narrowest container holding every month's bars at the minimum width
   const fitWidth = (count: number) => getMinOverlayBand(count) * MONTHS + AXES;
 
   it("five years in a 1280 px window's plot (718 px): no scroll, the container's width", () => {
@@ -87,7 +85,6 @@ describe("getOverlayScroll", () => {
 
 describe("adaptive bar width", () => {
   const MONTHS = 12;
-  // * a 1280 px window's plot: 718 px less the two 44 px axes
   const PLOT = 630;
   const barAt = (entityCount: number, plotWidth = PLOT) =>
     getOverlayBarLayout({ plotWidth, entityCount }).barSize;
@@ -134,7 +131,6 @@ describe("curve points anchored to their own bar", () => {
   const layout = getOverlayBarLayout({ plotWidth: 600, entityCount: 3 });
 
   it("bars sit side by side, centred on the month, in entity order", () => {
-    // * a 50 px band: 35 px for the group, less two 1 px gaps — three 11 px bars
     expect(layout.barSize).toBe(11);
     expect(layout.offsets).toEqual([-12, 0, 12]);
   });
@@ -142,7 +138,6 @@ describe("curve points anchored to their own bar", () => {
   it("each entity's points share x with its bar: a constant offset in months", () => {
     const offsets = getCurveOffsets([{ id: "a" }, { id: "b" }, { id: "c" }], layout);
     expect(offsets).toEqual({ a: -0.24, b: 0, c: 0.24 });
-    // * July's point of the first entity: July's centre less its offset
     expect(getCurvePointX(6, layout.offsets[0] ?? 0, layout.bandWidth)).toBeCloseTo(5.76);
   });
 
@@ -162,7 +157,6 @@ describe("hover: the tooltip names what's pointed at", () => {
       label: "Rome",
       aridityByMonth: { 7: true, 10: false },
       hatch: "diagonal",
-      // * the hatch style's swatch (getSwatchBarStyle): what the bar's tooltip shows
       swatch: { hatch: "diagonal" },
       isHidden: false,
       marker: { shape: "square" },
@@ -197,7 +191,6 @@ describe("hover: the tooltip names what's pointed at", () => {
     const { result } = focusAt(9);
     act(() => result.current.setFocus({ id: "rome", target: "bar" }));
     expect(result.current.tooltipFocus?.text).toBe("Rome — Oct 105 mm (humid period)");
-    // * the bar's identity: its swatch beside its shape (none in plain: the shape alone)
     expect(result.current.tooltipFocus?.marker).toEqual({ shape: "square", hatch: "diagonal" });
   });
 

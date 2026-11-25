@@ -7,10 +7,6 @@ import { BAR_STYLE_PICKER_CLASSES as C, BAR_STYLE_PREVIEW as P } from "../Settin
 import type { TBarStylePreviewProps } from "../Settings.type";
 import { getBarStylePreview } from "../Settings.util";
 
-/**
- * A bar style's thumbnail: three months of three entities' bars with the real chart's bar shape,
- * hatch patterns and fills, and a Tmax and a Tmin curve — in the current theme's tokens.
- */
 export function BarStylePreview({ barStyle }: TBarStylePreviewProps) {
   const patternPrefix = `bar-style-${toSvgId(useId())}`;
   const { hasHatch } = OVERLAY_BAR_STYLES[barStyle];

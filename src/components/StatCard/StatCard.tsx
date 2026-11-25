@@ -8,10 +8,6 @@ import {
 } from "./StatCard.constant";
 import type { TStatCardProps } from "./StatCard.type";
 
-/**
- * A small card with one value: a label, the value (with its unit) and an optional line under it.
- * Its value comes from the page's data, so it flashes when that data updates.
- */
 export function StatCard({
   label,
   value,

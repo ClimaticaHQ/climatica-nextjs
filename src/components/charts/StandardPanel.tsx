@@ -5,7 +5,6 @@ import { SplitPanelHeader } from "@/components/SeriesPanelHeader";
 import { StandardClimateChart } from "./StandardClimateChart";
 import type { TStandardPanelProps } from "./charts.type";
 
-/** One standard-chart panel: the WL split's card and header, the standard chart below. */
 export function StandardPanel({
   panel,
   headerSlots,

@@ -11,7 +11,6 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const pickBoolean = (value: unknown, fallback: boolean) =>
   typeof value === "boolean" ? value : fallback;
 
-/** Saved settings over the current ones: a missing or invalid value keeps the current one. */
 export function mergePersistedSettings(
   persisted: unknown,
   current: TSettingsState,
@@ -35,7 +34,6 @@ export function mergePersistedSettings(
   return { ...current, ...settings };
 }
 
-/** The settings to save — never the actions or the hydration flag. */
 export function getPersistedSettings(state: TSettingsState): TSettings {
   return {
     theme: state.theme,
@@ -50,7 +48,6 @@ export function getPersistedSettings(state: TSettingsState): TSettings {
   };
 }
 
-/** The theme an older version saved under its own key; null when none is valid. */
 export function readLegacyTheme(storage: TKeyValueStorage) {
   for (const key of LEGACY_THEME_STORAGE_KEYS) {
     const value = storage.getItem(key);
@@ -59,21 +56,13 @@ export function readLegacyTheme(storage: TKeyValueStorage) {
   return null;
 }
 
-/**
- * Version 0 → 1: the settings saved before (no theme) plus the theme from its old key; 1 → 2: the
- * default text size. Values are validated afterwards (mergePersistedSettings), so anything odd
- * falls back to the default.
- */
 export function migrateSettings(persisted: unknown, version: number, legacyTheme: string | null) {
   const saved = isRecord(persisted) ? persisted : {};
   const withTheme = version >= 1 || legacyTheme === null ? saved : { ...saved, theme: legacyTheme };
   return version >= 2 ? withTheme : { textSize: SETTINGS_DEFAULTS.textSize, ...withTheme };
 }
 
-/**
- * The store's storage: localStorage, but with no saved settings yet and a theme under an old
- * key, it reports an empty version 0 entry — so the migration runs and brings the theme over.
- */
+/** with no saved settings and a theme under an old key it reports an empty version 0 entry, so the migration brings the theme over */
 export function createSettingsStorage(getStorage: () => TSettingsStorage): TSettingsStorage {
   return {
     getItem: (key) => {

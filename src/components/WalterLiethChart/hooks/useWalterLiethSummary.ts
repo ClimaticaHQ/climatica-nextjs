@@ -5,10 +5,6 @@ import { getAnnualSummary } from "@/utils";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
-/**
- * A diagram's stats (its stats bar) and the sentence that names them for screen readers; both
- * null while its series isn't drawn yet (loading).
- */
 export function useWalterLiethSummary(series: TWalterLiethSeries | null) {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();

@@ -15,7 +15,6 @@ import type { TClimateStatsBarProps } from "./ClimateStatsBar.type";
 import { StatCell } from "@/components/UI/StatCell";
 import { TEXT_PLACEHOLDER_WIDTHS, TextPlaceholder } from "@/components/UI/TextPlaceholder";
 
-/** One place's annual stats: under each chart, and the heat map's regional profile. */
 export function ClimateStatsBar({
   meanTemp,
   annualPrecip,
@@ -28,12 +27,9 @@ export function ClimateStatsBar({
 }: TClimateStatsBarProps) {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();
-  // * pending: the altitude's cell too — a place's altitude arrives with its data
   const showAltitude = altitude !== undefined || isPending;
   const badge = martonneIndex !== null && !isPending ? getMartonneBadge(martonneIndex) : null;
-  // * still loading: each value's place, in its line height
   const pending = <TextPlaceholder widthClass={TEXT_PLACEHOLDER_WIDTHS.STAT} />;
-  // * a single weather year: the index describes that year alone, and says so
   const martonneLabels =
     martonneYear === undefined
       ? {
@@ -46,7 +42,6 @@ export function ClimateStatsBar({
           fullLabel: t("chart.martonneYear", { year: martonneYear }),
           title: buildMartonneTooltip(t("chart.martonneTooltipYear", { year: martonneYear }), t),
         };
-  // * every cell reserves the meta row (Martonne class), so the values line up
   const cell = { hasMetaRow: true, cellClassName: STATS_BAR_STYLE.cell };
 
   return (
@@ -114,7 +109,6 @@ export function ClimateStatsBar({
               <MartonneBadge badge={badge} />
             ) : (
               isPending && (
-                // * the class's place while it loads: a badge as big, so the cell keeps its height
                 <Badge tone={PENDING_MARTONNE_CLASS.tone} size={EBadgeSize.SM} isPending>
                   {t(PENDING_MARTONNE_CLASS.labelKey)}
                 </Badge>

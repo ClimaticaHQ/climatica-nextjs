@@ -18,7 +18,6 @@ afterEach(cleanup);
 
 type TPage = { page: string; series: readonly TChartSeries[] };
 
-// * one entity dry in summer, the other wet all year: their bars must differ month by month
 const DRY_AND_WET: readonly TChartSeries[] = CITY_PAIR.map((series, i) => ({
   ...series,
   data: months(0).map((month) => ({ ...month, prec: i === 0 ? 5 : 200 })),
@@ -109,7 +108,6 @@ describe("legends: semantic colours, entities by shape", () => {
       ...Object.values(ARIDITY_BAR_COLORS),
       SERIES_MARKER_COLOR,
     ];
-    // * an entity swatch: its hatch on the humid fill, cut out in the card's colour
     for (const { swatch } of items) {
       if (swatch.kind !== ELegendSwatch.ENTITY) continue;
       expect(swatch.fill).toBe(ARIDITY_BAR_COLORS.humid);
@@ -119,7 +117,6 @@ describe("legends: semantic colours, entities by shape", () => {
     const identities = items.flatMap(({ swatch }) =>
       swatch.kind === ELegendSwatch.ENTITY ? [[swatch.shape, swatch.hatch]] : [],
     );
-    // * weather years are named by their chips; a pair by the legend, by hatch and shape
     const isChips = getSeriesKindRule(series).hasSeriesChips;
     expect(identities).toEqual(
       isChips ? [] : entries.map(({ series: entry }) => [entry.shape, entry.hatch]),

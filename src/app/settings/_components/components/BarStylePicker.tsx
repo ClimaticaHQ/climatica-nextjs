@@ -6,11 +6,6 @@ import { BAR_STYLE_OPTIONS, BAR_STYLE_PICKER_CLASSES as C } from "../Settings.co
 import type { TBarStylePickerProps } from "../Settings.type";
 import { BarStylePreview } from "./BarStylePreview";
 
-/**
- * The bar style as appearance cards — a thumbnail of the chart in that style, its name under it.
- * One radio group, described by its row and each card by its style: the arrows move
- * the selection (and the focus), the whole card is clickable.
- */
 export function BarStylePicker({ labelId, describedById, value, onChange }: TBarStylePickerProps) {
   const t = useTranslations();
   const descriptionId = useId();

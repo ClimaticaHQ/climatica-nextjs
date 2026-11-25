@@ -19,9 +19,7 @@ import {
   pickVeryHumidMonths,
 } from "@/utils/infoFigure.util";
 
-// * WorldClim 2.1 via SCRAPI, 1970–2000 normals — per month: mean maximum °C, mean minimum °C,
-// * precipitation mm. Beijing (39.9042, 116.4074), 30″ grid, cell 54 m: frost Jan–Feb and
-// * Nov–Dec, arid Mar–May and Oct–Nov, the monsoon humid Jun–Sep, above 100 mm Jul–Aug
+// * WorldClim 2.1 via SCRAPI, 1970–2000 normals: mean max °C, mean min °C and precipitation mm per month
 const BEIJING_MONTHS = [
   [1.7, -8.8, 5],
   [5.1, -6.1, 4],
@@ -37,7 +35,6 @@ const BEIJING_MONTHS = [
   [3.6, -6.3, 5],
 ] as const;
 
-// * Soria (41.7636, −2.4649), 2.5′ grid, cell 1070 m: frost and arid months, none above 100 mm
 const SORIA_MONTHS = [
   [6.5, -2.2, 40],
   [8.4, -1.2, 41],
@@ -65,7 +62,6 @@ const toMonthlyData = (months: typeof BEIJING_MONTHS | typeof SORIA_MONTHS) =>
 const BEIJING_DATA = toMonthlyData(BEIJING_MONTHS);
 const SORIA_DATA = toMonthlyData(SORIA_MONTHS);
 
-// * a figure's one series: a City Climate series in all but its source
 const toFigureSeries = (place: TFigurePlace, data: TMonthlyTemperature[], altitude: number) =>
   ({
     id: "figure",
@@ -90,11 +86,9 @@ export const INDICATORS_FIGURE_SERIES: TChartSeries = toFigureSeries(
   1070,
 );
 
-// * each as a series list, one stable reference for the chart model
 const WALTER_LIETH_SERIES_LIST: readonly TChartSeries[] = [WALTER_LIETH_FIGURE_SERIES];
 const INDICATORS_SERIES_LIST: readonly TChartSeries[] = [INDICATORS_FIGURE_SERIES];
 
-// * the standard chart figure shows the lines and bars the indicators read: no mean line
 export const FIGURE_VISIBLE_SERIES = { tmax: true, tavg: false, tmin: true, prec: true } as const;
 
 const span = (key: string, months: readonly number[], band: EAnnotationBand, captionKey: string) =>
@@ -111,12 +105,10 @@ const span = (key: string, months: readonly number[], band: EAnnotationBand, cap
 // * the annotated months, chosen from the data by their condition — never typed in
 const HUMID = pickHumidMonth(BEIJING_DATA);
 
-// * figure 1, the Walter-Lieth diagram: its caption is the chart's own guide, numbered
 export const WALTER_LIETH_FIGURE = {
   PLACE: FIGURE_PLACES.WALTER_LIETH,
   SERIES_LIST: WALTER_LIETH_SERIES_LIST,
   ANNOTATIONS: [
-    // * a point in the widest humid hatching: between its curves, under the 100 mm line
     ...(HUMID === undefined
       ? []
       : [
@@ -138,14 +130,12 @@ export const WALTER_LIETH_FIGURE = {
       "chart.wlGuide.veryHumid",
     ),
     ...span("arid", pickAridMonths(BEIJING_DATA), EAnnotationBand.TOP, "chart.wlGuide.arid"),
-    // * under the month labels, where the frost band is
     ...span("frost", pickFrostMonths(BEIJING_DATA), EAnnotationBand.BOTTOM, "chart.wlGuide.frost"),
   ],
 } as const;
 
 const FROST = pickFrostMonth(SORIA_DATA);
 
-// * figure 2, the standard chart and its stats bar: where each indicator shows
 export const INDICATORS_FIGURE = {
   PLACE: FIGURE_PLACES.INDICATORS,
   SERIES_LIST: INDICATORS_SERIES_LIST,

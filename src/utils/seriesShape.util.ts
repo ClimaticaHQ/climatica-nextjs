@@ -15,43 +15,29 @@ import type {
   TSeriesShape,
 } from "@/types";
 
-/** An entity's shape by its place in the list, wrapping past the last; a missing place (-1) gets the first. */
 export function getSeriesShape(position: number): TSeriesShape {
   return SERIES_SHAPES[Math.max(position, 0) % SERIES_SHAPES.length] ?? SERIES_SHAPES[0];
 }
 
-/** A pair side's shape: A the first place's, B the second's. */
 export function getPairShape(side: EWalterLiethSeriesId): TSeriesShape {
   return getSeriesShape(PAIR_SHAPE_POSITION[side]);
 }
 
-/** An entity's bar hatch by its place in the list, wrapping like its shape. */
 export function getSeriesHatch(position: number): TSeriesHatch {
   return SERIES_HATCHES[Math.max(position, 0) % SERIES_HATCHES.length] ?? SERIES_HATCHES[0];
 }
 
-/** A pair side's hatch: A the first place's (solid), B the second's. */
 export function getPairHatch(side: EWalterLiethSeriesId): TSeriesHatch {
   return getSeriesHatch(PAIR_SHAPE_POSITION[side]);
 }
 
-/**
- * The one mapping from an entity's marker slot to what it draws — chart, chips, tables, legend
- * and export all read the series' marker, never its place in a list.
- */
 export function getEntityMarker(markerSlot: number): TEntityMarker {
   return { markerSlot, shape: getSeriesShape(markerSlot), hatch: getSeriesHatch(markerSlot) };
 }
 
-/** A pair side's marker: A the first slot's, B the second's. */
 export const getPairMarker = (side: EWalterLiethSeriesId) =>
   getEntityMarker(PAIR_SHAPE_POSITION[side]);
 
-/**
- * Each entity's slot, kept as the list changes: an entity that stays keeps its slot whatever the
- * order; one added takes the lowest slot no one holds (one removed frees its own). With nothing
- * saved, the list's order.
- */
 export function assignMarkerSlots(saved: TMarkerSlots, keys: readonly string[]): TMarkerSlots {
   const kept = keys.filter((key) => saved[key] !== undefined);
   const slots: Record<string, number> = {};
@@ -72,7 +58,6 @@ export function assignMarkerSlots(saved: TMarkerSlots, keys: readonly string[]):
   return slots;
 }
 
-/** Whether every entity holds its place in the list as its slot — what no saved slots means. */
 export const isListOrder = (slots: TMarkerSlots, keys: readonly string[]) =>
   keys.every((key, index) => slots[key] === index);
 
@@ -130,7 +115,6 @@ const SHAPE_PATHS: Record<TSeriesShape, (args: TMarkerPathArgs) => string> = {
   },
 };
 
-/** A marker's SVG path — one source for the screen, the export and the map's icons. */
 export function getMarkerPath(args: TMarkerPathArgs): string {
   return SHAPE_PATHS[args.shape](args);
 }
@@ -151,7 +135,6 @@ const HATCH_TILES: Record<TSeriesHatch, THatchTile | null> = {
   cross: { d: `M0 0L${T} ${T}M0 ${T}L${T} 0`, paint: "stroke" },
 };
 
-/** A hatch's tile — one source for the screen's patterns, the swatches and the export. */
 export function getHatchTile(hatch: TSeriesHatch): THatchTile | null {
   return HATCH_TILES[hatch];
 }

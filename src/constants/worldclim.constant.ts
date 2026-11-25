@@ -30,7 +30,6 @@ export const CLIMATE_PERIOD_LABELS: Record<TClimatePeriod, string> = {
   "c1991-2020": "1991–2020",
 };
 
-// * each normals period's first year — orders periods (the comparison's later − earlier)
 export const CLIMATE_PERIOD_START_YEAR: Record<TClimatePeriod, number> = {
   "c1951-1980": 1951,
   "c1961-1990": 1961,
@@ -39,13 +38,12 @@ export const CLIMATE_PERIOD_START_YEAR: Record<TClimatePeriod, number> = {
   "c1991-2020": 1991,
 };
 
-/** tavg isn't one of them: it's derived as (tmax + tmin) / 2. */
+/** tavg isn't fetched: it's derived as (tmax + tmin) / 2 */
 export const CLIMATE_VARIABLES = ["tmax", "tmin", "prec", "srad", "wind", "vapr"] as const;
 
-/** weather dataset only has these 3 variables */
+/** the weather dataset only has these three variables */
 export const WEATHER_VARIABLES = ["tmax", "tmin", "prec"] as const;
 
-// * what a heat map region's climate profile averages
 export const REGIONAL_PROFILE_VARIABLES = WEATHER_VARIABLES;
 
 /** only available in the c1970-2000 climate period */
@@ -83,7 +81,6 @@ export const GRID_DELTA: Record<string, number> = {
   "30s": 30 / 3600,
 };
 
-// * finest first: the first a heat map region fits in is the one to suggest
 export const GRIDS_FINEST_FIRST = [
   CELL_SIZES.THIRTY_SECONDS,
   CELL_SIZES.TWO_POINT_FIVE_MINUTES,
@@ -91,22 +88,19 @@ export const GRIDS_FINEST_FIRST = [
   CELL_SIZES.TEN_MINUTES,
 ] as const;
 
-// * WorldClim answers a region query with at most this many rows, whatever its `limit`; past
-// * it, `offset` paging repeats and skips rows (the queries have no ORDER BY), so a larger
-// * region is split into strips that each fit
+// * WorldClim caps a region answer at this many rows whatever its limit, and offset paging repeats and skips rows: regions are split into strips
 export const WORLDCLIM_MAX_ROWS = 10_000;
 
-// * inner strip edges are grid lines, rounded: the same region always asks for the same strips
+// * strip edges are rounded grid lines: the same region always asks for the same strips
 export const REGION_STRIP_EDGE_DECIMALS = 6;
 
-// * region queries the proxy caches in Redis, each strip under its own query string
 export const WORLDCLIM_CACHED_QUERY_IDS: readonly string[] = [
   "pixelvaluesinbox",
   "avgpixelvaluesinbox",
   "avgpixelvaluesinpolygonGEO",
 ];
 
-// * point queries the proxy caches in Redis by the raster cell holding the point, not by lat/lng
+// * cached by the raster cell holding the point, not by lat/lng
 export const WORLDCLIM_POINT_QUERY_IDS = {
   PIXEL_VALUES: "pixelvaluesofapoint",
   CELL: "cellofpoint",
@@ -122,8 +116,7 @@ export const POINT_QUERY_PARAMS = {
   YEAR: "year",
 } as const;
 
-// * whole cells per degree: a cell index is then a product of whole numbers, never a division by
-// * an inexact 10/60
+// * whole cells per degree: a cell index is never a division by an inexact 10/60
 export const CELLS_PER_DEGREE = {
   [CELL_SIZES.TEN_MINUTES]: 6,
   [CELL_SIZES.FIVE_MINUTES]: 12,
@@ -131,11 +124,9 @@ export const CELLS_PER_DEGREE = {
   [CELL_SIZES.THIRTY_SECONDS]: 120,
 } as const;
 
-// * SCRAPI puts a point up to ~1e-4° from a cell edge in either cell, not the same way at every grid
-// * (measured against cellofpoint, 2026-10-29); a point nearer an edge than this goes uncached
+// * SCRAPI puts a point up to ~1e-4° from a cell edge in either cell (measured 2026-10-29): nearer points go uncached
 export const POINT_CELL_EDGE_MARGIN_DEG = 5e-4;
 
 export const CELL_IRI_ROW_COL_REGEX = /Cell_[^_]+_r(\d+)c(\d+)/;
-// * ~1 m at the equator: far finer than any grid cell, and short in query and share URLs
 export const WKT_COORDINATE_PRECISION = 5;
 export const WKT_POINT_REGEX = /(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g;

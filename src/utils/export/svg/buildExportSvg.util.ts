@@ -143,12 +143,7 @@ function buildStatsTable(payload: TExportPayload, colors: TExportChartColors): s
   return border + dividers + content;
 }
 
-/**
- * precTicks are raw-mm label values; toScalePos maps a raw-mm tick to whatever value
- * precScale's own domain expects, since that differs by mode — standard mode's precScale
- * domain is already raw mm (identity), while Walter-Lieth mode's precScale shares the
- * temp-equivalent scaled domain (tempMin..plotMax), so its ticks go through toPrecipAxisValue.
- */
+/** precTicks are raw mm: Walter-Lieth's precScale is in °C axis units, so its ticks go through toPrecipAxisValue */
 export function buildGridAndAxes(
   scales: { tempMin: number; tempMax: number },
   colors: TExportChartColors,
@@ -160,7 +155,6 @@ export function buildGridAndAxes(
   chartBottom: number,
   precTicks: number[],
   toScalePos: (tick: number) => number,
-  // * WL passes its own (adds the tempMax tick); other charts keep the default steps
   tempTicks: number[] = computeWLAxisTicks(scales.tempMin, scales.tempMax),
   axesStyle: TGridAxesStyle = EXPORT_AXES_STYLE,
 ): string {
@@ -195,21 +189,12 @@ export function buildGridAndAxes(
   `;
 }
 
-/**
- * The standard chart's 0 °C line, as on screen (StandardChartAxes): only when the °C domain crosses
- * 0; drawn right after the grid, so behind the bars and lines. Its colour stays a token,
- * resolved with the rest of the markup.
- */
 export function buildZeroLine({ scales, tempScale, plotLeft, plotRight }: TZeroLineArgs) {
   if (!crossesZeroTemperature(scales)) return "";
   const y = tempScale(0);
   return `<line x1="${plotLeft}" y1="${y}" x2="${plotRight}" y2="${y}" stroke="${CHART_ZERO_LINE.STROKE}" stroke-width="${CHART_ZERO_LINE.STROKE_WIDTH}" stroke-dasharray="${CHART_ZERO_LINE.DASH}" data-zero-line="" />`;
 }
 
-/**
- * °C / mm above the plot: °C starts at the left axis, mm ends at the right, in the WL
- * temperature red and precipitation blue — as on screen.
- */
 function buildUnitTitles({ plotLeft, plotRight, chartTop, colors, axesStyle }: TUnitTitlesArgs) {
   const font = `font-size="11" font-weight="600"`;
   const y = chartTop - axesStyle.unitTitlesAbove;
@@ -274,7 +259,6 @@ function buildLine(
   return `<path d="${path}" fill="none" stroke="${color}" stroke-width="2"${dashArray} /> ${dots}`;
 }
 
-/** Standard chart's plot area: grid/axes sized off payload.rightMax, plus precip bars and tmax/tavg/tmin lines. */
 function buildStandardBody(
   payload: TExportPayload,
   colors: TExportChartColors,
@@ -299,9 +283,7 @@ function buildStandardBody(
       chartBottom,
       precTicks,
       (tick) => tick,
-      // * the screen's full-width °C axis: both ends on ticks
       getStandardTempAxis({ scales: payload.scales, isNarrow: false }).ticks,
-      // * the WL plot's axes: °C / mm above them, like the screen
       EXPORT_AXES_STYLE,
     ),
     buildZeroLine({ scales: payload.scales, tempScale, plotLeft, plotRight }),
@@ -312,17 +294,11 @@ function buildStandardBody(
   ].join("\n");
 }
 
-// * ids are fixed: the single-city export holds exactly one WL plot
 const WL_EXPORT_IDS = {
   patternIds: { humid: "wl-export-humid", arid: "wl-export-arid" },
   clipId: "wl-export-plot-clip",
 };
 
-/**
- * Walter-Lieth plot area — one convention-colored layer in a buildWalterLiethPanel, the same
- * panel the compare export uses. Domain = getSharedDomain for this one series, exactly what
- * the live diagram uses.
- */
 function buildWalterLiethBody(
   payload: TExportPayload,
   colors: TExportChartColors,
@@ -365,7 +341,6 @@ function buildMonthLabels(
     .join("");
 }
 
-/** The single-city legend — the same items ChartLegend shows for this chart type. */
 function buildLegend(payload: TExportPayload, colors: TExportChartColors, y: number) {
   const isWalterLieth = payload.chartMode === "walter-lieth";
   const { seriesLabels, aridityLegend } = payload.labels;
@@ -390,7 +365,6 @@ function buildLegend(payload: TExportPayload, colors: TExportChartColors, y: num
   });
 }
 
-/** The monthly values table under the plot — the page's: °C and mm under the plot's months. */
 function buildValuesTable(
   payload: TExportPayload,
   colors: TExportChartColors,
@@ -410,7 +384,6 @@ function buildValuesTable(
       locale: payload.labels.locale,
     }),
     span: { left, right },
-    // * the table spans the content width: its gutters are the plot margins inside the padding
     gutter: L.chartMarginLeft - L.paddingX,
     top: getValuesTableTop(chartBottom, WALTER_LIETH_EXPORT_TEXT.MONTH_LABEL_OFFSET),
     colors,
@@ -441,7 +414,6 @@ export function buildExportSvg(
   } = getSingleExportPlotBox(L.chartTop);
   const isWalterLieth = payload.chartMode === "walter-lieth";
 
-  // Standard mode only — Walter-Lieth builds its own scale from getSharedDomain.
   const tempScale = createLinearScale(
     ...getStandardTempAxis({ scales: payload.scales, isNarrow: false }).domain,
     chartBottom,
@@ -466,7 +438,6 @@ export function buildExportSvg(
     shareUrl: payload.shareUrl,
     layout: L,
   });
-  // * plot, table, legend, footer — each below the last
   const table = buildValuesTable(payload, colors, chartBottom);
   const legend = buildLegend(payload, colors, table.bottom + EXPORT_LEGEND.GAP);
   const footerY = legend.bottom + L.footerGap;
@@ -482,11 +453,7 @@ export function buildExportSvg(
     renderFooterLines(footerLines, colors, footerY),
   ].join("\n");
 
-  // Built as a joined array, not a single multi-line template literal — a raw
-  // multi-line template is fragile here because Prettier can re-indent the
-  // literal's surrounding return statement, which inserts whitespace BEFORE
-  // <?xml ...?>. The XML spec requires the declaration to be the document's
-  // very first character, so that whitespace breaks every consumer's parser.
+  // a joined array, not a multi-line template: Prettier's re-indent would put whitespace before <?xml ?>, which XML forbids
   const svg = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<svg xmlns="http://www.w3.org/2000/svg" width="${L.width}" height="${height}" viewBox="0 0 ${L.width} ${height}" font-family="${EXPORT_FONT_FAMILY}">`,

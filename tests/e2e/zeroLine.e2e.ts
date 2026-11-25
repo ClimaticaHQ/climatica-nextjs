@@ -1,6 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// * City Climate's standard chart: Soria has frost months (Tmin below 0 °C), Seville none
 const SORIA_URL = "/climate-statistics?city=Soria&lat=41.7636&lng=-2.4649&chart=standard";
 const SEVILLE_URL = "/climate-statistics?city=Seville&lat=37.3891&lng=-5.9845&chart=standard";
 const ZERO_LINE = ".chart-zero-line line";

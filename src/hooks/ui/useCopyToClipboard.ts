@@ -4,7 +4,6 @@ import { COPY_FEEDBACK_MS } from "@/constants";
 import { ECopyStatus } from "@/enums";
 import { useEffect, useRef, useState } from "react";
 
-/** Copies text to the clipboard and reports it for COPY_FEEDBACK_MS, then goes back to idle. */
 export function useCopyToClipboard() {
   const [status, setStatus] = useState(ECopyStatus.IDLE);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);

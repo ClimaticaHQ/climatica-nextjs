@@ -3,14 +3,9 @@ import type { TComparisonTableValue, TExportComparisonTableArgs } from "@/types"
 import { getPairShape } from "@/utils";
 import { buildExportTableSvg } from "./exportTable.util";
 
-/** A value, its De Martonne class after it in plain text: "37.3 (Very humid)". */
 const withClass = (value: TComparisonTableValue, classLabel: string | null) =>
   value.badge && classLabel !== null ? `${value.text} (${classLabel})` : value.text;
 
-/**
- * The pair's stats table, in the export table style: metric | A | B | difference, the series'
- * shapes in the heads and the difference's direction under its head.
- */
 export function buildComparisonTableSvg({
   table,
   labels,

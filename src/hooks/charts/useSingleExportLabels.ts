@@ -3,7 +3,6 @@ import type { TExportLabels, TUseSingleExportLabelsArgs } from "@/types";
 import { getMartonneBadge } from "@/utils";
 import { useLocale, useTranslations } from "next-intl";
 
-/** The single-series export's text, in the page's locale. */
 export function useSingleExportLabels({
   subtitle,
   periodLabel,

@@ -23,9 +23,6 @@ import type {
 import { buildGapAwarePath } from "./gapPath.util";
 import { dotRadius, escapeXml, monthOpacity } from "./buildExportSvg.util";
 
-// * the standard compare chart's parts — shared by the overlay body and the split panels
-
-/** The export's bars in a month: the screen overlay's layout, in the bar style's gap. */
 export function getExportBarLayout(
   monthBands: TMonthBand[],
   entityCount: number,
@@ -40,12 +37,6 @@ export function getExportBarLayout(
   });
 }
 
-/**
- * Each series' precipitation bars, side by side in the month band (the shared bar layout, so
- * each series' curve points can sit over its bars), filled by the month's aridity for that
- * series (as on screen); in the overlay as its bar style draws them — the gap, the series'
- * shade, its hatch knocked out of them.
- */
 export function buildGroupedBars(
   payload: TCompareExportPayload,
   precScale: TLinearScale,
@@ -79,9 +70,6 @@ export function buildGroupedBars(
     .join("");
 }
 
-/** One series' tmax/tavg/tmin lines in the semantic colours — dashes match the screen chart
- * (CHART_LINE_DASH): the multi-series ones by default; a split panel passes the single-city
- * chart's. The overlay draws each point in the series' shape. */
 export function buildSeriesLines({
   payload,
   series,
@@ -115,7 +103,6 @@ export function buildSeriesLines({
       // * a missing month is a gap in the line and has no dot — never a 0
       const points = series.data.map((row, i) => {
         const value = row[key];
-        // * in the overlay, over the series' own bar: a constant offset from the month's centre
         return value !== null
           ? { x: monthBands[i].center + pointOffset, y: tempScale(value) }
           : null;

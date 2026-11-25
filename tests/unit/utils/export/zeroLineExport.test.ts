@@ -33,7 +33,6 @@ const COLORS: TExportChartColors = {
 };
 
 const ZERO_LINE = "data-zero-line";
-// * px — a °C tick label's baseline below its tick
 const EXPORT_TICK_LABEL_OFFSET = 4;
 const scalesOf = (tempMin: number, tempMax: number): TWalterLiethScales => ({
   tempMin,
@@ -42,7 +41,6 @@ const scalesOf = (tempMin: number, tempMax: number): TWalterLiethScales => ({
   precMax: tempMax * 2,
   plotMax: tempMax * 2,
 });
-// * a °C axis from 100 px (top) to 300 px (bottom) over -10 … 30 °C: 0 °C at 250 px
 const tempScale = (value: number) => 300 - ((value + 10) / 40) * 200;
 
 const DOMAINS = [
@@ -75,7 +73,6 @@ describe("buildZeroLine", () => {
 });
 
 describe("buildExportSvg — the 0 °C line", () => {
-  // * a frosty winter: tmin below 0 °C in January, February and December
   const MONTHS: TWalterLiethMonth[] = [3, 4, 7, 10, 14, 19, 22, 22, 18, 13, 7, 4].map(
     (tavg, i) => ({ tavg, prec: 30 + i * 2 }),
   );
@@ -160,7 +157,6 @@ describe("buildExportSvg — the 0 °C line", () => {
     ];
     const values = labels.map((label) => Number(label.textContent?.replace("\u2212", "-")));
     expect(values).toEqual([-5, 0, 5, 10, 15, 20, 25, 30]);
-    // * the lowest label on the plot's baseline, the highest on its top grid line
     const ys = labels.map((label) => Number(label.getAttribute("y")) - EXPORT_TICK_LABEL_OFFSET);
     const grid = [...doc.querySelectorAll('line[stroke-dasharray="3 3"]')].map((line) =>
       Number(line.getAttribute("y1")),

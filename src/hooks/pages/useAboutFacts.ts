@@ -14,10 +14,6 @@ import { GLOBAL_CONFIG } from "@/libs/GlobalConfig";
 import { useTranslations } from "next-intl";
 import { useDisplayFormat } from "../ui/useDisplayFormat";
 
-/**
- * The About page's facts: its key facts, each counted from the constants the app itself runs
- * on, and the source code's version and licence (those set).
- */
 export function useAboutFacts() {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();

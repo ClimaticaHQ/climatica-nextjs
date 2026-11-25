@@ -6,7 +6,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const isDark = () => document.documentElement.classList.contains(ETheme.DARK);
 
-/** The device's colour-scheme preference, as matchMedia reports it. */
 function prefersDark(value: boolean) {
   vi.stubGlobal(
     "matchMedia",
@@ -47,7 +46,6 @@ describe("theme resolution", () => {
   });
 });
 
-// * the script runs in <head> before the first paint — these run it as the browser would
 describe("the inline theme script", () => {
   const run = () => new Function(THEME_INIT_SCRIPT)();
   const saveTheme = (theme: unknown) =>

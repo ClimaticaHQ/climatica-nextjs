@@ -1,6 +1,5 @@
 import { devices, expect, test, type Locator, type Page } from "@playwright/test";
 
-// * the touch scale (typography.css): what phones must get, in px at the default 16px
 const MIN_PX = {
   BODY: 16,
   CHIP: 15,
@@ -12,24 +11,19 @@ const MIN_PX = {
   BUTTON: 17,
   TARGET: 44,
 } as const;
-// * the TOUCH chip's visible pill: 36 px — under the 44 px target its ::before reaches
 const CHIP_PILL_PX = 36;
-// * the variables a Walter-Lieth diagram draws: selected, and disabled in that view
 const WALTER_LIETH_VARIABLES = ["Max temp", "Min temp", "Precip"];
-// * WCAG AA for text
 const MIN_CONTRAST = 4.5;
 const CITY_URL = "/climate-statistics?city=Paris&lat=48.8566&lng=2.3522";
 
 const fontSize = (locator: Locator) =>
   locator.evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
 
-/** Every matched element's computed font size, smallest first. */
 const fontSizes = (locator: Locator) =>
   locator.evaluateAll((elements) =>
     elements.map((element) => parseFloat(getComputedStyle(element).fontSize)).sort((a, b) => a - b),
   );
 
-/** Text against the first ancestor that paints a background, after the element's opacity. */
 const contrastOf = (locator: Locator) =>
   locator.evaluate((element) => {
     const rgb = (value: string) => (value.match(/[\d.]+/g) ?? []).map(Number);
@@ -58,7 +52,6 @@ const contrastOf = (locator: Locator) =>
     return ((a ?? 0) + 0.05) / ((b ?? 0) + 0.05);
   });
 
-/** The drawn variables: disabled, still pressed, and drawn apart from the unselected ones. */
 async function expectSelectedAndDisabled(scope: Locator) {
   const backgrounds = new Set<string>();
   for (const name of WALTER_LIETH_VARIABLES) {
@@ -107,7 +100,6 @@ for (const width of [360, 390]) {
       const contents = page.getByRole("button", { name: "Contents" });
       expect(await fontSize(contents)).toBeGreaterThanOrEqual(MIN_PX.NAV);
 
-      // * the current section is never cut: wholly shown, on up to two lines
       const section = bar.locator("span").last();
       expect(
         await section.evaluate(
@@ -154,7 +146,6 @@ for (const width of [360, 390]) {
         expect(pill).toBeLessThan(MIN_PX.TARGET);
         expect(target).toBeGreaterThanOrEqual(MIN_PX.TARGET);
       }
-      // * a tap just above a chip's pill, inside its target, lands on that chip — not a neighbour
       const climate = sheet.getByRole("button", { name: "Climate", exact: true });
       const landsOnChip = await climate.evaluate((element) => {
         const box = element.getBoundingClientRect();
@@ -178,7 +169,6 @@ for (const width of [360, 390]) {
         );
       }
 
-      // * the chips wrap inside the sheet: none reaches past its edge
       const sheetBox = await sheet.boundingBox();
       const rightmost = await chips.evaluateAll((elements) =>
         Math.max(...elements.map((element) => element.getBoundingClientRect().right)),
@@ -193,7 +183,6 @@ for (const width of [360, 390]) {
       await page.getByRole("button", { name: /^Filters/ }).click();
       const sheet = page.getByRole("dialog", { name: "Filters" });
       await expectSelectedAndDisabled(sheet);
-      // * the note carries the explanation, so it — not the disabled chip — meets AA
       const note = sheet.getByText("Not available", { exact: false }).first();
       expect(await fontSize(note)).toBeGreaterThanOrEqual(MIN_PX.SECONDARY);
       expect(await contrastOf(note)).toBeGreaterThanOrEqual(MIN_CONTRAST);
@@ -212,8 +201,6 @@ for (const width of [360, 390]) {
   });
 }
 
-// * the disabled look is shared: on the desktop sidebar too, the drawn variables stay selected and
-// * the notes meet AA
 test.describe("disabled chips on a desktop", () => {
   test.use({ viewport: { width: 1280, height: 900 }, isMobile: false, hasTouch: false });
 
@@ -232,7 +219,6 @@ test.describe("disabled chips on a desktop", () => {
     const sidebar = page.locator("aside");
     const months = sidebar.getByRole("button", { name: "All", exact: true });
     await expect(months).toBeDisabled();
-    // * colour, not opacity: a selected chip can keep its cue
     for (const chip of await sidebar.locator("button[aria-pressed]:disabled").all()) {
       expect(await chip.evaluate((element) => getComputedStyle(element).opacity)).toBe("1");
     }

@@ -60,7 +60,6 @@ describe("the MiniMap's place toggle", () => {
     const paths = within(toggle())
       .getAllByRole("button")
       .map((option) => option.querySelector("svg path")?.getAttribute("d"));
-    // * OptionMarker's SeriesMarkerIcon: a 9px shape centred in 14px
     const shapeOf = (shape: "circle" | "square") =>
       getMarkerPath({
         shape,

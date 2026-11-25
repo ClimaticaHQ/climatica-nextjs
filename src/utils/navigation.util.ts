@@ -1,9 +1,6 @@
 import type { TAppRouter } from "@/types";
 
-/**
- * Filter/sidebar-driven URL updates must never move the viewport — Next.js
- * scrolls to top by default on push/replace unless told not to.
- */
+/** Next.js scrolls to top on push/replace unless told not to */
 export function replaceUrlParams(
   router: TAppRouter,
   pathname: string,

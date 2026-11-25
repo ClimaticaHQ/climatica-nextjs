@@ -8,10 +8,6 @@ import { createConsentRecord } from "@/utils/analyticsConsent.util";
 import { useIsClient } from "@/hooks/ui/useIsClient";
 import { usePersistedJson } from "./usePersistedJson";
 
-/**
- * The analytics choice and the ways to change it. Without a measurement ID nothing is
- * available: no banner, no Settings row, no Cookie settings.
- */
 export function useAnalyticsConsent() {
   const [stored, setStored] = usePersistedJson(analyticsConsentStore);
   const { isReopened, reopen, close } = useConsentBannerStore();
@@ -28,7 +24,6 @@ export function useAnalyticsConsent() {
     isAvailable,
     gaId: GLOBAL_CONFIG.analyticsId,
     isGranted: isAvailable && stored?.choice === EAnalyticsConsent.GRANTED,
-    // * no choice yet (or a void one): asked on every page until there is
     isBannerShown: isAvailable && (stored === null || isReopened),
     accept: () => choose(EAnalyticsConsent.GRANTED),
     reject: () => choose(EAnalyticsConsent.DENIED),

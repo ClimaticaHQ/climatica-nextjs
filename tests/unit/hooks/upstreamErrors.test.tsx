@@ -12,10 +12,7 @@ vi.mock("@/libs/Logger", () => ({ logger: { info: vi.fn(), error: vi.fn() } }));
 vi.mock("@/libs/Env", () => ({ env: { PORT: "3000" } }));
 vi.mock("next-intl", () => ({ useLocale: () => "en" }));
 
-/**
- * The route handlers answer an upstream failure with 502/503 and an `{ error }` body.
- * Through the real apiClient that has to reach the hooks as an error — never as data.
- */
+/** an upstream failure (502/503 with { error }) must reach the hooks as an error, never as data */
 function stubRouteError({ status, message }: { status: number; message: string }) {
   const fetchMock = vi.fn().mockImplementation(
     async () =>
@@ -42,8 +39,7 @@ function makeWrapper() {
 const originalAdapter = axiosInstance.defaults.adapter;
 
 beforeEach(() => {
-  // * the fetch adapter, so the stubbed fetch stands in for the network and axios still
-  // * judges the status itself
+  // * the fetch adapter: the stubbed fetch stands in for the network, and axios still judges the status
   axiosInstance.defaults.adapter = "fetch";
 });
 

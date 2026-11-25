@@ -3,7 +3,6 @@ import { FOCUS_RING_CLASS } from "@/constants";
 import { ESettingsControlPlacement, ETextSize, ETheme, EUpdateFlashVariant } from "@/enums";
 import type { TBarStyleOption } from "./Settings.type";
 
-// * each section's title id — the section is named by it
 export const SETTINGS_SECTION_IDS = {
   LANGUAGE: "settings-language",
   APPEARANCE: "settings-appearance",
@@ -94,7 +93,6 @@ export const BAR_STYLE_OPTIONS = [
   },
 ] as const satisfies readonly TBarStyleOption[];
 
-// * a bar style card's thumbnail
 export const BAR_STYLE_PREVIEW = {
   WIDTH: 120,
   HEIGHT: 76,
@@ -136,15 +134,12 @@ export const SETTINGS_DESCRIPTION_IDS = {
   BAR_STYLE: "settings-chart-bar-style-description",
 } as const;
 
-// * the line between sections and between rows, one source for both: a top band of the
-// * background — a border can't be thinner than 1 CSS px, this is one device pixel on a
-// * high-density screen. None above the first
+// * a band of the background, not a border: a border can't be thinner than 1 CSS px
 const HAIRLINE =
   "bg-[linear-gradient(var(--color-divider),var(--color-divider))] bg-[length:100%_var(--divider-width)] bg-top bg-no-repeat first:bg-none";
 
 const ROW_MIN_HEIGHT = "min-h-[max(3rem,48px)]";
 
-// * flat, one card, no shadows anywhere
 export const SETTINGS_CLASSES = {
   CARD: "mx-auto w-full max-w-[40rem] px-4 sm:px-7 sm:py-1",
   SECTION: `${HAIRLINE} py-4 sm:py-5`,

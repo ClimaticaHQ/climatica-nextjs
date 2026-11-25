@@ -38,9 +38,7 @@ describe("resolveYearPair", () => {
   });
 
   it("a removed year falls back to the first one not on the other side", () => {
-    // * 1990 left the comparison: B falls back past A (2021) to 1967
     expect(resolveYearPair([2021, 1967, 2010], [2021, 1990])).toEqual([2021, 1967]);
-    // * A's year left: the first year that isn't B's
     expect(resolveYearPair([1967, 1990, 2010], [2021, 1967])).toEqual([1990, 1967]);
   });
 

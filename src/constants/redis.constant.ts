@@ -40,16 +40,10 @@ export const CACHE_KEYS = {
     `worldclim-point-counter:${queryId}:${cell.size}:r${cell.row}c${cell.col}${variant ? `:${variant}` : ""}`,
 } as const;
 
-/**
- * Errors that indicate a transient/recoverable server-side state — worth
- * forcing an immediate reconnect for. Deliberately does NOT include
- * connection-level errors like ECONNREFUSED/ETIMEDOUT — those mean Redis
- * is unreachable, and should be left to retryStrategy's bounded backoff
- * instead of triggering forced reconnects that reset its attempt counter.
- */
+/** not connection errors (ECONNREFUSED, ETIMEDOUT): a forced reconnect would reset retryStrategy's backoff */
 export const RECOVERABLE_REDIS_ERRORS = new Set([
-  "READONLY", // * connected to a read-only replica (e.g. mid-failover)
-  "LOADING", // * Redis is still loading the dataset into memory on startup
-  "MASTERDOWN", // * Sentinel setup: master is currently down
-  "CLUSTERDOWN", // * Redis Cluster is in a down/unhealthy state
+  "READONLY",
+  "LOADING",
+  "MASTERDOWN",
+  "CLUSTERDOWN",
 ]);

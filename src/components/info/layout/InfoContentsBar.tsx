@@ -5,11 +5,6 @@ import { useTranslations } from "next-intl";
 import { INFO_CONTENTS_BAR_CLASSES as C } from "../info.constant";
 import type { TInfoContentsBarProps } from "../info.type";
 
-/**
- * Below lg, the Info pages' one navigation control: a bar pinned under the top bar saying
- * where the reader is (a breadcrumb: page, then the section in view) and opening the Contents
- * sheet.
- */
 export function InfoContentsBar({
   pageLabel,
   sectionLabel,
@@ -25,7 +20,6 @@ export function InfoContentsBar({
         </span>
         {sectionLabel !== null && (
           <>
-            {/* * the app's chevron, turned to point on to the section */}
             <span aria-hidden="true" className={C.SEPARATOR}>
               <ChevronDownIcon open={false} />
             </span>

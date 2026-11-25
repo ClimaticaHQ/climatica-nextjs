@@ -6,10 +6,6 @@ import { type RefObject, useEffect, useState } from "react";
 
 const NO_HIDDEN_EDGES: TScrollEdges = { isStartHidden: false, isEndHidden: false };
 
-/**
- * Which ends of a horizontal scroller hide content, kept current as it scrolls or resizes.
- * contentKey re-measures when the content changes without the scroller resizing.
- */
 export function useScrollEdges(ref: RefObject<HTMLElement | null>, contentKey: string) {
   const [edges, setEdges] = useState(NO_HIDDEN_EDGES);
 

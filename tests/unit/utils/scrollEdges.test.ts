@@ -2,7 +2,6 @@
 import { areScrollEdgesEqual, getScrollEdges } from "@/utils/scroll.util";
 import { describe, expect, it } from "vitest";
 
-/** Only the three sizes getScrollEdges reads. */
 function scroller(scrollLeft: number, clientWidth: number, scrollWidth: number): HTMLElement {
   const element = document.createElement("div");
   Object.defineProperties(element, {

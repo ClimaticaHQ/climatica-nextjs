@@ -2,10 +2,6 @@ import { MOTION } from "@/constants";
 import { useHasMounted, useMotionPreference } from "@/hooks";
 import type { TSeriesToggleMotion } from "@/components/charts/charts.type";
 
-/**
- * Recharts' animation for a series toggled on or off: none on mount (ChartTransition fades
- * new content in) and none with motion off — then the series also leaves at once.
- */
 export function useSeriesToggleMotion(): TSeriesToggleMotion {
   const hasMounted = useHasMounted();
   const { isMotionEnabled } = useMotionPreference();

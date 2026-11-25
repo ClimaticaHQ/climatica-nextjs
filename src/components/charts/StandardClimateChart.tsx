@@ -37,11 +37,6 @@ import { ChartLoadingContext } from "./chartLoading.context";
 import { MonthTapLayer } from "./MonthTapLayer";
 import { StandardClimateChartFrame } from "./StandardClimateChartFrame";
 
-/**
- * One standard chart: its stats bar (not in a split panel), the plot and its footer, in one
- * frame. While its data load the plot is a skeleton in the same frame, so the data's arrival
- * swaps the plot alone.
- */
 export function StandardClimateChart(props: TStandardClimateChartProps) {
   const isLoading = useContext(ChartLoadingContext);
   return (
@@ -53,7 +48,6 @@ export function StandardClimateChart(props: TStandardClimateChartProps) {
   );
 }
 
-/** The chart's plot. */
 function Plot({
   chartData,
   aridity,
@@ -76,19 +70,15 @@ function Plot({
   const curveWidth = isNarrow ? CHART_PLOT.CURVE_WIDTH.NARROW : CHART_PLOT.CURVE_WIDTH.FULL;
   const { ref: plotRef, width: plotWidth } = useElementWidth<HTMLDivElement>();
   const monthFormat = getMonthLabelFormat({ chartWidth: plotWidth, isNarrow, textScale });
-  // * the tooltip's month names; the axes themselves are StandardChartAxes
   const axes = useStandardChartAxes(isPanel, monthFormat);
   const hidePrecBar = useDelayedHide(!visible.prec, seriesMotion.toggleMs);
   const hideTmaxLine = useDelayedHide(!visible.tmax, seriesMotion.toggleMs);
   const hideTminLine = useDelayedHide(!visible.tmin, seriesMotion.toggleMs);
   const hideTavgLine = useDelayedHide(!visible.tavg, seriesMotion.toggleMs);
 
-  // * the semantic colours on every standard chart; the bars by this series' own aridity
   const colors = STANDARD_CHART_SINGLE_COLORS;
   const aridityByMonth = useMemo(() => getAridityByMonth(aridity), [aridity]);
 
-  // * the tooltip's rows by their names: each variable's swatch, as in this chart's legend — the
-  // * hovered month's arid / humid bar
   const swatches = getStandardVariableSwatches(colors);
   const hoveredMonthIsArid =
     activeMonthIndex !== null && activeMonthIndex !== undefined
@@ -163,7 +153,6 @@ function Plot({
             />
 
             {activeMonthIndex !== null && activeMonthIndex !== undefined && (
-              // * the hovered month's band — the same color as the monthly values table's
               <ReferenceArea
                 yAxisId="temp"
                 x1={MONTH_NAMES[activeMonthIndex]}
@@ -173,8 +162,6 @@ function Plot({
                 stroke="none"
               />
             )}
-            {/* * one series: each row after its variable's legend swatch, not a marker; on
-                touch, the tapped month's */}
             {!isStatic && (
               <Tooltip
                 key={getTouchTooltipKey(tooltipState)}

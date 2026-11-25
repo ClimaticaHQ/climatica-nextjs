@@ -15,8 +15,7 @@ function memoryStorage(initial: Record<string, string> = {}): TKeyValueStorage {
   };
 }
 
-// * bug 1: clicking Compare Cities → Compare Periods sometimes stayed on compare-cities — the
-// * old page's replace() fired while the link navigation was in flight and cancelled it
+// * regression: the old page's replace() fired during a link navigation and cancelled it
 describe("canWriteUrlState", () => {
   const page = "/compare-cities";
   const search = { currentSearch: "cityA=Paris", scheduledSearch: "cityA=Paris" };
@@ -104,8 +103,7 @@ describe("getLinkNavigationTarget", () => {
   });
 });
 
-// * bug 2: the title showed "Madrid" on a Berlin URL — each component read its own copy of the
-// * persisted city, captured before the URL / stored value was applied
+// * regression: each component read its own copy of the persisted city, captured before the URL was applied
 describe("createPersistedJsonStore", () => {
   const key = "city";
 

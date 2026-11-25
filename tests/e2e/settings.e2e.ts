@@ -10,7 +10,6 @@ const FIVE_YEARS_URL =
 const settingsHeading = (page: Page) => page.getByRole("heading", { level: 1, name: "Settings" });
 const barStyleGroup = (page: Page) =>
   page.getByRole("radiogroup", { name: "Comparison bar style" });
-// * the overlay's bars: their fills (shades are tokens of their own) and their hatches
 const overlayBars = (page: Page) =>
   page.evaluate(() => {
     const bars = [
@@ -43,7 +42,6 @@ test.describe("Settings page", () => {
 
     await page.getByRole("link", { name: "Settings" }).click();
     await expect(settingsHeading(page)).toBeVisible();
-    // * the shared filters ride along, so the navbar's links from settings keep them
     expect(new URL(page.url()).searchParams.get("dataset")).toBe("weather");
 
     await page.goBack();
@@ -67,8 +65,7 @@ test.describe("Settings page", () => {
     await page.reload();
     await expect(page.locator("html")).toHaveClass(/\bdark\b/);
 
-    // * no app bundle at all: only the inline head script can have set the class — so the
-    // * first paint is already dark, never a light flash
+    // * no app bundle: only the inline head script can have set the class, so the first paint is dark
     await page.route("**/_next/static/**/*.js", (route) => route.abort());
     await page.goto(CITY_URL, { waitUntil: "domcontentloaded" });
     await expect(page.locator("html")).toHaveClass(/\bdark\b/);
@@ -115,14 +112,12 @@ test.describe("Comparison bar style", () => {
     const chips = page.locator("[data-toolbar-chips]");
     const swatches = chips.locator("[data-series-hatch]");
 
-    // * Walter-Lieth draws no bars: the shapes alone, even with Patterns set
     await page.goto("/settings");
     await barStyleGroup(page).getByRole("radio", { name: "Patterns" }).click();
     await page.goto(FIVE_YEARS_URL.replace("&chart=standard", "&chart=walter-lieth"));
     await expect(chips.getByRole("button")).toHaveCount(5, { timeout: 30_000 });
     await expect(swatches).toHaveCount(0);
 
-    // * the standard overlay with Patterns: each year's hatch beside its shape
     await page.getByTestId("climate-chart").getByRole("button", { name: "Standard chart" }).click();
     await expect(page).toHaveURL(/chart=standard/);
     await expect(swatches).toHaveCount(5);
@@ -173,7 +168,6 @@ test.describe("Comparison bar style", () => {
       })
       .toBe(true);
 
-    // * the keyboard: the arrow moves the selection on to Patterns
     await page.goto("/settings");
     await barStyleGroup(page).getByRole("radio", { name: "Shades" }).focus();
     await page.keyboard.press("ArrowRight");
@@ -201,10 +195,8 @@ test.describe("Settings page on a phone", () => {
 });
 
 const SECTIONS = ["Language", "Appearance", "Charts and filters"];
-// * the rows without a description of their own
 const UNDESCRIBED_ROWS = ["App language", "Theme"];
 
-/** Each section's rows: its label, its description's text and its controls' aria-describedby. */
 const settingsRows = (page: Page) =>
   page.locator("main section").evaluateAll((sections) =>
     sections.map((section) =>
@@ -291,7 +283,6 @@ test.describe("Settings page layout", () => {
     expect(new Set(lines).size).toBe(1);
     expect(lines[0]).toContain("linear-gradient");
     expect(sections.every(([first]) => first?.line.startsWith("none"))).toBe(true);
-    // * the bar style cards sit under their label, so that row is taller
     const [, appearance = [], charts = []] = sections;
     for (const rows of [appearance, charts.slice(0, -1)]) {
       expect(new Set(rows.map(({ height }) => height)).size).toBe(1);
@@ -369,27 +360,22 @@ for (const width of [360, 1440]) {
       expect(layout.scrollWidth).toBeLessThanOrEqual(width);
       expect(layout.outside).toEqual([]);
       expect(Math.min(...layout.rowHeights)).toBeGreaterThanOrEqual(44);
-      // * the three thumbnails stay in one row
       expect(new Set(layout.cardTops.map(Math.round)).size).toBe(1);
-      // * the dropdown always stays on the right of its label
       const [trigger, label] = layout.languageRow;
       expect(trigger?.left).toBeGreaterThan(label?.right ?? Infinity);
     });
   });
 }
 
-/** A Settings row's label and its control, in px, and whether every option's icon and text show. */
 const rowLayout = (page: Page, name: string) =>
   page.getByRole("group", { name, exact: true }).evaluate((control) => {
     const box = (element: Element | null | undefined) => {
       const { left, right, top, bottom, width } = element?.getBoundingClientRect() ?? new DOMRect();
       return { left, right, top, bottom, width };
     };
-    // * the row's content: the control sits in a wrapper of its own
     const content = control.closest("section > div > div")?.firstElementChild;
     const labels = [...control.querySelectorAll("button > span")];
     return {
-      // * the label itself: below `sm` its text block is display: contents (no box)
       label: box(content?.querySelector("span")),
       control: box(control),
       row: box(content),
@@ -404,7 +390,6 @@ const rowLayout = (page: Page, name: string) =>
     };
   });
 
-/** The bar style cards' thumbnail outlines and whether their radio indicators show. */
 const barStyleLook = (page: Page) =>
   page.locator("[role=radio]").evaluateAll((cards) =>
     cards.map((card) => ({
@@ -476,7 +461,6 @@ test.describe("Settings page on a 360px phone", () => {
           {
             isSwitch,
             label: label?.textContent,
-            // * from the line above: the label's, or a wide control's once it has wrapped
             gap:
               box(description).top -
               Math.max(
@@ -501,7 +485,6 @@ test.describe("Settings page on a 360px phone", () => {
       expect(row.centreOffset).toBeLessThanOrEqual(1);
     }
     for (const row of wide) expect(row.descriptionWidth).toBeCloseTo(row.rowWidth, 0);
-    // * 0.5rem at most between the line above and the description
     for (const row of rows) expect(row.gap).toBeLessThanOrEqual(8);
   });
 
@@ -510,7 +493,6 @@ test.describe("Settings page on a 360px phone", () => {
     const targets = await page.evaluate(() => {
       const rows = [...document.querySelectorAll("main section > div > div")];
       return rows.flatMap((row, rowIndex) =>
-        // * shown only: the closed language menu's options are no targets
         [...row.querySelectorAll("button, input[type=range], label, [role=radio]")]
           .filter((element) =>
             element.checkVisibility({ opacityProperty: true, visibilityProperty: true }),
@@ -622,7 +604,6 @@ test.describe("Settings segmented rows on a desktop", () => {
   }
 });
 
-/** The Theme control's layout, and whether each label is on one line (one line box per text). */
 const themeLayout = (page: Page) =>
   page.getByRole("group", { name: /^(Theme|Θέμα|Тема)$/ }).evaluate((control) => {
     const buttons = [...control.querySelectorAll("button")];

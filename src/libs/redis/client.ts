@@ -23,7 +23,6 @@ export class RedisClient {
             return null;
           }
 
-          // * exponential backoff, capped at 2s
           return Math.min(Math.pow(2, times) * TIME.IN_MILLISECONDS.ONE_HUNDRED_MS, 2000);
         },
         reconnectOnError(error) {

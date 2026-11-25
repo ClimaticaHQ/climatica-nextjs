@@ -12,8 +12,7 @@ describe("getScholarSearchUrl", () => {
     expect(decodeURIComponent(url.slice(SCHOLAR.length))).toBe(
       "\"Une nouvelle fonction climatologique : l'indice d'aridité\"",
     );
-    // * the query is a single parameter: spaces, quotes, the colon and accents all encoded (an
-    // * apostrophe is valid in a query as it is)
+    // * one parameter: spaces, quotes, the colon and accents encoded (an apostrophe is valid as is)
     expect(url.slice(SCHOLAR.length)).not.toMatch(/[ ":àé&#]/);
   });
 });

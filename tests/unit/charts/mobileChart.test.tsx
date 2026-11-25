@@ -44,7 +44,6 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 
-// * the device the test plays: a phone's width always; touch or a mouse as set
 const device = vi.hoisted(() => ({ isTouch: false }));
 
 beforeEach(() => {
@@ -109,7 +108,6 @@ function renderCard(props: TCardProps) {
   ).container;
 }
 
-/** A tap on the plot's tap layer, at a month's centre (the layer laid out 12 × 30 px + axes). */
 function tapMonth(container: HTMLElement, monthIndex: number, { dx = 0 } = {}) {
   const layer = container.querySelector<HTMLElement>("[data-month-tap-layer]");
   if (!layer) throw new Error("no tap layer");
@@ -220,7 +218,6 @@ describe("one chart card frame on every page", () => {
   });
 });
 
-/** A plot's tap layer, its month held as the card holds it — and something outside it. */
 function TapHarness() {
   const [month, setMonth] = useState<number | null>(null);
   return (
@@ -316,7 +313,6 @@ describe("touch: a tapped month's tooltip", () => {
 });
 
 describe("touch: a chip only toggles its series", () => {
-  // * a focused entity mutes the others' header markers in the values table
   const mutedHeaders = (container: HTMLElement) =>
     [...container.querySelectorAll("tbody th [title] [data-series-shape]")].filter((marker) =>
       marker.getAttribute("style")?.includes(FOCUS_CONTEXT.LINE),
@@ -422,7 +418,6 @@ describe("the phone's y axes: round ticks, every value inside", () => {
       const steps = ticks.slice(1).map((tick, i) => tick - (ticks[i] ?? 0));
       expect(new Set(steps).size).toBe(1);
     }
-    // * snug: 0–35 °C tops out at 36, not 60
     expect(getAxisTicks({ min: 0, max: 35, count: 4 })).toEqual([0, 12, 24, 36]);
   });
 
@@ -442,14 +437,11 @@ describe("the phone's y axes: round ticks, every value inside", () => {
         expect(value).toBeLessThanOrEqual(Number(high));
       }
     }
-    // * °C: round multiples at an even step, at most six on a phone (0 when crossed), the
-    // * domain's ends among them
     const phoneTicks = "ticks" in axes.temp ? axes.temp.ticks : [];
     expect(phoneTicks.length).toBeLessThanOrEqual(WALTER_LIETH_AXIS.STANDARD_TEMP_MAX_TICKS.NARROW);
     expect([phoneTicks[0], phoneTicks.at(-1)]).toEqual([low, high]);
     expect(phoneTicks).toContain(0);
     expect(new Set(phoneTicks.slice(1).map((tick, i) => tick - (phoneTicks[i] ?? 0))).size).toBe(1);
-    // * wider screens get the same round ticks, more of them
     const desktop = getStandardYAxes({
       scales: getWalterLiethScales(rows),
       rightMax: 200,

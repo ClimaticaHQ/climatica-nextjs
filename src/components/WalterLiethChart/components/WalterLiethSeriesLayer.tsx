@@ -7,10 +7,6 @@ import { WalterLiethDot } from "./WalterLiethDot";
 import { WalterLiethHalo } from "./WalterLiethHalo";
 import { WalterLiethSegmentPaths } from "./WalterLiethSegmentPaths";
 
-/**
- * One series, painted bottom to top: hatching → curve halos → perhumid fill → curves → dots.
- * The export's buildLayer paints in the same order.
- */
 export function WalterLiethSeriesLayer({
   layer,
   scaleX,

@@ -23,15 +23,13 @@ const CSS_VAR_MAP: Record<keyof TExportChartColors, string> = {
   seriesMarker: "--color-series-marker",
 };
 
-/** Resolves the export colors from the light palette — identical in light and dark mode. */
 export function resolveExportColors(): TExportChartColors {
   return readExportPalette(resolveFrom);
 }
 
 function resolveFrom(computed: CSSStyleDeclaration): TExportChartColors {
   const keys = Object.keys(CSS_VAR_MAP) as (keyof TExportChartColors)[];
-  // Same generic-Record-construction cast as extractParams — TS can't otherwise
-  // prove every key of TExportChartColors was populated by this loop.
+  // a cast at the boundary: TS can't prove the loop sets every key
   const entries = keys.map((key): [keyof TExportChartColors, string] => [
     key,
     computed.getPropertyValue(CSS_VAR_MAP[key]).trim(),

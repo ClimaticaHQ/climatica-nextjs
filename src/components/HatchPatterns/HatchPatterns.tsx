@@ -1,12 +1,6 @@
 import { WALTER_LIETH_HATCH } from "@/constants";
 import type { THatchPatternsProps } from "./HatchPatterns.type";
 
-/**
- * WL regime patterns — humid = thin vertical lines, arid = dots in the same columns. Used by
- * the diagram and by legend swatches. Geometry comes from
- * getHatchGeometry (derived from the month width), exactly like the export's
- * buildWalterLiethPatterns, so screen and PNG match.
- */
 export function HatchPatterns({
   humid,
   arid,

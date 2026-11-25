@@ -28,8 +28,7 @@ export function getSearchParam(searchParams: TSearchParams, key: string): string
   return Array.isArray(value) ? value[0] : value;
 }
 
-// Building a fully-typed object from a runtime-iterated key map requires a
-// cast at the boundary — TS can't otherwise prove the loop covers every K.
+// a cast at the boundary: TS can't prove the loop covers every key
 export function extractParams<K extends string>(
   searchParams: TSearchParams,
   keys: Record<K, string>,
@@ -88,9 +87,6 @@ export function buildOgImagePath(params: Record<string, string | undefined>): st
   return `/api/og?${query.toString()}`;
 }
 
-// Shared by resolvers that filter on dataset + variables + a single
-// period/year (climateStatistics, compareCities, heatMap). comparePeriods
-// compares two periods instead, so it has its own extraction below.
 function resolveCommonClimateParams(searchParams: TSearchParams): TCommonClimateParams {
   const { dataset, varParam, periodParam, yearParam } = extractParams(searchParams, {
     dataset: SIDEBAR_PARAMS.DATASET,
@@ -285,7 +281,6 @@ export async function resolveOgMeta({
   return resolver({ locale, searchParams });
 }
 
-/** The page's own URL — no locale prefix: one URL per page, whatever the visitor's language. */
 export function buildCanonicalPath(route: string, searchParams: TSearchParams) {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(searchParams)) {
@@ -297,10 +292,7 @@ export function buildCanonicalPath(route: string, searchParams: TSearchParams) {
   return search ? `${route}?${search}` : route;
 }
 
-/**
- * A page's metadata in the visitor's language: its title and description, the share image,
- * and the canonical URL. No hreflang: every language shares the one URL.
- */
+/** no hreflang: every language shares one URL */
 export function createPageMetadata(resolver: TMetaResolver, route: string) {
   return async function generateMetadata({ searchParams }: TPageProps): Promise<Metadata> {
     const locale = parseLocale(await getLocale());
@@ -326,7 +318,6 @@ export function createPageMetadata(resolver: TMetaResolver, route: string) {
   };
 }
 
-/** An Info page's metadata: its sidebar name as the title, its description, its canonical URL. */
 export function createInfoPageMetadata(page: TInfoPageKey, route: string) {
   return async function generateMetadata(): Promise<Metadata> {
     const t = await getTranslations("info");

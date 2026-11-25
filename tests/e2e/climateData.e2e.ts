@@ -25,10 +25,8 @@ test.describe("Climate data loading", () => {
 
   test("compare cities page loads and displays data for both cities", async ({ page }) => {
     await page.goto(COMPARE_CITIES_URL);
-    // Both city labels appear as column headers in CompareStatsGrid
     await expect(page.getByText("Paris").first()).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText("London").first()).toBeVisible({ timeout: 30_000 });
-    // Export menu appears only once data is loaded
     await expect(page.getByRole("button", { name: /Export/i })).toBeVisible({ timeout: 30_000 });
   });
 
@@ -67,7 +65,6 @@ test.describe("Climate data loading", () => {
     });
   }
 
-  // * the monthly values table under every chart: °C and mm rows, twelve values each
   test("shows a two-row monthly values table under the city chart", async ({ page }) => {
     await page.goto(PARIS_URL);
     const table = page.getByTestId("climate-chart").getByRole("table");
@@ -79,10 +76,8 @@ test.describe("Climate data loading", () => {
 
   test("shows a monthly values table under each compare split panel", async ({ page }) => {
     await page.goto(COMPARE_CITIES_URL);
-    // * a split panel is too narrow for twelve aligned columns: each opens its table on its side
     const disclosures = page.getByRole("button", { name: "Show monthly values" });
     await expect(disclosures).toHaveCount(2, { timeout: 30_000 });
-    // * an opened one turns into "Hide monthly values", so the next to open is always the first
     await disclosures.first().click();
     await disclosures.first().click();
     const tables = page.getByRole("table", { name: /^Monthly values: / });
@@ -120,7 +115,6 @@ test.describe("Climate data loading", () => {
       { timeout: 30_000 },
     );
     await expect(page.locator("main")).not.toContainText("WorldClim API request failed");
-    // * an empty results frame would still take the page's gap; it's not laid out at all
     await expect(page.getByTestId("page-results")).toHaveCSS("display", "none");
   });
 });

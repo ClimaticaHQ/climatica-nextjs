@@ -9,8 +9,6 @@ const CLS_LIMIT = 0.02;
 const SETTLE_MS = 1500;
 const GA_COLLECT = /google-analytics\.com\/g\/collect/;
 const GTAG_SCRIPT = /googletagmanager\.com\/gtag\/js/;
-// * every Google host gtag.js could call: none but gtag.js's own is reached, and that only in
-// * the opt-in real-gtag group
 const ANY_GOOGLE =
   /^https:\/\/([a-z0-9-]+\.)*(google|googletagmanager|google-analytics|doubleclick|gstatic)\.[a-z.]+\//;
 // * longer than gtag.js holds a batch of hits
@@ -18,7 +16,6 @@ const FLUSH_MS = 9000;
 const HIT_POLL = { timeout: 20_000 };
 const ORIGIN = "http://localhost:3001";
 const LEAKED_PARAMS = /[?&](lat|lng|latA|north|polygon)=/;
-// * where "Use my location" puts the reader: the label names the nearest town once looked up
 const HERE = { latitude: 41.652251, longitude: -4.724532 };
 const PLACE_NAMES = ["Paris", "Valladolid", "My location"];
 const LANGUAGE_COOKIE = "NEXT_LOCALE";
@@ -41,7 +38,6 @@ const storedChoice = (page: Page) =>
 const gaCookieNames = async (context: BrowserContext) =>
   (await context.cookies()).map(({ name }) => name).filter((name) => name.startsWith("_ga"));
 
-/** Every request to Google, answered here: nothing reaches Google from the tests. */
 async function interceptGoogle(context: BrowserContext) {
   const requests: string[] = [];
   await context.route(GOOGLE, (route) => {
@@ -56,15 +52,10 @@ type THit = {
   location: string | null;
   referrer: string | null;
   title: string | null;
-  /** the app_language user property the hit carries */
   language: string | null;
   raw: string;
 };
 
-/**
- * GA's real gtag.js, loaded from Google, with every hit it sends captured and answered here:
- * what Google would receive. gtag.js batches hits for a few seconds.
- */
 async function captureHits(context: BrowserContext) {
   const hits: THit[] = [];
   await context.route(ANY_GOOGLE, (route) => {
@@ -101,7 +92,6 @@ async function captureHits(context: BrowserContext) {
 }
 const pageViews = (hits: readonly THit[]) => hits.filter(({ event }) => event === "page_view");
 
-/** The page titles our code has queued for GA (gtag("set", { page_title })), in order. */
 const queuedTitles = (page: Page) =>
   page.evaluate(() =>
     (window.dataLayer ?? [])
@@ -113,7 +103,6 @@ const queuedTitles = (page: Page) =>
       ),
   );
 
-/** What our code queued for GA, in order: each app language set and each page view. */
 const queuedLanguageAndViews = (page: Page) =>
   page.evaluate(() =>
     (window.dataLayer ?? [])
@@ -130,7 +119,6 @@ const queuedLanguageAndViews = (page: Page) =>
       }),
   );
 
-/** Picks a language on the settings page. */
 async function chooseLanguage(page: Page, code: string) {
   await page.getByTestId("language-switcher").click();
   await page.getByTestId(`language-option-${code}`).click();
@@ -227,7 +215,6 @@ test.describe("Google Analytics, asked first", () => {
       .poll(() => requests.some((url) => url.includes(`/gtag/js?id=${E2E_GA_ID}`)))
       .toBe(true);
     expect(await storedChoice(page)).toBe("granted");
-    // * our defaults are queued before GA's own config
     const queue = await page.evaluate(() =>
       (window.dataLayer ?? []).map((entry) => Array.from(entry as ArrayLike<unknown>)),
     );
@@ -266,7 +253,6 @@ test.describe("Google Analytics, asked first", () => {
     await expect(banner(page)).toHaveCount(0);
     await expect.poll(() => requests.some((url) => url.includes("/gtag/js"))).toBe(true);
 
-    // * as gtag would have set them
     await context.addCookies(
       GA_COOKIES.map((name) => ({ name, value: "GA1.1.1", domain: "localhost", path: "/" })),
     );
@@ -340,11 +326,9 @@ test.describe("Google Analytics, asked first", () => {
       .toEqual(["app_language=de", "page_view", "app_language=uk", "page_view"]);
   });
 
-  // * opt-in (npm run test:e2e:analytics): loads gtag.js from Google; run before a release
   test.describe("page views, with GA's real script", { tag: REAL_GTAG_TAG }, () => {
     test.describe.configure({ timeout: 90_000 });
     test.use({ geolocation: HERE, permissions: ["geolocation"] });
-    // * each test's page views, in the report (annotation "page_views"): count and paths
     let recorded: THit[] = [];
     test.afterEach(async ({}, testInfo) => {
       const views = pageViews(recorded).map(({ location }) => new URL(location ?? ORIGIN).pathname);
@@ -369,13 +353,11 @@ test.describe("Google Analytics, asked first", () => {
         }),
       );
 
-      // * a filter: the query changes, the path doesn't
       await pickInSidebar(page, "Cell resolution", "10m");
       await expect.poll(() => new URL(page.url()).searchParams.get("grid")).toBe("10m");
       await page.waitForTimeout(FLUSH_MS);
       expect(pageViews(hits)).toHaveLength(1);
 
-      // * the reader's own place: coordinates in the URL, their label in the document title
       await page
         .getByRole("button", { name: /my location/i })
         .first()
@@ -384,7 +366,6 @@ test.describe("Google Analytics, asked first", () => {
       await expect(page).toHaveTitle(/Valladolid|My location/);
 
       await page.getByRole("banner").getByRole("link", { name: "About" }).first().click();
-      // * the navbar carries the filters: the URL keeps them, the hit doesn't
       await expect(page).toHaveURL(/\/about(\?|$)/);
       await expect.poll(() => pageViews(hits).length, HIT_POLL).toBe(2);
       await page.waitForTimeout(FLUSH_MS);
@@ -471,7 +452,6 @@ test.describe("Google Analytics, asked first", () => {
       await expect(banner(page)).toBeVisible();
       // * trial: Playwright's hit test, nothing clicked
       await page.getByRole("button", { name: "Contents" }).click({ trial: true });
-      // * the page's end scrolls above the banner
       const main = page.locator("main");
       await main.evaluate((element) => element.scrollTo(0, element.scrollHeight));
       const footer = page.getByRole("contentinfo");

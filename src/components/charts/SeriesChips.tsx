@@ -10,12 +10,6 @@ import { useTranslations } from "next-intl";
 import { SERIES_CHIP_FRAME_CLASS } from "./charts.constant";
 import type { TSeriesChipsProps } from "./charts.type";
 
-/**
- * The overlay's series as chips — its entity legend: each with its bars as the bar style draws
- * them (hatch, shade or none) and its curves' shape (entries in list order):
- * tap toggles one; the last one shown stays on (locked, as the last variable
- * does). Hovering or focusing a chip highlights its series.
- */
 export function SeriesChips({
   entries,
   barStyle = DEFAULT_BAR_STYLE,
@@ -25,7 +19,6 @@ export function SeriesChips({
 }: TSeriesChipsProps) {
   const t = useTranslations();
   const [lockedId] = shown.length === 1 ? shown : [];
-  // * a year just added flashes where it landed in the order
   const arrivalRef = useArrivalFlash<HTMLDivElement>(entries.map(({ series }) => series.id));
 
   return (

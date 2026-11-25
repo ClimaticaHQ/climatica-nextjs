@@ -7,13 +7,6 @@ import { DATA_UPDATE_CLASSES as C } from "./DataUpdate.constant";
 import type { TDataUpdateProviderProps } from "./DataUpdate.type";
 import { DataUpdateContext } from "./DataUpdateContext";
 
-/**
- * A page's data updates, for the cards inside: which series' data changed (by value, so the
- * first load and unchanged refetches don't count), and whether an update is loading — the
- * query's own isFetching, shown only past MOTION.UPDATE_LOADING_DELAY_MS. Announces each
- * update once in a polite live region. With motion off the loading state still shows, without
- * moving (animations.css).
- */
 export function DataUpdateProvider({
   series,
   announcement,
@@ -31,8 +24,7 @@ export function DataUpdateProvider({
   const next = reduceDataUpdate(state, { series, announcement });
   if (next !== state) setState(next);
 
-  // * the cards' effects run before this one: in the update's commit they see it fresh;
-  // * cards mounting later (chart type / layout) see it consumed and don't flash for it
+  // * the cards' effects run before this one: in the update's commit they see it fresh
   const consumedIdRef = useRef<number>(NO_DATA_UPDATE.id);
   useEffect(() => {
     consumedIdRef.current = state.update.id;

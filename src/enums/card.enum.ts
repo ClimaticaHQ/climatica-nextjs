@@ -1,4 +1,3 @@
-// * a card's corner radius, by nesting level: page-level cards, small cards, cards inside a card
 export enum ECardSize {
   LG = "lg",
   MD = "md",
@@ -6,16 +5,12 @@ export enum ECardSize {
 }
 
 export enum ECardPadding {
-  // * the content runs to the border (tables, bars, the map)
   NONE = "none",
-  // * a split panel: 10 px on phones, 16 px from `sm`
   PANEL = "panel",
-  // * a small stat card
   COMPACT = "compact",
   DEFAULT = "default",
 }
 
-// * a stat card's value: XL for a short number, LG for text that may wrap (a city name)
 export enum EStatValueSize {
   LG = "lg",
   XL = "xl",
@@ -23,13 +18,10 @@ export enum EStatValueSize {
 
 export enum ECardBackground {
   DEFAULT = "default",
-  // * a placeholder surface (the map skeleton)
   MUTED = "muted",
-  // * a block that stands out from the cards around it (a callout, a featured card)
   HIGHLIGHT = "highlight",
 }
 
-// * a stat card's label and sub line: XS in the app's stats, BASE on the Info pages
 export enum EStatLabelSize {
   XS = "xs",
   BASE = "base",

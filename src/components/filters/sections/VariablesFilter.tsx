@@ -13,7 +13,6 @@ import { useTranslations } from "next-intl";
 import { FilterNote, FilterSection } from "../FilterSection";
 import type { TFilterSectionRenderProps } from "../filters.type";
 
-/** Variable chips; the last selected one stays on (locked). */
 export function VariablesFilter({
   values,
   context,

@@ -19,9 +19,6 @@ import type {
   TWalterLiethOverlayLegendItemsArgs,
 } from "@/types";
 
-// * the legend items of every chart type — the screen (CSS-var colors) and the export
-// * (resolved colors) build them here, so both always list the same entries
-
 const line = (color: string, dash?: string): TLegendSwatch => ({
   kind: ELegendSwatch.LINE,
   color,
@@ -29,7 +26,6 @@ const line = (color: string, dash?: string): TLegendSwatch => ({
 });
 const bar = (color: string): TLegendSwatch => ({ kind: ELegendSwatch.BAR, color });
 
-/** Variable entries (tmax, tavg, tmin, prec) the chart shows — hidden ones drop out. */
 function variableItems(
   labels: TVariableLegendLabels,
   visible: TVisibleSeries,
@@ -41,11 +37,9 @@ function variableItems(
   });
 }
 
-/** A month's bar swatch when bars are coloured by aridity: its legend entry's (arid / humid). */
 export const getAridityBarSwatch = (palette: TAridityPalette, isArid: boolean) =>
   bar(isArid ? palette.arid : palette.humid);
 
-// * the bars by aridity — humid first: they stand for precipitation, so it has no entry of its own
 function aridityItems(labels: TAridityLegendLabels, aridity: TAridityPalette): TLegendItem[] {
   return [
     { key: "humid", label: labels.humid, swatch: bar(aridity.humid) },
@@ -53,7 +47,6 @@ function aridityItems(labels: TAridityLegendLabels, aridity: TAridityPalette): T
   ];
 }
 
-/** Entities by shape — and by hatch beside it where the chart draws their bars. */
 const markerItems = (
   series: readonly TLegendSeries[],
   markerColor: string,
@@ -76,7 +69,6 @@ const markerItems = (
     isMuted: isHidden === true,
   }));
 
-/** The WL frost band's entry: a cell like the band's — frost-filled, outlined. */
 const frostItem = (
   labels: TWalterLiethLegendLabels,
   { fill, outline }: TLegendFrostColors,
@@ -86,7 +78,6 @@ const frostItem = (
   swatch: { kind: ELegendSwatch.FROST, color: fill, outline },
 });
 
-/** WL diagram (single and split): the two curves, the three regimes and the frost band. */
 export function getWalterLiethLegendItems({
   labels,
   palette,
@@ -113,10 +104,6 @@ export function getWalterLiethLegendItems({
   ];
 }
 
-/**
- * WL overlay: the entities by shape, the curves in the diagram's semantic colours, and the
- * regimes and frost band of the hatched series when there is one.
- */
 export function getWalterLiethOverlayLegendItems({
   labels,
   series,
@@ -133,7 +120,6 @@ export function getWalterLiethOverlayLegendItems({
   ];
 }
 
-/** One series' variables in the standard chart's styles — its own color per variable. */
 export const getStandardVariableSwatches = (colors: TLegendSeriesColors) => ({
   tmax: line(colors.tmax),
   tavg: line(colors.tavg, CHART_LINE_DASH.STANDARD.tavg),
@@ -141,10 +127,6 @@ export const getStandardVariableSwatches = (colors: TLegendSeriesColors) => ({
   prec: bar(colors.prec),
 });
 
-/**
- * Standard chart, one entity or side by side (every panel in the same semantic colours): its
- * visible lines, then the bars' humid / arid fills.
- */
 export function getStandardLegendItems({
   labels,
   colors,
@@ -156,10 +138,6 @@ export function getStandardLegendItems({
   return [...shown, ...(visible.prec ? aridityItems(labels, aridity) : [])];
 }
 
-/**
- * Overlay: each entity by its bars' hatch and its points' shape, then the lines in their
- * semantic colours and the overlay's dashes, then the bars' humid / arid fills.
- */
 export function getSeriesLegendItems({
   labels,
   series,
@@ -183,11 +161,9 @@ export function getSeriesLegendItems({
   ];
 }
 
-/** A swatch's own width: an entity's is two squares (hatch, shape) side by side. */
 export const getLegendSwatchWidth = (swatch: TLegendSwatch, size: TSwatchSize) =>
   swatch.kind === ELegendSwatch.ENTITY ? size.height * 2 + CHART_LEGEND.ENTITY_GAP : size.width;
 
-/** The swatch box for a legend font size — swatches scale with the text (screen and export). */
 export const getSwatchSize = (fontSize: number): TSwatchSize => ({
   width: Math.round(fontSize * CHART_LEGEND.SWATCH_WIDTH_RATIO),
   height: Math.round(fontSize * CHART_LEGEND.SWATCH_HEIGHT_RATIO),

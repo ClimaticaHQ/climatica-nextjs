@@ -15,11 +15,6 @@ function getGeolocationErrorMessage(code: GeolocationPositionError["code"]): TGe
   return errorMap[code] ?? GEOLOCATION_ERRORS.UNKNOWN;
 }
 
-/**
- * The reader's position, like a map click: selected at once under its coordinates (the climate
- * data are for this exact spot), then renamed when the place lookup answers. A failed lookup
- * keeps the coordinates; the position itself was found.
- */
 export function useGeolocation(): TUseGeolocationReturn {
   const t = useTranslations();
   const placeLookup = usePlaceLookup();

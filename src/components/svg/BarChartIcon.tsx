@@ -1,4 +1,3 @@
-/** Standard chart mode — precipitation bars. */
 export function BarChartIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">

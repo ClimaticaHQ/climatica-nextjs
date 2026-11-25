@@ -1,7 +1,6 @@
 import type { TVisibleSeries } from "@/types";
 import { WALTER_LIETH_AXIS, WALTER_LIETH_FROST } from "./walterLieth.constant";
 import type { TGridAxesStyle } from "@/types";
-/** What every SVG export shares; each export's own layout spreads it and adds its own geometry. */
 export const EXPORT_SVG_SHARED_LAYOUT = {
   width: 1000,
   paddingX: 40,
@@ -12,7 +11,6 @@ export const EXPORT_SVG_SHARED_LAYOUT = {
   footerLineHeight: 15,
   footerFontSize: 11,
 
-  // * share url shrinks down to this size, then wraps
   footerUrlMinFontSize: 10,
   footerUrlAvgCharWidthRatio: 0.55,
   footerBottomMargin: 20,
@@ -21,42 +19,31 @@ export const EXPORT_SVG_SHARED_LAYOUT = {
 // * heat-map tiles are fetched at fittedZoom + log2(scale) to match
 export const EXPORT_PNG_SCALE = 2;
 
-// * CSV decimals, with "." whatever the locale: these files are for machines, not readers
+// * "." whatever the locale: these files are for machines
 export const CSV_DECIMALS = { COORDINATE: 4, HEATMAP_VALUE: 2, MARTONNE: 1 } as const;
 
-/** The single-city export: one chart with its monthly values and aridity legend. */
 export const EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,
   statsY: 92,
   statsHeight: 54,
-  // * the screen's full plot margins inside the page padding
   chartMarginLeft: EXPORT_SVG_SHARED_LAYOUT.paddingX + WALTER_LIETH_AXIS.WIDTH,
   chartMarginRight: EXPORT_SVG_SHARED_LAYOUT.paddingX + WALTER_LIETH_AXIS.WIDTH,
   chartTop: 170,
   chartHeight: 380,
-  // * below the legend (which follows the plot's monthly strip)
   footerGap: 44,
 } as const;
 
-// * the comparison exports (Compare Cities, Compare Periods)
 export const COMPARE_EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,
-  // * the stats table's top; the chart body starts under it (EXPORT_TABLE.GAP_BELOW) and each
-  // * body (WL or standard, split or overlay) sets its own height
   statsY: 92,
-  // * the overlay's hatch patterns' id prefix
   hatchPrefix: "cmp-hatch",
 } as const;
 
-// * the heat map export: its height follows its content
 export const HEATMAP_EXPORT_SVG_LAYOUT = {
   ...EXPORT_SVG_SHARED_LAYOUT,
   statsY: 96,
   statsHeight: 70,
 
-  // * map section: fills the same content width as every other section (width -
-  // paddingX * 2), fitted to the selection's bbox (+ paddingRatio) at a zoom
-  // computed independently of the live map's own pan/zoom — see buildFitZoom()
   mapY: 190,
   mapWidth: 920,
   mapHeight: 400,
@@ -66,24 +53,17 @@ export const HEATMAP_EXPORT_SVG_LAYOUT = {
   footerY: 670,
 } as const;
 
-// * safety limits for the heat-map export's basemap-tile fetch
 export const HEATMAP_EXPORT_TILE_LIMITS = {
   fetchTimeoutMs: 5000,
-  // * above this, tiles are fetched at fittedZoom instead of the sharpened zoom
   maxTileCount: 64,
 } as const;
 
-// * compare export in Walter-Lieth mode — starts where the standard chart would (chartTop)
 export const COMPARE_WL_EXPORT_LAYOUT = {
   splitGap: 30,
-  // * split panel card: header (name, period, stats cells) above the plot, all inside it
   panelPadding: 16,
   panelRadius: 10,
-  // * name and subtitle, then room for °C / mm above the plot — the table on top has the stats
   panelHeaderHeight: 64,
-  // * same side margins as the desktop diagram; °C / mm sit above the axes, not beside them
   panelPlotMarginX: WALTER_LIETH_AXIS.WIDTH,
-  // * below the plot, inside the card: room for the frost band and the month labels
   panelFooterHeight: 26 + WALTER_LIETH_FROST.BAND_HEIGHT.FULL,
   splitPlotHeight: 300,
   overlayPlotMarginX: EXPORT_SVG_SHARED_LAYOUT.paddingX + WALTER_LIETH_AXIS.WIDTH,
@@ -91,21 +71,17 @@ export const COMPARE_WL_EXPORT_LAYOUT = {
   footerGap: 44,
 } as const;
 
-// * a share URL in the footer wraps only before these: "?" and each "&" start a new part
 export const URL_BREAK_PATTERN = /(?=[?&])/;
 
-// * every export SVG's font stack — text is measured in the same stack (measureExportText)
+// * exported text is measured in the same stack (measureExportText)
 export const EXPORT_FONT_FAMILY = "Inter, Roboto, Helvetica Neue, Arial, sans-serif";
 
-// * text metrics for exports: the fallback estimate where no canvas can measure text
 export const EXPORT_TEXT = {
-  // * average glyph width as a share of font size (Inter/Roboto-like sans-serif)
   AVG_CHAR_WIDTH_RATIO: 0.55,
   LINE_HEIGHT_RATIO: 1.4,
   NOTICE_FONT_SIZE: 13,
 } as const;
 
-// * compare exports before the chart has reported its chips: max, min and precipitation
 export const COMPARE_EXPORT_DEFAULT_VISIBLE: TVisibleSeries = {
   tmax: true,
   tmin: true,
@@ -113,40 +89,25 @@ export const COMPARE_EXPORT_DEFAULT_VISIBLE: TVisibleSeries = {
   prec: true,
 };
 
-// * the monthly values table under each exported plot, in that plot's gutters — the screen's
 export const EXPORT_MONTHLY_VALUES = {
-  // * px below the month labels' baseline
   GAP_ABOVE: 8,
-  // * one line per series in a cell (overlay: A above B), padded top and bottom
   LINE_HEIGHT: 16,
   ROW_PADDING: 5,
-  // * the values' size follows the table's width, as on screen: a split panel's is smaller
   WIDE_MIN_WIDTH: 576,
   VALUE_FONT_SIZE: { WIDE: 13, NARROW: 11 },
-  // * a static file can't switch layout: where a column is too narrow for its longest value
-  // * ("−44.0"), the strip's values shrink to fit — the gap kept, never below the floor
+  // * a static file can't switch layout: a too-narrow column's values shrink to fit, never below the floor
   FIT: { CHAR_WIDTH_EM: 0.6, CELL_GAP: 4, MIN_FONT_SIZE: 8 },
   VALUE_FONT_WEIGHT: 500,
   UNIT_FONT_SIZE: 11,
   UNIT_FONT_WEIGHT: 600,
-  // * an overlay's markers beside the unit: the unit ends this far left of the gutter's centre,
-  // * the markers start this far right of it
   UNIT_MARKER_GAP: 2,
-  // * the standard overlay's row headers: the unit at the gutter's left, the series' labels beside
-  // * it, one level with each value line
   ROW_HEADER: { PADDING_X: 6, UNIT_GAP: 6 },
-  // * px — the widest the series' labels may take beside the unit: past it, their short labels
-  // * (their full names are in the legend)
   ROW_HEADER_MAX_WIDTH: 120,
-  // * a line's baseline below its centre
   BASELINE: 4,
 } as const;
 
-// * every export table (stats, comparison, monthly) in one style, the City Climate one: a
-// * square frame, a plain grid, centred values, no header fill
 export const EXPORT_TABLE = {
   HEADER_HEIGHT: 32,
-  // * a head with a second line under it (the difference's direction)
   HEADER_WITH_SUBTITLE_HEIGHT: 44,
   ROW_HEIGHT: 26,
   PADDING_X: 10,
@@ -154,47 +115,33 @@ export const EXPORT_TABLE = {
   HEADER_FONT_SIZE: 13,
   HEADER_FONT_WEIGHT: 700,
   SUBTITLE_FONT_SIZE: 11,
-  // * a two-line head: the name this far above the head's centre, the subtitle this far below
   SUBTITLE_OFFSET: 8,
   VALUE_FONT_SIZE: 13,
   VALUE_FONT_WEIGHT: 600,
-  // * a line's baseline below its centre
   BASELINE: 4,
-  // * a series' shape before its name in a head
   MARKER_SIZE: 8,
   MARKER_GAP: 8,
-  // * space below a table on top, above the chart: room for the °C / mm titles over the plot
   GAP_BELOW: 36,
 } as const;
 
-// * the exports' monthly table: the city page's two rows, or a row per variable and series
 export const EXPORT_MONTHLY_TABLE = {
-  // * the table's own hatch patterns' id prefix: it's drawn under charts that define none
   HATCH_PREFIX: "tbl-hatch",
   ROW_HEIGHT: 26,
-  // * px — the label column's least width; wider rows widen it (getMonthlyTableLabelWidth)
   LABEL_MIN_WIDTH: 110,
   LABEL_PADDING_X: 10,
   LABEL_FONT_SIZE: 11,
-  // * the unit in a row label, in its chart color
   UNIT_FONT_WEIGHT: 600,
-  // * px between the plot's month labels and the table below them (city export)
   GAP_BELOW_PLOT: 10,
   VALUE_FONT_SIZE: 16,
   VALUE_FONT_WEIGHT: 600,
-  // * text baselines within a row (px below the row's centre)
   LABEL_BASELINE: 4,
   VALUE_BASELINE: 5,
-  // * a series' marker before its row label, and the gap after it
   MARKER_SIZE: 8,
   MARKER_GAP: 6,
-  // * compare export: space between the chart's legend and the table
   GAP_ABOVE: 32,
 } as const;
 
-// * WL export text: month labels under a panel, the panel header lines
 export const WALTER_LIETH_EXPORT_TEXT = {
-  // * every export's month labels (WL and standard), below the frost band's reserved room
   MONTH_LABEL_OFFSET: 18 + WALTER_LIETH_FROST.BAND_HEIGHT.FULL,
   MONTH_LABEL_FONT_SIZE: 11,
   PANEL_NAME_Y: 16,
@@ -207,28 +154,20 @@ export const WALTER_LIETH_EXPORT_TEXT = {
   PANEL_TEXT_FONT_SIZE: 12,
 } as const;
 
-// * every export plot's axes, like the screen: tick labels this far from the plot, °C / mm
-// * upright this far above it
 export const EXPORT_AXES_STYLE = {
   tickGap: 4,
   unitTitlesAbove: 8,
 } as const satisfies TGridAxesStyle;
 
-// * WL export legends: items flow left to right and wrap onto new rows
-// * (font size and swatch box come from CHART_LEGEND, like the screen's ChartLegend)
 export const EXPORT_LEGEND = {
   ROW_HEIGHT: 22,
   ITEM_GAP: 24,
   SWATCH_TEXT_GAP: 6,
-  // * the swatch sits this far below the text baseline's top, so both look centered
   SWATCH_BASELINE_DROP: 1,
-  // * from the content above (split cards, or an overlay's month labels) to the legend's first
-  // * baseline — the same for every compare export layout
   GAP: 30,
 } as const;
 
-// * attribute that makes an element re-declare the light (:root) tokens — see global.css
+// * makes an element re-declare the light :root tokens (global.css)
 export const EXPORT_PALETTE_ATTRIBUTE = "data-export-palette";
 
-// * a colour token reference in an export's markup — resolved before the file is saved
 export const CSS_VAR_REFERENCE_PATTERN = /var\((--[\w-]+)\)/g;

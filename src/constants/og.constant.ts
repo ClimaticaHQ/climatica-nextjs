@@ -1,8 +1,4 @@
-/**
- * Satori (next/og's ImageResponse renderer) does not support CSS custom
- * properties, so the brand colors from tokens.css are duplicated here as
- * literal hex values for use only inside the OG image route.
- */
+/** Satori (next/og) can't read CSS custom properties, so the brand colours are duplicated here as hex */
 export const OG_IMAGE_COLORS = {
   primary: "#22a274",
   dark: "#10835b",

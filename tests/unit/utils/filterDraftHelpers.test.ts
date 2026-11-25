@@ -25,7 +25,6 @@ describe("filter draft helpers", () => {
 
   it("areFiltersEqual compares what the URL would carry", () => {
     const withYear = setFilterValue(FILTER_DEFAULTS, EFilterKey.WEATHER_YEAR, 1990);
-    // * the year means nothing with the Climate dataset
     expect(areFiltersEqual(FILTER_DEFAULTS, withYear)).toBe(true);
     const weather = setFilterValue(withYear, EFilterKey.DATASET, "weather");
     expect(areFiltersEqual(FILTER_DEFAULTS, weather)).toBe(false);

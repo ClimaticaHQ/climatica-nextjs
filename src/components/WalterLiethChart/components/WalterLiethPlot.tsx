@@ -33,7 +33,6 @@ import { WalterLiethFrostBand } from "./WalterLiethFrostBand";
 import { WalterLiethHoverBand } from "./WalterLiethHoverBand";
 import { WalterLiethLayer } from "./WalterLiethLayer";
 
-/** Recharts shell: shared axes (°C left, mm right, same domain), tooltip, sync, layers. */
 export function WalterLiethPlot({
   rows,
   domain,
@@ -83,7 +82,6 @@ export function WalterLiethPlot({
             if (!isStatic) onActiveMonthIndexChange?.(null);
           }}
         >
-          {/* * horizontal only — no month lines, matching the export */}
           <CartesianGrid
             vertical={false}
             strokeDasharray={WALTER_LIETH_DASH.GRID}
@@ -105,8 +103,7 @@ export function WalterLiethPlot({
             yAxisId="left"
             ticks={axes.tempTicks}
             tickFormatter={axes.formatTempTick}
-            // * every °C tick — Recharts would otherwise drop some at small heights, including
-            // * the 0 °C tick that marks the shared 0 °C / 0 mm baseline
+            // * every °C tick: Recharts would otherwise drop some at small heights, 0 °C included
             interval={0}
           />
           <YAxis
@@ -118,7 +115,6 @@ export function WalterLiethPlot({
             interval="preserveStartEnd"
             tickFormatter={axes.formatPrecTick}
           />
-          {/* * the hovered month's band — the same color as the monthly values table's */}
           <Customized
             component={WalterLiethHoverBand}
             activeMonthIndex={activeMonthIndex}
@@ -126,7 +122,6 @@ export function WalterLiethPlot({
             yMax={domain.plotMax}
           />
           <ChartUnitTitles isCompact={isCompact} isNarrow={isNarrow} />
-          {/* * on touch, the tapped month's */}
           {!isStatic && (
             <Tooltip
               key={getTouchTooltipKey(tooltipState)}

@@ -38,10 +38,7 @@ export interface TWorldClimPixelResource {
   valueMonth12: number;
 }
 
-/**
- * Raw binding returned by pixelvaluesinbox / pixelvaluesinpolygonGEO.
- * One row per pixel × month (not one row per pixel).
- */
+/** SCRAPI returns one row per pixel × month, not one per pixel */
 export type TRawPixelValueBinding = {
   value: TSparqlValue;
   month: TSparqlValue;
@@ -56,10 +53,7 @@ export type TRawPixelValueResponse = {
   results: { bindings: TRawPixelValueBinding[] };
 };
 
-/**
- * Raw binding returned by avgpixelvaluesinbox / avgpixelvaluesinpolygonGEO.
- * One row per raster × month.
- */
+/** SCRAPI returns one row per raster × month */
 export type TRawAvgValueBinding = {
   avgval: TSparqlValue;
   month: TSparqlValue;
@@ -73,10 +67,6 @@ export type TRawAvgValueResponse = {
   results: { bindings: TRawAvgValueBinding[] };
 };
 
-/**
- * Synthesized binding — one per pixel, produced by grouping the raw per-month rows.
- * valueMonth01..12 are populated from the raw `value` field keyed by month number.
- */
 export type TWorldClimBoxBinding = {
   pixel: TSparqlUriValue;
   cell?: TSparqlUriValue;
@@ -103,7 +93,6 @@ export type TWorldClimBoxResponse = {
   };
 };
 
-/** Synthesized avg binding — one per raster/period, produced by grouping raw per-month rows. */
 export type TWorldClimAvgBoxBinding = {
   raster?: TSparqlUriValue;
   variable?: TSparqlUriValue;
@@ -142,9 +131,6 @@ export type TWorldClimCellResource = {
   elevation?: number;
 };
 
-/** Returned by GET /resource?id=Raster&iri=... — carries the raster's real
- * source-dataset provenance (creator/version), which is what backs the export
- * footer's attribution line instead of a hardcoded app-config value. */
 export type TWorldClimRasterResource = {
   iri: string;
   isClimate?: boolean;

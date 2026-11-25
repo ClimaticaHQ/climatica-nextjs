@@ -23,15 +23,11 @@ import type {
 } from "@/types";
 import { getFinestGridSize, isGridSizeOffered } from "./filters.util";
 
-/** Whether a pathname is one of the Info pages. */
 export function isInfoRoute(pathname: string) {
   return INFO_PAGES.some(({ route }) => route === pathname);
 }
 
-/**
- * A person's initials for an avatar: the first letters of their first two words — the given
- * name and the first surname, as Spanish names read ("Pablo García Zarza" → "PG").
- */
+/** the given name and the first surname, as Spanish names read */
 export function getInitials(name: string) {
   return name
     .trim()
@@ -43,14 +39,12 @@ export function getInitials(name: string) {
     .toUpperCase();
 }
 
-/** The copyright's years: the first release to now, one year while they're the same. */
 export function formatCopyrightYears({ firstYear, currentYear }: TCopyrightYearsArgs) {
   return currentYear > firstYear
     ? `${firstYear}${COPYRIGHT.YEARS_SEPARATOR}${currentYear}`
     : String(firstYear);
 }
 
-/** A grid's resolution as an angle — arc-seconds below a minute (30″), else arc-minutes (2.5′). */
 export function getGridArc(size: TCellSize): TGridArc {
   const seconds = ARC_UNITS.SECONDS_PER_DEGREE / CELLS_PER_DEGREE[size];
   return seconds < ARC_UNITS.SECONDS_PER_MINUTE
@@ -62,15 +56,10 @@ export function getGridArc(size: TCellSize): TGridArc {
       };
 }
 
-/** A grid cell's side at the equator, in km. */
 export function getCellSizeKm(size: TCellSize) {
   return (GRID_DELTA[size] ?? 0) * EQUATOR_KM_PER_DEGREE;
 }
 
-/**
- * The resolutions table, coarsest first, with where each grid exists — asked of the filters'
- * own rule (isGridSizeOffered), so the page can't tell a different story from the selector.
- */
 export function getResolutionRows(): TResolutionRow[] {
   return Object.values(CELL_SIZES).map((size) => ({
     size,
@@ -85,7 +74,6 @@ export function getResolutionRows(): TResolutionRow[] {
   }));
 }
 
-/** The finest resolution the other climate normals and the weather years go down to. */
 export function getFinestGridSizeBeyondFullPeriod(): TCellSize {
   const otherNormals = Object.values(CLIMATE_PERIODS)
     .filter((climatePeriod) => climatePeriod !== FULL_VARIABLES_CLIMATE_PERIOD)
@@ -96,12 +84,10 @@ export function getFinestGridSizeBeyondFullPeriod(): TCellSize {
   ]);
 }
 
-/** A Google Scholar search for a work's exact title (quoted), not a record that can move. */
 export function getScholarSearchUrl(title: string) {
   return `${REFERENCE_LINKS.SCHOLAR_SEARCH_URL}${encodeURIComponent(`"${title}"`)}`;
 }
 
-/** A reference's link: its DOI (shown as doi:…), else a Scholar search for its title, else none. */
 export function getReferenceLink({ url, title }: TReferenceLinkArgs): TReferenceLink | null {
   if (url !== undefined) {
     return {

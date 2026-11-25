@@ -4,10 +4,6 @@ import { useXAxisScale, useYAxisScale } from "recharts";
 import type { TWalterLiethLayerProps } from "../WalterLiethChart.type";
 import { WalterLiethSeriesLayer } from "./WalterLiethSeriesLayer";
 
-/**
- * Draws each series' precomputed segment polygons and curves in Recharts' pixel space.
- * Pure projection — every WL rule (crossings, compression, regimes) lives in the utils.
- */
 export function WalterLiethLayer({
   layers,
   xDomain,
@@ -21,7 +17,6 @@ export function WalterLiethLayer({
 
   const scaleX = (x: number) => xScale(x) ?? 0;
   const scaleY = (y: number) => yScale(y) ?? 0;
-  // * hatching follows the month width, so it reads the same at every chart size
   const geometry = getHatchGeometry(scaleX(1) - scaleX(0));
   const originX = scaleX(xDomain[0]);
 

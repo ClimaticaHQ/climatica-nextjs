@@ -5,7 +5,6 @@ import { ROUTES } from "./route.constant";
 import { TEAM } from "./team.constant";
 import { TIME } from "./time.constant";
 
-// * every Info section's anchor: its element id and its navigation link's hash
 export const INFO_SECTION_IDS = {
   HOW_IT_WORKS: "how-it-works",
   DATA_SOURCES: "data-sources",
@@ -26,7 +25,6 @@ export const INFO_SECTION_IDS = {
   REFERENCES: "references",
 } as const;
 
-// * the Info pages in the sidebar's order, each with its sections in reading order
 export const INFO_PAGES: readonly TInfoPage[] = [
   {
     route: ROUTES.ABOUT,
@@ -73,18 +71,14 @@ export const INFO_PAGES: readonly TInfoPage[] = [
   },
 ];
 
-// * a page's sections by id, for its view
 export const INFO_SECTIONS: Readonly<Record<string, TInfoSection>> = Object.fromEntries(
   INFO_PAGES.flatMap(({ sections }) => sections.map((entry) => [entry.id, entry])),
 );
 
-// * the resolution selector's "What do resolutions mean?" link
 export const RESOLUTIONS_HELP_HREF = `${ROUTES.ABOUT_DATA}#${INFO_SECTION_IDS.RESOLUTIONS}`;
 
-// * km per degree of longitude at the equator (WGS 84): a grid cell's side there
 export const EQUATOR_KM_PER_DEGREE = 111.32;
 
-// * a grid's resolution: in arc-seconds below a minute, else in arc-minutes
 export const ARC_UNITS = {
   SECONDS_PER_DEGREE: 3600,
   SECONDS_PER_MINUTE: 60,
@@ -92,22 +86,14 @@ export const ARC_UNITS = {
   SECOND_SYMBOL: "″",
 } as const;
 
-// * how long a copy button says "Copied" (or that copying failed)
 export const COPY_FEEDBACK_MS = TIME.IN_MILLISECONDS.SECOND * 2;
 
-// * the Info navigation's scroll spy (useActiveSection): a section is current once its top
-// * crosses a line this share down <main>, under the sections' scroll margin
 export const SCROLL_SPY = {
   LINE_PERCENT: 30,
-  // * px from the bottom that count as scrolled to the end: the last section is then current
   END_TOLERANCE_PX: 4,
-  // * the user scrolling (wheel, touch, keys, the scrollbar) ends the hold on a clicked section
   USER_SCROLL_EVENTS: ["wheel", "touchmove", "keydown", "pointerdown"],
 } as const;
 
-// * where each Info figure's data come from (their fixtures are in components/info): the Walter-
-// * Lieth figure a place with frost, arid, humid and very humid months; the indicators figure one
-// * with frost and arid months under 100 mm
 export const FIGURE_PLACES = {
   WALTER_LIETH: {
     NAME: "Beijing",
@@ -121,8 +107,7 @@ export const FIGURE_PLACES = {
   },
 } as const;
 
-// * a reference's link: its DOI, or a Google Scholar search for its exact title where it has
-// * none (never a record or cluster URL, which can change). Proper names, not translated
+// * never a Scholar record or cluster URL: those can change
 export const REFERENCE_LINKS = {
   DOI_PREFIX: "https://doi.org/",
   DOI_LABEL_PREFIX: "doi:",

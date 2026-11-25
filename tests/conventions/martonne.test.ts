@@ -8,7 +8,6 @@ import { describe, expect, it } from "vitest";
 const translate: TTranslate = createTranslator<Messages>({ locale: "en", messages });
 const echo = (key: string) => key;
 
-// * "<10 martonne.arid" → { min: null, max: 10, label: "martonne.arid" }
 function parseClass(text: string) {
   const { BELOW, ABOVE, RANGE } = MARTONNE_SCALE_TEXT;
   const [bounds = "", ...label] = text.split(" ");

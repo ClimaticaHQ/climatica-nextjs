@@ -1,12 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-// * a 1° box over Lviv: 6 × 6 cells at 10′
 const BOX = "north=50&south=49&west=23&east=24&grid=10m&var=tmax";
 const CELL_COUNT = "36";
 
 test.describe("Region Heatmap", () => {
-  // * regression: the API stops at 100 rows unless asked for more, and a Climate box returns
-  // * every normals period — the selected one went missing and its stats never loaded
+  // * regression: the API stops at 100 rows unless asked for more, and a Climate box returns every normals period
   test("a Climate box from the URL shows the region's stats", async ({ page }) => {
     await page.goto(`/heat-map?dataset=climate&period=c1970-2000&${BOX}`);
     const stats = page.getByTestId("region-stats");
@@ -26,8 +24,7 @@ test.describe("Region Heatmap", () => {
     await expect(stats.locator(".animate-pulse")).toHaveCount(0);
   });
 
-  // * regression: WorldClim stops at 10,000 rows per request, so a region past ~830 cells lost
-  // * the rest; it now loads as strips
+  // * regression: WorldClim stops at 10,000 rows per request, so a large region now loads as strips
   test("a region larger than one request loads every cell", async ({ page }) => {
     await page.goto(
       "/heat-map?dataset=climate&period=c1970-2000&grid=10m&var=tmax&north=50&south=45&west=20&east=26",
@@ -47,7 +44,6 @@ test.describe("Region Heatmap", () => {
   });
 
   test("drawing a box shows its live cell count, a warning past the cap", async ({ page }) => {
-    // * 30 s: most of the opening view (about 1° × 0.6°) holds past the cap of 2,000 cells
     await page.goto("/heat-map?dataset=climate&period=c1970-2000&grid=30s&var=tmax");
     await page.getByRole("button", { name: "Draw bounding box" }).click();
     const map = page.locator(".leaflet-container");

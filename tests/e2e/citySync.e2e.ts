@@ -21,20 +21,17 @@ test.describe("Picking a city", () => {
     await expect(results).toBeVisible({ timeout: 15_000 });
     await results.getByRole("button").first().click();
 
-    // * every block of the page describes the new city
     await expect(chartTitle).toContainText("Lisbon", { timeout: 30_000 });
     await expect(page.getByTestId("stat-cards")).not.toHaveText(parisStats, { timeout: 30_000 });
     await expect(chart.locator("caption").first()).toContainText("Lisbon");
     await expect(page).toHaveTitle(/^Lisbon/);
     await expect(page.locator("main")).not.toContainText("Paris");
 
-    // * the export is named after the new city
     await chart.getByRole("button", { name: "Export data" }).click();
     const download = page.waitForEvent("download");
     await chart.getByRole("button", { name: "PNG image" }).click();
     expect((await download).suggestedFilename()).toMatch(/^city-climate-lisbon-/);
 
-    // * synced: the other pages open on it, with its data
     await page.getByRole("link", { name: "Compare Cities" }).click();
     await expect(page.getByRole("heading", { level: 3 }).first()).toContainText("Lisbon", {
       timeout: 30_000,

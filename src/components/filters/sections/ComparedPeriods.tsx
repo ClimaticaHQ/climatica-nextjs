@@ -51,11 +51,6 @@ import type {
 } from "../filters.type";
 import { YearInput } from "../YearInput";
 
-/**
- * Compare Periods' own selectors on the page, shown below lg; every change applies at once. From
- * lg the sidebar's copy shows instead, as part of its draft. Both copies are always rendered
- * (the server's HTML too), each hidden by CSS where the other shows; both read the URL.
- */
 export function ComparedPeriods() {
   const filters = useFilters();
   const { applyFilters, updateFilters } = useFilterNavigation();
@@ -77,7 +72,6 @@ export function ComparedPeriods() {
   );
 }
 
-/** The two climate periods, or — with Weather — the compared years. */
 export function ComparedPeriodsSection({
   values,
   availablePeriods,
@@ -102,7 +96,6 @@ export function ComparedPeriodsSection({
   );
 }
 
-/** Period A and Period B, a swap button by B's label; a side never offers the other's period. */
 function PeriodPair({
   periods,
   availablePeriods,
@@ -160,12 +153,10 @@ function PeriodPair({
   );
 }
 
-/** The compared weather years, kept within FILTER_WEATHER_PERIODS_LIMITS. */
 function YearsEditor({ value, onChange, isCompact }: TYearsEditorProps) {
   const t = useTranslations();
   const [year, setYear] = useState<number | undefined>(undefined);
   const [errorKey, setErrorKey] = useState<string | null>(null);
-  // * in the page's order, each year its own marker; one just added flashes where it landed
   const compared = useComparedYears(value);
   const arrivalRef = useArrivalFlash<HTMLDivElement>(compared.years.map(String));
   const isFull = value.length >= FILTER_WEATHER_PERIODS_LIMITS.MAX;

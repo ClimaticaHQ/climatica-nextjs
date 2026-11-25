@@ -14,11 +14,6 @@ import { FIXED_Y_AXES as F } from "./charts.constant";
 import type { TFixedYAxesProps } from "./charts.type";
 import { ChartDeviceContext } from "./chartDevice.context";
 
-/**
- * A scrolling overlay's two y axes, held in place over the plot's edges: each an axis-only chart
- * on the same domain, margins and height as the plot (so its ticks line up), on a strip of the
- * card's surface that hides the plot passing under it. Pointers go through to the plot.
- */
 export function FixedYAxes({ scales, rightMax, rows }: TFixedYAxesProps) {
   const { formatValue } = useDisplayFormat();
   const roundTick = (v: unknown) => formatValue(Number(v), { metric: EDisplayMetric.AXIS_TICK });
@@ -34,7 +29,7 @@ export function FixedYAxes({ scales, rightMax, rows }: TFixedYAxesProps) {
         <YAxis
           yAxisId="temp"
           {...y.temp}
-          // * no data of its own: the domain as given, the plot's
+          // * allowDataOverflow: no data of its own, the plot's domain as given
           allowDataOverflow
           tickFormatter={roundTick}
           {...axis}

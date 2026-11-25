@@ -1,7 +1,6 @@
 import { getIndicatorStyle } from "@/utils/slidingIndicator.util";
 import type { TSlidingIndicatorProps } from "./SlidingIndicator.type";
 
-/** One decorative element under a list's active item, sliding to the next (useSlidingIndicator). */
 export function SlidingIndicator({
   indicator,
   axis,

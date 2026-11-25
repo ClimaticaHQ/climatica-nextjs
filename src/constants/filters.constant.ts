@@ -26,28 +26,22 @@ import {
   WEATHER_MAX_YEAR,
 } from "./worldclim.constant";
 
-// * written for "all" months, and read back as all months
 export const ALL_MONTHS = "all";
 export const MONTHS_IN_YEAR = 12;
 export const MONTH_NUMBERS = Array.from({ length: MONTHS_IN_YEAR }, (_, i) => i + 1);
 
-// * list values (variables, months, years) travel comma-joined
 export const FILTER_LIST_SEPARATOR = ",";
 
 export const FILTER_WEATHER_PERIODS_LIMITS = { MIN: MIN_PERIODS, MAX: MAX_PERIODS } as const;
 
-// * the period whose normals carry every variable and the 30s grid
 export const FULL_VARIABLES_CLIMATE_PERIOD = CLIMATE_PERIODS.C1970_2000;
-// * offered for every dataset and period: the last resort of the finest-offered search
 export const ALWAYS_OFFERED_GRID_SIZE = CELL_SIZES.TEN_MINUTES;
 
-// * a view whose default resolution isn't the finest offered: at 30″ almost any heat map region
-// * would pass the cell cap (FILTER_MAX_HEATMAP_CELLS), so it opens at 2.5′
+// * at 30″ almost any heat map region would pass the cell cap, so it opens at 2.5′
 export const GRID_SIZE_VIEW_DEFAULTS: Partial<Record<EFilterView, TCellSize>> = {
   [EFilterView.HEAT_MAP]: CELL_SIZES.TWO_POINT_FIVE_MINUTES,
 };
 
-// * the years Compare Periods opens with on the Weather dataset
 export const DEFAULT_WEATHER_PERIODS = [2021, 1967] as const;
 
 export const FILTER_DEFAULTS: TFilters = {
@@ -55,7 +49,6 @@ export const FILTER_DEFAULTS: TFilters = {
   [EFilterKey.CLIMATE_PERIOD]: CLIMATE_PERIODS.C1970_2000,
   [EFilterKey.WEATHER_YEAR]: WEATHER_MAX_YEAR,
   [EFilterKey.VARIABLES]: [...DEFAULT_VARIABLES],
-  // * none chosen: each view opens at its default (resolveGridSize), and the URL leaves `grid` out
   [EFilterKey.GRID_SIZE]: null,
   [EFilterKey.MONTHS]: ALL_MONTHS,
   [EFilterKey.CLIMATE_PERIOD_A]: CLIMATE_PERIODS.C1970_2000,
@@ -67,7 +60,6 @@ const ALL_VIEWS = Object.values(EFilterView);
 const SINGLE_PERIOD_VIEWS = ALL_VIEWS.filter((view) => view !== EFilterView.COMPARE_PERIODS);
 const CLIMATE_PERIOD_OPTIONS = Object.values(CLIMATE_PERIODS);
 
-/** Every filter, described once — sidebar, chips, sheets, URL and badge all read from here. */
 export const FILTERS_CONFIG: TFiltersConfig = {
   [EFilterKey.DATASET]: {
     key: EFilterKey.DATASET,
@@ -169,7 +161,7 @@ export const FILTERS_CONFIG: TFiltersConfig = {
   },
 };
 
-/** Sidebar / full-sheet / chip order; also the order params are written in. */
+/** also the order params are written in */
 export const FILTER_ORDER = [
   EFilterKey.DATASET,
   EFilterKey.CLIMATE_PERIOD,
@@ -182,7 +174,7 @@ export const FILTER_ORDER = [
   EFilterKey.MONTHS,
 ] as const satisfies readonly EFilterKey[];
 
-/** The one place deciding how a filter change navigates: back returns to the previous Apply. */
+/** back returns to the previous Apply */
 export const FILTER_NAVIGATION_MODES: TFilterNavigationModes = {
   [EFilterApplyMode.QUICK]: EFilterNavigation.REPLACE,
   [EFilterApplyMode.APPLY]: EFilterNavigation.PUSH,
@@ -195,14 +187,11 @@ export const FILTER_VIEW_BY_ROUTE = {
   [ROUTES.HEAT_MAP]: EFilterView.HEAT_MAP,
 } as const;
 
-// * the explanation shown under a filter that's disabled in the current view
 export const FILTER_UNAVAILABLE_NOTE_KEYS: Partial<Record<EFilterAvailability, string>> = {
   [EFilterAvailability.WALTER_LIETH]: "chart.walterLiethTabUnavailable",
   [EFilterAvailability.HEAT_MAP]: "sidebar.notes.notAvailableHeatmap",
 };
 
-// * how a section disabled for each reason looks — its controls are disabled either way: the heat
-// * map's note goes above them, Walter-Lieth's below (with a way out)
 export const FILTER_UNAVAILABLE_LAYOUTS: TFilterUnavailableLayouts = {
   [EFilterAvailability.WALTER_LIETH]: {
     isNoteFirst: false,
@@ -216,17 +205,13 @@ export const FILTER_UNAVAILABLE_LAYOUTS: TFilterUnavailableLayouts = {
   },
 };
 
-// * the view whose sections a page without filters (home, not found) shows
-// * the dataset selection's scope while filters are synced: one for every page
 export const DATASET_SELECTION_SHARED_SCOPE = "allPages";
 
 export const FILTER_FALLBACK_VIEW = EFilterView.CLIMATE_STATISTICS;
 
-// * the heat map can't load more cells than this: Apply (and auto-apply) is blocked above it,
-// * and a region drawn larger isn't loaded. At most a few WorldClim requests (see WORLDCLIM_MAX_ROWS)
+// * above it Apply is blocked and a region isn't loaded: at most a few WorldClim requests (WORLDCLIM_MAX_ROWS)
 export const FILTER_MAX_HEATMAP_CELLS = 2_000;
 
-// * the resolution filter's badge for a heat map region, by its cell count (each up to `max`)
 export const CELL_COUNT_STATUSES = [
   {
     max: 500,
@@ -274,7 +259,6 @@ export const CELL_COUNT_STATUSES = [
   },
 ] as const;
 
-// * notes under the variable chips, by context
 export const VARIABLES_NOTE_RULES: readonly TFilterNoteRule[] = [
   {
     isShown: ({ dataset }) => dataset === DATASETS.WEATHER,
@@ -286,8 +270,6 @@ export const VARIABLES_NOTE_RULES: readonly TFilterNoteRule[] = [
   },
 ];
 
-// * the chips a view shows: changeable filters, plus — disabled, explained on tap — the ones only
-// * Walter-Lieth blocks (switching the chart frees them); the heat map's months stay hidden
 export const FILTER_CHIP_AVAILABILITIES: readonly EFilterAvailability[] = [
   EFilterAvailability.AVAILABLE,
   EFilterAvailability.WALTER_LIETH,

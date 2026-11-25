@@ -8,11 +8,6 @@ import { WalterLiethFrame, WalterLiethPlot, WalterLiethTooltip } from "./compone
 import { useWalterLiethChart } from "./hooks/useWalterLiethChart";
 import { useWalterLiethSummary } from "./hooks/useWalterLiethSummary";
 
-/**
- * One Walter-Lieth diagram. Presentational: draws the util-computed geometry, nothing more.
- * While its data load (or until its series is complete) the plot is a skeleton in the same
- * frame, so the data's arrival swaps the plot alone.
- */
 export function WalterLiethChart(props: TWalterLiethChartProps) {
   const { series, isCompact = false, isPanel = false, headerSlots, footer } = props;
   const isLoading = useContext(ChartLoadingContext);
@@ -33,7 +28,6 @@ export function WalterLiethChart(props: TWalterLiethChartProps) {
   );
 }
 
-/** The diagram's plot, from its series' geometry. */
 function Diagram({
   series,
   domain,

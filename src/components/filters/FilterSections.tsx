@@ -11,9 +11,6 @@ import { PeriodFilter } from "./sections/PeriodFilter";
 import { ResolutionFilter } from "./sections/ResolutionFilter";
 import { VariablesFilter } from "./sections/VariablesFilter";
 
-// * each filter's section; Period B is part of Period A's section (the pair is one control).
-// * Kept with its renderers, not in filters.constant.ts: importing a filters constant mustn't
-// * pull in every section and the page hooks behind them
 export const FILTER_SECTION_COMPONENTS = {
   [EFilterKey.DATASET]: DatasetFilter,
   [EFilterKey.CLIMATE_PERIOD]: PeriodFilter,
@@ -26,10 +23,6 @@ export const FILTER_SECTION_COMPONENTS = {
   [EFilterKey.MONTHS]: MonthsFilter,
 } satisfies TFilterSectionComponents;
 
-/**
- * Every filter section the context shows, in FILTER_ORDER — controlled: values in, changes
- * out. Where they're rendered, and when changes apply, is the caller's.
- */
 export function FilterSections(props: TFilterSectionsProps) {
   return (props.keys ?? FILTER_ORDER).map((key) => {
     const availability = getFilterAvailability(key, props.context);

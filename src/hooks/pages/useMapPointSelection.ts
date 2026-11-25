@@ -4,11 +4,6 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { usePlaceLookup } from "@/hooks/data/usePlaceLookup";
 
-/**
- * Picking a point on the map: it's selected at once under its coordinates, then renamed when
- * the place lookup answers — unless another point was picked meanwhile. A failed lookup keeps
- * the coordinates and says so.
- */
 export function useMapPointSelection({ onPicked, onResolved }: TUseMapPointSelectionArgs) {
   const t = useTranslations();
   const { lookUp, isResolving } = usePlaceLookup();

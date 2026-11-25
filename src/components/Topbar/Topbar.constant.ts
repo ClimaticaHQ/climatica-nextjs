@@ -1,20 +1,13 @@
-// * a navbar link's look: in the desktop row, and in the mobile menu (filled when current)
 export const TOPBAR_LINK_CLASSES = {
-  // * the desktop row: one line, never squeezed — when it doesn't fit (useNavbarFit) it collapses
-  // * into the menu
   DESKTOP_ROW: "hidden shrink-0 lg:flex",
-  // * its links over the pill; the gap narrower from lg to xl, so five links fit at 1024 px in most
-  // * languages
+  // * narrower from lg to xl, so five links fit at 1024 px in most languages
   DESKTOP_LIST: "relative flex gap-1 xl:gap-3",
-  // * one pill behind the highlighted link, sliding to the next (SlidingIndicator)
   DESKTOP_PILL:
     "pointer-events-none absolute top-0 left-0 rounded-[var(--radius-sm)] bg-[var(--color-primary-muted)]",
   DESKTOP_PILL_MOTION: "nav-indicator",
-  // * collapsed: out of the flow and unseen, still measured — so it can come back when it fits
+  // * out of the flow but still measured, so it can come back when it fits
   DESKTOP_ROW_COLLAPSED: "lg:invisible lg:absolute",
-  // * the menu button and the menu: below lg, and from lg while the links are collapsed
   MENU_ONLY_BELOW_LG: "lg:hidden",
-  // * its colours crossfade with the pill's slide
   DESKTOP:
     "nav-indicator-text relative whitespace-nowrap rounded-[var(--radius-sm)] px-2.5 py-2 text-[length:var(--font-sm)] font-medium xl:px-4",
   DESKTOP_ACTIVE: "text-[var(--color-primary)]",
@@ -26,7 +19,6 @@ export const TOPBAR_LINK_CLASSES = {
   IDLE: "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]",
 } as const;
 
-// * the bar itself: the logo, the links (or the menu button) and the controls on one row
 export const TOPBAR_CLASSES = {
   HEADER:
     "relative box-content h-16 w-full shrink-0 border-b pt-[env(safe-area-inset-top)] border-[var(--color-border)] bg-[var(--color-surface)]",
@@ -43,13 +35,11 @@ export const TOPBAR_CLASSES = {
     "touch-target flex size-[max(2.5rem,40px)] items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-150 hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text)]",
 } as const;
 
-// * the menu, dropped under the bar
 export const TOPBAR_MENU_CLASSES = {
   PANEL:
     "absolute left-0 right-0 top-full z-50 border-t border-[var(--color-border)] bg-[var(--color-surface)] shadow-md transition-all duration-300 ease-in-out",
   OPEN: "pointer-events-auto translate-y-0 opacity-100",
   CLOSED: "pointer-events-none -translate-y-2 opacity-0",
   LIST: "flex max-h-[calc(100dvh-4rem-env(safe-area-inset-top))] list-none flex-col gap-1 overflow-y-auto pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]",
-  // * Settings, apart from the pages under a rule
   SETTINGS_ITEM: "mt-2 border-t border-[var(--color-border)] pt-3",
 } as const;

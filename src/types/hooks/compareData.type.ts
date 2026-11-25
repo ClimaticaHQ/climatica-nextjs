@@ -2,8 +2,7 @@ import type { TClimatePeriod } from "../../constants/worldclim.constant";
 import type { TWorldClimPointValueBinding } from "../api/worldclim.dto";
 import { TMonthlyTemperature } from "../domain/climate";
 
-/** Raw, unfiltered bindings — every climate period SCRAPI has for this point,
- * cached once so switching periods only re-derives, never refetches. */
+/** SCRAPI returns every climate period for a point at once: cached once, a period switch re-derives instead of refetching */
 export type TCompareBindings = {
   cityA: TWorldClimPointValueBinding[];
   cityB: TWorldClimPointValueBinding[];
@@ -14,7 +13,6 @@ export type TUseGetCompareDataReturn = {
   cityB: TMonthlyTemperature[] | null;
   availablePeriods: TClimatePeriod[] | null;
   isLoading: boolean;
-  /** a refetch in progress — the previous data stays until it lands (keepPreviousData) */
   isFetching: boolean;
   error: Error | null;
 };
@@ -29,7 +27,6 @@ export type TUseGetComparePeriodsReturn = {
   dataB: TMonthlyTemperature[] | null;
   availablePeriods: TClimatePeriod[] | null;
   isLoading: boolean;
-  /** a refetch in progress — the previous data stays until it lands (keepPreviousData) */
   isFetching: boolean;
   error: Error | null;
 };

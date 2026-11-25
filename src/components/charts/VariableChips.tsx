@@ -4,11 +4,6 @@ import { useTranslations } from "next-intl";
 import { VARIABLE_CHIPS_ROW_CLASS } from "./charts.constant";
 import type { TVariableChipsProps } from "./charts.type";
 
-/**
- * The standard chart's variable toggles. The last active one stays on — locked, as in the
- * sidebar: not-allowed cursor, announced as disabled; a variable the store didn't fetch is shown
- * off and disabled (tavg is derived, so always available).
- */
 export function VariableChips({ visible, variables, onChange }: TVariableChipsProps) {
   const t = useTranslations();
   const activeCount = Object.values(visible).filter(Boolean).length;
@@ -39,6 +34,5 @@ export function VariableChips({ visible, variables, onChange }: TVariableChipsPr
     );
   });
 
-  // * a phone: one row, scrolling sideways, so the toolbar keeps one height in every view
   return <div className={VARIABLE_CHIPS_ROW_CLASS}>{items}</div>;
 }

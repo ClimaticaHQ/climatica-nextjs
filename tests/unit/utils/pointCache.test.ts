@@ -13,7 +13,6 @@ function pixelParams(point: { lat: number; lng: number }, extra = "isClimate=tru
 }
 
 describe("pointToCell", () => {
-  // * the cells SCRAPI's cellofpoint answered for these points
   it.each([
     ["10m", 122, 1193],
     ["5m", 244, 2387],

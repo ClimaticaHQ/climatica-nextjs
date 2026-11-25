@@ -5,7 +5,6 @@ import type { TSeriesHatchIconProps } from "./svg.type";
 
 const SIZE = 10;
 
-/** An entity's bar hatch as a swatch: the humid fill (or its own) with the hatch knocked out of it. */
 export function SeriesHatchIcon({ hatch, fill = PRECIP_BAR.HUMID }: TSeriesHatchIconProps) {
   const id = useId();
   return (

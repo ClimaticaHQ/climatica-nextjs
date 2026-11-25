@@ -7,7 +7,6 @@ import type { TSettingsViewProps } from "../Settings.type";
 import { SettingsGroup } from "./SettingsGroup";
 import { SettingsRow } from "./SettingsRow";
 
-/** The interface language — saved as the visitor's, so every page opens in it. */
 export function LanguageSettings({ page }: TSettingsViewProps) {
   const t = useTranslations();
 

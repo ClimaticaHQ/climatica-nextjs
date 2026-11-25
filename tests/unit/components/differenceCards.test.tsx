@@ -25,9 +25,7 @@ describe("PeriodTrendCards", () => {
     wrap(
       <PeriodTrendCards
         trend={{
-          // * 6.0 and 4.9 shown in the stats table: +1.1, not +1.0
           tmax: { minuend: 5.96, subtrahend: 4.94 },
-          // * 405 and 405 shown: no change, though the totals differ by 0.8 mm
           prec: { minuend: 405.4, subtrahend: 404.6 },
           labelA: "1961–1990",
           labelB: "1991–2020",
@@ -42,7 +40,6 @@ describe("PeriodTrendCards", () => {
 describe("CityDifferenceCards", () => {
   const diff: TDiffStats = {
     warmerCity: "B",
-    // * 17.5 and 18.5 shown: 1.0 apart, though the exact gap is 1.08
     avgTmax: { minuend: 17.46, subtrahend: 18.54 },
     moreRainCity: "A",
     totalPrec: { minuend: 600.6, subtrahend: 480.4 },

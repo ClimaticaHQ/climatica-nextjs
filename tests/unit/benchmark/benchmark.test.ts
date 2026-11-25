@@ -209,7 +209,6 @@ describe("summarize", () => {
     pair({ cold: { xCache: "BYPASS" }, warm: { xCache: "BYPASS" }, isPredictedBypass: true }),
     pair({ cold: { status: 502 } }),
     pair({ cold: EMPTY, warm: { ...EMPTY, xCache: "MISS" } }),
-    // * BYPASS the app's rule didn't predict
     pair({ cold: { xCache: "BYPASS" }, warm: { xCache: "BYPASS" } }),
   ];
   const [summary] = summarize(pairs);
@@ -231,7 +230,6 @@ describe("summarize", () => {
     expect(summary?.warm?.median).toBe(15);
     expect(summary?.speedUp).toBe(10);
     expect(summary?.upstreamMedianMs).toBe(90);
-    // * 80/100 and 100/200
     expect(summary?.upstreamShareMedian).toBeCloseTo(0.65);
     expect(summary?.periods).toEqual(["c1970-2000"]);
   });

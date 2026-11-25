@@ -6,12 +6,6 @@ import { useContext } from "react";
 import { MONTHLY_VALUES_CLASSES as C } from "../MonthlyValuesTable.constant";
 import type { THeaderMarkerProps } from "../MonthlyValuesTable.type";
 
-/**
- * A series' marker beside its row's unit — its shape only, the axis-wide column has no room for
- * the hatch. Named (the standard overlay): its full name as its accessible name and on hover;
- * hovering or focusing it focuses the entity; another entity focused, it's muted like the context
- * curves. Unnamed (the Walter-Lieth overlay): decoration, the legend names it.
- */
 export function HeaderMarker({ marker, entityKey }: THeaderMarkerProps) {
   const focus = useContext(ChartFocusContext);
   const { shape, title } = marker;

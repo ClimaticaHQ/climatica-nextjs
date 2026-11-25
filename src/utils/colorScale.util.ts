@@ -27,10 +27,6 @@ function interpolateStops(stops: readonly TColorStop[], t: number): string {
   return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
 
-/**
- * A scale's stops with their colours read from the tokens — `style` is the document's (the live
- * map and legend) or the export palette's (a saved image).
- */
 export function resolveColorScale(scale: TColorScale, style: CSSStyleDeclaration): TColorStop[] {
   return COLOR_SCALE_STOPS[scale].map(({ t, token }) => ({
     t,
@@ -38,7 +34,6 @@ export function resolveColorScale(scale: TColorScale, style: CSSStyleDeclaration
   }));
 }
 
-/** The colour of a value on a scale: its place between min and max, between the two stops around it. */
 export function interpolateColor(
   value: number,
   min: number,

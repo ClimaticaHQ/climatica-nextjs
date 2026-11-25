@@ -6,11 +6,6 @@ import { useDisclosureMotion } from "@/hooks/ui/useDisclosureMotion";
 import { DISCLOSURE_CLASSES as C } from "./Disclosure.constant";
 import type { TDisclosureProps } from "./Disclosure.type";
 
-/**
- * A question and its answer, closed by default. Native details / summary: keyboard, screen
- * readers and find-in-page (which opens it) work without script; a click folds the answer open
- * or shut (useDisclosureMotion), the chevron turning with it.
- */
 export function Disclosure({ summary, id, size = EDisclosureSize.MD, children }: TDisclosureProps) {
   const { detailsRef, contentRef, isExpanded, handleSummaryClick, handleToggle } =
     useDisclosureMotion();

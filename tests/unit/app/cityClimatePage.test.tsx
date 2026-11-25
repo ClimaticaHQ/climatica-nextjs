@@ -36,7 +36,6 @@ vi.mock("@/hooks/data/useGetDatasetVersion", () => ({
 vi.mock("@/hooks/data/useSearchCity", () => ({
   useSearchCity: () => ({ data: [], isLoading: false, error: null }),
 }));
-// * the sidebar's filters and the Leaflet map aren't this page's chart
 vi.mock("@/components/filters", () => ({ FilterBar: () => null }));
 vi.mock("@/components/LeafletMap", () => ({ LeafletMap: () => null }));
 
@@ -69,7 +68,6 @@ describe("City Climate through its page hook", () => {
       expect(screen.getByRole("heading", { level: 3 }).textContent).toBe("Paris");
       expect(blocks(EChartBlock.VALUES_TABLE)).toHaveLength(1);
       expect(blocks(EChartBlock.LEGEND)).toHaveLength(1);
-      // * one place: its stat cards instead of the comparison's stats table
       expect(blocks(EChartBlock.STATS_TABLE)).toHaveLength(0);
     },
   );

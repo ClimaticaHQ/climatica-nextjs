@@ -1,9 +1,6 @@
 import type { TVariable, TVisibleSeries } from "@/types";
 
-/**
- * Which series are visible for the selected variables. tavg has no fetched variable, so it's
- * carried over from prev rather than derived.
- */
+/** tavg has no fetched variable, so it's carried over rather than derived */
 export function resolveVisibleSeries(
   variables: readonly TVariable[] | undefined,
   prev: TVisibleSeries,

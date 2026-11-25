@@ -8,7 +8,6 @@ export function scrollToSection(el: HTMLElement, options: TScrollOptions = {}) {
   const { offset = SCROLL_OFFSET_PX, toBottom = false } = options;
 
   if (!container) {
-    // * if no scrollable container found, scroll the whole page
     const targetY = toBottom
       ? document.documentElement.scrollHeight
       : el.getBoundingClientRect().top + window.scrollY - offset;
@@ -37,7 +36,6 @@ export function scrollToSection(el: HTMLElement, options: TScrollOptions = {}) {
 // * px of slack, so subpixel scroll positions don't count as hidden content
 const SCROLL_EDGE_TOLERANCE_PX = 1;
 
-/** Which ends of a horizontal scroller have content hidden past them. */
 export function getScrollEdges(element: HTMLElement): TScrollEdges {
   const { scrollLeft, clientWidth, scrollWidth } = element;
   return {
@@ -48,4 +46,8 @@ export function getScrollEdges(element: HTMLElement): TScrollEdges {
 
 export function areScrollEdgesEqual(a: TScrollEdges, b: TScrollEdges) {
   return a.isStartHidden === b.isStartHidden && a.isEndHidden === b.isEndHidden;
+}
+
+export function scrollToSectionAfterSheetClose(id: string) {
+  requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView());
 }

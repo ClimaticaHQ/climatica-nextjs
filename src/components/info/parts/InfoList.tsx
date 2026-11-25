@@ -4,10 +4,6 @@ import { ExternalLink } from "@/components/UI/ExternalLink";
 import { INFO_CLASSES as C, INFO_LIST_CLASSES as L } from "../info.constant";
 import type { TInfoListProps } from "../info.type";
 
-/**
- * A list on the Info pages: bullets, or numbers; when its items have icons, a column of icon
- * rows instead. An item can end with a link to another site.
- */
 export function InfoList({ items, isNumbered = false }: TInfoListProps) {
   const hasIcons = items.some(({ icon }) => icon !== undefined);
   const List = isNumbered ? "ol" : "ul";

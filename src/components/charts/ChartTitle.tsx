@@ -4,10 +4,6 @@ import { CHART_TITLE_CLASSES as C } from "./charts.constant";
 import { ChartTitleNames } from "./ChartTitleNames";
 import { MonthBadge } from "./MonthBadge";
 
-/**
- * The chart card's title block, the same for both chart types: the chart type as a muted line,
- * the location(s), then the dataset / period line and — standard single-city — the month badge.
- */
 export function ChartTitle({
   names,
   eyebrow = "",

@@ -35,17 +35,14 @@ export const patternIdsOf = (prefix: string): TWalterLiethExportPatternIds => ({
   arid: `${prefix}-arid`,
 });
 
-/** A series' shape: its own (a compared entity), or its pair side's. */
 export const seriesShape = (series: TWalterLiethSeriesInput) =>
   series.shape ?? getPairShape(series.id);
 
-/** The series the split export draws, left to right: the expanded one alone, or both. */
 export function getExportPanels({ expanded, seriesA, seriesB }: TComparisonExport) {
   if (expanded === null) return [seriesA, seriesB];
   return [expanded === EWalterLiethSeriesId.A ? seriesA : seriesB];
 }
 
-/** A panel's header, as on the page: its shape in graphite and name, then its subtitle. */
 function buildPanelHeader(
   series: TWalterLiethSeriesInput,
   colors: TExportChartColors,
@@ -64,14 +61,12 @@ function buildPanelHeader(
     <text x="${x}" y="${y + T.PANEL_SUBTITLE_Y}" font-size="${T.PANEL_TEXT_FONT_SIZE}" fill="${colors.textSecondary}">${escapeXml(getPanelSubtitle(series))}</text>`;
 }
 
-/** What goes below a plot: its month labels and frost band, then its values table if any. */
 function getBelowPlotHeight(rows: readonly TMonthlyValuesRow[]) {
   return rows.length > 0
     ? T.MONTH_LABEL_OFFSET + EXPORT_MONTHLY_VALUES.GAP_ABOVE + getValuesTableHeight(rows)
     : W.panelFooterHeight;
 }
 
-/** A plot, then its monthly values table directly under it in the plot's gutters. */
 function buildPlotWithValues({ box, gutter, colors, renderPlot, valuesRows }: TPlotWithValuesArgs) {
   const table = buildMonthlyValuesSvg({
     rows: valuesRows,
@@ -83,10 +78,6 @@ function buildPlotWithValues({ box, gutter, colors, renderPlot, valuesRows }: TP
   return renderPlot(box) + table.svg;
 }
 
-/**
- * One split panel as a card on the export's surface — header, the chart type's plot, its
- * strip. Both cards are equally tall, so the plots and strips line up.
- */
 function buildSplitPanel({ series, context, renderPlot, valuesRows }: TSplitPanelArgs) {
   const { colors, left, top, panelWidth, panelHeight } = context;
   const inner = { x: left + W.panelPadding, y: top + W.panelPadding };
@@ -104,17 +95,12 @@ function buildSplitPanel({ series, context, renderPlot, valuesRows }: TSplitPane
   );
 }
 
-/**
- * The expanded panel, laid out like the single-city export: its header across the content
- * width, no card, the plot in the single export's plot box, its strip below.
- */
 function buildExpandedPanel({ series, colors, top, renderPlot, valuesRows }: TExpandedPanelArgs) {
   const header = buildPanelHeader(series, colors, { x: CL.paddingX, y: top });
   const box = getSingleExportPlotBox(top + W.panelHeaderHeight);
   return {
     body:
       header +
-      // * the strip spans the content width: its gutters are the plot margins inside the padding
       buildPlotWithValues({
         box,
         gutter: SL.chartMarginLeft - CL.paddingX,
@@ -126,7 +112,6 @@ function buildExpandedPanel({ series, colors, top, renderPlot, valuesRows }: TEx
   };
 }
 
-/** The comparison's panels as the page shows them: both side by side, or the expanded one. */
 export function buildComparisonPanels({
   comparison,
   colors,
@@ -145,7 +130,6 @@ export function buildComparisonPanels({
     });
   }
   const pair = [comparison.seriesA, comparison.seriesB];
-  // * both cards as tall as the taller (a WL panel with its notice has no table)
   const tallest = pair.map(valuesRows).reduce((a, b) => (b.length > a.length ? b : a));
   const panelWidth = (CONTENT_WIDTH - W.splitGap) / 2;
   const panelHeight =
@@ -169,10 +153,6 @@ export function buildComparisonPanels({
   return { body, bottom: top + panelHeight };
 }
 
-/**
- * Any number of panels, two to a row as on the page (Compare Periods' weather years); each
- * row's cards as tall as its tallest, so the plots and strips line up across the row.
- */
 export function buildPanelGrid({
   series,
   colors,

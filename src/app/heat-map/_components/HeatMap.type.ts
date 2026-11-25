@@ -46,7 +46,6 @@ export type THeatmapStats = {
   count: number;
 };
 
-/** The region the page shows: a box or a polygon (never both), and the shape being drawn. */
 export type THeatMapSelection = {
   bbox: TBbox | null;
   polygon: TPolygon | null;
@@ -116,7 +115,6 @@ export type TPolygonDrawerProps = {
 };
 
 export type TDrawingCellCountProps = {
-  /** the shape so far, [lat, lng] */
   vertices: TPolygon;
   gridSize: TCellSize;
 };
@@ -135,7 +133,6 @@ export type TToolbarProps = {
 };
 
 export type TStatsLegendBarProps = {
-  /** the region's cells are loading: the stats wait in their places */
   isLoading: boolean;
   hasData: boolean;
   stats: THeatmapStats;
@@ -167,7 +164,6 @@ export type TRegionalClimateProfileProps = {
   cellCount: number;
 };
 
-/** A heat map cell's popup: its value and where the cell is. */
 export type TPopupContentArgs = {
   value: number;
   unit: string;

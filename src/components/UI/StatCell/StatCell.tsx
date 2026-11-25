@@ -5,12 +5,6 @@ import {
 } from "./StatCell.constant";
 import type { TStatCellProps } from "./StatCell.type";
 
-/**
- * One stat of a stats bar. Three rows — label / value / meta (Martonne class, delta, context) —
- * as a subgrid of the bar's rows,
- * so across a row of cards the labels share one height, the values sit on one line and the
- * badges and deltas on the next, even when a label wraps.
- */
 export function StatCell({
   label,
   fullLabel,

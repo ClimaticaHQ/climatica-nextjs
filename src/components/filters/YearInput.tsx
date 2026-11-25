@@ -3,7 +3,6 @@ import { FORM_CONTROL_CLASSES } from "@/constants";
 import { YEAR_INPUT_CLASS } from "./filters.constant";
 import type { TYearInputProps } from "./filters.type";
 
-/** A typed year; only whole numbers reach onChange, Enter submits. */
 export function YearInput({
   value,
   min,

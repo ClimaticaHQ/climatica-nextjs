@@ -29,14 +29,6 @@ const CHART_BODIES = {
   [EChartBody.OVERLAY]: OverlayBody,
 } satisfies Record<EChartBody, ComponentType<TChartBodyProps>>;
 
-/**
- * The chart card, the same for every page: its header (with the toolbar, the same in every view)
- * and the body for the layout — crossfading when the chart type, the layout or the data changes —
- * all derived from the model, the view state and the page's features. A comparison overlay's
- * bars follow the bar style setting, live. On touch the plots take taps — the tapped month's
- * tooltip, pinned over the plot — and a chip never focuses its series (a tap would leave it
- * stuck).
- */
 export function ChartCard({ model, viewState, features, onVisibleChange }: TChartCardProps) {
   const series = model.series.map(({ series: entry }) => entry);
   const rule = getSeriesKindRule(series);
@@ -45,7 +37,6 @@ export function ChartCard({ model, viewState, features, onVisibleChange }: TChar
     ...(onVisibleChange ? { onVisibleSeriesChange: onVisibleChange } : {}),
   });
   const [activeMonthIndex, setActiveMonthIndex] = useState<number | null>(null);
-  // * the entity chip hovered or focused (in the header's toolbar): the overlay focuses it
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const barStyle = useSettingsStore((state) => state.chartBarStyle);
   const isTouch = useIsTouch();
@@ -53,7 +44,6 @@ export function ChartCard({ model, viewState, features, onVisibleChange }: TChar
   const textScale = useTextScale();
   const syncId = useId();
   const { update } = useDataUpdate();
-  // * while loading, the card and its header for real; the body's plots are skeletons
   const isLoading = useContext(ChartLoadingContext);
   if (!model.hasData && !isLoading) return null;
 
@@ -71,10 +61,8 @@ export function ChartCard({ model, viewState, features, onVisibleChange }: TChar
 
   return (
     <Card
-      // * split panels flash on their own; elsewhere the card flashes for any of its series
       flashKeys={body === EChartBody.SPLIT ? NO_FLASH_KEYS : series.map(({ id }) => id)}
       shouldClip
-      // * the same frame on every page; below `sm` a smaller padding, so the plot keeps its width
       padding={ECardPadding.PANEL}
       className={CHART_CARD_CLASS}
     >
@@ -86,7 +74,6 @@ export function ChartCard({ model, viewState, features, onVisibleChange }: TChar
       />
       <ChartDeviceContext.Provider value={{ isTouch, isNarrow, textScale }}>
         <DataUpdateFade>
-          {/* * the data's arrival swaps the plots in this same layer, fading it in */}
           <ChartTransition
             transitionKey={`${viewState.mode}-${body}-${update.id}`}
             isPlaceholder={isLoading}

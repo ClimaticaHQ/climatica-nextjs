@@ -1,4 +1,3 @@
-/** Two diagrams side by side — WL comparison "split" layout. Sized to match the chart-mode toggle icons. */
 export function SplitLayoutIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">

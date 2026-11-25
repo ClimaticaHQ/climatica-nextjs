@@ -44,7 +44,6 @@ export default function Dropdown({
         data-testid={testId}
         onClick={() => setIsOpen((o) => !o)}
         id={buttonId}
-        // * named by its label, then its value: "Period A 1970–2000"
         aria-labelledby={ariaLabelledBy === undefined ? undefined : `${ariaLabelledBy} ${buttonId}`}
         aria-expanded={isOpen}
         className={`
@@ -107,7 +106,6 @@ export default function Dropdown({
               }
             `}
           >
-            {/* * a disabled option's label fades; its description stays readable */}
             <span
               className={`inline-flex items-center gap-1.5 ${option.disabled ? "opacity-40" : ""}`}
             >

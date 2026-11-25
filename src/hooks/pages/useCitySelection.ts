@@ -6,11 +6,6 @@ import { useSettingsStore } from "@/stores";
 import type { TCity, TPlaceRename, TUseCitySelectionArgs } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 
-/**
- * Picking a city into a slot. With syncCity on (and the settings loaded), the slots that follow
- * it take the same city, and the pages reading them refetch. Typed coordinates are renamed when
- * their place lookup answers, like a map click: same slots, same coordinates, no refetch.
- */
 export function useCitySelection({ slot, onPicked }: TUseCitySelectionArgs) {
   const { syncCity, hasHydrated } = useSettingsStore();
   const queryClient = useQueryClient();
@@ -31,7 +26,6 @@ export function useCitySelection({ slot, onPicked }: TUseCitySelectionArgs) {
   } satisfies Record<ECitySlot, ((rename: TPlaceRename) => void) | null>;
   const slots = [slot, ...(syncCity && hasHydrated ? CITY_SLOT_RULES[slot].syncsTo : [])];
 
-  /** Renames a pick in every slot it went to, where it's still the slot's city */
   function renamePick(rename: TPlaceRename) {
     for (const target of slots) renamers[target]?.(rename);
   }

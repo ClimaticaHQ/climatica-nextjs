@@ -11,7 +11,6 @@ import {
 } from "../info.constant";
 import type { TInfoCardGridProps, TInfoCardProps } from "../info.type";
 
-/** The Info pages' cards: a grid of one Card per item, filled from the item's slots. */
 export function InfoCardGrid({
   items,
   columns,
@@ -45,7 +44,6 @@ function InfoCard({ item, layout }: TInfoCardProps) {
   );
   const background = item.isHighlighted ? ECardBackground.HIGHLIGHT : ECardBackground.DEFAULT;
 
-  // * a numbered step: its badge beside the title and text
   if (layout === EInfoCardLayout.ROW) {
     return (
       <Card size={ECardSize.MD} background={background} className={CARD.ROW}>

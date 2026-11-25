@@ -202,7 +202,6 @@ describe("getCanonicalFilterUrlParams", () => {
   });
 });
 
-// * each view's own params, which the filter params must travel alongside untouched
 const VIEW_PAGE_PARAMS = {
   climateStatistics: "city=Lviv&lat=49.8397&lng=24.0297&chart=standard",
   compareCities:
@@ -211,7 +210,6 @@ const VIEW_PAGE_PARAMS = {
   heatMap: "polygon=10%2C20%3B11%2C21%3B12%2C20",
 } as const;
 
-// * normalized, with the other dataset's values at their defaults — what parseFilters returns
 const NORMALIZED_FILTERS: Record<string, TFilters> = {
   climateDefaults: FILTER_DEFAULTS,
   climateFull: {
@@ -241,7 +239,6 @@ const NORMALIZED_FILTERS: Record<string, TFilters> = {
   },
 };
 
-// * hand-edited / legacy / non-canonical filter queries
 const MESSY_FILTER_QUERIES = [
   "dataset=climate&months=all&var=tmax,tmin,prec&grid=2.5m",
   "dataset=weather&year1=2018&year2=2020&grid=30s&var=srad",

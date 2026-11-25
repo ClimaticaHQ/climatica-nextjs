@@ -1,4 +1,3 @@
-/** A card in a soft halo — the "Glow" update highlight. Sized to the segmented icons. */
 export function FlashGlowIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">

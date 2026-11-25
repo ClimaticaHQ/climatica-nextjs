@@ -11,11 +11,6 @@ import type { TOverlayChartProps } from "./charts.type";
 import { buildStandardChartRows, getSeriesMarker, getShadedId } from "./charts.util";
 import { StandardChart } from "./StandardChart";
 
-/**
- * The overlay's chart: every drawn series in one Walter-Lieth diagram (a highlighted series
- * dims the others), or in the standard chart (series turned off by their chips are hidden; a
- * highlighted one is focused, the rest turn gray).
- */
 export function OverlayChart({
   model,
   rule,
@@ -72,7 +67,6 @@ export function OverlayChart({
                 id: entry.series.id,
                 label: entry.series.label,
                 aridityByMonth: getAridityByMonth(entry.aridity),
-                // * its own slot's shade, never its place in the list
                 barFills: getOverlayBarFills(barStyle, entry.series.markerSlot),
                 hatch: entry.series.hatch,
                 swatch: getEntityBarSwatch(

@@ -1,6 +1,5 @@
-/** Where an in-flight link navigation is going — so pages don't rewrite their URL meanwhile. */
+/** so pages don't rewrite their URL while a link navigation is in flight */
 export type TNavigationIntentState = {
-  /** the target's browser path; null when no navigation is pending */
   pendingPathname: string | null;
   setPendingPathname: (pathname: string | null) => void;
 };

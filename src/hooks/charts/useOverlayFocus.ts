@@ -7,11 +7,6 @@ import type { TOverlayFocus } from "@/types";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-/**
- * The overlay's hovered curve or bar (or tapped, on touch), or an entity's marker in the values
- * table, and the tooltip line naming a curve or bar at the hovered month: "Mean temperature ·
- * Rome — July 27.0 °C", "Rome — October 105 mm (humid period)".
- */
 export function useOverlayFocus({ entries, rows, lines, activeMonthIndex }: TUseOverlayFocusArgs) {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();
@@ -36,7 +31,6 @@ export function useOverlayFocus({ entries, rows, lines, activeMonthIndex }: TUse
       const period = t(isArid ? "chart.focusArid" : "chart.focusHumid");
       return {
         text: t("chart.focusBar", { entity: entry.label, month, value, period }),
-        // * the bar's swatch beside its shape only where the view draws them per entity
         marker: { ...entry.marker, ...entry.swatch },
       };
     }

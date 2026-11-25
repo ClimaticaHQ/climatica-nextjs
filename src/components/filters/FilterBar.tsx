@@ -16,10 +16,6 @@ import { useEffect } from "react";
 import { FiltersSheet } from "./FiltersSheet";
 import { FILTER_BAR_CLASSES as C } from "./filters.constant";
 
-/**
- * Below lg: the filter chips under a page's search — "Filters" pinned at the start, then one
- * chip per filter, scrolling sideways — and the sheet they open.
- */
 export function FilterBar() {
   const t = useTranslations();
   const filters = useFilters();

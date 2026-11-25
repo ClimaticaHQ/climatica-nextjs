@@ -7,10 +7,6 @@ import type { TMonthlyValuesVariantProps } from "../MonthlyValuesTable.type";
 import { UnitLabel } from "./UnitLabel";
 import { ValueStack } from "./ValueStack";
 
-/**
- * Where twelve columns don't fit (phones, split panels): a "Show monthly values" button (closed by default)
- * reveals the same table on its side — Month | °C | mm, the same cells.
- */
 export function VerticalValues({
   rows,
   caption,

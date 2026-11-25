@@ -47,7 +47,6 @@ describe("an added year flashes where it landed", () => {
     expect(animate).not.toHaveBeenCalled();
     rerender(<Years years={[1967, 1990, 2021]} />);
     expect(flashed()).toEqual(["1990"]);
-    // * a reorder adds nothing
     rerender(<Years years={[2021, 1990, 1967]} />);
     expect(flashed()).toEqual(["1990"]);
   });

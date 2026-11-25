@@ -4,13 +4,7 @@ import type { TSlidingIndicatorArgs, TSlidingIndicatorState } from "@/types";
 import { getIndicatorRect, isSameIndicatorRect } from "@/utils/slidingIndicator.util";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-/**
- * One indicator under a list's active item (SlidingIndicator). Measured before paint, so after
- * hydration it takes over from the item's static highlight in the same frame. It slides only to
- * a new active item once placed; on its first placement, a resize, a text size change or a font
- * arriving it jumps. Null while no item is active. The container must stay mounted with the hook.
- * `toTargetRect` sends it where its item will be (a list folding around it), not where it is now.
- */
+/** measured before paint, so after hydration it takes over from the static highlight in the same frame */
 export function useSlidingIndicator<TContainer extends HTMLElement>({
   activeKey,
   activeSelector,
@@ -52,7 +46,6 @@ export function useSlidingIndicator<TContainer extends HTMLElement>({
     const jump = () => {
       if (isMounted) measure(false);
     };
-    // * the list (its items' text, the text size) and the window (a centred list moves)
     const observer = new ResizeObserver(jump);
     observer.observe(container);
     observer.observe(document.documentElement);

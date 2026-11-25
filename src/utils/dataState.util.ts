@@ -1,7 +1,6 @@
 import { EDataStatus } from "@/enums";
 import type { TDataState, TResolveDataStateArgs } from "@/types";
 
-/** A page's or a series' data state: loading first, then an error, then empty, else ready. */
 export function resolveDataState({
   isLoading,
   error,

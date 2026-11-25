@@ -21,7 +21,6 @@ describe("formatMonthName", () => {
 });
 
 describe("the comparison's hottest and coldest month", () => {
-  // * July the hottest, January the coldest
   const tmaxByMonth = [2, 4, 8, 12, 16, 20, 30, 28, 22, 14, 8, 3];
   const series: TMonthlyTemperature[] = tmaxByMonth.map((tmax, i) => ({
     month: i + 1,

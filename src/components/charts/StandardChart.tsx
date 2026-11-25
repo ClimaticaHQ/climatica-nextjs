@@ -47,13 +47,6 @@ import { OverlayCurves } from "./OverlayCurves";
 import { StandardChartAxes } from "./StandardChartAxes";
 import { StandardTooltip } from "./StandardTooltip";
 
-/**
- * Every series in one standard chart (the overlay): the bar layer and the curve layer, each
- * entity's curve points over its own bars (one bar layout for both). An entity focused — its
- * chip, a curve, a bar or its marker in the values table — keeps its colours, the rest turn
- * gray. Bars too narrow even at their minimum: the plot scrolls sideways under fixed y axes, the
- * values table below with it.
- */
 export function StandardChart({
   entries,
   barStyle = DEFAULT_BAR_STYLE,
@@ -71,7 +64,6 @@ export function StandardChart({
   const seriesMotion = useSeriesToggleMotion();
   const { isTouch, isNarrow, textScale } = useContext(ChartDeviceContext);
   const plotMargin = getPlotMargin({ isCompact: false, isNarrow, textScale });
-  // * touch, scrolling sideways: the tooltip pins over the visible part
   const [scrollLeft, setScrollLeft] = useState(0);
   const { ref: plotRef, width: availableWidth } = useElementWidth<HTMLDivElement>();
   const { register } = useScrollSync();
@@ -92,7 +84,6 @@ export function StandardChart({
   });
   const shown = entries.filter(({ isHidden }) => !isHidden);
   const { gap, minGap, hasHatch } = OVERLAY_BAR_STYLES[barStyle];
-  // * a phone: fixed, roomy bars — the year scrolls sideways when it doesn't fit
   const phoneBars = isNarrow ? getPhoneOverlayBars(shown.length) : null;
   const scroll = getOverlayScroll({
     availableWidth: availableWidth ?? 0,
@@ -115,7 +106,6 @@ export function StandardChart({
         gap,
         minGap,
       });
-  // * a chip's highlight, else the curve or bar pointed at; a hidden entity is never focused
   const candidate = highlightedId ?? focus?.id ?? null;
   const focusedId = shown.some(({ id }) => id === candidate) ? candidate : null;
   const layer = {
@@ -139,7 +129,6 @@ export function StandardChart({
     activeMonthIndex,
     ...(scroll.isOverflowing ? { visibleLeft: scrollLeft + plotMargin } : {}),
   };
-  // * scrolling sideways, the plot keeps its own drag: months by tap only
   const tapLayer = isTouch && (
     <MonthTapLayer
       activeMonthIndex={activeMonthIndex}
@@ -151,8 +140,7 @@ export function StandardChart({
   const chart = (
     <ResponsiveContainer width="100%" height="100%">
       <ComposedChart
-        // * Recharts places series in the order they first mount — a series whose data
-        // * lands late would go last; a new set of series remounts the chart in order
+        // * Recharts places series in mount order: a new set of series remounts the chart, so a late one isn't last
         key={entries.map(({ id }) => id).join("|")}
         data={rows}
         margin={getChartMargin({ textScale })}
@@ -179,7 +167,6 @@ export function StandardChart({
           shouldShowUnitTitles={!scroll.isOverflowing}
         />
         {activeMonthIndex !== null && (
-          // * the hovered month's band — the same colour as the monthly values table's
           <ReferenceArea
             yAxisId="temp"
             x1={MONTH_NAMES[activeMonthIndex]}
@@ -189,7 +176,6 @@ export function StandardChart({
             stroke="none"
           />
         )}
-        {/* * on touch, the tapped month's — every shown entity's values */}
         <Tooltip
           key={getTouchTooltipKey(tooltipState)}
           cursor={false}
@@ -228,8 +214,7 @@ export function StandardChart({
           onEntityFocus: (id) => setFocus(id === null ? null : { id, target: "entity" }),
         }}
       >
-        {/* * the plot's box is measured (its width lays the bars out): it stays mounted, and while
-            the data load holds a skeleton — the data swap what's in it alone */}
+        {/* the plot box stays mounted: its measured width lays the bars out */}
         <div ref={plotRef} data-chart-plot className={`${S.ROOT} ${CHART_PLOT.HEIGHT.FULL}`}>
           {isLoading ? (
             <ChartSkeleton heightClass={FULL_HEIGHT_CLASS} />

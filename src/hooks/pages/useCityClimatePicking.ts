@@ -7,10 +7,6 @@ import { useTranslations } from "next-intl";
 import { useCitySelection } from "./useCitySelection";
 import { useMapPointSelection } from "./useMapPointSelection";
 
-/**
- * City Climate's three ways to pick a city — search, your location, a click on the map — and
- * the one notice they share (a location or a place lookup that failed).
- */
 export function useCityClimatePicking({ city, onShown }: TUseCityClimatePickingArgs) {
   const t = useTranslations();
   const { selectCity, renameCity } = usePersistedCity();

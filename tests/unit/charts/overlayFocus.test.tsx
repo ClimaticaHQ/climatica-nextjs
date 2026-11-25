@@ -76,7 +76,6 @@ describe("focus: the context turns gray", () => {
       dot: false,
       activeDot: false,
     });
-    // * the line style stays: the min curve keeps its dots' dash
     expect(line("2021-tmin")["strokeDasharray"]).toBe(STANDARD_CHART_LINES[2]?.dash);
     expect(line("1967-tmax")).toMatchObject({
       stroke: STANDARD_CHART_SINGLE_COLORS.tmax,

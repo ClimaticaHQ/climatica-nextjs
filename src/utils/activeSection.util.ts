@@ -1,10 +1,5 @@
 import type { TActiveSectionArgs } from "@/types";
 
-/**
- * The current section's index: the last whose top has crossed the line. Sections too near the
- * end to ever reach it share the scroll left after the last one that can, in order, so each is
- * current for a while; at the very end the last one is.
- */
 export function getActiveSectionIndex({
   tops,
   scrollTop,

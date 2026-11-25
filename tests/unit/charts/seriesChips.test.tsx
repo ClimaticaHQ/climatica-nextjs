@@ -55,7 +55,6 @@ describe("SeriesChips", () => {
     expect(chip.getAttribute("style")).toBeNull();
     const marker = chip.querySelector("[aria-hidden='true']");
     expect(marker?.getAttribute("style")).toContain(`color: ${SERIES_MARKER_COLOR}`);
-    // * 1967 is third in the list: the triangle
     expect(marker?.querySelector("svg:not([data-series-hatch]) path")?.getAttribute("d")).toBe(
       getMarkerPath({ shape: "triangle", cx: 7, cy: 7, size: 9 }),
     );

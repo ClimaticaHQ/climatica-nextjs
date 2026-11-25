@@ -8,15 +8,12 @@ import type {
 import { escapeXml, getMarkerPath } from "@/utils";
 import { measureExportText } from "./textWrap.util";
 
-/** An export table's box: square, unfilled, in the border colour. */
 export const buildTableFrame = ({ left, top, width, height, colors }: TExportTableFrameArgs) =>
   `<rect x="${left}" y="${top}" width="${width}" height="${height}" fill="none" stroke="${colors.border}" stroke-width="1" />`;
 
-/** One grid line of an export table. */
 export const buildTableRule = ({ x1, y1, x2, y2, colors }: TExportTableRuleArgs) =>
   `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colors.border}" stroke-width="1" />`;
 
-/** The label column: as wide as its longest label needs, never cut. */
 export const getTableLabelWidth = (labels: readonly string[]) =>
   Math.max(0, ...labels.map((label) => measureExportText(label, X.LABEL_FONT_SIZE))) +
   X.PADDING_X * 2;
@@ -24,11 +21,6 @@ export const getTableLabelWidth = (labels: readonly string[]) =>
 const hasSubtitle = (columns: readonly TExportTableColumn[]) =>
   columns.some(({ subtitle }) => subtitle !== undefined);
 
-/**
- * Every export table with a label column: a row of heads (a series' shape before its name, an
- * optional second line), then a row per metric, values centred — the City Climate export's
- * style: a square frame, a plain grid, no header fill.
- */
 export function buildExportTableSvg({ columns, rows, top, left, width, colors }: TExportTableArgs) {
   const labelWidth = getTableLabelWidth(rows.map(({ label }) => label));
   const columnWidth = (width - labelWidth) / Math.max(columns.length, 1);

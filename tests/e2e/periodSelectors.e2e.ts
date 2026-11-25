@@ -3,7 +3,6 @@ import { expect, test, type Page } from "@playwright/test";
 const PERIODS_URL = "/compare-periods?city=Madrid&lat=40.4168&lng=-3.7038";
 const sidebar = (page: Page) => page.locator("aside");
 const param = (page: Page, name: string) => new URL(page.url()).searchParams.get(name);
-// * a copy's Period B select, by role: only the copy shown at this width answers
 const periodB = (scope: ReturnType<Page["locator"]>) =>
   scope.getByRole("button", { name: /^Period B/ });
 
@@ -19,7 +18,6 @@ test.describe("Compare Periods selectors from lg: a sidebar section", () => {
 
     await periodB(sidebar(page)).click();
     await page.getByTestId("sidebar-period-b-option-c1981-2010").click();
-    // * a draft change: auto-apply (on by default) writes it shortly after
     await expect(page).toHaveURL(/period2=c1981-2010/);
     expect(param(page, "period1")).toBeNull();
 
@@ -40,7 +38,6 @@ test.describe("Compare Periods selectors from lg: a sidebar section", () => {
     await sidebar(page).getByRole("button", { name: "Remove 1990" }).click();
     await expect(page).toHaveURL(/periods=2021%2C1967%2C2010(&|$)/);
 
-    // * the last-page-params store keeps them, whichever placement changed them
     await page.locator("header nav").getByRole("link", { name: "City Climate" }).click();
     await expect(page).toHaveURL(/\/climate-statistics/);
     await page.locator("header nav").getByRole("link", { name: "Compare Periods" }).click();
@@ -83,7 +80,6 @@ test("the sidebar's Cell Resolution says why 30 s is unavailable — and offers 
   await expect(option).toBeDisabled();
   await expect(option).toHaveAccessibleDescription("Only for Climate 1970–2000");
 
-  // * 1970–2000 opens at 30″, its finest
   await page.goto("/climate-statistics?city=Paris&lat=48.8566&lng=2.3522");
   await sidebar.locator("button[aria-expanded]").filter({ hasText: "30 sec" }).click();
   await expect(sidebar.locator('button[data-value="30s"]')).toBeEnabled();

@@ -119,7 +119,6 @@ export function MiniMap({ locations, activeIndex, onToggle }: TMiniMapProps) {
       <div className="flex h-full flex-col">
         {showToggle && (
           <div className={MINI_MAP_TOGGLE_BAR_CLASS}>
-            {/* * values are the places' indexes: two places may share a label */}
             <SegmentedControl
               label={t("highlightedPlace")}
               options={locations.map((loc, i) => ({

@@ -17,7 +17,6 @@ const chipLabels = (page: Page) =>
     .locator("main [aria-haspopup=dialog]")
     .evaluateAll((chips) => chips.map((chip) => chip.getAttribute("aria-label")));
 
-/** Opens the n-th dropdown inside the open sheet and picks an option by its value. */
 async function pickInSheet(page: Page, dropdownIndex: number, value: string) {
   const sheet = page.getByRole("dialog");
   await sheet.locator("button[aria-expanded]").nth(dropdownIndex).click();
@@ -88,7 +87,6 @@ test.describe("Mobile filters", () => {
       expect(page.url()).toBe(urlBefore);
       await expect(page.getByRole("button", { name: "Filters, none changed" })).toBeVisible();
 
-      // * reopened, the sheet starts from the applied filters again
       await openFullSheet(page);
       await expect(page.getByRole("dialog").locator("button[aria-expanded]").first()).toContainText(
         "1970–2000",
@@ -156,7 +154,6 @@ test.describe("Mobile filters", () => {
     page,
   }) => {
     await page.goto(PERIODS_URL);
-    // * below lg the page's copy shows, applying at once; the sidebar's is hidden (display: none)
     const periodB = page.getByRole("button", { name: /^Period B/ });
     await expect(periodB).toHaveCount(1);
     await expect(page.locator("main").getByRole("button", { name: /^Period B/ })).toBeVisible();
@@ -164,7 +161,6 @@ test.describe("Mobile filters", () => {
     await periodB.click();
     await page.getByTestId("page-period-b-option-c1981-2010").click();
     await expect(page).toHaveURL(/period2=c1981-2010/);
-    // * Period A is the default, so it isn't written
     expect(param(page, "period1")).toBeNull();
 
     await page.getByRole("button", { name: "Swap periods" }).click();
@@ -201,7 +197,6 @@ test.describe("Mobile filters", () => {
       await expect(page.getByRole("dialog")).toHaveCount(0);
       expect(page.url()).toBe(urlBefore);
     }
-    // * still on the page: Back left only the sheets' own entries
     await expect(page.getByRole("button", { name: /^Filters/ })).toBeVisible();
   });
 });

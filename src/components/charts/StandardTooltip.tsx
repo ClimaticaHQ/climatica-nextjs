@@ -9,12 +9,6 @@ import { useTranslations } from "next-intl";
 import { TOOLTIP_CLASSES as C, TOOLTIP_FONT_SIZE } from "./charts.constant";
 import type { TStandardTooltipProps } from "./charts.type";
 
-/**
- * A standard chart's tooltip: the hovered month, then each line and bar drawn — its name and
- * value in the text colour, after its series' marker where the chart holds several series, or
- * its variable's legend swatch in a chart of one. In the overlay, a hovered curve or bar
- * replaces the list with the one line naming it.
- */
 export function StandardTooltip({
   active,
   payload,
@@ -29,7 +23,6 @@ export function StandardTooltip({
   const swatchSize = getSwatchSize(TOOLTIP_FONT_SIZE * useTextScale());
   if (!active || !payload || payload.length === 0) return null;
 
-  // * a hovered curve or bar of the overlay: only it, named by variable, entity and month
   if (focus) {
     return (
       <div className={C.FRAME} data-tooltip-focus>
@@ -55,7 +48,6 @@ export function StandardTooltip({
       <p className={C.TITLE}>{formatLabel(label)}</p>
       {payload.map(({ name, value }) => {
         const itemName = String(name ?? "");
-        // * an overlay curve's hit area is no series of its own
         if (itemName.startsWith(OVERLAY_FOCUS.HIT_NAME_PREFIX)) return null;
         const marker = markerOf?.(itemName);
         const swatch = swatchOf?.(itemName);

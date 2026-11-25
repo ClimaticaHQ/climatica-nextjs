@@ -3,11 +3,6 @@ import { useIsWrapped } from "@/hooks/ui";
 import { SETTINGS_CLASSES as C } from "../Settings.constant";
 import type { TSettingsRowProps } from "../Settings.type";
 
-/**
- * One row of a settings section: its label and description on the left, its control on the
- * right — or under them, by its placement; below `sm`, beside a wide control, the description
- * runs under both. Without a label, the control fills the row (a switch).
- */
 export function SettingsRow({
   labelId,
   label,

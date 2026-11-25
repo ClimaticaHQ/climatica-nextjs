@@ -37,7 +37,6 @@ describe("normalizeFilters", () => {
       filtersWith({ dataset: "weather", variables: ["srad", "prec", "wind"], gridSize: "30s" }),
     );
     expect(result.variables).toEqual(["prec"]);
-    // * a choice no longer offered becomes none chosen: the view's default again
     expect(result.gridSize).toBeNull();
   });
 
@@ -46,7 +45,6 @@ describe("normalizeFilters", () => {
       filtersWith({ climatePeriod: "c1991-2020", variables: ["wind", "tmin"], gridSize: "30s" }),
     );
     expect(result.variables).toEqual(["tmin"]);
-    // * a choice no longer offered becomes none chosen: the view's default again
     expect(result.gridSize).toBeNull();
   });
 

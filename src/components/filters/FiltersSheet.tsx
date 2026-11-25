@@ -35,11 +35,6 @@ import type {
   TFiltersSheetProps,
 } from "./filters.type";
 
-/**
- * The filters sheet below lg, one per page: every filter at once, one filter's section (from
- * its chip), or why a disabled chip can't be changed. Edits are a draft that each opening
- * resets; closing without Apply drops them.
- */
 export function FiltersSheet(props: TFiltersSheetProps) {
   const t = useTranslations();
   const filtersDraft = useFiltersDraft({ filters: props.filters, heatmapBbox: props.heatmapBbox });

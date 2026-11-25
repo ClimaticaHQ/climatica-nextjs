@@ -62,7 +62,6 @@ describe("buildWalterLiethYearsBody", () => {
 
   it("draws one card per year, named by the year and its shape, in graphite", () => {
     for (const label of ["2021", "1967", "1990"]) expect(body).toContain(`>${label}</text>`);
-    // * each card's header marker: the year's shape in the markers' graphite
     expect(
       body.match(new RegExp(`<path d="[^"]+" fill="${COLORS.seriesMarker}" />`, "g"))?.length,
     ).toBe(3);

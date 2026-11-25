@@ -5,10 +5,6 @@ import type { TTopbarMenuArgs } from "@/types";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-/**
- * The navbar menu's open state: closed on a new page, on a tap outside the header, and when the
- * window grows to lg while the links fit there (collapsed, the menu stays).
- */
 export function useTopbarMenu({ isCollapsed }: TTopbarMenuArgs) {
   const [isOpen, setIsOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);

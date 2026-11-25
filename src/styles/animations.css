@@ -1,18 +1,9 @@
-/* * All UI motion: keyframes, transitions, and the motion-off / reduced-motion rules. Durations,
-   easings and sizes come from MOTION (src/constants/motion.constant.ts)
-   as --motion-* custom properties, set once on <html> by the root layout. The update flash is
-   played from JS (useUpdateFlash), and chart series fades set inline through motionVar(), with
-   the same constants. */
-
-/* * SegmentedControl: the active pill sliding to the selected option */
 .segmented-indicator {
   transition-property: transform, width, height;
   transition-duration: var(--motion-control-slide);
   transition-timing-function: var(--motion-control-slide-easing);
 }
 
-/* * The navbar's pill and the Info sections' bar (SlidingIndicator), sliding once placed: a new
-   target mid-slide retargets from where they are. The navbar links' colours crossfade with it */
 .nav-indicator {
   transition-property: transform, width, height;
   transition-duration: var(--motion-nav-indicator-slide);
@@ -31,8 +22,6 @@
   transition-timing-function: var(--motion-indicator-slide-easing);
 }
 
-/* * Collapsible: a row from 0fr to 1fr, its content clipped while it folds; a fold reversed
-   mid-way turns back from where it is. An indicator moving with the fold takes its time */
 .accordion {
   display: grid;
   grid-template-rows: 0fr;
@@ -61,12 +50,10 @@
   transition-timing-function: var(--motion-indicator-slide-easing);
 }
 
-/* * SwapButton: the icon turning half a turn on each press */
 .swap-icon-turn {
   transition: transform var(--motion-control-slide) var(--motion-control-slide-easing);
 }
 
-/* * ChartTransition: a chart card's old content fades out while the new one fades in */
 @keyframes chart-fade-in {
   from {
     opacity: 0;
@@ -80,7 +67,6 @@
   }
 }
 
-/* * a split panel expanding: fade plus a slight scale-up from its side */
 @keyframes chart-expand-in {
   from {
     opacity: 0;
@@ -100,17 +86,14 @@
   animation: chart-expand-in var(--motion-panel-expand) var(--motion-panel-expand-easing) both;
 }
 
-/* * the content a panel expansion replaces: fades out over the expansion's time */
 .chart-expand-out {
   animation: chart-fade-out var(--motion-panel-expand) var(--motion-panel-expand-easing) both;
 }
 
-/* * a hover state layer fading in and out on each cell of a row (StatsTable) */
 .state-hover-row > * {
   transition: box-shadow var(--motion-state-hover) var(--motion-state-hover-easing);
 }
 
-/* * DataUpdateFade: content dimmed while an update loads */
 .update-fade {
   transition: opacity var(--motion-update-fade) var(--motion-update-fade-easing);
 }
@@ -119,7 +102,6 @@
   opacity: var(--motion-update-fade-opacity);
 }
 
-/* * DataUpdateProgress: a segment crossing the chart card's top edge while data loads */
 @keyframes update-progress {
   from {
     transform: translateX(-100%);
@@ -138,9 +120,7 @@
   animation: update-progress var(--motion-update-progress-cycle) linear infinite;
 }
 
-/* * Motion off — the Animations setting (MotionRoot's data-motion="off" on <html>, also set
-   under reduced motion) or the device's prefers-reduced-motion: nothing in the UI moves. The
-   loading state stays visible as a static bar across the card's top edge. */
+/* motion off: the Animations setting or prefers-reduced-motion (MotionRoot's data-motion on <html>) */
 :root[data-motion="off"] *,
 :root[data-motion="off"] *::before,
 :root[data-motion="off"] *::after {
@@ -173,8 +153,7 @@
   }
 }
 
-/* * BottomSheet: the panel slides up from the screen edge and back down, the backdrop fades with
-   it. Fill modes leave the panel's inline drag transform in charge once it has slid in. */
+/* fill modes leave the panel's inline drag transform in charge once it has slid in */
 @keyframes sheet-slide-in {
   from {
     transform: translateY(100%);
@@ -207,7 +186,6 @@
   animation: sheet-slide-out var(--motion-sheet-slide) var(--motion-sheet-slide-easing) forwards;
 }
 
-/* * released short of the close threshold: the panel settles back up */
 .sheet-snap-back {
   transition: transform var(--motion-sheet-slide) var(--motion-sheet-slide-easing);
 }

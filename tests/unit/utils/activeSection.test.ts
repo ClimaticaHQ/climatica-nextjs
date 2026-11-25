@@ -1,7 +1,6 @@
 import { getActiveSectionIndex } from "@/utils/activeSection.util";
 import { describe, expect, it } from "vitest";
 
-// * five sections; the last two start too near the end to reach the line (100px down)
 const TAIL = { tops: [0, 600, 1200, 1500, 1650], maxScroll: 1200, line: 100, endTolerance: 4 };
 
 describe("getActiveSectionIndex", () => {
@@ -19,7 +18,6 @@ describe("getActiveSectionIndex", () => {
   });
 
   it("gives each section that can't reach the line a turn, in order, as the scroll runs out", () => {
-    // * section 2 reaches the line at 1100; 1100–1200 is split three ways: 2, 3, 4
     const seen = [1050, 1110, 1140, 1170, 1199].map((scrollTop) =>
       getActiveSectionIndex({ ...TAIL, scrollTop }),
     );

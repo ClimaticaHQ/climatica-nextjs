@@ -5,7 +5,6 @@ const CITY_URL = `/climate-statistics?${CITY}`;
 const PERIODS_URL = `/compare-periods?${CITY}`;
 const DATA_REQUEST = /\/api\/worldclim\/pixelvaluesofapoint\?/;
 
-/** The grids the page's point requests ask for, as `10m` … `30s`. */
 function recordGrids(page: Page) {
   const grids = new Set<string>();
   page.on("request", (request) => {

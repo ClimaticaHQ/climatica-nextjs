@@ -10,7 +10,6 @@ import pt from "@/i18n/locales/pt.json";
 import uk from "@/i18n/locales/uk.json";
 
 const LOCALES = { de, el, en, es, fr, it: it_, pt, uk };
-// * messages aren't typed, so a key missing from one locale would only show up at runtime
 const WL_KEYS = Object.keys(en.chart).filter(
   (key) => key.startsWith("wl") || key.startsWith("layout") || key === "perhumidPeriod",
 );
@@ -38,7 +37,6 @@ describe("Walter-Lieth i18n keys", () => {
     WL_KEYS.filter((key) => key !== "wlGuide").forEach((key) => {
       expect(isText(chart[key])).toBe(true);
     });
-    // * the "how to read" guide's points, one per WALTER_LIETH_GUIDE_ITEMS key
     WALTER_LIETH_GUIDE_ITEMS.forEach((key) => expect(isText(guide[key])).toBe(true));
   });
 });

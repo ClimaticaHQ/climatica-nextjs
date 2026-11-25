@@ -3,11 +3,6 @@ import type { TUseYearsExportBlockArgs, TWeatherYearsExport } from "@/types";
 import { formatMonthLabel } from "@/utils";
 import { useLocale, useTranslations } from "next-intl";
 
-/**
- * The weather years' block of an export: each loaded year's Walter-Lieth series (the screen's),
- * their labels, and what the screen draws — chart type, layout, the drawn years. Undefined
- * without a layout or a loaded year.
- */
 export function useYearsExportBlock({
   model,
   viewState,

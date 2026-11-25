@@ -24,7 +24,6 @@ test.describe("Split panels", () => {
 
     await panelSwitch.getByRole("button", { name: "London" }).click();
     await expect(page).toHaveURL(/expanded=b/);
-    // * the panel header: name and "{period} · {altitude}" — the comparison table has the stats
     await expect(page.locator("figcaption").filter({ hasText: "London" }).first()).toContainText(
       " m",
     );

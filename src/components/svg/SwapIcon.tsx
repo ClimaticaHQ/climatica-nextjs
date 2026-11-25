@@ -1,4 +1,3 @@
-/** Two opposed arrows — exchanges two values. */
 export function SwapIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">

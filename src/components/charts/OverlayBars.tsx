@@ -8,11 +8,6 @@ import type { TOverlayBarsProps } from "./charts.type";
 import { seriesDataKey } from "./charts.util";
 import { PrecipBarShape } from "./PrecipBarShape";
 
-/**
- * The overlay's bars, one series per entity in entity order: its fill by its aridity (the
- * semantic one, or its shade), its hatch knocked out of it where the bar style has hatches —
- * or, while another entity is focused, plain light gray. Pointing at a bar focuses its entity.
- */
 export function OverlayBars({
   entries,
   visible,
@@ -38,7 +33,6 @@ export function OverlayBars({
           visible.prec ? Number(row[seriesDataKey(id, "prec")]) : 0
         }
         name={`${label}${SERIES_ITEM_SEPARATOR}${t("chart.precipitation")}`}
-        // * the bar's own fill reaches its shape: the context gray, or the humid default
         fill={isContext ? FOCUS_CONTEXT.BAR : CHART_COLORS.humid}
         minPointSize={0}
         background={false}

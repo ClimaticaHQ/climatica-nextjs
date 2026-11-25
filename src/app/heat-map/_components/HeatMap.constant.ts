@@ -7,8 +7,6 @@ export const HEAT_MAP_URL_SCHEMA: TUrlSchema<THeatMapUrlState> = {
   selection: selectionUrlField,
 };
 
-// * the region's stats: one row of six from `sm`, three per row below; a 1px gap over the
-// * border colour draws the dividers. The bar is its own size container (the cells' text scales)
 export const STATS_LEGEND_BAR_CLASSES = {
   FRAME: "@container",
   GRID: "grid grid-cols-3 gap-px bg-[var(--color-border)] sm:grid-cols-6",
@@ -19,16 +17,13 @@ export const STATS_LEGEND_BAR_CLASSES = {
   GRADIENT: "h-2.5 w-full rounded sm:h-3",
   GRADIENT_LABELS: "mt-1 flex justify-between",
   GRADIENT_LABEL: "text-[length:var(--font-xs)] text-[var(--color-text-secondary)]",
-  // * wraps rather than cuts: a narrow cell (or larger text) takes it onto two lines
   SUBTITLE: "block",
 } as const;
 
 export const STATS_LEGEND_GRADIENT_STOPS = 10;
 
-// * the live cell count on a shape being drawn: a Leaflet tooltip restyled in leaflet.css
 export const DRAWING_CELL_COUNT_TOOLTIP_CLASS = "drawing-cell-count";
 
-// * the map toolbar: its draw toggles share the form controls' frame and height
 export const TOOLBAR_CLASSES = {
   DRAW_BUTTON: `${FC.FRAME} ${FC.HEIGHT} flex items-center gap-2 px-3 text-[length:var(--font-sm)] font-medium transition-colors duration-150`,
   DRAW_ACTIVE:

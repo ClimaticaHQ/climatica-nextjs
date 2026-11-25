@@ -3,11 +3,7 @@ import { LEGACY_THEME_STORAGE_KEYS, LOCAL_STORAGE_KEYS } from "./localStorageKey
 
 export const PREFERS_DARK_MEDIA_QUERY = "(prefers-color-scheme: dark)";
 
-/**
- * Runs in <head> before the first paint, so a dark page never flashes light: the saved theme
- * (the settings store's, else an older version's own key), system for a missing or invalid one.
- * Plain ES5 in a string — it runs before any bundle.
- */
+/** runs before the first paint, before any bundle, so a dark page never flashes light: plain ES5 in a string */
 export const THEME_INIT_SCRIPT = `(function () {
   try {
     var themes = ${JSON.stringify(Object.values(ETheme))};

@@ -1,21 +1,12 @@
 import type { TDatasetAttribution, TFooterLinesParams, TFooterTextLine } from "@/types";
 import { wrapUrl } from "../svg/textWrap.util";
 
-/** "WorldClim v2.1 (CRU-TS 4.09)" — both numbers fetched live from WorldClim's
- * Raster resource, not hardcoded. Cited together regardless of dataset: even
- * climate-mode exports are grounded in WorldClim's v2.1 baseline, and weather
- * rasters are that baseline downscaled with CRU-TS anomalies. */
 export function formatDatasetAttribution(attribution: TDatasetAttribution | null): string {
   if (!attribution) return "WorldClim data";
   const { worldclim, cruTs } = attribution;
   return `${worldclim.creator} v${worldclim.version} (${cruTs.creator} ${cruTs.version}) data`;
 }
 
-/**
- * The share-URL line shrinks to fit on one line down to footerUrlMinFontSize.
- * If it still doesn't fit even at that size, it wraps (wrapUrl: before "?" or "&",
- * never a lone character) across as many lines as needed, all at the minimum size.
- */
 function buildShareUrlLines(url: string, layout: TFooterLinesParams["layout"]): TFooterTextLine[] {
   const { width, paddingX, footerFontSize, footerUrlMinFontSize, footerUrlAvgCharWidthRatio } =
     layout;
@@ -36,10 +27,6 @@ function buildShareUrlLines(url: string, layout: TFooterLinesParams["layout"]): 
   }));
 }
 
-/** The footer every export image (PNG/SVG, any page) carries as a mandatory
- * block — brand/context, live WorldClim+CRU-TS attribution, and a shareable
- * link back to this exact view. Callers derive their canvas height from
- * `lines.length`, since the share-URL line can wrap to more than one line. */
 export function buildFooterTextLines(params: TFooterLinesParams): TFooterTextLine[] {
   const { contextLabel, datasetAttribution, shareUrl, layout } = params;
 

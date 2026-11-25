@@ -17,7 +17,6 @@ export function computeClimateStats({
   const filtered =
     months && months.length > 0 ? data.filter((d) => months.includes(d.month)) : data;
 
-  // * unknown ("—") when no month is selected or any selected month lacks the value
   const format = (value: number | null, metric: EDisplayMetric) =>
     filtered.length > 0 ? formatValue(value, { metric, locale }) : MISSING_VALUE_LABEL;
   const avgTmax = format(meanOf(filtered.map((d) => d.tmax)), EDisplayMetric.TEMPERATURE);
@@ -27,7 +26,6 @@ export function computeClimateStats({
   return { avgTmax, avgTmin, totalPrec };
 }
 
-/** The stat cards' values and wording for the month filter. */
 export function buildCityStatsSummary({
   data,
   months,

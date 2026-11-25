@@ -20,10 +20,6 @@ import type { TChartBodyProps } from "./charts.type";
 import { getBlockContext } from "./charts.util";
 import { SidePicker } from "./SidePicker";
 
-/**
- * Two series side by side, each in its panel card with its blocks; the body's blocks below
- * both. With side pickers each panel picks its series and a swap sits between them.
- */
 export function SplitBody(props: TChartBodyProps) {
   const t = useTranslations();
   const { model, viewState, features, visible, activeMonth, syncId } = props;
@@ -99,8 +95,6 @@ export function SplitBody(props: TChartBodyProps) {
       "data-panel-series": entry.series.id,
       className: SPLIT_PANEL_CARD_CLASS,
     };
-    // * while loading every diagram takes its place, complete or not (its plot a skeleton): the
-    // * same card and chart before and after, so the data swap the plot alone
     return isLoading || isCompleteSeries(entry.walterLieth) ? (
       <Card {...card}>
         <WalterLiethChart

@@ -19,18 +19,11 @@ import type {
 import { getChartLegendItems, getContextSwatchStyle, getSeriesMarker } from "./charts.util";
 import { StatsTable } from "./StatsTable";
 
-/**
- * The monthly mean temperature and precipitation: one row per series, in the text colour — an
- * overlay's series show by their shapes.
- */
 function ValuesTableBlock({ context }: TChartBlockProps) {
   const { entries, body, mode, isCompact, activeMonth } = context;
   const isOverlay = body === EChartBody.OVERLAY;
   const isStandard = mode === "standard";
-  // * the vertical table's values carry the bars' hatch: only where the view draws each entity's
-  // * bars (the header shows the shape only)
   const swatchStyle = getContextSwatchStyle(context);
-  // * while the data load: twelve months without values, so the table keeps its columns
   const isLoading = useContext(ChartLoadingContext);
 
   return (
@@ -56,14 +49,12 @@ function ValuesTableBlock({ context }: TChartBlockProps) {
   );
 }
 
-/** The legend, for the chart type and body. */
 function LegendBlock({ context }: TChartBlockProps) {
   const labels = useLegendLabels();
   const walterLieth = useWalterLiethLegendItems();
   return <ChartLegend items={getChartLegendItems(context, labels, walterLieth)} />;
 }
 
-/** Each series' stats, metric by metric (a pair's with their difference) — above the card. */
 function StatsTableBlock({ model, features }: TSectionBlockProps) {
   const t = useTranslations();
   const table = useStatsTable(model, features);
@@ -71,7 +62,6 @@ function StatsTableBlock({ model, features }: TSectionBlockProps) {
   if (!first) return null;
 
   const rule = SERIES_KIND_RULES[first.series.kind];
-  // * a weather year's index describes that year; a pair of one weather year names it
   const martonneLabel = rule.isSingleYear
     ? t("chart.martonnePerYear")
     : first.series.year !== null
@@ -89,11 +79,7 @@ function StatsTableBlock({ model, features }: TSectionBlockProps) {
   );
 }
 
-/**
- * Everything drawn under or around a chart, in order. A new block is added here (with its
- * EChartBlock member) and appears under every chart of every page; a page leaves one out
- * through its features' hiddenBlocks.
- */
+/** a new block is added here with its EChartBlock member */
 const CHART_BLOCKS = {
   [EChartBlock.VALUES_TABLE]: {
     placement: EChartBlockPlacement.PANEL,
@@ -108,11 +94,6 @@ const CHART_BLOCKS = {
 
 const BLOCK_FRAME_CLASS = "contents";
 
-/**
- * The blocks for one spot: under a panel, under the body, or both (a body of one panel). Every
- * body places this; none renders a block itself. A display: contents frame keeps each block
- * a direct child of the chart's layout.
- */
 export function ChartBlocks({ context, placements, hiddenBlocks }: TChartBlocksProps) {
   return Object.values(EChartBlock).map((block) => {
     const definition = CHART_BLOCKS[block];
@@ -127,7 +108,6 @@ export function ChartBlocks({ context, placements, hiddenBlocks }: TChartBlocksP
   });
 }
 
-/** The blocks above the chart card, in the chart section. */
 export function SectionBlocks({ model, features }: TSectionBlockProps) {
   return Object.values(EChartBlock).map((block) => {
     const definition = CHART_BLOCKS[block];

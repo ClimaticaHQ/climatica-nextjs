@@ -8,7 +8,6 @@ export type TConsentBannerProps = {
 export type TCookieSettingsButtonProps = {
   children: ReactNode;
   className?: string | undefined;
-  /** shown instead when there are no analytics to choose about (no measurement ID) */
   fallback?: ReactNode;
 };
 

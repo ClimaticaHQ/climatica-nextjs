@@ -11,11 +11,6 @@ import { InfoNavigationContext } from "../infoNavigation.context";
 import { InfoContentsBar } from "./InfoContentsBar";
 import { InfoNavTree } from "./InfoNavTree";
 
-/**
- * The Info pages' content frame. Below lg the Contents bar above the content (hidden from lg by
- * its classes) and the navigation tree in a bottom sheet; from lg the tree is the side panel's
- * (InfoSidePanel). Both read the one navigation of InfoNavigationProvider.
- */
 export function InfoLayout({ children }: TInfoLayoutProps) {
   const t = useTranslations();
   const nav = useContext(InfoNavigationContext);
@@ -23,7 +18,6 @@ export function InfoLayout({ children }: TInfoLayoutProps) {
   const tree = {
     pages: INFO_PAGES,
     currentRoute: nav.currentPage?.route ?? null,
-    // * the sheet closes when a page is picked: it only ever shows the current one open
     openRoute: nav.currentPage?.route ?? null,
     activeId: nav.activeId,
     getPageHref: nav.getPageHref,

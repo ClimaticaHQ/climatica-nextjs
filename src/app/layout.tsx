@@ -18,8 +18,7 @@ export const metadata: Metadata = {
   description: "Climate data visualization",
 };
 
-// * cover: the page reaches under the notch and home indicator — everything pinned to an edge
-// * pads itself with env(safe-area-inset-*)
+// * cover: the page reaches under the notch; everything pinned to an edge pads itself with env(safe-area-inset-*)
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -35,7 +34,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       // * the head scripts set the theme class and the text scale before React hydrates
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      // * the motion settings, for src/styles/animations.css
       style={MOTION_CSS_VARIABLES}
     >
       <head>

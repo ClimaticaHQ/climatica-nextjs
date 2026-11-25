@@ -63,7 +63,6 @@ describe("text size", () => {
   it("reads the effective scale from the root size: the browser's and the app's together", () => {
     expect(toTextScale("16px")).toBe(1);
     expect(toTextScale("20px")).toBe(1.25);
-    // * a 20px browser default at Larger
     expect(toTextScale(`${20 * LARGER}px`)).toBe(1.5625);
     expect(toTextScale("")).toBe(1);
   });

@@ -37,8 +37,7 @@ const legendLabels = (chart: typeof de.chart) => ({
   frost: chart.frostLegend,
 });
 
-// * a deliberately wide measurer — real glyphs in the longest locales run wider than the
-// * plain estimate, and the layout must still keep them inside the margins
+// * deliberately wide: real glyphs in the longest locales run wider than the plain estimate
 const WIDE_CHAR_RATIO = 0.62;
 const measureWide = (text: string, fontSize: number) => text.length * fontSize * WIDE_CHAR_RATIO;
 
@@ -56,12 +55,10 @@ const render = (items: Parameters<typeof buildExportLegend>[0]["items"]) =>
 const unescapeXml = (text: string) =>
   text.replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
 
-/** Left and right edge of every legend text, from its x and the same measured width. */
 function textEdges(svg: string) {
   return [...svg.matchAll(/<text x="([\d.]+)" y="[\d.]+" font-size="\d+"[^>]*>([^<]*)</g)].map(
     ([, x, text]) => ({
       left: Number(x),
-      // * measure the text as drawn, not its XML escapes
       right: Number(x) + measureWide(unescapeXml(text), CHART_LEGEND.FONT_SIZE),
     }),
   );
@@ -111,7 +108,6 @@ describe("shared legend items", () => {
       visible,
       aridity: { humid: "humid", arid: "amber" },
     });
-    // * the humid fill stands for precipitation: no separate precipitation entry
     expect(items.map(({ key }) => key)).toEqual(["tmax", "tmin", "humid", "arid"]);
     expect(items.map(({ label }) => label)).toEqual([
       labels.tmax,

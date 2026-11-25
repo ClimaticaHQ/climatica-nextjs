@@ -1,12 +1,9 @@
 import { getUnitTitleFontSize, getUnitTitlePlacement } from "@/utils/chartAxis.util";
 import { describe, expect, it } from "vitest";
 
-// * a generous bound on a bold title's width: no glyph wider than 1 em
 const titleWidth = (text: string, isCompact: boolean) =>
   text.length * getUnitTitleFontSize({ isCompact });
 
-// * the narrowest and widest charts each geometry is drawn at: a split panel at 1024 px or a
-// * phone chart, up to a full-width desktop card
 const CASES = [
   { isCompact: true, chartWidth: 240 },
   { isCompact: true, chartWidth: 700 },

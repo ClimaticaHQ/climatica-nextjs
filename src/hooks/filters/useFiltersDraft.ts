@@ -15,12 +15,6 @@ import { useDatasetSelectionStore } from "@/stores";
 import { useState } from "react";
 import { useDatasetSelectionScope } from "./useDatasetSelectionScope";
 
-/**
- * The filters being edited before they're applied. Every value stays in the draft until
- * Apply — switching the dataset back and forth keeps both the climate period and the year.
- * Switching to the dataset the URL doesn't hold brings back its last applied selection.
- * Applying (how, and when) is the caller's: submit() only says what to apply.
- */
 export function useFiltersDraft({ filters, heatmapBbox }: TFiltersDraftOptions) {
   const [draft, setDraft] = useState(filters);
   const [followed, setFollowed] = useState(filters);
@@ -28,8 +22,6 @@ export function useFiltersDraft({ filters, heatmapBbox }: TFiltersDraftOptions) 
   const scope = useDatasetSelectionScope();
   const scoped = useDatasetSelectionStore((state) => state.selections[scope]);
 
-  // * the applied filters changed (back/forward, a canonical replace, an applied draft coming
-  // * back normalized): the draft follows them, and matches — so nothing applies again
   if (!areFiltersEqual(followed, filters)) {
     setFollowed(filters);
     setDraft(filters);
@@ -38,7 +30,6 @@ export function useFiltersDraft({ filters, heatmapBbox }: TFiltersDraftOptions) 
 
   const yearError =
     draft.dataset === DATASETS.WEATHER ? getWeatherYearError(draft.weatherYear) : null;
-  // * a region (and so a cell count) exists only on the heat map: the grid it would load at there
   const heatmapGridSize = resolveGridSize(draft, EFilterView.HEAT_MAP);
   const cellCount = heatmapBbox === null ? null : countCellsInBounds(heatmapBbox, heatmapGridSize);
 
@@ -52,7 +43,6 @@ export function useFiltersDraft({ filters, heatmapBbox }: TFiltersDraftOptions) 
     });
   }
 
-  /** The draft this change would make — for a pick applied at once, without the draft. */
   function withFilter<K extends EFilterKey>(key: K, value: TFilters[K]) {
     return withValues(draft, setFilterValue(draft, key, value));
   }
@@ -62,13 +52,12 @@ export function useFiltersDraft({ filters, heatmapBbox }: TFiltersDraftOptions) 
     setIsValidationShown(false);
   }
 
-  /** Several values at once, normalized together — a swapped pair is never equal halfway. */
+  /** normalized together, so a swapped pair is never equal halfway */
   function setFilters(values: Partial<TFilters>) {
     setDraft((prev) => withValues(prev, values));
     setIsValidationShown(false);
   }
 
-  /** The filters to apply, or null when the draft is invalid — its errors show from now on. */
   function submit(): TFilters | null {
     setIsValidationShown(true);
     return yearError === null ? draft : null;

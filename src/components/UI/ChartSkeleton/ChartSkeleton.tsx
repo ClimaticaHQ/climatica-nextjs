@@ -7,10 +7,6 @@ import {
 } from "./ChartSkeleton.constant";
 import type { TChartSkeletonProps } from "./ChartSkeleton.type";
 
-/**
- * A plot that is waiting for its data, in the plot's own box (its height class), so the chart
- * replaces it without moving anything. Decorative: the region around it says it is loading.
- */
 export function ChartSkeleton({ heightClass }: TChartSkeletonProps) {
   return (
     <div aria-hidden data-chart-skeleton className={`${C.ROOT} ${heightClass}`}>

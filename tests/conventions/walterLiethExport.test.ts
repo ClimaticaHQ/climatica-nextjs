@@ -16,7 +16,6 @@ import {
 } from "@/utils/walterLieth.util";
 import { describe, expect, it } from "vitest";
 
-// * Mumbai-like: dry winter (arid), monsoon far above 100 mm (perhumid), humid band between
 const MONTHS: TWalterLiethMonth[] = [
   [24, 1],
   [25, 1],
@@ -87,19 +86,15 @@ describe("buildWalterLiethPanel", () => {
   });
 
   it("derives the hatch patterns from the month width, like the live diagram", () => {
-    // * 860 px plot / 12 months — the same getHatchGeometry the screen uses
     const { spacing, dotRadius, dotRowHeight } = getHatchGeometry(860 / 12);
     const svg = buildPlot();
 
     expect(svg).toContain(`id="t-humid" x="70" width="${spacing}" height="${spacing}"`);
     expect(svg).toContain(`id="t-arid" x="70" width="${spacing}" height="${dotRowHeight}"`);
-    // * dots sit in the humid lines' columns
     expect(svg).toContain(`<circle cx="${spacing / 2}" cy="${dotRowHeight / 2}" r="${dotRadius}"`);
   });
 
   it("places month i at the centre of its band, like the live chart's [-0.5, 11.5] x axis", () => {
-    // * 860 px / 12 bands → January's dot at 70 + 35.83, December's at 930 − 35.83
-    // * a circle's path starts at its left edge: cx − r
     const r = WALTER_LIETH_DOT.RADIUS;
     const dotPattern = new RegExp(`<path d="M([\\d.]+) [\\d.]+a${r} ${r} 0 1 0`, "g");
     const dots = [...buildPlot().matchAll(dotPattern)].map((m) => Number(m[1]) + r);
@@ -110,7 +105,6 @@ describe("buildWalterLiethPanel", () => {
 });
 
 describe("buildExportSvg — Walter-Lieth mode", () => {
-  // * tmin/tmax chosen so (tmin + tmax) / 2 reproduces MONTHS' mean temperatures
   const monthlyData = MONTHS.map(({ tavg, prec }, i) => ({
     month: i + 1,
     monthName: `M${i + 1}`,
@@ -173,12 +167,11 @@ describe("buildExportSvg — Walter-Lieth mode", () => {
   });
 
   it("draws each curve over a background halo, like the live chart", () => {
-    expect(svg).toMatch(/stroke="#fff" stroke-width="5" stroke-linejoin="round"/); // * temp: 2 + 3
-    expect(svg).toMatch(/stroke="#fff" stroke-width="4.5" stroke-linejoin="round"/); // * prec: 1.5 + 3
+    expect(svg).toMatch(/stroke="#fff" stroke-width="5" stroke-linejoin="round"/);
+    expect(svg).toMatch(/stroke="#fff" stroke-width="4.5" stroke-linejoin="round"/);
   });
 
   it("paints hatching → halos → perhumid fill → curves, so no halo shows on the fill", () => {
-    // * the plot's own group — the legend below repeats some fills in its swatches
     const plotStart = svg.indexOf('<g clip-path="url(#wl-export-plot-clip)">');
     const plot = svg.slice(plotStart, svg.indexOf("</g>", plotStart));
     const at = (needle: string) => plot.indexOf(needle);
@@ -186,7 +179,7 @@ describe("buildExportSvg — Walter-Lieth mode", () => {
     const hatching = at('fill="url(#wl-export-humid)"');
     const halo = (width: number) =>
       `fill="none" stroke="#fff" stroke-width="${width}" stroke-linejoin`;
-    const halos = [at(halo(4.5)), at(halo(5))]; // * prec 1.5 + 3, temp 2 + 3
+    const halos = [at(halo(4.5)), at(halo(5))];
     const perhumid = at(`fill="${COLORS.wlCompressedFill}" fill-opacity="1"`);
     const precLine = at(`stroke="${COLORS.wlPrec}" stroke-width="1.5"`);
 

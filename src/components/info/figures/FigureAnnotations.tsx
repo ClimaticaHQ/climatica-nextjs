@@ -4,11 +4,6 @@ import type { TAnnotationNumberProps, TFigureAnnotationsProps } from "../info.ty
 
 const line = { stroke: S.STROKE, strokeWidth: S.STROKE_WIDTH, fill: "none" } as const;
 
-/**
- * A figure's annotations drawn in its chart: numbers in the band above the plot (a bottom
- * span's under the month labels), thin brackets over spans, dashed leaders down to rings at
- * points. Numbered by the caption. The 0 °C line is the standard chart's own.
- */
 export function FigureAnnotations({ annotations, projection, layout }: TFigureAnnotationsProps) {
   const { numbers, brackets, leaders } = layoutAnnotations({ annotations, projection, layout });
   const tick = layout.bracketTick;

@@ -4,14 +4,6 @@ import { CHART_TRANSITION_CLASSES as C } from "./ChartTransition.constant";
 import type { TChartTransitionProps, TTransitionLayer } from "./ChartTransition.type";
 import { getTransitionMotion } from "./ChartTransition.util";
 
-/**
- * Crossfades a chart card's content when transitionKey changes: the old content fades out as
- * it last rendered while the new one fades in on top — or, with enterOrigin, scales up slightly
- * from that side (a split panel expanding). A placeholder (the content while its data load) is
- * replaced, not crossfaded: under the same key the layer stays (nothing in it remounts) and
- * fades in as the content arrives; under a new key it goes at once. Instant with motion off
- * (setting or reduced motion).
- */
 export function ChartTransition({
   transitionKey,
   enterOrigin,

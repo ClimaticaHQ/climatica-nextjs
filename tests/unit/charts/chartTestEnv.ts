@@ -1,9 +1,6 @@
 import { vi } from "vitest";
 
-/**
- * What the charts need from a browser that jsdom lacks: matchMedia (reduced motion, so a chart
- * type switch replaces the body at once), ResizeObserver, and quiet Recharts size warnings.
- */
+/** what the charts need that jsdom lacks: matchMedia, ResizeObserver, and quiet Recharts size warnings */
 export function stubChartEnvironment() {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
     matches: query.includes("reduce"),

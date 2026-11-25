@@ -68,14 +68,12 @@ describe("the Comparison bar style row", () => {
     const group = renderPage();
     const description = screen.getByText(text.descriptions.chartBarStyle);
     const radios = within(group).getAllByRole("radio");
-    // * named by their style alone (the description is theirs too, apart)
     expect(radios).toEqual([card("plain"), card("shades"), card("hatch")]);
     expect(radios.map((radio) => radio.getAttribute("aria-checked"))).toEqual([
       "true",
       "false",
       "false",
     ]);
-    // * each card is described by its row's description, then by its style
     const [rowId, styleId] = card("hatch").getAttribute("aria-describedby")?.split(" ") ?? [];
     expect(rowId).toBe(description.id);
     expect(document.getElementById(styleId ?? "")?.textContent).toBe(
@@ -94,12 +92,9 @@ describe("the Comparison bar style row", () => {
     expect(previewFills("shades")).toEqual(
       expect.arrayContaining([0, 1, 2].map((place) => getBarShades(place).humid)),
     );
-    // * hatches only in the hatch card: the second and third entities' (the first is solid)
     expect(preview("plain")?.querySelectorAll("[data-bar-hatch]")).toHaveLength(0);
     expect(preview("shades")?.querySelectorAll("[data-bar-hatch]")).toHaveLength(0);
     expect(preview("hatch")?.querySelectorAll("[data-bar-hatch]")).toHaveLength(6);
-    // * and the chart's own layout for the thumbnail's band: the style's gap, adapted as the
-    // * chart adapts it (its bars at the minimum: plain at its floor)
     for (const style of ["plain", "shades", "hatch"] as const) {
       const { gap, minGap } = OVERLAY_BAR_STYLES[style];
       const plotWidth =
@@ -113,7 +108,6 @@ describe("the Comparison bar style row", () => {
       const [a = 0, b = 0] = barXs(style);
       expect(b - a).toBeCloseTo(layout.barSize + layout.gap);
     }
-    // * a Tmax and a Tmin curve over the bars
     expect(preview("plain")?.querySelectorAll("path")).toHaveLength(2);
   });
 
@@ -162,7 +156,6 @@ describe("the Comparison bar style row", () => {
     expect(useSettingsStore.getState().chartBarStyle).toBe("plain");
     fireEvent.keyDown(card("plain"), { key: "End" });
     expect(useSettingsStore.getState().chartBarStyle).toBe("hatch");
-    // * any other key is left alone
     fireEvent.keyDown(card("hatch"), { key: "a" });
     expect(useSettingsStore.getState().chartBarStyle).toBe("hatch");
   });

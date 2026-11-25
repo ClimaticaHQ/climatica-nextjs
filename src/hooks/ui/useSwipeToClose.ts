@@ -5,16 +5,11 @@ import type { TSwipeToCloseOptions } from "@/types";
 import { getSwipeOffset, shouldCloseOnSwipe } from "@/utils/bottomSheet.util";
 import { type PointerEvent, useState } from "react";
 
-/**
- * Drag-down-to-close for the element the handlers go on (a sheet's handle and header — never
- * its scrolling content). Past the threshold on release it closes; short of it, it snaps back.
- */
 export function useSwipeToClose({ isEnabled, thresholdPx, onClose }: TSwipeToCloseOptions) {
   const [startY, setStartY] = useState<number | null>(null);
   const [offset, setOffset] = useState(0);
   const [wasEnabled, setWasEnabled] = useState(isEnabled);
 
-  // * reopened: the drag that closed it last time is gone
   if (wasEnabled !== isEnabled) {
     setWasEnabled(isEnabled);
     if (isEnabled) setOffset(0);

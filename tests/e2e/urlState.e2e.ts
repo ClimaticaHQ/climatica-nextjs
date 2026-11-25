@@ -11,8 +11,7 @@ function persist(page: Page, entries: Record<string, unknown>) {
   }, entries);
 }
 
-// * regression: the title kept the persisted city ("Madrid" on a Berlin URL, "Rome" on an Oslo
-// * URL) because it was captured before the URL was applied
+// * regression: the title kept the persisted city because it was captured before the URL was applied
 test.describe("URL state wins over persisted state", () => {
   test.describe.configure({ retries: 0 });
 

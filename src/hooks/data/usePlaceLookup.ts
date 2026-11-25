@@ -2,11 +2,7 @@ import { useResolveCityByCoordinates } from "./useResolveCityByCoordinates";
 import type { TCoordinates, TPlaceLookupHandlers } from "@/types";
 import { useRef } from "react";
 
-/**
- * Looks up the place at a point. Only the latest lookup answers: one asked earlier, or one
- * cancelled by another pick, is dropped. The place keeps the looked-up coordinates, so renaming
- * a pick never changes what its climate queries ask for.
- */
+/** only the latest lookup answers: an earlier or cancelled one is dropped */
 export function usePlaceLookup() {
   const { isLoading, mutateAsync: resolveCity } = useResolveCityByCoordinates();
   const latestRef = useRef(0);

@@ -1,7 +1,6 @@
 import { SPLIT_PANELS_CLASSES as C } from "../SplitPanels.constant";
 import type { TPanelIconButtonProps } from "../SplitPanels.type";
 
-/** A panel header's icon button (expand, collapse): named by aria-label, shared focus ring. */
 export function PanelIconButton({
   label,
   icon,

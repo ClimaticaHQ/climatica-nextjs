@@ -18,7 +18,6 @@ import { buildWalterLiethPatterns } from "./walterLiethExport.util";
 const R = CHART_LEGEND.SWATCH_RADIUS;
 const FROST_INSET = WALTER_LIETH_FROST.STROKE_WIDTH / 2;
 
-/** The WL legend's palette resolved to export colors — the screen uses the same CSS vars. */
 export const getWalterLiethExportPalette = (
   colors: TExportChartColors,
 ): TWalterLiethLegendPalette => ({
@@ -31,12 +30,10 @@ export const getWalterLiethExportPalette = (
   frostOutline: colors.wlFrostOutline,
 });
 
-/** String twin of the ChartLegend swatches — the same descriptors, drawn as SVG markup. */
 export function buildSwatch({ swatch, x, top, size, id }: TExportSwatchArgs): TExportSwatch {
   const { width: w, height: h } = size;
   const box = (width: number, color: string) =>
     `<rect x="${(x + (w - width) / 2).toFixed(2)}" y="${top}" width="${width.toFixed(2)}" height="${h}" rx="${R}" fill="${color}" />`;
-  // * a switch narrows the descriptor union without casts
   switch (swatch.kind) {
     case ELegendSwatch.LINE: {
       const dash = swatch.dash !== undefined ? ` stroke-dasharray="${swatch.dash}"` : "";
@@ -51,7 +48,6 @@ export function buildSwatch({ swatch, x, top, size, id }: TExportSwatchArgs): TE
       return { svg: box(w, swatch.color), defs: "" };
     case ELegendSwatch.FROST:
       return {
-        // * inset by half the stroke, like FrostSwatch.tsx, so the outline stays in the box
         svg: `<rect x="${x + FROST_INSET}" y="${top + FROST_INSET}" width="${w - WALTER_LIETH_FROST.STROKE_WIDTH}" height="${h - WALTER_LIETH_FROST.STROKE_WIDTH}" fill="${swatch.color}" stroke="${swatch.outline}" stroke-width="${WALTER_LIETH_FROST.STROKE_WIDTH}" />`,
         defs: "",
       };
@@ -61,7 +57,6 @@ export function buildSwatch({ swatch, x, top, size, id }: TExportSwatchArgs): TE
       return { svg: `<path d="${d}" fill="${swatch.color}" />`, defs: "" };
     }
     case ELegendSwatch.ENTITY: {
-      // * the hatch square (its own pattern), then the shape square
       const patternId = `${id}-hatch`;
       const square = `x="${x}" y="${top}" width="${h}" height="${h}" rx="${R}"`;
       const hatch = swatch.hatch === "solid" ? "" : `<rect ${square} fill="url(#${patternId})" />`;
@@ -89,10 +84,6 @@ export function buildSwatch({ swatch, x, top, size, id }: TExportSwatchArgs): TE
   }
 }
 
-/**
- * Export twin of ChartLegend: the same items in rows that wrap before `width` and are
- * centered in it, like the screen legend. Returns the last row's baseline.
- */
 export function buildExportLegend({
   items,
   y,

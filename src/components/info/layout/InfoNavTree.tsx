@@ -12,11 +12,6 @@ import { INFO_NAV_CLASSES as C } from "../info.constant";
 import type { TInfoNavTreeProps } from "../info.type";
 import { InfoSectionList } from "./InfoSectionList";
 
-/**
- * The Info pages as one tree — the sidebar's from lg, the Contents sheet's below: every page with
- * its sections folded under it, open under the open page. Picking a page folds its list open and
- * the other shut while one pill moves to where the page's name lands (getFoldedRect).
- */
 export function InfoNavTree({
   pages,
   currentRoute,
@@ -48,8 +43,6 @@ export function InfoNavTree({
           const isOpen = route === openRoute;
           const isCurrent = route === currentRoute;
           const shown = sections.filter(({ isShown }) => isShown);
-          // * the current page keeps its section in view while it folds shut; a page being
-          // * opened shows its first
           const listActiveId = isCurrent ? activeId : isOpen ? (shown[0]?.id ?? null) : null;
           const activeClass = `${C.PAGE_LINK_ACTIVE} ${indicator ? "" : C.PAGE_LINK_ACTIVE_STATIC}`;
           return (

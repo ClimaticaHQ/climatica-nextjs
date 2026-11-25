@@ -4,14 +4,9 @@ import { ETextScale } from "@/enums";
 const ACTIVE_BG = "bg-[var(--color-chip-active-bg)]";
 const ACTIVE_BORDER = "border-[var(--color-chip-active-border)]";
 const ACTIVE_TEXT = "text-[var(--color-chip-active-text)]";
-// * every chip's disabled look, at every size and breakpoint, through colours (never opacity, so
-// * a selected one can keep its cue): the unselected chip's surface, with text and border at
-// * MD2's disabled emphasis. No hover. Not a contrast target (WCAG 1.4.3 exempts disabled
-// * controls) — the note under it explains, at full contrast
+// * through colours, never opacity, so a selected one keeps its cue; WCAG 1.4.3 exempts disabled controls
 export const DISABLED_LOOK =
   "border-[var(--color-border-disabled)] bg-[var(--color-surface)] text-[var(--color-text-disabled)]";
-// * disabled but selected (the variables a Walter-Lieth diagram draws): the selected tints at
-// * reduced emphasis, still apart from an unselected disabled chip
 export const DISABLED_SELECTED_LOOK =
   "border-[var(--color-chip-disabled-selected-border)] bg-[var(--color-chip-disabled-selected-bg)] text-[var(--color-chip-disabled-selected-text)]";
 
@@ -26,13 +21,6 @@ export const TOGGLE_CHIP_CLASSES = {
   LABEL_WITH_MARKER: "inline-flex items-center gap-1.5",
 } as const;
 
-// * a toggle chip's size per text scale — only its text and the spacing around it. DEFAULT keeps
-// * its look with a 44px target below lg (touch-target). TOUCH below
-// * lg: the desktop chip scaled up evenly — 15 px text in a 36 px pill, 14 px each side — and a
-// * transparent ::before reaching 4 px past the pill above and below (5 px from the padding edge,
-// * inside the 1 px border), so the tap target is 44 px — and sideways for a pill under 44 px wide.
-// * The pill has a 36 px floor and chips sit at least 8 px apart (FILTER_CHIP_ROW_CLASS), so at
-// * every text size neighbouring targets meet but never overlap
 export const TOGGLE_CHIP_SCALE_CLASSES: Record<ETextScale, string> = {
   [ETextScale.DEFAULT]:
     "touch-target px-2.5 py-1 text-[length:var(--font-base)] leading-[var(--leading-base)]",
@@ -40,7 +28,6 @@ export const TOGGLE_CHIP_SCALE_CLASSES: Record<ETextScale, string> = {
     "px-2.5 py-1 text-[length:var(--font-base)] leading-[var(--leading-base)] max-lg:relative max-lg:inline-flex max-lg:h-[max(2.25rem,36px)] max-lg:items-center max-lg:px-3.5 max-lg:py-0 max-lg:text-[length:var(--font-touch-chip)] max-lg:before:absolute max-lg:before:inset-x-[min(0px,calc((100%-44px)/2))] max-lg:before:-inset-y-[5px] max-lg:before:content-['']",
 };
 
-// * a filter bar chip is a ≥44px-tall button (the touch target); the pill inside is what shows
 export const BAR_CHIP_CLASSES = {
   BUTTON:
     "group flex min-h-target shrink-0 items-center rounded-[var(--radius-full)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand)]",
@@ -50,11 +37,9 @@ export const BAR_CHIP_CLASSES = {
   CHANGED:
     "border-[var(--color-chip-active-border)] bg-[var(--color-chip-active-bg)] text-[var(--color-chip-active-text)]",
   ALL: "border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-on-primary)]",
-  // * not changeable in this view, yet tappable — it opens the explanation
   DISABLED: DISABLED_LOOK,
   BADGE:
     "inline-flex h-5 min-w-5 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-on-primary)] px-1 text-[length:var(--font-xs)] font-semibold text-[var(--color-primary)]",
-  // * the "Filters" label shows from 360px up; below it, icon and badge only
   ALL_LABEL: "hidden min-[22.5rem]:inline",
   ICON: "h-4 w-4",
 } as const;

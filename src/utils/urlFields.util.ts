@@ -10,7 +10,6 @@ import { ECompareLayout, ESortOrder, EWalterLiethSeriesId, EWalterLiethShading }
 import type { TChartMode, TCity, TExpandedPanel, TMarkerSlots, TPair, TUrlField } from "@/types";
 import { parseCoord } from "./urlParams.util";
 
-/** Same factory for every city — only the param names differ per page/slot. */
 export function cityUrlField(paramNames: {
   name: string;
   lat: string;
@@ -32,11 +31,6 @@ export function cityUrlField(paramNames: {
   };
 }
 
-/**
- * Comparison layout, shared by both chart types. Written only when it differs from the
- * default (split); old links carried it as wlLayout, still read. Unknown values parse to
- * undefined.
- */
 export const compareLayoutUrlField: TUrlField<ECompareLayout> = {
   serialize(value, params) {
     if (value !== DEFAULT_COMPARE_LAYOUT) params.set(SIDEBAR_PARAMS.LAYOUT, value);
@@ -47,10 +41,6 @@ export const compareLayoutUrlField: TUrlField<ECompareLayout> = {
   },
 };
 
-/**
- * Chart mode — `chart=standard` for the standard chart; Walter-Lieth (the default) writes
- * nothing. Old links' `chart=wl` still parses to Walter-Lieth.
- */
 export const chartModeUrlField: TUrlField<TChartMode> = {
   serialize(value, params) {
     if (value === "standard") params.set(SIDEBAR_PARAMS.CHART, SIDEBAR_PARAMS.CHART_MODE_STANDARD);
@@ -60,7 +50,6 @@ export const chartModeUrlField: TUrlField<TChartMode> = {
   },
 };
 
-/** Overlay shading — written only when it differs from the default (series A). */
 export const walterLiethShadingUrlField: TUrlField<EWalterLiethShading> = {
   serialize(value, params) {
     if (value !== WALTER_LIETH_COMPARISON.DEFAULT_SHADING) {
@@ -73,16 +62,11 @@ export const walterLiethShadingUrlField: TUrlField<EWalterLiethShading> = {
   },
 };
 
-// * a comma-joined list of whole years, e.g. "2021,1990"
 const parseYearList = (raw: string | null) => {
   const years = (raw ?? "").split(",").map(Number);
   return raw !== null && raw !== "" && years.every(Number.isInteger) ? years : null;
 };
 
-/**
- * The weather years drawn side by side — "2021,1990"; null (the default pair) is omitted.
- * Old links' wlYears is still read, never written.
- */
 export const weatherYearPairUrlField: TUrlField<TPair<number> | null> = {
   serialize(value, params) {
     if (value !== null) params.set(SIDEBAR_PARAMS.PAIR_YEARS, value.join(","));
@@ -98,7 +82,6 @@ export const weatherYearPairUrlField: TUrlField<TPair<number> | null> = {
   },
 };
 
-/** The weather years drawn in the overlay — "2021,1990"; null (every year) is omitted. */
 export const shownYearsUrlField: TUrlField<readonly number[] | null> = {
   serialize(value, params) {
     if (value !== null) params.set(SIDEBAR_PARAMS.SHOWN_YEARS, value.join(","));
@@ -109,7 +92,6 @@ export const shownYearsUrlField: TUrlField<readonly number[] | null> = {
   },
 };
 
-/** The split's expanded panel — `expanded=a|b`; both panels shown (the default) writes nothing. */
 export const expandedPanelUrlField: TUrlField<TExpandedPanel> = {
   serialize(value, params) {
     if (value !== null) params.set(SIDEBAR_PARAMS.EXPANDED, value);
@@ -120,7 +102,6 @@ export const expandedPanelUrlField: TUrlField<TExpandedPanel> = {
   },
 };
 
-/** Compare Periods' list order — `order=desc`; oldest first (the default) writes nothing. */
 export const sortOrderUrlField: TUrlField<ESortOrder> = {
   serialize(value, params) {
     if (value !== DEFAULT_SORT_ORDER) params.set(SIDEBAR_PARAMS.SORT_ORDER, value);
@@ -131,10 +112,6 @@ export const sortOrderUrlField: TUrlField<ESortOrder> = {
   },
 };
 
-/**
- * Compare Periods' marker slots — "2021:0,1999:2"; null (each year its place in the list) is
- * omitted. An invalid or repeated entry drops the whole value: the list's order then.
- */
 export const markerSlotsUrlField: TUrlField<TMarkerSlots | null> = {
   serialize(value, params) {
     if (value === null) return;

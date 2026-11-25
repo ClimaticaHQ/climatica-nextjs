@@ -6,11 +6,6 @@ import { getLinkNavigationTarget } from "@/utils";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-/**
- * Records where an internal link click is navigating (capture phase, before the router acts)
- * and clears it once the route changes — so useUrlStateSync never rewrites the old page's URL
- * while the navigation is in flight. Renders nothing.
- */
 export function NavigationIntentTracker() {
   // * the browser path, locale prefix included — so a locale switch counts as landing too
   const pathname = usePathname();
@@ -28,7 +23,6 @@ export function NavigationIntentTracker() {
     return () => document.removeEventListener("click", onClick, { capture: true });
   }, [setPendingPathname]);
 
-  // * the primary clear: the navigation landed (or back/forward moved elsewhere)
   useEffect(() => {
     setPendingPathname(null);
   }, [pathname, setPendingPathname]);

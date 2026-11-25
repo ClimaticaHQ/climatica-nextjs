@@ -11,9 +11,7 @@ import type { useInfoNavigation } from "@/hooks/pages/useInfoNavigation";
 import type { ComponentType, MouseEvent, ReactNode } from "react";
 
 export type TInfoSectionProps = {
-  /** one of INFO_SECTION_IDS */
   id: string;
-  /** a paragraph under the title */
   intro?: ReactNode;
   children?: ReactNode;
 };
@@ -27,16 +25,13 @@ export type TDataSource = {
   key: string;
   name: string;
   url: string;
-  /** its citation or licence, as its authors give it: not translated */
   note: string;
 };
 
 export type TReference = {
   key: string;
   text: string;
-  /** its DOI link */
   url?: string;
-  /** its exact title, searched on Google Scholar where it has no DOI */
   title?: string;
 };
 
@@ -46,24 +41,18 @@ export type THowToCiteProps = {
 };
 
 export type TInfoNavTreeProps = {
-  /** each with its sections, folded open under it while it's the open page */
   pages: readonly TInfoPage[];
-  /** the page shown (aria-current) */
   currentRoute: string | null;
-  /** the page highlighted, its sections open: the one being opened, else the current one */
   openRoute: string | null;
-  /** the current page's section in view */
   activeId: string | null;
   getPageHref: (route: string) => string;
   onSectionClick: (event: MouseEvent<HTMLAnchorElement>, id: string) => void;
   onPageClick: (event: MouseEvent<HTMLAnchorElement>, route: string) => void;
-  /** finger-sized rows (the Contents sheet): 48 px pages, 44 px sections */
   hasLargeTargets: boolean;
 };
 
 export type TInfoSectionListProps = Pick<TInfoNavTreeProps, "activeId" | "onSectionClick"> & {
   sections: readonly TInfoSection[];
-  /** the tree's section link size (REGULAR or LARGE) */
   linkSizeClass: string;
 };
 
@@ -74,7 +63,6 @@ export type TInfoContentsBarProps = {
   onOpen: () => void;
 };
 
-/** The Info navigation's state (useInfoNavigation), shared by the side panel and the content. */
 export type TInfoNavigation = ReturnType<typeof useInfoNavigation>;
 
 export type TInfoNavigationProviderProps = {
@@ -82,30 +70,20 @@ export type TInfoNavigationProviderProps = {
 };
 
 export type TInfoLayoutProps = {
-  /** the page, its footer last (InfoFooter): both stream in together */
   children: ReactNode;
 };
 
-/** One card of an InfoCardGrid. Every slot is optional but the title; they show in this order. */
 export type TInfoCardItem = {
   key: string;
-  /** a STACK card's icon, in a tinted square */
   icon?: ComponentType;
-  /** a ROW card's number, in a badge */
   number?: string;
-  /** a small uppercase line above the title */
   eyebrow?: string;
   title: string;
-  /** a link on the title: a page of the app */
   titleHref?: string;
-  /** beside the title, in code type */
   formula?: string;
   text?: ReactNode;
-  /** content that doesn't fit the text slot (a list, several paragraphs), as given */
   body?: ReactNode;
-  /** a citation or licence, in italics */
   note?: string;
-  /** another site, at the bottom of the card */
   link?: { href: string; label: string };
   isHighlighted?: boolean;
 };
@@ -114,9 +92,7 @@ export type TInfoCardColumns = 1 | 2 | 3;
 
 export type TInfoCardGridProps = {
   items: readonly TInfoCardItem[];
-  /** from lg; one column below */
   columns: TInfoCardColumns;
-  /** an <ol>: the cards are steps */
   isOrdered?: boolean;
   layout?: EInfoCardLayout;
 };
@@ -126,7 +102,6 @@ export type TInfoCardProps = {
   layout: EInfoCardLayout;
 };
 
-/** One entry of an InfoList: its text, and optionally an icon before it or a link after it. */
 export type TInfoListItem = {
   key: string;
   text: ReactNode;
@@ -140,11 +115,8 @@ export type TInfoListProps = {
 };
 
 export type TInfoFigureProps = {
-  /** the picture (hidden from screen readers by itself: the caption says all it shows) */
   visual: ReactNode;
-  /** the numbered annotations: the n-th's marker and caption line both read n */
   annotations: readonly Pick<TFigureAnnotation, "key" | "captionKey">[];
-  /** where its data come from: the caption's first line */
   place: TFigurePlace;
 };
 
@@ -159,7 +131,6 @@ export type TInfoFigureMarkerProps = {
 export type TFigureAnnotationsProps = {
   annotations: readonly TFigureAnnotation[];
   projection: TChartProjection;
-  /** at the text scale (scaleAnnotationLayout) */
   layout: TAnnotationLayout;
 };
 

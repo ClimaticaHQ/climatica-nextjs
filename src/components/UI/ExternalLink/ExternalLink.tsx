@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import { EXTERNAL_LINK_CLASS, EXTERNAL_LINK_TARGET_CLASS } from "./ExternalLink.constant";
 import type { TExternalLinkProps } from "./ExternalLink.type";
 
-/** A link to another site, in a new tab — which screen readers are told. */
 export function ExternalLink({
   href,
   className = EXTERNAL_LINK_CLASS,

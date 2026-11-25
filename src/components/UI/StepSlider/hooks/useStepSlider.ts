@@ -2,10 +2,6 @@ import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from
 import { STEP_SLIDER_KEYS } from "../StepSlider.constant";
 import type { TStepSliderArgs, TStepSliderState } from "../StepSlider.type";
 
-/**
- * A stepped slider's state. A drag moves only the slider (a draft step) and applies on release —
- * the native change event — so nothing reflows under the finger; a key applies at once.
- */
 export function useStepSlider<TValue extends string>({
   steps,
   value,

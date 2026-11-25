@@ -7,11 +7,6 @@ import { useSheetHistory } from "../ui/useSheetHistory";
 import { useChartModeUrl } from "../url/useChartModeUrl";
 import { useFilterNavigation } from "./useFilterNavigation";
 
-/**
- * The filters sheet below lg — whether it's open, in which mode — and the only way it changes
- * filters. mode and filterKey stay on the last opening, so the sheet keeps its content while
- * sliding out.
- */
 export function useFiltersSheet() {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState(EFiltersSheetMode.ALL);
@@ -30,10 +25,7 @@ export function useFiltersSheet() {
     open(EFiltersSheetMode.SINGLE);
   }
 
-  // * never navigate while the sheet is open: Next's router.replace / push rewrite
-  // * history.state, dropping the marker of the entry the sheet pushed — it couldn't be popped
-  // * any more, and would stay behind as a Back press that does nothing. So the sheet closes
-  // * first (its entry popped), and only then does the router run.
+  // * never navigate while the sheet is open: Next's router rewrites history.state and strands the sheet's entry as a dead Back press
   async function applyAndClose(next: TFilters, applyMode: EFilterApplyMode) {
     await closeSheet();
     applyFilters(next, applyMode);

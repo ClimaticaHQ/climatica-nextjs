@@ -13,7 +13,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-/** { a: { b: "x" } } → { "a.b": "x" }; a non-string leaf is kept as-is so the test reports it */
 function flatten(messages: Record<string, unknown>, prefix = ""): Map<string, unknown> {
   const flat = new Map<string, unknown>();
   for (const [key, value] of Object.entries(messages)) {

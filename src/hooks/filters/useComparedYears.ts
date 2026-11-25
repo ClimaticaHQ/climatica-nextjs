@@ -7,11 +7,6 @@ import { markerSlotsUrlField, sortOrderUrlField } from "@/utils/urlFields.util";
 import { useSearchParams } from "next/navigation";
 import { useFilters } from "./useFilters";
 
-/**
- * Compare Periods' years as its lists show them, for the filters (a draft too): in the page's
- * order, each with its marker — the URL's slots (or the applied list's order) for the years
- * kept, the lowest free slot for one just added. Read only: the page owns both params.
- */
 export function useComparedYears(years: readonly number[]) {
   const params = new URLSearchParams(useSearchParams().toString());
   const { weatherPeriods: applied } = useFilters();

@@ -9,11 +9,7 @@ import {
   ZIndexLayer,
 } from "recharts";
 
-/**
- * Renders a chart's overlay through the chart's own scales (Recharts' Customized layer), so an
- * annotation anchored on a month and a value stays on them whatever the width, margins or
- * domain. A band scale is read at the band's middle.
- */
+/** through Recharts' Customized layer, so an annotation uses the chart's own scales */
 export function ChartOverlayLayer({
   render,
   xValueOf,

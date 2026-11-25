@@ -10,7 +10,6 @@ import { useTranslations } from "next-intl";
 import { INFO_CLASSES as C } from "../info.constant";
 import { InfoSection } from "./InfoSection";
 
-/** Every grid: its cell at the equator and the data it exists for, from the filters' own rule. */
 export function ResolutionsTable() {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();

@@ -1,4 +1,3 @@
-/** No hatching — an empty swatch struck through. */
 export function NoShadingIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">

@@ -1,6 +1,5 @@
 import { LOCALES } from "./locales.constant";
 
-// * each language in its own name, so a reader finds theirs whatever language the page is in
 const LANGUAGE_NATIVE_NAMES: Readonly<Record<string, string>> = {
   de: "Deutsch",
   el: "Ελληνικά",

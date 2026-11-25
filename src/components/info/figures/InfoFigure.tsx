@@ -4,11 +4,6 @@ import { useTranslations } from "next-intl";
 import { INFO_FIGURE_CLASSES as C } from "../info.constant";
 import type { TInfoFigureMarkerProps, TInfoFigureProps } from "../info.type";
 
-/**
- * An Info page figure: a picture with numbered annotations, and a caption saying where its data
- * come from and, by the same numbers, what each marks. The picture hides itself from screen
- * readers (the caption carries it); while its chart loads, its skeleton says so.
- */
 export function InfoFigure({ visual, annotations, place }: TInfoFigureProps) {
   const t = useTranslations();
   const source = t("info.figures.source", {
@@ -35,7 +30,6 @@ export function InfoFigure({ visual, annotations, place }: TInfoFigureProps) {
   );
 }
 
-/** An annotation's number in HTML — a caption line's, and a stats item's on the chart. */
 export function InfoFigureMarker({ number }: TInfoFigureMarkerProps) {
   return (
     <span className={C.MARKER} data-figure-marker={number}>

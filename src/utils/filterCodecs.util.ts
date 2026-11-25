@@ -20,7 +20,6 @@ function joinList(values: readonly (string | number)[]) {
   return values.join(FILTER_LIST_SEPARATOR);
 }
 
-/** Legacy links carried exactly two weather years, as year1 / year2. */
 function parseLegacyWeatherPeriods(params: URLSearchParams) {
   const years = (FILTERS_CONFIG[EFilterKey.WEATHER_PERIODS].legacyParams ?? []).map((param) =>
     parseYear(params.get(param)),
@@ -29,7 +28,6 @@ function parseLegacyWeatherPeriods(params: URLSearchParams) {
   return valid.length === years.length && valid.length > 0 ? valid : null;
 }
 
-/** Each filter's URL read/write pair: parse returns null for an absent or invalid value. */
 export const FILTER_CODECS: TFilterCodecs = {
   [EFilterKey.DATASET]: {
     parse: (params) => parseDataset(paramOf(EFilterKey.DATASET, params)),
@@ -49,7 +47,6 @@ export const FILTER_CODECS: TFilterCodecs = {
   },
   [EFilterKey.GRID_SIZE]: {
     parse: (params) => parseCellSize(paramOf(EFilterKey.GRID_SIZE, params)),
-    // * none chosen is the default, never written
     encode: (value) => value ?? "",
   },
   [EFilterKey.MONTHS]: {

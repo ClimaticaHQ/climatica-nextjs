@@ -9,12 +9,6 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useFilterView } from "./useFilterView";
 
-/**
- * Keeps the address matching what's rendered: when the URL's filter params aren't canonical
- * (a default written out, an invalid or legacy value, one normalization changed), replaces it
- * once with the canonical params. Canonical params are a fixed point, so this can't loop; the
- * write is guarded like useUrlStateSync's, so it never cancels a navigation or a restored entry.
- */
 export function useCanonicalFilterUrl() {
   const router = useRouter();
   const pathname = usePathname();

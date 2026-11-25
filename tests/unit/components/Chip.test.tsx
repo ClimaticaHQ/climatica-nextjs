@@ -22,7 +22,6 @@ const wrap = (node: ReactNode) =>
     </NextIntlClientProvider>,
   );
 
-/** A toggle chip's classes, with its text scale's own set aside: what's left is its state's look. */
 function stateClasses({ textScale, isActive }: { textScale: ETextScale; isActive: boolean }) {
   const label = `${textScale}-${isActive}`;
   wrap(<Chip label={label} disabled isActive={isActive} textScale={textScale} onClick={noop} />);

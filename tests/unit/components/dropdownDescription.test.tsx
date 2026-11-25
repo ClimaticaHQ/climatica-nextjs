@@ -30,7 +30,6 @@ describe("Dropdown: a disabled option's description", () => {
     expect(document.getElementById(descriptionId)?.textContent).toBe("Only for Climate 1970–2000");
     fireEvent.click(option);
     expect(onChange).not.toHaveBeenCalled();
-    // * an option without one has no description
     expect(screen.getByTestId("grid-2.5m").hasAttribute("aria-describedby")).toBe(false);
   });
 });

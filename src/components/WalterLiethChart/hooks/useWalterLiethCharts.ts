@@ -5,10 +5,6 @@ import { useTranslations } from "next-intl";
 import { useId, useMemo } from "react";
 import type { TUseWalterLiethChartsArgs } from "../WalterLiethChart.type";
 
-/**
- * useWalterLiethChart for a list of series drawn together (an overlay of any length): rows,
- * segments, summary and aria label per series, with pattern ids unique per series.
- */
 export function useWalterLiethCharts({ series, monthOrder }: TUseWalterLiethChartsArgs) {
   const t = useTranslations();
   const { formatValue } = useDisplayFormat();

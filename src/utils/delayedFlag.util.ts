@@ -1,9 +1,5 @@
 import type { TDelayedFlagArgs } from "@/types";
 
-/**
- * A flag that turns on only after its input has stayed on for delayMs, and off at once —
- * a loading state that never flickers for fast responses.
- */
 export function createDelayedFlag({ delayMs, onChange }: TDelayedFlagArgs) {
   let timer: ReturnType<typeof setTimeout> | null = null;
   let isOn = false;
