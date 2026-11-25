@@ -55,6 +55,11 @@ test.describe("Data update feedback", () => {
     const panelA = page.locator('[data-panel-series="a"]:not([inert] *)');
     const panelB = page.locator('[data-panel-series="b"]:not([inert] *)');
     await expect(panelB).toBeVisible({ timeout: 30_000 });
+    // * the first data landed: a change before them is part of the first load, which never
+    // * flashes (the skeleton panel is visible already)
+    await expect(page.getByTestId("climate-chart")).toHaveAttribute("aria-busy", "false", {
+      timeout: 30_000,
+    });
     await selectPagePeriod(page, "b", "c1981-2010");
 
     await expect(panelB).toHaveAttribute("data-update-flash", "active");
@@ -133,6 +138,11 @@ test.describe("Animation settings", () => {
     await page.goto(PERIODS_URL);
     const panelB = page.locator('[data-panel-series="b"]:not([inert] *)');
     await expect(panelB).toBeVisible({ timeout: 30_000 });
+    // * the first data landed: a change before them is part of the first load, which never
+    // * flashes (the skeleton panel is visible already)
+    await expect(page.getByTestId("climate-chart")).toHaveAttribute("aria-busy", "false", {
+      timeout: 30_000,
+    });
     await selectPagePeriod(page, "b", "c1981-2010");
 
     await expect(panelB).toHaveAttribute("data-update-flash", "active");

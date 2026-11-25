@@ -431,6 +431,11 @@ test.describe("Info pages on a phone", () => {
     page,
   }) => {
     await page.goto(CITY_URL);
+    // * hydrated: the chip is in the server's HTML, and a tap before hydration does nothing; the
+    // * chart turns not busy only on the client, once its data are in
+    await expect(page.getByTestId("climate-chart")).toHaveAttribute("aria-busy", "false", {
+      timeout: 30_000,
+    });
     await page.getByRole("button", { name: "Resolution: 30 sec" }).click();
     await page.getByRole("dialog").getByRole("link", { name: "What do resolutions mean?" }).click();
     await expect(page).toHaveURL(/\/about\/data#resolutions$/);
